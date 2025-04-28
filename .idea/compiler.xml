@@ -3,6 +3,7 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
       <module name="FinTrack.code.common" target="21" />
+      <module name="FinTrack.core.data" target="21" />
     </bytecodeTargetLevel>
   </component>
 </project>
