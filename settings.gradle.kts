@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "FinTrack"
 include(":app")
-include(":code:common")
+include(":core:common")
