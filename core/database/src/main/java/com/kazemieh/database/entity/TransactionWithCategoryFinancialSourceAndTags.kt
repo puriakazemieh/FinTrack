@@ -1,6 +1,7 @@
 package com.kazemieh.database.entity
 
 import androidx.room.Embedded
+import androidx.room.Junction
 import androidx.room.Relation
 
 data class TransactionWithCategoryFinancialSourceAndTags(
@@ -20,7 +21,12 @@ data class TransactionWithCategoryFinancialSourceAndTags(
 
     @Relation(
         parentColumn = "id",
-        entityColumn = "transactionId"
+        entityColumn = "id",
+        associateBy = Junction(
+            value = TransactionTagCrossRef::class,
+            parentColumn = "transactionId",
+            entityColumn = "tagId"
+        )
     )
     val tags: List<TagEntity>
 )
