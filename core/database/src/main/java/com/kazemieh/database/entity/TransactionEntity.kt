@@ -5,7 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 
-@Entity(tableName = "transaction",
+@Entity(tableName = "transactions",
     foreignKeys = [
         ForeignKey(entity = CategoryEntity::class,
             parentColumns = ["id"],
@@ -23,6 +23,5 @@ data class TransactionEntity(
     val categoryId: Long,
     val financialSourceId: Long,
     val description: String?,
-    val tags: String,
     val date: String
 )

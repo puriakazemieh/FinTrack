@@ -6,12 +6,13 @@ import com.kazemieh.database.entity.TagEntity
 @Dao
 interface TagDao {
 
+    @Insert
+    suspend fun insertTag(tag: TagEntity)
+
     @Query("SELECT * FROM tag")
     suspend fun getAllTags(): List<TagEntity>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTag(tag: TagEntity): Long
-
-    @Delete
-    suspend fun deleteTag(tag: TagEntity)
+    @Query("SELECT * FROM tag WHERE id = :tagId")
+    suspend fun getTagById(tagId: Long): TagEntity
 }
+

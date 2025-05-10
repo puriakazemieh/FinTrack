@@ -6,12 +6,13 @@ import com.kazemieh.database.entity.FinancialSourceEntity
 @Dao
 interface FinancialSourceDao {
 
+    @Insert
+    suspend fun insertFinancialSource(financialSource: FinancialSourceEntity)
+
     @Query("SELECT * FROM financial_source")
-    suspend fun getAllSources(): List<FinancialSourceEntity>
+    suspend fun getAllFinancialSources(): List<FinancialSourceEntity>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertSource(source: FinancialSourceEntity): Long
-
-    @Delete
-    suspend fun deleteSource(source: FinancialSourceEntity)
+    @Query("SELECT * FROM financial_source WHERE id = :financialSourceId")
+    suspend fun getFinancialSourceById(financialSourceId: Long): FinancialSourceEntity
 }
+

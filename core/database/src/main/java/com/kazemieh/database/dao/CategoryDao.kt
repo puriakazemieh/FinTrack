@@ -6,12 +6,12 @@ import com.kazemieh.database.entity.CategoryEntity
 @Dao
 interface CategoryDao {
 
+    @Insert
+    suspend fun insertCategory(category: CategoryEntity)
+
     @Query("SELECT * FROM category")
     suspend fun getAllCategories(): List<CategoryEntity>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCategory(category: CategoryEntity): Long
-
-    @Delete
-    suspend fun deleteCategory(category: CategoryEntity)
+    @Query("SELECT * FROM category WHERE id = :categoryId")
+    suspend fun getCategoryById(categoryId: Long): CategoryEntity
 }
