@@ -23,7 +23,7 @@ import com.kazemieh.database.entity.TransactionTagCrossRef
     ],
     version = 1
 )
-abstract class AppDatabase : RoomDatabase() {
+abstract class DatabaseModule : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun categoryDao(): CategoryDao
     abstract fun financialSourceDao(): FinancialSourceDao
