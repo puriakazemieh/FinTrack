@@ -6,9 +6,8 @@ import kotlinx.serialization.Serializable
 data class Transaction(
     val id: Long,
     val amount: Double,
-    val category: String,
-    val financialSource: String,
-    val description: String?,
-    val tags: List<String>,
+    val categoryId: Long,
+    val financialSourceId: Long,
+    val description: String? = null,
     val date: String
 )

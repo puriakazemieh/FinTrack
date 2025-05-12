@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+/.idea/developer-tools.xml
+/.idea/kotlinc.xml
