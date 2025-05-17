@@ -1,13 +1,25 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.ksp)
 }
 
-kotlin {
-    jvmToolchain(21)
+android {
+    namespace = "com.kazemieh.data"
+    compileSdk = 35
+    defaultConfig { minSdk = 24 }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    kotlinOptions { jvmTarget = "21" }
 }
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.core)
+    implementation(project(":core:model"))
+    implementation(project(":core:database"))
 }
