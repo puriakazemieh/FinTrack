@@ -45,4 +45,6 @@ dependencies {
 
     implementation(libs.koin.android) 
     implementation(libs.koin.core)
+    implementation(project(":core:model"))
+    implementation(project(":core:data"))
 }

@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Delete
 import androidx.room.Transaction
+import androidx.room.Update
 import com.kazemieh.database.entity.TransactionEntity
 import com.kazemieh.database.entity.TransactionWithCategoryFinancialSourceAndTags
 
@@ -13,6 +14,9 @@ interface TransactionDao {
 
     @Insert
     suspend fun insertTransaction(transaction: TransactionEntity)
+
+    @Update
+    suspend fun updateTransaction(transaction: TransactionEntity)
 
     @Transaction
     @Query("SELECT * FROM transactions")
