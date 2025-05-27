@@ -4,6 +4,7 @@
     <bytecodeTargetLevel>
       <module name="FinTrack.code.common" target="21" />
       <module name="FinTrack.core.data.test" target="21" />
+      <module name="FinTrack.core.domain" target="21" />
     </bytecodeTargetLevel>
   </component>
 </project>
