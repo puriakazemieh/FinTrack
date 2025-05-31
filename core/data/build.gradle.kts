@@ -22,4 +22,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(project(":core:model"))
     implementation(project(":core:database"))
+    implementation(project(":core:domain"))
+
+    implementation(libs.koin.core)
 }
