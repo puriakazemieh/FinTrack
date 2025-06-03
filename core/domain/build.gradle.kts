@@ -12,4 +12,5 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:common"))
     implementation(libs.koin.core)
+    implementation(libs.kotlinx.coroutines.core)
 }

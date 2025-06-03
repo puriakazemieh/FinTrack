@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Transaction</string>
+    <string name="delete_transaction">تراکنش حذف شد</string>
+    <string name="delete">حذف</string>
+    <string name="amount">مبلغ</string>
+    <string name="category">دسته</string>
+    <string name="financial_source">منبع مالی</string>
+    <string name="tags">تگ‌ها</string>
+    <string name="transaction_deleted">تراکنش حذف شد</string>
 </resources>

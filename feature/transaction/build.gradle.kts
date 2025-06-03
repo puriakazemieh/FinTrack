@@ -48,4 +48,18 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
 
     implementation(libs.kotlinx.serialization.json)
+
+    implementation(project(":core:model"))
+    implementation(project(":core:domain"))
+
+
+    implementation(libs.koin.viewmodel)
+    implementation(libs.koin.navigation)
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.core)
+    runtimeOnly(libs.koin.compose)
+    runtimeOnly(libs.koin.core)
+
+
 }
