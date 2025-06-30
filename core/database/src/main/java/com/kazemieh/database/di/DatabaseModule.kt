@@ -1,8 +1,10 @@
 package com.kazemieh.database.di
 
 import androidx.room.Room
+import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
 import org.koin.dsl.module
 import com.kazemieh.database.DatabaseModule
+import com.kazemieh.database.datasource.TransactionLocalDataSourceImpl
 import org.koin.android.ext.koin.androidContext
 
 val databaseModule = module {
@@ -21,4 +23,9 @@ val databaseModule = module {
     single { get<DatabaseModule>().financialSourceDao() }
     single { get<DatabaseModule>().tagDao() }
     single { get<DatabaseModule>().transactionTagCrossRefDao() }
+
+
+    single<TransactionLocalDataSource> {
+        TransactionLocalDataSourceImpl(get())
+    }
 }

@@ -3,7 +3,6 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
       <module name="FinTrack.code.common" target="21" />
-      <module name="FinTrack.core.data-contract.test" target="21" />
       <module name="FinTrack.core.data.test" target="21" />
     </bytecodeTargetLevel>
   </component>

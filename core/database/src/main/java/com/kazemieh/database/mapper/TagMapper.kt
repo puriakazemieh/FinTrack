@@ -1,4 +1,4 @@
-package com.kazemieh.data.mapper
+package com.kazemieh.database.mapper
 
 import com.kazemieh.database.entity.TagEntity
 import com.kazemieh.model.Tag

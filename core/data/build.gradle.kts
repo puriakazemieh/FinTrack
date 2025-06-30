@@ -21,8 +21,8 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.core)
     implementation(project(":core:model"))
-    implementation(project(":core:database"))
     implementation(project(":core:domain"))
+    implementation(project(":core:data-contract"))
 
     implementation(libs.koin.core)
 }

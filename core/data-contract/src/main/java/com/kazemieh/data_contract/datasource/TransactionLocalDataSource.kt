@@ -1,4 +1,4 @@
-package com.kazemieh.data.datasource
+package com.kazemieh.data_contract.datasource
 
 import com.kazemieh.model.Transaction
 import com.kazemieh.model.TransactionWithRelations

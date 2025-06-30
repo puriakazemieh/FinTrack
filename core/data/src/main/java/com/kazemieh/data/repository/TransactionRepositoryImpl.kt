@@ -1,6 +1,6 @@
 package com.kazemieh.data.repository
 
-import com.kazemieh.data.datasource.TransactionLocalDataSource
+import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
 import com.kazemieh.domain.repository.TransactionRepository
 import com.kazemieh.model.Transaction
 import com.kazemieh.model.TransactionWithRelations
