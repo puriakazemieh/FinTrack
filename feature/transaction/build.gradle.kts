@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -27,6 +28,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.12"
+    }
+
     kotlinOptions {
         jvmTarget = "21"
     }
@@ -35,7 +41,6 @@ android {
 dependencies {
 
 
-    implementation(libs.koin.android)
 
     // Compose
     implementation(libs.androidx.compose.ui)
@@ -52,14 +57,9 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:domain"))
 
-
-    implementation(libs.koin.viewmodel)
-    implementation(libs.koin.navigation)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
-    implementation(libs.koin.core)
-    runtimeOnly(libs.koin.compose)
-    runtimeOnly(libs.koin.core)
+    implementation(libs.koin.navigation)
 
 
 }

@@ -43,7 +43,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
 
-    implementation(libs.koin.android) 
+    implementation(libs.koin.android)
     implementation(libs.koin.core)
     implementation(project(":core:model"))
     implementation(project(":core:data-contract"))

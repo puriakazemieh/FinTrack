@@ -7,12 +7,16 @@ import com.kazemieh.domain.usecase.TransactionUseCases
 import org.koin.dsl.module
 
 val domainModule = module {
+    factory { AddTransaction(get()) }
+    factory { DeleteTransaction(get()) }
+    factory { GetAllTransactions(get()) }
 
     single {
         TransactionUseCases(
-            addTransaction = AddTransaction(get()),
-            deleteTransaction = DeleteTransaction(get()),
-            getAllTransactions = GetAllTransactions(get())
+            addTransaction = get(),
+            deleteTransaction = get(),
+            getAllTransactions = get()
         )
     }
+
 }

@@ -20,9 +20,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.model.TransactionWithRelations
 import com.kazemieh.transaction.R
-import org.koin.androidx.compose.koinViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.lazy.items
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TransactionScreen(

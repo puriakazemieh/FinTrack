@@ -28,12 +28,19 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
+
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "21"
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.12"
+    }
+
+
     buildFeatures {
         compose = true
     }
@@ -56,4 +63,15 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.koin.core)
+
+    implementation(project(":core:data"))
+    implementation(project(":core:database"))
+    implementation(project(":core:domain"))
+    implementation(project(":feature:transaction"))
+
+
+    implementation(libs.koin.android)
+
+
 }
