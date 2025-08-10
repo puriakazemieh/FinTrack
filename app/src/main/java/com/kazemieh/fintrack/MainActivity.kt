@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.kazemieh.fintrack.ui.theme.FinTrackTheme
 import com.kazemieh.transaction.ui.TransactionScreen
+import com.kazemieh.transaction.ui.add.AddTransactionScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +26,10 @@ class MainActivity : ComponentActivity() {
                     Box(modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)) {
-                        TransactionScreen()
+//                        TransactionScreen()
+                        AddTransactionScreen{
+
+                        }
                     }
                 }
             }

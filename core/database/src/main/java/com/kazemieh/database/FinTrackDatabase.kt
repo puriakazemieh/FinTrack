@@ -21,7 +21,8 @@ import com.kazemieh.database.entity.TransactionTagCrossRef
         TagEntity::class,
         TransactionTagCrossRef::class,
     ],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
 abstract class DatabaseModule : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao

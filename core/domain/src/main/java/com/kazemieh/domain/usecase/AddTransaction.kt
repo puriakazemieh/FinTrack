@@ -6,7 +6,7 @@ import com.kazemieh.model.Transaction
 class AddTransaction(
     private val repository: TransactionRepository
 ) {
-    suspend operator fun invoke(transaction: Transaction) {
-        repository.addTransaction(transaction)
+    suspend operator fun invoke(transaction: Transaction, tagIds: List<Long>) {
+        repository.insertTransaction(transaction, tagIds)
     }
 }

@@ -26,6 +26,6 @@ val databaseModule = module {
 
 
     single<TransactionLocalDataSource> {
-        TransactionLocalDataSourceImpl(get())
+        TransactionLocalDataSourceImpl(get(),get(),get(),get())
     }
 }

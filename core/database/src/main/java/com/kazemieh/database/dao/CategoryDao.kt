@@ -1,7 +1,10 @@
 package com.kazemieh.database.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
 import com.kazemieh.database.entity.CategoryEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CategoryDao {
@@ -10,8 +13,8 @@ interface CategoryDao {
     suspend fun insertCategory(category: CategoryEntity)
 
     @Query("SELECT * FROM category")
-    suspend fun getAllCategories(): List<CategoryEntity>
+    fun getAllCategories(): Flow<List<CategoryEntity>>
 
     @Query("SELECT * FROM category WHERE id = :categoryId")
-    suspend fun getCategoryById(categoryId: Long): CategoryEntity
+    fun getCategoryById(categoryId: Long): Flow<CategoryEntity>
 }
