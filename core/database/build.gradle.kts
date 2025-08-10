@@ -48,5 +48,5 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:data-contract"))
 
-    implementation(libs.androidx.room.migration.jvm)
+//    implementation(libs.androidx.room.migration.jvm)
 }

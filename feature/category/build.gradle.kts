@@ -5,43 +5,19 @@ plugins {
 }
 
 android {
-    namespace = "com.kazemieh.transaction"
+    namespace = "com.kazemieh.category"
     compileSdk = 35
-//    compileSdk = 35
 
-//    defaultConfig {
-//        minSdk = 24
-//        targetSdk = 35
-//
-//        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-//    }
-//
-//    buildTypes {
-//        release {
-//            isMinifyEnabled = false
-//            proguardFiles(
-//                getDefaultProguardFile("proguard-android-optimize.txt"),
-//                "proguard-rules.pro"
-//            )
-//        }
-//    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.12"
-    }
-
     kotlinOptions {
         jvmTarget = "21"
     }
 }
 
 dependencies {
-
-
 
     // Compose
     implementation(libs.androidx.compose.ui)
@@ -61,9 +37,4 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
     implementation(libs.koin.navigation)
-
-    implementation(libs.androidx.foundation)
-
-
-
 }
