@@ -38,7 +38,7 @@ class TransactionLocalDataSourceImpl(
     ) {
         val transactionId = transactionDao.insertTransaction(transaction.toTransactionEntity())
 
-        tagIds.forEach { tagId ->
+        tagIds?.forEach { tagId ->
             transactionDao.insertTransactionTagCrossRef(
                 TransactionTagCrossRef(
                     transactionId = transactionId,

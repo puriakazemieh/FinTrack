@@ -23,13 +23,19 @@ class MainActivity : ComponentActivity() {
         setContent {
             FinTrackTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Box(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)) {
-//                        TransactionScreen()
-                        AddTransactionScreen{
-
-                        }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                    ) {
+                        TransactionScreen()
+//                        AddTransactionScreen{}
+//                        AddCategoryScreen{}
+//                        CategoryListScreen{}
+//                        FinancialSourceListScreen{}
+//                        AddFinancialSourceScreen{}
+//                        AddTagScreen {}
+//                        TagListScreen {}
                     }
                 }
             }
