@@ -14,7 +14,11 @@ interface TransactionLocalDataSource {
     fun getAll(): Flow<List<TransactionWithRelations>>
     fun getByCategory(categoryId: Long): Flow<List<TransactionWithRelations>>
     fun getByFinancialSource(sourceId: Long): Flow<List<TransactionWithRelations>>
-//    fun getByTag(tagName: String): Flow<List<TransactionWithRelations>>
+
+    //    fun getByTag(tagName: String): Flow<List<TransactionWithRelations>>
+    suspend fun insertCategory(categoryName: String): Long
+    suspend fun insertFinancialSource(financialSourceName: String): Long
+    suspend fun insertTag(tagName: String): Long
     suspend fun getAllCategory(): Flow<List<Category>>
     suspend fun getAllFinancialSource(): Flow<List<FinancialSource>>
     suspend fun getAllTag(): Flow<List<Tag>>

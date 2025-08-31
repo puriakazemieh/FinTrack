@@ -69,6 +69,10 @@ dependencies {
     implementation(project(":core:database"))
     implementation(project(":core:domain"))
     implementation(project(":feature:transaction"))
+    implementation(project(":feature:category"))
+    implementation(project(":feature:FinancialSource"))
+    implementation(project(":feature:Tag"))
+    implementation(project(":feature:backup"))
 
 
     implementation(libs.koin.android)

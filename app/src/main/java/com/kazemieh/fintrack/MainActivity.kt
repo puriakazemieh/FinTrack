@@ -12,7 +12,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.kazemieh.backup.ui.BackupScreen
+import com.kazemieh.category.ui.CategoryListScreen
+import com.kazemieh.category.ui.add.AddCategoryScreen
+import com.kazemieh.financialsource.ui.FinancialSourceListScreen
+import com.kazemieh.financialsource.ui.add.AddFinancialSourceScreen
 import com.kazemieh.fintrack.ui.theme.FinTrackTheme
+import com.kazemieh.tag.ui.TagListScreen
+import com.kazemieh.tag.ui.add.AddTagScreen
 import com.kazemieh.transaction.ui.TransactionScreen
 import com.kazemieh.transaction.ui.add.AddTransactionScreen
 
@@ -28,7 +35,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .padding(innerPadding)
                     ) {
-                        TransactionScreen()
+//                        TransactionScreen()
 //                        AddTransactionScreen{}
 //                        AddCategoryScreen{}
 //                        CategoryListScreen{}
@@ -36,6 +43,7 @@ class MainActivity : ComponentActivity() {
 //                        AddFinancialSourceScreen{}
 //                        AddTagScreen {}
 //                        TagListScreen {}
+                        BackupScreen()
                     }
                 }
             }

@@ -29,8 +29,16 @@ class TransactionRepositoryImpl(
         return localDataSource.getAllCategory()
     }
 
-    override suspend fun insertTag(tagName: String) {
-        localDataSource.insertTag(tagName)
+    override suspend fun insertTag(tagName: String): Long {
+        return localDataSource.insertTag(tagName)
+    }
+
+    override suspend fun insertCategory(categoryName: String): Long {
+        return localDataSource.insertCategory(categoryName)
+    }
+
+    override suspend fun insertFinancialSource(financialSourceName: String): Long {
+        return localDataSource.insertFinancialSource(financialSourceName)
     }
 
     override suspend fun getAllFinancialSource(): Flow<List<FinancialSource>> {
