@@ -42,10 +42,22 @@ class TransactionViewModel(
     private fun loadTransactions() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            transactionUseCases.getAllTransactions().collect { result ->
+            transactionUseCases.getAllTransactions().collect { transactions ->
+                val totalIncome = transactions
+                    .filter { it.transaction.amount > 0 }
+                    .sumOf { it.transaction.amount }
+
+                val totalExpense = transactions
+                    .filter { it.transaction.amount < 0 }
+                    .sumOf { it.transaction.amount }
+
+                val balance = totalIncome + totalExpense
                 _state.update {
                     it.copy(
-                        transactions = result,
+                        transactions = transactions,
+                        totalIncome = totalIncome,
+                        totalExpense = totalExpense,
+                        balance = balance,
                         isLoading = false
                     )
                 }

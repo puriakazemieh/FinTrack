@@ -72,7 +72,7 @@ class AddTransactionViewModel(
 
     private fun submitTransaction() {
         val current = _state.value
-        val amount = current.amount.toDoubleOrNull()
+        val amount = current.amount.toDoubleOrNull()?.times(if (current.isIncome) 1 else -1)
         val categoryId = current.selectedCategory?.id
         val sourceId = current.selectedFinancialSource?.id
 
