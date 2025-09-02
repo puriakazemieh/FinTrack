@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 interface CategoryDao {
 
     @Insert
-    suspend fun insertCategory(category: CategoryEntity)
+    suspend fun insertCategory(category: CategoryEntity): Long
 
     @Query("SELECT * FROM category")
     fun getAllCategories(): Flow<List<CategoryEntity>>

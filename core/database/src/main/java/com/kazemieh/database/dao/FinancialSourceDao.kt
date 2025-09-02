@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface FinancialSourceDao {
 
     @Insert
-    suspend fun insertFinancialSource(financialSource: FinancialSourceEntity)
+    suspend fun insertFinancialSource(financialSource: FinancialSourceEntity): Long
 
     @Query("SELECT * FROM financial_source")
     fun getAllFinancialSources(): Flow<List<FinancialSourceEntity>>
