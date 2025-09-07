@@ -10,10 +10,10 @@ class AddFinancialSourceViewModel(
     private val addFinancialSourceUseCase: AddFinancialSource
 ) : ViewModel() {
 
-    fun addFinancialSource(name: String) {
+    fun addFinancialSource(name: String,balance: Double = 0.0) {
         viewModelScope.launch {
             if (name.isNotBlank()) {
-                addFinancialSourceUseCase(name)
+                addFinancialSourceUseCase(name,balance)
             }
         }
     }

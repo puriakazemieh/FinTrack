@@ -23,6 +23,7 @@
             <option value="$PROJECT_DIR$/feature/FinancialSource" />
             <option value="$PROJECT_DIR$/feature/Tag" />
             <option value="$PROJECT_DIR$/feature/category" />
+            <option value="$PROJECT_DIR$/feature/dashboard" />
             <option value="$PROJECT_DIR$/feature/transaction" />
           </set>
         </option>

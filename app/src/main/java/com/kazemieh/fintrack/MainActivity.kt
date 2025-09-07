@@ -10,12 +10,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.kazemieh.backup.ui.BackupScreen
 import com.kazemieh.category.ui.CategoryListScreen
 import com.kazemieh.category.ui.add.AddCategoryScreen
+import com.kazemieh.dashboard.DashboardScreen
 import com.kazemieh.financialsource.ui.FinancialSourceListScreen
+import com.kazemieh.financialsource.ui.add.AddFinancialSourceBottomSheet
 import com.kazemieh.financialsource.ui.add.AddFinancialSourceScreen
 import com.kazemieh.fintrack.ui.theme.FinTrackTheme
 import com.kazemieh.tag.ui.TagListScreen
@@ -35,6 +40,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .padding(innerPadding)
                     ) {
+                        var showAddSource by remember { mutableStateOf(false) }
 //                        TransactionScreen()
 //                        AddTransactionScreen{}
 //                        AddCategoryScreen{}
@@ -43,7 +49,25 @@ class MainActivity : ComponentActivity() {
 //                        AddFinancialSourceScreen{}
 //                        AddTagScreen {}
 //                        TagListScreen {}
-                        BackupScreen()
+
+                        DashboardScreen(
+                            onNavigateAddSource = {
+                                showAddSource = true
+                            },
+                            onNavigateAddTransaction = {
+
+                            }
+                        )
+                        if (showAddSource) {
+                            AddFinancialSourceBottomSheet(
+                                onDismiss = {
+                                    showAddSource = false
+                                },
+                                onFinancialSourceAdded = {
+                                    showAddSource = false
+                                }
+                            )
+                        }
                     }
                 }
             }

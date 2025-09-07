@@ -80,8 +80,16 @@ class TransactionLocalDataSourceImpl(
         return categoryDao.insertCategory(CategoryEntity(name = categoryName))
     }
 
-    override suspend fun insertFinancialSource(financialSourceName: String): Long {
-        return financialSourceDao.insertFinancialSource(FinancialSourceEntity(name = financialSourceName))
+    override suspend fun insertFinancialSource(
+        financialSourceName: String,
+        balance: Double
+    ): Long {
+        return financialSourceDao.insertFinancialSource(
+            FinancialSourceEntity(
+                name = financialSourceName,
+                balance = balance
+            )
+        )
     }
 
     override suspend fun insertTag(tagName: String): Long {

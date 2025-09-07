@@ -5,12 +5,12 @@ import com.kazemieh.domain.usecase.AddFinancialSource
 import com.kazemieh.domain.usecase.AddTag
 import com.kazemieh.domain.usecase.AddTransaction
 import com.kazemieh.domain.usecase.DeleteTransaction
-import com.kazemieh.domain.usecase.ExportTransactionsUseCase
+//import com.kazemieh.domain.usecase.ExportTransactionsUseCase
 import com.kazemieh.domain.usecase.GetAllCategory
 import com.kazemieh.domain.usecase.GetAllFinancialSource
 import com.kazemieh.domain.usecase.GetAllTag
 import com.kazemieh.domain.usecase.GetAllTransactions
-import com.kazemieh.domain.usecase.ImportTransactionsUseCase
+//import com.kazemieh.domain.usecase.ImportTransactionsUseCase
 import com.kazemieh.domain.usecase.TransactionUseCases
 import org.koin.dsl.module
 
@@ -24,8 +24,9 @@ val domainModule = module {
     factory { AddCategory(get()) }
     factory { AddFinancialSource(get()) }
     factory { AddTag(get()) }
-    factory { ExportTransactionsUseCase(get()) }
-    factory { ImportTransactionsUseCase(get()) }
+    factory { AddTag(get()) }
+//    factory { ExportTransactionsUseCase(get()) }
+//    factory { ImportTransactionsUseCase(get()) }
 
 
     single {

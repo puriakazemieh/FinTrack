@@ -8,5 +8,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FinancialSourceEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val name: String
+    val name: String,
+    val balance: Double = 0.0
 )
