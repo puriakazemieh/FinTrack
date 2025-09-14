@@ -21,7 +21,6 @@ import com.kazemieh.category.ui.add.AddCategoryScreen
 import com.kazemieh.dashboard.DashboardScreen
 import com.kazemieh.financialsource.ui.FinancialSourceListScreen
 import com.kazemieh.financialsource.ui.add.AddFinancialSourceBottomSheet
-import com.kazemieh.financialsource.ui.add.AddFinancialSourceScreen
 import com.kazemieh.fintrack.ui.theme.FinTrackTheme
 import com.kazemieh.tag.ui.TagListScreen
 import com.kazemieh.tag.ui.add.AddTagScreen
@@ -41,6 +40,7 @@ class MainActivity : ComponentActivity() {
                             .padding(innerPadding)
                     ) {
                         var showAddSource by remember { mutableStateOf(false) }
+                        var showAddTransaction by remember { mutableStateOf(false) }
 //                        TransactionScreen()
 //                        AddTransactionScreen{}
 //                        AddCategoryScreen{}
@@ -55,7 +55,10 @@ class MainActivity : ComponentActivity() {
                                 showAddSource = true
                             },
                             onNavigateAddTransaction = {
-
+                                showAddTransaction = true
+                            },
+                            onShowAllTransaction = {
+                                TransactionScreen()
                             }
                         )
                         if (showAddSource) {
@@ -65,6 +68,17 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onFinancialSourceAdded = {
                                     showAddSource = false
+                                }
+                            )
+                        }
+
+                        if (showAddTransaction) {
+                            AddTransactionScreen(
+                                onDismiss = {
+                                    showAddTransaction = false
+                                },
+                                onFinancialSourceAdded = {
+                                    showAddTransaction = false
                                 }
                             )
                         }

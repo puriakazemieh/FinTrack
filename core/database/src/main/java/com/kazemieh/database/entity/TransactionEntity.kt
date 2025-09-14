@@ -5,21 +5,27 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 
-@Entity(tableName = "transactions",
+@Entity(
+    tableName = "transactions",
     foreignKeys = [
-        ForeignKey(entity = CategoryEntity::class,
+        ForeignKey(
+            entity = CategoryEntity::class,
             parentColumns = ["id"],
             childColumns = ["categoryId"],
-            onDelete = ForeignKey.CASCADE),
-        ForeignKey(entity = FinancialSourceEntity::class,
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = FinancialSourceEntity::class,
             parentColumns = ["id"],
             childColumns = ["financialSourceId"],
-            onDelete = ForeignKey.CASCADE)
-    ])
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
 @Serializable
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val amount: Double,
+    val amount: Int,
     val categoryId: Long,
     val financialSourceId: Long,
     val description: String?,

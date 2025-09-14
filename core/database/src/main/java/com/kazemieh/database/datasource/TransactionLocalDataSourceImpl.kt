@@ -82,7 +82,7 @@ class TransactionLocalDataSourceImpl(
 
     override suspend fun insertFinancialSource(
         financialSourceName: String,
-        balance: Double
+        balance: Int
     ): Long {
         return financialSourceDao.insertFinancialSource(
             FinancialSourceEntity(

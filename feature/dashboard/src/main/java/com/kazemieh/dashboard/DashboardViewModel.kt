@@ -2,21 +2,19 @@ package com.kazemieh.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.domain.usecase.GetAllFinancialSource
 import com.kazemieh.domain.usecase.TransactionUseCases
 import com.kazemieh.model.FinancialSource
 import com.kazemieh.model.TransactionWithRelations
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 
 data class DashboardState(
-    val totalBalance: Double = 0.0,
-    val totalIncome: Double = 0.0,
-    val totalExpense: Double = 0.0,
+    val totalBalance: Int = 0,
+    val totalIncome: Int = 0,
+    val totalExpense: Int = 0,
 
     val financialSources: List<FinancialSource> = emptyList(),
 
@@ -31,8 +29,7 @@ sealed interface DashboardEvent {
 }
 
 class DashboardViewModel(
-    private val transactionUseCases: TransactionUseCases,
-    private val getAllFinancialSource: GetAllFinancialSource
+    private val transactionUseCases: TransactionUseCases
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DashboardState())
@@ -56,7 +53,7 @@ class DashboardViewModel(
         viewModelScope.launch {
             combine(
                 transactionUseCases.getAllTransactions(),
-                getAllFinancialSource()
+                transactionUseCases.getAllFinancialSource()
             ) { transactions, sources ->
                 val totalIncome = transactions
                     .filter { it.transaction.amount > 0 }

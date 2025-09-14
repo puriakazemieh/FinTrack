@@ -11,9 +11,9 @@ sealed interface TransactionEvent {
 data class TransactionState(
     val transactions: List<TransactionWithRelations> = emptyList(),
     val isLoading: Boolean = false,
-    val balance: Double = 0.0,
-    val totalIncome: Double = 0.0,
-    val totalExpense: Double = 0.0,
+    val balance: Int = 0,
+    val totalIncome: Int = 0,
+    val totalExpense: Int = 0,
     val error: String? = null
 )
 

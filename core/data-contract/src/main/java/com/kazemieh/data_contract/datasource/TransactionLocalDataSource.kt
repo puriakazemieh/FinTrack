@@ -17,7 +17,7 @@ interface TransactionLocalDataSource {
 
     //    fun getByTag(tagName: String): Flow<List<TransactionWithRelations>>
     suspend fun insertCategory(categoryName: String): Long
-    suspend fun insertFinancialSource(financialSourceName: String, balance: Double = 0.0): Long
+    suspend fun insertFinancialSource(financialSourceName: String, balance: Int = 0): Long
     suspend fun insertTag(tagName: String): Long
     suspend fun getAllCategory(): Flow<List<Category>>
     suspend fun getAllFinancialSource(): Flow<List<FinancialSource>>

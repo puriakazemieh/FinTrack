@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.core)
     implementation(project(":core:model"))
+    implementation(project(":core:common"))
     implementation(project(":core:data-contract"))
 
 //    implementation(libs.androidx.room.migration.jvm)

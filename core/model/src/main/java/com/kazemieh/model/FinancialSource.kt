@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class FinancialSource(
     val id: Long,
     val name: String,
-    val balance: Double = 0.0
+    val balance: Int = 0
 )
