@@ -7,7 +7,10 @@ import kotlinx.serialization.Serializable
 @Entity(tableName = "financial_source")
 @Serializable
 data class FinancialSourceEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey(autoGenerate = true) val id: Long? = 0,
     val name: String,
-    val balance: Int = 0
-)
+    val balance: Int = 0,
+    val cardNumber: String? = null,
+    val description: String? = null,
+    val type: Int? = null,
+    )

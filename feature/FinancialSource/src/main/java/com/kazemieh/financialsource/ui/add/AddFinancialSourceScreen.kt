@@ -1,6 +1,9 @@
 package com.kazemieh.financialsource.ui.add
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -8,19 +11,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.kazemieh.common.ld
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,60 +43,130 @@ fun AddFinancialSourceBottomSheet(
     onDismiss: () -> Unit,
     onFinancialSourceAdded: () -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
-    var balance by remember { mutableIntStateOf(0) }
+
+    val state by viewModel.state.collectAsState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    if (state.addedFinancialSource) {
+        onFinancialSourceAdded()
+    }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
+        sheetState = sheetState
     ) {
-        Column(
-            Modifier
+
+        Box(
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
         ) {
-            Text("افزودن منبع جدید", style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("نام منبع") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = if (balance == 0) "" else balance.toString(),
-                onValueChange = { input ->
-                    val newValue = input.toIntOrNull()
-                    if (newValue != null) {
-                        balance = newValue
-                    } else if (input.isEmpty()) {
-                        balance = 0
-                    }
-                },
-                label = { Text("مقدار اولیه") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number
-                )
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    if (name.isNotBlank()) {
-                        viewModel.addFinancialSource(name, balance)
-                        onFinancialSourceAdded()
-                        onDismiss()
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("ذخیره")
+                SingleChoiceSegmentedButtonRow(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    SelectedTypeFinancialSource.entries.forEachIndexed { index, option ->
+                        SegmentedButton(
+                            selected = state.selectedTypeFinancialSource == option,
+                            onClick = {
+                                viewModel.onIntent(AddFinancialSourceIntent.SelectedType(option))
+                            },
+                            shape = SegmentedButtonDefaults.itemShape(
+                                index = index,
+                                count = 2
+                            )
+                        ) {
+                            Text(stringResource(option.value))
+                        }
+                    }
+                }
+
+                OutlinedTextField(
+                    value = state.sourceName ?: "",
+                    onValueChange = { viewModel.onIntent(AddFinancialSourceIntent.SetSourceName(it)) },
+                    label = {
+                        Row {
+                            Text("نام منبع")
+                            Text("*", color = Color.Red)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = if (state.balance == 0) "" else state.balance.toString(),
+                    onValueChange = { input ->
+                        val newValue = input.toIntOrNull()
+                        if (newValue != null) viewModel.onIntent(
+                            AddFinancialSourceIntent.SetBalance(newValue)
+                        )
+                        else if (input.isEmpty()) viewModel.onIntent(
+                            AddFinancialSourceIntent.SetBalance(0)
+                        )
+                    },
+                    label = { Text("مبلغ اولیه") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+
+                if (state.selectedTypeFinancialSource == SelectedTypeFinancialSource.CREDIT) {
+                    OutlinedTextField(
+                        value = state.cardNumber ?: "",
+                        onValueChange = {
+                            viewModel.onIntent(
+                                AddFinancialSourceIntent.SetCardNumber(it)
+                            )
+                        },
+                        label = { Text("شماره کارت") },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                }
+
+
+                OutlinedTextField(
+                    value = state.description ?: "",
+                    onValueChange = { viewModel.onIntent(AddFinancialSourceIntent.SetDescription(it)) },
+                    label = { Text("توضیحات") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                // ✅ دکمه ثبت
+                Button(
+                    onClick = {
+                        if (state.sourceName?.isNotEmpty() == true) {
+                            viewModel.onIntent(AddFinancialSourceIntent.AddFinancialSource)
+                        } else {
+                            ld("AddFinancialSourceBottomSheet")
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = "لطفاً نام منبع را وارد کنید",
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("ثبت منبع")
+                }
+
             }
+
+            Box {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
+            }
+
         }
     }
 }

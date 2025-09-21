@@ -9,16 +9,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class CategoryState(
-    val financialSource: List<FinancialSource> = emptyList(),
-    val isLoading: Boolean = false
-)
-
 class FinancialSourceViewModel(
     private val getAllFinancialSource: GetAllFinancialSource
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(CategoryState())
+    private val _state = MutableStateFlow(FinancialSourceState())
     val state = _state.asStateFlow()
 
     init {
@@ -34,3 +29,8 @@ class FinancialSourceViewModel(
         }
     }
 }
+
+data class FinancialSourceState(
+    val financialSource: List<FinancialSource> = emptyList(),
+    val isLoading: Boolean = false
+)

@@ -37,8 +37,8 @@ class TransactionRepositoryImpl(
         return localDataSource.insertCategory(categoryName)
     }
 
-    override suspend fun insertFinancialSource(financialSourceName: String, balance: Int): Long {
-        return localDataSource.insertFinancialSource(financialSourceName, balance)
+    override suspend fun insertFinancialSource(financialSource: FinancialSource): Long? {
+        return localDataSource.insertFinancialSource(financialSource)
     }
 
     override suspend fun getAllFinancialSource(): Flow<List<FinancialSource>> {

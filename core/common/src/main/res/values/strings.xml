@@ -1,0 +1,4 @@
+<resources>
+    <string name="cash_">نقدی</string>
+    <string name="credit_">کارت بانکی</string>
+</resources>
