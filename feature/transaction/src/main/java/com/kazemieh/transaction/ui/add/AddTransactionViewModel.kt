@@ -35,7 +35,7 @@ class AddTransactionViewModel(
             is AddTransactionEvent.SetCategory -> _state.update { it.copy(selectedCategory = event.category) }
             is AddTransactionEvent.SetFinancialSource -> _state.update {
                 it.copy(
-                    selectedFinancialSource = event.financialSource
+                    selectedFinancialSource = event.addedFinancialSource,
                 )
             }
 
@@ -50,6 +50,19 @@ class AddTransactionViewModel(
             AddTransactionEvent.Submit -> submitTransaction()
             AddTransactionEvent.LoadInitialData -> loadInitialData()
             is AddTransactionEvent.SetIsIncome -> _state.update { it.copy(isIncome = event.isIncome) }
+            AddTransactionEvent.OnDismiss -> {
+                viewModelScope.launch {
+                    _state.update { AddTransactionState() }
+                    _effect.send(AddTransactionEffect.OnDismiss)
+                }
+            }
+
+            AddTransactionEvent.OnFinancialSourceClicked ->{
+                viewModelScope.launch {
+                    _state.update { AddTransactionState() }
+                    _effect.send(AddTransactionEffect.OnFinancialSourceClicked)
+                }
+            }
         }
     }
 
@@ -74,7 +87,7 @@ class AddTransactionViewModel(
         val current = _state.value
         val amount = current.amount.toIntOrNull()?.times(if (current.isIncome) 1 else -1)
         val categoryId = current.selectedCategory?.id
-        val sourceId = current.selectedFinancialSource?.id
+        val sourceId = current.selectedFinancialSource?.first
 
         if (amount == null || categoryId == null || sourceId == null) {
             viewModelScope.launch {
@@ -87,7 +100,7 @@ class AddTransactionViewModel(
             id = 0L,
             amount = amount,
             categoryId = categoryId,
-            financialSourceId = sourceId,
+            financialSourceId = sourceId.toLong(),
             description = current.description,
             date = current.selectedDate
         )
@@ -100,6 +113,7 @@ class AddTransactionViewModel(
                     current.selectedTags.filter { it.id != null }.map { it.id!! })
                 _state.update { it.copy(isLoading = false, isSuccess = true) }
                 _effect.send(AddTransactionEffect.Success)
+                _state.update { AddTransactionState() }
             } catch (e: Exception) {
                 _state.update { it.copy(isLoading = false) }
                 _effect.send(AddTransactionEffect.Error(e.message ?: "خطا در ثبت تراکنش"))

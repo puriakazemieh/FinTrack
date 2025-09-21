@@ -8,22 +8,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.kazemieh.category.ui.CategoryListScreen
-import com.kazemieh.category.ui.add.AddCategoryScreen
 import com.kazemieh.dashboard.DashboardScreen
 import com.kazemieh.financialsource.ui.FinancialSourceListScreen
 import com.kazemieh.financialsource.ui.add.AddFinancialSourceBottomSheet
 import com.kazemieh.fintrack.ui.theme.FinTrackTheme
-import com.kazemieh.tag.ui.TagListScreen
-import com.kazemieh.tag.ui.add.AddTagScreen
 import com.kazemieh.transaction.ui.TransactionScreen
 import com.kazemieh.transaction.ui.add.AddTransactionScreen
 
@@ -40,7 +33,11 @@ class MainActivity : ComponentActivity() {
                             .padding(innerPadding)
                     ) {
                         var showAddSource by remember { mutableStateOf(false) }
+                        var financialSourceList by remember { mutableStateOf(false) }
                         var showAddTransaction by remember { mutableStateOf(false) }
+                        var addedFinancialSource by remember {
+                            mutableStateOf<Pair<Int?, String?>>(null to null)
+                        }
 //                        TransactionScreen()
 //                        AddTransactionScreen{}
 //                        AddCategoryScreen{}
@@ -65,17 +62,44 @@ class MainActivity : ComponentActivity() {
                             AddFinancialSourceBottomSheet(
                                 onDismiss = {
                                     showAddSource = false
+                                },
+                                onFinancialSourceAdded = { id, name ->
+                                    addedFinancialSource = id to name
+                                    showAddSource = false
                                 }
                             )
                         }
 
                         if (showAddTransaction) {
                             AddTransactionScreen(
+                                addedFinancialSource = addedFinancialSource,
                                 onDismiss = {
+                                    addedFinancialSource = null to null
                                     showAddTransaction = false
                                 },
                                 onFinancialSourceAdded = {
                                     showAddTransaction = false
+                                },
+                                onFinancialSourceClicked = {
+                                    addedFinancialSource = null to null
+                                    financialSourceList = true
+                                }
+                            )
+                        }
+
+                        if (financialSourceList) {
+                            FinancialSourceListScreen(
+                                onAddCategoryClick = {
+                                    showAddSource = true
+                                    financialSourceList = false
+                                },
+                                onCategoryClick = { id, name ->
+                                    addedFinancialSource = id to name
+                                    financialSourceList = false
+                                },
+                                onDismiss = {
+                                    addedFinancialSource = null to null
+                                    financialSourceList = false
                                 }
                             )
                         }

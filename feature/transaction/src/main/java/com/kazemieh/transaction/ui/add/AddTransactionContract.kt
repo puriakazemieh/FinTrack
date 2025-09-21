@@ -8,7 +8,9 @@ import com.kazemieh.model.Tag
 sealed interface AddTransactionEvent {
     data class SetAmount(val amount: String) : AddTransactionEvent
     data class SetCategory(val category: Category) : AddTransactionEvent
-    data class SetFinancialSource(val financialSource: FinancialSource) : AddTransactionEvent
+    data class SetFinancialSource(val addedFinancialSource: Pair<Int?, String?>) :
+        AddTransactionEvent
+
     data class SetDate(val date: String) : AddTransactionEvent
     data class SetDescription(val description: String) : AddTransactionEvent
     data class ToggleTag(val tag: Tag) : AddTransactionEvent
@@ -16,6 +18,8 @@ sealed interface AddTransactionEvent {
 
     object LoadInitialData : AddTransactionEvent
     object Submit : AddTransactionEvent
+    data object OnDismiss : AddTransactionEvent
+    data object OnFinancialSourceClicked : AddTransactionEvent
 }
 
 
@@ -30,7 +34,7 @@ data class AddTransactionState(
     val tags: List<Tag> = emptyList(),
 
     val selectedCategory: Category? = null,
-    val selectedFinancialSource: FinancialSource? = null,
+    val selectedFinancialSource: Pair<Int?, String?>? = null,
     val selectedTags: Set<Tag> = emptySet(),
 
     val isLoading: Boolean = false,
@@ -41,5 +45,7 @@ data class AddTransactionState(
 sealed interface AddTransactionEffect {
     object Success : AddTransactionEffect
     data class Error(val message: String) : AddTransactionEffect
+    data object OnDismiss : AddTransactionEffect
+    data object OnFinancialSourceClicked : AddTransactionEffect
 }
 

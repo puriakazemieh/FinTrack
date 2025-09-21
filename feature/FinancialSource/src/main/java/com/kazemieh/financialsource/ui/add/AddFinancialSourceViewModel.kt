@@ -33,6 +33,12 @@ class AddFinancialSourceViewModel(
             is AddFinancialSourceIntent.SetCardNumber -> _state.update { it.copy(cardNumber = intent.cardNumber) }
             is AddFinancialSourceIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
             is AddFinancialSourceIntent.SetSourceName -> _state.update { it.copy(sourceName = intent.sourceName) }
+            AddFinancialSourceIntent.OnDismiss -> {
+                viewModelScope.launch {
+                    _state.update { AddFinancialSourceState() }
+                    _effect.send(AddFinancialSourceEffect.OnDismiss)
+                }
+            }
         }
     }
 
@@ -49,7 +55,12 @@ class AddFinancialSourceViewModel(
                 val addedFinancialSourceId = addFinancialSourceUseCase(financialSource)
                 if (addedFinancialSourceId != null) {
                     if (addedFinancialSourceId >= 0) {
-                        _effect.send(AddFinancialSourceEffect.AddedFinancialSource)
+                        _effect.send(
+                            AddFinancialSourceEffect.AddedFinancialSource(
+                                addedFinancialSourceId.toInt(),
+                                _state.value.sourceName ?: "انتخاب کنید"
+                            )
+                        )
                         _state.update { AddFinancialSourceState() }
                     }
                 }
@@ -78,6 +89,7 @@ sealed interface AddFinancialSourceIntent {
     data class SetSourceName(val sourceName: String? = null) : AddFinancialSourceIntent
     data class SetCardNumber(val cardNumber: String? = null) : AddFinancialSourceIntent
     data class SetDescription(val description: String? = null) : AddFinancialSourceIntent
+    data object OnDismiss : AddFinancialSourceIntent
 }
 
 enum class SelectedTypeFinancialSource(val count: Int, val value: Int) {
@@ -88,5 +100,6 @@ enum class SelectedTypeFinancialSource(val count: Int, val value: Int) {
 
 sealed interface AddFinancialSourceEffect {
     data class ShowMessage(val message: Int) : AddFinancialSourceEffect
-    data object AddedFinancialSource : AddFinancialSourceEffect
+    data class AddedFinancialSource(val id: Int, val name: String) : AddFinancialSourceEffect
+    data object OnDismiss : AddFinancialSourceEffect
 }

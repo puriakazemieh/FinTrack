@@ -1,5 +1,6 @@
 package com.kazemieh.transaction.ui.add
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun AddTransactionContent(
     state: AddTransactionState,
+    onFinancialSourceClicked: () -> Unit,
     onEvent: (AddTransactionEvent) -> Unit
 ) {
     Column(
@@ -57,7 +59,6 @@ fun AddTransactionContent(
             label = { Text("توضیحات") },
             modifier = Modifier.fillMaxWidth()
         )
-
         DropdownSelector(
             label = "دسته‌بندی",
             options = state.categories,
@@ -66,13 +67,19 @@ fun AddTransactionContent(
             onOptionSelected = { onEvent(AddTransactionEvent.SetCategory(it)) }
         )
 
-        DropdownSelector(
-            label = "منبع مالی",
-            options = state.financialSources,
-            selectedOption = state.selectedFinancialSource,
-            optionToString = { it.name },
-            onOptionSelected = { onEvent(AddTransactionEvent.SetFinancialSource(it)) }
-        )
+        Text(
+            text = state.selectedFinancialSource?.second ?: "انتخاب کنید",
+            modifier = Modifier.clickable {
+                onFinancialSourceClicked()
+            })
+
+//        DropdownSelector(
+//            label = "منبع مالی",
+//            options = state.financialSources,
+//            selectedOption = state.selectedFinancialSource,
+//            optionToString = { it.name },
+//            onOptionSelected = { onEvent(AddTransactionEvent.SetFinancialSource(it)) }
+//        )
 
         TagSelector(
             tags = state.tags,

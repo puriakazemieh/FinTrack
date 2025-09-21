@@ -22,7 +22,9 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AddTransactionScreen(
     viewModel: AddTransactionViewModel = koinViewModel(),
+    addedFinancialSource: Pair<Int?, String?>,
     onDismiss: () -> Unit,
+    onFinancialSourceClicked: () -> Unit,
     onFinancialSourceAdded: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -32,6 +34,8 @@ fun AddTransactionScreen(
         skipPartiallyExpanded = true
     )
     val scope = rememberCoroutineScope()
+
+    viewModel.onEvent(AddTransactionEvent.SetFinancialSource(addedFinancialSource))
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -47,12 +51,15 @@ fun AddTransactionScreen(
                 is AddTransactionEffect.Error -> {
                     Toast.makeText(context, effect.message, Toast.LENGTH_LONG).show()
                 }
+
+                AddTransactionEffect.OnDismiss -> onDismiss()
+                AddTransactionEffect.OnFinancialSourceClicked -> onFinancialSourceClicked()
             }
         }
     }
 
     ModalBottomSheet(
-        onDismissRequest = { onDismiss() },
+        onDismissRequest = { viewModel.onEvent(AddTransactionEvent.OnDismiss) },
         sheetState = sheetState
     ) {
         Column(
@@ -62,6 +69,7 @@ fun AddTransactionScreen(
         ) {
             AddTransactionContent(
                 state = state,
+                onFinancialSourceClicked = { viewModel.onEvent(AddTransactionEvent.OnFinancialSourceClicked) },
                 onEvent = viewModel::onEvent
             )
         }

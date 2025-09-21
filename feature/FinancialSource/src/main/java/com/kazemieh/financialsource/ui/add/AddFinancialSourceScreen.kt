@@ -41,7 +41,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AddFinancialSourceBottomSheet(
     viewModel: AddFinancialSourceViewModel = koinViewModel(),
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onFinancialSourceAdded: (id: Int, name: String) -> Unit
 ) {
 
     val state by viewModel.state.collectAsState()
@@ -63,14 +64,17 @@ fun AddFinancialSourceBottomSheet(
                     }
                 }
 
-                AddFinancialSourceEffect.AddedFinancialSource -> onDismiss()
+                is AddFinancialSourceEffect.AddedFinancialSource ->
+                    onFinancialSourceAdded(effect.id, effect.name)
+
+                AddFinancialSourceEffect.OnDismiss -> onDismiss()
             }
         }
     }
 
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { viewModel.onIntent(AddFinancialSourceIntent.OnDismiss) },
         sheetState = sheetState
     ) {
 
