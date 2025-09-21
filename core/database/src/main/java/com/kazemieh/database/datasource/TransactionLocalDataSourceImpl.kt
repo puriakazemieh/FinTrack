@@ -6,11 +6,11 @@ import com.kazemieh.database.dao.FinancialSourceDao
 import com.kazemieh.database.dao.TagDao
 import com.kazemieh.database.dao.TransactionDao
 import com.kazemieh.database.entity.CategoryEntity
-import com.kazemieh.database.entity.FinancialSourceEntity
 import com.kazemieh.database.entity.TagEntity
 import com.kazemieh.database.entity.TransactionTagCrossRef
 import com.kazemieh.database.mapper.toCategory
 import com.kazemieh.database.mapper.toFinancialSource
+import com.kazemieh.database.mapper.toFinancialSourceEntity
 import com.kazemieh.database.mapper.toTag
 import com.kazemieh.database.mapper.toTransactionEntity
 import com.kazemieh.database.mapper.toTransactionWithRelations
@@ -81,14 +81,7 @@ class TransactionLocalDataSourceImpl(
     }
 
     override suspend fun insertFinancialSource(financialSource: FinancialSource): Long {
-        return financialSourceDao.insertFinancialSource(
-            FinancialSourceEntity(
-                name = financialSource.name, balance = financialSource.balance,
-                cardNumber = financialSource.cardNumber,
-                description = financialSource.description,
-                type = financialSource.type
-            )
-        )
+        return financialSourceDao.insertFinancialSource(financialSource.toFinancialSourceEntity())
     }
 
     override suspend fun insertTag(tagName: String): Long {

@@ -13,4 +13,4 @@ data class FinancialSourceEntity(
     val cardNumber: String? = null,
     val description: String? = null,
     val type: Int? = null,
-    )
+)

@@ -22,6 +22,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -29,10 +30,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.kazemieh.common.ld
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -46,13 +47,28 @@ fun AddFinancialSourceBottomSheet(
 
     val state by viewModel.state.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    if (state.addedFinancialSource) {
-        onFinancialSourceAdded()
-    }
+    val context = LocalContext.current
 
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is AddFinancialSourceEffect.ShowMessage -> {
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(effect.message),
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }
+
+                AddFinancialSourceEffect.AddedFinancialSource -> onFinancialSourceAdded()
+            }
+        }
+    }
+
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -138,20 +154,10 @@ fun AddFinancialSourceBottomSheet(
 
                 Spacer(Modifier.height(16.dp))
 
-                // ✅ دکمه ثبت
+
                 Button(
                     onClick = {
-                        if (state.sourceName?.isNotEmpty() == true) {
-                            viewModel.onIntent(AddFinancialSourceIntent.AddFinancialSource)
-                        } else {
-                            ld("AddFinancialSourceBottomSheet")
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(
-                                    message = "لطفاً نام منبع را وارد کنید",
-                                    duration = SnackbarDuration.Short
-                                )
-                            }
-                        }
+                        viewModel.onIntent(AddFinancialSourceIntent.AddFinancialSource)
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {

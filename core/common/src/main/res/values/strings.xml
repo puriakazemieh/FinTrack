@@ -1,4 +1,5 @@
 <resources>
+    <string name="check_name_financial_source">لطفاً نام منبع را وارد کنید</string>
     <string name="cash_">نقدی</string>
     <string name="credit_">کارت بانکی</string>
 </resources>

@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.R
 import com.kazemieh.domain.usecase.AddFinancialSource
 import com.kazemieh.model.FinancialSource
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -17,13 +19,14 @@ class AddFinancialSourceViewModel(
     private val _state = MutableStateFlow(AddFinancialSourceState())
     val state = _state.asStateFlow()
 
+    private val _effect = Channel<AddFinancialSourceEffect>()
+    val effect = _effect.receiveAsFlow()
+
     fun onIntent(intent: AddFinancialSourceIntent) {
         when (intent) {
             AddFinancialSourceIntent.AddFinancialSource -> addFinancialSource()
             is AddFinancialSourceIntent.SelectedType -> _state.update {
-                it.copy(
-                    selectedTypeFinancialSource = intent.selectedTypeFinancialSource
-                )
+                it.copy(selectedTypeFinancialSource = intent.selectedTypeFinancialSource)
             }
 
             is AddFinancialSourceIntent.SetBalance -> _state.update { it.copy(balance = intent.balance) }
@@ -45,11 +48,13 @@ class AddFinancialSourceViewModel(
                 )
                 val addedFinancialSourceId = addFinancialSourceUseCase(financialSource)
                 if (addedFinancialSourceId != null) {
-                    if (addedFinancialSourceId >= 0)
-                        _state.update {
-                            it.copy(addedFinancialSource = true)
-                        }
+                    if (addedFinancialSourceId >= 0) {
+                        _effect.send(AddFinancialSourceEffect.AddedFinancialSource)
+                        _state.update { AddFinancialSourceState() }
+                    }
                 }
+            } else {
+                _effect.send(AddFinancialSourceEffect.ShowMessage(R.string.check_name_financial_source))
             }
         }
     }
@@ -62,8 +67,7 @@ data class AddFinancialSourceState(
     val sourceName: String? = null,
     val cardNumber: String? = null,
     val description: String? = null,
-    val addedFinancialSource: Boolean = false,
-    )
+)
 
 sealed interface AddFinancialSourceIntent {
     data class SetBalance(val balance: Int = 0) : AddFinancialSourceIntent
@@ -79,4 +83,10 @@ sealed interface AddFinancialSourceIntent {
 enum class SelectedTypeFinancialSource(val count: Int, val value: Int) {
     CREDIT(1, R.string.credit_),
     CASH(2, R.string.cash_)
+}
+
+
+sealed interface AddFinancialSourceEffect {
+    data class ShowMessage(val message: Int) : AddFinancialSourceEffect
+    data object AddedFinancialSource : AddFinancialSourceEffect
 }
