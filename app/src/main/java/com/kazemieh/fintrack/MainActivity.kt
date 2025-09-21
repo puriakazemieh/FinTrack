@@ -65,9 +65,6 @@ class MainActivity : ComponentActivity() {
                             AddFinancialSourceBottomSheet(
                                 onDismiss = {
                                     showAddSource = false
-                                },
-                                onFinancialSourceAdded = {
-                                    showAddSource = false
                                 }
                             )
                         }

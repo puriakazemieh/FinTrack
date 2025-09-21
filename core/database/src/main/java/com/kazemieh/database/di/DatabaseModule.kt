@@ -2,10 +2,11 @@ package com.kazemieh.database.di
 
 import androidx.room.Room
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
-import org.koin.dsl.module
 import com.kazemieh.database.DatabaseModule
+import com.kazemieh.database.PrepopulateCallback
 import com.kazemieh.database.datasource.TransactionLocalDataSourceImpl
 import org.koin.android.ext.koin.androidContext
+import org.koin.dsl.module
 
 val databaseModule = module {
 
@@ -14,7 +15,9 @@ val databaseModule = module {
             androidContext(),
             DatabaseModule::class.java,
             "fin_track.db"
-        ).build()
+        )
+            .addCallback(PrepopulateCallback(koin = getKoin()))
+            .build()
     }
 
     // Provide each DAO
@@ -26,6 +29,6 @@ val databaseModule = module {
 
 
     single<TransactionLocalDataSource> {
-        TransactionLocalDataSourceImpl(get(),get(),get(),get())
+        TransactionLocalDataSourceImpl(get(), get(), get(), get())
     }
 }
