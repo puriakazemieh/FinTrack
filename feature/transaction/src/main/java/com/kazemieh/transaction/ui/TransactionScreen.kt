@@ -1,6 +1,7 @@
 package com.kazemieh.transaction.ui
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,7 +33,7 @@ import com.kazemieh.model.TransactionWithRelations
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun TransactionScreen(
+fun TransactionList(
     viewModel: TransactionViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -122,6 +123,67 @@ fun TransactionItem(
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
             ) {
                 Text("Delete", color = Color.White)
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ShowTransactionCard(
+    viewModel: TransactionViewModel = koinViewModel()
+) {
+    val state by viewModel.state.collectAsState()
+    // ✅ بخش موجودی کل
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(" موجودی کل : ", style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = " ${state.balance}",
+                style = MaterialTheme.typography.headlineMedium,
+                color = if (state.balance >= 0) Color(0xFF2E7D32) else Color.Red
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        " پرداخت : ",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF2E7D32)
+                    )
+                    val plus = if (state.totalExpense > 0) "+" else ""
+                    Text(
+                        text = "$plus${state.totalExpense}",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color(0xFF2E7D32)
+                    )
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        " دریافت : ",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Red
+                    )
+                    val mines = if (state.totalIncome < 0) "-" else ""
+                    Text(
+                        text = "$mines${state.totalIncome}",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.Red
+                    )
+                }
             }
         }
     }

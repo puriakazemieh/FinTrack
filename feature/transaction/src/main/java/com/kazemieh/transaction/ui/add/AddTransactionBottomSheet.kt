@@ -20,12 +20,12 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddTransactionScreen(
+fun AddTransactionBottomSheet(
     viewModel: AddTransactionViewModel = koinViewModel(),
-    addedFinancialSource: Pair<Int?, String?>,
+    setSource: Pair<Int, String>? = null,
     onDismiss: () -> Unit,
-    onFinancialSourceClicked: () -> Unit,
-    onFinancialSourceAdded: () -> Unit
+    onSourceClicked: () -> Unit,
+    onSourceAdded: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -35,7 +35,7 @@ fun AddTransactionScreen(
     )
     val scope = rememberCoroutineScope()
 
-    viewModel.onEvent(AddTransactionEvent.SetFinancialSource(addedFinancialSource))
+    viewModel.onEvent(AddTransactionEvent.SetSource(setSource))
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -43,7 +43,7 @@ fun AddTransactionScreen(
                 is AddTransactionEffect.Success -> {
                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
-                            onFinancialSourceAdded()
+                            onSourceAdded()
                         }
                     }
                 }
@@ -53,7 +53,7 @@ fun AddTransactionScreen(
                 }
 
                 AddTransactionEffect.OnDismiss -> onDismiss()
-                AddTransactionEffect.OnFinancialSourceClicked -> onFinancialSourceClicked()
+                AddTransactionEffect.OnSourceClicked -> onSourceClicked()
             }
         }
     }
@@ -69,7 +69,7 @@ fun AddTransactionScreen(
         ) {
             AddTransactionContent(
                 state = state,
-                onFinancialSourceClicked = { viewModel.onEvent(AddTransactionEvent.OnFinancialSourceClicked) },
+                onSourceClicked = { viewModel.onEvent(AddTransactionEvent.OnSourceClicked) },
                 onEvent = viewModel::onEvent
             )
         }

@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun AddTransactionContent(
     state: AddTransactionState,
-    onFinancialSourceClicked: () -> Unit,
+    onSourceClicked: () -> Unit,
     onEvent: (AddTransactionEvent) -> Unit
 ) {
     Column(
@@ -68,18 +68,9 @@ fun AddTransactionContent(
         )
 
         Text(
-            text = state.selectedFinancialSource?.second ?: "انتخاب کنید",
-            modifier = Modifier.clickable {
-                onFinancialSourceClicked()
-            })
+            text = state.selectedSource?.second ?: "انتخاب کنید",
+            modifier = Modifier.clickable { onSourceClicked() })
 
-//        DropdownSelector(
-//            label = "منبع مالی",
-//            options = state.financialSources,
-//            selectedOption = state.selectedFinancialSource,
-//            optionToString = { it.name },
-//            onOptionSelected = { onEvent(AddTransactionEvent.SetFinancialSource(it)) }
-//        )
 
         TagSelector(
             tags = state.tags,

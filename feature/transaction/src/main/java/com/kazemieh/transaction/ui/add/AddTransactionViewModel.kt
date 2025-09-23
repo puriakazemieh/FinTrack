@@ -33,12 +33,7 @@ class AddTransactionViewModel(
         when (event) {
             is AddTransactionEvent.SetAmount -> _state.update { it.copy(amount = event.amount) }
             is AddTransactionEvent.SetCategory -> _state.update { it.copy(selectedCategory = event.category) }
-            is AddTransactionEvent.SetFinancialSource -> _state.update {
-                it.copy(
-                    selectedFinancialSource = event.addedFinancialSource,
-                )
-            }
-
+            is AddTransactionEvent.SetSource -> _state.update { it.copy(selectedSource = event.setSource) }
             is AddTransactionEvent.SetDate -> _state.update { it.copy(selectedDate = event.date) }
             is AddTransactionEvent.SetDescription -> _state.update { it.copy(description = event.description) }
             is AddTransactionEvent.ToggleTag -> {
@@ -57,11 +52,8 @@ class AddTransactionViewModel(
                 }
             }
 
-            AddTransactionEvent.OnFinancialSourceClicked ->{
-                viewModelScope.launch {
-                    _state.update { AddTransactionState() }
-                    _effect.send(AddTransactionEffect.OnFinancialSourceClicked)
-                }
+            AddTransactionEvent.OnSourceClicked -> {
+                viewModelScope.launch { _effect.send(AddTransactionEffect.OnSourceClicked) }
             }
         }
     }
@@ -87,7 +79,7 @@ class AddTransactionViewModel(
         val current = _state.value
         val amount = current.amount.toIntOrNull()?.times(if (current.isIncome) 1 else -1)
         val categoryId = current.selectedCategory?.id
-        val sourceId = current.selectedFinancialSource?.first
+        val sourceId = current.selectedSource?.first
 
         if (amount == null || categoryId == null || sourceId == null) {
             viewModelScope.launch {

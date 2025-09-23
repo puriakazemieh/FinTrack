@@ -7,12 +7,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -25,10 +29,10 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FinancialSourceListScreen(
+fun SourceListBottomSheet(
     viewModel: FinancialSourceViewModel = koinViewModel(),
-    onAddCategoryClick: () -> Unit,
-    onCategoryClick: (id: Int, name: String) -> Unit,
+    onAddSourceClick: () -> Unit,
+    onSourceClick: (id: Int, name: String) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
@@ -52,7 +56,7 @@ fun FinancialSourceListScreen(
                             .padding(8.dp)
                             .clickable {
                                 financialSource.id?.toInt()
-                                    ?.let { onCategoryClick(it, financialSource.name) }
+                                    ?.let { onSourceClick(it, financialSource.name) }
                             }
                     )
                 }
@@ -61,7 +65,7 @@ fun FinancialSourceListScreen(
             Spacer(Modifier.height(16.dp))
 
             FloatingActionButton(
-                onClick = onAddCategoryClick
+                onClick = onAddSourceClick
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -69,6 +73,36 @@ fun FinancialSourceListScreen(
                 )
             }
 
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SourceList(
+    viewModel: FinancialSourceViewModel = koinViewModel(),
+) {
+    val state by viewModel.state.collectAsState()
+
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        items(state.financialSource) { source ->
+            Card(
+                modifier = Modifier
+                    .padding(horizontal = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                ) {
+                    Text(source.name)
+                    Text("${source.balance} T")
+                }
+            }
         }
     }
 }

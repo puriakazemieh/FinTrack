@@ -72,7 +72,11 @@ dependencies {
     implementation(project(":feature:category"))
     implementation(project(":feature:FinancialSource"))
     implementation(project(":feature:Tag"))
-    implementation(project(":feature:dashboard"))
+
+
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.navigation)
 
 
     implementation(libs.koin.android)

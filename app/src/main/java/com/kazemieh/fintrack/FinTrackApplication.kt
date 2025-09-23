@@ -2,10 +2,8 @@ package com.kazemieh.fintrack
 
 
 import android.app.Application
-//import com.kazemieh.backup.di.backupViewModelModule
 import com.kazemieh.category.di.transactionAddCategoryModule
 import com.kazemieh.category.di.transactionCategoryModule
-import com.kazemieh.dashboard.dashboardModule
 import com.kazemieh.data.di.dataModule
 import com.kazemieh.database.di.databaseModule
 import com.kazemieh.domain.di.domainModule
@@ -36,8 +34,7 @@ class FinTrackApplication : Application() {
             transactionAddFinancialSourceModule,
             transactionAddTagModule,
             transactionTagModule,
-            dashboardModule,
-//            backupViewModelModule
+            dashboardViewModel
 
         )
         startKoin {

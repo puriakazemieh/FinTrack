@@ -39,10 +39,10 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddFinancialSourceBottomSheet(
+fun AddSourceBottomSheet(
     viewModel: AddFinancialSourceViewModel = koinViewModel(),
     onDismiss: () -> Unit,
-    onFinancialSourceAdded: (id: Int, name: String) -> Unit
+    setSource: (id: Int, name: String) -> Unit
 ) {
 
     val state by viewModel.state.collectAsState()
@@ -65,7 +65,7 @@ fun AddFinancialSourceBottomSheet(
                 }
 
                 is AddFinancialSourceEffect.AddedFinancialSource ->
-                    onFinancialSourceAdded(effect.id, effect.name)
+                    setSource(effect.id, effect.name)
 
                 AddFinancialSourceEffect.OnDismiss -> onDismiss()
             }
