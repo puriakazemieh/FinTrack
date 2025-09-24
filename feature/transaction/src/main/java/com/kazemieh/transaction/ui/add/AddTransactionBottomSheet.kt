@@ -22,10 +22,12 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AddTransactionBottomSheet(
     viewModel: AddTransactionViewModel = koinViewModel(),
-    setSource: Pair<Int, String>? = null,
+    source: Pair<Int, String>? = null,
+    category: Pair<Int, String>? = null,
     onDismiss: () -> Unit,
     onSourceClicked: () -> Unit,
-    onSourceAdded: () -> Unit = {}
+    onCategoryClicked: () -> Unit,
+    transactionAdded: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -35,7 +37,8 @@ fun AddTransactionBottomSheet(
     )
     val scope = rememberCoroutineScope()
 
-    viewModel.onEvent(AddTransactionEvent.SetSource(setSource))
+    viewModel.onEvent(AddTransactionEvent.SetSource(source))
+    viewModel.onEvent(AddTransactionEvent.SetCategory(category))
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -43,7 +46,7 @@ fun AddTransactionBottomSheet(
                 is AddTransactionEffect.Success -> {
                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
-                            onSourceAdded()
+                            transactionAdded()
                         }
                     }
                 }
@@ -53,7 +56,6 @@ fun AddTransactionBottomSheet(
                 }
 
                 AddTransactionEffect.OnDismiss -> onDismiss()
-                AddTransactionEffect.OnSourceClicked -> onSourceClicked()
             }
         }
     }
@@ -69,8 +71,9 @@ fun AddTransactionBottomSheet(
         ) {
             AddTransactionContent(
                 state = state,
-                onSourceClicked = { viewModel.onEvent(AddTransactionEvent.OnSourceClicked) },
-                onEvent = viewModel::onEvent
+                onEvent = viewModel::onEvent,
+                onSourceClicked = onSourceClicked,
+                onCategoryClicked = onCategoryClicked
             )
         }
     }

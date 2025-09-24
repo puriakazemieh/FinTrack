@@ -9,8 +9,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,15 +23,11 @@ class AddTransactionViewModel(
     private val _effect = Channel<AddTransactionEffect>()
     val effect = _effect.receiveAsFlow()
 
-    init {
-        onEvent(AddTransactionEvent.LoadInitialData)
-    }
-
     fun onEvent(event: AddTransactionEvent) {
         when (event) {
             is AddTransactionEvent.SetAmount -> _state.update { it.copy(amount = event.amount) }
-            is AddTransactionEvent.SetCategory -> _state.update { it.copy(selectedCategory = event.category) }
-            is AddTransactionEvent.SetSource -> _state.update { it.copy(selectedSource = event.setSource) }
+            is AddTransactionEvent.SetCategory -> _state.update { it.copy(category = event.category) }
+            is AddTransactionEvent.SetSource -> _state.update { it.copy(source = event.setSource) }
             is AddTransactionEvent.SetDate -> _state.update { it.copy(selectedDate = event.date) }
             is AddTransactionEvent.SetDescription -> _state.update { it.copy(description = event.description) }
             is AddTransactionEvent.ToggleTag -> {
@@ -43,7 +37,6 @@ class AddTransactionViewModel(
             }
 
             AddTransactionEvent.Submit -> submitTransaction()
-            AddTransactionEvent.LoadInitialData -> loadInitialData()
             is AddTransactionEvent.SetIsIncome -> _state.update { it.copy(isIncome = event.isIncome) }
             AddTransactionEvent.OnDismiss -> {
                 viewModelScope.launch {
@@ -51,35 +44,15 @@ class AddTransactionViewModel(
                     _effect.send(AddTransactionEffect.OnDismiss)
                 }
             }
-
-            AddTransactionEvent.OnSourceClicked -> {
-                viewModelScope.launch { _effect.send(AddTransactionEffect.OnSourceClicked) }
-            }
         }
     }
 
-    private fun loadInitialData() {
-        viewModelScope.launch {
-            val categories = transactionUseCases.getAllCategory()
-            val sources = transactionUseCases.getAllFinancialSource()
-            val tags = transactionUseCases.getAllTag()
-            combine(categories, sources, tags) { categories, sources, tags ->
-                _state.update { currentState ->
-                    currentState.copy(
-                        categories = categories,
-                        financialSources = sources,
-                        tags = tags
-                    )
-                }
-            }.launchIn(viewModelScope)
-        }
-    }
 
     private fun submitTransaction() {
         val current = _state.value
         val amount = current.amount.toIntOrNull()?.times(if (current.isIncome) 1 else -1)
-        val categoryId = current.selectedCategory?.id
-        val sourceId = current.selectedSource?.first
+        val categoryId = current.category?.first
+        val sourceId = current.source?.first
 
         if (amount == null || categoryId == null || sourceId == null) {
             viewModelScope.launch {
@@ -91,7 +64,7 @@ class AddTransactionViewModel(
         val transaction = Transaction(
             id = 0L,
             amount = amount,
-            categoryId = categoryId,
+            categoryId = categoryId.toLong(),
             financialSourceId = sourceId.toLong(),
             description = current.description,
             date = current.selectedDate

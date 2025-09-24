@@ -22,6 +22,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.kazemieh.category.ui.CategoryListBottomSheet
+import com.kazemieh.category.ui.add.AddCategoryBottomSheet
 import com.kazemieh.financialsource.ui.SourceList
 import com.kazemieh.financialsource.ui.SourceListBottomSheet
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
@@ -59,17 +61,20 @@ fun DashboardScreen(
 
             if (state.showAddTransaction) {
                 AddTransactionBottomSheet(
-                    setSource = state.setSource,
+                    source = state.setSource,
                     onDismiss = {
                         viewModel.onIntent(DashboardIntent.ShowAddTransaction(false))
                     },
                     onSourceClicked = {
-                        viewModel.onIntent(DashboardIntent.SourceList(true))
+                        viewModel.onIntent(DashboardIntent.ShowSourceList(true))
+                    },
+                    onCategoryClicked = {
+                        viewModel.onIntent(DashboardIntent.ShowCategoryList(true))
                     }
                 )
             }
 
-            if (state.sourceList) {
+            if (state.showSourceList) {
                 SourceListBottomSheet(
                     onAddSourceClick = {
                         viewModel.onIntent(
@@ -83,11 +88,35 @@ fun DashboardScreen(
                         viewModel.onIntent(DashboardIntent.SetSource(id to name))
                     },
                     onDismiss = {
-                        viewModel.onIntent(DashboardIntent.SourceList(false))
+                        viewModel.onIntent(DashboardIntent.ShowSourceList(false))
                     }
                 )
             }
 
+            if (state.showCategoryList) {
+                CategoryListBottomSheet(
+                    onCategoryClick = { id, name ->
+                        viewModel.onIntent(DashboardIntent.SetCategory(id to name))
+                    },
+                    onAddCategoryClick = {
+                        viewModel.onIntent(DashboardIntent.ShowAddCategory(true))
+                    },
+                    onDismiss = {
+                        viewModel.onIntent(DashboardIntent.ShowCategoryList(false))
+                    }
+                )
+            }
+
+            if (state.showAddCategory) {
+                AddCategoryBottomSheet(
+                    onDismiss = {
+                        viewModel.onIntent(DashboardIntent.ShowAddCategory(false))
+                    },
+                    setCategory = { id, name ->
+                        viewModel.onIntent(DashboardIntent.SetCategory(id to name))
+                    }
+                )
+            }
             if (state.showAddSource) {
                 AddSourceBottomSheet(
                     onDismiss = {

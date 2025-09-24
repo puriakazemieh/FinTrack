@@ -3,5 +3,5 @@ package com.kazemieh.database.mapper
 import com.kazemieh.database.entity.CategoryEntity
 import com.kazemieh.model.Category
 
-fun CategoryEntity.toCategory(): Category = Category(id, name)
-fun Category.toCategoryEntity(): CategoryEntity = CategoryEntity(id, name)
+fun CategoryEntity.toCategory(): Category = Category(id, name, description)
+fun Category.toCategoryEntity(): CategoryEntity = CategoryEntity(id, name, description)

@@ -5,10 +5,10 @@ import com.kazemieh.database.dao.CategoryDao
 import com.kazemieh.database.dao.FinancialSourceDao
 import com.kazemieh.database.dao.TagDao
 import com.kazemieh.database.dao.TransactionDao
-import com.kazemieh.database.entity.CategoryEntity
 import com.kazemieh.database.entity.TagEntity
 import com.kazemieh.database.entity.TransactionTagCrossRef
 import com.kazemieh.database.mapper.toCategory
+import com.kazemieh.database.mapper.toCategoryEntity
 import com.kazemieh.database.mapper.toFinancialSource
 import com.kazemieh.database.mapper.toFinancialSourceEntity
 import com.kazemieh.database.mapper.toTag
@@ -76,8 +76,8 @@ class TransactionLocalDataSourceImpl(
             )
         }
 
-    override suspend fun insertCategory(categoryName: String): Long {
-        return categoryDao.insertCategory(CategoryEntity(name = categoryName))
+    override suspend fun insertCategory(category: Category): Long {
+        return categoryDao.insertCategory(category.toCategoryEntity())
     }
 
     override suspend fun insertFinancialSource(financialSource: FinancialSource): Long {

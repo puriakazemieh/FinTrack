@@ -52,18 +52,17 @@ class AddFinancialSourceViewModel(
                     description = description,
                     type = selectedTypeFinancialSource.count
                 )
-                val addedFinancialSourceId = addFinancialSourceUseCase(financialSource)
-                if (addedFinancialSourceId != null) {
-                    if (addedFinancialSourceId >= 0) {
-                        _effect.send(
-                            AddFinancialSourceEffect.AddedFinancialSource(
-                                addedFinancialSourceId.toInt(),
-                                _state.value.sourceName ?: "انتخاب کنید"
-                            )
+                val sourceId = addFinancialSourceUseCase(financialSource)
+                if (sourceId >= 0) {
+                    _effect.send(
+                        AddFinancialSourceEffect.AddedFinancialSource(
+                            sourceId.toInt(),
+                            _state.value.sourceName ?: "انتخاب کنید"
                         )
-                        _state.update { AddFinancialSourceState() }
-                    }
+                    )
+                    _state.update { AddFinancialSourceState() }
                 }
+
             } else {
                 _effect.send(AddFinancialSourceEffect.ShowMessage(R.string.check_name_financial_source))
             }

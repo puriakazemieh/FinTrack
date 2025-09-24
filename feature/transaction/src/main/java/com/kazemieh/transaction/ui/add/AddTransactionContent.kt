@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 fun AddTransactionContent(
     state: AddTransactionState,
     onSourceClicked: () -> Unit,
+    onCategoryClicked: () -> Unit,
     onEvent: (AddTransactionEvent) -> Unit
 ) {
     Column(
@@ -59,16 +60,13 @@ fun AddTransactionContent(
             label = { Text("توضیحات") },
             modifier = Modifier.fillMaxWidth()
         )
-        DropdownSelector(
-            label = "دسته‌بندی",
-            options = state.categories,
-            selectedOption = state.selectedCategory,
-            optionToString = { it.name },
-            onOptionSelected = { onEvent(AddTransactionEvent.SetCategory(it)) }
-        )
 
         Text(
-            text = state.selectedSource?.second ?: "انتخاب کنید",
+            text = state.category?.second ?: "انتخاب کنید",
+            modifier = Modifier.clickable { onCategoryClicked() })
+
+        Text(
+            text = state.source?.second ?: "انتخاب کنید",
             modifier = Modifier.clickable { onSourceClicked() })
 
 

@@ -6,7 +6,7 @@ import com.kazemieh.model.FinancialSource
 class AddFinancialSource(
     private val repository: TransactionRepository
 ) {
-    suspend operator fun invoke(financialSource: FinancialSource): Long? {
+    suspend operator fun invoke(financialSource: FinancialSource): Long {
         return repository.insertFinancialSource(financialSource = financialSource)
     }
 }

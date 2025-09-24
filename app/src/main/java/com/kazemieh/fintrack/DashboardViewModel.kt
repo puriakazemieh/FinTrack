@@ -18,15 +18,22 @@ class DashboardViewModel() : ViewModel() {
                 _state.update {
                     it.copy(
                         setSource = intent.setSource,
-                        sourceList = false,
+                        showSourceList = false,
                         showAddSource = false
                     )
                 }
             }
 
-            is DashboardIntent.SourceList -> {
-                _state.update { it.copy(sourceList = intent.sourceList) }
+            is DashboardIntent.SetCategory -> {
+                _state.update {
+                    it.copy(
+                        setCategory = intent.setCategory,
+                        showCategoryList = false,
+                        showAddCategory = false
+                    )
+                }
             }
+
 
             is DashboardIntent.ShowAddSource -> {
                 _state.update {
@@ -38,6 +45,16 @@ class DashboardViewModel() : ViewModel() {
                 }
             }
 
+            is DashboardIntent.ShowAddCategory -> {
+                _state.update {
+                    it.copy(
+                        showAddCategory = intent.showAddCategory,
+                        setSource = if (!intent.showAddCategory) null else it.setCategory
+                    )
+                }
+            }
+
+
             is DashboardIntent.ShowAddTransaction -> {
                 _state.update {
                     it.copy(
@@ -47,6 +64,8 @@ class DashboardViewModel() : ViewModel() {
                 }
             }
 
+            is DashboardIntent.ShowSourceList -> _state.update { it.copy(showSourceList = intent.sourceList) }
+            is DashboardIntent.ShowCategoryList -> _state.update { it.copy(showCategoryList = intent.categoryList) }
         }
     }
 
@@ -55,8 +74,11 @@ class DashboardViewModel() : ViewModel() {
 
 data class DashboardState(
     val setSource: Pair<Int, String>? = null,
-    val sourceList: Boolean = false,
+    val setCategory: Pair<Int, String>? = null,
+    val showSourceList: Boolean = false,
+    val showCategoryList: Boolean = false,
     val showAddSource: Boolean = false,
+    val showAddCategory: Boolean = false,
     val showAddTransaction: Boolean = false,
     val fromSourceList: Boolean = false,
 )
@@ -64,11 +86,18 @@ data class DashboardState(
 
 sealed interface DashboardIntent {
     data class ShowAddTransaction(val showAddTransaction: Boolean = false) : DashboardIntent
-    data class SourceList(val sourceList: Boolean = false) : DashboardIntent
+
+    data class ShowSourceList(val sourceList: Boolean = false) : DashboardIntent
+    data class ShowCategoryList(val categoryList: Boolean = false) : DashboardIntent
+
     data class ShowAddSource(
         val showAddSource: Boolean = false,
         val fromSourceList: Boolean = false
     ) : DashboardIntent
 
+    data class ShowAddCategory(val showAddCategory: Boolean = false) : DashboardIntent
+
     data class SetSource(val setSource: Pair<Int, String>? = null) : DashboardIntent
+    data class SetCategory(val setCategory: Pair<Int, String>? = null) : DashboardIntent
+
 }

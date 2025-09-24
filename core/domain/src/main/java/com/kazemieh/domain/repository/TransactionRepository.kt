@@ -13,8 +13,8 @@ interface TransactionRepository {
     fun getAllTransactions(): Flow<List<TransactionWithRelations>>
     suspend fun getAllCategory(): Flow<List<Category>>
     suspend fun insertTag(tagName: String): Long
-    suspend fun insertCategory(categoryName: String): Long
-    suspend fun insertFinancialSource(financialSource: FinancialSource): Long?
+    suspend fun insertCategory(category : Category): Long
+    suspend fun insertFinancialSource(financialSource: FinancialSource): Long
     suspend fun getAllFinancialSource(): Flow<List<FinancialSource>>
     suspend fun getAllTag(): Flow<List<Tag>>
 }
