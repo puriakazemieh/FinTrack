@@ -33,9 +33,9 @@ val domainModule = module {
         TransactionUseCases(
             addTransaction = get(),
             deleteTransaction = get(),
-            getAllTag = get(),
-            getAllFinancialSource = get(),
-            getAllCategory = get(),
+//            getAllTag = get(),
+//            getAllFinancialSource = get(),
+//            getAllCategory = get(),
             getAllTransactions = get()
         )
     }

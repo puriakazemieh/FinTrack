@@ -5,13 +5,13 @@ import com.kazemieh.database.dao.CategoryDao
 import com.kazemieh.database.dao.FinancialSourceDao
 import com.kazemieh.database.dao.TagDao
 import com.kazemieh.database.dao.TransactionDao
-import com.kazemieh.database.entity.TagEntity
 import com.kazemieh.database.entity.TransactionTagCrossRef
 import com.kazemieh.database.mapper.toCategory
 import com.kazemieh.database.mapper.toCategoryEntity
 import com.kazemieh.database.mapper.toFinancialSource
 import com.kazemieh.database.mapper.toFinancialSourceEntity
 import com.kazemieh.database.mapper.toTag
+import com.kazemieh.database.mapper.toTagEntity
 import com.kazemieh.database.mapper.toTransactionEntity
 import com.kazemieh.database.mapper.toTransactionWithRelations
 import com.kazemieh.model.Category
@@ -37,7 +37,7 @@ class TransactionLocalDataSourceImpl(
     override suspend fun insertTransaction(
         transaction: Transaction,
         tagIds: List<Long>
-    ) {
+    ): Long {
         val transactionId = transactionDao.insertTransaction(transaction.toTransactionEntity())
 
         tagIds.forEach { tagId ->
@@ -48,6 +48,7 @@ class TransactionLocalDataSourceImpl(
                 )
             )
         }
+        return transactionId
     }
 
     override suspend fun update(transaction: Transaction) {
@@ -84,8 +85,8 @@ class TransactionLocalDataSourceImpl(
         return financialSourceDao.insertFinancialSource(financialSource.toFinancialSourceEntity())
     }
 
-    override suspend fun insertTag(tagName: String): Long {
-        return tagDao.insertTag(TagEntity(name = tagName))
+    override suspend fun insertTag(tag: Tag): Long {
+        return tagDao.insertTag(tag.toTagEntity())
     }
 
 //    override fun getByTag(tagName: String): Flow<List<TransactionWithRelations>> = flow {

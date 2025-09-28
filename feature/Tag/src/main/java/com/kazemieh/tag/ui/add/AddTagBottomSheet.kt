@@ -1,4 +1,4 @@
-package com.kazemieh.category.ui.add
+package com.kazemieh.tag.ui.add
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,12 +33,11 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddCategoryBottomSheet(
-    viewModel: AddCategoryViewModel = koinViewModel(),
+fun AddTagBottomSheet(
+    viewModel: AddTagViewModel = koinViewModel(),
     onDismiss: () -> Unit,
-    setCategory: (id: Int, name: String) -> Unit
+    setTag: (id: Int, name: String) -> Unit
 ) {
-
     val state by viewModel.state.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
@@ -49,7 +48,7 @@ fun AddCategoryBottomSheet(
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is AddCategoryEffect.ShowMessage -> {
+                is AddTagEffect.ShowMessage -> {
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(
                             message = context.getString(effect.message),
@@ -58,9 +57,9 @@ fun AddCategoryBottomSheet(
                     }
                 }
 
-                is AddCategoryEffect.AddedCategory -> setCategory(effect.id, effect.name)
+                is AddTagEffect.AddedTag -> setTag(effect.id, effect.name)
 
-                AddCategoryEffect.OnDismiss -> onDismiss()
+                AddTagEffect.OnDismiss -> onDismiss()
             }
         }
     }
@@ -68,7 +67,7 @@ fun AddCategoryBottomSheet(
 
 
     ModalBottomSheet(
-        onDismissRequest = { viewModel.onIntent(AddCategoryIntent.OnDismiss) },
+        onDismissRequest = { viewModel.onIntent(AddTagIntent.OnDismiss) },
         sheetState = sheetState
     ) {
 
@@ -83,8 +82,8 @@ fun AddCategoryBottomSheet(
             ) {
 
                 OutlinedTextField(
-                    value = state.categoryName ?: "",
-                    onValueChange = { viewModel.onIntent(AddCategoryIntent.SetCategoryName(it)) },
+                    value = state.tagName ?: "",
+                    onValueChange = { viewModel.onIntent(AddTagIntent.SetTagName(it)) },
                     label = {
                         Row {
                             Text("نام دسته بندی")
@@ -98,7 +97,7 @@ fun AddCategoryBottomSheet(
 
                 OutlinedTextField(
                     value = state.description ?: "",
-                    onValueChange = { viewModel.onIntent(AddCategoryIntent.SetDescription(it)) },
+                    onValueChange = { viewModel.onIntent(AddTagIntent.SetDescription(it)) },
                     label = {
                         Row {
                             Text("توضیحات")
@@ -111,7 +110,7 @@ fun AddCategoryBottomSheet(
 
                 Button(
                     onClick = {
-                        viewModel.onIntent(AddCategoryIntent.AddCategory)
+                        viewModel.onIntent(AddTagIntent.AddTag)
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {

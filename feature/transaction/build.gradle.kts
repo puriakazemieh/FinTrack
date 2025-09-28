@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(platform(libs.androidx.compose.bom))
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)

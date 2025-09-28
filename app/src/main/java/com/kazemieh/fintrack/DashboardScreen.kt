@@ -27,6 +27,7 @@ import com.kazemieh.category.ui.add.AddCategoryBottomSheet
 import com.kazemieh.financialsource.ui.SourceList
 import com.kazemieh.financialsource.ui.SourceListBottomSheet
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
+import com.kazemieh.tag.ui.TagListBottomSheet
 import com.kazemieh.transaction.ui.ShowTransactionCard
 import com.kazemieh.transaction.ui.TransactionList
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
@@ -61,7 +62,9 @@ fun DashboardScreen(
 
             if (state.showAddTransaction) {
                 AddTransactionBottomSheet(
-                    source = state.setSource,
+                    source = state.source,
+                    category = state.category,
+                    tags = state.tags,
                     onDismiss = {
                         viewModel.onIntent(DashboardIntent.ShowAddTransaction(false))
                     },
@@ -70,76 +73,31 @@ fun DashboardScreen(
                     },
                     onCategoryClicked = {
                         viewModel.onIntent(DashboardIntent.ShowCategoryList(true))
+                    },
+                    onTagClicked = {
+                        viewModel.onIntent(DashboardIntent.ShowTagList(true))
                     }
                 )
             }
 
-            if (state.showSourceList) {
-                SourceListBottomSheet(
-                    onAddSourceClick = {
-                        viewModel.onIntent(
-                            DashboardIntent.ShowAddSource(
-                                showAddSource = true,
-                                fromSourceList = true
-                            )
-                        )
-                    },
-                    onSourceClick = { id, name ->
-                        viewModel.onIntent(DashboardIntent.SetSource(id to name))
-                    },
-                    onDismiss = {
-                        viewModel.onIntent(DashboardIntent.ShowSourceList(false))
-                    }
-                )
-            }
+            Source(
+                state.showSourceList,
+                state.showAddSource,
+                state.fromSourceList,
+                viewModel::onIntent
+            )
 
-            if (state.showCategoryList) {
-                CategoryListBottomSheet(
-                    onCategoryClick = { id, name ->
-                        viewModel.onIntent(DashboardIntent.SetCategory(id to name))
-                    },
-                    onAddCategoryClick = {
-                        viewModel.onIntent(DashboardIntent.ShowAddCategory(true))
-                    },
-                    onDismiss = {
-                        viewModel.onIntent(DashboardIntent.ShowCategoryList(false))
-                    }
-                )
-            }
+            Category(
+                state.showCategoryList,
+                state.showAddCategory,
+                viewModel::onIntent
+            )
 
-            if (state.showAddCategory) {
-                AddCategoryBottomSheet(
-                    onDismiss = {
-                        viewModel.onIntent(DashboardIntent.ShowAddCategory(false))
-                    },
-                    setCategory = { id, name ->
-                        viewModel.onIntent(DashboardIntent.SetCategory(id to name))
-                    }
-                )
-            }
-            if (state.showAddSource) {
-                AddSourceBottomSheet(
-                    onDismiss = {
-                        viewModel.onIntent(
-                            DashboardIntent.ShowAddSource(
-                                showAddSource = false,
-                                fromSourceList = false
-                            )
-                        )
-                    },
-                    setSource = { id, name ->
-                        if (state.fromSourceList)
-                            viewModel.onIntent(DashboardIntent.SetSource(id to name))
-                        else viewModel.onIntent(
-                            DashboardIntent.ShowAddSource(
-                                showAddSource = false,
-                                fromSourceList = false
-                            )
-                        )
-                    }
-                )
-            }
-
+            Tag(
+                state.showTagList,
+                state.tags,
+                viewModel::onIntent
+            )
 
             Column(
                 modifier = Modifier
@@ -181,3 +139,109 @@ fun DashboardScreen(
         }
     }
 }
+
+
+@Composable
+fun Source(
+    showSourceList: Boolean,
+    showAddSource: Boolean,
+    fromSourceList: Boolean,
+    onIntent: (DashboardIntent) -> Unit
+) {
+    if (showSourceList) {
+        SourceListBottomSheet(
+            onAddSourceClick = {
+                onIntent(
+                    DashboardIntent.ShowAddSource(
+                        showAddSource = true,
+                        fromSourceList = true
+                    )
+                )
+            },
+            onSourceClick = { id, name ->
+                onIntent(DashboardIntent.SetSource(id to name))
+            },
+            onDismiss = {
+                onIntent(DashboardIntent.ShowSourceList(false))
+            }
+        )
+    }
+
+    if (showAddSource) {
+        AddSourceBottomSheet(
+            onDismiss = {
+                onIntent(
+                    DashboardIntent.ShowAddSource(
+                        showAddSource = false,
+                        fromSourceList = false
+                    )
+                )
+            },
+            setSource = { id, name ->
+                if (fromSourceList)
+                    onIntent(DashboardIntent.SetSource(id to name))
+                else onIntent(
+                    DashboardIntent.ShowAddSource(
+                        showAddSource = false,
+                        fromSourceList = false
+                    )
+                )
+            }
+        )
+    }
+}
+
+@Composable
+fun Category(
+    showCategoryList: Boolean,
+    showAddCategory: Boolean,
+    onIntent: (DashboardIntent) -> Unit
+) {
+
+    if (showCategoryList) {
+        CategoryListBottomSheet(
+            onCategoryClick = { id, name ->
+                onIntent(DashboardIntent.SetCategory(id to name))
+            },
+            onAddCategoryClick = {
+                onIntent(DashboardIntent.ShowAddCategory(true))
+            },
+            onDismiss = {
+                onIntent(DashboardIntent.ShowCategoryList(false))
+            }
+        )
+    }
+
+    if (showAddCategory) {
+        AddCategoryBottomSheet(
+            onDismiss = {
+                onIntent(DashboardIntent.ShowAddCategory(false))
+            },
+            setCategory = { id, name ->
+                onIntent(DashboardIntent.SetCategory(id to name))
+            }
+        )
+    }
+}
+
+
+@Composable
+fun Tag(
+    showTagList: Boolean,
+    selectedTags: Set<Pair<Int, String>>?,
+    onIntent: (DashboardIntent) -> Unit
+) {
+
+    if (showTagList) {
+        TagListBottomSheet(
+            selectedTags = selectedTags,
+            onSubmitClick = { selectedTags: Set<Pair<Int, String>>? ->
+                onIntent(DashboardIntent.SetAllSelectedTags(selectedTags))
+            },
+            onDismiss = {
+                onIntent(DashboardIntent.ShowTagList(false))
+            }
+        )
+    }
+}
+

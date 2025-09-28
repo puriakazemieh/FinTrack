@@ -27,14 +27,10 @@ class AddTransactionViewModel(
         when (event) {
             is AddTransactionEvent.SetAmount -> _state.update { it.copy(amount = event.amount) }
             is AddTransactionEvent.SetCategory -> _state.update { it.copy(category = event.category) }
-            is AddTransactionEvent.SetSource -> _state.update { it.copy(source = event.setSource) }
+            is AddTransactionEvent.SetSource -> _state.update { it.copy(source = event.source) }
             is AddTransactionEvent.SetDate -> _state.update { it.copy(selectedDate = event.date) }
             is AddTransactionEvent.SetDescription -> _state.update { it.copy(description = event.description) }
-            is AddTransactionEvent.ToggleTag -> {
-                val current = _state.value.selectedTags
-                val updated = if (event.tag in current) current - event.tag else current + event.tag
-                _state.update { it.copy(selectedTags = updated) }
-            }
+            is AddTransactionEvent.SetTags -> _state.update { it.copy(tags = event.tags) }
 
             AddTransactionEvent.Submit -> submitTransaction()
             is AddTransactionEvent.SetIsIncome -> _state.update { it.copy(isIncome = event.isIncome) }
@@ -73,16 +69,56 @@ class AddTransactionViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             try {
-                transactionUseCases.addTransaction(
-                    transaction,
-                    current.selectedTags.filter { it.id != null }.map { it.id!! })
-                _state.update { it.copy(isLoading = false, isSuccess = true) }
-                _effect.send(AddTransactionEffect.Success)
-                _state.update { AddTransactionState() }
+                val tagsId = current.tags?.map { it.first.toLong() } ?: emptyList()
+                val transactionId = transactionUseCases.addTransaction(transaction, tagsId)
+                if (transactionId >= 0) {
+                    _effect.send(AddTransactionEffect.Success)
+                    _state.update { AddTransactionState() }
+                }
             } catch (e: Exception) {
                 _state.update { it.copy(isLoading = false) }
                 _effect.send(AddTransactionEffect.Error(e.message ?: "خطا در ثبت تراکنش"))
             }
         }
     }
+}
+
+sealed interface AddTransactionEvent {
+    data class SetAmount(val amount: String) : AddTransactionEvent
+
+    data class SetCategory(val category: Pair<Int, String>? = null) : AddTransactionEvent
+    data class SetSource(val source: Pair<Int, String>? = null) : AddTransactionEvent
+    data class SetTags(val tags: Set<Pair<Int, String>>? = null) : AddTransactionEvent
+
+    data class SetDate(val date: String) : AddTransactionEvent
+    data class SetDescription(val description: String) : AddTransactionEvent
+
+
+    data class SetIsIncome(val isIncome: Boolean) : AddTransactionEvent
+
+    object Submit : AddTransactionEvent
+    data object OnDismiss : AddTransactionEvent
+
+
+}
+
+
+data class AddTransactionState(
+    val amount: String = "",
+    val description: String = "",
+    val selectedDate: String = "",
+    val isIncome: Boolean = false,
+
+    val category: Pair<Int, String>? = null,
+    val source: Pair<Int, String>? = null,
+    val tags: Set<Pair<Int, String>>? = null,
+
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
+)
+
+sealed interface AddTransactionEffect {
+    object Success : AddTransactionEffect
+    data class Error(val message: String) : AddTransactionEffect
+    data object OnDismiss : AddTransactionEffect
 }

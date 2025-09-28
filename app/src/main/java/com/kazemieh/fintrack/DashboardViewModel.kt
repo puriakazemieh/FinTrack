@@ -14,33 +14,46 @@ class DashboardViewModel() : ViewModel() {
 
     fun onIntent(intent: DashboardIntent) {
         when (intent) {
+
+            is DashboardIntent.ShowAddTransaction -> {
+                _state.update {
+                    it.copy(
+                        showAddTransaction = intent.showAddTransaction,
+                        source = if (!intent.showAddTransaction) null else it.source
+                    )
+                }
+            }
+
+
             is DashboardIntent.SetSource -> {
                 _state.update {
                     it.copy(
-                        setSource = intent.setSource,
+                        source = intent.source,
                         showSourceList = false,
                         showAddSource = false
                     )
                 }
             }
 
-            is DashboardIntent.SetCategory -> {
-                _state.update {
-                    it.copy(
-                        setCategory = intent.setCategory,
-                        showCategoryList = false,
-                        showAddCategory = false
-                    )
-                }
-            }
-
-
             is DashboardIntent.ShowAddSource -> {
                 _state.update {
                     it.copy(
                         showAddSource = intent.showAddSource,
                         fromSourceList = intent.fromSourceList,
-                        setSource = if (!intent.showAddSource && intent.fromSourceList) null else it.setSource
+                        source = if (!intent.showAddSource && intent.fromSourceList) null else it.source
+                    )
+                }
+            }
+
+            is DashboardIntent.ShowSourceList -> _state.update { it.copy(showSourceList = intent.sourceList) }
+
+
+            is DashboardIntent.SetCategory -> {
+                _state.update {
+                    it.copy(
+                        category = intent.category,
+                        showCategoryList = false,
+                        showAddCategory = false
                     )
                 }
             }
@@ -49,23 +62,39 @@ class DashboardViewModel() : ViewModel() {
                 _state.update {
                     it.copy(
                         showAddCategory = intent.showAddCategory,
-                        setSource = if (!intent.showAddCategory) null else it.setCategory
+                        source = if (!intent.showAddCategory) null else it.category
                     )
                 }
             }
 
+            is DashboardIntent.ShowCategoryList -> _state.update { it.copy(showCategoryList = intent.categoryList) }
 
-            is DashboardIntent.ShowAddTransaction -> {
+
+            is DashboardIntent.SetTag -> {
+                val current = _state.value.tags
+                val updatedTags =
+                    if (current?.contains(intent.tag) == true)
+                        current.minus(intent.tag)
+                    else
+                        current?.plus(intent.tag)
+
                 _state.update {
                     it.copy(
-                        showAddTransaction = intent.showAddTransaction,
-                        setSource = if (!intent.showAddTransaction) null else it.setSource
+                        tags = updatedTags,
+                        showTagList = false
                     )
                 }
             }
 
-            is DashboardIntent.ShowSourceList -> _state.update { it.copy(showSourceList = intent.sourceList) }
-            is DashboardIntent.ShowCategoryList -> _state.update { it.copy(showCategoryList = intent.categoryList) }
+
+            is DashboardIntent.ShowTagList -> _state.update { it.copy(showTagList = intent.showTagList) }
+
+            is DashboardIntent.SetAllSelectedTags -> _state.update {
+                it.copy(
+                    tags = intent.tags,
+                    showTagList = false
+                )
+            }
         }
     }
 
@@ -73,31 +102,42 @@ class DashboardViewModel() : ViewModel() {
 }
 
 data class DashboardState(
-    val setSource: Pair<Int, String>? = null,
-    val setCategory: Pair<Int, String>? = null,
-    val showSourceList: Boolean = false,
-    val showCategoryList: Boolean = false,
-    val showAddSource: Boolean = false,
-    val showAddCategory: Boolean = false,
     val showAddTransaction: Boolean = false,
+
+    val source: Pair<Int, String>? = null,
+    val showSourceList: Boolean = false,
+    val showAddSource: Boolean = false,
     val fromSourceList: Boolean = false,
-)
+
+    val category: Pair<Int, String>? = null,
+    val showCategoryList: Boolean = false,
+    val showAddCategory: Boolean = false,
+
+    val tags: Set<Pair<Int, String>>? = null,
+    val showTagList: Boolean = false,
+
+    )
 
 
 sealed interface DashboardIntent {
     data class ShowAddTransaction(val showAddTransaction: Boolean = false) : DashboardIntent
 
     data class ShowSourceList(val sourceList: Boolean = false) : DashboardIntent
-    data class ShowCategoryList(val categoryList: Boolean = false) : DashboardIntent
-
     data class ShowAddSource(
         val showAddSource: Boolean = false,
         val fromSourceList: Boolean = false
     ) : DashboardIntent
 
-    data class ShowAddCategory(val showAddCategory: Boolean = false) : DashboardIntent
+    data class SetSource(val source: Pair<Int, String>? = null) : DashboardIntent
 
-    data class SetSource(val setSource: Pair<Int, String>? = null) : DashboardIntent
-    data class SetCategory(val setCategory: Pair<Int, String>? = null) : DashboardIntent
+
+    data class ShowCategoryList(val categoryList: Boolean = false) : DashboardIntent
+    data class ShowAddCategory(val showAddCategory: Boolean = false) : DashboardIntent
+    data class SetCategory(val category: Pair<Int, String>? = null) : DashboardIntent
+
+    data class ShowTagList(val showTagList: Boolean = false) : DashboardIntent
+    data class SetTag(val tag: Pair<Int, String>) : DashboardIntent
+    data class SetAllSelectedTags(val tags: Set<Pair<Int, String>>? = null) : DashboardIntent
+
 
 }

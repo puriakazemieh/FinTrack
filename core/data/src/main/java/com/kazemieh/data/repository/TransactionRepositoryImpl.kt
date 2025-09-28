@@ -17,8 +17,8 @@ class TransactionRepositoryImpl(
         return localDataSource.getAll()
     }
 
-    override suspend fun insertTransaction(transaction: Transaction, tagIds: List<Long>) {
-        localDataSource.insertTransaction(transaction, tagIds)
+    override suspend fun insertTransaction(transaction: Transaction, tagIds: List<Long>): Long {
+        return localDataSource.insertTransaction(transaction, tagIds)
     }
 
     override suspend fun deleteTransaction(transaction: Transaction) {
@@ -29,11 +29,11 @@ class TransactionRepositoryImpl(
         return localDataSource.getAllCategory()
     }
 
-    override suspend fun insertTag(tagName: String): Long {
-        return localDataSource.insertTag(tagName)
+    override suspend fun insertTag(tag: Tag): Long {
+        return localDataSource.insertTag(tag)
     }
 
-    override suspend fun insertCategory(category : Category): Long {
+    override suspend fun insertCategory(category: Category): Long {
         return localDataSource.insertCategory(category)
     }
 

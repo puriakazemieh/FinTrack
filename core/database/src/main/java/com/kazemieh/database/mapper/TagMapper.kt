@@ -3,5 +3,5 @@ package com.kazemieh.database.mapper
 import com.kazemieh.database.entity.TagEntity
 import com.kazemieh.model.Tag
 
-fun TagEntity.toTag(): Tag = Tag(id, name)
-fun Tag.toTagEntity(): TagEntity = TagEntity(id, name)
+fun TagEntity.toTag(): Tag = Tag(id, name, description)
+fun Tag.toTagEntity(): TagEntity = TagEntity(id, name, description)
