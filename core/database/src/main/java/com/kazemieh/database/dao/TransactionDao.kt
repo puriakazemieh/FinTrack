@@ -10,6 +10,7 @@ import androidx.room.Update
 import com.kazemieh.database.entity.TransactionEntity
 import com.kazemieh.database.entity.TransactionTagCrossRef
 import com.kazemieh.database.entity.TransactionWithCategoryFinancialSourceAndTags
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TransactionDao {
@@ -25,7 +26,7 @@ interface TransactionDao {
 
     @Transaction
     @Query("SELECT * FROM transactions")
-    suspend fun getAllTransactionsWithCategoryFinancialSourceAndTags(): List<TransactionWithCategoryFinancialSourceAndTags>
+    fun getAllTransactionsWithCategoryFinancialSourceAndTags(): Flow<List<TransactionWithCategoryFinancialSourceAndTags>>
 
     @Transaction
     @Query("SELECT * FROM transactions WHERE categoryId = :categoryId")

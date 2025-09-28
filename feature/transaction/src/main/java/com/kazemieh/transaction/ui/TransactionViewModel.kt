@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.TransactionUseCases
 import com.kazemieh.model.Transaction
+import com.kazemieh.model.TransactionWithRelations
 import com.kazemieh.transaction.R
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -72,4 +73,22 @@ class TransactionViewModel(
             loadTransactions()
         }
     }
+}
+
+sealed interface TransactionEvent {
+    object LoadTransactions : TransactionEvent
+    data class DeleteTransaction(val transaction: Transaction) : TransactionEvent
+}
+
+data class TransactionState(
+    val transactions: List<TransactionWithRelations> = emptyList(),
+    val isLoading: Boolean = false,
+    val balance: Int = 0,
+    val totalIncome: Int = 0,
+    val totalExpense: Int = 0,
+    val error: String? = null
+)
+
+sealed interface TransactionEffect {
+    data class ShowMessage(val message: Int) : TransactionEffect
 }
