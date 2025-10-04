@@ -17,6 +17,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -27,12 +28,17 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun CategoryListBottomSheet(
     viewModel: CategoryViewModel = koinViewModel(),
+    selectedTransactionType: Int,
     onCategoryClick: (id: Int, name: String) -> Unit,
     onAddCategoryClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    LaunchedEffect(true){
+        viewModel.onIntent(CategoryIntent.LoadCategoryByType(selectedTransactionType))
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,

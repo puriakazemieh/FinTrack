@@ -4,10 +4,10 @@ import com.kazemieh.domain.repository.TransactionRepository
 import com.kazemieh.model.Category
 import kotlinx.coroutines.flow.Flow
 
-class GetAllCategory(
+class GetAllCategoryByType(
     private val repository: TransactionRepository
 ) {
-    suspend operator fun invoke(): Flow<List<Category>> {
-        return repository.getAllCategory()
+    suspend operator fun invoke(type: Int): Flow<List<Category>> {
+        return repository.getAllCategory(type)
     }
 }

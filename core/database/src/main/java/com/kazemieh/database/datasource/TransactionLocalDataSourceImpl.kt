@@ -95,8 +95,8 @@ class TransactionLocalDataSourceImpl(
 //        )
 //    }
 
-    override suspend fun getAllCategory(): Flow<List<Category>> {
-        return categoryDao.getAllCategories().map { it.map { it.toCategory() } }
+    override suspend fun getAllCategory(type: Int): Flow<List<Category>> {
+        return categoryDao.getAllCategories(type).map { it.map { it.toCategory() } }
     }
 
     override suspend fun getAllFinancialSource(): Flow<List<FinancialSource>> {

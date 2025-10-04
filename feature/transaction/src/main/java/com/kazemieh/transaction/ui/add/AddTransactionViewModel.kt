@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.TransactionUseCases
 import com.kazemieh.model.Transaction
+import com.kazemieh.model.TransactionType
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,12 +34,19 @@ class AddTransactionViewModel(
             is AddTransactionEvent.SetTags -> _state.update { it.copy(tags = event.tags) }
 
             AddTransactionEvent.Submit -> submitTransaction()
-            is AddTransactionEvent.SetIsIncome -> _state.update { it.copy(isIncome = event.isIncome) }
+
             AddTransactionEvent.OnDismiss -> {
                 viewModelScope.launch {
                     _state.update { AddTransactionState() }
                     _effect.send(AddTransactionEffect.OnDismiss)
                 }
+            }
+
+            is AddTransactionEvent.SelectedType -> _state.update {
+                it.copy(
+                    selectedTransactionType = event.selectedTransactionType,
+                    category = null
+                )
             }
         }
     }
@@ -46,7 +54,8 @@ class AddTransactionViewModel(
 
     private fun submitTransaction() {
         val current = _state.value
-        val amount = current.amount.toIntOrNull()?.times(if (current.isIncome) 1 else -1)
+        val amount = current.amount.toIntOrNull()
+            ?.times(if (current.selectedTransactionType.count == 1) 1 else -1)
         val categoryId = current.category?.first
         val sourceId = current.source?.first
 
@@ -63,7 +72,8 @@ class AddTransactionViewModel(
             categoryId = categoryId.toLong(),
             financialSourceId = sourceId.toLong(),
             description = current.description,
-            date = current.selectedDate
+            date = current.selectedDate,
+            type = current.selectedTransactionType
         )
 
         viewModelScope.launch {
@@ -93,13 +103,11 @@ sealed interface AddTransactionEvent {
     data class SetDate(val date: String) : AddTransactionEvent
     data class SetDescription(val description: String) : AddTransactionEvent
 
-
-    data class SetIsIncome(val isIncome: Boolean) : AddTransactionEvent
-
     object Submit : AddTransactionEvent
     data object OnDismiss : AddTransactionEvent
 
-
+    data class SelectedType(val selectedTransactionType: TransactionType = TransactionType.INCOMING) :
+        AddTransactionEvent
 }
 
 
@@ -107,14 +115,15 @@ data class AddTransactionState(
     val amount: String = "",
     val description: String = "",
     val selectedDate: String = "",
-    val isIncome: Boolean = false,
 
     val category: Pair<Int, String>? = null,
     val source: Pair<Int, String>? = null,
     val tags: Set<Pair<Int, String>>? = null,
 
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+
+    val selectedTransactionType: TransactionType = TransactionType.INCOMING,
 )
 
 sealed interface AddTransactionEffect {

@@ -40,7 +40,6 @@ fun DashboardScreen(
 
     val state by viewModel.state.collectAsState()
 
-
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -71,8 +70,13 @@ fun DashboardScreen(
                     onSourceClicked = {
                         viewModel.onIntent(DashboardIntent.ShowSourceList(true))
                     },
-                    onCategoryClicked = {
-                        viewModel.onIntent(DashboardIntent.ShowCategoryList(true))
+                    onCategoryClicked = { selectedTransactionType ->
+                        viewModel.onIntent(
+                            DashboardIntent.ShowCategoryList(
+                                categoryList = true,
+                                selectedTransactionType = selectedTransactionType
+                            )
+                        )
                     },
                     onTagClicked = {
                         viewModel.onIntent(DashboardIntent.ShowTagList(true))
@@ -81,22 +85,23 @@ fun DashboardScreen(
             }
 
             Source(
-                state.showSourceList,
-                state.showAddSource,
-                state.fromSourceList,
-                viewModel::onIntent
+                showSourceList = state.showSourceList,
+                showAddSource = state.showAddSource,
+                fromSourceList = state.fromSourceList,
+                onIntent = viewModel::onIntent
             )
 
             Category(
-                state.showCategoryList,
-                state.showAddCategory,
-                viewModel::onIntent
+                showCategoryList = state.showCategoryList,
+                showAddCategory = state.showAddCategory,
+                selectedTransactionType = state.selectedTransactionType,
+                onIntent = viewModel::onIntent
             )
 
             Tag(
-                state.showTagList,
-                state.tags,
-                viewModel::onIntent
+                showTagList = state.showTagList,
+                selectedTags = state.tags,
+                onIntent = viewModel::onIntent
             )
 
             Column(
@@ -195,11 +200,13 @@ fun Source(
 fun Category(
     showCategoryList: Boolean,
     showAddCategory: Boolean,
+    selectedTransactionType: Int,
     onIntent: (DashboardIntent) -> Unit
 ) {
 
     if (showCategoryList) {
         CategoryListBottomSheet(
+            selectedTransactionType = selectedTransactionType,
             onCategoryClick = { id, name ->
                 onIntent(DashboardIntent.SetCategory(id to name))
             },
@@ -214,6 +221,7 @@ fun Category(
 
     if (showAddCategory) {
         AddCategoryBottomSheet(
+            selectedTransactionType = selectedTransactionType,
             onDismiss = {
                 onIntent(DashboardIntent.ShowAddCategory(false))
             },

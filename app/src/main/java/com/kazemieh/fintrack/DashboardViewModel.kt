@@ -67,7 +67,13 @@ class DashboardViewModel() : ViewModel() {
                 }
             }
 
-            is DashboardIntent.ShowCategoryList -> _state.update { it.copy(showCategoryList = intent.categoryList) }
+            is DashboardIntent.ShowCategoryList -> _state.update {
+                it.copy(
+                    showCategoryList = intent.categoryList,
+                    selectedTransactionType = intent.selectedTransactionType,
+                    category = if (intent.selectedTransactionType != it.selectedTransactionType) null else it.category
+                )
+            }
 
 
             is DashboardIntent.SetTag -> {
@@ -116,7 +122,8 @@ data class DashboardState(
     val tags: Set<Pair<Int, String>>? = null,
     val showTagList: Boolean = false,
 
-    )
+    val selectedTransactionType: Int = 1,
+)
 
 
 sealed interface DashboardIntent {
@@ -131,7 +138,11 @@ sealed interface DashboardIntent {
     data class SetSource(val source: Pair<Int, String>? = null) : DashboardIntent
 
 
-    data class ShowCategoryList(val categoryList: Boolean = false) : DashboardIntent
+    data class ShowCategoryList(
+        val categoryList: Boolean = false,
+        val selectedTransactionType: Int = 1
+    ) : DashboardIntent
+
     data class ShowAddCategory(val showAddCategory: Boolean = false) : DashboardIntent
     data class SetCategory(val category: Pair<Int, String>? = null) : DashboardIntent
 

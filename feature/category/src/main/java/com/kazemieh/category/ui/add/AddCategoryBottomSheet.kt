@@ -35,9 +35,14 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AddCategoryBottomSheet(
     viewModel: AddCategoryViewModel = koinViewModel(),
+    selectedTransactionType: Int,
     onDismiss: () -> Unit,
     setCategory: (id: Int, name: String) -> Unit
 ) {
+
+    LaunchedEffect(true){
+        viewModel.onIntent(AddCategoryIntent.SetCategoryType(selectedTransactionType))
+    }
 
     val state by viewModel.state.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)

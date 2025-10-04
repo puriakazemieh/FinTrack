@@ -4,17 +4,17 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -24,8 +24,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.common.R
+import com.kazemieh.model.TransactionType
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -38,7 +41,7 @@ fun AddTransactionBottomSheet(
     tags: Set<Pair<Int, String>>? = null,
     onDismiss: () -> Unit,
     onSourceClicked: () -> Unit,
-    onCategoryClicked: () -> Unit,
+    onCategoryClicked: (Int) -> Unit,
     onTagClicked: () -> Unit,
     transactionAdded: () -> Unit = {}
 ) {
@@ -88,7 +91,7 @@ fun AddTransactionBottomSheet(
                 onEvent = viewModel::onEvent,
                 onSourceClicked = onSourceClicked,
                 onTagClicked = onTagClicked,
-                onCategoryClicked = onCategoryClicked
+                onCategoryClicked = { onCategoryClicked(state.selectedTransactionType.count) }
             )
         }
     }
@@ -108,22 +111,32 @@ fun AddTransactionContent(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier.fillMaxWidth()
+        ) {
 
-        Row {
-            RadioButton(
-                selected = state.isIncome,
-                onClick = { onEvent(AddTransactionEvent.SetIsIncome(true)) }
-            )
-            Text(text = "درآمد")
+            TransactionType.entries.forEachIndexed { index, option ->
+                SegmentedButton(
+                    selected = state.selectedTransactionType == option,
+                    onClick = {
+                        onEvent(AddTransactionEvent.SelectedType(option))
+                    },
+                    shape = SegmentedButtonDefaults.itemShape(
+                        index = index,
+                        count = 2
+                    )
+                ) {
+                    val text = if (option.count == 1) {
+                        stringResource(R.string.incoming)
+                    } else {
+                        stringResource(R.string.outcoming)
+                    }
 
-            Spacer(modifier = Modifier.width(16.dp))
-
-            RadioButton(
-                selected = !state.isIncome,
-                onClick = { onEvent(AddTransactionEvent.SetIsIncome(false)) }
-            )
-            Text(text = "هزینه")
+                    Text(text)
+                }
+            }
         }
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -146,6 +159,7 @@ fun AddTransactionContent(
             item = state.category?.second ?: "انتخاب کنید",
             onClicked = onCategoryClicked,
         )
+
         Selector(
             label = "منبع مالی را انتخاب کنید",
             item = state.source?.second ?: "انتخاب کنید",

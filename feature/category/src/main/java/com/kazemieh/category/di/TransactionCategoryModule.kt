@@ -8,7 +8,7 @@ import org.koin.dsl.module
 val transactionCategoryModule = module {
     viewModel {
         CategoryViewModel(
-            getAllCategory = get()
+            getAllCategoryByType = get()
         )
     }
 }

@@ -25,8 +25,8 @@ class TransactionRepositoryImpl(
         localDataSource.delete(transaction)
     }
 
-    override suspend fun getAllCategory(): Flow<List<Category>> {
-        return localDataSource.getAllCategory()
+    override suspend fun getAllCategory(type: Int): Flow<List<Category>> {
+        return localDataSource.getAllCategory(type)
     }
 
     override suspend fun insertTag(tag: Tag): Long {

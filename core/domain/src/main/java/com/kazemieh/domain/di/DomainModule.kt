@@ -6,7 +6,7 @@ import com.kazemieh.domain.usecase.AddTag
 import com.kazemieh.domain.usecase.AddTransaction
 import com.kazemieh.domain.usecase.DeleteTransaction
 //import com.kazemieh.domain.usecase.ExportTransactionsUseCase
-import com.kazemieh.domain.usecase.GetAllCategory
+import com.kazemieh.domain.usecase.GetAllCategoryByType
 import com.kazemieh.domain.usecase.GetAllFinancialSource
 import com.kazemieh.domain.usecase.GetAllTag
 import com.kazemieh.domain.usecase.GetAllTransactions
@@ -20,7 +20,7 @@ val domainModule = module {
     factory { GetAllTransactions(get()) }
     factory { GetAllTag(get()) }
     factory { GetAllFinancialSource(get()) }
-    factory { GetAllCategory(get()) }
+    factory { GetAllCategoryByType(get()) }
     factory { AddCategory(get()) }
     factory { AddFinancialSource(get()) }
     factory { AddTag(get()) }

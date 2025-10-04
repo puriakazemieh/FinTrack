@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.category.R
 import com.kazemieh.domain.usecase.AddCategory
 import com.kazemieh.model.Category
+import com.kazemieh.model.TransactionType
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,6 +36,7 @@ class AddCategoryViewModel(
 
             is AddCategoryIntent.SetCategoryName -> _state.update { it.copy(categoryName = intent.categoryName) }
             is AddCategoryIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
+            is AddCategoryIntent.SetCategoryType -> _state.update { it.copy(categoryType = intent.categoryType) }
         }
     }
 
@@ -43,7 +45,8 @@ class AddCategoryViewModel(
             if (categoryName?.isNotBlank() == true) {
                 val category = Category(
                     name = categoryName,
-                    description = description
+                    description = description,
+                    type = TransactionType.fromInt(categoryType)
                 )
                 val categoryId = addCategoryUseCase(category)
                 if (categoryId >= 0) {
@@ -67,11 +70,13 @@ class AddCategoryViewModel(
 data class AddCategoryState(
     val categoryName: String? = null,
     val description: String? = null,
+    val categoryType: Int = 1,
 )
 
 sealed interface AddCategoryIntent {
     data object AddCategory : AddCategoryIntent
     data class SetCategoryName(val categoryName: String? = null) : AddCategoryIntent
+    data class SetCategoryType(val categoryType: Int) : AddCategoryIntent
     data class SetDescription(val description: String? = null) : AddCategoryIntent
     data object OnDismiss : AddCategoryIntent
 }
