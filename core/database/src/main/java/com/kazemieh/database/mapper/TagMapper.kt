@@ -4,4 +4,4 @@ import com.kazemieh.database.entity.TagEntity
 import com.kazemieh.model.Tag
 
 fun TagEntity.toTag(): Tag = Tag(id, name, description)
-fun Tag.toTagEntity(): TagEntity = TagEntity(id, name, description)
+fun Tag.toTagEntity(): TagEntity = TagEntity(name = name, description = description)

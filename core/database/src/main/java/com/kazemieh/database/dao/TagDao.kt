@@ -12,6 +12,9 @@ interface TagDao {
     @Insert
     suspend fun insertTag(tag: TagEntity): Long
 
+    @Insert
+    suspend fun insertAllTag(tag: List<TagEntity>): List<Long>
+
     @Query("SELECT * FROM tag")
     fun getAllTags(): Flow<List<TagEntity>>
 

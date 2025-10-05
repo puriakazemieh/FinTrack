@@ -76,6 +76,21 @@ class PrepopulateCallback(
                 CategoryEntity(name = "سایر هزینه‌ها", type = TransactionType.OUTCOMING.count)
             )
             categoryDao.insertAllCategory(defaultCategory)
+
+            val tagDao: TagDao by koin.inject()
+            val defaultTags = listOf(
+                TagEntity(name = "کار", description = "تراکنش‌های مرتبط با محل کار یا پروژه‌ها"),
+                TagEntity(name = "تفریح", description = "هزینه‌های مربوط به سرگرمی و تفریح"),
+                TagEntity(name = "خرید", description = "خرید کالا و خدمات عمومی"),
+                TagEntity(name = "خوراک", description = "هزینه‌های غذا و رستوران"),
+                TagEntity(name = "مسافرت", description = "هزینه‌های سفر و جابجایی"),
+                TagEntity(name = "سلامت", description = "هزینه‌های پزشکی و سلامت"),
+                TagEntity(name = "آموزش", description = "هزینه‌های دوره‌ها، کتاب و آموزش"),
+                TagEntity(name = "سرمایه‌گذاری", description = "سرمایه‌گذاری‌ها و پس‌اندازها"),
+                TagEntity(name = "حمل و نقل", description = "سوخت، تاکسی، حمل و نقل عمومی"),
+                TagEntity(name = "هدیه", description = "هدیه‌ها و کمک‌های مالی به دیگران")
+            )
+            tagDao.insertAllTag(defaultTags)
         }
 
     }
