@@ -12,6 +12,9 @@ interface CategoryDao {
     @Insert
     suspend fun insertCategory(category: CategoryEntity): Long
 
+    @Insert
+    suspend fun insertAllCategory(category: List<CategoryEntity>): List<Long>
+
     @Query("SELECT * FROM category WHERE type = :type")
     fun getAllCategories(type: Int): Flow<List<CategoryEntity>>
 

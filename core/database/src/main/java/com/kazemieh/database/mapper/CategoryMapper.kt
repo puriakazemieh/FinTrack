@@ -7,4 +7,8 @@ import com.kazemieh.model.TransactionType
 fun CategoryEntity.toCategory(): Category =
     Category(id, name, description, TransactionType.fromInt(type))
 
-fun Category.toCategoryEntity(): CategoryEntity = CategoryEntity(id, name, description, type.count)
+fun Category.toCategoryEntity(): CategoryEntity = CategoryEntity(
+    name = name,
+    description = description,
+    type = type.count
+)

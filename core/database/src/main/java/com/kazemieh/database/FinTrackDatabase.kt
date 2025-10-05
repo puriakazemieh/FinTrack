@@ -13,6 +13,7 @@ import com.kazemieh.database.entity.FinancialSourceEntity
 import com.kazemieh.database.entity.TagEntity
 import com.kazemieh.database.entity.TransactionEntity
 import com.kazemieh.database.entity.TransactionTagCrossRef
+import com.kazemieh.model.TransactionType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,6 +49,33 @@ class PrepopulateCallback(
             prefsDao.insertFinancialSource(
                 FinancialSourceEntity(name = "test", type = 1)
             )
+            val categoryDao: CategoryDao by koin.inject()
+            val defaultCategory = listOf(
+                // Incomes
+                CategoryEntity(name = "حقوق و دستمزد", type = TransactionType.INCOMING.count),
+                CategoryEntity(name = "پاداش و مزایا", type = TransactionType.INCOMING.count),
+                CategoryEntity(name = "پروژه‌های جانبی", type = TransactionType.INCOMING.count),
+                CategoryEntity(name = "فروش کالا/خدمات", type = TransactionType.INCOMING.count),
+                CategoryEntity(name = "سود بانکی", type = TransactionType.INCOMING.count),
+                CategoryEntity(name = "بازگشت وجه", type = TransactionType.INCOMING.count),
+                CategoryEntity(name = "سرمایه‌گذاری", type = TransactionType.INCOMING.count),
+                CategoryEntity(name = "اجاره دریافتی", type = TransactionType.INCOMING.count),
+                CategoryEntity(name = "هدیه یا کمک مالی", type = TransactionType.INCOMING.count),
+                CategoryEntity(name = "سایر دریافتی‌ها", type = TransactionType.INCOMING.count),
+
+                // Expenses
+                CategoryEntity(name = "خوراک و رستوران", type = TransactionType.OUTCOMING.count),
+                CategoryEntity(name = "حمل‌ونقل و سوخت", type = TransactionType.OUTCOMING.count),
+                CategoryEntity(name = "اجاره یا وام مسکن", type = TransactionType.OUTCOMING.count),
+                CategoryEntity(name = "قبوض و خدمات", type = TransactionType.OUTCOMING.count),
+                CategoryEntity(name = "خرید پوشاک", type = TransactionType.OUTCOMING.count),
+                CategoryEntity(name = "بهداشت و درمان", type = TransactionType.OUTCOMING.count),
+                CategoryEntity(name = "آموزش و تحصیل", type = TransactionType.OUTCOMING.count),
+                CategoryEntity(name = "تفریح و سرگرمی", type = TransactionType.OUTCOMING.count),
+                CategoryEntity(name = "کمک مالی و هدیه", type = TransactionType.OUTCOMING.count),
+                CategoryEntity(name = "سایر هزینه‌ها", type = TransactionType.OUTCOMING.count)
+            )
+            categoryDao.insertAllCategory(defaultCategory)
         }
 
     }
