@@ -1,4 +1,4 @@
-package com.kazemieh.fintrack.ui.theme
+package com.kazemieh.designsystem
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

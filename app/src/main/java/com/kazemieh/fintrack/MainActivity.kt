@@ -4,14 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.kazemieh.fintrack.ui.theme.FinTrackTheme
+import com.kazemieh.designsystem.FintrackTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            FinTrackTheme {
+            FintrackTheme {
                 DashboardScreen()
             }
         }

@@ -69,7 +69,7 @@ class TransactionViewModel(
     private fun deleteTransaction(transaction: Transaction) {
         viewModelScope.launch {
             transactionUseCases.deleteTransaction(transaction)
-            _effect.send(TransactionEffect.ShowMessage(R.string.delete_transaction))
+            _effect.send(TransactionEffect.ShowMessage(R.string.transaction_deleted))
             loadTransactions()
         }
     }

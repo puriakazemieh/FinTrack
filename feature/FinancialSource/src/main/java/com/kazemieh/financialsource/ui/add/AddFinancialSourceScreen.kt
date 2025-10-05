@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
@@ -34,6 +36,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackOutlinedTextField
+import com.kazemieh.financialsource.R
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -72,7 +77,6 @@ fun AddSourceBottomSheet(
         }
     }
 
-
     ModalBottomSheet(
         onDismissRequest = { viewModel.onIntent(AddFinancialSourceIntent.OnDismiss) },
         sheetState = sheetState
@@ -86,96 +90,86 @@ fun AddSourceBottomSheet(
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+
+                // انتخاب نوع منبع مالی
                 SingleChoiceSegmentedButtonRow(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     SelectedTypeFinancialSource.entries.forEachIndexed { index, option ->
                         SegmentedButton(
                             selected = state.selectedTypeFinancialSource == option,
-                            onClick = {
-                                viewModel.onIntent(AddFinancialSourceIntent.SelectedType(option))
-                            },
-                            shape = SegmentedButtonDefaults.itemShape(
-                                index = index,
-                                count = 2
-                            )
+                            onClick = { viewModel.onIntent(AddFinancialSourceIntent.SelectedType(option)) },
+                            shape = SegmentedButtonDefaults.itemShape(index = index, count = 2)
                         ) {
-                            Text(stringResource(option.value))
+                            FintrackBodyMediumText(text = stringResource(option.value))
                         }
                     }
                 }
 
-                OutlinedTextField(
+                // نام منبع
+                FintrackOutlinedTextField(
                     value = state.sourceName ?: "",
                     onValueChange = { viewModel.onIntent(AddFinancialSourceIntent.SetSourceName(it)) },
                     label = {
                         Row {
-                            Text("نام منبع")
-                            Text("*", color = Color.Red)
+                            FintrackBodyMediumText(text = stringResource(R.string.source_name_label))
+                            FintrackBodyMediumText(text = stringResource(R.string.required_star), color = MaterialTheme.colorScheme.error)
                         }
-                    },
-                    modifier = Modifier.fillMaxWidth()
+                    }
                 )
 
-                OutlinedTextField(
+                // مبلغ اولیه
+                FintrackOutlinedTextField(
                     value = if (state.balance == 0) "" else state.balance.toString(),
                     onValueChange = { input ->
                         val newValue = input.toIntOrNull()
-                        if (newValue != null) viewModel.onIntent(
-                            AddFinancialSourceIntent.SetBalance(newValue)
-                        )
-                        else if (input.isEmpty()) viewModel.onIntent(
-                            AddFinancialSourceIntent.SetBalance(0)
-                        )
+                        if (newValue != null) viewModel.onIntent(AddFinancialSourceIntent.SetBalance(newValue))
+                        else if (input.isEmpty()) viewModel.onIntent(AddFinancialSourceIntent.SetBalance(0))
                     },
-                    label = { Text("مبلغ اولیه") },
-                    modifier = Modifier.fillMaxWidth(),
+                    label = { FintrackBodyMediumText(text = stringResource(R.string.initial_balance_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
 
+                // شماره کارت (در صورت CREDIT)
                 if (state.selectedTypeFinancialSource == SelectedTypeFinancialSource.CREDIT) {
-                    OutlinedTextField(
+                    FintrackOutlinedTextField(
                         value = state.cardNumber ?: "",
-                        onValueChange = {
-                            viewModel.onIntent(
-                                AddFinancialSourceIntent.SetCardNumber(it)
-                            )
-                        },
-                        label = { Text("شماره کارت") },
-                        modifier = Modifier.fillMaxWidth(),
+                        onValueChange = { viewModel.onIntent(AddFinancialSourceIntent.SetCardNumber(it)) },
+                        label = { FintrackBodyMediumText(text = stringResource(R.string.card_number_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
                 }
 
-
-                OutlinedTextField(
+                // توضیحات
+                FintrackOutlinedTextField(
                     value = state.description ?: "",
                     onValueChange = { viewModel.onIntent(AddFinancialSourceIntent.SetDescription(it)) },
-                    label = { Text("توضیحات") },
-                    modifier = Modifier.fillMaxWidth()
+                    label = { FintrackBodyMediumText(text = stringResource(R.string.description_label)) }
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-
+                // دکمه ثبت
                 Button(
-                    onClick = {
-                        viewModel.onIntent(AddFinancialSourceIntent.AddFinancialSource)
-                    },
-                    modifier = Modifier.fillMaxWidth()
+                    onClick = { viewModel.onIntent(AddFinancialSourceIntent.AddFinancialSource) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 ) {
-                    Text("ثبت منبع")
+                    FintrackBodyMediumText(text = stringResource(R.string.submit_source))
                 }
-
             }
 
+            // Snackbar
             Box {
                 SnackbarHost(
                     hostState = snackbarHostState,
                     modifier = Modifier.align(Alignment.BottomCenter)
                 )
             }
-
         }
     }
 }
+

@@ -24,9 +24,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackBodySmallText
+import com.kazemieh.financialsource.R
 import org.koin.androidx.compose.koinViewModel
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SourceListBottomSheet(
@@ -44,41 +47,53 @@ fun SourceListBottomSheet(
         sheetState = sheetState
     ) {
 
-        Column(Modifier.fillMaxWidth().padding(16.dp)) {
-
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
 
             LazyColumn {
                 items(state.sources) { source ->
-                    Text(
-                        text = source.name,
+                    Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp)
+                            .padding(vertical = 4.dp)
                             .clickable {
-                                source.id?.toInt()
-                                    ?.let { onSourceClick(it, source.name) }
-                            }
-                    )
+                                source.id?.toInt()?.let { onSourceClick(it, source.name) }
+                            },
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            FintrackBodyMediumText(text = source.name)
+                            FintrackBodySmallText(
+                                text = stringResource(R.string.balance, source.balance.toString()),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             FloatingActionButton(
-                onClick = onAddSourceClick
+                onClick = onAddSourceClick,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "افزودن منبع "
+                    contentDescription = stringResource(R.string.add_source)
                 )
             }
-
         }
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SourceList(
     viewModel: FinancialSourceViewModel = koinViewModel(),
@@ -94,13 +109,17 @@ fun SourceList(
             Card(
                 modifier = Modifier
                     .padding(horizontal = 4.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = MaterialTheme.shapes.medium
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    Text(source.name)
-                    Text("${source.balance} T")
+                    FintrackBodyMediumText(text = source.name)
+                    FintrackBodySmallText(
+                        text = stringResource(R.string.balance, source.balance.toString()),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         }

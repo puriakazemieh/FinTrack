@@ -15,15 +15,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.CategoryListBottomSheet
 import com.kazemieh.category.ui.add.AddCategoryBottomSheet
+import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.financialsource.ui.SourceList
 import com.kazemieh.financialsource.ui.SourceListBottomSheet
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
@@ -37,17 +38,18 @@ import org.koin.androidx.compose.koinViewModel
 fun DashboardScreen(
     viewModel: DashboardViewModel = koinViewModel()
 ) {
-
     val state by viewModel.state.collectAsState()
 
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { viewModel.onIntent(DashboardIntent.ShowAddTransaction(true)) }
+                onClick = { viewModel.onIntent(DashboardIntent.ShowAddTransaction(true)) },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "افزودن تراکنش"
+                    contentDescription = stringResource(R.string.add_transaction)
                 )
             }
         }
@@ -58,29 +60,23 @@ fun DashboardScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-
+            // 📝 BottomSheets
             if (state.showAddTransaction) {
                 AddTransactionBottomSheet(
                     source = state.source,
                     category = state.category,
                     tags = state.tags,
-                    onDismiss = {
-                        viewModel.onIntent(DashboardIntent.ShowAddTransaction(false))
-                    },
-                    onSourceClicked = {
-                        viewModel.onIntent(DashboardIntent.ShowSourceList(true))
-                    },
-                    onCategoryClicked = { selectedTransactionType ->
+                    onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddTransaction(false)) },
+                    onSourceClicked = { viewModel.onIntent(DashboardIntent.ShowSourceList(true)) },
+                    onCategoryClicked = { type ->
                         viewModel.onIntent(
                             DashboardIntent.ShowCategoryList(
                                 categoryList = true,
-                                selectedTransactionType = selectedTransactionType
+                                selectedTransactionType = type
                             )
                         )
                     },
-                    onTagClicked = {
-                        viewModel.onIntent(DashboardIntent.ShowTagList(true))
-                    }
+                    onTagClicked = { viewModel.onIntent(DashboardIntent.ShowTagList(true)) }
                 )
             }
 
@@ -104,33 +100,40 @@ fun DashboardScreen(
                 onIntent = viewModel::onIntent
             )
 
+            // 📝 Main content
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-
-
                 ShowTransactionCard()
 
                 Spacer(Modifier.height(16.dp))
 
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        "منابع مالی",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.weight(1f)
+                // 📌 منابع مالی Section
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FintrackTitleMediumText(
+                        text = stringResource(R.string.financial_sources),
+                        modifier = Modifier.weight(1f),
+                        color = MaterialTheme.colorScheme.onBackground
                     )
-                    IconButton(onClick = {
-                        viewModel.onIntent(
-                            DashboardIntent.ShowAddSource(
-                                showAddSource = true,
-                                fromSourceList = false
+                    IconButton(
+                        onClick = {
+                            viewModel.onIntent(
+                                DashboardIntent.ShowAddSource(
+                                    showAddSource = true,
+                                    fromSourceList = false
+                                )
                             )
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription =  stringResource(R.string.add_source),
+                            tint = MaterialTheme.colorScheme.primary
                         )
-                    }) {
-                        Icon(Icons.Default.Add, contentDescription = "افزودن منبع")
                     }
                 }
 
@@ -139,7 +142,6 @@ fun DashboardScreen(
                 Spacer(Modifier.height(16.dp))
 
                 TransactionList()
-
             }
         }
     }
@@ -231,7 +233,6 @@ fun Category(
         )
     }
 }
-
 
 @Composable
 fun Tag(

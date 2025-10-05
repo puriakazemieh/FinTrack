@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">FinTrack</string>
+
+    <!-- Dashboard -->
+    <string name="add_transaction">افزودن تراکنش</string>
+    <string name="financial_sources">منابع مالی</string>
+    <string name="add_source">افزودن منبع</string>
+
+    <!-- BottomSheets -->
+    <string name="add_category">افزودن دسته‌بندی</string>
+    <string name="add_tag">افزودن تگ</string>
+
+    <!-- TransactionCard -->
+    <string name="balance">موجودی: %1$s</string>
 </resources>
