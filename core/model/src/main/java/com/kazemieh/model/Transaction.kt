@@ -9,7 +9,7 @@ data class Transaction(
     val categoryId: Long,
     val financialSourceId: Long,
     val description: String? = null,
-    val date: String,
+    val timeStamp: Long = System.currentTimeMillis(),
     val type: TransactionType,
 )
 

@@ -11,7 +11,7 @@ fun TransactionEntity.toTransaction(): Transaction =
         categoryId = categoryId,
         financialSourceId = financialSourceId,
         description = description,
-        date = date,
+        timeStamp = timeStamp,
         type = TransactionType.fromInt(type)
     )
 
@@ -22,6 +22,6 @@ fun Transaction.toTransactionEntity(): TransactionEntity =
         categoryId = categoryId,
         financialSourceId = financialSourceId,
         description = description,
-        date = date,
+        timeStamp = timeStamp,
         type = type.count
     )

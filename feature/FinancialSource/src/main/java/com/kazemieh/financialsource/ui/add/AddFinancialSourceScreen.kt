@@ -14,14 +14,12 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -98,7 +95,9 @@ fun AddSourceBottomSheet(
                     SelectedTypeFinancialSource.entries.forEachIndexed { index, option ->
                         SegmentedButton(
                             selected = state.selectedTypeFinancialSource == option,
-                            onClick = { viewModel.onIntent(AddFinancialSourceIntent.SelectedType(option)) },
+                            onClick = {
+                                viewModel.onIntent(AddFinancialSourceIntent.SelectedType(option))
+                            },
                             shape = SegmentedButtonDefaults.itemShape(index = index, count = 2)
                         ) {
                             FintrackBodyMediumText(text = stringResource(option.value))
@@ -113,7 +112,10 @@ fun AddSourceBottomSheet(
                     label = {
                         Row {
                             FintrackBodyMediumText(text = stringResource(R.string.source_name_label))
-                            FintrackBodyMediumText(text = stringResource(R.string.required_star), color = MaterialTheme.colorScheme.error)
+                            FintrackBodyMediumText(
+                                text = stringResource(R.string.required_star),
+                                color = MaterialTheme.colorScheme.error
+                            )
                         }
                     }
                 )
@@ -123,8 +125,12 @@ fun AddSourceBottomSheet(
                     value = if (state.balance == 0) "" else state.balance.toString(),
                     onValueChange = { input ->
                         val newValue = input.toIntOrNull()
-                        if (newValue != null) viewModel.onIntent(AddFinancialSourceIntent.SetBalance(newValue))
-                        else if (input.isEmpty()) viewModel.onIntent(AddFinancialSourceIntent.SetBalance(0))
+                        if (newValue != null) viewModel.onIntent(
+                            AddFinancialSourceIntent.SetBalance(newValue)
+                        )
+                        else if (input.isEmpty()) viewModel.onIntent(
+                            AddFinancialSourceIntent.SetBalance(0)
+                        )
                     },
                     label = { FintrackBodyMediumText(text = stringResource(R.string.initial_balance_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -134,7 +140,11 @@ fun AddSourceBottomSheet(
                 if (state.selectedTypeFinancialSource == SelectedTypeFinancialSource.CREDIT) {
                     FintrackOutlinedTextField(
                         value = state.cardNumber ?: "",
-                        onValueChange = { viewModel.onIntent(AddFinancialSourceIntent.SetCardNumber(it)) },
+                        onValueChange = {
+                            viewModel.onIntent(
+                                AddFinancialSourceIntent.SetCardNumber(it)
+                            )
+                        },
                         label = { FintrackBodyMediumText(text = stringResource(R.string.card_number_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
@@ -158,7 +168,10 @@ fun AddSourceBottomSheet(
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    FintrackBodyMediumText(text = stringResource(R.string.submit_source))
+                    FintrackBodyMediumText(
+                        text = stringResource(R.string.submit_source),
+                        color = MaterialTheme.colorScheme.background
+                    )
                 }
             }
 

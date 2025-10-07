@@ -18,18 +18,20 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kazemieh.common.ld
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.financialsource.R
 import org.koin.androidx.compose.koinViewModel
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SourceListBottomSheet(
@@ -65,7 +67,8 @@ fun SourceListBottomSheet(
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surface
                         ),
-                        shape = MaterialTheme.shapes.medium
+                        shape = MaterialTheme.shapes.medium,
+                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
                             FintrackBodyMediumText(text = source.name)
@@ -98,6 +101,10 @@ fun SourceListBottomSheet(
 fun SourceList(
     viewModel: FinancialSourceViewModel = koinViewModel(),
 ) {
+    LaunchedEffect(true) {
+        viewModel.loadCategories()
+    }
+
     val state by viewModel.state.collectAsState()
 
     LazyRow(
@@ -107,17 +114,19 @@ fun SourceList(
     ) {
         items(state.sources) { source ->
             Card(
-                modifier = Modifier
-                    .padding(horizontal = 4.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                shape = MaterialTheme.shapes.medium
+                modifier = Modifier.padding(horizontal = 4.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                shape = MaterialTheme.shapes.medium,
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     FintrackBodyMediumText(text = source.name)
                     FintrackBodySmallText(
-                        text = stringResource(R.string.balance, source.balance.toString()),
+                        text = stringResource(R.string.balance, source.balance.ld("balance").toString()),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

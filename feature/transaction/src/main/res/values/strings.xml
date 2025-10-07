@@ -5,7 +5,9 @@
     <string name="amount">مبلغ</string>
     <string name="description">توضیحات</string>
     <string name="select_category">دسته بندی را انتخاب کنید</string>
+    <string name="category">دسته بندی</string>
     <string name="select_source">منبع مالی را انتخاب کنید</string>
+    <string name="source">منبع مالی </string>
     <string name="select_tags">تگ ها را انتخاب کنید</string>
     <string name="change">تغییر دهید</string>
     <string name="tag_list">لیست تگ ها</string>
@@ -15,6 +17,7 @@
     <string name="balance_total">موجودی کل</string>
     <string name="payment">پرداخت</string>
     <string name="income">دریافت</string>
+    <string name="date">تاریخ</string>
     <string name="amount_label">Amount: %1$s €</string>
     <string name="tags_label">Tags: %1$s</string>
     <string name="delete">حذف</string>

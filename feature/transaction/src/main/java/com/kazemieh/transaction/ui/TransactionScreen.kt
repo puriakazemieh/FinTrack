@@ -164,9 +164,9 @@ fun ShowTransactionCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             FintrackTitleMediumText(text = stringResource(R.string.balance_total))
-
+            val type = if (state.balance > 0) "+ " else if (state.balance < 0) "- " else ""
             FintrackHeadlineMediumText(
-                text = state.balance.toString(),
+                text = "$type${state.balance}",
                 color = if (state.balance >= 0) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
             )
 
@@ -178,25 +178,24 @@ fun ShowTransactionCard(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     FintrackBodyMediumText(
-                        text = stringResource(R.string.payment),
-                        color = MaterialTheme.colorScheme.secondary
+                        text = stringResource(R.string.outcoming),
+                        color = MaterialTheme.colorScheme.error
                     )
-                    val plus = if (state.totalExpense > 0) "+" else ""
                     FintrackTitleMediumText(
-                        text = "$plus${state.totalExpense}",
-                        color = MaterialTheme.colorScheme.secondary
+                        text = "${state.totalExpense}",
+                        color = MaterialTheme.colorScheme.error
                     )
                 }
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     FintrackBodyMediumText(
-                        text = stringResource(R.string.income),
-                        color = MaterialTheme.colorScheme.error
+                        text = stringResource(R.string.incoming),
+                        color = MaterialTheme.colorScheme.secondary
                     )
-                    val minus = if (state.totalIncome < 0) "-" else ""
+                    val plus = if (state.totalIncome > 0) "+ " else ""
                     FintrackTitleMediumText(
-                        text = "$minus${state.totalIncome}",
-                        color = MaterialTheme.colorScheme.error
+                        text = "$plus${state.totalIncome}",
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }

@@ -1,7 +1,6 @@
 package com.kazemieh.tag.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -108,7 +107,10 @@ fun TagListBottomSheet(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                FintrackBodyMediumText(text = stringResource(R.string.confirm))
+                FintrackBodyMediumText(
+                    text = stringResource(R.string.confirm),
+                    color = MaterialTheme.colorScheme.background
+                )
             }
         }
 

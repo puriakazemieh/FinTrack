@@ -19,7 +19,9 @@ class DashboardViewModel() : ViewModel() {
                 _state.update {
                     it.copy(
                         showAddTransaction = intent.showAddTransaction,
-                        source = if (!intent.showAddTransaction) null else it.source
+                        source = if (!intent.showAddTransaction) null else it.source,
+                        category = if (!intent.showAddTransaction) null else it.category,
+                        tags = if (!intent.showAddTransaction) null else it.tags,
                     )
                 }
             }

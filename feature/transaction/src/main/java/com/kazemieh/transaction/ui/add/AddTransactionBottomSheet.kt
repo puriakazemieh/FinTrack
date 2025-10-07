@@ -1,6 +1,9 @@
 package com.kazemieh.transaction.ui.add
 
 import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -8,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,7 +20,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -69,6 +72,7 @@ fun AddTransactionBottomSheet(
                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
                             transactionAdded()
+                            onDismiss()
                         }
                     }
                 }
@@ -152,49 +156,71 @@ fun AddTransactionContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Selector(
-            label = stringResource(R.string.select_category),
-            item = state.category?.second ?: stringResource(R.string.select_category),
-            onClicked = onCategoryClicked,
+        FintrackOutlinedTextField(
+            value = state.category?.second ?: "",
+            onClick = onCategoryClicked,
+            readOnly = true,
+            enabled = false,
+            label = {
+                if (state.category?.second != null) {
+                    FintrackBodyMediumText(text = stringResource(R.string.category))
+                } else {
+                    FintrackBodyMediumText(text = stringResource(R.string.select_category))
+                }
+
+            }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Selector(
-            label = stringResource(R.string.select_source),
-            item = state.source?.second ?: stringResource(R.string.select_source),
-            onClicked = onSourceClicked,
+        FintrackOutlinedTextField(
+            value = state.source?.second ?: "",
+            onClick = onSourceClicked,
+            readOnly = true,
+            enabled = false,
+            label = {
+                if (state.source?.second != null) {
+                    FintrackBodyMediumText(text = stringResource(R.string.source))
+                } else {
+                    FintrackBodyMediumText(text = stringResource(R.string.select_source))
+                }
+            }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         if (state.tags != null) {
-            Column(Modifier.fillMaxWidth()) {
+            Column(
+                Modifier.fillMaxWidth()
+                    .border(
+                        1.dp,
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(2.dp)
+                    )
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(vertical = 8.dp, horizontal = 16.dp)
+            ) {
 
-                Selector(
-                    label = stringResource(R.string.select_tags),
-                    item = stringResource(R.string.change),
-                    onClicked = onTagClicked,
-                )
-
-                Spacer(Modifier.height(16.dp))
+                FintrackBodyMediumText(
+                    text = stringResource(R.string.change),
+                    modifier = Modifier.clickable { onTagClicked() })
 
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     state.tags.forEach { tag ->
-                        TextButton(onClick = { /* هیچ عملی */ }) {
-                            FintrackBodySmallText(text = tag.second)
-                        }
+                        FintrackBodySmallText(text = tag.second)
                     }
                 }
             }
         } else {
-            Selector(
-                label = stringResource(R.string.select_tags),
-                item = stringResource(R.string.tag_list),
-                onClicked = onTagClicked,
+            FintrackOutlinedTextField(
+                value = "",
+                onClick = onTagClicked,
+                readOnly = true,
+                enabled = false,
+                label = { FintrackBodyMediumText(text = stringResource(R.string.select_tags)) }
             )
         }
 
@@ -202,7 +228,9 @@ fun AddTransactionContent(
 
         DatePickerField(
             selectedDate = state.selectedDate,
-            onDateSelected = { onEvent(AddTransactionEvent.SetDate(it)) }
+            onDateSelected = { date, timeStamp ->
+                onEvent(AddTransactionEvent.SetDate(date, timeStamp))
+            }
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -216,7 +244,10 @@ fun AddTransactionContent(
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )
         ) {
-            FintrackTitleMediumText(text = stringResource(R.string.save_transaction))
+            FintrackTitleMediumText(
+                text = stringResource(R.string.save_transaction),
+                color = MaterialTheme.colorScheme.background
+            )
         }
     }
 }

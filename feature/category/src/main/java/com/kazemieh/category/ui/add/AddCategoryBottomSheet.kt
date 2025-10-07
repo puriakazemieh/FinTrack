@@ -121,7 +121,10 @@ fun AddCategoryBottomSheet(
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    FintrackBodyMediumText(text = stringResource(R.string.save_category))
+                    FintrackBodyMediumText(
+                        text = stringResource(R.string.save_category),
+                        color = MaterialTheme.colorScheme.background
+                    )
                 }
             }
 

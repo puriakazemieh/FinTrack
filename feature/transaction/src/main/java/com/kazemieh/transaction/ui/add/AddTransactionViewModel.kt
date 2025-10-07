@@ -29,7 +29,10 @@ class AddTransactionViewModel(
             is AddTransactionEvent.SetAmount -> _state.update { it.copy(amount = event.amount) }
             is AddTransactionEvent.SetCategory -> _state.update { it.copy(category = event.category) }
             is AddTransactionEvent.SetSource -> _state.update { it.copy(source = event.source) }
-            is AddTransactionEvent.SetDate -> _state.update { it.copy(selectedDate = event.date) }
+            is AddTransactionEvent.SetDate -> _state.update {
+                it.copy(selectedDate = event.date, timeStamp = event.timeStamp)
+            }
+
             is AddTransactionEvent.SetDescription -> _state.update { it.copy(description = event.description) }
             is AddTransactionEvent.SetTags -> _state.update { it.copy(tags = event.tags) }
 
@@ -72,7 +75,7 @@ class AddTransactionViewModel(
             categoryId = categoryId.toLong(),
             financialSourceId = sourceId.toLong(),
             description = current.description,
-            date = current.selectedDate,
+            timeStamp = current.timeStamp,
             type = current.selectedTransactionType
         )
 
@@ -100,7 +103,7 @@ sealed interface AddTransactionEvent {
     data class SetSource(val source: Pair<Int, String>? = null) : AddTransactionEvent
     data class SetTags(val tags: Set<Pair<Int, String>>? = null) : AddTransactionEvent
 
-    data class SetDate(val date: String) : AddTransactionEvent
+    data class SetDate(val date: String, val timeStamp: Long) : AddTransactionEvent
     data class SetDescription(val description: String) : AddTransactionEvent
 
     object Submit : AddTransactionEvent
@@ -115,6 +118,7 @@ data class AddTransactionState(
     val amount: String = "",
     val description: String = "",
     val selectedDate: String = "",
+    val timeStamp: Long = System.currentTimeMillis(),
 
     val category: Pair<Int, String>? = null,
     val source: Pair<Int, String>? = null,

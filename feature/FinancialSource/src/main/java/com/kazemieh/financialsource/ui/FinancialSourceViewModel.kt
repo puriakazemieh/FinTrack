@@ -16,9 +16,6 @@ class FinancialSourceViewModel(
     private val _state = MutableStateFlow(FinancialSourceState())
     val state = _state.asStateFlow()
 
-    init {
-        loadCategories()
-    }
 
     fun loadCategories() {
         viewModelScope.launch {

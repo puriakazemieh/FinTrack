@@ -8,6 +8,8 @@
 #lifecycleRuntimeKtx = "2.9.0"
 
 foundation = "1.8.3"
+jalalicalendar = "1.3.3"
+jalaliDatepickerCompose = "1.2.0"
 kotlin = "1.9.24"
 agp = "8.4.1"
 koin = "3.5.6"
@@ -38,6 +40,8 @@ material = "1.10.0"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-foundation = { module = "androidx.compose.foundation:foundation" }
 androidx-room-migration-jvm = { module = "androidx.room:room-migration-jvm", version.ref = "room" }
+jalali-datepicker-compose = { module = "com.github.hamooo90:jalali-datepicker-compose", version.ref = "jalaliDatepickerCompose" }
+jalalicalendar = { module = "ir.huri:JalaliCalendar", version.ref = "jalalicalendar" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
