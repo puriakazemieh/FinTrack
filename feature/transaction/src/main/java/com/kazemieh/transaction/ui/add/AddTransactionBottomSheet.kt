@@ -1,6 +1,7 @@
 package com.kazemieh.transaction.ui.add
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,13 +19,16 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -95,19 +99,13 @@ fun AddTransactionBottomSheet(
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
-            AddTransactionContent(
-                state = state,
-                onEvent = viewModel::onEvent,
-                onSourceClicked = onSourceClicked,
-                onTagClicked = onTagClicked,
-                onCategoryClicked = { onCategoryClicked(state.selectedTransactionType.count) }
-            )
-        }
+        AddTransactionContent(
+            state = state,
+            onEvent = viewModel::onEvent,
+            onSourceClicked = onSourceClicked,
+            onTagClicked = onTagClicked,
+            onCategoryClicked = { onCategoryClicked(state.selectedTransactionType.count) }
+        )
     }
 }
 
@@ -122,27 +120,28 @@ fun AddTransactionContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(12.dp)
     ) {
-        SingleChoiceSegmentedButtonRow(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            TransactionType.entries.forEachIndexed { index, option ->
-                SegmentedButton(
-                    selected = state.selectedTransactionType == option,
-                    onClick = { onEvent(AddTransactionEvent.SelectedType(option)) },
-                    shape = SegmentedButtonDefaults.itemShape(index = index, count = 2)
-                ) {
-                    val text = if (option.count == 1) {
-                        stringResource(R.string.incoming)
-                    } else {
-                        stringResource(R.string.outcoming)
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+            SingleChoiceSegmentedButtonRow(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                TransactionType.entries.forEachIndexed { index, option ->
+                    SegmentedButton(
+                        selected = state.selectedTransactionType == option,
+                        onClick = { onEvent(AddTransactionEvent.SelectedType(option)) },
+                        shape = SegmentedButtonDefaults.itemShape(index = index, count = 2),
+                    ) {
+                        val text = if (option.count == 1) {
+                            stringResource(R.string.incoming)
+                        } else {
+                            stringResource(R.string.outcoming)
+                        }
+                        FintrackBodyMediumText(text = text)
                     }
-                    FintrackBodyMediumText(text = text)
                 }
             }
         }
-
         Spacer(modifier = Modifier.height(16.dp))
 
         FintrackOutlinedTextField(

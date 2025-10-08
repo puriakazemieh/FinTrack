@@ -57,8 +57,8 @@ fun FintrackOutlinedTextField(
         label = {
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
                     .background(MaterialTheme.colorScheme.surface)
+                    .clip(RoundedCornerShape(topEnd = 8.dp, topStart = 8.dp))
             ) {
                 label()
             }

@@ -22,6 +22,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,8 +31,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
@@ -77,35 +80,35 @@ fun AddSourceBottomSheet(
     ModalBottomSheet(
         onDismissRequest = { viewModel.onIntent(AddFinancialSourceIntent.OnDismiss) },
         sheetState = sheetState,
-        containerColor =  MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background
     ) {
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(12.dp),
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
 
-                // انتخاب نوع منبع مالی
-                SingleChoiceSegmentedButtonRow(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    SelectedTypeFinancialSource.entries.forEachIndexed { index, option ->
-                        SegmentedButton(
-                            selected = state.selectedTypeFinancialSource == option,
-                            onClick = {
-                                viewModel.onIntent(AddFinancialSourceIntent.SelectedType(option))
-                            },
-                            shape = SegmentedButtonDefaults.itemShape(index = index, count = 2)
-                        ) {
-                            FintrackBodyMediumText(text = stringResource(option.value))
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                    SingleChoiceSegmentedButtonRow(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        SelectedTypeFinancialSource.entries.forEachIndexed { index, option ->
+                            SegmentedButton(
+                                selected = state.selectedTypeFinancialSource == option,
+                                onClick = {
+                                    viewModel.onIntent(AddFinancialSourceIntent.SelectedType(option))
+                                },
+                                shape = SegmentedButtonDefaults.itemShape(index = index, count = 2)
+                            ) {
+                                FintrackBodyMediumText(text = stringResource(option.value))
+                            }
                         }
                     }
                 }
-
                 // نام منبع
                 FintrackOutlinedTextField(
                     value = state.sourceName ?: "",

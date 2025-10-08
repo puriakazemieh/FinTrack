@@ -73,7 +73,7 @@ fun AddTagBottomSheet(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(12.dp)
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 

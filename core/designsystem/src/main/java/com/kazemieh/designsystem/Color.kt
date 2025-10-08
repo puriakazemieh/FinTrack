@@ -33,32 +33,33 @@ val md_theme_light_onSurface = Color(0xFF1A1C18)
 val md_theme_light_outline = Color(0xFF72796F)
 val md_theme_light_outlineVariant = Color(0xFFC3C8BC)
 
-// 🌚 Dark Theme Colors (Green)
+// 🌚 Dark Theme Colors (Green) — Optimized
 val md_theme_dark_primary = Color(0xFF7CDB76)
 val md_theme_dark_onPrimary = Color(0xFF00390A)
-val md_theme_dark_primaryContainer = Color(0xFF005313)
-val md_theme_dark_onPrimaryContainer = Color(0xFF98F990)
+val md_theme_dark_primaryContainer = Color(0xFF145C1A)
+val md_theme_dark_onPrimaryContainer = Color(0xFFE5FFE1)
 
-val md_theme_dark_secondary = Color(0xFFBACCB3)
-val md_theme_dark_onSecondary = Color(0xFF253423)
-val md_theme_dark_secondaryContainer = Color(0xFF3B4B38)
-val md_theme_dark_onSecondaryContainer = Color(0xFFD5E8CF)
+val md_theme_dark_secondary = Color(0xFFB5D1AE)
+val md_theme_dark_onSecondary = Color(0xFF22331E)
+val md_theme_dark_secondaryContainer = Color(0xFF384C35)
+val md_theme_dark_onSecondaryContainer = Color(0xFFD9ECD2)
 
 val md_theme_dark_tertiary = Color(0xFFA1CED4)
 val md_theme_dark_onTertiary = Color(0xFF00363B)
-val md_theme_dark_tertiaryContainer = Color(0xFF1E4D52)
+val md_theme_dark_tertiaryContainer = Color(0xFF2C5B60)
 val md_theme_dark_onTertiaryContainer = Color(0xFFBCEBF0)
 
 val md_theme_dark_error = Color(0xFFFFB4AB)
 val md_theme_dark_onError = Color(0xFF690005)
-val md_theme_dark_errorContainer = Color(0xFF93000A)
+val md_theme_dark_errorContainer = Color(0xFF8C1D26)
 val md_theme_dark_onErrorContainer = Color(0xFFFFDAD6)
 
-val md_theme_dark_background = Color(0xFF1A1C18)
-val md_theme_dark_onBackground = Color(0xFFE2E3DC)
+val md_theme_dark_background = Color(0xFF222622)
+val md_theme_dark_onBackground = Color(0xFFE8E9E3)
 
-val md_theme_dark_surface = Color(0xFF1A1C18)
-val md_theme_dark_onSurface = Color(0xFFE2E3DC)
+val md_theme_dark_surface = Color(0xFF2C2F26)
+val md_theme_dark_onSurface = Color(0xFFE8E9E3)
 
-val md_theme_dark_outline = Color(0xFF8C9388)
-val md_theme_dark_outlineVariant = Color(0xFF43483E)
+val md_theme_dark_outline = Color(0xFF5E655B)
+val md_theme_dark_outlineVariant = Color(0xFF464B42)
+

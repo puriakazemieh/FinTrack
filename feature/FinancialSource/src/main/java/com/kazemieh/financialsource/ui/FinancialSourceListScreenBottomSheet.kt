@@ -1,6 +1,7 @@
 package com.kazemieh.financialsource.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,10 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.kazemieh.common.ld
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.financialsource.R
@@ -53,7 +54,7 @@ fun SourceListBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(12.dp)
         ) {
 
             LazyColumn {
@@ -84,15 +85,21 @@ fun SourceListBottomSheet(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            FloatingActionButton(
-                onClick = onAddSourceClick,
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+            Box(
+                modifier = Modifier.fillMaxWidth().padding(4.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_source)
-                )
+                FloatingActionButton(
+                    onClick = onAddSourceClick,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.add_source)
+                    )
+                }
             }
         }
     }
@@ -127,10 +134,7 @@ fun SourceList(
                 ) {
                     FintrackBodyMediumText(text = source.name)
                     FintrackBodySmallText(
-                        text = stringResource(
-                            R.string.balance,
-                            source.balance.ld("balance").toString()
-                        ),
+                        text = stringResource(R.string.balance, source.balance),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

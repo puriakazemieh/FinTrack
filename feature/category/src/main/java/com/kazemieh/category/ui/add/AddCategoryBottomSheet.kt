@@ -82,7 +82,7 @@ fun AddCategoryBottomSheet(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(12.dp),
         ) {
 
             Column(
