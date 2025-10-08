@@ -52,7 +52,8 @@ fun TagListBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
@@ -71,7 +72,12 @@ fun TagListBottomSheet(
                         onClick = {
                             viewModel.onIntent(TagIntent.SetSelectedTag(tag.first to tag.second))
                         },
-                        label = { FintrackBodyMediumText(text = tag.second) },
+                        label = {
+                            FintrackBodyMediumText(
+                                text = tag.second,
+                                color = if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onBackground
+                            )
+                        },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = MaterialTheme.colorScheme.primary,
                             selectedLabelColor = MaterialTheme.colorScheme.onPrimary,

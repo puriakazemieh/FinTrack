@@ -76,7 +76,8 @@ fun AddSourceBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = { viewModel.onIntent(AddFinancialSourceIntent.OnDismiss) },
-        sheetState = sheetState
+        sheetState = sheetState,
+        containerColor =  MaterialTheme.colorScheme.background
     ) {
 
         Box(

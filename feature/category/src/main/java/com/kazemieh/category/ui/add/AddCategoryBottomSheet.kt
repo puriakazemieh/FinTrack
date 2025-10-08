@@ -75,7 +75,8 @@ fun AddCategoryBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = { viewModel.onIntent(AddCategoryIntent.OnDismiss) },
-        sheetState = sheetState
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background
     ) {
 
         Box(

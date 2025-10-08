@@ -46,7 +46,8 @@ fun SourceListBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background
     ) {
 
         Column(
@@ -126,7 +127,10 @@ fun SourceList(
                 ) {
                     FintrackBodyMediumText(text = source.name)
                     FintrackBodySmallText(
-                        text = stringResource(R.string.balance, source.balance.ld("balance").toString()),
+                        text = stringResource(
+                            R.string.balance,
+                            source.balance.ld("balance").toString()
+                        ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

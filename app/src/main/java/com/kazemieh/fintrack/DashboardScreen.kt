@@ -52,7 +52,8 @@ fun DashboardScreen(
                     contentDescription = stringResource(R.string.add_transaction)
                 )
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
 
         Box(
@@ -131,7 +132,7 @@ fun DashboardScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription =  stringResource(R.string.add_source),
+                            contentDescription = stringResource(R.string.add_source),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }

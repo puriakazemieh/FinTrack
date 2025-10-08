@@ -47,7 +47,8 @@ fun CategoryListBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState
+        sheetState = sheetState,
+        containerColor =  MaterialTheme.colorScheme.background
     ) {
 
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
@@ -62,7 +63,8 @@ fun CategoryListBottomSheet(
                                 category.id?.toInt()?.let { onCategoryClick(it, category.name) }
                             },
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        shape = MaterialTheme.shapes.medium
+                        shape = MaterialTheme.shapes.medium,
+                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
                             FintrackBodyMediumText(text = category.name)

@@ -26,9 +26,27 @@ class AddTransactionViewModel(
 
     fun onEvent(event: AddTransactionEvent) {
         when (event) {
-            is AddTransactionEvent.SetAmount -> _state.update { it.copy(amount = event.amount) }
-            is AddTransactionEvent.SetCategory -> _state.update { it.copy(category = event.category) }
-            is AddTransactionEvent.SetSource -> _state.update { it.copy(source = event.source) }
+            is AddTransactionEvent.SetAmount -> _state.update {
+                it.copy(
+                    amount = event.amount,
+                    isAmountError = event.amount.isBlank()
+                )
+            }
+
+            is AddTransactionEvent.SetCategory -> _state.update {
+                it.copy(
+                    category = event.category,
+                    isCategoryError = event.category?.second?.isBlank() == true
+                )
+            }
+
+            is AddTransactionEvent.SetSource -> _state.update {
+                it.copy(
+                    source = event.source,
+                    isSourceError = event.source?.second?.isBlank() == true
+                )
+            }
+
             is AddTransactionEvent.SetDate -> _state.update {
                 it.copy(selectedDate = event.date, timeStamp = event.timeStamp)
             }
@@ -65,6 +83,13 @@ class AddTransactionViewModel(
         if (amount == null || categoryId == null || sourceId == null) {
             viewModelScope.launch {
                 _effect.send(AddTransactionEffect.Error("لطفاً تمام فیلدها را پر کنید."))
+            }
+            _state.update {
+                it.copy(
+                    isSourceError = sourceId == null,
+                    isCategoryError = categoryId == null,
+                    isAmountError = amount == null
+                )
             }
             return
         }
@@ -117,12 +142,16 @@ sealed interface AddTransactionEvent {
 data class AddTransactionState(
     val amount: String = "",
     val description: String = "",
-    val selectedDate: String = "",
+    val selectedDate: String? = null,
     val timeStamp: Long = System.currentTimeMillis(),
 
     val category: Pair<Int, String>? = null,
     val source: Pair<Int, String>? = null,
     val tags: Set<Pair<Int, String>>? = null,
+
+    val isAmountError: Boolean = false,
+    val isCategoryError: Boolean = false,
+    val isSourceError: Boolean = false,
 
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
