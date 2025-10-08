@@ -67,6 +67,8 @@ fun AddTransactionBottomSheet(
         viewModel.onEvent(AddTransactionEvent.SetTags(tags))
     }
 
+    viewModel.onEvent(AddTransactionEvent.FetchDefaultData)
+
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
@@ -96,7 +98,7 @@ fun AddTransactionBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(8.dp)
         ) {
             AddTransactionContent(
                 state = state,

@@ -164,10 +164,10 @@ fun ShowTransactionCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             FintrackTitleMediumText(text = stringResource(R.string.balance_total))
-            val type = if (state.balance > 0) "+ " else if (state.balance < 0) "- " else ""
+
             FintrackHeadlineMediumText(
-                text = "$type${state.balance}",
-                color = if (state.balance >= 0) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
+                text = state.balance,
+                color = if (state.isPositiveBalance) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -182,7 +182,7 @@ fun ShowTransactionCard(
                         color = MaterialTheme.colorScheme.error
                     )
                     FintrackTitleMediumText(
-                        text = "${state.totalExpense}",
+                        text = state.totalExpense,
                         color = MaterialTheme.colorScheme.error
                     )
                 }
@@ -192,9 +192,8 @@ fun ShowTransactionCard(
                         text = stringResource(R.string.incoming),
                         color = MaterialTheme.colorScheme.secondary
                     )
-                    val plus = if (state.totalIncome > 0) "+ " else ""
                     FintrackTitleMediumText(
-                        text = "$plus${state.totalIncome}",
+                        text = state.totalIncome,
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }

@@ -56,7 +56,7 @@ class TransactionLocalDataSourceImpl(
     }
 
     override fun getAll(): Flow<List<TransactionWithRelations>> {
-      return  transactionDao.getAllTransactionsWithCategoryFinancialSourceAndTags().map {
+        return transactionDao.getAllTransactionsWithCategoryFinancialSourceAndTags().map {
             it.map { it.toTransactionWithRelations() }
         }
     }
@@ -107,6 +107,22 @@ class TransactionLocalDataSourceImpl(
 
     override suspend fun getAllTag(): Flow<List<Tag>> {
         return tagDao.getAllTags().map { it.map { it.toTag() } }
+    }
+
+    override suspend fun increaseBalanceFinancialSource(id: Long, amount: Int) {
+        financialSourceDao.increaseBalance(id, amount)
+    }
+
+    override suspend fun decreaseBalanceFinancialSource(id: Long, amount: Int) {
+        financialSourceDao.decreaseBalance(id, amount)
+    }
+
+    override suspend fun getDefaultCategory(type: Int): Category {
+        return categoryDao.getDefaultCategory(type).toCategory()
+    }
+
+    override suspend fun getDefaultSource(): FinancialSource {
+        return financialSourceDao.getDefaultSource().toFinancialSource()
     }
 
 }

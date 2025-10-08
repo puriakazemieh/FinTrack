@@ -53,12 +53,21 @@ class TransactionViewModel(
                     .sumOf { it.transaction.amount }
 
                 val balance = totalIncome + totalExpense
+
+                val newBalance =
+                    if (balance < 0) "- ${balance * -1}" else if (balance > 0) "+ $balance" else "0"
+
+                val newTotalExpense = if (totalExpense < 0) "- ${totalExpense * -1}" else "0"
+
+                val newTotalIncome = if (totalIncome > 0) "+ $totalIncome" else "0"
+
                 _state.update {
                     it.copy(
                         transactions = transactions,
-                        totalIncome = totalIncome,
-                        totalExpense = totalExpense,
-                        balance = balance,
+                        totalIncome = newTotalIncome,
+                        totalExpense = newTotalExpense,
+                        balance = newBalance,
+                        isPositiveBalance = balance >= 0,
                         isLoading = false
                     )
                 }
@@ -83,9 +92,10 @@ sealed interface TransactionEvent {
 data class TransactionState(
     val transactions: List<TransactionWithRelations> = emptyList(),
     val isLoading: Boolean = false,
-    val balance: Int = 0,
-    val totalIncome: Int = 0,
-    val totalExpense: Int = 0,
+    val balance: String = "0",
+    val isPositiveBalance: Boolean = true,
+    val totalIncome: String = "0",
+    val totalExpense: String = "0",
     val error: String? = null
 )
 

@@ -69,6 +69,31 @@ class AddTransactionViewModel(
                     category = null
                 )
             }
+
+            AddTransactionEvent.FetchDefaultData -> fetchDefaultData()
+        }
+    }
+
+    private fun fetchDefaultData() {
+        viewModelScope.launch {
+            val defaultCategory =
+                transactionUseCases.getDefaultCategoryUseCase(TransactionType.INCOME.count)
+            val defaultSource = transactionUseCases.getDefaultFinancialSourceUseCase()
+
+            val category = if (defaultCategory.id != null) {
+                defaultCategory.id!!.toInt() to defaultCategory.name
+            } else null
+
+            val source = if (defaultSource.id != null) {
+                defaultSource.id!!.toInt() to defaultSource.name
+            } else null
+
+            _state.update {
+                it.copy(
+                    category = category,
+                    source = source
+                )
+            }
         }
     }
 
@@ -132,9 +157,10 @@ sealed interface AddTransactionEvent {
     data class SetDescription(val description: String) : AddTransactionEvent
 
     object Submit : AddTransactionEvent
+    object FetchDefaultData : AddTransactionEvent
     data object OnDismiss : AddTransactionEvent
 
-    data class SelectedType(val selectedTransactionType: TransactionType = TransactionType.INCOMING) :
+    data class SelectedType(val selectedTransactionType: TransactionType = TransactionType.INCOME) :
         AddTransactionEvent
 }
 
@@ -156,7 +182,7 @@ data class AddTransactionState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
 
-    val selectedTransactionType: TransactionType = TransactionType.INCOMING,
+    val selectedTransactionType: TransactionType = TransactionType.INCOME,
 )
 
 sealed interface AddTransactionEffect {

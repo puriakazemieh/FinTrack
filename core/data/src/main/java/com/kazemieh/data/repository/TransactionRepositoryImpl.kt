@@ -48,4 +48,20 @@ class TransactionRepositoryImpl(
     override suspend fun getAllTag(): Flow<List<Tag>> {
         return localDataSource.getAllTag()
     }
+
+    override suspend fun increaseBalanceFinancialSource(id: Long, amount: Int) {
+        localDataSource.increaseBalanceFinancialSource(id, amount)
+    }
+
+    override suspend fun decreaseBalanceFinancialSource(id: Long, amount: Int) {
+        localDataSource.decreaseBalanceFinancialSource(id, amount)
+    }
+
+    override suspend fun getDefaultCategory(type: Int): Category {
+        return localDataSource.getDefaultCategory(type)
+    }
+
+    override suspend fun getDefaultSource(): FinancialSource {
+        return localDataSource.getDefaultSource()
+    }
 }

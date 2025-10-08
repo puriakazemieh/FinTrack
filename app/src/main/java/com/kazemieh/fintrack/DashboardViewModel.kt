@@ -131,22 +131,20 @@ data class DashboardState(
 sealed interface DashboardIntent {
     data class ShowAddTransaction(val showAddTransaction: Boolean = false) : DashboardIntent
 
+    data class SetSource(val source: Pair<Int, String>? = null) : DashboardIntent
     data class ShowSourceList(val sourceList: Boolean = false) : DashboardIntent
     data class ShowAddSource(
         val showAddSource: Boolean = false,
         val fromSourceList: Boolean = false
     ) : DashboardIntent
 
-    data class SetSource(val source: Pair<Int, String>? = null) : DashboardIntent
 
-
+    data class ShowAddCategory(val showAddCategory: Boolean = false) : DashboardIntent
+    data class SetCategory(val category: Pair<Int, String>? = null) : DashboardIntent
     data class ShowCategoryList(
         val categoryList: Boolean = false,
         val selectedTransactionType: Int = 1
     ) : DashboardIntent
-
-    data class ShowAddCategory(val showAddCategory: Boolean = false) : DashboardIntent
-    data class SetCategory(val category: Pair<Int, String>? = null) : DashboardIntent
 
     data class ShowTagList(val showTagList: Boolean = false) : DashboardIntent
     data class SetTag(val tag: Pair<Int, String>) : DashboardIntent

@@ -14,8 +14,8 @@ data class Transaction(
 )
 
 enum class TransactionType(val count: Int) {
-    INCOMING(1),
-    OUTCOMING(2);
+    INCOME(1),
+    EXPENSE(2);
 
     companion object {
         fun fromInt(value: Int) = TransactionType.entries.first { it.count == value }
