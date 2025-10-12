@@ -1,7 +1,6 @@
 package com.kazemieh.transaction.ui.add
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -71,7 +70,9 @@ fun AddTransactionBottomSheet(
         viewModel.onEvent(AddTransactionEvent.SetTags(tags))
     }
 
-    viewModel.onEvent(AddTransactionEvent.FetchDefaultData)
+    LaunchedEffect(true) {
+        viewModel.onEvent(AddTransactionEvent.FetchDefaultData)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -222,7 +223,14 @@ fun AddTransactionContent(
             readOnly = true,
             enabled = false,
             singleLine = false,
-            label = { FintrackBodyMediumText(text = stringResource(R.string.select_tags)) }
+            label = {
+                if (state.tags != null) {
+                    FintrackBodyMediumText(text = stringResource(R.string.tags))
+                } else {
+                    FintrackBodyMediumText(text = stringResource(R.string.select_tags))
+                }
+            }
+
         )
 
         /* if (state.tags != null) {

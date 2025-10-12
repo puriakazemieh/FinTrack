@@ -21,13 +21,18 @@ class FinancialSourceViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             getAllFinancialSource().collect { financialSource ->
-                _state.update { it.copy(sources = financialSource, isLoading = false) }
+                _state.update {
+                    it.copy(
+                        sources = financialSource.map { it.toUi() },
+                        isLoading = false
+                    )
+                }
             }
         }
     }
 }
 
 data class FinancialSourceState(
-    val sources: List<FinancialSource> = emptyList(),
+    val sources: List<FinancialSourceUi> = emptyList(),
     val isLoading: Boolean = false
 )

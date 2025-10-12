@@ -63,7 +63,7 @@ fun DashboardScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // 📝 BottomSheets
+
             if (state.showAddTransaction) {
                 AddTransactionBottomSheet(
                     source = state.source,
@@ -113,7 +113,6 @@ fun DashboardScreen(
 
                 Spacer(Modifier.height(16.dp))
 
-                // 📌 منابع مالی Section
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {

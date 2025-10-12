@@ -100,7 +100,7 @@ fun TagListBottomSheet(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier
-                        .align(Alignment.BottomEnd),
+                        .align(Alignment.BottomStart),
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,

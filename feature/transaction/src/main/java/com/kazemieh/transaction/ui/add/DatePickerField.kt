@@ -18,6 +18,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,7 +26,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.gmail.hamedvakhide.compose_jalali_datepicker.JalaliCalendarView
@@ -41,24 +44,25 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerField(
-    selectedDate: String? = "${JalaliCalendar().day}/${JalaliCalendar().month}/${JalaliCalendar().year}",
+    selectedDate: String? = "${JalaliCalendar().day} / ${JalaliCalendar().monthString} / ${JalaliCalendar().year}",
     onDateSelected: (String, Long) -> Unit
 ) {
     val openSheet = remember { mutableStateOf(false) }
 
-    JalaliDatePickerBottomSheet(
-        openSheet = openSheet,
-        onConfirm = {
-            val gregorian = it.toGregorian()
-            val timestamp = gregorian.timeInMillis
-            val date = "${it.day}/${it.month}/${it.year}"
-            onDateSelected(date, timestamp)
-        },
-    )
-
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        JalaliDatePickerBottomSheet(
+            openSheet = openSheet,
+            onConfirm = {
+                val gregorian = it.toGregorian()
+                val timestamp = gregorian.timeInMillis
+                val date = "${it.day} / ${it.monthString} / ${it.year}"
+                onDateSelected(date, timestamp)
+            },
+        )
+    }
     FintrackOutlinedTextField(
         value = selectedDate
-            ?: "${JalaliCalendar().day}/${JalaliCalendar().month}/${JalaliCalendar().year}",
+            ?: "${JalaliCalendar().day} / ${JalaliCalendar().monthString} / ${JalaliCalendar().year}",
         onClick = { openSheet.value = true },
         readOnly = true,
         enabled = false,

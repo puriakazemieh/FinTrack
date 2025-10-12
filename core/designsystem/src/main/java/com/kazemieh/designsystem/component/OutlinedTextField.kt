@@ -28,9 +28,9 @@ fun FintrackOutlinedTextField(
     label: @Composable (() -> Unit),
     textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     textColor: Color = MaterialTheme.colorScheme.onBackground,
-    containerColor: Color = MaterialTheme.colorScheme.surface,
+    containerColor: Color = MaterialTheme.colorScheme.background,
     disabledBorderColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-    disabledContainerColor: Color = MaterialTheme.colorScheme.surface,
+    disabledContainerColor: Color = MaterialTheme.colorScheme.background,
     focusedBorderColor: Color = MaterialTheme.colorScheme.primary,
     unfocusedBorderColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     cursorColor: Color = MaterialTheme.colorScheme.primary,
@@ -55,13 +55,14 @@ fun FintrackOutlinedTextField(
             },
         textStyle = textStyle.copy(color = textColor),
         label = {
-            Box(
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surface)
-                    .clip(RoundedCornerShape(topEnd = 8.dp, topStart = 8.dp))
-            ) {
-                label()
-            }
+            label()
+//            Box(
+//                modifier = Modifier
+//                    .background(MaterialTheme.colorScheme.surface)
+//                    .clip(RoundedCornerShape(topEnd = 8.dp, topStart = 8.dp))
+//            ) {
+//                label()
+//            }
         },
         enabled = enabled,
         singleLine = singleLine,

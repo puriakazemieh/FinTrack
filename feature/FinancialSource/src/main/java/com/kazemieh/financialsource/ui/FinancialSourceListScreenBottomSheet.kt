@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -64,7 +65,7 @@ fun SourceListBottomSheet(
                             .fillMaxWidth()
                             .padding(vertical = 4.dp)
                             .clickable {
-                                source.id?.toInt()?.let { onSourceClick(it, source.name) }
+                                onSourceClick(source.id.toInt(), source.name)
                             },
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surface
@@ -75,7 +76,7 @@ fun SourceListBottomSheet(
                         Column(modifier = Modifier.padding(12.dp)) {
                             FintrackBodyMediumText(text = source.name)
                             FintrackBodySmallText(
-                                text = stringResource(R.string.balance, source.balance.toString()),
+                                text = stringResource(R.string.balance, source.formattedBalance),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -93,7 +94,7 @@ fun SourceListBottomSheet(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier
-                        .align(Alignment.BottomEnd),
+                        .align(Alignment.BottomStart),
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -116,10 +117,12 @@ fun SourceList(
     val state by viewModel.state.collectAsState()
 
     LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
+        modifier = Modifier.fillMaxWidth()
     ) {
+//        item {
+//            Spacer(modifier = Modifier.width(4.dp))
+//        }
+
         items(state.sources) { source ->
             Card(
                 modifier = Modifier.padding(horizontal = 4.dp),
@@ -134,11 +137,15 @@ fun SourceList(
                 ) {
                     FintrackBodyMediumText(text = source.name)
                     FintrackBodySmallText(
-                        text = stringResource(R.string.balance, source.balance),
+                        text = stringResource(R.string.balance, source.formattedBalance),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
         }
+
+//        item {
+//            Spacer(modifier = Modifier.width(4.dp))
+//        }
     }
 }

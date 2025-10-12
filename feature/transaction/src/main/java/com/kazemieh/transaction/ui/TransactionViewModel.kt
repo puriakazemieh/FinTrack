@@ -2,9 +2,8 @@ package com.kazemieh.transaction.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.formatted
 import com.kazemieh.domain.usecase.TransactionUseCases
-import com.kazemieh.model.Transaction
-import com.kazemieh.model.TransactionWithRelations
 import com.kazemieh.transaction.R
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,29 +43,27 @@ class TransactionViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             transactionUseCases.getAllTransactions().collect { transactions ->
-                val totalIncome = transactions
-                    .filter { it.transaction.amount > 0 }
-                    .sumOf { it.transaction.amount }
 
-                val totalExpense = transactions
-                    .filter { it.transaction.amount < 0 }
-                    .sumOf { it.transaction.amount }
+                var totalIncome = 0
+                var totalExpense = 0
+                var balance = 0
 
-                val balance = totalIncome + totalExpense
-
-                val newBalance =
-                    if (balance < 0) "- ${balance * -1}" else if (balance > 0) "+ $balance" else "0"
-
-                val newTotalExpense = if (totalExpense < 0) "- ${totalExpense * -1}" else "0"
-
-                val newTotalIncome = if (totalIncome > 0) "+ $totalIncome" else "0"
+                val uiTransactionWithRelations = transactions.map { transactionWithRelations ->
+                    if (transactionWithRelations.transaction.amount > 0)
+                        totalIncome += transactionWithRelations.transaction.amount
+                    else totalExpense += transactionWithRelations.transaction.amount
+                    balance += transactionWithRelations.transaction.amount
+                    transactionWithRelations.copy()
+                    transactionWithRelations.transaction.toUi()
+                    transactionWithRelations.toUi()
+                }
 
                 _state.update {
                     it.copy(
-                        transactions = transactions,
-                        totalIncome = newTotalIncome,
-                        totalExpense = newTotalExpense,
-                        balance = newBalance,
+                        uiTransactionWithRelations = uiTransactionWithRelations,
+                        totalIncome = totalIncome.formatted(),
+                        totalExpense = totalExpense.formatted(),
+                        balance = balance.formatted(),
                         isPositiveBalance = balance >= 0,
                         isLoading = false
                     )
@@ -75,9 +72,9 @@ class TransactionViewModel(
         }
     }
 
-    private fun deleteTransaction(transaction: Transaction) {
+    private fun deleteTransaction(transaction: TransactionUi) {
         viewModelScope.launch {
-            transactionUseCases.deleteTransaction(transaction)
+            transactionUseCases.deleteTransaction(transaction.toDomain())
             _effect.send(TransactionEffect.ShowMessage(R.string.transaction_deleted))
             loadTransactions()
         }
@@ -86,11 +83,11 @@ class TransactionViewModel(
 
 sealed interface TransactionEvent {
     object LoadTransactions : TransactionEvent
-    data class DeleteTransaction(val transaction: Transaction) : TransactionEvent
+    data class DeleteTransaction(val transaction: TransactionUi) : TransactionEvent
 }
 
 data class TransactionState(
-    val transactions: List<TransactionWithRelations> = emptyList(),
+    val uiTransactionWithRelations: List<TransactionWithRelationsUi> = emptyList(),
     val isLoading: Boolean = false,
     val balance: String = "0",
     val isPositiveBalance: Boolean = true,

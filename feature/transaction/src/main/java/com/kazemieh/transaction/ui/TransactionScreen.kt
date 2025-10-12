@@ -1,6 +1,7 @@
 package com.kazemieh.transaction.ui
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,11 +13,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,7 +35,7 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackHeadlineMediumText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.model.TransactionWithRelations
+import com.kazemieh.model.TransactionType
 import com.kazemieh.transaction.R
 import org.koin.androidx.compose.koinViewModel
 
@@ -51,13 +54,11 @@ fun TransactionList(
         }
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
         if (state.isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -66,22 +67,25 @@ fun TransactionList(
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         } else {
-            LazyColumn {
-                item {
-                    FintrackTitleMediumText(
-                        text = stringResource(R.string.recent_transactions),
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                }
-                items(state.transactions) { transactionWithRelations ->
-                    TransactionItem(
-                        transaction = transactionWithRelations,
-                        onDelete = {
-                            viewModel.onEvent(
-                                TransactionEvent.DeleteTransaction(transactionWithRelations.transaction)
-                            )
-                        }
-                    )
+            Column {
+                FintrackTitleMediumText(
+                    text = stringResource(R.string.recent_transactions),
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(state.uiTransactionWithRelations) { transactionWithRelations ->
+                        TransactionItem(
+                            uiTransactionWithRelation = transactionWithRelations,
+                            onDelete = {
+                                viewModel.onEvent(
+                                    TransactionEvent.DeleteTransaction(transactionWithRelations.transaction)
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -91,56 +95,78 @@ fun TransactionList(
 
 @Composable
 fun TransactionItem(
-    transaction: TransactionWithRelations,
+    uiTransactionWithRelation: TransactionWithRelationsUi,
     onDelete: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp),
+            .padding(vertical = 4.dp),
         shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                FintrackTitleMediumText(
+                    text = uiTransactionWithRelation.categoryName,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.delete),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(6.dp))
+
             FintrackTitleMediumText(
-                text = "${transaction.category.name} - ${transaction.financialSource.name}"
+                text = "${stringResource(R.string.source)} : ${uiTransactionWithRelation.financialSourceName}",
+                color = MaterialTheme.colorScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             val amountColor =
-                if (transaction.transaction.amount >= 0) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
+                if (uiTransactionWithRelation.transaction.amount >= 0)
+                    MaterialTheme.colorScheme.secondary
+                else
+                    MaterialTheme.colorScheme.error
+
+            val type = if (uiTransactionWithRelation.transaction.type == TransactionType.INCOME)
+                stringResource(R.string.incoming)
+            else stringResource(R.string.outcoming)
 
             FintrackBodyLargeText(
                 text = stringResource(
                     R.string.amount_label,
-                    transaction.transaction.amount.toString()
+                    type,
+                    uiTransactionWithRelation.transaction.formatedAmount
                 ),
                 color = amountColor
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            val tagsText = transaction.tags.joinToString { it.name }
-            FintrackBodySmallText(
-                text = stringResource(R.string.tags_label, tagsText),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(
-                onClick = onDelete,
-                modifier = Modifier.align(Alignment.End),
-                shape = MaterialTheme.shapes.small,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error,
-                    contentColor = MaterialTheme.colorScheme.onError
+            if (uiTransactionWithRelation.tags.isNotEmpty()) {
+                FintrackBodySmallText(
+                    text = stringResource(R.string.tags_label, uiTransactionWithRelation.tags),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            ) {
-                FintrackBodyMediumText(text = stringResource(R.string.delete))
             }
         }
+
+
     }
 }
 

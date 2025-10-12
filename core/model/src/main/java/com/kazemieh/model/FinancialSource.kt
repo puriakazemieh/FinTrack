@@ -9,5 +9,5 @@ data class FinancialSource(
     val balance: Int = 0,
     val cardNumber: String? = null,
     val description: String? = null,
-    val type: Int? = null,
+    val type: Int,
 )
