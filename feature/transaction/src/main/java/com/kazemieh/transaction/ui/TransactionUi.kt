@@ -1,6 +1,7 @@
 package com.kazemieh.transaction.ui
 
 import com.kazemieh.common.formatted
+import com.kazemieh.designsystem.component.PieChartItem
 import com.kazemieh.model.Transaction
 import com.kazemieh.model.TransactionType
 import com.kazemieh.model.TransactionWithRelations
@@ -59,4 +60,12 @@ fun TransactionWithRelations.toUi() = TransactionWithRelationsUi(
     financialSourceName = financialSource.name,
     tags = tags.joinToString { it.name }
 )
+
+fun TransactionWithRelations.toPieChartItem(): PieChartItem {
+    return PieChartItem(
+        id = category.id,
+        label = category.name,
+        value = transaction.amount.toLong()
+    )
+}
 

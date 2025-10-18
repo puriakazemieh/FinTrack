@@ -29,3 +29,11 @@ fun Int.formatted(): String =
         this > 0 -> "${this.formatNumber()} +"
         else -> "0"
     }
+
+
+fun Int.toPositive(): Int =
+    when {
+        this < 0 -> this * -1
+        this > 0 -> this
+        else -> 0
+    }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
@@ -27,14 +28,21 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
+import com.kazemieh.designsystem.component.FintrackDisplayLargeText
+import com.kazemieh.designsystem.component.FintrackDisplayMediumText
+import com.kazemieh.designsystem.component.FintrackHeadlineLargeText
 import com.kazemieh.designsystem.component.FintrackHeadlineMediumText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.PieChart
+import com.kazemieh.designsystem.component.PieChartItem
 import com.kazemieh.model.TransactionType
 import com.kazemieh.transaction.R
 import org.koin.androidx.compose.koinViewModel
@@ -177,6 +185,15 @@ fun ShowTransactionCard(
 ) {
     val state by viewModel.state.collectAsState()
 
+    val incoming = stringResource(R.string.incoming)
+    val incomingItem = PieChartItem(label = incoming, value = state.totalIncome)
+
+    val outcoming = stringResource(R.string.outcoming)
+    val outcomingItem = PieChartItem(label = outcoming, value = state.totalExpense)
+
+
+    val sampleData = listOf(incomingItem, outcomingItem)
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
@@ -185,45 +202,46 @@ fun ShowTransactionCard(
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
+
         Column(
             modifier = Modifier.padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            FintrackTitleMediumText(text = stringResource(R.string.balance_total))
-
-            FintrackHeadlineMediumText(
-                text = state.balance,
-                color = if (state.isPositiveBalance) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.SpaceAround
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    FintrackBodyMediumText(
-                        text = stringResource(R.string.outcoming),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                    FintrackTitleMediumText(
-                        text = state.totalExpense,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    FintrackBodyMediumText(
-                        text = stringResource(R.string.incoming),
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                    FintrackTitleMediumText(
-                        text = state.totalIncome,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                }
+                FintrackHeadlineMediumText(text = stringResource(R.string.balance_total))
+
+                val balanceTotalLabel = stringResource(R.string.balance_total_label, state.balance)
+
+                FintrackHeadlineMediumText(
+                    modifier = Modifier.weight(1f),
+                    text = balanceTotalLabel,
+                    textAlign = TextAlign.End,
+                    color = if (state.isPositiveBalance) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
+                )
+
             }
+
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .height(1.dp)
+                    .fillMaxWidth()
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.secondary)
+            )
+
+            PieChart(
+                data = sampleData,
+                radiusOuter = 50.dp,
+                chartBarWidth = 20.dp,
+                textDistanceExtra = 20.dp,
+                animDuration = 500,
+            )
+
+
         }
     }
 }

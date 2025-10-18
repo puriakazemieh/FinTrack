@@ -3,6 +3,8 @@ package com.kazemieh.transaction.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.formatted
+import com.kazemieh.common.toPositive
+import com.kazemieh.designsystem.component.PieChartItem
 import com.kazemieh.domain.usecase.TransactionUseCases
 import com.kazemieh.transaction.R
 import kotlinx.coroutines.channels.Channel
@@ -58,11 +60,14 @@ class TransactionViewModel(
                     transactionWithRelations.toUi()
                 }
 
+
                 _state.update {
                     it.copy(
                         uiTransactionWithRelations = uiTransactionWithRelations,
-                        totalIncome = totalIncome.formatted(),
-                        totalExpense = totalExpense.formatted(),
+                        formatedTotalIncome = totalIncome.formatted(),
+                        totalIncome = totalIncome.toPositive().toLong(),
+                        totalExpense = totalExpense.toPositive().toLong(),
+                        formatedTotalExpense = totalExpense.formatted(),
                         balance = balance.formatted(),
                         isPositiveBalance = balance >= 0,
                         isLoading = false
@@ -91,8 +96,11 @@ data class TransactionState(
     val isLoading: Boolean = false,
     val balance: String = "0",
     val isPositiveBalance: Boolean = true,
-    val totalIncome: String = "0",
-    val totalExpense: String = "0",
+    val formatedTotalIncome: String = "0",
+    val totalIncome: Long = 0,
+    val formatedTotalExpense: String = "0",
+    val totalExpense: Long = 0,
+    val pieChartItems: List<PieChartItem> = listOf(),
     val error: String? = null
 )
 

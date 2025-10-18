@@ -15,11 +15,12 @@
     <string name="save_transaction">ذخیره تراکنش</string>
     <string name="transaction_deleted">تراکنش حذف شد</string>
     <string name="recent_transactions">تراکنش‌های اخیر</string>
-    <string name="balance_total">موجودی کل</string>
+    <string name="balance_total">موجودی کل:</string>
     <string name="payment">پرداخت</string>
     <string name="income">دریافت</string>
     <string name="date">تاریخ</string>
     <string name="amount_label">%1$s: %2$s تومان</string>
+    <string name="balance_total_label">%1$s تومان</string>
     <string name="tags_label">برچست ها: %1$s</string>
     <string name="delete">حذف</string>
     <string name="required_star">*</string>
