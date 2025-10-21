@@ -34,7 +34,8 @@ class FinTrackApplication : Application() {
             transactionAddFinancialSourceModule,
             transactionAddTagModule,
             transactionTagModule,
-            dashboardViewModel
+            dashboardViewModel,
+            reportViewModel
 
         )
         startKoin {

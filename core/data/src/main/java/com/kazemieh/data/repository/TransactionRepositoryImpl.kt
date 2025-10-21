@@ -14,7 +14,10 @@ class TransactionRepositoryImpl(
 ) : TransactionRepository {
 
     override fun getAllTransactions(): Flow<List<TransactionWithRelations>> {
-        return localDataSource.getAll()
+        return localDataSource.getAllTransactions()
+    }
+    override fun getAllTransactionsByType(type: Int): Flow<List<TransactionWithRelations>> {
+        return localDataSource.getAllTransactionsByType(type)
     }
 
     override suspend fun insertTransaction(transaction: Transaction, tagIds: List<Long>): Long {

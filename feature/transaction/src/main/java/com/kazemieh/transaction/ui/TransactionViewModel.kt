@@ -6,6 +6,7 @@ import com.kazemieh.common.formatted
 import com.kazemieh.common.toPositive
 import com.kazemieh.designsystem.component.PieChartItem
 import com.kazemieh.domain.usecase.TransactionUseCases
+import com.kazemieh.model.TransactionType
 import com.kazemieh.transaction.R
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,18 +26,21 @@ class TransactionViewModel(
     private val _effect = Channel<TransactionEffect>()
     val effect = _effect.receiveAsFlow()
 
-    init {
-        onEvent(TransactionEvent.LoadTransactions)
-    }
-
     fun onEvent(event: TransactionEvent) {
         when (event) {
             is TransactionEvent.LoadTransactions -> {
-                loadTransactions()
+                if (event.transactionType == null)
+                    loadTransactions()
+                else loadTransactionsByType(event.transactionType)
             }
 
-            is TransactionEvent.DeleteTransaction -> {
-                deleteTransaction(event.transaction)
+            is TransactionEvent.DeleteTransaction -> deleteTransaction(event.transaction)
+
+            is TransactionEvent.SelectedType -> {
+                _state.update {
+                    it.copy(selectedTransactionType = event.selectedTransactionType)
+                }
+                loadTransactionsByType(event.selectedTransactionType.count)
             }
         }
     }
@@ -60,7 +64,6 @@ class TransactionViewModel(
                     transactionWithRelations.toUi()
                 }
 
-
                 _state.update {
                     it.copy(
                         uiTransactionWithRelations = uiTransactionWithRelations,
@@ -77,6 +80,41 @@ class TransactionViewModel(
         }
     }
 
+    private fun loadTransactionsByType(transactionType: Int) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            transactionUseCases.getAllTransactionsByType(transactionType)
+                .collect { transactions ->
+
+                    var balance = 0
+
+                    val groupedByCategory = transactions.groupBy { it.category }
+                    val pieChartItems = groupedByCategory.map { (category, items) ->
+                        val totalAmount = items.sumOf { it.transaction.amount }
+                        PieChartItem(
+                            id = category.id,
+                            label = category.name,
+                            value = totalAmount.toLong()
+                        )
+                    }
+
+                    balance = transactions.sumOf { it.transaction.amount }
+
+                    val uiTransactionWithRelations = transactions.map { it.toUi() }
+
+                    _state.update {
+                        it.copy(
+                            uiTransactionWithRelations = uiTransactionWithRelations,
+                            balance = balance.formatted(),
+                            isPositiveBalance = balance >= 0,
+                            isLoading = false,
+                            pieChartData = pieChartItems
+                        )
+                    }
+                }
+        }
+    }
+
     private fun deleteTransaction(transaction: TransactionUi) {
         viewModelScope.launch {
             transactionUseCases.deleteTransaction(transaction.toDomain())
@@ -84,11 +122,14 @@ class TransactionViewModel(
             loadTransactions()
         }
     }
+
 }
 
 sealed interface TransactionEvent {
-    object LoadTransactions : TransactionEvent
     data class DeleteTransaction(val transaction: TransactionUi) : TransactionEvent
+    data class LoadTransactions(val transactionType: Int? = null) : TransactionEvent
+    data class SelectedType(val selectedTransactionType: TransactionType = TransactionType.INCOME) :
+        TransactionEvent
 }
 
 data class TransactionState(
@@ -100,7 +141,8 @@ data class TransactionState(
     val totalIncome: Long = 0,
     val formatedTotalExpense: String = "0",
     val totalExpense: Long = 0,
-    val pieChartItems: List<PieChartItem> = listOf(),
+    val selectedTransactionType: TransactionType = TransactionType.INCOME,
+    val pieChartData: List<PieChartItem> = listOf(),
     val error: String? = null
 )
 

@@ -29,6 +29,10 @@ interface TransactionDao {
     fun getAllTransactionsWithCategoryFinancialSourceAndTags(): Flow<List<TransactionWithCategoryFinancialSourceAndTags>>
 
     @Transaction
+    @Query("SELECT * FROM transactions  WHERE type = :type")
+    fun getAllTransactionsByTypeWithCategoryFinancialSourceAndTags(type: Int): Flow<List<TransactionWithCategoryFinancialSourceAndTags>>
+
+    @Transaction
     @Query("SELECT * FROM transactions WHERE categoryId = :categoryId")
     suspend fun getTransactionsByCategoryId(categoryId: Long): List<TransactionWithCategoryFinancialSourceAndTags>
 

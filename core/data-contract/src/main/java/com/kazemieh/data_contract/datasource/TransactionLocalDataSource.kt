@@ -11,7 +11,8 @@ interface TransactionLocalDataSource {
     suspend fun insertTransaction(transaction: Transaction, tagIds: List<Long>): Long
     suspend fun update(transaction: Transaction)
     suspend fun delete(transaction: Transaction)
-    fun getAll(): Flow<List<TransactionWithRelations>>
+    fun getAllTransactions(): Flow<List<TransactionWithRelations>>
+    fun getAllTransactionsByType(type: Int): Flow<List<TransactionWithRelations>>
     fun getByCategory(categoryId: Long): Flow<List<TransactionWithRelations>>
     fun getByFinancialSource(sourceId: Long): Flow<List<TransactionWithRelations>>
 

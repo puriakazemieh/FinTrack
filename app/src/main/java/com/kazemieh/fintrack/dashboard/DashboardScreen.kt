@@ -1,4 +1,4 @@
-package com.kazemieh.fintrack
+package com.kazemieh.fintrack.dashboard
 
 
 import androidx.compose.foundation.background
@@ -22,11 +22,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.CategoryListBottomSheet
 import com.kazemieh.category.ui.add.AddCategoryBottomSheet
+import com.kazemieh.financialsource.R
 import com.kazemieh.financialsource.ui.SourceList
 import com.kazemieh.financialsource.ui.SourceListBottomSheet
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.tag.ui.TagListBottomSheet
-import com.kazemieh.transaction.ui.ShowTransactionCard
+import com.kazemieh.transaction.ui.TotalTransactionCard
 import com.kazemieh.transaction.ui.TransactionList
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import org.koin.androidx.compose.koinViewModel
@@ -45,9 +46,9 @@ fun DashboardScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
         ) {
-            item { ShowTransactionCard() }
+            item { TotalTransactionCard() }
 
             item { Spacer(Modifier.height(16.dp)) }
 
@@ -80,7 +81,7 @@ fun DashboardScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(com.kazemieh.financialsource.R.string.add_source)
+                    contentDescription = stringResource(R.string.add_source)
                 )
             }
         }

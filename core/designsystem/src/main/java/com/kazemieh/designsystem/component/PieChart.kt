@@ -9,6 +9,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -336,12 +337,13 @@ private fun PieChartLegend(
     data: List<PieChartItem>,
     colors: List<Color>
 ) {
-    Row(
+    FlowRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 20.dp),
+            .padding(top = 20.dp)
+        ,
         horizontalArrangement = Arrangement.spacedBy(
-            6.dp,
+            space = 4.dp,
             alignment = Alignment.CenterHorizontally
         ),
     ) {
@@ -349,14 +351,14 @@ private fun PieChartLegend(
             val txtColor = textColorForBackground(colors[index])
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 12.dp)
+                modifier = Modifier.padding(horizontal = 6.dp)
             ) {
                 Box(
                     modifier = Modifier
                         .size(14.dp)
                         .background(colors[index], shape = CircleShape)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 item.icon?.let {
                     Icon(
                         imageVector = it,
@@ -364,12 +366,10 @@ private fun PieChartLegend(
                         tint = txtColor,
                         modifier = Modifier.size(18.dp)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                 }
                 FintrackLabelSmallText(
-                    text = "${item.label} — ${
-                        item.value.toInt().formatNumber()
-                    } تومان "
+                    text = "${item.label}: ${item.value.toInt().formatNumber()} تومان "
                 )
             }
         }

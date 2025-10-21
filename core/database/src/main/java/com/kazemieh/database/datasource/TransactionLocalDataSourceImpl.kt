@@ -55,8 +55,14 @@ class TransactionLocalDataSourceImpl(
         transactionDao.updateTransaction(transaction.toTransactionEntity())
     }
 
-    override fun getAll(): Flow<List<TransactionWithRelations>> {
+    override fun getAllTransactions(): Flow<List<TransactionWithRelations>> {
         return transactionDao.getAllTransactionsWithCategoryFinancialSourceAndTags().map {
+            it.map { it.toTransactionWithRelations() }
+        }
+    }
+
+    override fun getAllTransactionsByType(type: Int): Flow<List<TransactionWithRelations>> {
+        return transactionDao.getAllTransactionsByTypeWithCategoryFinancialSourceAndTags(type).map {
             it.map { it.toTransactionWithRelations() }
         }
     }

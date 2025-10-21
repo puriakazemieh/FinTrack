@@ -1,4 +1,4 @@
-package com.kazemieh.fintrack
+package com.kazemieh.fintrack.dashboard
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
