@@ -12,4 +12,7 @@
 
     <!-- TransactionCard -->
     <string name="balance">موجودی: %1$s</string>
+
+    <string name="navigation_home">صفحه نخست</string>
+    <string name="navigation_report">گزارش</string>
 </resources>
