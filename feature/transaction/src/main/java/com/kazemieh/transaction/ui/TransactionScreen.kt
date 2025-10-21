@@ -29,17 +29,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
-import com.kazemieh.designsystem.component.FintrackDisplayLargeText
-import com.kazemieh.designsystem.component.FintrackDisplayMediumText
-import com.kazemieh.designsystem.component.FintrackHeadlineLargeText
 import com.kazemieh.designsystem.component.FintrackHeadlineMediumText
+import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.PieChart
 import com.kazemieh.designsystem.component.PieChartItem
@@ -211,11 +208,11 @@ fun ShowTransactionCard(
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
 
-                FintrackHeadlineMediumText(text = stringResource(R.string.balance_total))
+                FintrackHeadlineSmallText(text = stringResource(R.string.balance_total))
 
                 val balanceTotalLabel = stringResource(R.string.balance_total_label, state.balance)
 
-                FintrackHeadlineMediumText(
+                FintrackHeadlineSmallText(
                     modifier = Modifier.weight(1f),
                     text = balanceTotalLabel,
                     textAlign = TextAlign.End,
@@ -224,24 +221,28 @@ fun ShowTransactionCard(
 
             }
 
-            Box(
-                modifier = Modifier
-                    .padding(vertical = 8.dp)
-                    .height(1.dp)
-                    .fillMaxWidth()
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.secondary)
-            )
-
-            PieChart(
-                data = sampleData,
-                radiusOuter = 50.dp,
-                chartBarWidth = 20.dp,
-                textDistanceExtra = 20.dp,
-                animDuration = 500,
-            )
+            if (sampleData.any { it.value.toInt() > 0 }) {
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .height(1.dp)
+                        .fillMaxWidth()
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.secondary)
+                )
 
 
+                Box(modifier = Modifier.padding(top = 20.dp)) {
+                    PieChart(
+                        data = sampleData,
+                        radiusOuter = 40.dp,
+                        chartBarWidth = 20.dp,
+                        textDistanceExtra = 20.dp,
+                        animDuration = 500,
+                    )
+
+                }
+            }
         }
     }
 }

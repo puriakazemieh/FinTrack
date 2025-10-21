@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,6 +47,7 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.kazemieh.common.formatNumber
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -211,8 +211,6 @@ fun PieChart(
             PieChartLegend(
                 data = data,
                 colors = colors,
-                percentages = percentages,
-                textStyle = legendTextStyle
             )
         }
     }
@@ -336,12 +334,12 @@ private fun PieChartLegend(
 @Composable
 private fun PieChartLegend(
     data: List<PieChartItem>,
-    colors: List<Color>,
-    percentages: List<Float>,
-    textStyle: TextStyle
+    colors: List<Color>
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 20.dp),
         horizontalArrangement = Arrangement.spacedBy(
             6.dp,
             alignment = Alignment.CenterHorizontally
@@ -368,9 +366,10 @@ private fun PieChartLegend(
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                 }
-                Text(
-                    text = "${item.label} — ${"%.0f".format(percentages[index])}%",
-                    style = textStyle.copy(color = txtColor)
+                FintrackLabelSmallText(
+                    text = "${item.label} — ${
+                        item.value.toInt().formatNumber()
+                    } تومان "
                 )
             }
         }
