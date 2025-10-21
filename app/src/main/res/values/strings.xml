@@ -3,7 +3,6 @@
 
     <!-- Dashboard -->
     <string name="add_transaction">افزودن تراکنش</string>
-    <string name="financial_sources">منابع مالی</string>
     <string name="add_source">افزودن منبع</string>
 
     <!-- BottomSheets -->

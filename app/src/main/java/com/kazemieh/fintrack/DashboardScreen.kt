@@ -1,21 +1,18 @@
 package com.kazemieh.fintrack
 
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,7 +22,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.CategoryListBottomSheet
 import com.kazemieh.category.ui.add.AddCategoryBottomSheet
-import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.financialsource.ui.SourceList
 import com.kazemieh.financialsource.ui.SourceListBottomSheet
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
@@ -41,111 +37,92 @@ fun DashboardScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { viewModel.onIntent(DashboardIntent.ShowAddTransaction(true)) },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_transaction)
-                )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            item { ShowTransactionCard() }
+
+            item { Spacer(Modifier.height(16.dp)) }
+
+            item {
+                SourceList {
+                    viewModel.onIntent(
+                        DashboardIntent.ShowAddSource(
+                            showAddSource = true,
+                            fromSourceList = false
+                        )
+                    )
+                }
             }
-        },
-        floatingActionButtonPosition = FabPosition.Start,
-        containerColor = MaterialTheme.colorScheme.background
-    ) { innerPadding ->
+
+            item { Spacer(Modifier.height(16.dp)) }
+
+            item { TransactionList() }
+        }
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(16.dp)
         ) {
-
-            if (state.showAddTransaction) {
-                AddTransactionBottomSheet(
-                    source = state.source,
-                    category = state.category,
-                    tags = state.tags,
-                    onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddTransaction(false)) },
-                    onSourceClicked = { viewModel.onIntent(DashboardIntent.ShowSourceList(true)) },
-                    onCategoryClicked = { type ->
-                        viewModel.onIntent(
-                            DashboardIntent.ShowCategoryList(
-                                categoryList = true,
-                                selectedTransactionType = type
-                            )
-                        )
-                    },
-                    onTagClicked = { viewModel.onIntent(DashboardIntent.ShowTagList(true)) }
+            FloatingActionButton(
+                onClick = { viewModel.onIntent(DashboardIntent.ShowAddTransaction(true)) },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.align(Alignment.BottomStart),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(com.kazemieh.financialsource.R.string.add_source)
                 )
             }
-
-            Source(
-                showSourceList = state.showSourceList,
-                showAddSource = state.showAddSource,
-                fromSourceList = state.fromSourceList,
-                onIntent = viewModel::onIntent
-            )
-
-            Category(
-                showCategoryList = state.showCategoryList,
-                showAddCategory = state.showAddCategory,
-                selectedTransactionType = state.selectedTransactionType,
-                onIntent = viewModel::onIntent
-            )
-
-            Tag(
-                showTagList = state.showTagList,
-                selectedTags = state.tags,
-                onIntent = viewModel::onIntent
-            )
-
-            // 📝 Main content
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                ShowTransactionCard()
-
-                Spacer(Modifier.height(16.dp))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    FintrackTitleMediumText(
-                        text = stringResource(R.string.financial_sources),
-                        modifier = Modifier.weight(1f),
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    IconButton(
-                        onClick = {
-                            viewModel.onIntent(
-                                DashboardIntent.ShowAddSource(
-                                    showAddSource = true,
-                                    fromSourceList = false
-                                )
-                            )
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(R.string.add_source),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-
-                SourceList()
-
-                Spacer(Modifier.height(16.dp))
-
-                TransactionList()
-            }
         }
+
+        if (state.showAddTransaction) {
+            AddTransactionBottomSheet(
+                source = state.source,
+                category = state.category,
+                tags = state.tags,
+                onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddTransaction(false)) },
+                onSourceClicked = { viewModel.onIntent(DashboardIntent.ShowSourceList(true)) },
+                onCategoryClicked = { type ->
+                    viewModel.onIntent(
+                        DashboardIntent.ShowCategoryList(
+                            categoryList = true,
+                            selectedTransactionType = type
+                        )
+                    )
+                },
+                onTagClicked = { viewModel.onIntent(DashboardIntent.ShowTagList(true)) }
+            )
+        }
+
+        Source(
+            showSourceList = state.showSourceList,
+            showAddSource = state.showAddSource,
+            fromSourceList = state.fromSourceList,
+            onIntent = viewModel::onIntent
+        )
+
+        Category(
+            showCategoryList = state.showCategoryList,
+            showAddCategory = state.showAddCategory,
+            selectedTransactionType = state.selectedTransactionType,
+            onIntent = viewModel::onIntent
+        )
+
+        Tag(
+            showTagList = state.showTagList,
+            selectedTags = state.tags,
+            onIntent = viewModel::onIntent
+        )
     }
 }
 

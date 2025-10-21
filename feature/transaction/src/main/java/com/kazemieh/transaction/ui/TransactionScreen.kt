@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -35,7 +33,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
-import com.kazemieh.designsystem.component.FintrackHeadlineMediumText
 import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.PieChart
@@ -78,19 +75,15 @@ fun TransactionList(
                     modifier = Modifier.padding(vertical = 8.dp),
                     color = MaterialTheme.colorScheme.onBackground
                 )
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(state.uiTransactionWithRelations) { transactionWithRelations ->
-                        TransactionItem(
-                            uiTransactionWithRelation = transactionWithRelations,
-                            onDelete = {
-                                viewModel.onEvent(
-                                    TransactionEvent.DeleteTransaction(transactionWithRelations.transaction)
-                                )
-                            }
-                        )
-                    }
+                state.uiTransactionWithRelations.forEach { transactionWithRelations ->
+                    TransactionItem(
+                        uiTransactionWithRelation = transactionWithRelations,
+                        onDelete = {
+                            viewModel.onEvent(
+                                TransactionEvent.DeleteTransaction(transactionWithRelations.transaction)
+                            )
+                        }
+                    )
                 }
             }
         }

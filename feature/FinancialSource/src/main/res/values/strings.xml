@@ -8,4 +8,5 @@
     <string name="description_label">توضیحات</string>
     <string name="required_star">*</string>
     <string name="submit_source">ثبت منبع</string>
+    <string name="financial_sources">منابع مالی</string>
 </resources>

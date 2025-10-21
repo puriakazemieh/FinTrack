@@ -3,11 +3,11 @@ package com.kazemieh.financialsource.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -18,6 +18,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -31,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
+import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.financialsource.R
 import org.koin.androidx.compose.koinViewModel
 
@@ -109,43 +111,64 @@ fun SourceListBottomSheet(
 @Composable
 fun SourceList(
     viewModel: FinancialSourceViewModel = koinViewModel(),
+    onAddSourceClick: () -> Unit
 ) {
     LaunchedEffect(true) {
         viewModel.loadCategories()
     }
 
     val state by viewModel.state.collectAsState()
-
-    LazyRow(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-//        item {
-//            Spacer(modifier = Modifier.width(4.dp))
-//        }
-
-        items(state.sources) { source ->
-            Card(
-                modifier = Modifier.padding(horizontal = 4.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                shape = MaterialTheme.shapes.medium,
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            FintrackTitleMediumText(
+                text = stringResource(R.string.financial_sources),
+                modifier = Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            IconButton(
+                onClick = onAddSourceClick
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    FintrackBodyMediumText(text = source.name)
-                    FintrackBodySmallText(
-                        text = stringResource(R.string.balance, source.formattedBalance),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.add_source),
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
         }
 
+        LazyRow(
+            modifier = Modifier.fillMaxWidth()
+        ) {
 //        item {
 //            Spacer(modifier = Modifier.width(4.dp))
 //        }
+
+            items(state.sources) { source ->
+                Card(
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    shape = MaterialTheme.shapes.medium,
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        FintrackBodyMediumText(text = source.name)
+                        FintrackBodySmallText(
+                            text = stringResource(R.string.balance, source.formattedBalance),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+//        item {
+//            Spacer(modifier = Modifier.width(4.dp))
+//        }
+        }
     }
 }
