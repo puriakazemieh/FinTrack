@@ -1,12 +1,13 @@
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+//    alias(libs.plugins.android.library)
+//    alias(libs.plugins.kotlin.android)
+//    alias(libs.plugins.kotlin.compose)
+    id("convention.android.feature")
 }
 
 android {
     namespace = "com.kazemieh.transaction"
-    compileSdk = 35
+//    compileSdk = 35
 //    compileSdk = 35
 
 //    defaultConfig {
@@ -25,18 +26,18 @@ android {
 //            )
 //        }
 //    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.12"
-    }
-
-    kotlinOptions {
-        jvmTarget = "21"
-    }
+//    compileOptions {
+//        sourceCompatibility = JavaVersion.VERSION_21
+//        targetCompatibility = JavaVersion.VERSION_21
+//    }
+//
+//    composeOptions {
+//        kotlinCompilerExtensionVersion = "1.5.12"
+//    }
+//
+//    kotlinOptions {
+//        jvmTarget = "21"
+//    }
 }
 
 dependencies {
@@ -44,17 +45,17 @@ dependencies {
 
 
     // Compose
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.runtime)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.navigation.compose)
-    implementation(platform(libs.androidx.compose.bom))
-
-    // Coroutines
-    implementation(libs.kotlinx.coroutines.android)
-
-    implementation(libs.kotlinx.serialization.json)
+//    implementation(libs.androidx.compose.ui)
+//    implementation(libs.androidx.compose.material3)
+//    implementation(libs.androidx.compose.runtime)
+//    implementation(libs.androidx.lifecycle.viewmodel.compose)
+//    implementation(libs.androidx.navigation.compose)
+//    implementation(platform(libs.androidx.compose.bom))
+//
+//    // Coroutines
+//    implementation(libs.kotlinx.coroutines.android)
+//
+//    implementation(libs.kotlinx.serialization.json)
 
     implementation(project(":core:model"))
     implementation(project(":core:domain"))
@@ -64,9 +65,9 @@ dependencies {
     implementation(libs.jalali.datepicker.compose)
     implementation(libs.jalalicalendar)
 
-    implementation(libs.koin.android)
-    implementation(libs.koin.compose)
-    implementation(libs.koin.navigation)
+//    implementation(libs.koin.android)
+//    implementation(libs.koin.compose)
+//    implementation(libs.koin.navigation)
 
     implementation(libs.androidx.foundation)
 

@@ -1,5 +1,6 @@
 pluginManagement {
     repositories {
+        includeBuild("build-logic")
         maven {url = uri("https://srepo.tosantechno.net/repository/maven-group/") }
 //        google {
 //            content {
@@ -25,12 +26,12 @@ rootProject.name = "FinTrack"
 include(":app")
 include(":core:common")
 include(":core:data")
+include(":core:data-contract")
 include(":core:database")
 include(":core:designsystem")
 include(":core:model")
-include(":feature:transaction")
 include(":core:domain")
-include(":core:data-contract")
+include(":feature:transaction")
 include(":feature:category")
 include(":feature:FinancialSource")
 include(":feature:Tag")
