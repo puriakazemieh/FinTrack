@@ -3,7 +3,6 @@ package com.kazemieh.financialsource.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.GetAllFinancialSource
-import com.kazemieh.model.FinancialSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -16,8 +15,25 @@ class FinancialSourceViewModel(
     private val _state = MutableStateFlow(FinancialSourceState())
     val state = _state.asStateFlow()
 
+    fun onIntent(intent: FinancialSourceIntent) {
+        when (intent) {
+            FinancialSourceIntent.LoadAllFinancialSource -> loadAllFinancialSource()
+            is FinancialSourceIntent.SelectedSources -> {
+                val current = _state.value.selectedSources ?: emptySet()
+                val selectedSources =
+                    if (current.contains(intent.selectedSources))
+                        current - intent.selectedSources
+                    else
+                        current + intent.selectedSources
 
-    fun loadCategories() {
+                _state.update {
+                    it.copy(selectedSources = selectedSources)
+                }
+            }
+        }
+    }
+
+    private fun loadAllFinancialSource() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             getAllFinancialSource().collect { financialSource ->
@@ -30,9 +46,18 @@ class FinancialSourceViewModel(
             }
         }
     }
+
+
+}
+
+sealed interface FinancialSourceIntent {
+    data object LoadAllFinancialSource : FinancialSourceIntent
+    data class SelectedSources(val selectedSources: Pair<Int, String>) :
+        FinancialSourceIntent
 }
 
 data class FinancialSourceState(
     val sources: List<FinancialSourceUi> = emptyList(),
+    val selectedSources: Set<Pair<Int, String>>? = null,
     val isLoading: Boolean = false
 )

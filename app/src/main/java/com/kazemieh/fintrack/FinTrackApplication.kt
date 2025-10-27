@@ -13,6 +13,7 @@ import com.kazemieh.tag.di.transactionAddTagModule
 import com.kazemieh.tag.di.transactionTagModule
 import com.kazemieh.transaction.di.addTransactionPresentationModule
 import com.kazemieh.transaction.di.transactionPresentationModule
+import com.kazemieh.transaction.di.transactionReportViewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 
@@ -28,6 +29,7 @@ class FinTrackApplication : Application() {
             databaseModule,
             transactionPresentationModule,
             addTransactionPresentationModule,
+            transactionReportViewModelModule,
             transactionCategoryModule,
             transactionAddCategoryModule,
             transactionFinancialSourceModule,

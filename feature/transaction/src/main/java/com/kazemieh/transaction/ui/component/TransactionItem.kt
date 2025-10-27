@@ -1,13 +1,9 @@
-package com.kazemieh.transaction.ui
+package com.kazemieh.transaction.ui.component
 
-import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,17 +11,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
@@ -33,61 +24,6 @@ import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.model.TransactionType
 import com.kazemieh.transaction.R
-import org.koin.androidx.compose.koinViewModel
-
-@Composable
-fun TransactionList(
-    transactionType: Int? = null,
-    viewModel: TransactionViewModel = koinViewModel()
-) {
-    val state by viewModel.state.collectAsState()
-    val context = LocalContext.current
-
-    LaunchedEffect(transactionType) {
-        viewModel.onEvent(TransactionEvent.LoadTransactions(transactionType))
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
-            if (effect is TransactionEffect.ShowMessage) {
-                Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        if (state.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-            }
-        } else {
-            Column {
-                FintrackTitleMediumText(
-                    text = stringResource(R.string.recent_transactions),
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                state.uiTransactionWithRelations.forEach { transactionWithRelations ->
-                    TransactionItem(
-                        uiTransactionWithRelation = transactionWithRelations,
-                        onDelete = {
-                            viewModel.onEvent(
-                                TransactionEvent.DeleteTransaction(transactionWithRelations.transaction)
-                            )
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
 
 
 @Composable

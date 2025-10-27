@@ -1,4 +1,4 @@
-package com.kazemieh.transaction.ui
+package com.kazemieh.transaction.ui.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,7 +33,7 @@ fun TotalTransactionCard(
     viewModel: TransactionViewModel = koinViewModel()
 ) {
     LaunchedEffect(true) {
-        viewModel.onEvent(TransactionEvent.LoadTransactions())
+        viewModel.onIntent(TransactionIntent.LoadTransactions)
     }
 
     val state by viewModel.state.collectAsState()

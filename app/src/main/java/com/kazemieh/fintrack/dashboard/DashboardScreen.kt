@@ -27,8 +27,8 @@ import com.kazemieh.financialsource.ui.SourceList
 import com.kazemieh.financialsource.ui.SourceListBottomSheet
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.tag.ui.TagListBottomSheet
-import com.kazemieh.transaction.ui.TotalTransactionCard
-import com.kazemieh.transaction.ui.TransactionList
+import com.kazemieh.transaction.ui.main.TotalTransactionCard
+import com.kazemieh.transaction.ui.main.TransactionListScreen
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
@@ -65,7 +65,7 @@ fun DashboardScreen(
 
             item { Spacer(Modifier.height(16.dp)) }
 
-            item { TransactionList() }
+            item { TransactionListScreen() }
         }
 
         Box(

@@ -60,6 +60,10 @@ fun AddTransactionBottomSheet(
     )
     val scope = rememberCoroutineScope()
 
+    LaunchedEffect(true) {
+        viewModel.onEvent(AddTransactionEvent.FetchDefaultData)
+    }
+
     LaunchedEffect(source) {
         viewModel.onEvent(AddTransactionEvent.SetSource(source))
     }
@@ -68,10 +72,6 @@ fun AddTransactionBottomSheet(
     }
     LaunchedEffect(tags) {
         viewModel.onEvent(AddTransactionEvent.SetTags(tags))
-    }
-
-    LaunchedEffect(true) {
-        viewModel.onEvent(AddTransactionEvent.FetchDefaultData)
     }
 
     LaunchedEffect(Unit) {

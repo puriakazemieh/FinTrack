@@ -2,6 +2,7 @@
 
     <string name="incoming">درآمد</string>
     <string name="outcoming">خرج</string>
+    <string name="all">همه</string>
     <string name="amount">مبلغ</string>
     <string name="description">توضیحات</string>
     <string name="select_category">دسته بندی را انتخاب کنید</string>

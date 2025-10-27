@@ -1,4 +1,4 @@
-package com.kazemieh.transaction.ui
+package com.kazemieh.transaction.ui.component
 
 import com.kazemieh.common.formatted
 import com.kazemieh.designsystem.component.PieChartItem

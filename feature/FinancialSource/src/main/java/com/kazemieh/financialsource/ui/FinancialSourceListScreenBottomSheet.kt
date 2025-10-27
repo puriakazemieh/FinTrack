@@ -8,13 +8,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -44,6 +48,11 @@ fun SourceListBottomSheet(
     onSourceClick: (id: Int, name: String) -> Unit,
     onDismiss: () -> Unit,
 ) {
+
+    LaunchedEffect(true) {
+        viewModel.onIntent(FinancialSourceIntent.LoadAllFinancialSource)
+    }
+
     val state by viewModel.state.collectAsState()
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -89,7 +98,9 @@ fun SourceListBottomSheet(
             Spacer(modifier = Modifier.height(16.dp))
 
             Box(
-                modifier = Modifier.fillMaxWidth().padding(4.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
             ) {
                 FloatingActionButton(
                     onClick = onAddSourceClick,
@@ -108,13 +119,106 @@ fun SourceListBottomSheet(
     }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SourceListSelectionBottomSheet(
+    viewModel: FinancialSourceViewModel = koinViewModel(),
+    onSourceClick: (Set<Pair<Int, String>>) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    LaunchedEffect(true) {
+        viewModel.onIntent(FinancialSourceIntent.LoadAllFinancialSource)
+    }
+    val state by viewModel.state.collectAsState()
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background
+    ) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+
+            LazyColumn {
+                items(state.sources) { source ->
+                    val isSelected =
+                        state.selectedSources?.contains(source.id.toInt() to source.name) == true
+//                    val isSelected = state.selectedSources?.any { it.first == source.id.toInt() } == true
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .clickable {
+                                viewModel.onIntent(FinancialSourceIntent.SelectedSources(source.id.toInt() to source.name))
+                            },
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.surface
+                        ),
+                        shape = MaterialTheme.shapes.medium,
+                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                    ) {
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = isSelected,
+                                onCheckedChange = {
+                                    viewModel.onIntent(FinancialSourceIntent.SelectedSources(source.id.toInt() to source.name))
+                                }
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+
+                            FintrackBodyMediumText(text = source.name)
+
+                            Spacer(modifier = Modifier.width(4.dp))
+
+                            FintrackBodySmallText(
+                                text = stringResource(R.string.balance, source.formattedBalance),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onSourceClick(state.selectedSources ?: emptySet()) },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                FintrackBodyMediumText(
+                    text = stringResource(R.string.confirm),
+                    color = MaterialTheme.colorScheme.background
+                )
+            }
+
+
+        }
+    }
+}
+
 @Composable
 fun SourceList(
     viewModel: FinancialSourceViewModel = koinViewModel(),
     onAddSourceClick: () -> Unit
 ) {
     LaunchedEffect(true) {
-        viewModel.loadCategories()
+        viewModel.onIntent(FinancialSourceIntent.LoadAllFinancialSource)
     }
 
     val state by viewModel.state.collectAsState()

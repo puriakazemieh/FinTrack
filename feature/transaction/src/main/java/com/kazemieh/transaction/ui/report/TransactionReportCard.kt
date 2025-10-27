@@ -1,4 +1,4 @@
-package com.kazemieh.transaction.ui
+package com.kazemieh.transaction.ui.report
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,27 +31,33 @@ import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.PieChart
-import com.kazemieh.model.TransactionType
 import com.kazemieh.transaction.R
 import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
 fun ShowTransactionReportCard(
-    viewModel: TransactionViewModel = koinViewModel(),
-    selectedTransactionType: (Int) -> Unit
+    viewModel: TransactionReportViewModel = koinViewModel()
 ) {
 
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(true) {
-        viewModel.onEvent(TransactionEvent.LoadTransactions(state.selectedTransactionType.count))
+        viewModel.onIntent(TransactionReportIntent.LoadTransactionsByFilter)
     }
 
-    val textType = if (state.selectedTransactionType.count == 1) {
-        stringResource(R.string.incoming)
-    } else {
-        stringResource(R.string.outcoming)
+    val text = when (state.selectedTransactionType.count) {
+        1 -> {
+            stringResource(R.string.incoming)
+        }
+
+        2 -> {
+            stringResource(R.string.outcoming)
+        }
+
+        else -> {
+            stringResource(R.string.all)
+        }
     }
 
     Card(
@@ -70,16 +76,21 @@ fun ShowTransactionReportCard(
                 SingleChoiceSegmentedButtonRow(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    TransactionType.entries.forEachIndexed { index, option ->
+                    TransactionFilterType.entries.forEachIndexed { index, option ->
                         SegmentedButton(
                             selected = state.selectedTransactionType == option,
                             onClick = {
-                                viewModel.onEvent(TransactionEvent.SelectedType(option))
-                                selectedTransactionType(option.count)
+                                viewModel.onIntent(
+                                    TransactionReportIntent.SelectedType(option)
+                                )
                             },
-                            shape = SegmentedButtonDefaults.itemShape(index = index, count = 2),
+                            shape = SegmentedButtonDefaults.itemShape(
+                                index = index,
+                                count = TransactionFilterType.entries.size
+                            ),
                         ) {
-                            FintrackBodyMediumText(text = textType)
+
+                            FintrackBodyMediumText(text = text)
                         }
                     }
                 }
@@ -91,7 +102,7 @@ fun ShowTransactionReportCard(
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
 
-                FintrackTitleSmallText(text = stringResource(R.string.balance_with_label, textType))
+                FintrackTitleSmallText(text = stringResource(R.string.balance_with_label, text))
 
                 val balanceTotalLabel = stringResource(R.string.balance_total_label, state.balance)
 

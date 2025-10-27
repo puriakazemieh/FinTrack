@@ -1,4 +1,4 @@
-package com.kazemieh.transaction.ui
+package com.kazemieh.transaction.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +8,10 @@ import com.kazemieh.designsystem.component.PieChartItem
 import com.kazemieh.domain.usecase.TransactionUseCases
 import com.kazemieh.model.TransactionType
 import com.kazemieh.transaction.R
+import com.kazemieh.transaction.ui.component.TransactionUi
+import com.kazemieh.transaction.ui.component.TransactionWithRelationsUi
+import com.kazemieh.transaction.ui.component.toDomain
+import com.kazemieh.transaction.ui.component.toUi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,22 +30,12 @@ class TransactionViewModel(
     private val _effect = Channel<TransactionEffect>()
     val effect = _effect.receiveAsFlow()
 
-    fun onEvent(event: TransactionEvent) {
-        when (event) {
-            is TransactionEvent.LoadTransactions -> {
-                if (event.transactionType == null)
-                    loadTransactions()
-                else loadTransactionsByType(event.transactionType)
-            }
+    fun onIntent(intent: TransactionIntent) {
+        when (intent) {
+            is TransactionIntent.LoadTransactions -> loadTransactions()
 
-            is TransactionEvent.DeleteTransaction -> deleteTransaction(event.transaction)
+            is TransactionIntent.DeleteTransaction -> deleteTransaction(intent.transaction)
 
-            is TransactionEvent.SelectedType -> {
-                _state.update {
-                    it.copy(selectedTransactionType = event.selectedTransactionType)
-                }
-                loadTransactionsByType(event.selectedTransactionType.count)
-            }
         }
     }
 
@@ -80,41 +74,6 @@ class TransactionViewModel(
         }
     }
 
-    private fun loadTransactionsByType(transactionType: Int) {
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
-            transactionUseCases.getAllTransactionsByType(transactionType)
-                .collect { transactions ->
-
-                    var balance = 0
-
-                    val groupedByCategory = transactions.groupBy { it.category }
-                    val pieChartItems = groupedByCategory.map { (category, items) ->
-                        val totalAmount = items.sumOf { it.transaction.amount }
-                        PieChartItem(
-                            id = category.id,
-                            label = category.name,
-                            value = totalAmount.toLong()
-                        )
-                    }
-
-                    balance = transactions.sumOf { it.transaction.amount }
-
-                    val uiTransactionWithRelations = transactions.map { it.toUi() }
-
-                    _state.update {
-                        it.copy(
-                            uiTransactionWithRelations = uiTransactionWithRelations,
-                            balance = balance.formatted(),
-                            isPositiveBalance = balance >= 0,
-                            isLoading = false,
-                            pieChartData = pieChartItems
-                        )
-                    }
-                }
-        }
-    }
-
     private fun deleteTransaction(transaction: TransactionUi) {
         viewModelScope.launch {
             transactionUseCases.deleteTransaction(transaction.toDomain())
@@ -125,11 +84,9 @@ class TransactionViewModel(
 
 }
 
-sealed interface TransactionEvent {
-    data class DeleteTransaction(val transaction: TransactionUi) : TransactionEvent
-    data class LoadTransactions(val transactionType: Int? = null) : TransactionEvent
-    data class SelectedType(val selectedTransactionType: TransactionType = TransactionType.INCOME) :
-        TransactionEvent
+sealed interface TransactionIntent {
+    data class DeleteTransaction(val transaction: TransactionUi) : TransactionIntent
+    data object LoadTransactions : TransactionIntent
 }
 
 data class TransactionState(

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="add_source">افزودن منبع</string>
+    <string name="report">گزارش</string>
     <string name="balance">موجودی: %1$s T</string>
     <string name="source_name_label">نام منبع</string>
     <string name="initial_balance_label">مبلغ اولیه</string>
@@ -9,4 +10,5 @@
     <string name="required_star">*</string>
     <string name="submit_source">ثبت منبع</string>
     <string name="financial_sources">منابع مالی</string>
+    <string name="confirm">تایید</string>
 </resources>

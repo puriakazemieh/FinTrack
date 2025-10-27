@@ -1,9 +1,16 @@
 <resources>
     <string name="app_name">FinTrack</string>
 
+
+
     <!-- Dashboard -->
     <string name="add_transaction">افزودن تراکنش</string>
     <string name="add_source">افزودن منبع</string>
+    <string name="all_source">همه منابع‌مالی</string>
+    <string name="all_category">همه دسته‌بندی‌ها</string>
+
+    <string name="categories">دسته‌بندی</string>
+    <string name="sources">منبع</string>
 
     <!-- BottomSheets -->
     <string name="add_category">افزودن دسته‌بندی</string>
