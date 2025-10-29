@@ -20,18 +20,30 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.kazemieh.designsystem.component.FilterButton
+import com.kazemieh.category.ui.CategoryListSelectionBottomSheet
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.financialsource.ui.SourceListSelectionBottomSheet
 import com.kazemieh.fintrack.R
 import com.kazemieh.transaction.ui.report.ShowTransactionReportCard
+import com.kazemieh.transaction.ui.report.TransactionFilterType
+import com.kazemieh.transaction.ui.report.TransactionListByFilterScreen
+import com.kazemieh.transaction.ui.report.TransactionReportIntent
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -64,7 +76,7 @@ fun ReportScreen(
                 item { Spacer(Modifier.height(16.dp)) }
 
                 item {
-//                    TransactionListByFilterScreen(transactionType = state.transactionType)
+                    TransactionListByFilterScreen(selectedSources = state.selectedSources)
                 }
 
                 item { Spacer(Modifier.height(8.dp)) }
@@ -83,10 +95,30 @@ fun ReportScreen(
             )
         }
 
+        if (state.isCategorySheetVisible) {
+            CategoryListSelectionBottomSheet(
+                selectedTransactionType = state.selectedTransactionType.count,
+                onCategoryClick = {
+                    viewModel.onIntent(ReportFilterIntent.OnCategoriesSelected(it))
+                },
+                onDismiss = {
+                    viewModel.onIntent(ReportFilterIntent.OnToggleCategorySheet)
+                }
+            )
+        }
+
 
     }
 }
 
+@Preview(
+    showSystemUi = true, showBackground = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun ReportTopBarPrev() {
+    ReportTopBar({}, ReportFilterState())
+}
 
 @Composable
 fun ReportTopBar(onIntent: (ReportFilterIntent) -> Unit, state: ReportFilterState) {
@@ -97,28 +129,97 @@ fun ReportTopBar(onIntent: (ReportFilterIntent) -> Unit, state: ReportFilterStat
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                FilterButton(
-                    modifier = Modifier.weight(1f),
-                    text = if (state.selectedSources.isEmpty()) stringResource(R.string.all_source)
-                    else if (state.selectedSources.size == 1) state.selectedSources.first().second
-                    else "${stringResource(R.string.sources)} (${state.selectedSources.size})",
-                    onClick = { onIntent(ReportFilterIntent.OnToggleSourceSheet) }
-                )
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                SingleChoiceSegmentedButtonRow(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TransactionTypeFilter.entries.forEachIndexed { index, option ->
+                        val text = when (option.count) {
+                            1 -> {
+                                stringResource(com.kazemieh.transaction.R.string.incoming)
+                            }
 
-                FilterButton(
-                    modifier = Modifier.weight(1f),
-                    text = if (state.selectedCategories.isEmpty()) stringResource(R.string.all_category)
-                    else if (state.selectedCategories.size == 1) state.selectedCategories.first().second
-                    else "${stringResource(R.string.categories)} (${state.selectedCategories.size})",
-                    onClick = { onIntent(ReportFilterIntent.OnToggleCategorySheet) }
-                )
+                            2 -> {
+                                stringResource(com.kazemieh.transaction.R.string.outcoming)
+                            }
+
+                            else -> {
+                                stringResource(com.kazemieh.transaction.R.string.all)
+                            }
+                        }
+                        SegmentedButton(
+                            selected = state.selectedTransactionType == option,
+                            onClick = {
+                                onIntent(ReportFilterIntent.OnTransactionTypeSelected(option))
+                            },
+                            shape = SegmentedButtonDefaults.itemShape(
+                                index = index,
+                                count = TransactionFilterType.entries.size
+                            ),
+                        ) {
+
+                            FintrackBodyMediumText(text = text)
+                        }
+                    }
+                }
             }
 
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+
+                val sourceTextStyle =
+                    if (state.selectedSources.isEmpty()) MaterialTheme.typography.bodyMedium
+                    else MaterialTheme.typography.labelSmall
+                FintrackOutlinedTextField(
+                    value = if (state.selectedSources.isEmpty()) state.selectedSources.first().second
+                    else state.selectedSources.joinToString("") { ", ${it.second}" },
+                    onClick = { onIntent(ReportFilterIntent.OnToggleSourceSheet) },
+                    readOnly = true,
+                    enabled = false,
+                    singleLine = true,
+                    textStyle = sourceTextStyle,
+                    modifier = Modifier.weight(1f),
+                    disabledBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                    disabledContainerColor = MaterialTheme.colorScheme.surface,
+                    label = {
+                        val text =
+                            if (state.selectedSources.isEmpty()) stringResource(R.string.all_source)
+                            else stringResource(R.string.sources, state.selectedSources.size)
+
+                        FintrackBodyMediumText(text = text)
+
+                    }
+
+                )
+
+                val categoryTextStyle =
+                    if (state.selectedCategories.isEmpty()) MaterialTheme.typography.bodyMedium
+                    else MaterialTheme.typography.labelSmall
+                FintrackOutlinedTextField(
+                    value = if (state.selectedCategories.isEmpty()) state.selectedCategories.first().second
+                    else state.selectedCategories.joinToString("") { ", ${it.second}" },
+                    onClick = { onIntent(ReportFilterIntent.OnToggleCategorySheet) },
+                    readOnly = true,
+                    enabled = false,
+                    singleLine = true,
+                    textStyle = categoryTextStyle,
+                    modifier = Modifier.weight(1f),
+                    disabledBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                    disabledContainerColor = MaterialTheme.colorScheme.surface,
+                    label = {
+                        val text =
+                            if (state.selectedCategories.isEmpty()) stringResource(R.string.all_category)
+                            else stringResource(R.string.categories, state.selectedCategories.size)
+
+                        FintrackBodyMediumText(text = text)
+
+                    }
+
+                )
+            }
 
             DatePeriodSelector(
                 selectedPeriod = state.selectedPeriod,
@@ -127,7 +228,6 @@ fun ReportTopBar(onIntent: (ReportFilterIntent) -> Unit, state: ReportFilterStat
         }
     }
 }
-
 
 
 @Composable

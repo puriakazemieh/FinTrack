@@ -59,7 +59,6 @@ fun ShowTransactionReportCard(
             stringResource(R.string.all)
         }
     }
-
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
@@ -72,29 +71,7 @@ fun ShowTransactionReportCard(
         Column(
             modifier = Modifier.padding(20.dp),
         ) {
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                SingleChoiceSegmentedButtonRow(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    TransactionFilterType.entries.forEachIndexed { index, option ->
-                        SegmentedButton(
-                            selected = state.selectedTransactionType == option,
-                            onClick = {
-                                viewModel.onIntent(
-                                    TransactionReportIntent.SelectedType(option)
-                                )
-                            },
-                            shape = SegmentedButtonDefaults.itemShape(
-                                index = index,
-                                count = TransactionFilterType.entries.size
-                            ),
-                        ) {
 
-                            FintrackBodyMediumText(text = text)
-                        }
-                    }
-                }
-            }
 
             Spacer(Modifier.height(8.dp))
 

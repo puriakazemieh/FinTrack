@@ -6,4 +6,5 @@
     <string name="description_label">توضیحات</string>
     <string name="required_star">*</string>
     <string name="save_category">ذخیره</string>
+    <string name="confirm">تایید</string>
 </resources>

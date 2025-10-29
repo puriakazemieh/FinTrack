@@ -9,13 +9,17 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TransactionListByFilterScreen(
-    transactionType: Int? = null,
+    selectedSources: Set<Pair<Int, String>>? = null,
     viewModel: TransactionReportViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(transactionType) {
+    LaunchedEffect(selectedSources) {
         viewModel.onIntent(TransactionReportIntent.LoadTransactionsByFilter)
+    }
+
+    LaunchedEffect(selectedSources) {
+        viewModel.onIntent(TransactionReportIntent.SelectedSource(selectedSources))
     }
 
 

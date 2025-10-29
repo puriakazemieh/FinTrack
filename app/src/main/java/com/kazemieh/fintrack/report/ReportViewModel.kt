@@ -15,7 +15,7 @@ class ReportViewModel() : ViewModel() {
     fun onIntent(intent: ReportFilterIntent) {
         when (intent) {
             is ReportFilterIntent.OnTransactionTypeSelected -> _state.update {
-                it.copy(selectedTransactionType = intent.type)
+                it.copy(selectedTransactionType = intent.type, selectedCategories = emptySet())
             }
 
             is ReportFilterIntent.OnSourcesSelected -> _state.update {
@@ -50,13 +50,15 @@ data class ReportFilterState(
     val isCategorySheetVisible: Boolean = false
 )
 
-enum class TransactionTypeFilter { INCOME, EXPENSE, ALL }
+enum class TransactionTypeFilter(val count: Int) { INCOME(1), EXPENSE(2), ALL(0) }
 enum class ReportPeriod { ThisMonth, LastMonth, Custom }
 
 
 sealed interface ReportFilterIntent {
     data class OnTransactionTypeSelected(val type: TransactionTypeFilter) : ReportFilterIntent
-    data class OnSourcesSelected(val sources: Set<Pair<Int, String>> = emptySet()) : ReportFilterIntent
+    data class OnSourcesSelected(val sources: Set<Pair<Int, String>> = emptySet()) :
+        ReportFilterIntent
+
     data class OnCategoriesSelected(val categories: Set<Pair<Int, String>>) : ReportFilterIntent
     data class OnPeriodChanged(val period: ReportPeriod) : ReportFilterIntent
     data object OnToggleSourceSheet : ReportFilterIntent

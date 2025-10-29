@@ -1,10 +1,8 @@
 package com.kazemieh.designsystem.component
 
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -14,8 +12,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 
@@ -23,7 +21,7 @@ import androidx.compose.ui.unit.dp
 fun FintrackOutlinedTextField(
     value: String,
     onValueChange: (String) -> Unit = {},
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.fillMaxWidth(),
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     label: @Composable (() -> Unit),
     textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
@@ -35,6 +33,7 @@ fun FintrackOutlinedTextField(
     unfocusedBorderColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     cursorColor: Color = MaterialTheme.colorScheme.primary,
     errorColor: Color = MaterialTheme.colorScheme.error,
+    shape: Shape = RoundedCornerShape(12.dp),
     enabled: Boolean = true,
     singleLine: Boolean = true,
     readOnly: Boolean = false,
@@ -46,13 +45,13 @@ fun FintrackOutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier
-            .fillMaxWidth()
             .clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
             ) {
                 onClick()
             },
+        shape = shape,
         textStyle = textStyle.copy(color = textColor),
         label = {
             label()

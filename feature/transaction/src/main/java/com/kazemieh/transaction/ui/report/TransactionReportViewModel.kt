@@ -2,14 +2,11 @@ package com.kazemieh.transaction.ui.report
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.common.formatted
 import com.kazemieh.designsystem.component.PieChartItem
 import com.kazemieh.domain.usecase.TransactionUseCases
-import com.kazemieh.model.TransactionType
 import com.kazemieh.transaction.ui.component.TransactionUi
 import com.kazemieh.transaction.ui.component.TransactionWithRelationsUi
 import com.kazemieh.transaction.ui.component.toDomain
-import com.kazemieh.transaction.ui.component.toUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,39 +33,45 @@ class TransactionReportViewModel(
                 loadTransactionsByFilter()
             }
 
+            is TransactionReportIntent.SelectedSource -> {
+                _state.update {
+                    it.copy(selectedSource = intent.selectedSource)
+                }
+                loadTransactionsByFilter()
+            }
         }
     }
 
     private fun loadTransactionsByFilter() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            transactionUseCases.getAllTransactionsByType(_state.value.selectedTransactionType.count)
-                .collect { transactions ->
-
-                    val groupedByCategory = transactions.groupBy { it.category }
-                    val pieChartItems = groupedByCategory.map { (category, items) ->
-                        val totalAmount = items.sumOf { it.transaction.amount }
-                        PieChartItem(
-                            id = category.id,
-                            label = category.name,
-                            value = totalAmount.toLong()
-                        )
-                    }
-
-                    val balance = transactions.sumOf { it.transaction.amount }
-
-                    val uiTransactionWithRelations = transactions.map { it.toUi() }
-
-                    _state.update {
-                        it.copy(
-                            uiTransactionWithRelations = uiTransactionWithRelations,
-                            balance = balance.formatted(),
-                            isPositiveBalance = balance >= 0,
-                            isLoading = false,
-                            pieChartData = pieChartItems
-                        )
-                    }
-                }
+//            transactionUseCases.getAllTransactionsByType(_state.value.selectedTransactionType.count)
+//                .collect { transactions ->
+//
+//                    val groupedByCategory = transactions.groupBy { it.category }
+//                    val pieChartItems = groupedByCategory.map { (category, items) ->
+//                        val totalAmount = items.sumOf { it.transaction.amount }
+//                        PieChartItem(
+//                            id = category.id,
+//                            label = category.name,
+//                            value = totalAmount.toLong()
+//                        )
+//                    }
+//
+//                    val balance = transactions.sumOf { it.transaction.amount }
+//
+//                    val uiTransactionWithRelations = transactions.map { it.toUi() }
+//
+//                    _state.update {
+//                        it.copy(
+//                            uiTransactionWithRelations = uiTransactionWithRelations,
+//                            balance = balance.formatted(),
+//                            isPositiveBalance = balance >= 0,
+//                            isLoading = false,
+//                            pieChartData = pieChartItems
+//                        )
+//                    }
+//                }
         }
     }
 
@@ -87,6 +90,9 @@ sealed interface TransactionReportIntent {
 
     data class SelectedType(val selectedTransactionType: TransactionFilterType = TransactionFilterType.ALL) :
         TransactionReportIntent
+
+    data class SelectedSource(val selectedSource: Set<Pair<Int, String>>? = null) :
+        TransactionReportIntent
 }
 
 data class TransactionReportState(
@@ -99,12 +105,13 @@ data class TransactionReportState(
     val formatedTotalExpense: String = "0",
     val totalExpense: Long = 0,
     val selectedTransactionType: TransactionFilterType = TransactionFilterType.ALL,
+    val selectedSource: Set<Pair<Int, String>>? = null,
     val pieChartData: List<PieChartItem> = listOf(),
     val error: String? = null
 )
 
 
-enum class TransactionFilterType(val count: Int)  {
+enum class TransactionFilterType(val count: Int) {
     ALL(0),
     INCOME(1),
     EXPENSE(2);
