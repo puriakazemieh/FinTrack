@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -54,6 +56,8 @@ fun ReportScreen(
     ) {
 
         Column {
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             ReportTopBar(onIntent = viewModel::onIntent, state = state)
 
@@ -157,15 +161,13 @@ fun ReportTopBar(onIntent: (ReportFilterIntent) -> Unit, state: ReportFilterStat
                     else MaterialTheme.typography.labelSmall
                 FintrackOutlinedTextField(
                     value = if (state.selectedSources.size == 1) state.selectedSources.first().second
-                    else state.selectedSources.joinToString("") { ", ${it.second}" },
+                    else state.selectedSources.joinToString(", ") { it.second },
                     onClick = { onIntent(ReportFilterIntent.OnToggleSourceSheet) },
                     readOnly = true,
                     enabled = false,
                     singleLine = true,
                     textStyle = sourceTextStyle,
                     modifier = Modifier.weight(1f),
-                    disabledBorderColor = MaterialTheme.colorScheme.outlineVariant,
-                    disabledContainerColor = MaterialTheme.colorScheme.surface,
                     label = {
                         val text =
                             if (state.selectedSources.isEmpty()) stringResource(R.string.all_source)
@@ -182,15 +184,13 @@ fun ReportTopBar(onIntent: (ReportFilterIntent) -> Unit, state: ReportFilterStat
                     else MaterialTheme.typography.labelSmall
                 FintrackOutlinedTextField(
                     value = if (state.selectedCategories.size == 1) state.selectedCategories.first().second
-                    else state.selectedCategories.joinToString("") { ", ${it.second}" },
+                    else state.selectedCategories.joinToString(", ") { it.second },
                     onClick = { onIntent(ReportFilterIntent.OnToggleCategorySheet) },
                     readOnly = true,
                     enabled = false,
                     singleLine = true,
                     textStyle = categoryTextStyle,
                     modifier = Modifier.weight(1f),
-                    disabledBorderColor = MaterialTheme.colorScheme.outlineVariant,
-                    disabledContainerColor = MaterialTheme.colorScheme.surface,
                     label = {
                         val text =
                             if (state.selectedCategories.isEmpty()) stringResource(R.string.all_category)

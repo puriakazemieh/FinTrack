@@ -1,5 +1,6 @@
 package com.kazemieh.category.ui
 
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.category.R
@@ -120,6 +123,7 @@ fun CategoryListSelectionBottomSheet(
     val state by viewModel.state.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+    val nestedScrollConnection = rememberNestedScrollInteropConnection()
     LaunchedEffect(true) {
         viewModel.onIntent(CategoryIntent.LoadCategoryByType(selectedTransactionType))
     }
@@ -135,7 +139,10 @@ fun CategoryListSelectionBottomSheet(
                 .fillMaxWidth()
                 .padding(12.dp)
         ) {
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier
+                    .nestedScroll(nestedScrollConnection)
+            ) {
                 items(state.categories) { category ->
                     val isSelected =
                         state.selectedCategory?.contains(category.id?.toInt() to category.name) == true

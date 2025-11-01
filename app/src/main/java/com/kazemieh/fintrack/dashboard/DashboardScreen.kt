@@ -48,6 +48,8 @@ fun DashboardScreen(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
+            item { Spacer(modifier = Modifier.height(8.dp)) }
+
             item { TotalTransactionCard() }
 
             item { Spacer(Modifier.height(16.dp)) }
