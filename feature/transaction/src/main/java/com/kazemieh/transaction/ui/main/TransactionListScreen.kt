@@ -28,7 +28,7 @@ fun TransactionListScreen(
         }
     }
 
-    TransactionListContent(state.isLoading, state.uiTransactionWithRelations) {
+    TransactionListContent(state.uiTransactionWithRelations, state.isLoading) {
         viewModel.onIntent(TransactionIntent.DeleteTransaction(it.transaction))
     }
 }

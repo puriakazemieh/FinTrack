@@ -6,5 +6,6 @@ data class TransactionUseCases(
     val getDefaultFinancialSourceUseCase: GetDefaultFinancialSourceUseCase,
     val deleteTransaction: DeleteTransaction,
     val getAllTransactions: GetAllTransactions,
-    val getAllTransactionsByType: GetAllTransactionsByType
+    val getAllTransactionsByType: GetAllTransactionsByType,
+    val getAllTransactionsFiltered: GetAllTransactionsFiltered
 )

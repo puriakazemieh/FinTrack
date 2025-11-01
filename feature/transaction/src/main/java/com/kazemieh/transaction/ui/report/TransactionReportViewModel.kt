@@ -2,11 +2,13 @@ package com.kazemieh.transaction.ui.report
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.formatted
 import com.kazemieh.designsystem.component.PieChartItem
 import com.kazemieh.domain.usecase.TransactionUseCases
 import com.kazemieh.transaction.ui.component.TransactionUi
 import com.kazemieh.transaction.ui.component.TransactionWithRelationsUi
 import com.kazemieh.transaction.ui.component.toDomain
+import com.kazemieh.transaction.ui.component.toUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,39 +41,50 @@ class TransactionReportViewModel(
                 }
                 loadTransactionsByFilter()
             }
+
+            is TransactionReportIntent.SelectedCategory -> {
+                _state.update {
+                    it.copy(selectedCategories = intent.selectedCategories)
+                }
+                loadTransactionsByFilter()
+            }
         }
     }
 
     private fun loadTransactionsByFilter() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-//            transactionUseCases.getAllTransactionsByType(_state.value.selectedTransactionType.count)
-//                .collect { transactions ->
-//
-//                    val groupedByCategory = transactions.groupBy { it.category }
-//                    val pieChartItems = groupedByCategory.map { (category, items) ->
-//                        val totalAmount = items.sumOf { it.transaction.amount }
-//                        PieChartItem(
-//                            id = category.id,
-//                            label = category.name,
-//                            value = totalAmount.toLong()
-//                        )
-//                    }
-//
-//                    val balance = transactions.sumOf { it.transaction.amount }
-//
-//                    val uiTransactionWithRelations = transactions.map { it.toUi() }
-//
-//                    _state.update {
-//                        it.copy(
-//                            uiTransactionWithRelations = uiTransactionWithRelations,
-//                            balance = balance.formatted(),
-//                            isPositiveBalance = balance >= 0,
-//                            isLoading = false,
-//                            pieChartData = pieChartItems
-//                        )
-//                    }
-//                }
+            transactionUseCases.getAllTransactionsFiltered(
+                type = if (state.value.selectedTransactionType == 0) null else state.value.selectedTransactionType,
+                categoryIds = state.value.selectedCategories.map { it.first },
+                sourceIds = state.value.selectedSource.map { it.first }
+            )
+                .collect { transactions ->
+
+                    val groupedByCategory = transactions.groupBy { it.category }
+                    val pieChartItems = groupedByCategory.map { (category, items) ->
+                        val totalAmount = items.sumOf { it.transaction.amount }
+                        PieChartItem(
+                            id = category.id,
+                            label = category.name,
+                            value = totalAmount.toLong()
+                        )
+                    }
+
+                    val balance = transactions.sumOf { it.transaction.amount }
+
+                    val uiTransactionWithRelations = transactions.map { it.toUi() }
+
+                    _state.update {
+                        it.copy(
+                            uiTransactionWithRelations = uiTransactionWithRelations,
+                            balance = balance.formatted(),
+                            isPositiveBalance = balance >= 0,
+                            isLoading = false,
+                            pieChartData = pieChartItems
+                        )
+                    }
+                }
         }
     }
 
@@ -88,10 +101,12 @@ sealed interface TransactionReportIntent {
     data class DeleteTransactionReport(val transaction: TransactionUi) : TransactionReportIntent
     data object LoadTransactionsByFilter : TransactionReportIntent
 
-    data class SelectedType(val selectedTransactionType: TransactionFilterType = TransactionFilterType.ALL) :
+    data class SelectedType(val selectedTransactionType: Int = 0) : TransactionReportIntent
+
+    data class SelectedSource(val selectedSource: Set<Pair<Int, String>> = emptySet()) :
         TransactionReportIntent
 
-    data class SelectedSource(val selectedSource: Set<Pair<Int, String>>? = null) :
+    data class SelectedCategory(val selectedCategories: Set<Pair<Int, String>> = emptySet()) :
         TransactionReportIntent
 }
 
@@ -104,8 +119,9 @@ data class TransactionReportState(
     val totalIncome: Long = 0,
     val formatedTotalExpense: String = "0",
     val totalExpense: Long = 0,
-    val selectedTransactionType: TransactionFilterType = TransactionFilterType.ALL,
-    val selectedSource: Set<Pair<Int, String>>? = null,
+    val selectedTransactionType: Int = 0,
+    val selectedSource: Set<Pair<Int, String>> = emptySet(),
+    val selectedCategories: Set<Pair<Int, String>> = emptySet(),
     val pieChartData: List<PieChartItem> = listOf(),
     val error: String? = null
 )
@@ -117,6 +133,6 @@ enum class TransactionFilterType(val count: Int) {
     EXPENSE(2);
 
     companion object {
-        fun fromInt(value: Int) = TransactionFilterType.entries.first { it.count == value }
+        fun fromInt(value: Int) = entries.first { it.count == value }
     }
 }

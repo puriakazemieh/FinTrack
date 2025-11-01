@@ -179,8 +179,9 @@ fun CategoryListSelectionBottomSheet(
 
                     }
 
-                    Spacer(Modifier.height(12.dp))
                 }
+
+                item { Spacer(Modifier.height(40.dp)) }
             }
 
             Box(modifier = Modifier.align(Alignment.BottomCenter)) {

@@ -5,12 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -40,10 +37,8 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.financialsource.ui.SourceListSelectionBottomSheet
 import com.kazemieh.fintrack.R
-import com.kazemieh.transaction.ui.report.ShowTransactionReportCard
 import com.kazemieh.transaction.ui.report.TransactionFilterType
 import com.kazemieh.transaction.ui.report.TransactionListByFilterScreen
-import com.kazemieh.transaction.ui.report.TransactionReportIntent
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -62,25 +57,12 @@ fun ReportScreen(
 
             ReportTopBar(onIntent = viewModel::onIntent, state = state)
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-            ) {
-                item { Spacer(Modifier.height(8.dp)) }
+            TransactionListByFilterScreen(
+                selectedSources = state.selectedSources,
+                selectedCategories = state.selectedCategories,
+                selectedTransactionType = state.selectedTransactionType.count
+            )
 
-                item {
-                    ShowTransactionReportCard()
-                }
-
-                item { Spacer(Modifier.height(16.dp)) }
-
-                item {
-                    TransactionListByFilterScreen(selectedSources = state.selectedSources)
-                }
-
-                item { Spacer(Modifier.height(8.dp)) }
-            }
         }
 
 
@@ -174,7 +156,7 @@ fun ReportTopBar(onIntent: (ReportFilterIntent) -> Unit, state: ReportFilterStat
                     if (state.selectedSources.isEmpty()) MaterialTheme.typography.bodyMedium
                     else MaterialTheme.typography.labelSmall
                 FintrackOutlinedTextField(
-                    value = if (state.selectedSources.isEmpty()) state.selectedSources.first().second
+                    value = if (state.selectedSources.size == 1) state.selectedSources.first().second
                     else state.selectedSources.joinToString("") { ", ${it.second}" },
                     onClick = { onIntent(ReportFilterIntent.OnToggleSourceSheet) },
                     readOnly = true,
@@ -199,7 +181,7 @@ fun ReportTopBar(onIntent: (ReportFilterIntent) -> Unit, state: ReportFilterStat
                     if (state.selectedCategories.isEmpty()) MaterialTheme.typography.bodyMedium
                     else MaterialTheme.typography.labelSmall
                 FintrackOutlinedTextField(
-                    value = if (state.selectedCategories.isEmpty()) state.selectedCategories.first().second
+                    value = if (state.selectedCategories.size == 1) state.selectedCategories.first().second
                     else state.selectedCategories.joinToString("") { ", ${it.second}" },
                     onClick = { onIntent(ReportFilterIntent.OnToggleCategorySheet) },
                     readOnly = true,

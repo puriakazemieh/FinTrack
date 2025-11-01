@@ -67,6 +67,16 @@ class TransactionLocalDataSourceImpl(
         }
     }
 
+    override fun getAllTransactionsFiltered(
+        type: Int?,
+        categoryIds: List<Int>,
+        sourceIds: List<Int>,
+    ): Flow<List<TransactionWithRelations>> {
+        return transactionDao.getAllTransactionsFiltered(type, categoryIds, sourceIds).map {
+            it.map { it.toTransactionWithRelations() }
+        }
+    }
+
     override fun getByCategory(categoryId: Long): Flow<List<TransactionWithRelations>> = flow {
         emit(
             transactionDao.getTransactionsByCategoryId(categoryId)

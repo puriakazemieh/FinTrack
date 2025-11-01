@@ -12,6 +12,11 @@ interface TransactionRepository {
     suspend fun deleteTransaction(transaction: Transaction)
     fun getAllTransactions(): Flow<List<TransactionWithRelations>>
     fun getAllTransactionsByType(type: Int): Flow<List<TransactionWithRelations>>
+    fun getAllTransactionsFiltered(
+        type: Int? = null,
+        categoryIds: List<Int> = emptyList(),
+        sourceIds: List<Int> = emptyList(),
+    ): Flow<List<TransactionWithRelations>>
     suspend fun getAllCategory(type: Int): Flow<List<Category>>
     suspend fun insertTag(tag: Tag): Long
     suspend fun insertCategory(category: Category): Long

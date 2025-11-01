@@ -18,9 +18,9 @@ import com.kazemieh.transaction.R
 
 @Composable
 fun TransactionListContent(
-    isLoading: Boolean,
     uiTransactionWithRelations: List<TransactionWithRelationsUi>,
-    onDelete: (TransactionWithRelationsUi) -> Unit
+    isLoading: Boolean = true,
+    onDelete: (TransactionWithRelationsUi) -> Unit = {}
 ) {
     Box(
         modifier = Modifier

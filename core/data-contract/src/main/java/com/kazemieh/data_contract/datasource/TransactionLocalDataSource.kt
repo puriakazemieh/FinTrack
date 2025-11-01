@@ -13,6 +13,12 @@ interface TransactionLocalDataSource {
     suspend fun delete(transaction: Transaction)
     fun getAllTransactions(): Flow<List<TransactionWithRelations>>
     fun getAllTransactionsByType(type: Int): Flow<List<TransactionWithRelations>>
+    fun getAllTransactionsFiltered(
+        type: Int? = null,
+        categoryIds: List<Int> = emptyList(),
+        sourceIds: List<Int> = emptyList(),
+    ): Flow<List<TransactionWithRelations>>
+
     fun getByCategory(categoryId: Long): Flow<List<TransactionWithRelations>>
     fun getByFinancialSource(sourceId: Long): Flow<List<TransactionWithRelations>>
 

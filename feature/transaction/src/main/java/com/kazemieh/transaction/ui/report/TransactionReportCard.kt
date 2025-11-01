@@ -13,22 +13,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.PieChart
 import com.kazemieh.transaction.R
@@ -36,17 +28,12 @@ import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
-fun ShowTransactionReportCard(
-    viewModel: TransactionReportViewModel = koinViewModel()
-) {
+fun ShowTransactionReportCard(viewModel: TransactionReportViewModel = koinViewModel()) {
 
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(true) {
-        viewModel.onIntent(TransactionReportIntent.LoadTransactionsByFilter)
-    }
 
-    val text = when (state.selectedTransactionType.count) {
+    val text = when (state.selectedTransactionType) {
         1 -> {
             stringResource(R.string.incoming)
         }

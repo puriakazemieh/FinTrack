@@ -1,10 +1,10 @@
 package com.kazemieh.database.dao
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
 import androidx.room.Delete
+import androidx.room.Insert
 import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.kazemieh.database.entity.TransactionEntity
@@ -31,6 +31,24 @@ interface TransactionDao {
     @Transaction
     @Query("SELECT * FROM transactions  WHERE type = :type")
     fun getAllTransactionsByTypeWithCategoryFinancialSourceAndTags(type: Int): Flow<List<TransactionWithCategoryFinancialSourceAndTags>>
+
+    @Transaction
+    @Query(
+        """
+    SELECT * FROM transactions
+    WHERE (:type IS NULL OR type = :type)
+      AND ((:categoryIdsSize = 0) OR categoryId IN (:categoryIds))
+      AND ((:sourceIdsSize = 0) OR financialSourceId IN (:sourceIds))
+"""
+    )
+    fun getAllTransactionsFiltered(
+        type: Int? = null,
+        categoryIds: List<Int> = emptyList(),
+        sourceIds: List<Int> = emptyList(),
+        categoryIdsSize: Int = categoryIds.size,
+        sourceIdsSize: Int = sourceIds.size
+    ): Flow<List<TransactionWithCategoryFinancialSourceAndTags>>
+
 
     @Transaction
     @Query("SELECT * FROM transactions WHERE categoryId = :categoryId")
