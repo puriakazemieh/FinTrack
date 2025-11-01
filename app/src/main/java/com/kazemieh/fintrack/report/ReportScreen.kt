@@ -1,6 +1,7 @@
 package com.kazemieh.fintrack.report
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,19 +11,26 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -31,12 +39,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.CategoryListSelectionBottomSheet
+import com.kazemieh.designsystem.component.DatePickerField
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
+import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.financialsource.ui.SourceListSelectionBottomSheet
 import com.kazemieh.fintrack.R
 import com.kazemieh.transaction.ui.report.TransactionFilterType
@@ -64,7 +73,8 @@ fun ReportScreen(
             TransactionListByFilterScreen(
                 selectedSources = state.selectedSources,
                 selectedCategories = state.selectedCategories,
-                selectedTransactionType = state.selectedTransactionType.count
+                selectedTransactionType = state.selectedTransactionType.count,
+                //todo add date
             )
 
         }
@@ -93,17 +103,22 @@ fun ReportScreen(
             )
         }
 
+        if (state.isDateSheetVisible) {
+            DateFilterSheet(viewModel::onIntent)
+        }
+
+        if (state.isCustomDateSheetVisible) {
+            CustomRangeSheet(
+                state = state,
+                onIntent = viewModel::onIntent
+            )
+        }
+
+        if (state.isCustomDateStartSheetVisible) {
+
+        }
 
     }
-}
-
-@Preview(
-    showSystemUi = true, showBackground = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
-)
-@Composable
-fun ReportTopBarPrev() {
-    ReportTopBar({}, ReportFilterState())
 }
 
 @Composable
@@ -204,37 +219,164 @@ fun ReportTopBar(onIntent: (ReportFilterIntent) -> Unit, state: ReportFilterStat
             }
 
             DatePeriodSelector(
-                selectedPeriod = state.selectedPeriod,
-                onChange = { onIntent(ReportFilterIntent.OnPeriodChanged(it)) }
+                selectedDateFilter = state.selectedDateFilter,
+                onChange = { onIntent(ReportFilterIntent.OnToggleDateSheet) }
             )
+
+
         }
     }
 }
 
 
 @Composable
-fun DatePeriodSelector(selectedPeriod: ReportPeriod, onChange: (ReportPeriod) -> Unit) {
+fun DatePeriodSelector(selectedDateFilter: DateFilterType, onChange: () -> Unit) {
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { /* ماه قبل */ }) {
+        IconButton(
+            modifier = Modifier.weight(0.1f),
+            onClick = { /* ماه قبل */ }) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "ماه قبل")
         }
 
         Text(
-            text = when (selectedPeriod) {
-                ReportPeriod.ThisMonth -> "این ماه"
-                ReportPeriod.LastMonth -> "ماه قبل"
-                ReportPeriod.Custom -> "بازه دلخواه"
-            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.8f)
+                .clickable {
+                    onChange()
+                },
+            text = selectedDateFilter.title,
             style = MaterialTheme.typography.titleMedium
         )
 
-        IconButton(onClick = { /* ماه بعد */ }) {
+        IconButton(
+            modifier = Modifier.weight(0.1f),
+            onClick = { /* ماه بعد */ }) {
             Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "ماه بعد")
         }
     }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DateFilterSheet(
+    onIntent: (ReportFilterIntent) -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = { onIntent(ReportFilterIntent.OnToggleDateSheet) },
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background
+    ) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+
+            LazyColumn {
+                items(DateFilterType.entries) { filter ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .clickable {
+                                if (filter == DateFilterType.CUSTOM_RANGE)
+                                    onIntent(ReportFilterIntent.OnToggleCustomDateSheet)
+                                else
+                                    onIntent(ReportFilterIntent.OnDateFilterSelected(filter))
+                            },
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        shape = MaterialTheme.shapes.medium,
+                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                    ) {
+                        FintrackBodyMediumText(
+                            modifier = Modifier.padding(12.dp),
+                            text = filter.title
+                        )
+                    }
+                }
+            }
+
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomRangeSheet(
+    state: ReportFilterState,
+    onIntent: (ReportFilterIntent) -> Unit,
+) {
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = { onIntent(ReportFilterIntent.OnToggleCustomDateSheet) },
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background
+    ) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+            Column(Modifier.padding(16.dp)) {
+
+                FintrackTitleMediumText("بازه انتخابی")
+                Spacer(Modifier.height(8.dp))
+
+                DatePickerField(
+                    selectedDate = "شروع: ${state.customRangeStart ?: "انتخاب نشده"}",
+                    onDateSelected = { date, timeStamp ->
+                        onIntent(
+                            ReportFilterIntent.OnCustomRangeStartSelected(
+                                date = date,
+                                timeStamp = timeStamp
+                            )
+                        )
+                    }
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                DatePickerField(
+                    selectedDate = "پایان: ${state.customRangeEnd ?: "انتخاب نشده"}",
+                    onDateSelected = { date, timeStamp ->
+                        onIntent(
+                            ReportFilterIntent.OnCustomRangeEndSelected(
+                                date = date,
+                                timeStamp = timeStamp
+                            )
+                        )
+                    }
+                )
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { onIntent(ReportFilterIntent.OnDateSheetSubmit) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    FintrackBodyMediumText(
+                        text = stringResource(com.kazemieh.category.R.string.confirm),
+                        color = MaterialTheme.colorScheme.background
+                    )
+                }
+            }
+        }
+
+    }
+}

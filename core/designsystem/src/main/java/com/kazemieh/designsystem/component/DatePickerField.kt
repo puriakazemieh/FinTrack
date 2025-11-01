@@ -1,4 +1,4 @@
-package com.kazemieh.transaction.ui.add
+package com.kazemieh.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,9 +35,7 @@ import com.gmail.hamedvakhide.compose_jalali_datepicker.JalaliCalendarView
 import com.gmail.hamedvakhide.compose_jalali_datepicker.ui.theme.textDisabledColor
 import com.kazemieh.designsystem.FintrackFontFamily
 import com.kazemieh.designsystem.FintrackTypography
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackOutlinedTextField
-import com.kazemieh.transaction.R
+import com.kazemieh.designsystem.R
 import ir.huri.jcal.JalaliCalendar
 import kotlinx.coroutines.launch
 

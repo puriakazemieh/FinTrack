@@ -12,9 +12,6 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:designsystem"))
 
-    implementation(libs.jalali.datepicker.compose)
-    implementation(libs.jalalicalendar)
-
     implementation(libs.androidx.foundation)
 
 
