@@ -91,8 +91,30 @@ class ReportViewModel() : ViewModel() {
                     it.copy(isCustomDateSheetVisible = false, isDateSheetVisible = false)
                 }
             }
+
+            is ReportFilterIntent.OnShiftFilter -> {
+                val filter = if (intent.direction == 1) {
+                    DateFilterHelper.getNextFilter(_state.value.selectedDateFilter)
+                } else {
+                    DateFilterHelper.getPreviousFilter(_state.value.selectedDateFilter)
+                }
+                val range = DateFilterHelper.getRange(filter)
+                _state.update {
+                    it.copy(
+                        selectedDateFilter = filter,
+                        isDateSheetVisible = false,
+                        timeStampRangeStart = range?.fromTimestamp,
+                        timeStampRangeEnd = range?.toTimestamp,
+                        customRangeStart = null,
+                        customRangeEnd = null
+                    )
+                }
+            }
+
         }
     }
+
+
 }
 
 data class ReportFilterState(
@@ -130,4 +152,5 @@ sealed interface ReportFilterIntent {
         ReportFilterIntent
 
     data class OnCustomRangeEndSelected(val date: String, val timeStamp: Long) : ReportFilterIntent
+    data class OnShiftFilter(val direction: Int) : ReportFilterIntent
 }

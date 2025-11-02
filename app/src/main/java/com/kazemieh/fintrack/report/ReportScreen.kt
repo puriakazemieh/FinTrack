@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -38,13 +37,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.CategoryListSelectionBottomSheet
 import com.kazemieh.common.DateFilterType
 import com.kazemieh.designsystem.component.DatePickerField
-import com.kazemieh.designsystem.component.FintrackBodyLargeText
+import com.kazemieh.designsystem.component.FilterButton
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
@@ -130,7 +128,7 @@ fun ReportTopBar(onIntent: (ReportFilterIntent) -> Unit, state: ReportFilterStat
     ) {
         Column(
             modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+//            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
 
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -219,7 +217,7 @@ fun ReportTopBar(onIntent: (ReportFilterIntent) -> Unit, state: ReportFilterStat
 
             DatePeriodSelector(
                 state = state,
-                onChange = { onIntent(ReportFilterIntent.OnToggleDateSheet) }
+                onIntent = onIntent
             )
 
 
@@ -229,42 +227,49 @@ fun ReportTopBar(onIntent: (ReportFilterIntent) -> Unit, state: ReportFilterStat
 
 
 @Composable
-fun DatePeriodSelector(state: ReportFilterState, onChange: () -> Unit) {
+fun DatePeriodSelector(
+    state: ReportFilterState,
+    onIntent: (ReportFilterIntent) -> Unit
+) {
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-
-        if (state.customRangeStart == null && state.customRangeEnd == null)
+        if (state.customRangeStart == null && state.customRangeEnd == null) {
             IconButton(
                 modifier = Modifier.weight(0.1f),
-                onClick = { /* ماه قبل */ }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "ماه قبل")
+                onClick = {
+                    onIntent(ReportFilterIntent.OnShiftFilter(1))
+                }
+            ) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "قبلی")
             }
+        }
 
         val text = if (state.customRangeStart != null && state.customRangeEnd != null)
-            state.customRangeStart + " - " + state.customRangeEnd
-        else state.selectedDateFilter.title
+            "${state.customRangeStart} - ${state.customRangeEnd}"
+        else
+            state.selectedDateFilter.title
 
-        FintrackBodyLargeText(
+        FilterButton(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .weight(0.8f)
-                .clickable {
-                    onChange()
-                },
+                .padding(top = 8.dp, end = 8.dp, start = 8.dp, bottom = 4.dp)
+                .weight(0.8f),
             text = text,
-            textAlign = TextAlign.Center
+            onClick = { onIntent(ReportFilterIntent.OnToggleDateSheet) }
         )
 
-        if (state.customRangeStart == null && state.customRangeEnd == null)
+        if (state.customRangeStart == null && state.customRangeEnd == null) {
             IconButton(
                 modifier = Modifier.weight(0.1f),
-                onClick = { /* ماه بعد */ }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "ماه بعد")
+                onClick = {
+                    onIntent(ReportFilterIntent.OnShiftFilter(-1))
+                }
+            ) {
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "بعدی")
             }
+        }
     }
 }
 
@@ -282,6 +287,29 @@ fun DateFilterSheet(
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background
     ) {
+        val dayFilters = DateFilterType.entries.filter {
+            it in listOf(
+                DateFilterType.TODAY,
+                DateFilterType.YESTERDAY,
+                DateFilterType.TOMORROW
+            )
+        }
+
+        val weekFilters = DateFilterType.entries.filter {
+            it in listOf(
+                DateFilterType.THIS_WEEK,
+                DateFilterType.LAST_WEEK,
+                DateFilterType.NEXT_WEEK
+            )
+        }
+
+        val monthFilters = DateFilterType.entries.filter {
+            it in listOf(
+                DateFilterType.THIS_MONTH,
+                DateFilterType.LAST_MONTH,
+                DateFilterType.NEXT_MONTH
+            )
+        }
 
         Column(
             modifier = Modifier
@@ -290,40 +318,61 @@ fun DateFilterSheet(
         ) {
 
             LazyColumn {
-                items(DateFilterType.entries) { filter ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                            .clickable {
-                                if (filter == DateFilterType.CUSTOM_RANGE)
-                                    onIntent(ReportFilterIntent.OnToggleCustomDateSheet)
-                                else
-                                    onIntent(ReportFilterIntent.OnDateFilterSelected(filter))
-                            },
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface
-                        ),
-                        shape = MaterialTheme.shapes.medium,
-                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                    ) {
-                        val text =
-                            if (filter == DateFilterType.CUSTOM_RANGE)
-                                if (state.customRangeStart != null && state.customRangeEnd != null)
-                                    state.customRangeStart + " - " + state.customRangeEnd
-                                else filter.title else filter.title
-
-                        FintrackBodyMediumText(
-                            modifier = Modifier.padding(20.dp),
-                            text = text
-                        )
-                    }
+                item {
+                    FilterRow(dayFilters, state, onIntent)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    FilterRow(weekFilters, state, onIntent)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    FilterRow(monthFilters, state, onIntent)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    FilterRow(listOf(DateFilterType.CUSTOM_RANGE), state, onIntent)
                 }
             }
-
         }
     }
 }
+
+@Composable
+private fun FilterRow(
+    filters: List<DateFilterType>,
+    state: ReportFilterState,
+    onIntent: (ReportFilterIntent) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        filters.forEach { filter ->
+            Card(
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        if (filter == DateFilterType.CUSTOM_RANGE)
+                            onIntent(ReportFilterIntent.OnToggleCustomDateSheet)
+                        else
+                            onIntent(ReportFilterIntent.OnDateFilterSelected(filter))
+                    },
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                shape = MaterialTheme.shapes.medium,
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            ) {
+                val text = if (filter == DateFilterType.CUSTOM_RANGE) {
+                    if (state.customRangeStart != null && state.customRangeEnd != null)
+                        "${state.customRangeStart} - ${state.customRangeEnd}"
+                    else filter.title
+                } else filter.title
+
+                FintrackBodyMediumText(
+                    modifier = Modifier.padding(16.dp),
+                    text = text
+                )
+            }
+        }
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -351,7 +400,8 @@ fun CustomRangeSheet(
                 Spacer(Modifier.height(8.dp))
 
                 DatePickerField(
-                    selectedDate = "شروع: ${state.customRangeStart ?: "انتخاب نشده"}",
+                    selectedDate = state.customRangeStart ?: "انتخاب نشده",
+                    labelText = "شروع",
                     onDateSelected = { date, timeStamp ->
                         onIntent(
                             ReportFilterIntent.OnCustomRangeStartSelected(
@@ -365,7 +415,8 @@ fun CustomRangeSheet(
                 Spacer(Modifier.height(8.dp))
 
                 DatePickerField(
-                    selectedDate = "پایان: ${state.customRangeEnd ?: "انتخاب نشده"}",
+                    selectedDate = state.customRangeEnd ?: "انتخاب نشده",
+                    labelText = "پایان",
                     onDateSelected = { date, timeStamp ->
                         onIntent(
                             ReportFilterIntent.OnCustomRangeEndSelected(

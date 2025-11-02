@@ -289,6 +289,54 @@ object DateFilterHelper {
         }
     }
 
+    fun DateFilterType.isDaily() = this in listOf(
+        DateFilterType.TODAY, DateFilterType.YESTERDAY, DateFilterType.TOMORROW
+    )
+
+    fun DateFilterType.isWeekly() = this in listOf(
+        DateFilterType.THIS_WEEK, DateFilterType.LAST_WEEK, DateFilterType.NEXT_WEEK
+    )
+
+    fun DateFilterType.isMonthly() = this in listOf(
+        DateFilterType.THIS_MONTH, DateFilterType.LAST_MONTH, DateFilterType.NEXT_MONTH
+    )
+
+    fun getPreviousFilter(current: DateFilterType): DateFilterType {
+        return when (current) {
+            DateFilterType.TODAY -> DateFilterType.YESTERDAY
+            DateFilterType.YESTERDAY -> DateFilterType.YESTERDAY // یا یه فیلتر جدید مثلاً "TWO_DAYS_AGO"
+            DateFilterType.TOMORROW -> DateFilterType.TODAY
+
+            DateFilterType.THIS_WEEK -> DateFilterType.LAST_WEEK
+            DateFilterType.LAST_WEEK -> DateFilterType.LAST_WEEK // یا "TWO_WEEKS_AGO"
+            DateFilterType.NEXT_WEEK -> DateFilterType.THIS_WEEK
+
+            DateFilterType.THIS_MONTH -> DateFilterType.LAST_MONTH
+            DateFilterType.LAST_MONTH -> DateFilterType.LAST_MONTH // یا "TWO_MONTHS_AGO"
+            DateFilterType.NEXT_MONTH -> DateFilterType.THIS_MONTH
+
+            DateFilterType.CUSTOM_RANGE -> DateFilterType.CUSTOM_RANGE
+        }
+    }
+
+    fun getNextFilter(current: DateFilterType): DateFilterType {
+        return when (current) {
+            DateFilterType.TODAY -> DateFilterType.TOMORROW
+            DateFilterType.YESTERDAY -> DateFilterType.TODAY
+            DateFilterType.TOMORROW -> DateFilterType.TOMORROW // یا "DAY_AFTER_TOMORROW"
+
+            DateFilterType.THIS_WEEK -> DateFilterType.NEXT_WEEK
+            DateFilterType.LAST_WEEK -> DateFilterType.THIS_WEEK
+            DateFilterType.NEXT_WEEK -> DateFilterType.NEXT_WEEK // یا "TWO_WEEKS_LATER"
+
+            DateFilterType.THIS_MONTH -> DateFilterType.NEXT_MONTH
+            DateFilterType.LAST_MONTH -> DateFilterType.THIS_MONTH
+            DateFilterType.NEXT_MONTH -> DateFilterType.NEXT_MONTH // یا "TWO_MONTHS_LATER"
+
+            DateFilterType.CUSTOM_RANGE -> DateFilterType.CUSTOM_RANGE
+        }
+    }
+
     /**
      * تبدیل تاریخ شمسی به بازه‌ی زمانی میلادی برحسب timestamp
      */
@@ -327,6 +375,7 @@ object DateFilterHelper {
         }
         return DateRange(startGc.timeInMillis, endGc.timeInMillis)
     }
+
 }
 
 

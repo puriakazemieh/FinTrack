@@ -43,6 +43,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun DatePickerField(
     selectedDate: String? = "${JalaliCalendar().day} / ${JalaliCalendar().monthString} / ${JalaliCalendar().year}",
+    labelText: String = stringResource(R.string.date),
     onDateSelected: (String, Long) -> Unit
 ) {
     val openSheet = remember { mutableStateOf(false) }
@@ -64,10 +65,8 @@ fun DatePickerField(
         onClick = { openSheet.value = true },
         readOnly = true,
         enabled = false,
-        label = { FintrackBodyMediumText(text = stringResource(R.string.date)) }
+        label = { FintrackBodyMediumText(text = labelText) }
     )
-
-
 }
 
 
