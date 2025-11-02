@@ -71,8 +71,17 @@ class TransactionLocalDataSourceImpl(
         type: Int?,
         categoryIds: List<Int>,
         sourceIds: List<Int>,
+        fromTimestamp: Long?,
+        toTimestamp: Long?
     ): Flow<List<TransactionWithRelations>> {
-        return transactionDao.getAllTransactionsFiltered(type, categoryIds, sourceIds).map {
+
+        return transactionDao.getAllTransactionsFiltered(
+            type = type,
+            categoryIds = categoryIds,
+            sourceIds = sourceIds,
+            fromTimestamp = fromTimestamp,
+            toTimestamp = toTimestamp
+        ).map {
             it.map { it.toTransactionWithRelations() }
         }
     }

@@ -25,8 +25,16 @@ class TransactionRepositoryImpl(
         type: Int?,
         categoryIds: List<Int>,
         sourceIds: List<Int>,
+        fromTimestamp: Long?,
+        toTimestamp: Long?
     ): Flow<List<TransactionWithRelations>> {
-        return localDataSource.getAllTransactionsFiltered(type, categoryIds, sourceIds)
+        return localDataSource.getAllTransactionsFiltered(
+            type,
+            categoryIds,
+            sourceIds,
+            fromTimestamp,
+            toTimestamp
+        )
     }
 
     override suspend fun insertTransaction(transaction: Transaction, tagIds: List<Long>): Long {

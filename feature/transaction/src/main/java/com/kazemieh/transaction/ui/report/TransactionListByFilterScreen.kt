@@ -19,6 +19,8 @@ fun TransactionListByFilterScreen(
     selectedSources: Set<Pair<Int, String>>,
     selectedCategories: Set<Pair<Int, String>>,
     selectedTransactionType: Int,
+    fromTimestamp: Long? = null,
+    toTimestamp: Long? = null,
     viewModel: TransactionReportViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -33,6 +35,10 @@ fun TransactionListByFilterScreen(
 
     LaunchedEffect(selectedTransactionType) {
         viewModel.onIntent(TransactionReportIntent.SelectedType(selectedTransactionType))
+    }
+
+    LaunchedEffect(fromTimestamp, toTimestamp) {
+        viewModel.onIntent(TransactionReportIntent.SelectedDate(fromTimestamp, toTimestamp))
     }
 
     LaunchedEffect(true) {

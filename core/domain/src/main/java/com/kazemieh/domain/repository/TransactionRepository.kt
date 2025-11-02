@@ -16,7 +16,10 @@ interface TransactionRepository {
         type: Int? = null,
         categoryIds: List<Int> = emptyList(),
         sourceIds: List<Int> = emptyList(),
+        fromTimestamp: Long? = null,
+        toTimestamp: Long? = null
     ): Flow<List<TransactionWithRelations>>
+
     suspend fun getAllCategory(type: Int): Flow<List<Category>>
     suspend fun insertTag(tag: Tag): Long
     suspend fun insertCategory(category: Category): Long

@@ -48,6 +48,13 @@ class TransactionReportViewModel(
                 }
                 loadTransactionsByFilter()
             }
+
+            is TransactionReportIntent.SelectedDate -> {
+                _state.update {
+                    it.copy(fromTimestamp = intent.fromTimestamp, toTimestamp = intent.toTimestamp)
+                }
+                loadTransactionsByFilter()
+            }
         }
     }
 
@@ -57,7 +64,9 @@ class TransactionReportViewModel(
             transactionUseCases.getAllTransactionsFiltered(
                 type = if (state.value.selectedTransactionType == 0) null else state.value.selectedTransactionType,
                 categoryIds = state.value.selectedCategories.map { it.first },
-                sourceIds = state.value.selectedSource.map { it.first }
+                sourceIds = state.value.selectedSource.map { it.first },
+                fromTimestamp = state.value.fromTimestamp,
+                toTimestamp = state.value.toTimestamp
             )
                 .collect { transactions ->
 
@@ -108,6 +117,9 @@ sealed interface TransactionReportIntent {
 
     data class SelectedCategory(val selectedCategories: Set<Pair<Int, String>> = emptySet()) :
         TransactionReportIntent
+
+    data class SelectedDate(val fromTimestamp: Long? = null, val toTimestamp: Long? = null) :
+        TransactionReportIntent
 }
 
 data class TransactionReportState(
@@ -119,6 +131,8 @@ data class TransactionReportState(
     val totalIncome: Long = 0,
     val formatedTotalExpense: String = "0",
     val totalExpense: Long = 0,
+    val fromTimestamp: Long? = null,
+    val toTimestamp: Long? = null,
     val selectedTransactionType: Int = 0,
     val selectedSource: Set<Pair<Int, String>> = emptySet(),
     val selectedCategories: Set<Pair<Int, String>> = emptySet(),

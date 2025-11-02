@@ -35,18 +35,24 @@ interface TransactionDao {
     @Transaction
     @Query(
         """
-    SELECT * FROM transactions
-    WHERE (:type IS NULL OR type = :type)
-      AND ((:categoryIdsSize = 0) OR categoryId IN (:categoryIds))
-      AND ((:sourceIdsSize = 0) OR financialSourceId IN (:sourceIds))
-"""
+        SELECT * FROM transactions
+        WHERE (:type IS NULL OR type = :type)
+          AND ((:categoryIdsSize = 0) OR categoryId IN (:categoryIds))
+          AND ((:sourceIdsSize = 0) OR financialSourceId IN (:sourceIds))
+          AND (
+              (:fromTimestamp IS NULL OR :toTimestamp IS NULL)
+              OR (timeStamp BETWEEN :fromTimestamp AND :toTimestamp)
+          )
+    """
     )
     fun getAllTransactionsFiltered(
         type: Int? = null,
         categoryIds: List<Int> = emptyList(),
         sourceIds: List<Int> = emptyList(),
         categoryIdsSize: Int = categoryIds.size,
-        sourceIdsSize: Int = sourceIds.size
+        sourceIdsSize: Int = categoryIds.size,
+        fromTimestamp: Long? = null,
+        toTimestamp: Long? = null
     ): Flow<List<TransactionWithCategoryFinancialSourceAndTags>>
 
 

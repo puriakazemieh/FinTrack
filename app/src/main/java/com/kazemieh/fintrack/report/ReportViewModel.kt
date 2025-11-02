@@ -2,6 +2,8 @@ package com.kazemieh.fintrack.report
 
 
 import androidx.lifecycle.ViewModel
+import com.kazemieh.common.DateFilterHelper
+import com.kazemieh.common.DateFilterType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -26,8 +28,19 @@ class ReportViewModel() : ViewModel() {
                 it.copy(selectedCategories = intent.categories, isCategorySheetVisible = false)
             }
 
-            is ReportFilterIntent.OnDateFilterSelected -> _state.update {
-                it.copy(selectedDateFilter = intent.filter)
+            is ReportFilterIntent.OnDateFilterSelected -> {
+
+                val range = DateFilterHelper.getRange(intent.filter)
+                _state.update {
+                    it.copy(
+                        selectedDateFilter = intent.filter,
+                        isDateSheetVisible = false,
+                        timeStampRangeStart = range?.fromTimestamp,
+                        timeStampRangeEnd = range?.toTimestamp,
+                        customRangeStart = null,
+                        customRangeEnd = null
+                    )
+                }
             }
 
             is ReportFilterIntent.OnCustomRangeStartSelected -> _state.update {
@@ -75,7 +88,7 @@ class ReportViewModel() : ViewModel() {
                 }
 
                 _state.update {
-                    it.copy(isCustomDateSheetVisible = false)
+                    it.copy(isCustomDateSheetVisible = false, isDateSheetVisible = false)
                 }
             }
         }
@@ -93,26 +106,12 @@ data class ReportFilterState(
     val timeStampRangeEnd: Long? = null,
     val isDateSheetVisible: Boolean = false,
     val isCustomDateSheetVisible: Boolean = false,
-    val isCustomDateStartSheetVisible: Boolean = false,
     val isCustomDateEndSheetVisible: Boolean = false,
     val isSourceSheetVisible: Boolean = false,
     val isCategorySheetVisible: Boolean = false
 )
 
 enum class TransactionTypeFilter(val count: Int) { INCOME(1), EXPENSE(2), ALL(0) }
-
-enum class DateFilterType(val title: String) {
-    TODAY("امروز"),
-    YESTERDAY("دیروز"),
-    TOMORROW("فردا"),
-    THIS_WEEK("این هفته"),
-    LAST_WEEK("هفته قبل"),
-    NEXT_WEEK("هفته بعد"),
-    THIS_MONTH("این ماه"),
-    LAST_MONTH("ماه قبل"),
-    NEXT_MONTH("ماه بعد"),
-    CUSTOM_RANGE("بازه انتخابی")
-}
 
 
 sealed interface ReportFilterIntent {

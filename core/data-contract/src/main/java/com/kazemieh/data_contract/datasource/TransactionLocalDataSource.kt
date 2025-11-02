@@ -17,6 +17,8 @@ interface TransactionLocalDataSource {
         type: Int? = null,
         categoryIds: List<Int> = emptyList(),
         sourceIds: List<Int> = emptyList(),
+        fromTimestamp: Long? = null,
+        toTimestamp: Long? = null
     ): Flow<List<TransactionWithRelations>>
 
     fun getByCategory(categoryId: Long): Flow<List<TransactionWithRelations>>

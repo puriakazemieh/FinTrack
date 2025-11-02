@@ -29,7 +29,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -39,10 +38,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.CategoryListSelectionBottomSheet
+import com.kazemieh.common.DateFilterType
 import com.kazemieh.designsystem.component.DatePickerField
+import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
@@ -74,7 +76,8 @@ fun ReportScreen(
                 selectedSources = state.selectedSources,
                 selectedCategories = state.selectedCategories,
                 selectedTransactionType = state.selectedTransactionType.count,
-                //todo add date
+                fromTimestamp = state.timeStampRangeStart,
+                toTimestamp = state.timeStampRangeEnd
             )
 
         }
@@ -104,7 +107,7 @@ fun ReportScreen(
         }
 
         if (state.isDateSheetVisible) {
-            DateFilterSheet(viewModel::onIntent)
+            DateFilterSheet(state, viewModel::onIntent)
         }
 
         if (state.isCustomDateSheetVisible) {
@@ -112,10 +115,6 @@ fun ReportScreen(
                 state = state,
                 onIntent = viewModel::onIntent
             )
-        }
-
-        if (state.isCustomDateStartSheetVisible) {
-
         }
 
     }
@@ -219,7 +218,7 @@ fun ReportTopBar(onIntent: (ReportFilterIntent) -> Unit, state: ReportFilterStat
             }
 
             DatePeriodSelector(
-                selectedDateFilter = state.selectedDateFilter,
+                state = state,
                 onChange = { onIntent(ReportFilterIntent.OnToggleDateSheet) }
             )
 
@@ -230,34 +229,42 @@ fun ReportTopBar(onIntent: (ReportFilterIntent) -> Unit, state: ReportFilterStat
 
 
 @Composable
-fun DatePeriodSelector(selectedDateFilter: DateFilterType, onChange: () -> Unit) {
+fun DatePeriodSelector(state: ReportFilterState, onChange: () -> Unit) {
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(
-            modifier = Modifier.weight(0.1f),
-            onClick = { /* ماه قبل */ }) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "ماه قبل")
-        }
 
-        Text(
+        if (state.customRangeStart == null && state.customRangeEnd == null)
+            IconButton(
+                modifier = Modifier.weight(0.1f),
+                onClick = { /* ماه قبل */ }) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "ماه قبل")
+            }
+
+        val text = if (state.customRangeStart != null && state.customRangeEnd != null)
+            state.customRangeStart + " - " + state.customRangeEnd
+        else state.selectedDateFilter.title
+
+        FintrackBodyLargeText(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(16.dp)
                 .weight(0.8f)
                 .clickable {
                     onChange()
                 },
-            text = selectedDateFilter.title,
-            style = MaterialTheme.typography.titleMedium
+            text = text,
+            textAlign = TextAlign.Center
         )
 
-        IconButton(
-            modifier = Modifier.weight(0.1f),
-            onClick = { /* ماه بعد */ }) {
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "ماه بعد")
-        }
+        if (state.customRangeStart == null && state.customRangeEnd == null)
+            IconButton(
+                modifier = Modifier.weight(0.1f),
+                onClick = { /* ماه بعد */ }) {
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "ماه بعد")
+            }
     }
 }
 
@@ -265,6 +272,7 @@ fun DatePeriodSelector(selectedDateFilter: DateFilterType, onChange: () -> Unit)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateFilterSheet(
+    state: ReportFilterState,
     onIntent: (ReportFilterIntent) -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -299,9 +307,15 @@ fun DateFilterSheet(
                         shape = MaterialTheme.shapes.medium,
                         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                     ) {
+                        val text =
+                            if (filter == DateFilterType.CUSTOM_RANGE)
+                                if (state.customRangeStart != null && state.customRangeEnd != null)
+                                    state.customRangeStart + " - " + state.customRangeEnd
+                                else filter.title else filter.title
+
                         FintrackBodyMediumText(
-                            modifier = Modifier.padding(12.dp),
-                            text = filter.title
+                            modifier = Modifier.padding(20.dp),
+                            text = text
                         )
                     }
                 }
@@ -361,6 +375,8 @@ fun CustomRangeSheet(
                         )
                     }
                 )
+
+                Spacer(Modifier.height(8.dp))
 
                 Button(
                     modifier = Modifier.fillMaxWidth(),

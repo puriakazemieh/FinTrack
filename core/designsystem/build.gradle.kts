@@ -8,7 +8,6 @@ android {
 
 dependencies {
     implementation(project(":core:common"))
-
     implementation(libs.jalali.datepicker.compose)
     implementation(libs.jalalicalendar)
 }
