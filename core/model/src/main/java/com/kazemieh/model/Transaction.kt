@@ -14,6 +14,7 @@ data class Transaction(
 )
 
 enum class TransactionType(val count: Int) {
+    ALL(0),
     INCOME(1),
     EXPENSE(2);
 

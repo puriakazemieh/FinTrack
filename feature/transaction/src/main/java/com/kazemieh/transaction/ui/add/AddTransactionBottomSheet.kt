@@ -128,7 +128,8 @@ fun AddTransactionContent(
             SingleChoiceSegmentedButtonRow(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                TransactionType.entries.forEachIndexed { index, option ->
+                val listTransactionType = listOf(TransactionType.INCOME, TransactionType.EXPENSE)
+                listTransactionType.forEachIndexed { index, option ->
                     SegmentedButton(
                         selected = state.selectedTransactionType == option,
                         onClick = { onEvent(AddTransactionEvent.SelectedType(option)) },
