@@ -29,18 +29,17 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.kazemieh.common.DateFilterHelper
 import com.kazemieh.common.DateFilterType
-import com.kazemieh.common.DateRange
 import com.kazemieh.designsystem.component.DatePickerField
 import com.kazemieh.designsystem.component.FilterButton
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -48,12 +47,10 @@ import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.filter.R
 import com.kazemieh.model.TransactionType
-import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
 fun ReportTopBar(
-    viewModel: FilterViewModel = koinViewModel(),
     onTransactionTypeSelected: Int,
     onTransactionTypeClicked: (Int) -> Unit,
     selectedSources: Set<Pair<Int, String>> = emptySet(),
@@ -61,22 +58,10 @@ fun ReportTopBar(
     selectedCategories: Set<Pair<Int, String>> = emptySet(),
     onCategoryClicked: () -> Unit,
     onDateClick: () -> Unit,
-    startDateTimeStamp: Long? = null,
-    endDateTimeStamp: Long? = null,
-    dateFilterType: DateFilterType = DateFilterType.THIS_MONTH
+    onPrevClick: () -> Unit,
+    onNextClick: () -> Unit,
+    textDate: String
 ) {
-
-    val state by viewModel.state.collectAsState()
-
-    LaunchedEffect(startDateTimeStamp, endDateTimeStamp, dateFilterType) {
-        viewModel.onIntent(
-            FilterIntent.OnSetDate(
-                startDateTimeStamp,
-                endDateTimeStamp,
-                dateFilterType
-            )
-        )
-    }
 
 
     Card(
@@ -89,7 +74,7 @@ fun ReportTopBar(
             modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp)
         ) {
 
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 SingleChoiceSegmentedButtonRow(
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -129,7 +114,9 @@ fun ReportTopBar(
 
                 Selector(
                     selected = selectedSources,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
                     labelText = labelTextSource,
                     onClick = onSourceClicked
                 )
@@ -140,7 +127,9 @@ fun ReportTopBar(
 
                 Selector(
                     selected = selectedCategories,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
                     labelText = labelTextCategory,
                     onClick = onCategoryClicked
                 )
@@ -148,14 +137,9 @@ fun ReportTopBar(
             }
 
             DatePeriodSelector(
-                dateText = state.textDate,
-//                isShowArrowButton = state.selectedDateFilter!=DateFilterType.CUSTOM_RANGE,
-                onPrevClick = {
-                    viewModel.onIntent(FilterIntent.OnPrevClick)
-                              },
-                onNextClick = {
-                    viewModel.onIntent(FilterIntent.OnNextClick)
-                              },
+                dateText = textDate,
+                onPrevClick = onPrevClick,
+                onNextClick = onNextClick,
                 onDateClick = onDateClick
             )
 
@@ -186,7 +170,6 @@ private fun Selector(
         modifier = modifier,
         label = {
             FintrackBodyMediumText(text = labelText)
-
         }
 
     )
@@ -237,7 +220,7 @@ fun DatePeriodSelector(
 @Composable
 fun DateFilterBottomSheet(
     onDismiss: () -> Unit,
-    onDateRange: (DateRange?, DateFilterType) -> Unit,
+    onDateRange: (DateFilterType) -> Unit,
     onToggleCustomDateSheet: () -> Unit,
     startDate: String? = null,
     endDate: String? = null,
@@ -317,7 +300,7 @@ fun DateFilterBottomSheet(
 private fun FilterRow(
     filters: List<DateFilterType>,
     onToggleCustomDateSheet: () -> Unit,
-    onDateRange: (DateRange?, DateFilterType) -> Unit,
+    onDateRange: (DateFilterType) -> Unit,
     isCustomDate: Boolean = false,
     startDate: String? = null,
     endDate: String? = null
@@ -332,10 +315,8 @@ private fun FilterRow(
                     .weight(1f)
                     .clickable {
                         if (filter == DateFilterType.CUSTOM_RANGE) onToggleCustomDateSheet()
-                        else {
-                            val range = DateFilterHelper.getRange(filter)
-                            onDateRange(range, filter)
-                        }
+                        else onDateRange(filter)
+
                     },
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
@@ -360,15 +341,17 @@ private fun FilterRow(
 @Composable
 fun CustomDateBottomSheet(
     onDismiss: () -> Unit,
-    startDate: String? = null,
-    endDate: String? = null,
+    start: Pair<String?, Long?>? = null,
+    end: Pair<String?, Long?>? = null,
     isError: Boolean = false,
-    onCustomDateStartSelected: (String, Long) -> Unit,
-    onCustomDateEndSelected: (String, Long) -> Unit,
-    onSubmit: () -> Unit,
+    onSubmit: (Pair<String?, Long?>?, Pair<String?, Long?>?) -> Unit,
 ) {
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    var startDate by remember { mutableStateOf(start) }
+    var endDate by remember { mutableStateOf(end) }
+    var startDateTimeStamp by remember { mutableStateOf(startDate?.second) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -387,26 +370,33 @@ fun CustomDateBottomSheet(
                 Spacer(Modifier.height(8.dp))
 
                 DatePickerField(
-                    selectedDate = startDate ?: stringResource(R.string.not_choose),
+                    selectedDate = startDate?.first ?: stringResource(R.string.not_choose),
                     labelText = stringResource(R.string.start),
                     isError = isError && startDate == null,
-                    onDateSelected = onCustomDateStartSelected
+                    onDateSelected = { date, timeStamp ->
+                        startDate = date to timeStamp
+                        startDateTimeStamp = timeStamp
+                    }
                 )
 
                 Spacer(Modifier.height(8.dp))
 
                 DatePickerField(
-                    selectedDate = endDate ?: stringResource(R.string.not_choose),
+                    selectedDate = endDate?.first ?: stringResource(R.string.not_choose),
                     labelText = stringResource(R.string.end),
                     isError = isError && endDate == null,
-                    onDateSelected = onCustomDateEndSelected
+                    disableBeforeDate = startDateTimeStamp,
+                    clickable = startDate != null,
+                    onDateSelected = { date, timeStamp ->
+                        endDate = date to timeStamp
+                    }
                 )
 
                 Spacer(Modifier.height(8.dp))
 
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = onSubmit,
+                    onClick = { onSubmit(startDate, endDate) },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary

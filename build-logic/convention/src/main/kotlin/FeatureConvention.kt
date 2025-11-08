@@ -30,7 +30,7 @@ class FeatureConvention : Plugin<Project> {
 
     private fun Project.applyDependencies() {
         dependencies {
-            // TODO: After adding modules, update this section to include [list the specific modules needed here]
+
         }
     }
 }

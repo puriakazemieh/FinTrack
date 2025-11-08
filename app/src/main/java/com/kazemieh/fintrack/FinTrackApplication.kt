@@ -14,7 +14,6 @@ import com.kazemieh.tag.di.transactionTagModule
 import com.kazemieh.transaction.di.addTransactionPresentationModule
 import com.kazemieh.transaction.di.transactionPresentationModule
 import com.kazemieh.transaction.di.transactionReportViewModelModule
-import com.tosantechno.filter.di.transactionFilterModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 
@@ -38,7 +37,6 @@ class FinTrackApplication : Application() {
             transactionAddTagModule,
             transactionTagModule,
             dashboardViewModel,
-            transactionFilterModule,
             reportViewModel
 
         )

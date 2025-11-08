@@ -2,8 +2,9 @@ package com.kazemieh.fintrack.report
 
 
 import androidx.lifecycle.ViewModel
+import com.kazemieh.common.DateFilterHelper
 import com.kazemieh.common.DateFilterType
-import com.kazemieh.common.DateRange
+import com.kazemieh.common.Direction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -53,32 +54,84 @@ class ReportViewModel() : ViewModel() {
             }
 
             is ReportIntent.OnDateRange -> {
+                val range = DateFilterHelper.getRange(intent.dateFilterType)
                 _state.update {
                     it.copy(
-                        dateFilterType = intent.dateFilterType,
+                        dateFilterType = range?.filterType ?: DateFilterType.THIS_MONTH,
                         isDateSheetVisible = false,
-                        startDateTimeStamp = intent.dateRange?.start,
-                        endDateTimeStamp = intent.dateRange?.end,
+                        startDateTimeStamp = range?.start,
+                        endDateTimeStamp = range?.end,
+                        textDate = range?.label ?: DateFilterType.THIS_MONTH.title,
                         startDate = null,
                         endDate = null
                     )
                 }
             }
 
-            ReportIntent.OnDateSheetSubmit -> {
+            is ReportIntent.OnDateSheetSubmit -> {
                 if (
-                    _state.value.endDateTimeStamp != null &&
-                    _state.value.startDateTimeStamp != null &&
-                    _state.value.endDate != null &&
-                    _state.value.startDate != null
+                    intent.endTimeStamp != null &&
+                    intent.startTimeStamp != null &&
+                    intent.endDate != null &&
+                    intent.startDate != null
                 ) {
+                    val range = DateFilterHelper.getRange(
+                        DateFilterType.CUSTOM_RANGE,
+                        intent.startTimeStamp,
+                        intent.endTimeStamp
+                    )
                     _state.update {
-                        it.copy(isCustomDateSheetVisible = false, isDateSheetVisible = false)
+                        it.copy(
+                            dateFilterType = range?.filterType ?: DateFilterType.THIS_MONTH,
+                            isDateSheetVisible = false,
+                            startDateTimeStamp = range?.start,
+                            endDateTimeStamp = range?.end,
+                            textDate = range?.label ?: DateFilterType.CUSTOM_RANGE.title,
+                            startDate = intent.startDate,
+                            endDate = intent.endDate,
+                            isCustomDateSheetVisible = false,
+                        )
                     }
                 } else {
                     _state.update {
                         it.copy(isError = true)
                     }
+                }
+
+            }
+
+            ReportIntent.OnNextClick -> {
+                val result = DateFilterHelper.shiftDateRange(
+                    start = state.value.startDateTimeStamp,
+                    end = state.value.endDateTimeStamp,
+                    filterType = state.value.dateFilterType,
+                    direction = Direction.NEXT
+                )
+                _state.update {
+                    it.copy(
+                        textDate = result.label,
+                        dateFilterType = result.filterType,
+                        startDateTimeStamp = result.start,
+                        endDateTimeStamp = result.end
+                    )
+                }
+
+            }
+
+            ReportIntent.OnPrevClick -> {
+                val result = DateFilterHelper.shiftDateRange(
+                    start = state.value.startDateTimeStamp,
+                    end = state.value.endDateTimeStamp,
+                    filterType = state.value.dateFilterType,
+                    direction = Direction.PREVIOUS
+                )
+                _state.update {
+                    it.copy(
+                        textDate = result.label,
+                        dateFilterType = result.filterType,
+                        startDateTimeStamp = result.start,
+                        endDateTimeStamp = result.end
+                    )
                 }
 
             }
@@ -104,6 +157,7 @@ data class ReportState(
     val isError: Boolean = false,
     val startDateTimeStamp: Long? = null,
     val endDateTimeStamp: Long? = null,
+    val textDate: String = DateFilterType.THIS_MONTH.title,
 )
 
 
@@ -113,14 +167,21 @@ sealed interface ReportIntent {
     data object OnToggleCategorySheet : ReportIntent
     data object OnToggleDateSheet : ReportIntent
     data object OnToggleCustomDateSheet : ReportIntent
-    data class OnDateRange(val dateRange: DateRange?, val dateFilterType: DateFilterType) :
-        ReportIntent
+    data class OnDateRange(val dateFilterType: DateFilterType) : ReportIntent
+    data object OnPrevClick : ReportIntent
+    data object OnNextClick : ReportIntent
 
     data class OnCustomDateStartSelected(val date: String, val timeStamp: Long) :
         ReportIntent
 
     data class OnCustomDateEndSelected(val date: String, val timeStamp: Long) : ReportIntent
-    data object OnDateSheetSubmit : ReportIntent
+    data class OnDateSheetSubmit(
+        val startDate: String?,
+        val startTimeStamp: Long?,
+        val endDate: String?,
+        val endTimeStamp: Long?
+    ) : ReportIntent
+
     data class OnSourcesSelected(val sources: Set<Pair<Int, String>> = emptySet()) :
         ReportIntent
 

@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.CategoryListSelectionBottomSheet
+import com.kazemieh.common.DateFilterType
 import com.kazemieh.financialsource.ui.SourceListSelectionBottomSheet
 import com.kazemieh.transaction.ui.report.TransactionListByFilterScreen
 import com.tosantechno.filter.CustomDateBottomSheet
@@ -46,11 +47,11 @@ fun ReportScreen(
                 selectedSources = state.selectedSources,
                 onSourceClicked = { viewModel.onIntent(ReportIntent.OnToggleSourceSheet) },
                 onDateClick = { viewModel.onIntent(ReportIntent.OnToggleDateSheet) },
-                startDateTimeStamp = state.startDateTimeStamp,
-                endDateTimeStamp = state.endDateTimeStamp,
-                dateFilterType = state.dateFilterType,
+                onNextClick = { viewModel.onIntent(ReportIntent.OnNextClick) },
+                onPrevClick = { viewModel.onIntent(ReportIntent.OnPrevClick) },
+                textDate = state.textDate
 
-                )
+            )
 
             TransactionListByFilterScreen(
                 selectedSources = state.selectedSources,
@@ -90,14 +91,7 @@ fun ReportScreen(
             DateFilterBottomSheet(
                 onDismiss = { viewModel.onIntent(ReportIntent.OnToggleDateSheet) },
                 onToggleCustomDateSheet = { viewModel.onIntent(ReportIntent.OnToggleCustomDateSheet) },
-                onDateRange = { range, dateFilterType ->
-                    viewModel.onIntent(
-                        ReportIntent.OnDateRange(
-                            range,
-                            dateFilterType
-                        )
-                    )
-                },
+                onDateRange = { viewModel.onIntent(ReportIntent.OnDateRange(it)) },
                 startDate = state.startDate,
                 endDate = state.endDate,
             )
@@ -106,20 +100,19 @@ fun ReportScreen(
         if (state.isCustomDateSheetVisible) {
             CustomDateBottomSheet(
                 onDismiss = { viewModel.onIntent(ReportIntent.OnToggleCustomDateSheet) },
-                startDate = state.startDate,
-                endDate = state.endDate,
+                start = if (state.dateFilterType == DateFilterType.CUSTOM_RANGE) state.startDate to state.startDateTimeStamp else null,
+                end = if (state.dateFilterType == DateFilterType.CUSTOM_RANGE) state.endDate to state.endDateTimeStamp else null,
                 isError = state.isError,
-                onCustomDateStartSelected = { date, timeStamp ->
+                onSubmit = { startDate, endDate ->
                     viewModel.onIntent(
-                        ReportIntent.OnCustomDateStartSelected(date = date, timeStamp = timeStamp)
+                        ReportIntent.OnDateSheetSubmit(
+                            startDate = startDate?.first,
+                            startTimeStamp = startDate?.second,
+                            endDate = endDate?.first,
+                            endTimeStamp = endDate?.second
+                        )
                     )
-                },
-                onCustomDateEndSelected = { date, timeStamp ->
-                    viewModel.onIntent(
-                        ReportIntent.OnCustomDateEndSelected(date = date, timeStamp = timeStamp)
-                    )
-                },
-                onSubmit = { viewModel.onIntent(ReportIntent.OnDateSheetSubmit) }
+                }
             )
         }
 

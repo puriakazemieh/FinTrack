@@ -38,6 +38,7 @@ import com.kazemieh.designsystem.FintrackTypography
 import com.kazemieh.designsystem.R
 import ir.huri.jcal.JalaliCalendar
 import kotlinx.coroutines.launch
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,6 +46,8 @@ fun DatePickerField(
     selectedDate: String? = "${JalaliCalendar().day} / ${JalaliCalendar().monthString} / ${JalaliCalendar().year}",
     labelText: String = stringResource(R.string.date),
     isError: Boolean = false,
+    clickable: Boolean = true,
+    disableBeforeDate: Long? = null,
     onDateSelected: (String, Long) -> Unit
 ) {
     val openSheet = remember { mutableStateOf(false) }
@@ -52,6 +55,7 @@ fun DatePickerField(
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         JalaliDatePickerBottomSheet(
             openSheet = openSheet,
+            disableBeforeDate = disableBeforeDate,
             onConfirm = {
                 val gregorian = it.toGregorian()
                 val timestamp = gregorian.timeInMillis
@@ -63,7 +67,7 @@ fun DatePickerField(
     FintrackOutlinedTextField(
         value = selectedDate
             ?: "${JalaliCalendar().day} / ${JalaliCalendar().monthString} / ${JalaliCalendar().year}",
-        onClick = { openSheet.value = true },
+        onClick = { if (clickable) openSheet.value = true },
         readOnly = true,
         enabled = false,
         isError = isError,
@@ -139,6 +143,7 @@ fun JalaliDatePickerDialog(
 @Composable
 fun JalaliDatePickerBottomSheet(
     openSheet: MutableState<Boolean>,
+    disableBeforeDate: Long? = null,
     onConfirm: (JalaliCalendar) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -162,7 +167,8 @@ fun JalaliDatePickerBottomSheet(
                 JalaliCalendarView(
                     openDialog = openSheet,
                     initialDate = null,
-                    disableBeforeDate = null,
+                    disableBeforeDate = if (disableBeforeDate != null)
+                        JalaliCalendar(Date(disableBeforeDate)) else null,
                     disableAfterDate = null,
                     onSelectDay = { },
                     onConfirm = {

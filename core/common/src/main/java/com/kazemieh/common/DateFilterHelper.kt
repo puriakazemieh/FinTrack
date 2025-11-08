@@ -7,8 +7,8 @@ import java.util.Date
 data class DateRange(
     val start: Long,
     val end: Long,
-    val filterType: DateFilterType = DateFilterType.THIS_MONTH,
-    val label: String = ""
+    val filterType: DateFilterType,
+    val label: String
 )
 
 enum class Direction { NEXT, PREVIOUS }
@@ -26,23 +26,23 @@ object DateFilterHelper {
         return when (type) {
 
             DateFilterType.TODAY -> {
-                today.toDateRange()
+                today.toDateRange(type)
             }
 
             DateFilterType.YESTERDAY -> {
-                today.yesterday.toDateRange()
+                today.yesterday.toDateRange(type)
             }
 
             DateFilterType.TOMORROW -> {
-                today.tomorrow.toDateRange()
+                today.tomorrow.toDateRange(type)
             }
 
             DateFilterType.THIS_WEEK -> {
                 val dayOfWeek = today.dayOfWeek
-                val diffToStart = (dayOfWeek - Calendar.SATURDAY + 7) % 7 // شنبه شروع هفته
+                val diffToStart = (dayOfWeek - Calendar.SATURDAY + 7) % 7
                 val start = today.getDateByDiff(-diffToStart)
                 val end = start.getDateByDiff(6)
-                start.toDateRange(end)
+                start.toDateRange(end, type)
             }
 
             DateFilterType.LAST_WEEK -> {
@@ -50,7 +50,7 @@ object DateFilterHelper {
                 val diffToStart = (dayOfWeek - Calendar.SATURDAY + 7) % 7
                 val start = today.getDateByDiff(-diffToStart - 7)
                 val end = start.getDateByDiff(6)
-                start.toDateRange(end)
+                start.toDateRange(end, type)
             }
 
             DateFilterType.NEXT_WEEK -> {
@@ -58,13 +58,13 @@ object DateFilterHelper {
                 val diffToStart = (dayOfWeek - Calendar.SATURDAY + 7) % 7
                 val start = today.getDateByDiff(-diffToStart + 7)
                 val end = start.getDateByDiff(6)
-                start.toDateRange(end)
+                start.toDateRange(end, type)
             }
 
             DateFilterType.THIS_MONTH -> {
                 val start = JalaliCalendar(today.year, today.month, 1)
                 val end = JalaliCalendar(today.year, today.month, today.getMonthLength())
-                start.toDateRange(end)
+                start.toDateRange(end, type)
             }
 
             DateFilterType.LAST_MONTH -> {
@@ -76,7 +76,7 @@ object DateFilterHelper {
                 }
                 val start = JalaliCalendar(year, month, 1)
                 val end = JalaliCalendar(year, month, start.getMonthLength())
-                start.toDateRange(end)
+                start.toDateRange(end, type)
             }
 
             DateFilterType.NEXT_MONTH -> {
@@ -88,12 +88,13 @@ object DateFilterHelper {
                 }
                 val start = JalaliCalendar(year, month, 1)
                 val end = JalaliCalendar(year, month, start.getMonthLength())
-                start.toDateRange(end)
+                start.toDateRange(end, type)
             }
 
             DateFilterType.CUSTOM_RANGE -> {
                 if (customFrom != null && customTo != null) {
-                    DateRange(customFrom, customTo)
+                    val text = getDateRangeText(customFrom, customTo, type)
+                    DateRange(customFrom, customTo, type, text)
                 } else null
             }
         }
@@ -105,53 +106,32 @@ object DateFilterHelper {
         end: Long,
         filterType: DateFilterType
     ): String {
-        val startDate = Date(start)
-        val endDate = Date(end)
-
-        val startJalali = JalaliCalendar(startDate)
-        val endJalali = JalaliCalendar(endDate)
+        val startJalali = JalaliCalendar(Date(start))
+        val endJalali = JalaliCalendar(Date(end))
 
         return when (filterType) {
-
-            // ===== روزها =====
             DateFilterType.TODAY -> "امروز"
             DateFilterType.YESTERDAY -> "دیروز"
             DateFilterType.TOMORROW -> "فردا"
-
-            // ===== هفته‌ها =====
             DateFilterType.THIS_WEEK -> "این هفته"
             DateFilterType.LAST_WEEK -> "هفته قبل"
             DateFilterType.NEXT_WEEK -> "هفته بعد"
-
-            // ===== ماه‌ها =====
             DateFilterType.THIS_MONTH -> "این ماه"
             DateFilterType.LAST_MONTH -> "ماه قبل"
             DateFilterType.NEXT_MONTH -> "ماه بعد"
 
-            // ===== سایر موارد =====
-            else -> when {
-                // اگر بازه فقط یک روز بود (start = end)
-                startJalali == endJalali -> {
+            DateFilterType.CUSTOM_RANGE -> {
+                if (startJalali.day == 1 && endJalali.day == startJalali.monthLength) {
+                    val monthName = startJalali.monthString
+                    val today = JalaliCalendar()
+                    if (startJalali.year != today.year) {
+                        "$monthName ${startJalali.year}"
+                    } else monthName
+                } else if (startJalali == endJalali) {
                     "${startJalali.day} ${startJalali.monthString} ${startJalali.year}"
-                }
-
-                // اگر بازه از نوع هفته بود (غیر از سه حالت خاص بالا)
-                filterType.name.contains("WEEK", ignoreCase = true) -> {
+                } else {
                     val startText = "${startJalali.day} ${startJalali.monthString}"
                     val endText = "${endJalali.day} ${endJalali.monthString}"
-                    "$startText تا $endText"
-                }
-
-                // اگر بازه از نوع ماه بود (غیر از سه حالت خاص بالا)
-                filterType.name.contains("MONTH", ignoreCase = true) -> {
-                    "${startJalali.monthString} ${startJalali.year}"
-                }
-
-                // حالت بازه‌ی انتخابی یا سایر فیلترها
-                else -> {
-                    val startText =
-                        "${startJalali.day} ${startJalali.monthString} ${startJalali.year}"
-                    val endText = "${endJalali.day} ${endJalali.monthString} ${endJalali.year}"
                     "$startText تا $endText"
                 }
             }
@@ -160,16 +140,16 @@ object DateFilterHelper {
 
 
     fun shiftDateRange(
-        start: Long,
-        end: Long,
+        start: Long?,
+        end: Long?,
         filterType: DateFilterType,
         direction: Direction
     ): DateRange {
 
         val diff = if (direction == Direction.NEXT) 1 else -1
 
-        val startJalali = JalaliCalendar(Date(start))
-        val endJalali = JalaliCalendar(Date(end))
+        val startJalali = if (start != null) JalaliCalendar(Date(start)) else JalaliCalendar()
+        val endJalali = if (end != null) JalaliCalendar(Date(end)) else JalaliCalendar()
         val today = JalaliCalendar()
 
         val newStart: JalaliCalendar
@@ -185,73 +165,101 @@ object DateFilterHelper {
                 newStart = startJalali.getDateByDiff(diff)
                 newEnd = newStart
 
-                // حالا بررسی می‌کنیم روز جدید نسبت به امروز کجاست:
-                when {
-                    newStart == today -> newFilter = DateFilterType.TODAY
-                    newStart == today.getYesterday() -> newFilter = DateFilterType.YESTERDAY
-                    newStart == today.getTomorrow() -> newFilter = DateFilterType.TOMORROW
-                    else -> newFilter = DateFilterType.CUSTOM_RANGE // دیگه روز خاصی نیست
+                newFilter = when (newStart) {
+                    today -> DateFilterType.TODAY
+                    today.yesterday -> DateFilterType.YESTERDAY
+                    today.tomorrow -> DateFilterType.TOMORROW
+                    else -> DateFilterType.CUSTOM_RANGE
                 }
             }
 
-            // ===== هفته‌ها =====
             DateFilterType.THIS_WEEK,
             DateFilterType.LAST_WEEK,
             DateFilterType.NEXT_WEEK -> {
                 newStart = startJalali.getDateByDiff(diff * 7)
                 newEnd = endJalali.getDateByDiff(diff * 7)
 
-                val thisWeekStart = today.getDateByDiff(-(today.getDayOfWeek() - Calendar.SATURDAY))
+                val thisWeekStart = today.getDateByDiff(-(today.dayOfWeek - Calendar.SATURDAY))
                 val thisWeekEnd = thisWeekStart.getDateByDiff(6)
 
-                when {
-                    newStart == thisWeekStart -> newFilter = DateFilterType.THIS_WEEK
-                    newStart.getDateByDiff(7) == thisWeekStart -> newFilter =
-                        DateFilterType.LAST_WEEK
+                newFilter = when {
+                    newStart == thisWeekStart -> DateFilterType.THIS_WEEK
+                    newStart.getDateByDiff(7) == thisWeekStart -> DateFilterType.LAST_WEEK
 
-                    newStart.getDateByDiff(-7) == thisWeekStart -> newFilter =
-                        DateFilterType.NEXT_WEEK
+                    newStart.getDateByDiff(-7) == thisWeekStart -> DateFilterType.NEXT_WEEK
 
-                    else -> newFilter = DateFilterType.CUSTOM_RANGE
+                    else -> DateFilterType.CUSTOM_RANGE
                 }
             }
 
-            // ===== ماه‌ها =====
             DateFilterType.THIS_MONTH,
             DateFilterType.LAST_MONTH,
             DateFilterType.NEXT_MONTH -> {
-                val newMonth = startJalali.getMonth() + diff
-                val newYear =
-                    startJalali.getYear() + (if (newMonth > 12) 1 else if (newMonth < 1) -1 else 0)
-                val adjustedMonth = when {
-                    newMonth > 12 -> 1
-                    newMonth < 1 -> 12
-                    else -> newMonth
+                var newMonth = startJalali.month + diff
+                var newYear = startJalali.year
+
+                if (newMonth > 12) {
+                    newMonth = 1
+                    newYear++
+                } else if (newMonth < 1) {
+                    newMonth = 12
+                    newYear--
                 }
 
-                newStart = JalaliCalendar(newYear, adjustedMonth, 1)
-                newEnd = JalaliCalendar(newYear, adjustedMonth, newStart.getMonthLength())
+                newStart = JalaliCalendar(newYear, newMonth, 1)
+                newEnd = JalaliCalendar(newYear, newMonth, newStart.monthLength)
 
-                when {
-                    newYear == today.getYear() && adjustedMonth == today.getMonth() ->
-                        newFilter = DateFilterType.THIS_MONTH
+                newFilter = when (newYear) {
+                    today.year if newMonth == today.month ->
+                        DateFilterType.THIS_MONTH
 
-                    newYear == today.getYear() && adjustedMonth == today.getMonth() - 1 ->
-                        newFilter = DateFilterType.LAST_MONTH
+                    today.year if newMonth == today.month - 1 ->
+                        DateFilterType.LAST_MONTH
 
-                    newYear == today.getYear() && adjustedMonth == today.getMonth() + 1 ->
-                        newFilter = DateFilterType.NEXT_MONTH
+                    today.year if newMonth == today.month + 1 ->
+                        DateFilterType.NEXT_MONTH
 
-                    else -> newFilter = DateFilterType.CUSTOM_RANGE
+                    today.year + 1 if newMonth == 1 && today.month == 12 ->
+                        DateFilterType.NEXT_MONTH
+
+                    today.year - 1 if newMonth == 12 && today.month == 1 ->
+                        DateFilterType.LAST_MONTH
+
+                    else -> DateFilterType.CUSTOM_RANGE
                 }
             }
 
             // ===== سایر بازه‌ها =====
             else -> {
-                val daysBetween = ((end - start) / (1000 * 60 * 60 * 24)).toInt()
-                newStart = startJalali.getDateByDiff(diff * (daysBetween + 1))
-                newEnd = endJalali.getDateByDiff(diff * (daysBetween + 1))
+
+                var daysBetween = 0
+                var temp = JalaliCalendar(Date(start ?: 0))
+                val endJ = JalaliCalendar(Date(end ?: 0))
+
+                if (temp.day == 1 && endJ.day == temp.monthLength) {
+                    var newMonth = startJalali.month + diff
+                    var newYear = startJalali.year
+                    if (newMonth > 12) {
+                        newMonth = 1
+                        newYear++
+                    } else if (newMonth < 1) {
+                        newMonth = 12
+                        newYear--
+                    }
+                    newStart = JalaliCalendar(newYear, newMonth, 1)
+                    newEnd = JalaliCalendar(newYear, newMonth, newStart.monthLength)
+                } else {
+                    while (temp != endJ) {
+                        temp = temp.getDateByDiff(1)
+                        daysBetween++
+                    }
+
+
+                    newStart = startJalali.getDateByDiff(diff * (daysBetween + 1))
+                    newEnd = endJalali.getDateByDiff(diff * (daysBetween + 1))
+                }
             }
+
         }
 
         val newStartMillis = newStart.toGregorian().timeInMillis
@@ -267,151 +275,9 @@ object DateFilterHelper {
     }
 
 
-    fun getPreviousFilter(current: DateFilterType): DateFilterType {
-        return when (current) {
-            DateFilterType.TODAY -> DateFilterType.YESTERDAY
-            DateFilterType.YESTERDAY -> DateFilterType.YESTERDAY // یا یه فیلتر جدید مثلاً "TWO_DAYS_AGO"
-            DateFilterType.TOMORROW -> DateFilterType.TODAY
-
-            DateFilterType.THIS_WEEK -> DateFilterType.LAST_WEEK
-            DateFilterType.LAST_WEEK -> DateFilterType.LAST_WEEK // یا "TWO_WEEKS_AGO"
-            DateFilterType.NEXT_WEEK -> DateFilterType.THIS_WEEK
-
-            DateFilterType.THIS_MONTH -> DateFilterType.LAST_MONTH
-            DateFilterType.LAST_MONTH -> DateFilterType.LAST_MONTH // یا "TWO_MONTHS_AGO"
-            DateFilterType.NEXT_MONTH -> DateFilterType.THIS_MONTH
-
-            DateFilterType.CUSTOM_RANGE -> DateFilterType.CUSTOM_RANGE
-        }
-    }
-
-    fun getNextFilter(current: DateFilterType): DateFilterType {
-        return when (current) {
-            DateFilterType.TODAY -> DateFilterType.TOMORROW
-            DateFilterType.YESTERDAY -> DateFilterType.TODAY
-            DateFilterType.TOMORROW -> DateFilterType.TOMORROW // یا "DAY_AFTER_TOMORROW"
-
-            DateFilterType.THIS_WEEK -> DateFilterType.NEXT_WEEK
-            DateFilterType.LAST_WEEK -> DateFilterType.THIS_WEEK
-            DateFilterType.NEXT_WEEK -> DateFilterType.NEXT_WEEK // یا "TWO_WEEKS_LATER"
-
-            DateFilterType.THIS_MONTH -> DateFilterType.NEXT_MONTH
-            DateFilterType.LAST_MONTH -> DateFilterType.THIS_MONTH
-            DateFilterType.NEXT_MONTH -> DateFilterType.NEXT_MONTH // یا "TWO_MONTHS_LATER"
-
-            DateFilterType.CUSTOM_RANGE -> DateFilterType.CUSTOM_RANGE
-        }
-    }
-
-    fun getShiftedRange(
+    private fun JalaliCalendar.toDateRange(
         type: DateFilterType,
-        offset: Int
-    ): DateRange? {
-        val today = JalaliCalendar()
-
-        return when (type) {
-
-            DateFilterType.TODAY,
-            DateFilterType.YESTERDAY,
-            DateFilterType.TOMORROW -> {
-                val shifted = today.getDateByDiff(offset)
-                shifted.toDateRange()
-            }
-
-            DateFilterType.THIS_WEEK,
-            DateFilterType.LAST_WEEK,
-            DateFilterType.NEXT_WEEK -> {
-                val dayOfWeek = today.dayOfWeek
-                val diffToStart = (dayOfWeek - Calendar.SATURDAY + 7) % 7
-                val start = today.getDateByDiff(-diffToStart + offset * 7)
-                val end = start.getDateByDiff(6)
-                start.toDateRange(end)
-            }
-
-            DateFilterType.THIS_MONTH,
-            DateFilterType.LAST_MONTH,
-            DateFilterType.NEXT_MONTH -> {
-                var year = today.year
-                var month = today.month + offset
-                while (month > 12) {
-                    month -= 12; year++
-                }
-                while (month < 1) {
-                    month += 12; year--
-                }
-                val start = JalaliCalendar(year, month, 1)
-                val end = JalaliCalendar(year, month, start.getMonthLength())
-                start.toDateRange(end)
-            }
-
-            DateFilterType.CUSTOM_RANGE -> null
-        }
-    }
-
-    fun getFilterDisplayText(type: DateFilterType, offset: Int): String {
-        val range = getShiftedRange(type, offset)
-        return when (type) {
-            DateFilterType.TODAY,
-            DateFilterType.YESTERDAY,
-            DateFilterType.TOMORROW -> {
-                range?.let { "${it.startFormatted()}" } ?: ""
-            }
-
-            DateFilterType.THIS_WEEK,
-            DateFilterType.LAST_WEEK,
-            DateFilterType.NEXT_WEEK -> {
-                range?.let { "${it.startFormatted()} تا ${it.endFormatted()}" } ?: ""
-            }
-
-            DateFilterType.THIS_MONTH,
-            DateFilterType.LAST_MONTH,
-            DateFilterType.NEXT_MONTH -> {
-                range?.let { "${it.startMonthName()} ${it.startYear()}" } ?: ""
-            }
-
-            DateFilterType.CUSTOM_RANGE -> "بازه انتخابی"
-        }
-    }
-
-    fun DateRange.startFormatted(): String {
-        val calendar = JalaliCalendar().fromTimestamp(start)
-        return calendar.formatAsShortDate()
-    }
-
-    fun DateRange.endFormatted(): String {
-        val calendar = JalaliCalendar().fromTimestamp(end)
-        return calendar.formatAsShortDate()
-    }
-
-    fun DateRange.startMonthName(): String {
-        val calendar = JalaliCalendar().fromTimestamp(start)
-        return calendar.monthString
-    }
-
-    fun DateRange.startYear(): Int {
-        val calendar = JalaliCalendar().fromTimestamp(start)
-        return calendar.year
-    }
-
-
-    fun JalaliCalendar.formatAsShortDate(): String {
-        return "${this.day} ${this.monthString} ${this.year}"
-    }
-
-
-    fun JalaliCalendar.fromTimestamp(ts: Long): JalaliCalendar {
-        val cal = Calendar.getInstance()
-        cal.timeInMillis = ts
-        val year = cal.get(Calendar.YEAR)
-        val month = cal.get(Calendar.MONTH) + 1 // چون Calendar.MONTH از 0 شروع می‌شه
-        val day = cal.get(Calendar.DAY_OF_MONTH)
-        return JalaliCalendar(year, month, day)
-    }
-
-    /**
-     * تبدیل تاریخ شمسی به بازه‌ی زمانی میلادی برحسب timestamp
-     */
-    private fun JalaliCalendar.toDateRange(): DateRange {
+    ): DateRange {
         val gc = this.toGregorian()
         gc.set(Calendar.HOUR_OF_DAY, 0)
         gc.set(Calendar.MINUTE, 0)
@@ -425,13 +291,13 @@ object DateFilterHelper {
         gc.set(Calendar.MILLISECOND, 999)
         val end = gc.timeInMillis
 
-        return DateRange(start, end)
+        return DateRange(start, end, type, type.title)
     }
 
-    /**
-     * بازه بین دو تاریخ شمسی (شروع تا پایان)
-     */
-    private fun JalaliCalendar.toDateRange(endDate: JalaliCalendar): DateRange {
+    private fun JalaliCalendar.toDateRange(
+        endDate: JalaliCalendar,
+        type: DateFilterType,
+    ): DateRange {
         val startGc = this.toGregorian().apply {
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
@@ -444,7 +310,7 @@ object DateFilterHelper {
             set(Calendar.SECOND, 59)
             set(Calendar.MILLISECOND, 999)
         }
-        return DateRange(startGc.timeInMillis, endGc.timeInMillis)
+        return DateRange(startGc.timeInMillis, endGc.timeInMillis, type, type.title)
     }
 
 }
