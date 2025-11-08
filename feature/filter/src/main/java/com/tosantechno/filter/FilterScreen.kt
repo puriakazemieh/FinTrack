@@ -326,7 +326,7 @@ private fun FilterRow(
             ) {
                 val text =
                     if (isCustomDate && startDate != null && endDate != null) "$startDate - $endDate"
-                    else filter.title
+                    else stringResource(filter.titleResId)
 
                 FintrackBodyMediumText(
                     modifier = Modifier.padding(16.dp),

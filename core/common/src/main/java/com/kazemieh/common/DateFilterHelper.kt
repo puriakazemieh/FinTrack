@@ -1,5 +1,6 @@
 package com.kazemieh.common
 
+import androidx.annotation.StringRes
 import ir.huri.jcal.JalaliCalendar
 import java.util.Calendar
 import java.util.Date
@@ -8,7 +9,7 @@ data class DateRange(
     val start: Long,
     val end: Long,
     val filterType: DateFilterType,
-    val label: String
+    val label: Any
 )
 
 enum class Direction { NEXT, PREVIOUS }
@@ -105,28 +106,16 @@ object DateFilterHelper {
         start: Long,
         end: Long,
         filterType: DateFilterType
-    ): String {
+    ): Any {
         val startJalali = JalaliCalendar(Date(start))
         val endJalali = JalaliCalendar(Date(end))
 
         return when (filterType) {
-            DateFilterType.TODAY -> "امروز"
-            DateFilterType.YESTERDAY -> "دیروز"
-            DateFilterType.TOMORROW -> "فردا"
-            DateFilterType.THIS_WEEK -> "این هفته"
-            DateFilterType.LAST_WEEK -> "هفته قبل"
-            DateFilterType.NEXT_WEEK -> "هفته بعد"
-            DateFilterType.THIS_MONTH -> "این ماه"
-            DateFilterType.LAST_MONTH -> "ماه قبل"
-            DateFilterType.NEXT_MONTH -> "ماه بعد"
-
             DateFilterType.CUSTOM_RANGE -> {
                 if (startJalali.day == 1 && endJalali.day == startJalali.monthLength) {
                     val monthName = startJalali.monthString
                     val today = JalaliCalendar()
-                    if (startJalali.year != today.year) {
-                        "$monthName ${startJalali.year}"
-                    } else monthName
+                    if (startJalali.year != today.year) "$monthName ${startJalali.year}" else monthName
                 } else if (startJalali == endJalali) {
                     "${startJalali.day} ${startJalali.monthString} ${startJalali.year}"
                 } else {
@@ -135,8 +124,10 @@ object DateFilterHelper {
                     "$startText تا $endText"
                 }
             }
+            else -> filterType.titleResId
         }
     }
+
 
 
     fun shiftDateRange(
@@ -291,7 +282,7 @@ object DateFilterHelper {
         gc.set(Calendar.MILLISECOND, 999)
         val end = gc.timeInMillis
 
-        return DateRange(start, end, type, type.title)
+        return DateRange(start, end, type, type.titleResId)
     }
 
     private fun JalaliCalendar.toDateRange(
@@ -310,21 +301,21 @@ object DateFilterHelper {
             set(Calendar.SECOND, 59)
             set(Calendar.MILLISECOND, 999)
         }
-        return DateRange(startGc.timeInMillis, endGc.timeInMillis, type, type.title)
+        return DateRange(startGc.timeInMillis, endGc.timeInMillis, type, type.titleResId)
     }
 
 }
 
 
-enum class DateFilterType(val title: String) {
-    TODAY("امروز"),
-    YESTERDAY("دیروز"),
-    TOMORROW("فردا"),
-    THIS_WEEK("این هفته"),
-    LAST_WEEK("هفته قبل"),
-    NEXT_WEEK("هفته بعد"),
-    THIS_MONTH("این ماه"),
-    LAST_MONTH("ماه قبل"),
-    NEXT_MONTH("ماه بعد"),
-    CUSTOM_RANGE("بازه انتخابی")
+enum class DateFilterType(@StringRes val titleResId: Int) {
+    TODAY(R.string.today),
+    YESTERDAY(R.string.yesterday),
+    TOMORROW(R.string.tomorrow),
+    THIS_WEEK(R.string.this_week),
+    LAST_WEEK(R.string.last_week),
+    NEXT_WEEK(R.string.next_week),
+    THIS_MONTH(R.string.this_month),
+    LAST_MONTH(R.string.last_month),
+    NEXT_MONTH(R.string.next_month),
+    CUSTOM_RANGE(R.string.custom_range)
 }

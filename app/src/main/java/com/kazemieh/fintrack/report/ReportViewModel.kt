@@ -55,13 +55,14 @@ class ReportViewModel() : ViewModel() {
 
             is ReportIntent.OnDateRange -> {
                 val range = DateFilterHelper.getRange(intent.dateFilterType)
+
                 _state.update {
                     it.copy(
                         dateFilterType = range?.filterType ?: DateFilterType.THIS_MONTH,
                         isDateSheetVisible = false,
                         startDateTimeStamp = range?.start,
                         endDateTimeStamp = range?.end,
-                        textDate = range?.label ?: DateFilterType.THIS_MONTH.title,
+                        textDate = range?.label ?: DateFilterType.THIS_MONTH.titleResId,
                         startDate = null,
                         endDate = null
                     )
@@ -86,7 +87,7 @@ class ReportViewModel() : ViewModel() {
                             isDateSheetVisible = false,
                             startDateTimeStamp = range?.start,
                             endDateTimeStamp = range?.end,
-                            textDate = range?.label ?: DateFilterType.CUSTOM_RANGE.title,
+                            textDate = range?.label ?: DateFilterType.CUSTOM_RANGE.titleResId,
                             startDate = intent.startDate,
                             endDate = intent.endDate,
                             isCustomDateSheetVisible = false,
@@ -157,7 +158,7 @@ data class ReportState(
     val isError: Boolean = false,
     val startDateTimeStamp: Long? = null,
     val endDateTimeStamp: Long? = null,
-    val textDate: String = DateFilterType.THIS_MONTH.title,
+    val textDate: Any = DateFilterType.THIS_MONTH.titleResId,
 )
 
 

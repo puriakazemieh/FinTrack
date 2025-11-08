@@ -20,6 +20,6 @@ fun FilterButton(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp)
     ) {
-        FintrackBodyLargeText(text, textAlign =textAlign )
+        FintrackBodyLargeText(text, textAlign = textAlign)
     }
 }

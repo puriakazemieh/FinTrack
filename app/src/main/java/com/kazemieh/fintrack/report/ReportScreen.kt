@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.CategoryListSelectionBottomSheet
 import com.kazemieh.common.DateFilterType
@@ -36,7 +37,11 @@ fun ReportScreen(
         Column {
 
             Spacer(modifier = Modifier.height(8.dp))
-
+            val label = when (val labelValue = state.textDate) {
+                is Int -> stringResource(id = labelValue)
+                is String -> labelValue
+                else -> ""
+            }
             ReportTopBar(
                 onTransactionTypeSelected = state.selectedTransactionType,
                 onTransactionTypeClicked = {
@@ -49,7 +54,7 @@ fun ReportScreen(
                 onDateClick = { viewModel.onIntent(ReportIntent.OnToggleDateSheet) },
                 onNextClick = { viewModel.onIntent(ReportIntent.OnNextClick) },
                 onPrevClick = { viewModel.onIntent(ReportIntent.OnPrevClick) },
-                textDate = state.textDate
+                textDate = label
 
             )
 
