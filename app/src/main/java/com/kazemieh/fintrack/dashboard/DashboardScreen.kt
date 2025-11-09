@@ -16,6 +16,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -27,9 +30,9 @@ import com.kazemieh.financialsource.ui.SourceList
 import com.kazemieh.financialsource.ui.SourceListBottomSheet
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.tag.ui.TagListBottomSheet
+import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.TotalTransactionCard
 import com.kazemieh.transaction.ui.main.TransactionListScreen
-import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -37,6 +40,8 @@ fun DashboardScreen(
     viewModel: DashboardViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+
+    var enableAnimationChart by remember { mutableStateOf(true) }
 
     Box(
         modifier = Modifier
@@ -50,7 +55,7 @@ fun DashboardScreen(
         ) {
             item { Spacer(modifier = Modifier.height(8.dp)) }
 
-            item { TotalTransactionCard() }
+            item { TotalTransactionCard(enableAnimationChart = enableAnimationChart) }
 
             item { Spacer(Modifier.height(16.dp)) }
 
@@ -103,7 +108,10 @@ fun DashboardScreen(
                         )
                     )
                 },
-                onTagClicked = { viewModel.onIntent(DashboardIntent.ShowTagList(true)) }
+                onTagClicked = { viewModel.onIntent(DashboardIntent.ShowTagList(true)) },
+                transactionAdded = {
+                    enableAnimationChart = !enableAnimationChart
+                }
             )
         }
 

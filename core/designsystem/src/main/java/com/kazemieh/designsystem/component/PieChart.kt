@@ -25,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +50,8 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.formatNumber
+import com.kazemieh.common.ld
+import kotlinx.coroutines.delay
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -105,6 +108,7 @@ fun PieChart(
     labelTextStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     legendTextStyle: TextStyle = MaterialTheme.typography.bodySmall,
     showLegend: Boolean = true,
+    enableAnimation: Boolean = true,
     onSliceClick: ((PieChartItem) -> Unit)? = null
 ) {
     if (data.isEmpty()) return
@@ -122,20 +126,31 @@ fun PieChart(
     }
 
     val textMeasurer = rememberTextMeasurer()
-
-    var animationPlayed by remember { mutableStateOf(false) }
-
+    var animationPlayed by rememberSaveable() { mutableStateOf(false) }
+    val chartKey = remember(data) {
+        data.fold(0L) { acc, item ->
+            acc + item.value + item.label.hashCode().toLong()
+        }
+    }
     val animatedRotation by animateFloatAsState(
-        targetValue = if (animationPlayed) 90f * 11f else 0f,
+        targetValue = if (enableAnimation) 90f * 11f else 0f,
         animationSpec = tween(animDuration, easing = LinearOutSlowInEasing),
         label = "pieRotation"
     )
 
 
-    LaunchedEffect(Unit) {
-        animationPlayed = true
-    }
-
+//    LaunchedEffect(chartKey) {
+//        "LaunchedEffect".ld("LaunchedEffect with key: $chartKey")
+//
+//        animationPlayed =false
+//        delay(100)
+//        animationPlayed = true
+//
+////        if (!animationPlayed) {
+////            delay(100) // تأخیر کوچک برای اطمینان
+////            animationPlayed = true
+////        }
+//    }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -340,8 +355,7 @@ private fun PieChartLegend(
     FlowRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 20.dp)
-        ,
+            .padding(top = 20.dp),
         horizontalArrangement = Arrangement.spacedBy(
             space = 4.dp,
             alignment = Alignment.CenterHorizontally

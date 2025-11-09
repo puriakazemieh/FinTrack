@@ -64,7 +64,8 @@ fun ReportScreen(
                 selectedCategories = state.selectedCategories,
                 selectedTransactionType = state.selectedTransactionType,
                 fromTimestamp = state.startDateTimeStamp,
-                toTimestamp = state.endDateTimeStamp
+                toTimestamp = state.endDateTimeStamp,
+                enableAnimationChart = state.enableAnimationChart
             )
 
         }

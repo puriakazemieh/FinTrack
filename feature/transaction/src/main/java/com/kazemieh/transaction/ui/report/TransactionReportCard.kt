@@ -28,7 +28,10 @@ import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
-fun ShowTransactionReportCard(viewModel: TransactionReportViewModel = koinViewModel()) {
+fun ShowTransactionReportCard(
+    viewModel: TransactionReportViewModel = koinViewModel(),
+    enableAnimationChart: Boolean = true,
+) {
 
     val state by viewModel.state.collectAsState()
 
@@ -99,6 +102,7 @@ fun ShowTransactionReportCard(viewModel: TransactionReportViewModel = koinViewMo
                         chartBarWidth = 20.dp,
                         textDistanceExtra = 20.dp,
                         animDuration = 500,
+                        enableAnimation = enableAnimationChart
                     )
 
                 }

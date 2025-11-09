@@ -21,6 +21,7 @@ fun TransactionListByFilterScreen(
     selectedTransactionType: Int,
     fromTimestamp: Long? = null,
     toTimestamp: Long? = null,
+    enableAnimationChart: Boolean = true,
     viewModel: TransactionReportViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -53,7 +54,7 @@ fun TransactionListByFilterScreen(
         item { Spacer(Modifier.height(8.dp)) }
 
         item {
-            ShowTransactionReportCard()
+            ShowTransactionReportCard(enableAnimationChart = enableAnimationChart)
         }
 
         item { Spacer(Modifier.height(16.dp)) }

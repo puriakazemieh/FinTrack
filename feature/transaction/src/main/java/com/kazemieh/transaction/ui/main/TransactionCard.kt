@@ -15,7 +15,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
@@ -30,7 +32,8 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TotalTransactionCard(
-    viewModel: TransactionViewModel = koinViewModel()
+    viewModel: TransactionViewModel = koinViewModel(),
+    enableAnimationChart: Boolean = true,
 ) {
     LaunchedEffect(true) {
         viewModel.onIntent(TransactionIntent.LoadTransactions)
@@ -39,13 +42,17 @@ fun TotalTransactionCard(
     val state by viewModel.state.collectAsState()
 
     val incoming = stringResource(R.string.incoming)
-    val incomingItem = PieChartItem(label = incoming, value = state.totalIncome)
-
     val outcoming = stringResource(R.string.outcoming)
-    val outcomingItem = PieChartItem(label = outcoming, value = state.totalExpense)
 
+    val piChartData by remember(state.totalIncome, state.totalExpense) {
+        derivedStateOf {
+            listOf(
+                PieChartItem(label = incoming, value = state.totalIncome),
+                PieChartItem(label = outcoming, value = state.totalExpense)
+            )
+        }
+    }
 
-    val sampleData = listOf(incomingItem, outcomingItem)
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -77,7 +84,7 @@ fun TotalTransactionCard(
 
             }
 
-            if (sampleData.any { it.value.toInt() > 0 }) {
+            if (piChartData.any { it.value.toInt() > 0 }) {
                 Box(
                     modifier = Modifier
                         .padding(vertical = 8.dp)
@@ -90,11 +97,12 @@ fun TotalTransactionCard(
 
                 Box(modifier = Modifier.padding(top = 20.dp)) {
                     PieChart(
-                        data = sampleData,
+                        data = piChartData,
                         radiusOuter = 40.dp,
                         chartBarWidth = 20.dp,
                         textDistanceExtra = 20.dp,
                         animDuration = 500,
+                        enableAnimation = enableAnimationChart
                     )
 
                 }

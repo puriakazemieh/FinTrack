@@ -18,23 +18,25 @@ class ReportViewModel() : ViewModel() {
     fun onIntent(intent: ReportIntent) {
         when (intent) {
             is ReportIntent.OnTransactionTypeSelected -> _state.update {
-                it.copy(selectedTransactionType = intent.type, selectedCategories = emptySet())
+                it.copy(
+                    selectedTransactionType = intent.type,
+                    selectedCategories = emptySet(),
+                    enableAnimationChart = !_state.value.enableAnimationChart
+                )
             }
 
             is ReportIntent.OnSourcesSelected -> _state.update {
-                it.copy(selectedSources = intent.sources, isSourceSheetVisible = false)
+                it.copy(
+                    selectedSources = intent.sources, isSourceSheetVisible = false,
+                    enableAnimationChart = !_state.value.enableAnimationChart
+                )
             }
 
             is ReportIntent.OnCategoriesSelected -> _state.update {
-                it.copy(selectedCategories = intent.categories, isCategorySheetVisible = false)
-            }
-
-            is ReportIntent.OnCustomDateStartSelected -> _state.update {
-                it.copy(startDate = intent.date, startDateTimeStamp = intent.timeStamp)
-            }
-
-            is ReportIntent.OnCustomDateEndSelected -> _state.update {
-                it.copy(endDate = intent.date, endDateTimeStamp = intent.timeStamp)
+                it.copy(
+                    selectedCategories = intent.categories, isCategorySheetVisible = false,
+                    enableAnimationChart = !_state.value.enableAnimationChart
+                )
             }
 
             ReportIntent.OnToggleSourceSheet -> _state.update {
@@ -65,7 +67,8 @@ class ReportViewModel() : ViewModel() {
                         isShowArrowButton = true,
                         textDate = range?.label ?: DateFilterType.THIS_MONTH.titleResId,
                         startDate = null,
-                        endDate = null
+                        endDate = null,
+                        enableAnimationChart = !_state.value.enableAnimationChart
                     )
                 }
             }
@@ -93,6 +96,7 @@ class ReportViewModel() : ViewModel() {
                             endDate = intent.endDate,
                             isShowArrowButton = false,
                             isCustomDateSheetVisible = false,
+                            enableAnimationChart = !_state.value.enableAnimationChart
                         )
                     }
                 } else {
@@ -115,7 +119,8 @@ class ReportViewModel() : ViewModel() {
                         textDate = result.label,
                         dateFilterType = result.filterType,
                         startDateTimeStamp = result.start,
-                        endDateTimeStamp = result.end
+                        endDateTimeStamp = result.end,
+                        enableAnimationChart = !_state.value.enableAnimationChart
                     )
                 }
 
@@ -133,7 +138,8 @@ class ReportViewModel() : ViewModel() {
                         textDate = result.label,
                         dateFilterType = result.filterType,
                         startDateTimeStamp = result.start,
-                        endDateTimeStamp = result.end
+                        endDateTimeStamp = result.end,
+                        enableAnimationChart = !_state.value.enableAnimationChart
                     )
                 }
 
@@ -161,6 +167,7 @@ data class ReportState(
     val isError: Boolean = false,
     val startDateTimeStamp: Long? = null,
     val endDateTimeStamp: Long? = null,
+    val enableAnimationChart: Boolean = true,
     val textDate: Any = DateFilterType.THIS_MONTH.titleResId,
 )
 
@@ -175,10 +182,6 @@ sealed interface ReportIntent {
     data object OnPrevClick : ReportIntent
     data object OnNextClick : ReportIntent
 
-    data class OnCustomDateStartSelected(val date: String, val timeStamp: Long) :
-        ReportIntent
-
-    data class OnCustomDateEndSelected(val date: String, val timeStamp: Long) : ReportIntent
     data class OnDateSheetSubmit(
         val startDate: String?,
         val startTimeStamp: Long?,
