@@ -57,6 +57,7 @@ fun ReportTopBar(
     onSourceClicked: () -> Unit,
     selectedCategories: Set<Pair<Int, String>> = emptySet(),
     onCategoryClicked: () -> Unit,
+    isShowArrowButton: Boolean = true,
     onDateClick: () -> Unit,
     onPrevClick: () -> Unit,
     onNextClick: () -> Unit,
@@ -138,6 +139,7 @@ fun ReportTopBar(
 
             DatePeriodSelector(
                 dateText = textDate,
+                isShowArrowButton = isShowArrowButton,
                 onPrevClick = onPrevClick,
                 onNextClick = onNextClick,
                 onDateClick = onDateClick

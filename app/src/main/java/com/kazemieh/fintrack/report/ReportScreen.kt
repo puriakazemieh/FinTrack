@@ -50,6 +50,7 @@ fun ReportScreen(
                 selectedCategories = state.selectedCategories,
                 onCategoryClicked = { viewModel.onIntent(ReportIntent.OnToggleCategorySheet) },
                 selectedSources = state.selectedSources,
+                isShowArrowButton = state.isShowArrowButton,
                 onSourceClicked = { viewModel.onIntent(ReportIntent.OnToggleSourceSheet) },
                 onDateClick = { viewModel.onIntent(ReportIntent.OnToggleDateSheet) },
                 onNextClick = { viewModel.onIntent(ReportIntent.OnNextClick) },
