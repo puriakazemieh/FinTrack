@@ -10,6 +10,8 @@ class ApplicationConvention : Plugin<Project> {
             applicationGradle {
                 kotlinAndroidGradleExtension(this)
                 defaultConfig.targetSdk = 36
+                defaultConfig.versionCode = 1
+                defaultConfig.versionName = "1.0.0"
             }
         }
     }

@@ -11,15 +11,22 @@ android {
     defaultConfig {
         applicationId = "com.kazemieh.fintrack"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+//        versionCode = 1
+//        versionName = "1.0.0"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            isDebuggable = true
         }
     }
 }

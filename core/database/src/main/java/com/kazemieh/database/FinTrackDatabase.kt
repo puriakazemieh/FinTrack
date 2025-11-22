@@ -47,7 +47,7 @@ class PrepopulateCallback(
         CoroutineScope(Dispatchers.IO).launch {
             val prefsDao: FinancialSourceDao by koin.inject()
             prefsDao.insertFinancialSource(
-                FinancialSourceEntity(name = "test", type = 1)
+                FinancialSourceEntity(name = "منبع مالی پیش فرض", type = 1)
             )
             val categoryDao: CategoryDao by koin.inject()
             val defaultCategory = listOf(
