@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.hours
 
 class TransactionReportViewModel(
     private val transactionUseCases: TransactionUseCases
@@ -66,7 +67,7 @@ class TransactionReportViewModel(
                 categoryIds = state.value.selectedCategories.map { it.first },
                 sourceIds = state.value.selectedSource.map { it.first },
                 fromTimestamp = state.value.fromTimestamp,
-                toTimestamp = state.value.toTimestamp
+                toTimestamp = state.value.toTimestamp?.plus(24.hours.inWholeMilliseconds)
             )
                 .collect { transactions ->
 

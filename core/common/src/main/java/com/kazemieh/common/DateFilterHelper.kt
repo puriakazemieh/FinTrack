@@ -124,10 +124,10 @@ object DateFilterHelper {
                     "$startText تا $endText"
                 }
             }
+
             else -> filterType.titleResId
         }
     }
-
 
 
     fun shiftDateRange(
@@ -239,6 +239,16 @@ object DateFilterHelper {
                     }
                     newStart = JalaliCalendar(newYear, newMonth, 1)
                     newEnd = JalaliCalendar(newYear, newMonth, newStart.monthLength)
+
+                    if (newStart.month == today.month - 1 && newEnd.month == today.month - 1) {
+                        newFilter = DateFilterType.LAST_MONTH
+                    }
+                    if (newStart.month == today.month && newEnd.month == today.month) {
+                        newFilter = DateFilterType.THIS_MONTH
+                    }
+                    if (newStart.month == today.month + 1 && newEnd.month == today.month + 1) {
+                        newFilter = DateFilterType.NEXT_MONTH
+                    }
                 } else {
                     while (temp != endJ) {
                         temp = temp.getDateByDiff(1)
@@ -249,6 +259,7 @@ object DateFilterHelper {
                     newStart = startJalali.getDateByDiff(diff * (daysBetween + 1))
                     newEnd = endJalali.getDateByDiff(diff * (daysBetween + 1))
                 }
+
             }
 
         }

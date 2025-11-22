@@ -41,7 +41,7 @@ interface TransactionDao {
           AND ((:sourceIdsSize = 0) OR financialSourceId IN (:sourceIds))
           AND (
               (:fromTimestamp IS NULL OR :toTimestamp IS NULL)
-              OR (timeStamp BETWEEN :fromTimestamp AND :toTimestamp)
+              OR (timeStamp >= :fromTimestamp AND timeStamp < :toTimestamp)
           )
     """
     )
@@ -50,7 +50,7 @@ interface TransactionDao {
         categoryIds: List<Int> = emptyList(),
         sourceIds: List<Int> = emptyList(),
         categoryIdsSize: Int = categoryIds.size,
-        sourceIdsSize: Int = categoryIds.size,
+        sourceIdsSize: Int = sourceIds.size,
         fromTimestamp: Long? = null,
         toTimestamp: Long? = null
     ): Flow<List<TransactionWithCategoryFinancialSourceAndTags>>

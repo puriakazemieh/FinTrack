@@ -14,8 +14,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.kazemieh.common.formatNumber
+import com.kazemieh.common.toPrice
 
 @Composable
 fun FintrackOutlinedTextField(
@@ -38,12 +44,18 @@ fun FintrackOutlinedTextField(
     singleLine: Boolean = true,
     readOnly: Boolean = false,
     isError: Boolean = false,
+    isPrice: Boolean = false,
+    minLine : Int = 1,
+    maxLine : Int = if (singleLine) 1 else Int.MAX_VALUE,
     onClick: () -> Unit = {},
 ) {
 
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
+        minLines = minLine,
+        maxLines = maxLine,
+        visualTransformation = if (isPrice) NumberCommaTransformation() else VisualTransformation.None,
         modifier = modifier
             .clickable(
                 indication = null,
@@ -82,5 +94,22 @@ fun FintrackOutlinedTextField(
     )
 
 
+}
+
+class NumberCommaTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        return TransformedText(
+            text = AnnotatedString(text.text.toPrice()),
+            offsetMapping = object : OffsetMapping {
+                override fun originalToTransformed(offset: Int): Int {
+                    return text.text.toPrice().length
+                }
+
+                override fun transformedToOriginal(offset: Int): Int {
+                    return text.length
+                }
+            }
+        )
+    }
 }
 

@@ -37,3 +37,11 @@ fun Int.toPositive(): Int =
         this > 0 -> this
         else -> 0
     }
+
+
+
+fun String.toPrice(): String {
+    this.toIntOrNull()?.let { number ->
+        return String.format(Locale.getDefault(), "%,d", number)
+    } ?: return ""
+}

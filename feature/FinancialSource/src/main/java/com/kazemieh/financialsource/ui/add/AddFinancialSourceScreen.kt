@@ -1,5 +1,6 @@
 package com.kazemieh.financialsource.ui.add
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -109,7 +110,7 @@ fun AddSourceBottomSheet(
                         }
                     }
                 }
-                // نام منبع
+
                 FintrackOutlinedTextField(
                     value = state.sourceName ?: "",
                     onValueChange = { viewModel.onIntent(AddFinancialSourceIntent.SetSourceName(it)) },
@@ -124,8 +125,8 @@ fun AddSourceBottomSheet(
                     }
                 )
 
-                // مبلغ اولیه
                 FintrackOutlinedTextField(
+                    isPrice = true,
                     value = if (state.balance == 0) "" else state.balance.toString(),
                     onValueChange = { input ->
                         val newValue = input.toIntOrNull()
@@ -140,21 +141,20 @@ fun AddSourceBottomSheet(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
 
-                // شماره کارت (در صورت CREDIT)
-                if (state.selectedTypeFinancialSource == SelectedTypeFinancialSource.CREDIT) {
-                    FintrackOutlinedTextField(
-                        value = state.cardNumber ?: "",
-                        onValueChange = {
-                            viewModel.onIntent(
-                                AddFinancialSourceIntent.SetCardNumber(it)
-                            )
-                        },
-                        label = { FintrackBodyMediumText(text = stringResource(R.string.card_number_label)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
-                }
 
-                // توضیحات
+                AnimatedVisibility(visible = state.selectedTypeFinancialSource == SelectedTypeFinancialSource.CREDIT) {
+                        FintrackOutlinedTextField(
+                            value = state.cardNumber ?: "",
+                            onValueChange = {
+                                viewModel.onIntent(
+                                    AddFinancialSourceIntent.SetCardNumber(it)
+                                )
+                            },
+                            label = { FintrackBodyMediumText(text = stringResource(R.string.card_number_label)) },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        )
+                    }
+
                 FintrackOutlinedTextField(
                     value = state.description ?: "",
                     onValueChange = { viewModel.onIntent(AddFinancialSourceIntent.SetDescription(it)) },
@@ -163,7 +163,7 @@ fun AddSourceBottomSheet(
 
                 Spacer(Modifier.height(16.dp))
 
-                // دکمه ثبت
+
                 Button(
                     onClick = { viewModel.onIntent(AddFinancialSourceIntent.AddFinancialSource) },
                     modifier = Modifier.fillMaxWidth(),
