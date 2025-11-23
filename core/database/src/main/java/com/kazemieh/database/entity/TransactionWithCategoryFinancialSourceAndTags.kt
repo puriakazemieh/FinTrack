@@ -28,5 +28,16 @@ data class TransactionWithCategoryFinancialSourceAndTags(
             entityColumn = "tagId"
         )
     )
-    val tags: List<TagEntity>
+    val tags: List<TagEntity>,
+
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "id",
+        associateBy = Junction(
+            value = TransactionPersonCrossRef::class,
+            parentColumn = "transactionId",
+            entityColumn = "personId"
+        )
+    )
+    val person: List<PersonEntity>
 )

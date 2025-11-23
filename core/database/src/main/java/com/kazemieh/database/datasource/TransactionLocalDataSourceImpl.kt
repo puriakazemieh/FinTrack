@@ -3,24 +3,28 @@ package com.kazemieh.database.datasource
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
 import com.kazemieh.database.dao.CategoryDao
 import com.kazemieh.database.dao.FinancialSourceDao
+import com.kazemieh.database.dao.PersonDao
 import com.kazemieh.database.dao.TagDao
 import com.kazemieh.database.dao.TransactionDao
+import com.kazemieh.database.entity.TransactionPersonCrossRef
 import com.kazemieh.database.entity.TransactionTagCrossRef
 import com.kazemieh.database.mapper.toCategory
 import com.kazemieh.database.mapper.toCategoryEntity
 import com.kazemieh.database.mapper.toFinancialSource
 import com.kazemieh.database.mapper.toFinancialSourceEntity
+import com.kazemieh.database.mapper.toPerson
+import com.kazemieh.database.mapper.toPersonEntity
 import com.kazemieh.database.mapper.toTag
 import com.kazemieh.database.mapper.toTagEntity
 import com.kazemieh.database.mapper.toTransactionEntity
 import com.kazemieh.database.mapper.toTransactionWithRelations
 import com.kazemieh.model.Category
 import com.kazemieh.model.FinancialSource
+import com.kazemieh.model.Person
 import com.kazemieh.model.Tag
 import com.kazemieh.model.Transaction
 import com.kazemieh.model.TransactionWithRelations
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 class TransactionLocalDataSourceImpl(
@@ -28,6 +32,7 @@ class TransactionLocalDataSourceImpl(
     private val tagDao: TagDao,
     private val financialSourceDao: FinancialSourceDao,
     private val categoryDao: CategoryDao,
+    private val personDao: PersonDao,
 ) : TransactionLocalDataSource {
 
     override suspend fun delete(transaction: Transaction) {
@@ -36,7 +41,8 @@ class TransactionLocalDataSourceImpl(
 
     override suspend fun insertTransaction(
         transaction: Transaction,
-        tagIds: List<Long>
+        tagIds: List<Long>,
+        personIds: List<Long>,
     ): Long {
         val transactionId = transactionDao.insertTransaction(transaction.toTransactionEntity())
 
@@ -45,6 +51,14 @@ class TransactionLocalDataSourceImpl(
                 TransactionTagCrossRef(
                     transactionId = transactionId,
                     tagId = tagId
+                )
+            )
+        }
+        personIds.forEach { personId ->
+            transactionDao.insertTransactionPersonCrossRef(
+                TransactionPersonCrossRef(
+                    transactionId = transactionId,
+                    personId = personId
                 )
             )
         }
@@ -85,21 +99,6 @@ class TransactionLocalDataSourceImpl(
             it.map { it.toTransactionWithRelations() }
         }
     }
-
-    override fun getByCategory(categoryId: Long): Flow<List<TransactionWithRelations>> = flow {
-        emit(
-            transactionDao.getTransactionsByCategoryId(categoryId)
-                .map { it.toTransactionWithRelations() }
-        )
-    }
-
-    override fun getByFinancialSource(sourceId: Long): Flow<List<TransactionWithRelations>> =
-        flow {
-            emit(
-                transactionDao.getTransactionsByFinancialSourceId(sourceId)
-                    .map { it.toTransactionWithRelations() }
-            )
-        }
 
     override suspend fun insertCategory(category: Category): Long {
         return categoryDao.insertCategory(category.toCategoryEntity())
@@ -150,4 +149,11 @@ class TransactionLocalDataSourceImpl(
         return financialSourceDao.getDefaultSource().toFinancialSource()
     }
 
+    override suspend fun insertPerson(person: Person): Long {
+        return personDao.insertPerson(person.toPersonEntity())
+    }
+
+    override suspend fun getAllPersons(): Flow<List<Person>> {
+        return personDao.getAllPersons().map { it.map { it.toPerson() } }
+    }
 }

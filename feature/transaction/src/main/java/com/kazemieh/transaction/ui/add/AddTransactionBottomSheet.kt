@@ -51,10 +51,12 @@ fun AddTransactionBottomSheet(
     source: Pair<Int, String>? = null,
     category: Pair<Int, String>? = null,
     tags: Set<Pair<Int, String>>? = null,
+    persons: Set<Pair<Int, String>>? = null,
     onDismiss: () -> Unit,
     onSourceClicked: () -> Unit,
     onCategoryClicked: (Int) -> Unit,
     onTagClicked: () -> Unit,
+    onPersonClicked: () -> Unit,
     transactionAdded: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -77,6 +79,9 @@ fun AddTransactionBottomSheet(
     }
     LaunchedEffect(tags) {
         viewModel.onEvent(AddTransactionEvent.SetTags(tags))
+    }
+    LaunchedEffect(persons) {
+        viewModel.onEvent(AddTransactionEvent.SetPerson(persons))
     }
 
     LaunchedEffect(Unit) {
@@ -110,6 +115,7 @@ fun AddTransactionBottomSheet(
             onEvent = viewModel::onEvent,
             onSourceClicked = onSourceClicked,
             onTagClicked = onTagClicked,
+            onPersonClicked = onPersonClicked,
             onCategoryClicked = { onCategoryClicked(state.selectedTransactionType.count) }
         )
     }
@@ -121,6 +127,7 @@ fun AddTransactionContent(
     onSourceClicked: () -> Unit,
     onCategoryClicked: () -> Unit,
     onTagClicked: () -> Unit,
+    onPersonClicked: () -> Unit,
     onEvent: (AddTransactionEvent) -> Unit
 ) {
 
@@ -254,6 +261,24 @@ fun AddTransactionContent(
                         FintrackBodyMediumText(text = stringResource(R.string.tags))
                     } else {
                         FintrackBodyMediumText(text = stringResource(R.string.select_tags))
+                    }
+                }
+
+            )
+        }
+
+        item {
+            FintrackOutlinedTextField(
+                value = state.persons?.joinToString("") { " #${it.second}" } ?: "",
+                onClick = onPersonClicked,
+                readOnly = true,
+                enabled = false,
+                singleLine = false,
+                label = {
+                    if (state.persons != null) {
+                        FintrackBodyMediumText(text = stringResource(R.string.persons))
+                    } else {
+                        FintrackBodyMediumText(text = stringResource(R.string.select_person))
                     }
                 }
 

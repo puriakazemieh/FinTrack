@@ -22,6 +22,7 @@ class DashboardViewModel() : ViewModel() {
                         source = if (!intent.showAddTransaction) null else it.source,
                         category = if (!intent.showAddTransaction) null else it.category,
                         tags = if (!intent.showAddTransaction) null else it.tags,
+                        persons = if (!intent.showAddTransaction) null else it.persons,
                     )
                 }
             }
@@ -78,29 +79,22 @@ class DashboardViewModel() : ViewModel() {
             }
 
 
-            is DashboardIntent.SetTag -> {
-                val current = _state.value.tags
-                val updatedTags =
-                    if (current?.contains(intent.tag) == true)
-                        current.minus(intent.tag)
-                    else
-                        current?.plus(intent.tag)
-
-                _state.update {
-                    it.copy(
-                        tags = updatedTags,
-                        showTagList = false
-                    )
-                }
-            }
-
-
             is DashboardIntent.ShowTagList -> _state.update { it.copy(showTagList = intent.showTagList) }
 
             is DashboardIntent.SetAllSelectedTags -> _state.update {
                 it.copy(
                     tags = intent.tags,
                     showTagList = false
+                )
+            }
+
+
+            is DashboardIntent.ShowPersonList -> _state.update { it.copy(showPersonList = intent.showPersonList) }
+
+            is DashboardIntent.SetAllSelectedPerson -> _state.update {
+                it.copy(
+                    persons = intent.persons,
+                    showPersonList = false
                 )
             }
         }
@@ -123,6 +117,9 @@ data class DashboardState(
 
     val tags: Set<Pair<Int, String>>? = null,
     val showTagList: Boolean = false,
+
+    val persons: Set<Pair<Int, String>>? = null,
+    val showPersonList: Boolean = false,
 
     val selectedTransactionType: Int = 1,
 )
@@ -147,8 +144,10 @@ sealed interface DashboardIntent {
     ) : DashboardIntent
 
     data class ShowTagList(val showTagList: Boolean = false) : DashboardIntent
-    data class SetTag(val tag: Pair<Int, String>) : DashboardIntent
     data class SetAllSelectedTags(val tags: Set<Pair<Int, String>>? = null) : DashboardIntent
+
+    data class ShowPersonList(val showPersonList: Boolean = false) : DashboardIntent
+    data class SetAllSelectedPerson(val persons: Set<Pair<Int, String>>? = null) : DashboardIntent
 
 
 }

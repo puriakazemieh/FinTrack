@@ -45,5 +45,6 @@ dependencies {
     implementation(project(":feature:FinancialSource"))
     implementation(project(":feature:Tag"))
     implementation(project(":feature:filter"))
+    implementation(project(":feature:person"))
 
 }

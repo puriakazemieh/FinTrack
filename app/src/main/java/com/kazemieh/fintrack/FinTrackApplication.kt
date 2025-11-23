@@ -9,6 +9,8 @@ import com.kazemieh.database.di.databaseModule
 import com.kazemieh.domain.di.domainModule
 import com.kazemieh.financialsource.di.transactionAddFinancialSourceModule
 import com.kazemieh.financialsource.di.transactionFinancialSourceModule
+import com.kazemieh.person.di.transactionAddPersonModule
+import com.kazemieh.person.di.transactionPersonModule
 import com.kazemieh.tag.di.transactionAddTagModule
 import com.kazemieh.tag.di.transactionTagModule
 import com.kazemieh.transaction.di.addTransactionPresentationModule
@@ -37,7 +39,9 @@ class FinTrackApplication : Application() {
             transactionAddTagModule,
             transactionTagModule,
             dashboardViewModel,
-            reportViewModel
+            reportViewModel,
+            transactionPersonModule,
+            transactionAddPersonModule,
 
         )
         startKoin {

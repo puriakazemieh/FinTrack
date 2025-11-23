@@ -5,13 +5,15 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.kazemieh.database.dao.CategoryDao
 import com.kazemieh.database.dao.FinancialSourceDao
+import com.kazemieh.database.dao.PersonDao
 import com.kazemieh.database.dao.TagDao
 import com.kazemieh.database.dao.TransactionDao
-import com.kazemieh.database.dao.TransactionTagCrossRefDao
 import com.kazemieh.database.entity.CategoryEntity
 import com.kazemieh.database.entity.FinancialSourceEntity
+import com.kazemieh.database.entity.PersonEntity
 import com.kazemieh.database.entity.TagEntity
 import com.kazemieh.database.entity.TransactionEntity
+import com.kazemieh.database.entity.TransactionPersonCrossRef
 import com.kazemieh.database.entity.TransactionTagCrossRef
 import com.kazemieh.model.TransactionType
 import kotlinx.coroutines.CoroutineScope
@@ -26,8 +28,10 @@ import org.koin.core.Koin
         FinancialSourceEntity::class,
         TagEntity::class,
         TransactionTagCrossRef::class,
+        PersonEntity::class,
+        TransactionPersonCrossRef::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class DatabaseModule : RoomDatabase() {
@@ -35,7 +39,7 @@ abstract class DatabaseModule : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun financialSourceDao(): FinancialSourceDao
     abstract fun tagDao(): TagDao
-    abstract fun transactionTagCrossRefDao(): TransactionTagCrossRefDao
+    abstract fun personDao(): PersonDao
 
 }
 

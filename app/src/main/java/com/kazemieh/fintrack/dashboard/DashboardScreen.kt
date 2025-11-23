@@ -29,6 +29,7 @@ import com.kazemieh.financialsource.R
 import com.kazemieh.financialsource.ui.SourceList
 import com.kazemieh.financialsource.ui.SourceListBottomSheet
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
+import com.kazemieh.person.ui.PersonListBottomSheet
 import com.kazemieh.tag.ui.TagListBottomSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.TotalTransactionCard
@@ -98,6 +99,7 @@ fun DashboardScreen(
                 source = state.source,
                 category = state.category,
                 tags = state.tags,
+                persons = state.persons,
                 onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddTransaction(false)) },
                 onSourceClicked = { viewModel.onIntent(DashboardIntent.ShowSourceList(true)) },
                 onCategoryClicked = { type ->
@@ -109,6 +111,7 @@ fun DashboardScreen(
                     )
                 },
                 onTagClicked = { viewModel.onIntent(DashboardIntent.ShowTagList(true)) },
+                onPersonClicked = { viewModel.onIntent(DashboardIntent.ShowPersonList(true)) },
                 transactionAdded = {
                     enableAnimationChart = !enableAnimationChart
                 }
@@ -132,6 +135,12 @@ fun DashboardScreen(
         Tag(
             showTagList = state.showTagList,
             selectedTags = state.tags,
+            onIntent = viewModel::onIntent
+        )
+
+        Person(
+            showPersonList = state.showPersonList,
+            selectedPerson = state.persons,
             onIntent = viewModel::onIntent
         )
     }
@@ -239,6 +248,26 @@ fun Tag(
             },
             onDismiss = {
                 onIntent(DashboardIntent.ShowTagList(false))
+            }
+        )
+    }
+}
+
+@Composable
+fun Person(
+    showPersonList: Boolean,
+    selectedPerson: Set<Pair<Int, String>>?,
+    onIntent: (DashboardIntent) -> Unit
+) {
+
+    if (showPersonList) {
+        PersonListBottomSheet(
+            selectedPersons = selectedPerson,
+            onSubmitClick = { selectedPerson: Set<Pair<Int, String>>? ->
+                onIntent(DashboardIntent.SetAllSelectedPerson(selectedPerson))
+            },
+            onDismiss = {
+                onIntent(DashboardIntent.ShowPersonList(false))
             }
         )
     }

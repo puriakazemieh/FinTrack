@@ -1,13 +1,13 @@
 package com.kazemieh.domain.usecase
 
 import com.kazemieh.domain.repository.TransactionRepository
-import com.kazemieh.model.Tag
+import com.kazemieh.model.Person
 import kotlinx.coroutines.flow.Flow
 
-class GetAllTag(
+class GetAllPerson(
     private val repository: TransactionRepository
 ) {
-    suspend operator fun invoke(): Flow<List<Tag>> {
-        return repository.getAllTag()
+    suspend operator fun invoke(): Flow<List<Person>> {
+        return repository.getAllPersons()
     }
 }

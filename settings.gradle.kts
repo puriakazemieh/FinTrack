@@ -1,3 +1,8 @@
+import java.net.URI
+
+include(":feature:person")
+
+
 pluginManagement {
     repositories {
         includeBuild("build-logic")

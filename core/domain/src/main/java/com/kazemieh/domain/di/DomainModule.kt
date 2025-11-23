@@ -2,12 +2,14 @@ package com.kazemieh.domain.di
 
 import com.kazemieh.domain.usecase.AddCategory
 import com.kazemieh.domain.usecase.AddFinancialSource
+import com.kazemieh.domain.usecase.AddPerson
 import com.kazemieh.domain.usecase.AddTag
 import com.kazemieh.domain.usecase.AddTransaction
 import com.kazemieh.domain.usecase.DeleteTransaction
 //import com.kazemieh.domain.usecase.ExportTransactionsUseCase
 import com.kazemieh.domain.usecase.GetAllCategoryByType
 import com.kazemieh.domain.usecase.GetAllFinancialSource
+import com.kazemieh.domain.usecase.GetAllPerson
 import com.kazemieh.domain.usecase.GetAllTag
 import com.kazemieh.domain.usecase.GetAllTransactions
 import com.kazemieh.domain.usecase.GetAllTransactionsByType
@@ -31,6 +33,8 @@ val domainModule = module {
     factory { AddTag(get()) }
     factory { GetDefaultCategoryUseCase(get()) }
     factory { GetDefaultFinancialSourceUseCase(get()) }
+    factory { AddPerson(get()) }
+    factory { GetAllPerson(get()) }
 
 
     single {

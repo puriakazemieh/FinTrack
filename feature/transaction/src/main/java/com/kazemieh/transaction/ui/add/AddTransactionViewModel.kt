@@ -53,6 +53,7 @@ class AddTransactionViewModel(
 
             is AddTransactionEvent.SetDescription -> _state.update { it.copy(description = event.description) }
             is AddTransactionEvent.SetTags -> _state.update { it.copy(tags = event.tags) }
+            is AddTransactionEvent.SetPerson -> _state.update { it.copy(persons = event.persons) }
 
             AddTransactionEvent.Submit -> submitTransaction()
 
@@ -133,7 +134,9 @@ class AddTransactionViewModel(
             _state.update { it.copy(isLoading = true) }
             try {
                 val tagsId = current.tags?.map { it.first.toLong() } ?: emptyList()
-                val transactionId = transactionUseCases.addTransaction(transaction, tagsId)
+                val personIds = current.persons?.map { it.first.toLong() } ?: emptyList()
+                val transactionId =
+                    transactionUseCases.addTransaction(transaction, tagsId, personIds)
                 if (transactionId >= 0) {
                     _effect.send(AddTransactionEffect.Success)
                     _state.update { AddTransactionState() }
@@ -152,6 +155,7 @@ sealed interface AddTransactionEvent {
     data class SetCategory(val category: Pair<Int, String>? = null) : AddTransactionEvent
     data class SetSource(val source: Pair<Int, String>? = null) : AddTransactionEvent
     data class SetTags(val tags: Set<Pair<Int, String>>? = null) : AddTransactionEvent
+    data class SetPerson(val persons: Set<Pair<Int, String>>? = null) : AddTransactionEvent
 
     data class SetDate(val date: String, val timeStamp: Long) : AddTransactionEvent
     data class SetDescription(val description: String) : AddTransactionEvent
@@ -174,6 +178,7 @@ data class AddTransactionState(
     val category: Pair<Int, String>? = null,
     val source: Pair<Int, String>? = null,
     val tags: Set<Pair<Int, String>>? = null,
+    val persons: Set<Pair<Int, String>>? = null,
 
     val isAmountError: Boolean = false,
     val isCategoryError: Boolean = false,

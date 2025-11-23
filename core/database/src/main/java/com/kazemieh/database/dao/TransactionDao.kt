@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.kazemieh.database.entity.TransactionEntity
+import com.kazemieh.database.entity.TransactionPersonCrossRef
 import com.kazemieh.database.entity.TransactionTagCrossRef
 import com.kazemieh.database.entity.TransactionWithCategoryFinancialSourceAndTags
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +21,9 @@ interface TransactionDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertTransactionTagCrossRef(crossRef: TransactionTagCrossRef)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertTransactionPersonCrossRef(crossRef: TransactionPersonCrossRef)
 
     @Update
     suspend fun updateTransaction(transaction: TransactionEntity)
@@ -57,14 +61,6 @@ interface TransactionDao {
 
 
     @Transaction
-    @Query("SELECT * FROM transactions WHERE categoryId = :categoryId")
-    suspend fun getTransactionsByCategoryId(categoryId: Long): List<TransactionWithCategoryFinancialSourceAndTags>
-
-    @Transaction
-    @Query("SELECT * FROM transactions WHERE financialSourceId = :financialSourceId")
-    suspend fun getTransactionsByFinancialSourceId(financialSourceId: Long): List<TransactionWithCategoryFinancialSourceAndTags>
-
-    @Transaction
     @Query(
         """
         SELECT * FROM transactions
@@ -74,18 +70,6 @@ interface TransactionDao {
     """
     )
     suspend fun getTransactionsByTag(tagName: String): List<TransactionWithCategoryFinancialSourceAndTags>
-
-//    @Transaction
-//    @Query(
-//        """
-//    SELECT * FROM transactions WHERE id IN (
-//        SELECT transactionId FROM transaction_tag
-//        INNER JOIN tag ON transaction_tag.tagId = tag.id
-//        WHERE tag.name = :tagName
-//    )
-//    """
-//    )
-//    suspend fun getTransactionsByTag(tagName: String): List<TransactionWithCategoryFinancialSourceAndTags>
 
     @Delete
     suspend fun deleteTransaction(transaction: TransactionEntity)

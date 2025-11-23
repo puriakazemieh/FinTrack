@@ -4,10 +4,12 @@ import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
 import com.kazemieh.domain.repository.TransactionRepository
 import com.kazemieh.model.Category
 import com.kazemieh.model.FinancialSource
+import com.kazemieh.model.Person
 import com.kazemieh.model.Tag
 import com.kazemieh.model.Transaction
 import com.kazemieh.model.TransactionWithRelations
 import kotlinx.coroutines.flow.Flow
+import kotlin.Long
 
 class TransactionRepositoryImpl(
     private val localDataSource: TransactionLocalDataSource
@@ -37,8 +39,12 @@ class TransactionRepositoryImpl(
         )
     }
 
-    override suspend fun insertTransaction(transaction: Transaction, tagIds: List<Long>): Long {
-        return localDataSource.insertTransaction(transaction, tagIds)
+    override suspend fun insertTransaction(
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+    ): Long {
+        return localDataSource.insertTransaction(transaction, tagIds, personIds)
     }
 
     override suspend fun deleteTransaction(transaction: Transaction) {
@@ -51,6 +57,10 @@ class TransactionRepositoryImpl(
 
     override suspend fun insertTag(tag: Tag): Long {
         return localDataSource.insertTag(tag)
+    }
+
+    override suspend fun insertPerson(person: Person): Long {
+        return localDataSource.insertPerson(person)
     }
 
     override suspend fun insertCategory(category: Category): Long {
@@ -67,6 +77,10 @@ class TransactionRepositoryImpl(
 
     override suspend fun getAllTag(): Flow<List<Tag>> {
         return localDataSource.getAllTag()
+    }
+
+    override suspend fun getAllPersons(): Flow<List<Person>> {
+        return localDataSource.getAllPersons()
     }
 
     override suspend fun increaseBalanceFinancialSource(id: Long, amount: Int) {

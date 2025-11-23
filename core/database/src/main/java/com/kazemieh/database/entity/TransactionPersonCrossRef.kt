@@ -6,8 +6,8 @@ import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.Index
 
 @Entity(
-    tableName = "transaction_tag",
-    primaryKeys = ["transactionId", "tagId"],
+    tableName = "transaction_person",
+    primaryKeys = ["transactionId", "personId"],
     foreignKeys = [
         ForeignKey(
             entity = TransactionEntity::class,
@@ -16,15 +16,15 @@ import androidx.room.Index
             onDelete = CASCADE
         ),
         ForeignKey(
-            entity = TagEntity::class,
+            entity = PersonEntity::class,
             parentColumns = ["id"],
-            childColumns = ["tagId"],
+            childColumns = ["personId"],
             onDelete = CASCADE
         )
     ],
-    indices = [Index("transactionId"), Index("tagId")]
+    indices = [Index("transactionId"), Index("personId")]
 )
-data class TransactionTagCrossRef(
+data class TransactionPersonCrossRef(
     val transactionId: Long,
-    val tagId: Long
+    val personId: Long,
 )
