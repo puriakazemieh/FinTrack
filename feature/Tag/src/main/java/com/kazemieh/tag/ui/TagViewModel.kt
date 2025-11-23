@@ -3,6 +3,7 @@ package com.kazemieh.tag.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.GetAllTag
+import com.kazemieh.model.Tag
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -47,8 +48,8 @@ class TagViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             getAllTag().collect { tags ->
-                val tagSet = tags.map { tag -> (tag.id?.toInt() ?: -1) to tag.name }.toSet()
-                _state.update { it.copy(tags = tagSet, isLoading = false) }
+//                val tagSet = tags.map { tag -> (tag.id?.toInt() ?: -1) to tag.name }.toSet()
+                _state.update { it.copy(tags = tags, isLoading = false) }
             }
         }
     }
@@ -57,7 +58,7 @@ class TagViewModel(
 }
 
 data class TagState(
-    val tags: Set<Pair<Int, String>>? = null,
+    val tags: List<Tag> = emptyList(),
     val selectedTags: Set<Pair<Int, String>>? = null,
     val showAddTag: Boolean = false,
     val isLoading: Boolean = false

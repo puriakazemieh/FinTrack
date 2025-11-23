@@ -39,5 +39,5 @@ data class TransactionWithCategoryFinancialSourceAndTags(
             entityColumn = "personId"
         )
     )
-    val person: List<PersonEntity>
+    val persons: List<PersonEntity>
 )

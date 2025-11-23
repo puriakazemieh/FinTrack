@@ -3,6 +3,7 @@ package com.kazemieh.person.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.GetAllPerson
+import com.kazemieh.model.Person
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -47,8 +48,8 @@ class PersonViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             getAllPerson().collect { persons ->
-                val personSet = persons.map { person -> (person.id?.toInt() ?: -1) to person.name }.toSet()
-                _state.update { it.copy(persons = personSet, isLoading = false) }
+//                val personSet = persons.map { person -> (person.id?.toInt() ?: -1) to person.name }.toSet()
+                _state.update { it.copy(persons = persons, isLoading = false) }
             }
         }
     }
@@ -57,7 +58,7 @@ class PersonViewModel(
 }
 
 data class PersonState(
-    val persons: Set<Pair<Int, String>>? = null,
+    val persons: List<Person> = emptyList(),
     val selectedPersons: Set<Pair<Int, String>>? = null,
     val showAddPerson: Boolean = false,
     val isLoading: Boolean = false

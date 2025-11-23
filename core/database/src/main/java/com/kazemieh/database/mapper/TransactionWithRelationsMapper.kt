@@ -8,5 +8,6 @@ fun TransactionWithCategoryFinancialSourceAndTags.toTransactionWithRelations(): 
         transaction = transaction.toTransaction(),
         category = category.toCategory(),
         financialSource = financialSource.toFinancialSource(),
-        tags = tags.map { it.toTag() }
+        tags = tags.map { it.toTag() },
+        persons = persons.map { it.toPerson() },
     )

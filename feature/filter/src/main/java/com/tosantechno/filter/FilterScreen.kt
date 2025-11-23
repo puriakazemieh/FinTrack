@@ -57,6 +57,10 @@ fun ReportTopBar(
     onSourceClicked: () -> Unit,
     selectedCategories: Set<Pair<Int, String>> = emptySet(),
     onCategoryClicked: () -> Unit,
+    selectedTags: Set<Pair<Int, String>> = emptySet(),
+    onTagClicked: () -> Unit,
+    selectedPersons: Set<Pair<Int, String>> = emptySet(),
+    onPersonClicked: () -> Unit,
     isShowArrowButton: Boolean = true,
     onDateClick: () -> Unit,
     onPrevClick: () -> Unit,
@@ -133,6 +137,36 @@ fun ReportTopBar(
                         .height(56.dp),
                     labelText = labelTextCategory,
                     onClick = onCategoryClicked
+                )
+
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+
+                val labelTextSource =
+                    if (selectedTags.isEmpty()) stringResource(R.string.all_tags)
+                    else stringResource(R.string.tags, selectedTags.size)
+
+                Selector(
+                    selected = selectedTags,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    labelText = labelTextSource,
+                    onClick = onTagClicked
+                )
+
+                val labelTextCategory =
+                    if (selectedPersons.isEmpty()) stringResource(R.string.all_person)
+                    else stringResource(R.string.persons, selectedPersons.size)
+
+                Selector(
+                    selected = selectedPersons,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    labelText = labelTextCategory,
+                    onClick = onPersonClicked
                 )
 
             }

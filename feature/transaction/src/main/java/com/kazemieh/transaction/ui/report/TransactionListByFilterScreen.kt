@@ -18,6 +18,8 @@ import org.koin.androidx.compose.koinViewModel
 fun TransactionListByFilterScreen(
     selectedSources: Set<Pair<Int, String>>,
     selectedCategories: Set<Pair<Int, String>>,
+    selectedTags: Set<Pair<Int, String>>,
+    selectedPersons: Set<Pair<Int, String>>,
     selectedTransactionType: Int,
     fromTimestamp: Long? = null,
     toTimestamp: Long? = null,
@@ -32,6 +34,14 @@ fun TransactionListByFilterScreen(
 
     LaunchedEffect(selectedSources) {
         viewModel.onIntent(TransactionReportIntent.SelectedSource(selectedSources))
+    }
+
+    LaunchedEffect(selectedTags) {
+        viewModel.onIntent(TransactionReportIntent.SelectedTag(selectedTags))
+    }
+
+    LaunchedEffect(selectedPersons) {
+        viewModel.onIntent(TransactionReportIntent.SelectedPerson(selectedPersons))
     }
 
     LaunchedEffect(selectedTransactionType) {

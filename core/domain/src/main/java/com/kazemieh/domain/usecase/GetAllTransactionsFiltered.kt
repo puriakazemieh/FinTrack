@@ -11,15 +11,19 @@ class GetAllTransactionsFiltered(
         type: Int? = null,
         categoryIds: List<Int> = emptyList(),
         sourceIds: List<Int> = emptyList(),
+        tagIds: List<Int> = emptyList(),
+        personIds: List<Int> = emptyList(),
         fromTimestamp: Long? = null,
         toTimestamp: Long? = null
     ): Flow<List<TransactionWithRelations>> {
         return repository.getAllTransactionsFiltered(
-            type,
-            categoryIds,
-            sourceIds,
-            fromTimestamp,
-            toTimestamp
+            type = type,
+            categoryIds = categoryIds,
+            sourceIds = sourceIds,
+            tagIds = tagIds,
+            personIds = personIds,
+            fromTimestamp = fromTimestamp,
+            toTimestamp = toTimestamp
         )
     }
 }

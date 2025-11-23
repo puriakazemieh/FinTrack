@@ -27,15 +27,19 @@ class TransactionRepositoryImpl(
         type: Int?,
         categoryIds: List<Int>,
         sourceIds: List<Int>,
+        tagIds: List<Int>,
+        personIds: List<Int>,
         fromTimestamp: Long?,
         toTimestamp: Long?
     ): Flow<List<TransactionWithRelations>> {
         return localDataSource.getAllTransactionsFiltered(
-            type,
-            categoryIds,
-            sourceIds,
-            fromTimestamp,
-            toTimestamp
+            type = type,
+            categoryIds = categoryIds,
+            sourceIds = sourceIds,
+            tagIds = tagIds,
+            personIds = personIds,
+            fromTimestamp = fromTimestamp,
+            toTimestamp = toTimestamp
         )
     }
 

@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.CategoryListSelectionBottomSheet
 import com.kazemieh.common.DateFilterType
 import com.kazemieh.financialsource.ui.SourceListSelectionBottomSheet
+import com.kazemieh.person.ui.PersonListSelectionBottomSheet
+import com.kazemieh.tag.ui.TagListSelectionBottomSheet
 import com.kazemieh.transaction.ui.report.TransactionListByFilterScreen
 import com.tosantechno.filter.CustomDateBottomSheet
 import com.tosantechno.filter.DateFilterBottomSheet
@@ -50,6 +52,10 @@ fun ReportScreen(
                 selectedCategories = state.selectedCategories,
                 onCategoryClicked = { viewModel.onIntent(ReportIntent.OnToggleCategorySheet) },
                 selectedSources = state.selectedSources,
+                onTagClicked = { viewModel.onIntent(ReportIntent.OnToggleTagSheet) },
+                selectedTags = state.selectedTag,
+                onPersonClicked = { viewModel.onIntent(ReportIntent.OnTogglePersonSheet) },
+                selectedPersons = state.selectedPerson,
                 isShowArrowButton = state.isShowArrowButton,
                 onSourceClicked = { viewModel.onIntent(ReportIntent.OnToggleSourceSheet) },
                 onDateClick = { viewModel.onIntent(ReportIntent.OnToggleDateSheet) },
@@ -62,6 +68,8 @@ fun ReportScreen(
             TransactionListByFilterScreen(
                 selectedSources = state.selectedSources,
                 selectedCategories = state.selectedCategories,
+                selectedTags = state.selectedTag,
+                selectedPersons = state.selectedPerson,
                 selectedTransactionType = state.selectedTransactionType,
                 fromTimestamp = state.startDateTimeStamp,
                 toTimestamp = state.endDateTimeStamp,
@@ -70,6 +78,28 @@ fun ReportScreen(
 
         }
 
+
+        if (state.isTagSheetVisible) {
+            TagListSelectionBottomSheet(
+                onTagClick = {
+                    viewModel.onIntent(ReportIntent.OnTagSelected(it))
+                },
+                onDismiss = {
+                    viewModel.onIntent(ReportIntent.OnToggleTagSheet)
+                }
+            )
+        }
+
+        if (state.isPersonSheetVisible) {
+            PersonListSelectionBottomSheet(
+                onPersonClick = {
+                    viewModel.onIntent(ReportIntent.OnPersonSelected(it))
+                },
+                onDismiss = {
+                    viewModel.onIntent(ReportIntent.OnTogglePersonSheet)
+                }
+            )
+        }
 
         if (state.isSourceSheetVisible) {
             SourceListSelectionBottomSheet(

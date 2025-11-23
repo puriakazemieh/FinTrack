@@ -7,5 +7,6 @@ data class TransactionWithRelations(
     val transaction: Transaction,
     val category: Category,
     val financialSource: FinancialSource,
-    val tags: List<Tag>
+    val tags: List<Tag>,
+    val persons: List<Person>
 )

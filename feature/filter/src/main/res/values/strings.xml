@@ -7,10 +7,14 @@
     <string name="start">شروع</string>
     <string name="end">پایان</string>
     <string name="all_source">همه منابع‌مالی</string>
+    <string name="all_tags">همه تگ ها</string>
+    <string name="all_person">همه اشخاص</string>
     <string name="all_category">همه دسته‌بندی‌ها</string>
 
     <string name="categories">%1$s دسته‌بندی</string>
     <string name="sources">%1$s منبع</string>
+    <string name="tags">%1$s تگ</string>
+    <string name="persons">%1$s شخص</string>
 
     <string name="custom_date">بازه انتخابی</string>
     <string name="not_choose">انتخاب نشده</string>

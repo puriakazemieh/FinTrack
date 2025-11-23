@@ -43,6 +43,23 @@ interface TransactionDao {
         WHERE (:type IS NULL OR type = :type)
           AND ((:categoryIdsSize = 0) OR categoryId IN (:categoryIds))
           AND ((:sourceIdsSize = 0) OR financialSourceId IN (:sourceIds))
+
+          AND (
+                :tagIdsSize = 0 OR id IN (
+                    SELECT transactionId
+                    FROM transaction_tag
+                    WHERE tagId IN (:tagIds)
+                )
+          )
+
+          AND (
+                :personIdsSize = 0 OR id IN (
+                    SELECT transactionId
+                    FROM transaction_person
+                    WHERE personId IN (:personIds)
+                )
+          )
+
           AND (
               (:fromTimestamp IS NULL OR :toTimestamp IS NULL)
               OR (timeStamp >= :fromTimestamp AND timeStamp < :toTimestamp)
@@ -53,6 +70,10 @@ interface TransactionDao {
         type: Int? = null,
         categoryIds: List<Int> = emptyList(),
         sourceIds: List<Int> = emptyList(),
+        tagIds: List<Int> = emptyList(),
+        personIds: List<Int> = emptyList(),
+        tagIdsSize: Int = tagIds.size,
+        personIdsSize: Int = personIds.size,
         categoryIdsSize: Int = categoryIds.size,
         sourceIdsSize: Int = sourceIds.size,
         fromTimestamp: Long? = null,

@@ -32,6 +32,20 @@ class ReportViewModel() : ViewModel() {
                 )
             }
 
+            is ReportIntent.OnTagSelected -> _state.update {
+                it.copy(
+                    selectedTag = intent.tag, isTagSheetVisible = false,
+                    enableAnimationChart = !_state.value.enableAnimationChart
+                )
+            }
+
+            is ReportIntent.OnPersonSelected -> _state.update {
+                it.copy(
+                    selectedPerson = intent.person, isPersonSheetVisible = false,
+                    enableAnimationChart = !_state.value.enableAnimationChart
+                )
+            }
+
             is ReportIntent.OnCategoriesSelected -> _state.update {
                 it.copy(
                     selectedCategories = intent.categories, isCategorySheetVisible = false,
@@ -45,6 +59,14 @@ class ReportViewModel() : ViewModel() {
 
             ReportIntent.OnToggleCategorySheet -> _state.update {
                 it.copy(isCategorySheetVisible = !it.isCategorySheetVisible)
+            }
+
+            ReportIntent.OnToggleTagSheet -> _state.update {
+                it.copy(isTagSheetVisible = !it.isTagSheetVisible)
+            }
+
+            ReportIntent.OnTogglePersonSheet -> _state.update {
+                it.copy(isPersonSheetVisible = !it.isPersonSheetVisible)
             }
 
             ReportIntent.OnToggleDateSheet -> _state.update {
@@ -160,6 +182,10 @@ data class ReportState(
     val isShowArrowButton: Boolean = true,
     val isSourceSheetVisible: Boolean = false,
     val isCategorySheetVisible: Boolean = false,
+    val isTagSheetVisible: Boolean = false,
+    val isPersonSheetVisible: Boolean = false,
+    val selectedTag: Set<Pair<Int, String>> = emptySet(),
+    val selectedPerson: Set<Pair<Int, String>> = emptySet(),
     val selectedSources: Set<Pair<Int, String>> = emptySet(),
     val selectedCategories: Set<Pair<Int, String>> = emptySet(),
     val startDate: String? = null,
@@ -176,6 +202,8 @@ sealed interface ReportIntent {
     data class OnTransactionTypeSelected(val type: Int) : ReportIntent
     data object OnToggleSourceSheet : ReportIntent
     data object OnToggleCategorySheet : ReportIntent
+    data object OnToggleTagSheet : ReportIntent
+    data object OnTogglePersonSheet : ReportIntent
     data object OnToggleDateSheet : ReportIntent
     data object OnToggleCustomDateSheet : ReportIntent
     data class OnDateRange(val dateFilterType: DateFilterType) : ReportIntent
@@ -193,6 +221,8 @@ sealed interface ReportIntent {
         ReportIntent
 
     data class OnCategoriesSelected(val categories: Set<Pair<Int, String>>) : ReportIntent
+    data class OnTagSelected(val tag: Set<Pair<Int, String>>) : ReportIntent
+    data class OnPersonSelected(val person: Set<Pair<Int, String>>) : ReportIntent
 
 
 }

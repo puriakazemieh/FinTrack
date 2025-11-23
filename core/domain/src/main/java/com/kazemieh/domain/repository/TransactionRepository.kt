@@ -22,6 +22,8 @@ interface TransactionRepository {
         type: Int? = null,
         categoryIds: List<Int> = emptyList(),
         sourceIds: List<Int> = emptyList(),
+        tagIds: List<Int> = emptyList(),
+        personIds: List<Int> = emptyList(),
         fromTimestamp: Long? = null,
         toTimestamp: Long? = null
     ): Flow<List<TransactionWithRelations>>
