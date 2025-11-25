@@ -30,6 +30,15 @@ fun Int.formatted(): String =
         else -> "0"
     }
 
+fun Int?.formattedOrNull(): String? {
+    if (this == null) return null
+    return when {
+        this < 0 -> "${(-this).formatNumber()} -"
+        this > 0 -> "${this.formatNumber()} +"
+        else -> "0"
+    }
+}
+
 
 fun Int.toPositive(): Int =
     when {
@@ -37,7 +46,6 @@ fun Int.toPositive(): Int =
         this > 0 -> this
         else -> 0
     }
-
 
 
 fun String.toPrice(): String {

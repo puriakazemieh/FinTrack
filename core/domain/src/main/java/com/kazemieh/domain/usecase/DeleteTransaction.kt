@@ -7,18 +7,22 @@ class DeleteTransaction(
     private val repository: TransactionRepository
 ) {
     suspend operator fun invoke(transaction: Transaction) {
-//        if (transaction.type == TransactionType.INCOME) {
-//            repository.decreaseBalanceFinancialSource(
-//                transaction.financialSourceId,
-//                transaction.amount
-//            )
-//        } else {
-//            repository.increaseBalanceFinancialSource(
-//                transaction.financialSourceId,
-//                transaction.amount
-//            )
-//        }
-        repository.decreaseBalanceFinancialSource(transaction.financialSourceId, transaction.amount)
+        if (transaction.financialSourceEndId != null) {
+            repository.increaseBalanceFinancialSource(
+                transaction.financialSourceId,
+                transaction.amount + (transaction.amountTransfer)
+            )
+            repository.increaseBalanceFinancialSource(
+                transaction.financialSourceEndId!!,
+                (transaction.amount).times(-1)
+            )
+        } else {
+            repository.increaseBalanceFinancialSource(
+                transaction.financialSourceId,
+                transaction.amount.times(-1)
+            )
+        }
+
         repository.deleteTransaction(transaction)
     }
 }

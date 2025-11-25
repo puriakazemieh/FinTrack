@@ -26,6 +26,7 @@ import kotlinx.serialization.Serializable
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val amount: Int,
+    val amountTransfer: Int? = null,
     val categoryId: Long,
     val financialSourceId: Long,
     val financialSourceEndId: Long? = null,

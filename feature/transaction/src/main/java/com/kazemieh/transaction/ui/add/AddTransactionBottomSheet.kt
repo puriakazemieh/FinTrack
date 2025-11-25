@@ -217,7 +217,8 @@ fun AddTransactionContent(
                 TransferScreen(
                     state = state,
                     onSourceClicked = onSourceClicked,
-                    onSourceEndClicked = onSourceEndClicked
+                    onSourceEndClicked = onSourceEndClicked,
+                    setTransferAmount = { onEvent(AddTransactionEvent.SetAmountTransfer(it)) }
                 )
             }
         }
@@ -338,6 +339,7 @@ private fun TransferScreen(
     state: AddTransactionState,
     onSourceClicked: () -> Unit,
     onSourceEndClicked: () -> Unit,
+    setTransferAmount: (String) -> Unit,
 ) {
     Column {
         FintrackOutlinedTextField(
@@ -348,7 +350,7 @@ private fun TransferScreen(
             label = {
                 Row {
                     if (state.source?.second != null) {
-                        FintrackBodyMediumText(text = stringResource(R.string.source))
+                        FintrackBodyMediumText(text = stringResource(R.string.source_from))
                     } else {
                         FintrackBodyMediumText(text = stringResource(R.string.select_source))
                     }
@@ -371,7 +373,7 @@ private fun TransferScreen(
             label = {
                 Row {
                     if (state.sourceEnd?.second != null) {
-                        FintrackBodyMediumText(text = stringResource(R.string.source))
+                        FintrackBodyMediumText(text = stringResource(R.string.source_to))
                     } else {
                         FintrackBodyMediumText(text = stringResource(R.string.select_source))
                     }
@@ -382,6 +384,21 @@ private fun TransferScreen(
                 }
             },
             isError = state.isSourceEndError
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        FintrackOutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            isPrice = true,
+            value = state.amountTransfer ?: "0",
+            onValueChange = { setTransferAmount(it) },
+            label = {
+                Row {
+                    FintrackBodyMediumText(text = stringResource(R.string.amount_transfer))
+                }
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
         )
 
     }

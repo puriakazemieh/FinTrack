@@ -8,6 +8,7 @@ fun TransactionEntity.toTransaction(): Transaction =
     Transaction(
         id = id,
         amount = amount,
+        amountTransfer = amountTransfer ?: 0,
         categoryId = categoryId,
         financialSourceId = financialSourceId,
         financialSourceEndId = financialSourceEndId,
@@ -20,6 +21,7 @@ fun Transaction.toTransactionEntity(): TransactionEntity =
     TransactionEntity(
         id = id,
         amount = amount,
+        amountTransfer = amountTransfer,
         categoryId = categoryId,
         financialSourceId = financialSourceId,
         financialSourceEndId = financialSourceEndId,

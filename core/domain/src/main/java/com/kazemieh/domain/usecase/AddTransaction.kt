@@ -18,7 +18,7 @@ class AddTransaction(
             )
             repository.increaseBalanceFinancialSource(
                 transaction.financialSourceId,
-                transaction.amount.times(-1)
+                (transaction.amount + (transaction.amountTransfer)).times(-1)
             )
         } else {
             repository.increaseBalanceFinancialSource(

@@ -74,6 +74,13 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 
         db.execSQL(
             """
+            ALTER TABLE transactions 
+            ADD COLUMN amountTransfer INTEGER
+            """
+        )
+
+        db.execSQL(
+            """
             INSERT INTO category (name, description, type)
             VALUES ('انتقال', NULL , 3)
             """

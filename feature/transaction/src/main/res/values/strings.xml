@@ -5,11 +5,14 @@
     <string name="transfer">انتقال</string>
     <string name="all">همه</string>
     <string name="amount">مبلغ</string>
+    <string name="amount_transfer">کارمزد جابه جایی</string>
     <string name="description">توضیحات</string>
     <string name="select_category">دسته بندی را انتخاب کنید</string>
     <string name="category">دسته بندی</string>
     <string name="select_source">منبع مالی را انتخاب کنید</string>
     <string name="source">منبع مالی </string>
+    <string name="source_from">از منبع مالی </string>
+    <string name="source_to">به منبع مالی </string>
     <string name="select_tags">برچسب ها را انتخاب کنید</string>
     <string name="select_person"> شخص ها را اضافه کنید</string>
     <string name="tags">برچسب ها</string>

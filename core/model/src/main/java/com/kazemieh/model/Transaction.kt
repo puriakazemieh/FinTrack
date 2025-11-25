@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class Transaction(
     val id: Long,
     val amount: Int,
+    val amountTransfer: Int = 0,
     val categoryId: Long,
     val financialSourceId: Long,
     val financialSourceEndId: Long? = null,

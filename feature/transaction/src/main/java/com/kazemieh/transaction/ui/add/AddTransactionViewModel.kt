@@ -33,6 +33,10 @@ class AddTransactionViewModel(
                 )
             }
 
+            is AddTransactionEvent.SetAmountTransfer -> _state.update {
+                it.copy(amountTransfer = event.amount)
+            }
+
             is AddTransactionEvent.SetCategory -> _state.update {
                 it.copy(
                     category = event.category,
@@ -75,7 +79,8 @@ class AddTransactionViewModel(
                 it.copy(
                     selectedTransactionType = event.selectedTransactionType,
                     category = null,
-                    sourceEnd = null
+                    sourceEnd = null,
+                    amountTransfer = null
                 )
             }
 
@@ -145,6 +150,7 @@ class AddTransactionViewModel(
             val transaction = Transaction(
                 id = 0L,
                 amount = amount,
+                amountTransfer = current.amountTransfer?.toIntOrNull() ?: 0,
                 categoryId = categoryId.toLong(),
                 financialSourceId = sourceId.toLong(),
                 financialSourceEndId = sourceEndId?.toLong(),
@@ -172,6 +178,7 @@ class AddTransactionViewModel(
 
 sealed interface AddTransactionEvent {
     data class SetAmount(val amount: String) : AddTransactionEvent
+    data class SetAmountTransfer(val amount: String) : AddTransactionEvent
 
     data class SetCategory(val category: Pair<Int, String>? = null) : AddTransactionEvent
     data class SetSource(val source: Pair<Int, String>? = null) : AddTransactionEvent
@@ -193,6 +200,7 @@ sealed interface AddTransactionEvent {
 
 data class AddTransactionState(
     val amount: String = "",
+    val amountTransfer: String? = "",
     val description: String = "",
     val selectedDate: String? = null,
     val timeStamp: Long = System.currentTimeMillis(),
