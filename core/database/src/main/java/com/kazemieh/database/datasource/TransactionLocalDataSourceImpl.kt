@@ -149,6 +149,10 @@ class TransactionLocalDataSourceImpl(
         return categoryDao.getDefaultCategory(type).toCategory()
     }
 
+    override suspend fun getTransferCategory(): Category {
+        return categoryDao.getTransferCategory().toCategory()
+    }
+
     override suspend fun getDefaultSource(): FinancialSource {
         return financialSourceDao.getDefaultSource().toFinancialSource()
     }

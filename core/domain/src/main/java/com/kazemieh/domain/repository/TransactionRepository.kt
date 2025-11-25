@@ -39,5 +39,6 @@ interface TransactionRepository {
     suspend fun increaseBalanceFinancialSource(id: Long, amount: Int)
     suspend fun decreaseBalanceFinancialSource(id: Long, amount: Int)
     suspend fun getDefaultCategory(type: Int): Category
+    suspend fun getTransferCategory(): Category
     suspend fun getDefaultSource(): FinancialSource
 }

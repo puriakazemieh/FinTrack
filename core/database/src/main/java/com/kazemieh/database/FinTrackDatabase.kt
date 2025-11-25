@@ -77,7 +77,10 @@ class PrepopulateCallback(
                 CategoryEntity(name = "آموزش و تحصیل", type = TransactionType.EXPENSE.count),
                 CategoryEntity(name = "تفریح و سرگرمی", type = TransactionType.EXPENSE.count),
                 CategoryEntity(name = "کمک مالی و هدیه", type = TransactionType.EXPENSE.count),
-                CategoryEntity(name = "سایر هزینه‌ها", type = TransactionType.EXPENSE.count)
+                CategoryEntity(name = "سایر هزینه‌ها", type = TransactionType.EXPENSE.count),
+
+
+                CategoryEntity(name = "انتقال", type = TransactionType.TRANSFER.count)
             )
             categoryDao.insertAllCategory(defaultCategory)
 

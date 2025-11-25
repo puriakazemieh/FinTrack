@@ -97,11 +97,21 @@ fun DashboardScreen(
         if (state.showAddTransaction) {
             AddTransactionBottomSheet(
                 source = state.source,
+                sourceEnd = state.sourceEnd,
                 category = state.category,
                 tags = state.tags,
                 persons = state.persons,
                 onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddTransaction(false)) },
-                onSourceClicked = { viewModel.onIntent(DashboardIntent.ShowSourceList(true)) },
+                onSourceClicked = {
+                    viewModel.onIntent(
+                        DashboardIntent.ShowSourceList(sourceList = true, isSourceEnd = false)
+                    )
+                },
+                onSourceEndClicked = {
+                    viewModel.onIntent(
+                        DashboardIntent.ShowSourceList(sourceList = true, isSourceEnd = true)
+                    )
+                },
                 onCategoryClicked = { type ->
                     viewModel.onIntent(
                         DashboardIntent.ShowCategoryList(
@@ -122,6 +132,7 @@ fun DashboardScreen(
             showSourceList = state.showSourceList,
             showAddSource = state.showAddSource,
             fromSourceList = state.fromSourceList,
+            isSourceEnd = state.isSourceEnd,
             onIntent = viewModel::onIntent
         )
 
@@ -152,6 +163,7 @@ fun Source(
     showSourceList: Boolean,
     showAddSource: Boolean,
     fromSourceList: Boolean,
+    isSourceEnd: Boolean,
     onIntent: (DashboardIntent) -> Unit
 ) {
     if (showSourceList) {
@@ -168,7 +180,7 @@ fun Source(
                 onIntent(DashboardIntent.SetSource(id to name))
             },
             onDismiss = {
-                onIntent(DashboardIntent.ShowSourceList(false))
+                onIntent(DashboardIntent.ShowSourceList(false,isSourceEnd))
             }
         )
     }

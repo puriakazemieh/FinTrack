@@ -99,6 +99,10 @@ class TransactionRepositoryImpl(
         return localDataSource.getDefaultCategory(type)
     }
 
+    override suspend fun getTransferCategory(): Category {
+        return localDataSource.getTransferCategory()
+    }
+
     override suspend fun getDefaultSource(): FinancialSource {
         return localDataSource.getDefaultSource()
     }

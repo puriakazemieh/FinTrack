@@ -47,6 +47,13 @@ class AddTransactionViewModel(
                 )
             }
 
+            is AddTransactionEvent.SetSourceEnd -> _state.update {
+                it.copy(
+                    sourceEnd = event.source,
+                    isSourceEndError = event.source?.second?.isBlank() == true
+                )
+            }
+
             is AddTransactionEvent.SetDate -> _state.update {
                 it.copy(selectedDate = event.date, timeStamp = event.timeStamp)
             }
@@ -67,7 +74,8 @@ class AddTransactionViewModel(
             is AddTransactionEvent.SelectedType -> _state.update {
                 it.copy(
                     selectedTransactionType = event.selectedTransactionType,
-                    category = null
+                    category = null,
+                    sourceEnd = null
                 )
             }
 
@@ -100,38 +108,51 @@ class AddTransactionViewModel(
 
 
     private fun submitTransaction() {
-        val current = _state.value
-        val amount = current.amount.toIntOrNull()
-            ?.times(if (current.selectedTransactionType.count == 1) 1 else -1)
-        val categoryId = current.category?.first
-        val sourceId = current.source?.first
-
-        if (amount == null || categoryId == null || sourceId == null) {
-            viewModelScope.launch {
-                _effect.send(AddTransactionEffect.Error("لطفاً تمام فیلدها را پر کنید."))
-            }
-            _state.update {
-                it.copy(
-                    isSourceError = sourceId == null,
-                    isCategoryError = categoryId == null,
-                    isAmountError = amount == null
-                )
-            }
-            return
-        }
-
-        val transaction = Transaction(
-            id = 0L,
-            amount = amount,
-            categoryId = categoryId.toLong(),
-            financialSourceId = sourceId.toLong(),
-            description = current.description,
-            timeStamp = current.timeStamp,
-            type = current.selectedTransactionType
-        )
-
         viewModelScope.launch {
+            val current = _state.value
+            var categoryId = current.category?.first
+            val sourceId = current.source?.first
+            val sourceEndId = current.sourceEnd?.first
+
+            if (current.selectedTransactionType == TransactionType.TRANSFER) {
+                val category = transactionUseCases.getTransferCategoryUseCase()
+                _state.update {
+                    it.copy(category = (category.id?.toInt() ?: 1) to category.name)
+                }
+                categoryId = category.id?.toInt() ?: 1
+            }
+
+            val amount = current.amount.toIntOrNull()?.also { amount ->
+                if (current.selectedTransactionType == TransactionType.EXPENSE)
+                    amount.times(-1)
+            }
+
+            if (amount == null || categoryId == null || sourceId == null || (current.selectedTransactionType == TransactionType.TRANSFER && sourceEndId == null)) {
+                _effect.send(AddTransactionEffect.Error("لطفاً تمام فیلدها را پر کنید."))
+                _state.update {
+                    it.copy(
+                        isSourceError = sourceId == null,
+                        isCategoryError = categoryId == null,
+                        isAmountError = amount == null,
+                        isSourceEndError = sourceEndId == null
+                    )
+                }
+                return@launch
+            }
+
             _state.update { it.copy(isLoading = true) }
+
+            val transaction = Transaction(
+                id = 0L,
+                amount = amount,
+                categoryId = categoryId.toLong(),
+                financialSourceId = sourceId.toLong(),
+                financialSourceEndId = sourceEndId?.toLong(),
+                description = current.description,
+                timeStamp = current.timeStamp,
+                type = current.selectedTransactionType
+            )
+
             try {
                 val tagsId = current.tags?.map { it.first.toLong() } ?: emptyList()
                 val personIds = current.persons?.map { it.first.toLong() } ?: emptyList()
@@ -154,6 +175,7 @@ sealed interface AddTransactionEvent {
 
     data class SetCategory(val category: Pair<Int, String>? = null) : AddTransactionEvent
     data class SetSource(val source: Pair<Int, String>? = null) : AddTransactionEvent
+    data class SetSourceEnd(val source: Pair<Int, String>? = null) : AddTransactionEvent
     data class SetTags(val tags: Set<Pair<Int, String>>? = null) : AddTransactionEvent
     data class SetPerson(val persons: Set<Pair<Int, String>>? = null) : AddTransactionEvent
 
@@ -177,17 +199,22 @@ data class AddTransactionState(
 
     val category: Pair<Int, String>? = null,
     val source: Pair<Int, String>? = null,
+    val sourceEnd: Pair<Int, String>? = null,
     val tags: Set<Pair<Int, String>>? = null,
     val persons: Set<Pair<Int, String>>? = null,
 
     val isAmountError: Boolean = false,
     val isCategoryError: Boolean = false,
     val isSourceError: Boolean = false,
+    val isSourceEndError: Boolean = false,
 
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
 
     val selectedTransactionType: TransactionType = TransactionType.INCOME,
+
+    val listTransactionType: List<TransactionType> =
+        listOf(TransactionType.INCOME, TransactionType.EXPENSE, TransactionType.TRANSFER)
 )
 
 sealed interface AddTransactionEffect {

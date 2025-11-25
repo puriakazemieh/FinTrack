@@ -8,6 +8,7 @@ data class Transaction(
     val amount: Int,
     val categoryId: Long,
     val financialSourceId: Long,
+    val financialSourceEndId: Long? = null,
     val description: String? = null,
     val timeStamp: Long = System.currentTimeMillis(),
     val type: TransactionType,
@@ -16,7 +17,8 @@ data class Transaction(
 enum class TransactionType(val count: Int) {
     ALL(0),
     INCOME(1),
-    EXPENSE(2);
+    EXPENSE(2),
+    TRANSFER(3);
 
     companion object {
         fun fromInt(value: Int) = TransactionType.entries.first { it.count == value }

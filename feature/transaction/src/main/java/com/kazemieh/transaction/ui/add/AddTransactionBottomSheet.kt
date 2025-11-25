@@ -1,6 +1,8 @@
 package com.kazemieh.transaction.ui.add
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,11 +51,13 @@ import org.koin.androidx.compose.koinViewModel
 fun AddTransactionBottomSheet(
     viewModel: AddTransactionViewModel = koinViewModel(),
     source: Pair<Int, String>? = null,
+    sourceEnd: Pair<Int, String>? = null,
     category: Pair<Int, String>? = null,
     tags: Set<Pair<Int, String>>? = null,
     persons: Set<Pair<Int, String>>? = null,
     onDismiss: () -> Unit,
     onSourceClicked: () -> Unit,
+    onSourceEndClicked: () -> Unit,
     onCategoryClicked: (Int) -> Unit,
     onTagClicked: () -> Unit,
     onPersonClicked: () -> Unit,
@@ -70,9 +74,11 @@ fun AddTransactionBottomSheet(
     LaunchedEffect(true) {
         viewModel.onEvent(AddTransactionEvent.FetchDefaultData)
     }
-
     LaunchedEffect(source) {
         viewModel.onEvent(AddTransactionEvent.SetSource(source))
+    }
+    LaunchedEffect(sourceEnd) {
+        viewModel.onEvent(AddTransactionEvent.SetSourceEnd(sourceEnd))
     }
     LaunchedEffect(category) {
         viewModel.onEvent(AddTransactionEvent.SetCategory(category))
@@ -116,6 +122,7 @@ fun AddTransactionBottomSheet(
             onSourceClicked = onSourceClicked,
             onTagClicked = onTagClicked,
             onPersonClicked = onPersonClicked,
+            onSourceEndClicked = onSourceEndClicked,
             onCategoryClicked = { onCategoryClicked(state.selectedTransactionType.count) }
         )
     }
@@ -128,9 +135,9 @@ fun AddTransactionContent(
     onCategoryClicked: () -> Unit,
     onTagClicked: () -> Unit,
     onPersonClicked: () -> Unit,
+    onSourceEndClicked: () -> Unit,
     onEvent: (AddTransactionEvent) -> Unit
 ) {
-
 
     val focusRequester = remember { FocusRequester() }
 
@@ -145,25 +152,36 @@ fun AddTransactionContent(
                 SingleChoiceSegmentedButtonRow(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    val listTransactionType =
-                        listOf(TransactionType.INCOME, TransactionType.EXPENSE)
-                    listTransactionType.forEachIndexed { index, option ->
+                    state.listTransactionType.forEachIndexed { index, option ->
                         SegmentedButton(
                             selected = state.selectedTransactionType == option,
                             onClick = { onEvent(AddTransactionEvent.SelectedType(option)) },
-                            shape = SegmentedButtonDefaults.itemShape(index = index, count = 2),
+                            shape = SegmentedButtonDefaults.itemShape(
+                                index = index,
+                                count = state.listTransactionType.size
+                            ),
                         ) {
-                            val text = if (option.count == 1) {
-                                stringResource(R.string.incoming)
-                            } else {
-                                stringResource(R.string.outcoming)
+                            val text = when (option.count) {
+                                1 -> {
+                                    stringResource(R.string.incoming)
+                                }
+
+                                2 -> {
+                                    stringResource(R.string.outcoming)
+                                }
+
+                                else -> {
+                                    stringResource(R.string.transfer)
+                                }
                             }
+
                             FintrackBodyMediumText(text = text)
                         }
                     }
                 }
             }
         }
+
         item {
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -190,59 +208,28 @@ fun AddTransactionContent(
             )
         }
 
-
         item {
             Spacer(modifier = Modifier.height(16.dp))
         }
 
         item {
-            FintrackOutlinedTextField(
-                value = state.category?.second ?: "",
-                onClick = onCategoryClicked,
-                readOnly = true,
-                enabled = false,
-                label = {
-                    Row {
-                        if (state.category?.second != null) {
-                            FintrackBodyMediumText(text = stringResource(R.string.category))
-                        } else {
-                            FintrackBodyMediumText(text = stringResource(R.string.select_category))
-                        }
-                        FintrackBodyMediumText(
-                            text = stringResource(R.string.required_star),
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                },
-                isError = state.isCategoryError
-            )
+            AnimatedVisibility(visible = state.selectedTransactionType == TransactionType.TRANSFER) {
+                TransferScreen(
+                    state = state,
+                    onSourceClicked = onSourceClicked,
+                    onSourceEndClicked = onSourceEndClicked
+                )
+            }
         }
 
         item {
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        item {
-            FintrackOutlinedTextField(
-                value = state.source?.second ?: "",
-                onClick = onSourceClicked,
-                readOnly = true,
-                enabled = false,
-                label = {
-                    Row {
-                        if (state.source?.second != null) {
-                            FintrackBodyMediumText(text = stringResource(R.string.source))
-                        } else {
-                            FintrackBodyMediumText(text = stringResource(R.string.select_source))
-                        }
-                        FintrackBodyMediumText(
-                            text = stringResource(R.string.required_star),
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                },
-                isError = state.isSourceError
-            )
+            AnimatedVisibility(visible = state.selectedTransactionType != TransactionType.TRANSFER) {
+                TransactionDetail(
+                    state = state,
+                    onSourceClicked = onSourceClicked,
+                    onCategoryClicked = onCategoryClicked
+                )
+            }
         }
 
         item {
@@ -268,6 +255,10 @@ fun AddTransactionContent(
         }
 
         item {
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        item {
             FintrackOutlinedTextField(
                 value = state.persons?.joinToString("") { " #${it.second}" } ?: "",
                 onClick = onPersonClicked,
@@ -285,19 +276,8 @@ fun AddTransactionContent(
             )
         }
 
-        /* if (state.tags != null) {
-             FlowRow(
-                 modifier = Modifier.fillMaxWidth(),
-                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-             ) {
-                 state.tags.forEach { tag ->
-                     FintrackBodySmallText(text = tag.second)
-                 }
-             }
-         }*/
-
         item {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
         }
 
         item {
@@ -310,7 +290,7 @@ fun AddTransactionContent(
         }
 
         item {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
         }
 
         item {
@@ -343,10 +323,121 @@ fun AddTransactionContent(
                 )
             }
         }
+
     }
 
     LaunchedEffect(Unit) {
         delay(100)
         focusRequester.requestFocus()
+    }
+}
+
+
+@Composable
+private fun TransferScreen(
+    state: AddTransactionState,
+    onSourceClicked: () -> Unit,
+    onSourceEndClicked: () -> Unit,
+) {
+    Column {
+        FintrackOutlinedTextField(
+            value = state.source?.second ?: "",
+            onClick = onSourceClicked,
+            readOnly = true,
+            enabled = false,
+            label = {
+                Row {
+                    if (state.source?.second != null) {
+                        FintrackBodyMediumText(text = stringResource(R.string.source))
+                    } else {
+                        FintrackBodyMediumText(text = stringResource(R.string.select_source))
+                    }
+                    FintrackBodyMediumText(
+                        text = stringResource(R.string.required_star),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            isError = state.isSourceError
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        FintrackOutlinedTextField(
+            value = state.sourceEnd?.second ?: "",
+            onClick = onSourceEndClicked,
+            readOnly = true,
+            enabled = false,
+            label = {
+                Row {
+                    if (state.sourceEnd?.second != null) {
+                        FintrackBodyMediumText(text = stringResource(R.string.source))
+                    } else {
+                        FintrackBodyMediumText(text = stringResource(R.string.select_source))
+                    }
+                    FintrackBodyMediumText(
+                        text = stringResource(R.string.required_star),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            isError = state.isSourceEndError
+        )
+
+    }
+}
+
+@Composable
+private fun TransactionDetail(
+    state: AddTransactionState,
+    onSourceClicked: () -> Unit,
+    onCategoryClicked: () -> Unit,
+) {
+    Column {
+        FintrackOutlinedTextField(
+            value = state.category?.second ?: "",
+            onClick = onCategoryClicked,
+            readOnly = true,
+            enabled = false,
+            label = {
+                Row {
+                    if (state.category?.second != null) {
+                        FintrackBodyMediumText(text = stringResource(R.string.category))
+                    } else {
+                        FintrackBodyMediumText(text = stringResource(R.string.select_category))
+                    }
+                    FintrackBodyMediumText(
+                        text = stringResource(R.string.required_star),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            isError = state.isCategoryError
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+
+        FintrackOutlinedTextField(
+            value = state.source?.second ?: "",
+            onClick = onSourceClicked,
+            readOnly = true,
+            enabled = false,
+            label = {
+                Row {
+                    if (state.source?.second != null) {
+                        FintrackBodyMediumText(text = stringResource(R.string.source))
+                    } else {
+                        FintrackBodyMediumText(text = stringResource(R.string.select_source))
+                    }
+                    FintrackBodyMediumText(
+                        text = stringResource(R.string.required_star),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            isError = state.isSourceError
+        )
+
+
     }
 }

@@ -28,6 +28,7 @@ data class TransactionEntity(
     val amount: Int,
     val categoryId: Long,
     val financialSourceId: Long,
+    val financialSourceEndId: Long? = null,
     val description: String?,
     val timeStamp: Long,
     val type: Int,

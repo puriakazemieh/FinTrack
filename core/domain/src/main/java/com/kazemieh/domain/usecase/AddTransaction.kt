@@ -11,12 +11,21 @@ class AddTransaction(
         tagIds: List<Long>,
         personIds: List<Long>,
     ): Long {
-        /* if (transaction.type == TransactionType.INCOME) {
-             repository.increaseBalanceFinancialSource(transaction.financialSourceId, transaction.amount)
-         } else {
-             repository.decreaseBalanceFinancialSource(transaction.financialSourceId, transaction.amount)
-         }*/
-        repository.increaseBalanceFinancialSource(transaction.financialSourceId, transaction.amount)
+        if (transaction.financialSourceEndId != null) {
+            repository.increaseBalanceFinancialSource(
+                transaction.financialSourceEndId!!,
+                transaction.amount
+            )
+            repository.increaseBalanceFinancialSource(
+                transaction.financialSourceId,
+                transaction.amount.times(-1)
+            )
+        } else {
+            repository.increaseBalanceFinancialSource(
+                transaction.financialSourceId,
+                transaction.amount
+            )
+        }
         return repository.insertTransaction(transaction, tagIds, personIds)
     }
 }

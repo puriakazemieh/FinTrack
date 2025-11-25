@@ -63,5 +63,20 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         // ایندکس‌ها
         db.execSQL("CREATE INDEX IF NOT EXISTS index_transaction_person_transactionId ON transaction_person(transactionId)")
         db.execSQL("CREATE INDEX IF NOT EXISTS index_transaction_person_personId ON transaction_person(personId)")
+
+
+        db.execSQL(
+            """
+            ALTER TABLE transactions 
+            ADD COLUMN financialSourceEndId INTEGER
+            """
+        )
+
+        db.execSQL(
+            """
+            INSERT INTO category (name, description, type)
+            VALUES ('انتقال', NULL , 3)
+            """
+        )
     }
 }

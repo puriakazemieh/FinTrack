@@ -23,4 +23,7 @@ interface CategoryDao {
 
     @Query("SELECT * FROM category WHERE type = :type AND id = 1 LIMIT 1")
     suspend fun getDefaultCategory(type: Int): CategoryEntity
+
+    @Query("SELECT * FROM category WHERE type = 3 LIMIT 1")
+    suspend fun getTransferCategory(): CategoryEntity
 }

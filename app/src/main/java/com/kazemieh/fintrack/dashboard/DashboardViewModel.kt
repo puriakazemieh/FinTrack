@@ -20,6 +20,7 @@ class DashboardViewModel() : ViewModel() {
                     it.copy(
                         showAddTransaction = intent.showAddTransaction,
                         source = if (!intent.showAddTransaction) null else it.source,
+                        sourceEnd = if (!intent.showAddTransaction) null else it.sourceEnd,
                         category = if (!intent.showAddTransaction) null else it.category,
                         tags = if (!intent.showAddTransaction) null else it.tags,
                         persons = if (!intent.showAddTransaction) null else it.persons,
@@ -31,9 +32,11 @@ class DashboardViewModel() : ViewModel() {
             is DashboardIntent.SetSource -> {
                 _state.update {
                     it.copy(
-                        source = intent.source,
+                        source = if (!state.value.isSourceEnd) intent.source else state.value.source,
+                        sourceEnd = if (state.value.isSourceEnd) intent.source else state.value.sourceEnd,
                         showSourceList = false,
-                        showAddSource = false
+                        showAddSource = false,
+                        isSourceEnd = false
                     )
                 }
             }
@@ -43,12 +46,18 @@ class DashboardViewModel() : ViewModel() {
                     it.copy(
                         showAddSource = intent.showAddSource,
                         fromSourceList = intent.fromSourceList,
-                        source = if (!intent.showAddSource && intent.fromSourceList) null else it.source
+                        source = if (!intent.showAddSource && intent.fromSourceList) null else it.source,
+                        sourceEnd = if (!intent.showAddSource && intent.fromSourceList) null else it.sourceEnd
                     )
                 }
             }
 
-            is DashboardIntent.ShowSourceList -> _state.update { it.copy(showSourceList = intent.sourceList) }
+            is DashboardIntent.ShowSourceList -> _state.update {
+                it.copy(
+                    showSourceList = intent.sourceList,
+                    isSourceEnd = intent.isSourceEnd
+                )
+            }
 
 
             is DashboardIntent.SetCategory -> {
@@ -107,6 +116,7 @@ data class DashboardState(
     val showAddTransaction: Boolean = false,
 
     val source: Pair<Int, String>? = null,
+    val sourceEnd: Pair<Int, String>? = null,
     val showSourceList: Boolean = false,
     val showAddSource: Boolean = false,
     val fromSourceList: Boolean = false,
@@ -121,6 +131,8 @@ data class DashboardState(
     val persons: Set<Pair<Int, String>>? = null,
     val showPersonList: Boolean = false,
 
+    val isSourceEnd: Boolean = false,
+
     val selectedTransactionType: Int = 1,
 )
 
@@ -129,7 +141,9 @@ sealed interface DashboardIntent {
     data class ShowAddTransaction(val showAddTransaction: Boolean = false) : DashboardIntent
 
     data class SetSource(val source: Pair<Int, String>? = null) : DashboardIntent
-    data class ShowSourceList(val sourceList: Boolean = false) : DashboardIntent
+    data class ShowSourceList(val sourceList: Boolean = false, val isSourceEnd: Boolean = false) :
+        DashboardIntent
+
     data class ShowAddSource(
         val showAddSource: Boolean = false,
         val fromSourceList: Boolean = false
