@@ -11,13 +11,13 @@ enum class Destinations(
 
     DASHBOARD(
         R.drawable.ic_navigation_home,
-        R.string.navigation_home,
+        com.kazemieh.designsystem.R.string.navigation_home,
         Dashboard
     ),
 
     REPORT(
         R.drawable.ic_navigation_report,
-        R.string.navigation_report,
+        com.kazemieh.designsystem.R.string.navigation_report,
         Report
     );
 

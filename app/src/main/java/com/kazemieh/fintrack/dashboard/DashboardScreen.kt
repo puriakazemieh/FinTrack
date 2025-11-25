@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.CategoryListBottomSheet
 import com.kazemieh.category.ui.add.AddCategoryBottomSheet
-import com.kazemieh.financialsource.R
+import com.kazemieh.designsystem.R
 import com.kazemieh.financialsource.ui.SourceList
 import com.kazemieh.financialsource.ui.SourceListBottomSheet
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet

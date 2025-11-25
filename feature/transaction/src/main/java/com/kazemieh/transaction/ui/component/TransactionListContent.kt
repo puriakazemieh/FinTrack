@@ -14,7 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.transaction.R
+import com.kazemieh.designsystem.R
 
 
 @Composable

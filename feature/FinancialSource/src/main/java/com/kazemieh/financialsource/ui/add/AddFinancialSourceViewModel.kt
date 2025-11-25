@@ -2,7 +2,7 @@ package com.kazemieh.financialsource.ui.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.common.R
+import com.kazemieh.designsystem.R
 import com.kazemieh.domain.usecase.AddFinancialSource
 import com.kazemieh.model.FinancialSource
 import kotlinx.coroutines.channels.Channel

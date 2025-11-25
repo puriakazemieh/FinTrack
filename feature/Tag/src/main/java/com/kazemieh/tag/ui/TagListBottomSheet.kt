@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.kazemieh.common.safeLet
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.tag.R
+import com.kazemieh.designsystem.R
 import com.kazemieh.tag.ui.add.AddTagBottomSheet
 import org.koin.androidx.compose.koinViewModel
 

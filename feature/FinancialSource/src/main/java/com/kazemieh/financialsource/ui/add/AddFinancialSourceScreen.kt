@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
-import com.kazemieh.financialsource.R
+import com.kazemieh.designsystem.R
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 

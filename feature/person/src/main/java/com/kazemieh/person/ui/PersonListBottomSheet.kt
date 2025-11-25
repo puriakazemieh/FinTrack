@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.kazemieh.common.safeLet
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.person.R
+import com.kazemieh.designsystem.R
 import com.kazemieh.person.ui.add.AddPersonBottomSheet
 import org.koin.androidx.compose.koinViewModel
 

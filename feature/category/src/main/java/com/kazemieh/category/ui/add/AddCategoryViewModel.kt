@@ -2,7 +2,7 @@ package com.kazemieh.category.ui.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.category.R
+import com.kazemieh.designsystem.R
 import com.kazemieh.domain.usecase.AddCategory
 import com.kazemieh.model.Category
 import com.kazemieh.model.TransactionType

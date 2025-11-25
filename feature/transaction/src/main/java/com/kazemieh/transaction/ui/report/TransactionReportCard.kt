@@ -23,7 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.PieChart
-import com.kazemieh.transaction.R
+import com.kazemieh.designsystem.R
 import org.koin.androidx.compose.koinViewModel
 
 

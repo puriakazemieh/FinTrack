@@ -23,7 +23,7 @@ import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.model.TransactionType
-import com.kazemieh.transaction.R
+import com.kazemieh.designsystem.R
 
 
 @Composable

@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
 import com.kazemieh.designsystem.component.PieChart
 import com.kazemieh.designsystem.component.PieChartItem
-import com.kazemieh.transaction.R
+import com.kazemieh.designsystem.R
 import org.koin.androidx.compose.koinViewModel
 
 

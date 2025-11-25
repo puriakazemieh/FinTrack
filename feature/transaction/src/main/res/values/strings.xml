@@ -1,36 +1,4 @@
 <resources>
 
-    <string name="incoming">درآمد</string>
-    <string name="outcoming">خرج</string>
-    <string name="transfer">انتقال</string>
-    <string name="all">همه</string>
-    <string name="amount">مبلغ</string>
-    <string name="amount_transfer">کارمزد جابه جایی</string>
-    <string name="description">توضیحات</string>
-    <string name="select_category">دسته بندی را انتخاب کنید</string>
-    <string name="category">دسته بندی</string>
-    <string name="select_source">منبع مالی را انتخاب کنید</string>
-    <string name="source">منبع مالی </string>
-    <string name="source_from">از منبع مالی </string>
-    <string name="source_to">به منبع مالی </string>
-    <string name="select_tags">برچسب ها را انتخاب کنید</string>
-    <string name="select_person"> شخص ها را اضافه کنید</string>
-    <string name="tags">برچسب ها</string>
-    <string name="persons">اشخاص</string>
-    <string name="change">تغییر دهید</string>
-    <string name="tag_list">لیست تگ ها</string>
-    <string name="save_transaction">ذخیره تراکنش</string>
-    <string name="transaction_deleted">تراکنش حذف شد</string>
-    <string name="recent_transactions">تراکنش‌های اخیر</string>
-    <string name="balance_total">موجودی کل:</string>
-    <string name="balance_with_label">موجودی %1$s :</string>
-    <string name="payment">پرداخت</string>
-    <string name="income">دریافت</string>
-    <string name="date">تاریخ</string>
-    <string name="amount_label">%1$s: %2$s تومان</string>
-    <string name="balance_total_label">%1$s تومان</string>
-    <string name="tags_label">برچسب ها: %1$s</string>
-    <string name="person_label">اشخاص : %1$s</string>
-    <string name="delete">حذف</string>
-    <string name="required_star">*</string>
+
 </resources>

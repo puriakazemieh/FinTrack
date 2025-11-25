@@ -1,11 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="check_name_category_source">لطفاً نام دسته بندی را وارد کنید</string>
-    <string name="add_category">افزودن دسته بندی</string>
-    <string name="select_All">انتخاب همه</string>
-    <string name="category_name_label">نام دسته بندی</string>
-    <string name="description_label">توضیحات</string>
-    <string name="required_star">*</string>
-    <string name="save_category">ذخیره</string>
-    <string name="confirm">تایید</string>
+
 </resources>
