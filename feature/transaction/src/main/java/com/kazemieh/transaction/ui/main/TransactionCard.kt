@@ -43,16 +43,20 @@ fun TotalTransactionCard(
 
     val incoming = stringResource(R.string.incoming)
     val outcoming = stringResource(R.string.outcoming)
+    val transfer = stringResource(R.string.transfer)
 
-    val piChartData by remember(state.totalIncome, state.totalExpense) {
+    val piChartData by remember(state.totalIncome, state.totalExpense, state.totalTransfer) {
         derivedStateOf {
-            listOf(
-                PieChartItem(label = incoming, value = state.totalIncome),
-                PieChartItem(label = outcoming, value = state.totalExpense)
-            )
+            buildList {
+                if (state.totalIncome != 0L)
+                    add(PieChartItem(label = incoming, value = state.totalIncome))
+                if (state.totalExpense != 0L)
+                    add(PieChartItem(label = outcoming, value = state.totalExpense))
+                if (state.totalExpense != 0L)
+                    add(PieChartItem(label = transfer, value = state.totalExpense))
+            }
         }
     }
-
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -62,7 +66,6 @@ fun TotalTransactionCard(
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-
         Column(
             modifier = Modifier.padding(20.dp),
         ) {

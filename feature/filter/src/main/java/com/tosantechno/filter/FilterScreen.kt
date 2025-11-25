@@ -84,18 +84,23 @@ fun ReportTopBar(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     TransactionType.entries.forEachIndexed { index, option ->
-                        val text = when (option.count) {
-                            1 -> {
+                        val text = when (option) {
+                            TransactionType.INCOME -> {
                                 stringResource(R.string.incoming)
                             }
 
-                            2 -> {
+                            TransactionType.EXPENSE -> {
                                 stringResource(R.string.outcoming)
+                            }
+
+                            TransactionType.TRANSFER -> {
+                                stringResource(R.string.transfer)
                             }
 
                             else -> {
                                 stringResource(R.string.all)
                             }
+
                         }
                         SegmentedButton(
                             selected = onTransactionTypeSelected == option.count,

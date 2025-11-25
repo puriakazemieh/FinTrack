@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.safeLet
+import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.person.R
 import com.kazemieh.person.ui.add.AddPersonBottomSheet
@@ -65,44 +66,48 @@ fun PersonListBottomSheet(
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                state.persons.forEach { person ->
-                    val isSelected =
-                        state.selectedPersons?.contains(person.id?.toInt() to person.name) == true
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = {
-                            safeLet(person.id, person.name) { id, name ->
-                                viewModel.onIntent(PersonIntent.SetSelectedPerson(id.toInt() to name))
-                            }
-                        },
-                        label = {
-                            FintrackBodyMediumText(
-                                text = person.name,
-                                color = if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onBackground
+
+                if (state.persons.isNotEmpty())
+                    state.persons.forEach { person ->
+                        val isSelected =
+                            state.selectedPersons?.contains(person.id?.toInt() to person.name) == true
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = {
+                                safeLet(person.id, person.name) { id, name ->
+                                    viewModel.onIntent(PersonIntent.SetSelectedPerson(id.toInt() to name))
+                                }
+                            },
+                            label = {
+                                FintrackBodyMediumText(
+                                    text = person.name,
+                                    color = if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onBackground
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                labelColor = MaterialTheme.colorScheme.onSurface
                             )
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primary,
-                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            labelColor = MaterialTheme.colorScheme.onSurface
                         )
-                    )
-                }
+                    }
+                else EmptyListScreen()
             }
 
             Spacer(Modifier.height(12.dp))
-
 
             Box(
                 modifier = Modifier
@@ -160,6 +165,7 @@ fun PersonListSelectionBottomSheet(
     LaunchedEffect(true) {
         viewModel.onIntent(PersonIntent.GetAllPerson)
     }
+
     val state by viewModel.state.collectAsState()
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -177,47 +183,49 @@ fun PersonListSelectionBottomSheet(
         ) {
 
             LazyColumn {
-                items(state.persons) { person ->
-                    val isSelected =
-                        state.selectedPersons?.contains(person.id?.toInt() to person.name) == true
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                            .clickable {
-                                safeLet(person.id, person.name) { id, name ->
-                                    viewModel.onIntent(PersonIntent.SetSelectedPerson(id.toInt() to name))
-                                }
-
-                            },
-                        colors = CardDefaults.cardColors(
-                            containerColor = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.surface
-                        ),
-                        shape = MaterialTheme.shapes.medium,
-                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                    ) {
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Checkbox(
-                                checked = isSelected,
-                                onCheckedChange = {
+                if (state.persons.isNotEmpty())
+                    items(state.persons) { person ->
+                        val isSelected =
+                            state.selectedPersons?.contains(person.id?.toInt() to person.name) == true
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .clickable {
                                     safeLet(person.id, person.name) { id, name ->
                                         viewModel.onIntent(PersonIntent.SetSelectedPerson(id.toInt() to name))
                                     }
 
-                                }
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
+                                },
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.surface
+                            ),
+                            shape = MaterialTheme.shapes.medium,
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                        ) {
 
-                            FintrackBodyMediumText(text = person.name)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Checkbox(
+                                    checked = isSelected,
+                                    onCheckedChange = {
+                                        safeLet(person.id, person.name) { id, name ->
+                                            viewModel.onIntent(PersonIntent.SetSelectedPerson(id.toInt() to name))
+                                        }
+
+                                    }
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+
+                                FintrackBodyMediumText(text = person.name)
+
+                            }
 
                         }
-
                     }
-                }
+                else item { EmptyListScreen() }
             }
 
             Spacer(Modifier.height(12.dp))

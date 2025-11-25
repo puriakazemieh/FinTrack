@@ -46,12 +46,17 @@ class TransactionViewModel(
 
                 var totalIncome = 0
                 var totalExpense = 0
+                var totalTransfer = 0
                 var balance = 0
 
                 val uiTransactionWithRelations = transactions.map { transactionWithRelations ->
-                    if (transactionWithRelations.transaction.amount > 0)
-                        totalIncome += transactionWithRelations.transaction.amount
-                    else totalExpense += transactionWithRelations.transaction.amount
+
+                    when(transactionWithRelations.transaction.type){
+                        TransactionType.INCOME -> { totalIncome += transactionWithRelations.transaction.amount}
+                        TransactionType.EXPENSE -> {totalExpense += transactionWithRelations.transaction.amount}
+                        TransactionType.TRANSFER -> {totalTransfer += transactionWithRelations.transaction.amount}
+                        else -> {}
+                    }
                     balance += transactionWithRelations.transaction.amount
                     transactionWithRelations.copy()
                     transactionWithRelations.transaction.toUi()
@@ -63,8 +68,10 @@ class TransactionViewModel(
                         uiTransactionWithRelations = uiTransactionWithRelations,
                         formatedTotalIncome = totalIncome.formatted(),
                         totalIncome = totalIncome.toPositive().toLong(),
-                        totalExpense = totalExpense.toPositive().toLong(),
                         formatedTotalExpense = totalExpense.formatted(),
+                        totalExpense = totalExpense.toPositive().toLong(),
+                        formatedTotalTransfer = totalTransfer.formatted(),
+                        totalTransfer = totalTransfer.toPositive().toLong(),
                         balance = balance.formatted(),
                         isPositiveBalance = balance >= 0,
                         isLoading = false
@@ -91,13 +98,21 @@ sealed interface TransactionIntent {
 
 data class TransactionState(
     val uiTransactionWithRelations: List<TransactionWithRelationsUi> = emptyList(),
+
     val isLoading: Boolean = false,
+
     val balance: String = "0",
     val isPositiveBalance: Boolean = true,
+
     val formatedTotalIncome: String = "0",
     val totalIncome: Long = 0,
+
+    val formatedTotalTransfer: String = "0",
+    val totalTransfer: Long = 0,
+
     val formatedTotalExpense: String = "0",
     val totalExpense: Long = 0,
+
     val selectedTransactionType: TransactionType = TransactionType.INCOME,
     val pieChartData: List<PieChartItem> = listOf(),
     val error: String? = null

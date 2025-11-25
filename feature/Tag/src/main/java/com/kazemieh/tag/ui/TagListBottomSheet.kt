@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.safeLet
+import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.tag.R
 import com.kazemieh.tag.ui.add.AddTagBottomSheet
@@ -65,46 +66,53 @@ fun TagListBottomSheet(
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                state.tags.forEach { tag ->
-                    val isSelected = state.selectedTags?.contains(tag.id?.toInt() to tag.name) == true
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = {
-                            safeLet(tag.id, tag.name) { id, name ->
-                                viewModel.onIntent(TagIntent.SetSelectedTag(id.toInt() to name))
-                            }
-                        },
-                        label = {
-                            FintrackBodyMediumText(
-                                text = tag.name,
-                                color = if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onBackground
+                if (state.tags.isNotEmpty())
+                    state.tags.forEach { tag ->
+                        val isSelected =
+                            state.selectedTags?.contains(tag.id?.toInt() to tag.name) == true
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = {
+                                safeLet(tag.id, tag.name) { id, name ->
+                                    viewModel.onIntent(TagIntent.SetSelectedTag(id.toInt() to name))
+                                }
+                            },
+                            label = {
+                                FintrackBodyMediumText(
+                                    text = tag.name,
+                                    color = if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onBackground
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                labelColor = MaterialTheme.colorScheme.onSurface
                             )
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primary,
-                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            labelColor = MaterialTheme.colorScheme.onSurface
                         )
-                    )
-                }
+                    }
+                else EmptyListScreen()
             }
 
             Spacer(Modifier.height(12.dp))
 
 
             Box(
-                modifier = Modifier.fillMaxWidth().padding(4.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
             ) {
                 FloatingActionButton(
                     onClick = { viewModel.onIntent(TagIntent.ShowAddTag(true)) },
@@ -147,8 +155,6 @@ fun TagListBottomSheet(
 }
 
 
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TagListSelectionBottomSheet(
@@ -159,6 +165,7 @@ fun TagListSelectionBottomSheet(
     LaunchedEffect(true) {
         viewModel.onIntent(TagIntent.GetAllTag)
     }
+
     val state by viewModel.state.collectAsState()
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -176,46 +183,49 @@ fun TagListSelectionBottomSheet(
         ) {
 
             LazyColumn {
-                items(state.tags) { tag ->
-                    val isSelected = state.selectedTags?.contains(tag.id?.toInt() to tag.name) == true
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                            .clickable {
-                                safeLet(tag.id, tag.name) { id, name ->
-                                    viewModel.onIntent(TagIntent.SetSelectedTag(id.toInt() to name))
-                                }
-                            },
-                        colors = CardDefaults.cardColors(
-                            containerColor = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.surface
-                        ),
-                        shape = MaterialTheme.shapes.medium,
-                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                    ) {
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Checkbox(
-                                checked = isSelected,
-                                onCheckedChange = {
-
+                if (state.tags.isNotEmpty())
+                    items(state.tags) { tag ->
+                        val isSelected =
+                            state.selectedTags?.contains(tag.id?.toInt() to tag.name) == true
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .clickable {
                                     safeLet(tag.id, tag.name) { id, name ->
                                         viewModel.onIntent(TagIntent.SetSelectedTag(id.toInt() to name))
                                     }
+                                },
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.surface
+                            ),
+                            shape = MaterialTheme.shapes.medium,
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                        ) {
 
-                                }
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Checkbox(
+                                    checked = isSelected,
+                                    onCheckedChange = {
 
-                            FintrackBodyMediumText(text = tag.name)
+                                        safeLet(tag.id, tag.name) { id, name ->
+                                            viewModel.onIntent(TagIntent.SetSelectedTag(id.toInt() to name))
+                                        }
+
+                                    }
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+
+                                FintrackBodyMediumText(text = tag.name)
+
+                            }
 
                         }
-
                     }
-                }
+                else item { EmptyListScreen() }
             }
 
             Spacer(Modifier.height(12.dp))

@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.category.R
+import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import org.koin.androidx.compose.koinViewModel
 
@@ -68,23 +69,24 @@ fun CategoryListBottomSheet(
         ) {
 
             LazyColumn {
-                items(state.categories) { category ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                            .clickable {
-                                category.id?.toInt()?.let { onCategoryClick(it, category.name) }
-                            },
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        shape = MaterialTheme.shapes.medium,
-                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            FintrackBodyMediumText(text = category.name)
+                if (state.categories.isNotEmpty())
+                    items(state.categories) { category ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .clickable {
+                                    category.id?.toInt()?.let { onCategoryClick(it, category.name) }
+                                },
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            shape = MaterialTheme.shapes.medium,
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                FintrackBodyMediumText(text = category.name)
+                            }
                         }
-                    }
-                }
+                    } else item { EmptyListScreen() }
             }
 
             Spacer(Modifier.height(16.dp))
@@ -124,9 +126,11 @@ fun CategoryListSelectionBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val nestedScrollConnection = rememberNestedScrollInteropConnection()
-    LaunchedEffect(true) {
+    LaunchedEffect(selectedTransactionType) {
         viewModel.onIntent(CategoryIntent.LoadCategoryByType(selectedTransactionType))
     }
+
+    val selectAllTitle = stringResource(R.string.select_All)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -143,50 +147,21 @@ fun CategoryListSelectionBottomSheet(
                 modifier = Modifier
                     .nestedScroll(nestedScrollConnection)
             ) {
-                items(state.categories) { category ->
-                    val isSelected =
-                        state.selectedCategory?.contains(category.id?.toInt() to category.name) == true
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                            .clickable {
+                if (state.categories.isNotEmpty()) {
+                    items(state.categories) { category ->
+                        val isSelected =
+                            state.selectedCategory?.contains(category.id?.toInt() to category.name) == true
+                        ItemCategorySelected(
+                            isSelected = isSelected,
+                            category = (category.id?.toInt() ?: 0) to category.name,
+                            selectedCategory = { category ->
                                 viewModel.onIntent(
-                                    CategoryIntent.SelectedCategory(
-                                        (category.id?.toInt() ?: 0) to category.name
-                                    )
+                                    CategoryIntent.SelectedCategory(category.first to category.second)
                                 )
-                            },
-                        colors = CardDefaults.cardColors(
-                            containerColor = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.surface
-                        ),
-                        shape = MaterialTheme.shapes.medium,
-                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                    ) {
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Checkbox(
-                                checked = isSelected,
-                                onCheckedChange = {
-                                    viewModel.onIntent(
-                                        CategoryIntent.SelectedCategory(
-                                            (category.id?.toInt() ?: 0) to category.name
-                                        )
-                                    )
-                                }
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-
-                            FintrackBodyMediumText(text = category.name)
-
-                        }
+                            })
 
                     }
-
-                }
+                } else item { EmptyListScreen() }
 
                 item { Spacer(Modifier.height(40.dp)) }
             }
@@ -209,5 +184,39 @@ fun CategoryListSelectionBottomSheet(
         }
     }
 
+}
 
+@Composable
+fun ItemCategorySelected(
+    isSelected: Boolean,
+    category: Pair<Int, String>,
+    selectedCategory: (Pair<Int, String>) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .clickable { selectedCategory(category) },
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.surface
+        ),
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = isSelected,
+                onCheckedChange = { selectedCategory(category) }
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+
+            FintrackBodyMediumText(text = category.second)
+
+        }
+
+    }
 }

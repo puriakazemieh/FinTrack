@@ -2,4 +2,5 @@
 <resources>
 
     <string name="date">تاریخ</string>
+    <string name="empty_title">محتوایی برای نمایش وجود ندارد</string>
 </resources>

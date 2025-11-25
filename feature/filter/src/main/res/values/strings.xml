@@ -3,6 +3,7 @@
 
     <string name="incoming">درآمد</string>
     <string name="outcoming">خرج</string>
+    <string name="transfer">انتقال</string>
     <string name="all">همه</string>
     <string name="start">شروع</string>
     <string name="end">پایان</string>

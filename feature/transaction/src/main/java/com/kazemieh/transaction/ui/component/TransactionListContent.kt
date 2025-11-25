@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.transaction.R
 
@@ -36,17 +37,21 @@ fun TransactionListContent(
             }
         } else {
             Column {
-                FintrackTitleMediumText(
-                    text = stringResource(R.string.recent_transactions),
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                uiTransactionWithRelations.forEach { transactionWithRelations ->
-                    TransactionItem(
-                        uiTransactionWithRelation = transactionWithRelations,
-                        onDelete = { onDelete(transactionWithRelations) }
+                if (uiTransactionWithRelations.isNotEmpty()) {
+                    FintrackTitleMediumText(
+                        text = stringResource(R.string.recent_transactions),
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        color = MaterialTheme.colorScheme.onBackground
                     )
-                }
+
+                    uiTransactionWithRelations.forEach { transactionWithRelations ->
+                        TransactionItem(
+                            uiTransactionWithRelation = transactionWithRelations,
+                            onDelete = { onDelete(transactionWithRelations) }
+                        )
+                    }
+                } else EmptyListScreen()
+
             }
         }
     }

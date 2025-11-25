@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
@@ -70,29 +71,36 @@ fun SourceListBottomSheet(
         ) {
 
             LazyColumn {
-                items(state.sources) { source ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                            .clickable {
-                                onSourceClick(source.id.toInt(), source.name)
-                            },
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface
-                        ),
-                        shape = MaterialTheme.shapes.medium,
-                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            FintrackBodyMediumText(text = source.name)
-                            FintrackBodySmallText(
-                                text = stringResource(R.string.balance, source.formattedBalance),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+
+                if (state.sources.isNotEmpty())
+                    items(state.sources) { source ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .clickable {
+                                    onSourceClick(source.id.toInt(), source.name)
+                                },
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surface
+                            ),
+                            shape = MaterialTheme.shapes.medium,
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                FintrackBodyMediumText(text = source.name)
+                                FintrackBodySmallText(
+                                    text = stringResource(
+                                        R.string.balance,
+                                        source.formattedBalance
+                                    ),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
-                }
+                else item { EmptyListScreen() }
+
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -130,6 +138,7 @@ fun SourceListSelectionBottomSheet(
     LaunchedEffect(true) {
         viewModel.onIntent(FinancialSourceIntent.LoadAllFinancialSource)
     }
+
     val state by viewModel.state.collectAsState()
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -147,48 +156,57 @@ fun SourceListSelectionBottomSheet(
         ) {
 
             LazyColumn {
-                items(state.sources) { source ->
-                    val isSelected =
-                        state.selectedSources?.contains(source.id.toInt() to source.name) == true
+                if (state.sources.isNotEmpty())
+                    items(state.sources) { source ->
+                        val isSelected =
+                            state.selectedSources?.contains(source.id.toInt() to source.name) == true
 //                    val isSelected = state.selectedSources?.any { it.first == source.id.toInt() } == true
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                            .clickable {
-                                viewModel.onIntent(FinancialSourceIntent.SelectedSources(source.id.toInt() to source.name))
-                            },
-                        colors = CardDefaults.cardColors(
-                            containerColor = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.surface
-                        ),
-                        shape = MaterialTheme.shapes.medium,
-                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                    ) {
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Checkbox(
-                                checked = isSelected,
-                                onCheckedChange = {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .clickable {
                                     viewModel.onIntent(FinancialSourceIntent.SelectedSources(source.id.toInt() to source.name))
-                                }
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
+                                },
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.surface
+                            ),
+                            shape = MaterialTheme.shapes.medium,
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                        ) {
 
-                            FintrackBodyMediumText(text = source.name)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Checkbox(
+                                    checked = isSelected,
+                                    onCheckedChange = {
+                                        viewModel.onIntent(
+                                            FinancialSourceIntent.SelectedSources(
+                                                source.id.toInt() to source.name
+                                            )
+                                        )
+                                    }
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
 
-                            Spacer(modifier = Modifier.width(4.dp))
+                                FintrackBodyMediumText(text = source.name)
 
-                            FintrackBodySmallText(
-                                text = stringResource(R.string.balance, source.formattedBalance),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                                Spacer(modifier = Modifier.width(4.dp))
+
+                                FintrackBodySmallText(
+                                    text = stringResource(
+                                        R.string.balance,
+                                        source.formattedBalance
+                                    ),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+
                         }
-
                     }
-                }
+                else item { EmptyListScreen() }
             }
 
             Spacer(Modifier.height(12.dp))
