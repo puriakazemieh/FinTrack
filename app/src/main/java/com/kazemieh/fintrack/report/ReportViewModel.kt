@@ -48,7 +48,9 @@ class ReportViewModel() : ViewModel() {
 
             is ReportIntent.OnCategoriesSelected -> _state.update {
                 it.copy(
-                    selectedCategories = intent.categories, isCategorySheetVisible = false,
+                    selectedCategories = intent.categories,
+                    isCategorySheetVisible = false,
+                    isAllCategorySelected = intent.isAllCategorySelected,
                     enableAnimationChart = !_state.value.enableAnimationChart
                 )
             }
@@ -188,6 +190,7 @@ data class ReportState(
     val selectedPerson: Set<Pair<Int, String>> = emptySet(),
     val selectedSources: Set<Pair<Int, String>> = emptySet(),
     val selectedCategories: Set<Pair<Int, String>> = emptySet(),
+    val isAllCategorySelected: Boolean = true,
     val startDate: String? = null,
     val endDate: String? = null,
     val isError: Boolean = false,
@@ -196,7 +199,6 @@ data class ReportState(
     val enableAnimationChart: Boolean = true,
     val textDate: Any = DateFilterType.THIS_MONTH.titleResId,
 )
-
 
 sealed interface ReportIntent {
     data class OnTransactionTypeSelected(val type: Int) : ReportIntent
@@ -220,7 +222,11 @@ sealed interface ReportIntent {
     data class OnSourcesSelected(val sources: Set<Pair<Int, String>> = emptySet()) :
         ReportIntent
 
-    data class OnCategoriesSelected(val categories: Set<Pair<Int, String>>) : ReportIntent
+    data class OnCategoriesSelected(
+        val categories: Set<Pair<Int, String>>,
+        val isAllCategorySelected: Boolean = true
+    ) : ReportIntent
+
     data class OnTagSelected(val tag: Set<Pair<Int, String>>) : ReportIntent
     data class OnPersonSelected(val person: Set<Pair<Int, String>>) : ReportIntent
 

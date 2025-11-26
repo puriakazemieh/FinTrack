@@ -118,7 +118,9 @@ fun CategoryListBottomSheet(
 @Composable
 fun CategoryListSelectionBottomSheet(
     viewModel: CategoryViewModel = koinViewModel(),
-    onCategoryClick: (Set<Pair<Int, String>>) -> Unit,
+    onCategoryClick: (category: Set<Pair<Int, String>>, isAllCategorySelected: Boolean) -> Unit,
+    selectedCategories: Set<Pair<Int, String>>,
+    isAllCategorySelected: Boolean,
     selectedTransactionType: Int,
     onDismiss: () -> Unit
 ) {
@@ -126,8 +128,22 @@ fun CategoryListSelectionBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val nestedScrollConnection = rememberNestedScrollInteropConnection()
+
     LaunchedEffect(selectedTransactionType) {
         viewModel.onIntent(CategoryIntent.LoadCategoryByType(selectedTransactionType))
+    }
+
+    LaunchedEffect(isAllCategorySelected) {
+        viewModel.onIntent(
+            CategoryIntent.IsAllCategorySelected(
+                isAllCategorySelected,
+                selectedTransactionType
+            )
+        )
+    }
+
+    LaunchedEffect(selectedCategories) {
+        viewModel.onIntent(CategoryIntent.SelectedCategories(selectedCategories))
     }
 
     val selectAllTitle = stringResource(R.string.select_All)
@@ -147,10 +163,19 @@ fun CategoryListSelectionBottomSheet(
                 modifier = Modifier
                     .nestedScroll(nestedScrollConnection)
             ) {
+                item {
+                    ItemCategorySelected(
+                        isSelected = state.isAllCategorySelected,
+                        category = 0 to selectAllTitle,
+                        selectedCategory = {
+                            viewModel.onIntent(CategoryIntent.SelectedAllCategory)
+                        }
+                    )
+                }
                 if (state.categories.isNotEmpty()) {
                     items(state.categories) { category ->
                         val isSelected =
-                            state.selectedCategory?.contains(category.id?.toInt() to category.name) == true
+                            state.selectedCategory.contains(category.id?.toInt() to category.name)
                         ItemCategorySelected(
                             isSelected = isSelected,
                             category = (category.id?.toInt() ?: 0) to category.name,
@@ -169,7 +194,12 @@ fun CategoryListSelectionBottomSheet(
             Box(modifier = Modifier.align(Alignment.BottomCenter)) {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { onCategoryClick(state.selectedCategory ?: emptySet()) },
+                    onClick = {
+                        onCategoryClick(
+                            state.selectedCategory,
+                            state.isAllCategorySelected
+                        )
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary

@@ -40,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.DateFilterType
+import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.DatePickerField
 import com.kazemieh.designsystem.component.FilterButton
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -55,7 +56,8 @@ fun ReportTopBar(
     onTransactionTypeClicked: (Int) -> Unit,
     selectedSources: Set<Pair<Int, String>> = emptySet(),
     onSourceClicked: () -> Unit,
-    selectedCategories: Set<Pair<Int, String>> = emptySet(),
+    isAllCategorySelected: Boolean = true,
+    selectedCategories: Set<Pair<Int, String>>,
     onCategoryClicked: () -> Unit,
     selectedTags: Set<Pair<Int, String>> = emptySet(),
     onTagClicked: () -> Unit,
@@ -128,15 +130,17 @@ fun ReportTopBar(
                         .weight(1f)
                         .height(56.dp),
                     labelText = labelTextSource,
-                    onClick = onSourceClicked
+                    onClick = onSourceClicked,
                 )
 
                 val labelTextCategory =
-                    if (selectedCategories.isEmpty()) stringResource(R.string.all_category)
+                    if (isAllCategorySelected) stringResource(R.string.all_category)
+                    else if (selectedCategories.isEmpty()) stringResource(R.string.empty_category)
                     else stringResource(R.string.categories, selectedCategories.size)
 
                 Selector(
                     selected = selectedCategories,
+                    isAllCategorySelected = isAllCategorySelected,
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),
@@ -158,7 +162,7 @@ fun ReportTopBar(
                         .weight(1f)
                         .height(56.dp),
                     labelText = labelTextSource,
-                    onClick = onTagClicked
+                    onClick = onTagClicked,
                 )
 
                 val labelTextCategory =
@@ -171,7 +175,7 @@ fun ReportTopBar(
                         .weight(1f)
                         .height(56.dp),
                     labelText = labelTextCategory,
-                    onClick = onPersonClicked
+                    onClick = onPersonClicked,
                 )
 
             }
@@ -194,13 +198,14 @@ private fun Selector(
     selected: Set<Pair<Int, String>> = emptySet(),
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
     labelText: String,
+    isAllCategorySelected: Boolean = false,
     onClick: () -> Unit
 ) {
     val sourceTextStyle =
         if (selected.isEmpty()) MaterialTheme.typography.bodyMedium
         else MaterialTheme.typography.labelSmall
     FintrackOutlinedTextField(
-        value = if (selected.size == 1) selected.first().second
+        value = if (isAllCategorySelected) "" else if (selected.size == 1) selected.first().second
         else selected.joinToString(", ") { it.second },
         onClick = onClick,
         readOnly = true,

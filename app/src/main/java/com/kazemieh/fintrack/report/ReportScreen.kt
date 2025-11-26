@@ -50,6 +50,7 @@ fun ReportScreen(
                     viewModel.onIntent(ReportIntent.OnTransactionTypeSelected(it))
                 },
                 selectedCategories = state.selectedCategories,
+                isAllCategorySelected = state.isAllCategorySelected,
                 onCategoryClicked = { viewModel.onIntent(ReportIntent.OnToggleCategorySheet) },
                 selectedSources = state.selectedSources,
                 onTagClicked = { viewModel.onIntent(ReportIntent.OnToggleTagSheet) },
@@ -115,8 +116,15 @@ fun ReportScreen(
         if (state.isCategorySheetVisible) {
             CategoryListSelectionBottomSheet(
                 selectedTransactionType = state.selectedTransactionType,
-                onCategoryClick = {
-                    viewModel.onIntent(ReportIntent.OnCategoriesSelected(it))
+                selectedCategories = state.selectedCategories,
+                isAllCategorySelected = state.isAllCategorySelected,
+                onCategoryClick = { categorySelected, isAllCategorySelected ->
+                    viewModel.onIntent(
+                        ReportIntent.OnCategoriesSelected(
+                            categorySelected,
+                            isAllCategorySelected
+                        )
+                    )
                 },
                 onDismiss = {
                     viewModel.onIntent(ReportIntent.OnToggleCategorySheet)

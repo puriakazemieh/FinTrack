@@ -1,7 +1,6 @@
 package com.kazemieh.designsystem.component
 
 import androidx.compose.foundation.layout.Arrangement
-import com.kazemieh.designsystem.R
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,9 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.R
 
 @Composable
-fun EmptyListScreen() {
+fun EmptyListScreen(title: String = stringResource(R.string.empty_title)) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -28,6 +28,6 @@ fun EmptyListScreen() {
     ) {
         Icon(Icons.Default.ErrorOutline, "", modifier = Modifier.size(40.dp))
         Spacer(modifier = Modifier.height(8.dp))
-        FintrackHeadlineSmallText(stringResource(R.string.empty_title))
+        FintrackHeadlineSmallText(title)
     }
 }
