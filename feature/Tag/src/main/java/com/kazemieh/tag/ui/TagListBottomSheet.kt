@@ -1,26 +1,18 @@
 package com.kazemieh.tag.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -38,12 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.safeLet
+import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.R
-import com.kazemieh.designsystem.component.selectable.SelectableItemUi
-import com.kazemieh.designsystem.component.selectable.SelectableListBottomSheet
-import com.kazemieh.designsystem.component.selectable.toPairSetFrom
+import com.kazemieh.designsystem.component.list.ItemUi
+import com.kazemieh.designsystem.component.list.selectable.SelectableListBottomSheet
+import com.kazemieh.designsystem.component.list.toPairSetFrom
 import com.kazemieh.tag.ui.add.AddTagBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
@@ -158,101 +150,6 @@ fun TagListBottomSheet(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TagListSelectionBottomSheet(
-    viewModel: TagViewModel = koinViewModel(),
-    onTagClick: (Set<Pair<Int, String>>) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    LaunchedEffect(true) {
-        viewModel.onIntent(TagIntent.GetAllTag)
-    }
-
-    val state by viewModel.state.collectAsState()
-
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.background
-    ) {
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
-        ) {
-
-            LazyColumn {
-                if (state.tags.isNotEmpty())
-                    items(state.tags) { tag ->
-                        val isSelected =
-                            state.selectedTags?.contains(tag.id?.toInt() to tag.name) == true
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                                .clickable {
-                                    safeLet(tag.id, tag.name) { id, name ->
-                                        viewModel.onIntent(TagIntent.SetSelectedTag(id.toInt() to name))
-                                    }
-                                },
-                            colors = CardDefaults.cardColors(
-                                containerColor = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.surface
-                            ),
-                            shape = MaterialTheme.shapes.medium,
-                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                        ) {
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Checkbox(
-                                    checked = isSelected,
-                                    onCheckedChange = {
-
-                                        safeLet(tag.id, tag.name) { id, name ->
-                                            viewModel.onIntent(TagIntent.SetSelectedTag(id.toInt() to name))
-                                        }
-
-                                    }
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-
-                                FintrackBodyMediumText(text = tag.name)
-
-                            }
-
-                        }
-                    }
-                else item { EmptyListScreen() }
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { onTagClick(state.selectedTags ?: emptySet()) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                FintrackBodyMediumText(
-                    text = stringResource(R.string.confirm),
-                    color = MaterialTheme.colorScheme.background
-                )
-            }
-
-
-        }
-    }
-}
-
-
 @Composable
 fun TagListSelectionBottomSheet(
     viewModel: TagViewModel = koinViewModel(),
@@ -266,7 +163,7 @@ fun TagListSelectionBottomSheet(
         viewModel.onIntent(TagIntent.GetAllTag)
     }
 
-    val items = state.tags.map { SelectableItemUi(it.id?.toInt() ?: 0, it.name) }
+    val items = state.tags.map { ItemUi(it.id?.toInt() ?: 0, it.name) }
     val initialSelectionIds = initialSelectionPairs.map { it.first }.toSet()
 
     SelectableListBottomSheet(

@@ -1,8 +1,9 @@
-package com.kazemieh.designsystem.component.selectable
+package com.kazemieh.designsystem.component.list.selectable
 
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.designsystem.component.list.ItemUi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -42,11 +43,12 @@ class SelectableListViewModel : ViewModel() {
             }
 
             SelectableIntent.Dismiss -> viewModelScope.launch { _oneShot.emit(SelectableOneShot.Dismissed) }
+            SelectableIntent.AddClick -> viewModelScope.launch { _oneShot.emit(SelectableOneShot.AddClick) }
         }
     }
 
     private fun handleLoad(
-        items: List<SelectableItemUi>,
+        items: List<ItemUi>,
         initialSelection: Set<Int>,
         showSelectAll: Boolean
     ) {
@@ -55,9 +57,8 @@ class SelectableListViewModel : ViewModel() {
 
             val allIds = items.map { it.id }.toSet()
             val selected =
-                if (initialSelection.isEmpty() && showSelectAll) allIds else initialSelection.intersect(
-                    allIds
-                )
+                if (initialSelection.isEmpty() && showSelectAll) allIds
+                else initialSelection.intersect(allIds)
             val allSelected = allIds.isNotEmpty() && selected == allIds
 
             _state.update {
@@ -102,14 +103,15 @@ class SelectableListViewModel : ViewModel() {
 }
 
 sealed interface SelectableOneShot {
-    data class Confirmed(val selectedIds: Set<Int>, val isAllSelected: Boolean) : SelectableOneShot
+    data class Confirmed(val selectedId: Set<Int>, val isAllSelected: Boolean) : SelectableOneShot
     object Dismissed : SelectableOneShot
+    object AddClick : SelectableOneShot
 }
 
 
 sealed interface SelectableIntent {
     data class Load(
-        val items: List<SelectableItemUi>,
+        val items: List<ItemUi>,
         val initialSelection: Set<Int> = emptySet(),
         val showSelectAll: Boolean = true
     ) : SelectableIntent
@@ -119,11 +121,12 @@ sealed interface SelectableIntent {
     data class SetSelection(val ids: Set<Int>) : SelectableIntent
     object Confirm : SelectableIntent
     object Dismiss : SelectableIntent
+    object AddClick : SelectableIntent
 }
 
 
 data class SelectableState(
-    val items: List<SelectableItemUi> = emptyList(),
+    val items: List<ItemUi> = emptyList(),
     val selectedIds: Set<Int> = emptySet(),
     val isAllSelected: Boolean = false,
     val isLoading: Boolean = false

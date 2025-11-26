@@ -1,4 +1,4 @@
-package com.kazemieh.designsystem.component.selectable
+package com.kazemieh.designsystem.component.list.selectable
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -17,23 +17,26 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.R
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackTitleLargeText
+import com.kazemieh.designsystem.component.list.ItemUi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectableListBottomSheet(
     title: String,
-    items: List<SelectableItemUi>,
+    items: List<ItemUi>,
     initialSelection: Set<Int> = emptySet(),
     showSelectAll: Boolean = true,
     onConfirm: (selectedIds: Set<Int>, isAllSelected: Boolean) -> Unit,
@@ -41,7 +44,6 @@ fun SelectableListBottomSheet(
 ) {
     val viewModel = remember { SelectableListViewModel() }
     val state by viewModel.state.collectAsState()
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(items, initialSelection, showSelectAll) {
         viewModel.onIntent(SelectableIntent.Load(items, initialSelection, showSelectAll))
@@ -51,10 +53,11 @@ fun SelectableListBottomSheet(
         viewModel.oneShot.collect { one ->
             when (one) {
                 is SelectableOneShot.Confirmed -> {
-                    onConfirm(one.selectedIds, one.isAllSelected)
+                    onConfirm(one.selectedId, one.isAllSelected)
                 }
 
                 is SelectableOneShot.Dismissed -> onDismiss()
+                else -> {}
             }
         }
     }
@@ -93,27 +96,19 @@ fun SelectableListBottomSheetStateless(
                 .padding(12.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
+                FintrackTitleLargeText(
                     text = title,
-                    style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(4.dp)
                 )
                 Spacer(Modifier.height(8.dp))
 
                 if (showSelectAll) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onToggleSelectAll() }
-                            .padding(vertical = 8.dp, horizontal = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Checkbox(
-                            checked = state.isAllSelected,
-                            onCheckedChange = { onToggleSelectAll() })
-                        Spacer(Modifier.width(8.dp))
-                        Text(text = "Select all")
-                    }
+                    ItemSelected(
+                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp),
+                        isSelected = state.isAllSelected,
+                        item = 0 to stringResource(R.string.select_All),
+                        onToggle = { onToggleSelectAll() }
+                    )
                 }
 
                 HorizontalDivider()
@@ -121,28 +116,44 @@ fun SelectableListBottomSheetStateless(
                 LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
                     items(state.items) { item ->
                         val isSelected = state.selectedIds.contains(item.id)
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onToggle(item.id) }
-                                .padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Checkbox(checked = isSelected, onCheckedChange = { onToggle(item.id) })
-                            Spacer(Modifier.width(12.dp))
-                            Text(text = item.title)
-                        }
+                        ItemSelected(
+                            modifier = Modifier.padding(12.dp),
+                            isSelected = isSelected,
+                            item = item.id to item.title,
+                            onToggle = { onToggle(item.id) })
                     }
                 }
 
                 Spacer(Modifier.height(12.dp))
 
                 Button(modifier = Modifier.fillMaxWidth(), onClick = onConfirm) {
-                    Text(text = "Confirm")
+                    FintrackBodyMediumText(text = stringResource(R.string.confirm))
                 }
 
                 Spacer(Modifier.height(8.dp))
             }
         }
     }
+}
+
+
+@Composable
+fun ItemSelected(
+    modifier: Modifier = Modifier,
+    isSelected: Boolean,
+    item: Pair<Int, String>,
+    onToggle: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onToggle() }
+            .then(modifier),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(checked = isSelected, onCheckedChange = { onToggle() })
+        Spacer(modifier = Modifier.width(12.dp))
+        FintrackBodyMediumText(text = item.second)
+    }
+
 }

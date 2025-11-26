@@ -1,18 +1,19 @@
-package com.kazemieh.designsystem.component.selectable
+package com.kazemieh.designsystem.component.list
 
 import com.kazemieh.common.model.Category
 
 
-data class SelectableItemUi(
+data class ItemUi(
     val id: Int,
-    val title: String
+    val title: String,
+    val extraData: Any? = null
 )
 
-fun List<SelectableItemUi>.toIdSet(): Set<Int> = this.map { it.id }.toSet()
+fun List<ItemUi>.toIdSet(): Set<Int> = this.map { it.id }.toSet()
 
 fun Set<Pair<Int, String>>.toIdSet(): Set<Int> = this.map { it.first }.toSet()
 
-fun Set<Int>.toPairSetFrom(items: List<SelectableItemUi>): Set<Pair<Int, String>> =
+fun Set<Int>.toPairSetFrom(items: List<ItemUi>): Set<Pair<Int, String>> =
     this.mapNotNull { id ->
         items.firstOrNull { it.id == id }?.let { id to it.title }
     }.toSet()
