@@ -39,7 +39,7 @@ import com.kazemieh.designsystem.component.DatePickerField
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.model.TransactionType
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

@@ -1,4 +1,4 @@
-package com.kazemieh.model
+package com.kazemieh.common.model
 
 import kotlinx.serialization.Serializable
 

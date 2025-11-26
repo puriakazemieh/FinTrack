@@ -1,9 +1,7 @@
 package com.kazemieh.domain.usecase
 
+import com.kazemieh.common.model.FinancialSource
 import com.kazemieh.domain.repository.TransactionRepository
-import com.kazemieh.model.Category
-import com.kazemieh.model.FinancialSource
-import com.kazemieh.model.Tag
 import kotlinx.coroutines.flow.Flow
 
 class GetAllFinancialSource(

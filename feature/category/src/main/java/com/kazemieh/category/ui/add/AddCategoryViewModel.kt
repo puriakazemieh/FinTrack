@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.designsystem.R
 import com.kazemieh.domain.usecase.AddCategory
-import com.kazemieh.model.Category
-import com.kazemieh.model.TransactionType
+import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.TransactionType
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

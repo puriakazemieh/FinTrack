@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.model.TransactionType
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.R
 
 

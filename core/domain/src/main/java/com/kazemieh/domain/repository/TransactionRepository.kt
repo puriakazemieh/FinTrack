@@ -1,11 +1,11 @@
 package com.kazemieh.domain.repository
 
-import com.kazemieh.model.Category
-import com.kazemieh.model.FinancialSource
-import com.kazemieh.model.Person
-import com.kazemieh.model.Tag
-import com.kazemieh.model.Transaction
-import com.kazemieh.model.TransactionWithRelations
+import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.FinancialSource
+import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.Tag
+import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionWithRelations
 import kotlinx.coroutines.flow.Flow
 
 interface TransactionRepository {

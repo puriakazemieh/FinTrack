@@ -3,9 +3,9 @@ package com.kazemieh.transaction.ui.component
 import com.kazemieh.common.formatted
 import com.kazemieh.common.formattedOrNull
 import com.kazemieh.designsystem.component.PieChartItem
-import com.kazemieh.model.Transaction
-import com.kazemieh.model.TransactionType
-import com.kazemieh.model.TransactionWithRelations
+import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionType
+import com.kazemieh.common.model.TransactionWithRelations
 import kotlinx.serialization.Serializable
 
 

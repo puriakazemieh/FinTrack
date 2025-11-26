@@ -1,7 +1,7 @@
 package com.kazemieh.database.mapper
 
 import com.kazemieh.database.entity.TransactionWithCategoryFinancialSourceAndTags
-import com.kazemieh.model.TransactionWithRelations
+import com.kazemieh.common.model.TransactionWithRelations
 
 fun TransactionWithCategoryFinancialSourceAndTags.toTransactionWithRelations(): TransactionWithRelations =
     TransactionWithRelations(

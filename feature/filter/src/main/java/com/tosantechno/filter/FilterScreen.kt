@@ -46,8 +46,7 @@ import com.kazemieh.designsystem.component.FilterButton
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.designsystem.R
-import com.kazemieh.model.TransactionType
+import com.kazemieh.common.model.TransactionType
 
 
 @Composable

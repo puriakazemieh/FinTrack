@@ -1,7 +1,7 @@
 package com.kazemieh.financialsource.ui
 
 import com.kazemieh.common.formatted
-import com.kazemieh.model.FinancialSource
+import com.kazemieh.common.model.FinancialSource
 
 data class FinancialSourceUi(
     val id: Long,

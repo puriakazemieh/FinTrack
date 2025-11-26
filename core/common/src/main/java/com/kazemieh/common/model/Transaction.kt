@@ -1,4 +1,4 @@
-package com.kazemieh.model
+package com.kazemieh.common.model
 
 import kotlinx.serialization.Serializable
 
@@ -22,6 +22,6 @@ enum class TransactionType(val count: Int) {
     TRANSFER(3);
 
     companion object {
-        fun fromInt(value: Int) = TransactionType.entries.first { it.count == value }
+        fun fromInt(value: Int) = entries.first { it.count == value }
     }
 }

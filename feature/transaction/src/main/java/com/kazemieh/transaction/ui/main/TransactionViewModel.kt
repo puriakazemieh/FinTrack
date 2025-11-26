@@ -6,7 +6,7 @@ import com.kazemieh.common.formatted
 import com.kazemieh.common.toPositive
 import com.kazemieh.designsystem.component.PieChartItem
 import com.kazemieh.domain.usecase.TransactionUseCases
-import com.kazemieh.model.TransactionType
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.R
 import com.kazemieh.transaction.ui.component.TransactionUi
 import com.kazemieh.transaction.ui.component.TransactionWithRelationsUi

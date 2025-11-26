@@ -4,8 +4,8 @@ package com.kazemieh.transaction.ui.add
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.TransactionUseCases
-import com.kazemieh.model.Transaction
-import com.kazemieh.model.TransactionType
+import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionType
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

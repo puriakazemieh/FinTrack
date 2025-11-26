@@ -3,7 +3,7 @@ package com.kazemieh.tag.ui.add
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.AddTag
-import com.kazemieh.model.Tag
+import com.kazemieh.common.model.Tag
 import com.kazemieh.designsystem.R
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

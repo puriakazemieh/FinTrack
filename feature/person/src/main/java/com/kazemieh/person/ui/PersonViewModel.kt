@@ -3,7 +3,7 @@ package com.kazemieh.person.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.GetAllPerson
-import com.kazemieh.model.Person
+import com.kazemieh.common.model.Person
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

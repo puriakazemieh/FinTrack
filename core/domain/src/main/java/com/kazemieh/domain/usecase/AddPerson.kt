@@ -1,7 +1,7 @@
 package com.kazemieh.domain.usecase
 
 import com.kazemieh.domain.repository.TransactionRepository
-import com.kazemieh.model.Person
+import com.kazemieh.common.model.Person
 
 class AddPerson(
     private val repository: TransactionRepository

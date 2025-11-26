@@ -15,7 +15,7 @@ import com.kazemieh.database.entity.TagEntity
 import com.kazemieh.database.entity.TransactionEntity
 import com.kazemieh.database.entity.TransactionPersonCrossRef
 import com.kazemieh.database.entity.TransactionTagCrossRef
-import com.kazemieh.model.TransactionType
+import com.kazemieh.common.model.TransactionType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

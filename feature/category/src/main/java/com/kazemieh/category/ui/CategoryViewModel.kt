@@ -3,8 +3,8 @@ package com.kazemieh.category.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.GetAllCategoryByType
-import com.kazemieh.model.Category
-import com.kazemieh.model.TransactionType
+import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.TransactionType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine

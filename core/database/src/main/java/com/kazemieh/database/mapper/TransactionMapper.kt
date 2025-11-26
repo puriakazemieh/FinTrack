@@ -1,8 +1,8 @@
 package com.kazemieh.database.mapper
 
 import com.kazemieh.database.entity.TransactionEntity
-import com.kazemieh.model.Transaction
-import com.kazemieh.model.TransactionType
+import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionType
 
 fun TransactionEntity.toTransaction(): Transaction =
     Transaction(

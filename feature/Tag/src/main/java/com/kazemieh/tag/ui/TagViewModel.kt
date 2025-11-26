@@ -3,7 +3,7 @@ package com.kazemieh.tag.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.GetAllTag
-import com.kazemieh.model.Tag
+import com.kazemieh.common.model.Tag
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

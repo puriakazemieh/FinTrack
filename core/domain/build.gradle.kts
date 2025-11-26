@@ -8,6 +8,5 @@ android {
     namespace = "com.kazemieh.domain"
 }
 dependencies {
-    implementation(project(":core:model"))
     implementation(project(":core:common"))
 }

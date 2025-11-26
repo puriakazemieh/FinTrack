@@ -1,7 +1,7 @@
 package com.kazemieh.domain.usecase
 
 import com.kazemieh.domain.repository.TransactionRepository
-import com.kazemieh.model.Tag
+import com.kazemieh.common.model.Tag
 
 class AddTag(
     private val repository: TransactionRepository

@@ -1,7 +1,7 @@
 package com.kazemieh.domain.usecase
 
 import com.kazemieh.domain.repository.TransactionRepository
-import com.kazemieh.model.FinancialSource
+import com.kazemieh.common.model.FinancialSource
 
 class AddFinancialSource(
     private val repository: TransactionRepository

@@ -1,7 +1,7 @@
 package com.kazemieh.domain.usecase
 
 import com.kazemieh.domain.repository.TransactionRepository
-import com.kazemieh.model.Category
+import com.kazemieh.common.model.Category
 import kotlinx.coroutines.flow.Flow
 
 class GetAllCategoryByType(

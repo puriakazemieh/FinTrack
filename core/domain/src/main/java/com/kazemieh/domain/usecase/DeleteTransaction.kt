@@ -1,7 +1,7 @@
 package com.kazemieh.domain.usecase
 
 import com.kazemieh.domain.repository.TransactionRepository
-import com.kazemieh.model.Transaction
+import com.kazemieh.common.model.Transaction
 
 class DeleteTransaction(
     private val repository: TransactionRepository

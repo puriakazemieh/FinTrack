@@ -15,7 +15,6 @@ room {
 }
 
 dependencies {
-    implementation(project(":core:model"))
     implementation(project(":core:common"))
     implementation(project(":core:data-contract"))
 

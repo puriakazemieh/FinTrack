@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.designsystem.R
 import com.kazemieh.domain.usecase.AddFinancialSource
-import com.kazemieh.model.FinancialSource
+import com.kazemieh.common.model.FinancialSource
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
