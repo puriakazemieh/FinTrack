@@ -1,9 +1,14 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
+    id("convention.android.library")
     id("convention.android.serialization")
 }
 
 
+android {
+    namespace = "com.kazemieh.data_contract"
+}
+
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
+    implementation(project(":core:common"))
 }
