@@ -79,6 +79,16 @@ fun ReportScreen(
 
         }
 
+        if (state.isCategorySheetVisible) {
+            CategoryListSelectionBottomSheet(
+                initialSelectionPairs = state.selectedCategories,
+                selectedTransactionType = state.selectedTransactionType,
+                onConfirmPairs = { pairs, isAll ->
+                    viewModel.onIntent(ReportIntent.OnCategoriesSelected(pairs, isAll))
+                },
+                onDismiss = { viewModel.onIntent(ReportIntent.OnToggleCategorySheet) }
+            )
+        }
 
         if (state.isTagSheetVisible) {
             TagListSelectionBottomSheet(
@@ -109,25 +119,6 @@ fun ReportScreen(
                 },
                 onDismiss = {
                     viewModel.onIntent(ReportIntent.OnToggleSourceSheet)
-                }
-            )
-        }
-
-        if (state.isCategorySheetVisible) {
-            CategoryListSelectionBottomSheet(
-                selectedTransactionType = state.selectedTransactionType,
-                selectedCategories = state.selectedCategories,
-                isAllCategorySelected = state.isAllCategorySelected,
-                onCategoryClick = { categorySelected, isAllCategorySelected ->
-                    viewModel.onIntent(
-                        ReportIntent.OnCategoriesSelected(
-                            categorySelected,
-                            isAllCategorySelected
-                        )
-                    )
-                },
-                onDismiss = {
-                    viewModel.onIntent(ReportIntent.OnToggleCategorySheet)
                 }
             )
         }

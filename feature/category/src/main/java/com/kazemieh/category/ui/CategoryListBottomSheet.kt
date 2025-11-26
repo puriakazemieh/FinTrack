@@ -38,6 +38,9 @@ import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.selectable.SelectableItemUi
+import com.kazemieh.designsystem.component.selectable.SelectableListBottomSheet
+import com.kazemieh.designsystem.component.selectable.toPairSetFrom
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -249,4 +252,34 @@ fun ItemCategorySelected(
         }
 
     }
+}
+
+
+@Composable
+fun CategoryListSelectionBottomSheet(
+    viewModel: CategoryViewModel = koinViewModel(),
+    initialSelectionPairs: Set<Pair<Int, String>> = emptySet(),
+    onConfirmPairs: (Set<Pair<Int, String>>, isAllSelected: Boolean) -> Unit,
+    selectedTransactionType: Int,
+    onDismiss: () -> Unit
+) {
+    val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(selectedTransactionType) {
+        viewModel.onIntent(CategoryIntent.LoadCategoryByType(selectedTransactionType))
+    }
+
+    val items = state.categories.map { SelectableItemUi(it.id?.toInt() ?: 0, it.name) }
+    val initialSelectionIds = initialSelectionPairs.map { it.first }.toSet()
+
+    SelectableListBottomSheet(
+        title = stringResource(R.string.category),
+        items = items,
+        initialSelection = initialSelectionIds,
+        onConfirm = { selectedIds, isAll ->
+            val pairSet = selectedIds.toPairSetFrom(items)
+            onConfirmPairs(pairSet, isAll)
+        },
+        onDismiss = onDismiss
+    )
 }
