@@ -25,25 +25,47 @@ class ReportViewModel() : ViewModel() {
                 )
             }
 
+            ReportIntent.OnToggleSourceSheet -> _state.update {
+                it.copy(isSourceSheetVisible = !it.isSourceSheetVisible)
+            }
+
             is ReportIntent.OnSourcesSelected -> _state.update {
                 it.copy(
-                    selectedSources = intent.sources, isSourceSheetVisible = false,
+                    selectedSources = intent.sources,
+                    isSourceSheetVisible = false,
+                    isAllSourceSelected = intent.isAllSourceSelected,
                     enableAnimationChart = !_state.value.enableAnimationChart
                 )
+            }
+
+            ReportIntent.OnToggleTagSheet -> _state.update {
+                it.copy(isTagSheetVisible = !it.isTagSheetVisible)
             }
 
             is ReportIntent.OnTagSelected -> _state.update {
                 it.copy(
-                    selectedTag = intent.tag, isTagSheetVisible = false,
+                    selectedTag = intent.tag,
+                    isTagSheetVisible = false,
+                    isAllTAgSelected = intent.isAllTAgSelected,
                     enableAnimationChart = !_state.value.enableAnimationChart
                 )
             }
 
+            ReportIntent.OnTogglePersonSheet -> _state.update {
+                it.copy(isPersonSheetVisible = !it.isPersonSheetVisible)
+            }
+
             is ReportIntent.OnPersonSelected -> _state.update {
                 it.copy(
-                    selectedPerson = intent.person, isPersonSheetVisible = false,
+                    selectedPerson = intent.persons,
+                    isPersonSheetVisible = false,
+                    isAllPersonSelected = intent.isAllPersonSelected,
                     enableAnimationChart = !_state.value.enableAnimationChart
                 )
+            }
+
+            ReportIntent.OnToggleCategorySheet -> _state.update {
+                it.copy(isCategorySheetVisible = !it.isCategorySheetVisible)
             }
 
             is ReportIntent.OnCategoriesSelected -> _state.update {
@@ -53,22 +75,6 @@ class ReportViewModel() : ViewModel() {
                     isAllCategorySelected = intent.isAllCategorySelected,
                     enableAnimationChart = !_state.value.enableAnimationChart
                 )
-            }
-
-            ReportIntent.OnToggleSourceSheet -> _state.update {
-                it.copy(isSourceSheetVisible = !it.isSourceSheetVisible)
-            }
-
-            ReportIntent.OnToggleCategorySheet -> _state.update {
-                it.copy(isCategorySheetVisible = !it.isCategorySheetVisible)
-            }
-
-            ReportIntent.OnToggleTagSheet -> _state.update {
-                it.copy(isTagSheetVisible = !it.isTagSheetVisible)
-            }
-
-            ReportIntent.OnTogglePersonSheet -> _state.update {
-                it.copy(isPersonSheetVisible = !it.isPersonSheetVisible)
             }
 
             ReportIntent.OnToggleDateSheet -> _state.update {
@@ -178,57 +184,75 @@ class ReportViewModel() : ViewModel() {
 
 data class ReportState(
     val selectedTransactionType: Int = 0,
+
     val dateFilterType: DateFilterType = DateFilterType.THIS_MONTH,
     val isDateSheetVisible: Boolean = false,
     val isCustomDateSheetVisible: Boolean = false,
     val isShowArrowButton: Boolean = true,
-    val isSourceSheetVisible: Boolean = false,
-    val isCategorySheetVisible: Boolean = false,
-    val isTagSheetVisible: Boolean = false,
-    val isPersonSheetVisible: Boolean = false,
-    val selectedTag: Set<Pair<Int, String>> = emptySet(),
-    val selectedPerson: Set<Pair<Int, String>> = emptySet(),
-    val selectedSources: Set<Pair<Int, String>> = emptySet(),
-    val selectedCategories: Set<Pair<Int, String>> = emptySet(),
-    val isAllCategorySelected: Boolean = true,
     val startDate: String? = null,
     val endDate: String? = null,
-    val isError: Boolean = false,
     val startDateTimeStamp: Long? = null,
     val endDateTimeStamp: Long? = null,
-    val enableAnimationChart: Boolean = true,
     val textDate: Any = DateFilterType.THIS_MONTH.titleResId,
+
+    val isSourceSheetVisible: Boolean = false,
+    val selectedSources: Set<Pair<Int, String>> = emptySet(),
+    val isAllSourceSelected: Boolean = true,
+
+    val isCategorySheetVisible: Boolean = false,
+    val selectedCategories: Set<Pair<Int, String>> = emptySet(),
+    val isAllCategorySelected: Boolean = true,
+
+    val isTagSheetVisible: Boolean = false,
+    val selectedTag: Set<Pair<Int, String>> = emptySet(),
+    val isAllTAgSelected: Boolean = true,
+
+    val isPersonSheetVisible: Boolean = false,
+    val selectedPerson: Set<Pair<Int, String>> = emptySet(),
+    val isAllPersonSelected: Boolean = true,
+
+    val isError: Boolean = false,
+    val enableAnimationChart: Boolean = true,
 )
 
 sealed interface ReportIntent {
     data class OnTransactionTypeSelected(val type: Int) : ReportIntent
+
     data object OnToggleSourceSheet : ReportIntent
+    data class OnSourcesSelected(
+        val sources: Set<Pair<Int, String>>,
+        val isAllSourceSelected: Boolean = true
+    ) : ReportIntent
+
     data object OnToggleCategorySheet : ReportIntent
+    data class OnCategoriesSelected(
+        val categories: Set<Pair<Int, String>>,
+        val isAllCategorySelected: Boolean = true
+    ) : ReportIntent
+
     data object OnToggleTagSheet : ReportIntent
+    data class OnTagSelected(
+        val tag: Set<Pair<Int, String>>,
+        val isAllTAgSelected: Boolean = true
+    ) : ReportIntent
+
     data object OnTogglePersonSheet : ReportIntent
+    data class OnPersonSelected(
+        val persons: Set<Pair<Int, String>>,
+        val isAllPersonSelected: Boolean = true
+    ) : ReportIntent
+
     data object OnToggleDateSheet : ReportIntent
     data object OnToggleCustomDateSheet : ReportIntent
     data class OnDateRange(val dateFilterType: DateFilterType) : ReportIntent
     data object OnPrevClick : ReportIntent
     data object OnNextClick : ReportIntent
-
     data class OnDateSheetSubmit(
         val startDate: String?,
         val startTimeStamp: Long?,
         val endDate: String?,
         val endTimeStamp: Long?
     ) : ReportIntent
-
-    data class OnSourcesSelected(val sources: Set<Pair<Int, String>> = emptySet()) :
-        ReportIntent
-
-    data class OnCategoriesSelected(
-        val categories: Set<Pair<Int, String>>,
-        val isAllCategorySelected: Boolean = true
-    ) : ReportIntent
-
-    data class OnTagSelected(val tag: Set<Pair<Int, String>>) : ReportIntent
-    data class OnPersonSelected(val person: Set<Pair<Int, String>>) : ReportIntent
 
 
 }

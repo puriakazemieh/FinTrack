@@ -40,28 +40,36 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.DateFilterType
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.DatePickerField
 import com.kazemieh.designsystem.component.FilterButton
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.common.model.TransactionType
 
 
 @Composable
 fun ReportTopBar(
     onTransactionTypeSelected: Int,
     onTransactionTypeClicked: (Int) -> Unit,
+
+    isAllSourceSelected: Boolean = true,
     selectedSources: Set<Pair<Int, String>> = emptySet(),
     onSourceClicked: () -> Unit,
+
     isAllCategorySelected: Boolean = true,
     selectedCategories: Set<Pair<Int, String>>,
     onCategoryClicked: () -> Unit,
+
+    isAllTAgSelected: Boolean = true,
     selectedTags: Set<Pair<Int, String>> = emptySet(),
     onTagClicked: () -> Unit,
+
+    isAllPersonSelected: Boolean = true,
     selectedPersons: Set<Pair<Int, String>> = emptySet(),
     onPersonClicked: () -> Unit,
+
     isShowArrowButton: Boolean = true,
     onDateClick: () -> Unit,
     onPrevClick: () -> Unit,
@@ -120,11 +128,13 @@ fun ReportTopBar(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
 
                 val labelTextSource =
-                    if (selectedSources.isEmpty()) stringResource(R.string.all_source)
+                    if (isAllSourceSelected) stringResource(R.string.all_source)
+                    else if (selectedSources.isEmpty()) stringResource(R.string.empty_source)
                     else stringResource(R.string.sources, selectedSources.size)
 
                 Selector(
                     selected = selectedSources,
+                    isAllSelected = isAllSourceSelected,
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),
@@ -139,7 +149,7 @@ fun ReportTopBar(
 
                 Selector(
                     selected = selectedCategories,
-                    isAllCategorySelected = isAllCategorySelected,
+                    isAllSelected = isAllCategorySelected,
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),
@@ -152,11 +162,13 @@ fun ReportTopBar(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
 
                 val labelTextSource =
-                    if (selectedTags.isEmpty()) stringResource(R.string.all_tags)
+                    if (isAllTAgSelected) stringResource(R.string.all_tags)
+                    else if (selectedTags.isEmpty()) stringResource(R.string.empty_tag)
                     else stringResource(R.string.tags, selectedTags.size)
 
                 Selector(
                     selected = selectedTags,
+                    isAllSelected = isAllTAgSelected,
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),
@@ -165,11 +177,13 @@ fun ReportTopBar(
                 )
 
                 val labelTextCategory =
-                    if (selectedPersons.isEmpty()) stringResource(R.string.all_person)
+                    if (isAllPersonSelected) stringResource(R.string.all_person)
+                    else if (selectedPersons.isEmpty()) stringResource(R.string.empty_person)
                     else stringResource(R.string.persons, selectedPersons.size)
 
                 Selector(
                     selected = selectedPersons,
+                    isAllSelected = isAllPersonSelected,
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),
@@ -197,14 +211,14 @@ private fun Selector(
     selected: Set<Pair<Int, String>> = emptySet(),
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
     labelText: String,
-    isAllCategorySelected: Boolean = false,
+    isAllSelected: Boolean = false,
     onClick: () -> Unit
 ) {
     val sourceTextStyle =
         if (selected.isEmpty()) MaterialTheme.typography.bodyMedium
         else MaterialTheme.typography.labelSmall
     FintrackOutlinedTextField(
-        value = if (isAllCategorySelected) "" else if (selected.size == 1) selected.first().second
+        value = if (isAllSelected) "" else if (selected.size == 1) selected.first().second
         else selected.joinToString(", ") { it.second },
         onClick = onClick,
         readOnly = true,

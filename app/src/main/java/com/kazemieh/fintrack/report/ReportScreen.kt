@@ -49,16 +49,24 @@ fun ReportScreen(
                 onTransactionTypeClicked = {
                     viewModel.onIntent(ReportIntent.OnTransactionTypeSelected(it))
                 },
+
                 selectedCategories = state.selectedCategories,
                 isAllCategorySelected = state.isAllCategorySelected,
                 onCategoryClicked = { viewModel.onIntent(ReportIntent.OnToggleCategorySheet) },
+
                 selectedSources = state.selectedSources,
-                onTagClicked = { viewModel.onIntent(ReportIntent.OnToggleTagSheet) },
-                selectedTags = state.selectedTag,
-                onPersonClicked = { viewModel.onIntent(ReportIntent.OnTogglePersonSheet) },
-                selectedPersons = state.selectedPerson,
-                isShowArrowButton = state.isShowArrowButton,
+                isAllSourceSelected = state.isAllSourceSelected,
                 onSourceClicked = { viewModel.onIntent(ReportIntent.OnToggleSourceSheet) },
+
+                selectedTags = state.selectedTag,
+                isAllTAgSelected = state.isAllTAgSelected,
+                onTagClicked = { viewModel.onIntent(ReportIntent.OnToggleTagSheet) },
+
+                selectedPersons = state.selectedPerson,
+                isAllPersonSelected = state.isAllPersonSelected,
+                onPersonClicked = { viewModel.onIntent(ReportIntent.OnTogglePersonSheet) },
+
+                isShowArrowButton = state.isShowArrowButton,
                 onDateClick = { viewModel.onIntent(ReportIntent.OnToggleDateSheet) },
                 onNextClick = { viewModel.onIntent(ReportIntent.OnNextClick) },
                 onPrevClick = { viewModel.onIntent(ReportIntent.OnPrevClick) },
@@ -92,8 +100,9 @@ fun ReportScreen(
 
         if (state.isTagSheetVisible) {
             TagListSelectionBottomSheet(
-                onTagClick = {
-                    viewModel.onIntent(ReportIntent.OnTagSelected(it))
+                initialSelectionPairs = state.selectedPerson,
+                onConfirmPairs = { pairs, isAll ->
+                    viewModel.onIntent(ReportIntent.OnTagSelected(pairs, isAll))
                 },
                 onDismiss = {
                     viewModel.onIntent(ReportIntent.OnToggleTagSheet)
@@ -103,8 +112,9 @@ fun ReportScreen(
 
         if (state.isPersonSheetVisible) {
             PersonListSelectionBottomSheet(
-                onPersonClick = {
-                    viewModel.onIntent(ReportIntent.OnPersonSelected(it))
+                initialSelectionPairs = state.selectedPerson,
+                onConfirmPairs = { pairs, isAll ->
+                    viewModel.onIntent(ReportIntent.OnPersonSelected(pairs, isAll))
                 },
                 onDismiss = {
                     viewModel.onIntent(ReportIntent.OnTogglePersonSheet)
@@ -114,8 +124,9 @@ fun ReportScreen(
 
         if (state.isSourceSheetVisible) {
             SourceListSelectionBottomSheet(
-                onSourceClick = {
-                    viewModel.onIntent(ReportIntent.OnSourcesSelected(it))
+                initialSelectionPairs = state.selectedSources,
+                onConfirmPairs = { pairs, isAll ->
+                    viewModel.onIntent(ReportIntent.OnSourcesSelected(pairs, isAll))
                 },
                 onDismiss = {
                     viewModel.onIntent(ReportIntent.OnToggleSourceSheet)

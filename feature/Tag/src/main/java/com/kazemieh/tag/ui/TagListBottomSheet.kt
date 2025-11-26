@@ -41,6 +41,9 @@ import com.kazemieh.common.safeLet
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.R
+import com.kazemieh.designsystem.component.selectable.SelectableItemUi
+import com.kazemieh.designsystem.component.selectable.SelectableListBottomSheet
+import com.kazemieh.designsystem.component.selectable.toPairSetFrom
 import com.kazemieh.tag.ui.add.AddTagBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
@@ -249,3 +252,31 @@ fun TagListSelectionBottomSheet(
     }
 }
 
+
+@Composable
+fun TagListSelectionBottomSheet(
+    viewModel: TagViewModel = koinViewModel(),
+    initialSelectionPairs: Set<Pair<Int, String>> = emptySet(),
+    onConfirmPairs: (Set<Pair<Int, String>>, isAllSelected: Boolean) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(true) {
+        viewModel.onIntent(TagIntent.GetAllTag)
+    }
+
+    val items = state.tags.map { SelectableItemUi(it.id?.toInt() ?: 0, it.name) }
+    val initialSelectionIds = initialSelectionPairs.map { it.first }.toSet()
+
+    SelectableListBottomSheet(
+        title = stringResource(R.string.tags),
+        items = items,
+        initialSelection = initialSelectionIds,
+        onConfirm = { selectedIds, isAll ->
+            val pairSet = selectedIds.toPairSetFrom(items)
+            onConfirmPairs(pairSet, isAll)
+        },
+        onDismiss = onDismiss
+    )
+}

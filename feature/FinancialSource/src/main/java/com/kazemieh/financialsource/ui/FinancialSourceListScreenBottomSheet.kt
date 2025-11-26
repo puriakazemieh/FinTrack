@@ -39,6 +39,9 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.R
+import com.kazemieh.designsystem.component.selectable.SelectableItemUi
+import com.kazemieh.designsystem.component.selectable.SelectableListBottomSheet
+import com.kazemieh.designsystem.component.selectable.toPairSetFrom
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -293,4 +296,34 @@ fun SourceList(
 //        }
         }
     }
+}
+
+
+
+@Composable
+fun SourceListSelectionBottomSheet(
+    viewModel: FinancialSourceViewModel = koinViewModel(),
+    initialSelectionPairs: Set<Pair<Int, String>> = emptySet(),
+    onConfirmPairs: (Set<Pair<Int, String>>, isAllSelected: Boolean) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(true) {
+        viewModel.onIntent(FinancialSourceIntent.LoadAllFinancialSource)
+    }
+
+    val items = state.sources.map { SelectableItemUi(it.id.toInt(), it.name) }
+    val initialSelectionIds = initialSelectionPairs.map { it.first }.toSet()
+
+    SelectableListBottomSheet(
+        title = stringResource(R.string.source),
+        items = items,
+        initialSelection = initialSelectionIds,
+        onConfirm = { selectedIds, isAll ->
+            val pairSet = selectedIds.toPairSetFrom(items)
+            onConfirmPairs(pairSet, isAll)
+        },
+        onDismiss = onDismiss
+    )
 }
