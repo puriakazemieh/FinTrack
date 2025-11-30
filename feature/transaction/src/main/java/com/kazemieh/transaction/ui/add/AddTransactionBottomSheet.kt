@@ -35,12 +35,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.common.model.TransactionType
+import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.DatePickerField
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.common.model.TransactionType
-import com.kazemieh.designsystem.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -245,7 +245,7 @@ fun AddTransactionContent(
                 enabled = false,
                 singleLine = false,
                 label = {
-                    if (state.tags != null) {
+                    if (!state.tags.isNullOrEmpty()) {
                         FintrackBodyMediumText(text = stringResource(R.string.tags))
                     } else {
                         FintrackBodyMediumText(text = stringResource(R.string.select_tags))
@@ -267,7 +267,7 @@ fun AddTransactionContent(
                 enabled = false,
                 singleLine = false,
                 label = {
-                    if (state.persons != null) {
+                    if (!state.persons.isNullOrEmpty()) {
                         FintrackBodyMediumText(text = stringResource(R.string.persons))
                     } else {
                         FintrackBodyMediumText(text = stringResource(R.string.select_person))

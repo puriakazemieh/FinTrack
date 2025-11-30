@@ -2,8 +2,9 @@ package com.kazemieh.person.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.domain.usecase.GetAllPerson
 import com.kazemieh.common.model.Person
+import com.kazemieh.designsystem.component.list.ItemUi
+import com.kazemieh.domain.usecase.GetAllPerson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -21,24 +22,28 @@ class PersonViewModel(
             PersonIntent.GetAllPerson -> loadAllPersons()
 
             is PersonIntent.SetSelectedPerson -> {
-                val current = _state.value.selectedPersons ?: emptySet()
+                val current = _state.value.initialSelectionIds
+                val person = intent.person.first
                 val selectedPersons =
-                    if (current.contains(intent.person))
-                        current - intent.person
+                    if (current.contains(person))
+                        current - person
                     else
-                        current + intent.person
+                        current + person
 
                 _state.update {
-                    it.copy(selectedPersons = selectedPersons, showAddPerson = false)
+                    it.copy(initialSelectionIds = selectedPersons, showAddPerson = false)
                 }
             }
 
             is PersonIntent.SetAllSelectedPersons -> _state.update {
-                it.copy(selectedPersons = intent.persons)
+                it.copy(
+                    initialSelectionIds = intent.persons?.map { it.first }?.toSet() ?: emptySet()
+                )
             }
 
+
             is PersonIntent.ShowAddPerson -> _state.update {
-                it.copy(showAddPerson = intent.showAddPerson)
+                it.copy(showAddPerson = !state.value.showAddPerson)
             }
 
         }
@@ -48,25 +53,30 @@ class PersonViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             getAllPerson().collect { persons ->
-//                val personSet = persons.map { person -> (person.id?.toInt() ?: -1) to person.name }.toSet()
-                _state.update { it.copy(persons = persons, isLoading = false) }
+                _state.update {
+                    it.copy(
+                        persons = persons,
+                        items = persons.map { ItemUi(it.id?.toInt() ?: 0, it.name) },
+                        isLoading = false
+                    )
+                }
             }
         }
     }
-
 
 }
 
 data class PersonState(
     val persons: List<Person> = emptyList(),
-    val selectedPersons: Set<Pair<Int, String>>? = null,
     val showAddPerson: Boolean = false,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val initialSelectionIds: Set<Int> = emptySet(),
+    val items: List<ItemUi> = emptyList(),
 )
 
 sealed interface PersonIntent {
     data class SetSelectedPerson(val person: Pair<Int, String>) : PersonIntent
     data class SetAllSelectedPersons(val persons: Set<Pair<Int, String>>? = null) : PersonIntent
     data object GetAllPerson : PersonIntent
-    data class ShowAddPerson(val showAddPerson: Boolean = false) : PersonIntent
+    data object ShowAddPerson : PersonIntent
 }
