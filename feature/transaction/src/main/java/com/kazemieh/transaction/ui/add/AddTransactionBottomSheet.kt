@@ -1,7 +1,7 @@
 package com.kazemieh.transaction.ui.add
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +18,9 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -25,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -69,7 +73,9 @@ fun AddTransactionBottomSheet(
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
-    val scope = rememberCoroutineScope()
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(true) {
         viewModel.onEvent(AddTransactionEvent.FetchDefaultData)
@@ -93,8 +99,8 @@ fun AddTransactionBottomSheet(
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is AddTransactionEffect.Success -> {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                is AddTransactionEffect.AddedTransaction -> {
+                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
                             transactionAdded()
                             onDismiss()
@@ -102,8 +108,13 @@ fun AddTransactionBottomSheet(
                     }
                 }
 
-                is AddTransactionEffect.Error -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_LONG).show()
+                is AddTransactionEffect.ShowMessage -> {
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(effect.message),
+                            duration = SnackbarDuration.Short
+                        )
+                    }
                 }
 
                 AddTransactionEffect.OnDismiss -> onDismiss()
@@ -116,15 +127,25 @@ fun AddTransactionBottomSheet(
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background
     ) {
-        AddTransactionContent(
-            state = state,
-            onEvent = viewModel::onEvent,
-            onSourceClicked = onSourceClicked,
-            onTagClicked = onTagClicked,
-            onPersonClicked = onPersonClicked,
-            onSourceEndClicked = onSourceEndClicked,
-            onCategoryClicked = { onCategoryClicked(state.selectedTransactionType.count) }
-        )
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            AddTransactionContent(
+                state = state,
+                onEvent = viewModel::onEvent,
+                onSourceClicked = onSourceClicked,
+                onTagClicked = onTagClicked,
+                onPersonClicked = onPersonClicked,
+                onSourceEndClicked = onSourceEndClicked,
+                onCategoryClicked = { onCategoryClicked(state.selectedTransactionType.count) }
+            )
+            Box {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
+            }
+        }
     }
 }
 

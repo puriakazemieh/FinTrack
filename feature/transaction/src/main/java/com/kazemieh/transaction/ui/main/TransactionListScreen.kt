@@ -1,11 +1,9 @@
 package com.kazemieh.transaction.ui.main
 
-import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import com.kazemieh.transaction.ui.component.TransactionListContent
 import org.koin.androidx.compose.koinViewModel
 
@@ -14,7 +12,9 @@ fun TransactionListScreen(
     viewModel: TransactionViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    val context = LocalContext.current
+//    val context = LocalContext.current
+//    val snackbarHostState = remember { SnackbarHostState() }
+//    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(true) {
         viewModel.onIntent(TransactionIntent.LoadTransactions)
@@ -22,9 +22,14 @@ fun TransactionListScreen(
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
-            if (effect is TransactionEffect.ShowMessage) {
-                Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
-            }
+//            if (effect is TransactionEffect.ShowMessage) {
+//                coroutineScope.launch {
+//                    snackbarHostState.showSnackbar(
+//                        message = context.getString(effect.message),
+//                        duration = SnackbarDuration.Short
+//                    )
+//                }
+//            }
         }
     }
 

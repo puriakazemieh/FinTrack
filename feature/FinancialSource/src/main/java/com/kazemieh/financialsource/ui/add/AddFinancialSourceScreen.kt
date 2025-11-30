@@ -37,9 +37,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
-import com.kazemieh.designsystem.R
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -143,17 +143,17 @@ fun AddSourceBottomSheet(
 
 
                 AnimatedVisibility(visible = state.selectedTypeFinancialSource == SelectedTypeFinancialSource.CREDIT) {
-                        FintrackOutlinedTextField(
-                            value = state.cardNumber ?: "",
-                            onValueChange = {
-                                viewModel.onIntent(
-                                    AddFinancialSourceIntent.SetCardNumber(it)
-                                )
-                            },
-                            label = { FintrackBodyMediumText(text = stringResource(R.string.card_number_label)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                        )
-                    }
+                    FintrackOutlinedTextField(
+                        value = state.cardNumber ?: "",
+                        onValueChange = {
+                            viewModel.onIntent(
+                                AddFinancialSourceIntent.SetCardNumber(it)
+                            )
+                        },
+                        label = { FintrackBodyMediumText(text = stringResource(R.string.card_number_label)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                }
 
                 FintrackOutlinedTextField(
                     value = state.description ?: "",
@@ -179,7 +179,7 @@ fun AddSourceBottomSheet(
                 }
             }
 
-            // Snackbar
+
             Box {
                 SnackbarHost(
                     hostState = snackbarHostState,

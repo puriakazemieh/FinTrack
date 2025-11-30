@@ -89,5 +89,7 @@
     <string name="description_label">توضیحات</string>
     <string name="required_star">*</string>
     <string name="save_tag">ذخیره</string>
+    <string name="fill_all_field">لطفاً تمام فیلدها را پر کنید.</string>
+    <string name="transaction_failed">خطا در ثبت تراکنش</string>
 
 </resources>

@@ -89,7 +89,6 @@ fun AddCategoryBottomSheet(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
 
-                // نام دسته‌بندی
                 FintrackOutlinedTextField(
                     value = state.categoryName ?: "",
                     onValueChange = { viewModel.onIntent(AddCategoryIntent.SetCategoryName(it)) },
@@ -104,7 +103,6 @@ fun AddCategoryBottomSheet(
                     }
                 )
 
-                // توضیحات
                 FintrackOutlinedTextField(
                     value = state.description ?: "",
                     onValueChange = { viewModel.onIntent(AddCategoryIntent.SetDescription(it)) },
@@ -113,7 +111,7 @@ fun AddCategoryBottomSheet(
 
                 Spacer(Modifier.height(16.dp))
 
-                // دکمه ذخیره
+
                 Button(
                     onClick = { viewModel.onIntent(AddCategoryIntent.AddCategory) },
                     modifier = Modifier.fillMaxWidth(),
@@ -129,7 +127,6 @@ fun AddCategoryBottomSheet(
                 }
             }
 
-            // Snackbar
             Box {
                 SnackbarHost(
                     hostState = snackbarHostState,

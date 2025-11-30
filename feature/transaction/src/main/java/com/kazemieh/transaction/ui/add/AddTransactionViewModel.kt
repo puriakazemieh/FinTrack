@@ -3,9 +3,10 @@ package com.kazemieh.transaction.ui.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.domain.usecase.TransactionUseCases
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.designsystem.R
+import com.kazemieh.domain.usecase.TransactionUseCases
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -133,7 +134,7 @@ class AddTransactionViewModel(
             }
 
             if (amount == null || categoryId == null || sourceId == null || (current.selectedTransactionType == TransactionType.TRANSFER && sourceEndId == null)) {
-                _effect.send(AddTransactionEffect.Error("لطفاً تمام فیلدها را پر کنید."))
+                _effect.send(AddTransactionEffect.ShowMessage(R.string.fill_all_field))
                 _state.update {
                     it.copy(
                         isSourceError = sourceId == null,
@@ -159,19 +160,15 @@ class AddTransactionViewModel(
                 type = current.selectedTransactionType
             )
 
-            try {
-                val tagsId = current.tags?.map { it.first.toLong() } ?: emptyList()
-                val personIds = current.persons?.map { it.first.toLong() } ?: emptyList()
-                val transactionId =
-                    transactionUseCases.addTransaction(transaction, tagsId, personIds)
-                if (transactionId >= 0) {
-                    _effect.send(AddTransactionEffect.Success)
-                    _state.update { AddTransactionState() }
-                }
-            } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false) }
-                _effect.send(AddTransactionEffect.Error(e.message ?: "خطا در ثبت تراکنش"))
-            }
+            val tagsId = current.tags?.map { it.first.toLong() } ?: emptyList()
+            val personIds = current.persons?.map { it.first.toLong() } ?: emptyList()
+            val transactionId =
+                transactionUseCases.addTransaction(transaction, tagsId, personIds)
+            if (transactionId >= 0) {
+                _effect.send(AddTransactionEffect.AddedTransaction)
+                _state.update { AddTransactionState() }
+            } else _effect.send(AddTransactionEffect.ShowMessage(R.string.transaction_failed))
+
         }
     }
 }
@@ -226,7 +223,7 @@ data class AddTransactionState(
 )
 
 sealed interface AddTransactionEffect {
-    object Success : AddTransactionEffect
-    data class Error(val message: String) : AddTransactionEffect
+    object AddedTransaction : AddTransactionEffect
+    data class ShowMessage(val message: Int) : AddTransactionEffect
     data object OnDismiss : AddTransactionEffect
 }

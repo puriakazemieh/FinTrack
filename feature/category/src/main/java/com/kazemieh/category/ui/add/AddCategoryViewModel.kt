@@ -53,7 +53,7 @@ class AddCategoryViewModel(
                     _effect.send(
                         AddCategoryEffect.AddedCategory(
                             categoryId.toInt(),
-                            _state.value.categoryName ?: "انتخاب کنید"
+                            _state.value.categoryName ?: ""
                         )
                     )
                     _state.update { AddCategoryState() }
