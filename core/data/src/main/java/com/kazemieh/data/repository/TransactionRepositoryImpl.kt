@@ -1,21 +1,22 @@
 package com.kazemieh.data.repository
 
-import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
-import com.kazemieh.domain.repository.TransactionRepository
+import androidx.paging.PagingData
 import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.CategorySum
 import com.kazemieh.common.model.FinancialSource
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
+import com.kazemieh.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
-import kotlin.Long
 
 class TransactionRepositoryImpl(
     private val localDataSource: TransactionLocalDataSource
 ) : TransactionRepository {
 
-    override fun getAllTransactions(): Flow<List<TransactionWithRelations>> {
+    override fun getAllTransactions(): Flow<PagingData<TransactionWithRelations>> {
         return localDataSource.getAllTransactions()
     }
 
@@ -31,8 +32,28 @@ class TransactionRepositoryImpl(
         personIds: List<Int>,
         fromTimestamp: Long?,
         toTimestamp: Long?
-    ): Flow<List<TransactionWithRelations>> {
+    ): Flow<PagingData<TransactionWithRelations>> {
         return localDataSource.getAllTransactionsFiltered(
+            type = type,
+            categoryIds = categoryIds,
+            sourceIds = sourceIds,
+            tagIds = tagIds,
+            personIds = personIds,
+            fromTimestamp = fromTimestamp,
+            toTimestamp = toTimestamp
+        )
+    }
+
+    override fun getCategorySums(
+        type: Int?,
+        categoryIds: List<Int>,
+        sourceIds: List<Int>,
+        tagIds: List<Int>,
+        personIds: List<Int>,
+        fromTimestamp: Long?,
+        toTimestamp: Long?
+    ): Flow<List<CategorySum>> {
+        return localDataSource.getCategorySums(
             type = type,
             categoryIds = categoryIds,
             sourceIds = sourceIds,

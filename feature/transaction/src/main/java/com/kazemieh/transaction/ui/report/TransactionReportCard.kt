@@ -21,9 +21,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.PieChart
-import com.kazemieh.designsystem.R
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -36,7 +36,7 @@ fun ShowTransactionReportCard(
     val state by viewModel.state.collectAsState()
 
 
-    val text = when (state.selectedTransactionType) {
+    val text = when (state.filterParams.type) {
         1 -> {
             stringResource(R.string.incoming)
         }

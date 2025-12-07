@@ -14,6 +14,7 @@ import com.kazemieh.domain.usecase.GetAllTag
 import com.kazemieh.domain.usecase.GetAllTransactions
 import com.kazemieh.domain.usecase.GetAllTransactionsByType
 import com.kazemieh.domain.usecase.GetAllTransactionsFiltered
+import com.kazemieh.domain.usecase.GetCategorySum
 import com.kazemieh.domain.usecase.GetDefaultCategoryUseCase
 import com.kazemieh.domain.usecase.GetDefaultFinancialSourceUseCase
 import com.kazemieh.domain.usecase.GetTransferCategoryUseCase
@@ -26,6 +27,7 @@ val domainModule = module {
     factory { GetAllTransactions(get()) }
     factory { GetAllTransactionsByType(get()) }
     factory { GetAllTransactionsFiltered(get()) }
+    factory { GetCategorySum(get()) }
     factory { GetAllTag(get()) }
     factory { GetAllFinancialSource(get()) }
     factory { GetAllCategoryByType(get()) }
@@ -48,7 +50,8 @@ val domainModule = module {
             getDefaultFinancialSourceUseCase = get(),
             getAllTransactions = get(),
             getAllTransactionsByType = get(),
-            getAllTransactionsFiltered = get()
+            getAllTransactionsFiltered = get(),
+            getCategorySum = get(),
         )
     }
 

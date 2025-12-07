@@ -27,6 +27,7 @@ class LibraryConvention : Plugin<Project> {
         dependencies {
             implementation(libs.findLibrary("kotlinx.collections.immutable").get())
             implementation(libs.findLibrary("kotlinx.coroutines.core").get())
+            implementation(libs.findLibrary("paging.runtime").get())
         }
     }
 }

@@ -8,5 +8,6 @@ data class TransactionUseCases(
     val deleteTransaction: DeleteTransaction,
     val getAllTransactions: GetAllTransactions,
     val getAllTransactionsByType: GetAllTransactionsByType,
-    val getAllTransactionsFiltered: GetAllTransactionsFiltered
+    val getAllTransactionsFiltered: GetAllTransactionsFiltered,
+    val getCategorySum: GetCategorySum
 )

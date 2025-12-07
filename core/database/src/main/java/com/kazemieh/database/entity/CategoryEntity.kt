@@ -12,3 +12,11 @@ data class CategoryEntity(
     val description: String? = null,
     val type: Int,
 )
+
+@Serializable
+data class CategorySumEntity(
+    val categoryId: Long,
+    val name: String,
+    val totalAmount: Long,
+    val type: Int
+)

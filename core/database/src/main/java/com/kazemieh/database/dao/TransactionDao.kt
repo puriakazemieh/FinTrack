@@ -1,5 +1,6 @@
 package com.kazemieh.database.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -7,6 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.kazemieh.database.entity.CategorySumEntity
 import com.kazemieh.database.entity.TransactionEntity
 import com.kazemieh.database.entity.TransactionPersonCrossRef
 import com.kazemieh.database.entity.TransactionTagCrossRef
@@ -30,7 +32,7 @@ interface TransactionDao {
 
     @Transaction
     @Query("SELECT * FROM transactions")
-    fun getAllTransactionsWithCategoryFinancialSourceAndTags(): Flow<List<TransactionWithCategoryFinancialSourceAndTags>>
+    fun getAllTransactionsWithCategoryFinancialSourceAndTags(): PagingSource<Int, TransactionWithCategoryFinancialSourceAndTags>
 
     @Transaction
     @Query("SELECT * FROM transactions  WHERE type = :type")
@@ -78,7 +80,61 @@ interface TransactionDao {
         sourceIdsSize: Int = sourceIds.size,
         fromTimestamp: Long? = null,
         toTimestamp: Long? = null
-    ): Flow<List<TransactionWithCategoryFinancialSourceAndTags>>
+    ): PagingSource<Int, TransactionWithCategoryFinancialSourceAndTags>
+
+    @Query(
+        """
+    SELECT 
+        c.id AS categoryId,
+        c.name AS name,
+        SUM(t.amount) AS totalAmount,
+        c.type AS type
+    FROM transactions t
+    INNER JOIN category c ON t.categoryId = c.id
+    
+    WHERE (:type IS NULL OR t.type = :type)
+
+      AND ((:categoryIdsSize = 0) OR t.categoryId IN (:categoryIds))
+
+      AND ((:sourceIdsSize = 0) OR t.financialSourceId IN (:sourceIds))
+
+      AND (
+            :tagIdsSize = 0 OR t.id IN (
+                SELECT transactionId
+                FROM transaction_tag
+                WHERE tagId IN (:tagIds)
+            )
+      )
+
+      AND (
+            :personIdsSize = 0 OR t.id IN (
+                SELECT transactionId
+                FROM transaction_person
+                WHERE personId IN (:personIds)
+            )
+      )
+
+      AND (
+            (:fromTimestamp IS NULL OR :toTimestamp IS NULL)
+            OR (t.timeStamp >= :fromTimestamp AND t.timeStamp < :toTimestamp)
+      )
+
+    GROUP BY c.id
+    """
+    )
+    fun getCategorySums(
+        type: Int?,
+        categoryIds: List<Int>,
+        sourceIds: List<Int>,
+        tagIds: List<Int>,
+        personIds: List<Int>,
+        tagIdsSize: Int = tagIds.size,
+        personIdsSize: Int = personIds.size,
+        categoryIdsSize: Int = categoryIds.size,
+        sourceIdsSize: Int = sourceIds.size,
+        fromTimestamp: Long?,
+        toTimestamp: Long?
+    ): Flow<List<CategorySumEntity>>
 
 
     @Transaction

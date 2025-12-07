@@ -22,6 +22,7 @@ class RoomConvention : Plugin<Project> {
         dependencies {
             implementation(libs.findLibrary("room.runtime").get())
             implementation(libs.findLibrary("room.ktx").get())
+            implementation(libs.findLibrary("paging.room").get())
             annotationProcessor(libs.findLibrary("room.compiler").get())
             ksp(libs.findLibrary("room.compiler").get())
         }

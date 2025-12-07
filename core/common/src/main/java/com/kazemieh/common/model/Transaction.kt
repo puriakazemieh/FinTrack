@@ -15,6 +15,7 @@ data class Transaction(
     val type: TransactionType,
 )
 
+@Serializable
 enum class TransactionType(val count: Int) {
     ALL(0),
     INCOME(1),

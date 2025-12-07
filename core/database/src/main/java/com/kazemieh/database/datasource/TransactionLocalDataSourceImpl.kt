@@ -1,5 +1,16 @@
 package com.kazemieh.database.datasource
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
+import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.CategorySum
+import com.kazemieh.common.model.FinancialSource
+import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.Tag
+import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
 import com.kazemieh.database.dao.CategoryDao
 import com.kazemieh.database.dao.FinancialSourceDao
@@ -18,12 +29,6 @@ import com.kazemieh.database.mapper.toTag
 import com.kazemieh.database.mapper.toTagEntity
 import com.kazemieh.database.mapper.toTransactionEntity
 import com.kazemieh.database.mapper.toTransactionWithRelations
-import com.kazemieh.common.model.Category
-import com.kazemieh.common.model.FinancialSource
-import com.kazemieh.common.model.Person
-import com.kazemieh.common.model.Tag
-import com.kazemieh.common.model.Transaction
-import com.kazemieh.common.model.TransactionWithRelations
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -69,9 +74,21 @@ class TransactionLocalDataSourceImpl(
         transactionDao.updateTransaction(transaction.toTransactionEntity())
     }
 
-    override fun getAllTransactions(): Flow<List<TransactionWithRelations>> {
-        return transactionDao.getAllTransactionsWithCategoryFinancialSourceAndTags().map {
-            it.map { it.toTransactionWithRelations() }
+
+    override fun getAllTransactions(): Flow<PagingData<TransactionWithRelations>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 3,
+                initialLoadSize = 3,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                transactionDao.getAllTransactionsWithCategoryFinancialSourceAndTags()
+            }
+        ).flow.map { pagingData ->
+            pagingData.map { item ->
+                item.toTransactionWithRelations()
+            }
         }
     }
 
@@ -89,9 +106,41 @@ class TransactionLocalDataSourceImpl(
         personIds: List<Int>,
         fromTimestamp: Long?,
         toTimestamp: Long?
-    ): Flow<List<TransactionWithRelations>> {
+    ): Flow<PagingData<TransactionWithRelations>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 3,
+                initialLoadSize = 3,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                transactionDao.getAllTransactionsFiltered(
+                    type = type,
+                    categoryIds = categoryIds,
+                    sourceIds = sourceIds,
+                    tagIds = tagIds,
+                    personIds = personIds,
+                    fromTimestamp = fromTimestamp,
+                    toTimestamp = toTimestamp
+                )
+            }
+        ).flow.map { pagingData ->
+            pagingData.map { item ->
+                item.toTransactionWithRelations()
+            }
+        }
+    }
 
-        return transactionDao.getAllTransactionsFiltered(
+    override fun getCategorySums(
+        type: Int?,
+        categoryIds: List<Int>,
+        sourceIds: List<Int>,
+        tagIds: List<Int>,
+        personIds: List<Int>,
+        fromTimestamp: Long?,
+        toTimestamp: Long?
+    ): Flow<List<CategorySum>> {
+        return transactionDao.getCategorySums(
             type = type,
             categoryIds = categoryIds,
             sourceIds = sourceIds,
@@ -100,7 +149,7 @@ class TransactionLocalDataSourceImpl(
             fromTimestamp = fromTimestamp,
             toTimestamp = toTimestamp
         ).map {
-            it.map { it.toTransactionWithRelations() }
+            it.map { it.toCategory() }
         }
     }
 

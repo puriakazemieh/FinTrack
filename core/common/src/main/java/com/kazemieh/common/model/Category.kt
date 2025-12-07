@@ -9,3 +9,12 @@ data class Category(
     val description: String? = null,
     val type: TransactionType,
 )
+
+
+@Serializable
+data class CategorySum(
+    val categoryId: Long,
+    val name: String,
+    val totalAmount: Long,
+    val type: Int
+)

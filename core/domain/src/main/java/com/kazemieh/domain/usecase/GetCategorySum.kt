@@ -1,11 +1,10 @@
 package com.kazemieh.domain.usecase
 
-import androidx.paging.PagingData
+import com.kazemieh.common.model.CategorySum
 import com.kazemieh.domain.repository.TransactionRepository
-import com.kazemieh.common.model.TransactionWithRelations
 import kotlinx.coroutines.flow.Flow
 
-class GetAllTransactionsFiltered(
+class GetCategorySum(
     private val repository: TransactionRepository
 ) {
     operator fun invoke(
@@ -16,8 +15,8 @@ class GetAllTransactionsFiltered(
         personIds: List<Int> = emptyList(),
         fromTimestamp: Long? = null,
         toTimestamp: Long? = null
-    ): Flow<PagingData<TransactionWithRelations>> {
-        return repository.getAllTransactionsFiltered(
+    ): Flow<List<CategorySum>> {
+        return repository.getCategorySums(
             type = type,
             categoryIds = categoryIds,
             sourceIds = sourceIds,

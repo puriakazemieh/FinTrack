@@ -12,14 +12,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import com.kazemieh.common.ld
+import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.designsystem.R
 
 
 @Composable
 fun TransactionListContent(
-    uiTransactionWithRelations: List<TransactionWithRelationsUi>,
+    uiTransactionWithRelations: LazyPagingItems<TransactionWithRelationsUi>,
     isLoading: Boolean = true,
     onDelete: (TransactionWithRelationsUi) -> Unit = {}
 ) {
@@ -36,23 +38,25 @@ fun TransactionListContent(
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         } else {
-            Column {
-                if (uiTransactionWithRelations.isNotEmpty()) {
-                    FintrackTitleMediumText(
-                        text = stringResource(R.string.recent_transactions),
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-
-                    uiTransactionWithRelations.forEach { transactionWithRelations ->
-                        TransactionItem(
-                            uiTransactionWithRelation = transactionWithRelations,
-                            onDelete = { onDelete(transactionWithRelations) }
-                        )
-                    }
-                } else EmptyListScreen()
-
-            }
+//            Column {
+//                if (uiTransactionWithRelations.itemSnapshotList.isNotEmpty()) {
+//                    uiTransactionWithRelations.itemSnapshotList.size.ld("itemSnapshotList")
+//                    FintrackTitleMediumText(
+//                        text = stringResource(R.string.recent_transactions),
+//                        modifier = Modifier.padding(vertical = 8.dp),
+//                        color = MaterialTheme.colorScheme.onBackground
+//                    )
+//
+//                    uiTransactionWithRelations.itemSnapshotList.forEach { transactionWithRelations ->
+//                        if (transactionWithRelations != null)
+//                            TransactionItem(
+//                                uiTransactionWithRelation = transactionWithRelations,
+//                                onDelete = { onDelete(transactionWithRelations) }
+//                            )
+//                    }
+//                } else EmptyListScreen()
+//
+//            }
         }
     }
 }

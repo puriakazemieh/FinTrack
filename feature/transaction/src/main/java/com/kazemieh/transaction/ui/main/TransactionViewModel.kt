@@ -2,20 +2,25 @@ package com.kazemieh.transaction.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.map
 import com.kazemieh.common.formatted
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.toPositive
+import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.PieChartItem
 import com.kazemieh.domain.usecase.TransactionUseCases
-import com.kazemieh.common.model.TransactionType
-import com.kazemieh.designsystem.R
 import com.kazemieh.transaction.ui.component.TransactionUi
 import com.kazemieh.transaction.ui.component.TransactionWithRelationsUi
 import com.kazemieh.transaction.ui.component.toDomain
 import com.kazemieh.transaction.ui.component.toUi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -30,6 +35,10 @@ class TransactionViewModel(
     private val _effect = Channel<TransactionEffect>()
     val effect = _effect.receiveAsFlow()
 
+    val uiTransactionWithRelations: Flow<PagingData<TransactionWithRelationsUi>> =
+        transactionUseCases.getAllTransactions().cachedIn(viewModelScope)
+            .map { it.map { it.toUi() } }
+
     fun onIntent(intent: TransactionIntent) {
         when (intent) {
             is TransactionIntent.LoadTransactions -> loadTransactions()
@@ -42,37 +51,43 @@ class TransactionViewModel(
     private fun loadTransactions() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            transactionUseCases.getAllTransactions().collect { transactions ->
+            transactionUseCases.getCategorySum().collect { categorySums ->
 
-                var totalIncome = 0
-                var totalExpense = 0
-                var totalTransfer = 0
-                var balance = 0
+                var totalIncome: Long = 0
+                var totalExpense: Long = 0
+                var totalTransfer: Long = 0
+                var balance: Long = 0
 
-                val uiTransactionWithRelations = transactions.map { transactionWithRelations ->
 
-                    when(transactionWithRelations.transaction.type){
-                        TransactionType.INCOME -> { totalIncome += transactionWithRelations.transaction.amount}
-                        TransactionType.EXPENSE -> {totalExpense += transactionWithRelations.transaction.amount}
-                        TransactionType.TRANSFER -> {totalTransfer += transactionWithRelations.transaction.amount}
+                categorySums.map { category ->
+
+                    balance += category.totalAmount
+                    when (category.type) {
+                        TransactionType.INCOME.count -> {
+                            totalIncome += category.totalAmount
+                        }
+
+                        TransactionType.EXPENSE.count -> {
+                            totalExpense += category.totalAmount
+                        }
+
+                        TransactionType.TRANSFER.count -> {
+                            totalTransfer += category.totalAmount
+                        }
+
                         else -> {}
                     }
-                    balance += transactionWithRelations.transaction.amount
-                    transactionWithRelations.copy()
-                    transactionWithRelations.transaction.toUi()
-                    transactionWithRelations.toUi()
                 }
 
                 _state.update {
                     it.copy(
-                        uiTransactionWithRelations = uiTransactionWithRelations,
-                        formatedTotalIncome = totalIncome.formatted(),
-                        totalIncome = totalIncome.toPositive().toLong(),
-                        formatedTotalExpense = totalExpense.formatted(),
-                        totalExpense = totalExpense.toPositive().toLong(),
-                        formatedTotalTransfer = totalTransfer.formatted(),
-                        totalTransfer = totalTransfer.toPositive().toLong(),
-                        balance = balance.formatted(),
+                        formatedTotalIncome = totalIncome.toInt().formatted(),
+                        totalIncome = totalIncome.toInt().toPositive().toLong(),
+                        formatedTotalExpense = totalExpense.toInt().formatted(),
+                        totalExpense = totalExpense.toInt().toPositive().toLong(),
+                        formatedTotalTransfer = totalTransfer.toInt().formatted(),
+                        totalTransfer = totalTransfer.toInt().toPositive().toLong(),
+                        balance = balance.toInt().formatted(),
                         isPositiveBalance = balance >= 0,
                         isLoading = false
                     )
@@ -97,7 +112,6 @@ sealed interface TransactionIntent {
 }
 
 data class TransactionState(
-    val uiTransactionWithRelations: List<TransactionWithRelationsUi> = emptyList(),
 
     val isLoading: Boolean = false,
 

@@ -24,6 +24,7 @@ internal fun Project.composeGradleExtension(
             implementation(libs.findLibrary("androidx.ui.graphics").get())
             implementation(libs.findLibrary("androidx.compose.runtime").get())
 
+            implementation(libs.findLibrary("paging.compose").get())
             implementation(libs.findLibrary("androidx.ui.tooling").get())
             implementation(libs.findLibrary("androidx.ui.tooling.preview").get())
             implementation(libs.findLibrary("androidx.material3").get())
