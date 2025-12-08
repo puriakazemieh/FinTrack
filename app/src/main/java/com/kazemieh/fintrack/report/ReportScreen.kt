@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.CategoryListSelectionBottomSheet
 import com.kazemieh.common.DateFilterType
+import com.kazemieh.common.ld
 import com.kazemieh.financialsource.ui.SourceListSelectionBottomSheet
 import com.kazemieh.person.ui.PersonListSelectionBottomSheet
 import com.kazemieh.tag.ui.TagListSelectionBottomSheet
@@ -92,6 +93,7 @@ fun ReportScreen(
                 initialSelectionPairs = state.selectedCategories,
                 selectedTransactionType = state.selectedTransactionType,
                 onConfirmPairs = { pairs, isAll ->
+                    pairs.ld("pairs")
                     viewModel.onIntent(ReportIntent.OnCategoriesSelected(pairs, isAll))
                 },
                 onDismiss = { viewModel.onIntent(ReportIntent.OnToggleCategorySheet) }

@@ -56,15 +56,14 @@ fun CategoryListSelectionBottomSheet(
         viewModel.onIntent(CategoryIntent.LoadCategoryByType(selectedTransactionType))
     }
 
-    val items = state.categories.map { ItemUi(it.id?.toInt() ?: 0, it.name) }
     val initialSelectionIds = initialSelectionPairs.map { it.first }.toSet()
 
     SelectableListBottomSheet(
         title = stringResource(R.string.category),
-        items = items,
+        items = state.items,
         initialSelection = initialSelectionIds,
         onConfirm = { selectedIds, isAll ->
-            val pairSet = selectedIds.toPairSetFrom(items)
+            val pairSet = selectedIds.toPairSetFrom(state.items)
             onConfirmPairs(pairSet, isAll)
         },
         onDismiss = onDismiss

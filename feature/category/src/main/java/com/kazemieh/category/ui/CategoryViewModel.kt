@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.GetAllCategoryByType
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.designsystem.component.list.ItemUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -91,6 +92,7 @@ class CategoryViewModel(
                     _state.update {
                         it.copy(
                             categories = allCategory,
+                            items = allCategory.map { ItemUi(it.id?.toInt() ?: 0, it.name) },
                             isLoading = false,
                             selectedCategory = if (isAllCategorySelected) allCategorySelect(
                                 allCategory = allCategory
@@ -116,6 +118,7 @@ class CategoryViewModel(
 
 data class CategoryState(
     val categories: List<Category> = emptyList(),
+    val items: List<ItemUi> = emptyList(),
     val selectedCategory: Set<Pair<Int, String>> = emptySet(),
     val isLoading: Boolean = false,
     val isAllCategorySelected: Boolean = true

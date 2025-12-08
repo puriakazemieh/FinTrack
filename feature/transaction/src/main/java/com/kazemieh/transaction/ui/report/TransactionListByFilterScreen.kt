@@ -41,7 +41,6 @@ fun TransactionListByFilterScreen(
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(selectedCategories) {
-        selectedCategories.ld("selectedCategories selectedCategories")
         viewModel.onIntent(TransactionReportIntent.SelectedCategory(selectedCategories))
     }
 
@@ -98,7 +97,6 @@ fun TransactionListByFilterScreen(
                 contentType = lazyPagingItems.itemContentType { "MyPagingItems" },
             ) { index ->
                 val item = lazyPagingItems[index]
-                item.ld("item")
                 if (item != null) {
                     TransactionItem(
                         uiTransactionWithRelation = item,

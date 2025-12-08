@@ -2,6 +2,7 @@ package com.kazemieh.financialsource.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.designsystem.component.list.ItemUi
 import com.kazemieh.domain.usecase.GetAllFinancialSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,6 +41,7 @@ class FinancialSourceViewModel(
                 _state.update {
                     it.copy(
                         sources = financialSource.map { it.toUi() },
+                        items = financialSource.map { ItemUi(it.id?.toInt() ?: 0, it.name) },
                         isLoading = false
                     )
                 }
@@ -58,6 +60,7 @@ sealed interface FinancialSourceIntent {
 
 data class FinancialSourceState(
     val sources: List<FinancialSourceUi> = emptyList(),
+    val items: List<ItemUi> = emptyList(),
     val selectedSources: Set<Pair<Int, String>>? = null,
     val isLoading: Boolean = false
 )

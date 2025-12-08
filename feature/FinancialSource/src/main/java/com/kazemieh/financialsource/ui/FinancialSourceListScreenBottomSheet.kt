@@ -148,15 +148,14 @@ fun SourceListSelectionBottomSheet(
         viewModel.onIntent(FinancialSourceIntent.LoadAllFinancialSource)
     }
 
-    val items = state.sources.map { ItemUi(it.id.toInt(), it.name) }
     val initialSelectionIds = initialSelectionPairs.map { it.first }.toSet()
 
     SelectableListBottomSheet(
         title = stringResource(R.string.source),
-        items = items,
+        items = state.items,
         initialSelection = initialSelectionIds,
         onConfirm = { selectedIds, isAll ->
-            val pairSet = selectedIds.toPairSetFrom(items)
+            val pairSet = selectedIds.toPairSetFrom(state.items)
             onConfirmPairs(pairSet, isAll)
         },
         onDismiss = onDismiss
