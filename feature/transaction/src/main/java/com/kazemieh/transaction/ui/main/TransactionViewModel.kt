@@ -36,7 +36,7 @@ class TransactionViewModel(
     val effect = _effect.receiveAsFlow()
 
     val uiTransactionWithRelations: Flow<PagingData<TransactionWithRelationsUi>> =
-        transactionUseCases.getAllTransactions().cachedIn(viewModelScope)
+        transactionUseCases.getAllTransactionsFiltered().cachedIn(viewModelScope)
             .map { it.map { it.toUi() } }
 
     fun onIntent(intent: TransactionIntent) {
