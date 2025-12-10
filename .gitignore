@@ -17,3 +17,5 @@ local.properties
 /.idea/kotlinc.xml
 /build-logic/.gradle
 /build-logic/convention/build
+.idea
+/.idea
