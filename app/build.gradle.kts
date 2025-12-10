@@ -40,11 +40,11 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:database"))
     implementation(project(":core:domain"))
-    implementation(project(":feature:transaction"))
-    implementation(project(":feature:category"))
-    implementation(project(":feature:source"))
-    implementation(project(":feature:Tag"))
-    implementation(project(":feature:filter"))
-    implementation(project(":feature:person"))
+    implementation(project(":feature-share:transaction"))
+    implementation(project(":feature-share:category"))
+    implementation(project(":feature-share:source"))
+    implementation(project(":feature-share:Tag"))
+    implementation(project(":feature-share:filter"))
+    implementation(project(":feature-share:person"))
 
 }

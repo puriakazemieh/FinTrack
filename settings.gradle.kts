@@ -1,8 +1,3 @@
-import java.net.URI
-
-include(":feature:person")
-
-
 pluginManagement {
     repositories {
         includeBuild("build-logic")
@@ -35,8 +30,10 @@ include(":core:data-contract")
 include(":core:database")
 include(":core:designsystem")
 include(":core:domain")
-include(":feature:transaction")
-include(":feature:category")
-include(":feature:source")
-include(":feature:Tag")
-include(":feature:filter")
+include(":feature-share:transaction")
+include(":feature-share:category")
+include(":feature-share:source")
+include(":feature-share:Tag")
+include(":feature-share:filter")
+include(":feature-share:person")
+
