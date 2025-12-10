@@ -24,6 +24,8 @@ android {
         }
         debug {
             isDebuggable = true
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
