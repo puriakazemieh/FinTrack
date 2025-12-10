@@ -11,9 +11,6 @@ android {
     defaultConfig {
         applicationId = "com.kazemieh.fintrack"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-//        versionCode = 1
-//        versionName = "1.0.0"
     }
 
     buildTypes {
@@ -43,7 +40,7 @@ dependencies {
     implementation(project(":feature-share:transaction"))
     implementation(project(":feature-share:category"))
     implementation(project(":feature-share:source"))
-    implementation(project(":feature-share:Tag"))
+    implementation(project(":feature-share:tags"))
     implementation(project(":feature-share:filter"))
     implementation(project(":feature-share:person"))
 

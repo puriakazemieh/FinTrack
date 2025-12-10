@@ -33,7 +33,7 @@ include(":core:domain")
 include(":feature-share:transaction")
 include(":feature-share:category")
 include(":feature-share:source")
-include(":feature-share:Tag")
+include(":feature-share:tags")
 include(":feature-share:filter")
 include(":feature-share:person")
 
