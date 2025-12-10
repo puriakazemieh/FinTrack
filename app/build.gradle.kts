@@ -42,7 +42,7 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":feature:transaction"))
     implementation(project(":feature:category"))
-    implementation(project(":feature:FinancialSource"))
+    implementation(project(":feature:source"))
     implementation(project(":feature:Tag"))
     implementation(project(":feature:filter"))
     implementation(project(":feature:person"))
