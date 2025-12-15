@@ -37,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
@@ -48,7 +49,7 @@ import org.koin.androidx.compose.koinViewModel
 fun AddSourceBottomSheet(
     viewModel: AddFinancialSourceViewModel = koinViewModel(),
     onDismiss: () -> Unit,
-    setSource: (id: Int, name: String) -> Unit
+    setSource: (Source) -> Unit
 ) {
 
     val state by viewModel.state.collectAsState()
@@ -70,8 +71,7 @@ fun AddSourceBottomSheet(
                     }
                 }
 
-                is AddFinancialSourceEffect.AddedFinancialSource ->
-                    setSource(effect.id, effect.name)
+                is AddFinancialSourceEffect.AddedFinancialSource -> setSource(effect.source)
 
                 AddFinancialSourceEffect.OnDismiss -> onDismiss()
             }

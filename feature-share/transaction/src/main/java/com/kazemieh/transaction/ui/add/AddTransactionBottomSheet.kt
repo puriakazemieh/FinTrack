@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -39,12 +40,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.category.ui.CategoryListBottomSheet
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.DatePickerField
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.financialsource.ui.SourceListBottomSheet
+import com.kazemieh.person.ui.PersonListBottomSheet
+import com.kazemieh.tag.ui.TagListBottomSheet
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -54,47 +59,35 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AddTransactionBottomSheet(
     viewModel: AddTransactionViewModel = koinViewModel(),
-    source: Pair<Int, String>? = null,
-    sourceEnd: Pair<Int, String>? = null,
-    category: Pair<Int, String>? = null,
-    tags: Set<Pair<Int, String>>? = null,
-    persons: Set<Pair<Int, String>>? = null,
     onDismiss: () -> Unit,
-    onSourceClicked: () -> Unit,
-    onSourceEndClicked: () -> Unit,
-    onCategoryClicked: (Int) -> Unit,
-    onTagClicked: () -> Unit,
-    onPersonClicked: () -> Unit,
-    transactionAdded: () -> Unit = {}
+    transactionAdded: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(true) {
-        viewModel.onEvent(AddTransactionEvent.FetchDefaultData)
+        viewModel.onIntent(AddTransactionIntent.FetchDefaultData)
     }
-    LaunchedEffect(source) {
-        viewModel.onEvent(AddTransactionEvent.SetSource(source))
-    }
-    LaunchedEffect(sourceEnd) {
-        viewModel.onEvent(AddTransactionEvent.SetSourceEnd(sourceEnd))
-    }
-    LaunchedEffect(category) {
-        viewModel.onEvent(AddTransactionEvent.SetCategory(category))
-    }
-    LaunchedEffect(tags) {
-        viewModel.onEvent(AddTransactionEvent.SetTags(tags))
-    }
-    LaunchedEffect(persons) {
-        viewModel.onEvent(AddTransactionEvent.SetPerson(persons))
-    }
+    /*    LaunchedEffect(source) {
+            viewModel.onIntent(AddTransactionIntent.SetSource(source))
+        }
+        LaunchedEffect(sourceEnd) {
+            viewModel.onIntent(AddTransactionIntent.SetSourceEnd(sourceEnd))
+        }
+        LaunchedEffect(category) {
+            viewModel.onIntent(AddTransactionIntent.SetCategory(category))
+        }
+        LaunchedEffect(tags) {
+            viewModel.onIntent(AddTransactionIntent.SetTags(tags))
+        }
+        LaunchedEffect(persons) {
+            viewModel.onIntent(AddTransactionIntent.SetPerson(persons))
+        }*/
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -122,27 +115,71 @@ fun AddTransactionBottomSheet(
         }
     }
 
+    BottomSheetContent(state, viewModel::onIntent, sheetState, snackbarHostState)
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BottomSheetContent(
+    state: AddTransactionState,
+    onIntent: (intent: AddTransactionIntent) -> Unit,
+    sheetState: SheetState,
+    snackbarHostState: SnackbarHostState
+) {
     ModalBottomSheet(
-        onDismissRequest = { viewModel.onEvent(AddTransactionEvent.OnDismiss) },
+        onDismissRequest = { onIntent(AddTransactionIntent.OnDismiss) },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background
     ) {
         Box(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            AddTransactionContent(
-                state = state,
-                onEvent = viewModel::onEvent,
-                onSourceClicked = onSourceClicked,
-                onTagClicked = onTagClicked,
-                onPersonClicked = onPersonClicked,
-                onSourceEndClicked = onSourceEndClicked,
-                onCategoryClicked = { onCategoryClicked(state.selectedTransactionType.count) }
-            )
+
+            AddTransactionContent(state = state, onIntent = onIntent)
+
             Box {
                 SnackbarHost(
                     hostState = snackbarHostState,
                     modifier = Modifier.align(Alignment.BottomCenter)
+                )
+            }
+
+            if (state.isSourceShow) {
+                SourceListBottomSheet(
+                    onSourceClick = { onIntent(AddTransactionIntent.SetSource(it)) },
+                    onDismiss = { onIntent(AddTransactionIntent.OnSourceClicked) }
+                )
+            }
+
+            if (state.isSourceEndShow) {
+                SourceListBottomSheet(
+                    onSourceClick = { onIntent(AddTransactionIntent.SetSourceEnd(it)) },
+                    onDismiss = { onIntent(AddTransactionIntent.OnSourceEndClicked) }
+                )
+            }
+
+            if (state.isCategoryShow) {
+                CategoryListBottomSheet(
+                    transactionType = state.transactionType,
+                    onCategoryClick = { onIntent(AddTransactionIntent.SetCategory(it)) },
+                    onDismiss = { onIntent(AddTransactionIntent.OnCategoryClicked) }
+                )
+            }
+
+            if (state.isTagShow) {
+                TagListBottomSheet(
+                    selectedTags = state.tags,
+                    onSubmitClick = { onIntent(AddTransactionIntent.SetTags(it)) },
+                    onDismiss = { onIntent(AddTransactionIntent.OnTagClicked) }
+                )
+            }
+
+            if (state.isPersonShow) {
+                PersonListBottomSheet(
+                    selectedPersons = state.persons,
+                    onSubmitClick = { onIntent(AddTransactionIntent.SetPerson(it)) },
+                    onDismiss = { onIntent(AddTransactionIntent.OnPersonClicked) }
                 )
             }
         }
@@ -152,14 +189,8 @@ fun AddTransactionBottomSheet(
 @Composable
 fun AddTransactionContent(
     state: AddTransactionState,
-    onSourceClicked: () -> Unit,
-    onCategoryClicked: () -> Unit,
-    onTagClicked: () -> Unit,
-    onPersonClicked: () -> Unit,
-    onSourceEndClicked: () -> Unit,
-    onEvent: (AddTransactionEvent) -> Unit
+    onIntent: (AddTransactionIntent) -> Unit
 ) {
-
     val focusRequester = remember { FocusRequester() }
 
     LazyColumn(
@@ -175,8 +206,8 @@ fun AddTransactionContent(
                 ) {
                     state.listTransactionType.forEachIndexed { index, option ->
                         SegmentedButton(
-                            selected = state.selectedTransactionType == option,
-                            onClick = { onEvent(AddTransactionEvent.SelectedType(option)) },
+                            selected = state.transactionType == option,
+                            onClick = { onIntent(AddTransactionIntent.SelectedType(option)) },
                             shape = SegmentedButtonDefaults.itemShape(
                                 index = index,
                                 count = state.listTransactionType.size
@@ -203,9 +234,7 @@ fun AddTransactionContent(
             }
         }
 
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-        }
+        item { Spacer(modifier = Modifier.height(16.dp)) }
 
         item {
             FintrackOutlinedTextField(
@@ -214,7 +243,7 @@ fun AddTransactionContent(
                     .focusRequester(focusRequester),
                 isPrice = true,
                 value = state.amount,
-                onValueChange = { onEvent(AddTransactionEvent.SetAmount(it)) },
+                onValueChange = { onIntent(AddTransactionIntent.SetAmount(it)) },
                 label = {
                     Row {
                         FintrackBodyMediumText(text = stringResource(R.string.amount))
@@ -229,39 +258,35 @@ fun AddTransactionContent(
             )
         }
 
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-        }
+        item { Spacer(modifier = Modifier.height(16.dp)) }
 
         item {
-            AnimatedVisibility(visible = state.selectedTransactionType == TransactionType.TRANSFER) {
+            AnimatedVisibility(visible = state.transactionType == TransactionType.TRANSFER) {
                 TransferScreen(
                     state = state,
-                    onSourceClicked = onSourceClicked,
-                    onSourceEndClicked = onSourceEndClicked,
-                    setTransferAmount = { onEvent(AddTransactionEvent.SetAmountTransfer(it)) }
+                    onSourceClicked = { onIntent(AddTransactionIntent.OnSourceClicked) },
+                    onSourceEndClicked = { onIntent(AddTransactionIntent.OnSourceEndClicked) },
+                    setTransferAmount = { onIntent(AddTransactionIntent.SetAmountTransfer(it)) }
                 )
             }
         }
 
         item {
-            AnimatedVisibility(visible = state.selectedTransactionType != TransactionType.TRANSFER) {
+            AnimatedVisibility(visible = state.transactionType != TransactionType.TRANSFER) {
                 TransactionDetail(
                     state = state,
-                    onSourceClicked = onSourceClicked,
-                    onCategoryClicked = onCategoryClicked
+                    onSourceClicked = { onIntent(AddTransactionIntent.OnSourceClicked) },
+                    onCategoryClicked = { onIntent(AddTransactionIntent.OnCategoryClicked) }
                 )
             }
         }
 
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-        }
+        item { Spacer(modifier = Modifier.height(8.dp)) }
 
         item {
             FintrackOutlinedTextField(
-                value = state.tags?.joinToString("") { " #${it.second}" } ?: "",
-                onClick = onTagClicked,
+                value = state.tags?.joinToString("") { " #${it.name}" } ?: "",
+                onClick = { onIntent(AddTransactionIntent.OnTagClicked) },
                 readOnly = true,
                 enabled = false,
                 singleLine = false,
@@ -276,14 +301,12 @@ fun AddTransactionContent(
             )
         }
 
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-        }
+        item { Spacer(modifier = Modifier.height(8.dp)) }
 
         item {
             FintrackOutlinedTextField(
-                value = state.persons?.joinToString("") { " #${it.second}" } ?: "",
-                onClick = onPersonClicked,
+                value = state.persons?.joinToString("") { " #${it.name}" } ?: "",
+                onClick = { onIntent(AddTransactionIntent.OnPersonClicked) },
                 readOnly = true,
                 enabled = false,
                 singleLine = false,
@@ -298,40 +321,34 @@ fun AddTransactionContent(
             )
         }
 
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-        }
+        item { Spacer(modifier = Modifier.height(8.dp)) }
 
         item {
             DatePickerField(
-                selectedDate = state.selectedDate,
+                selectedDate = state.date,
                 onDateSelected = { date, timeStamp ->
-                    onEvent(AddTransactionEvent.SetDate(date, timeStamp))
+                    onIntent(AddTransactionIntent.SetDate(date, timeStamp))
                 }
             )
         }
 
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-        }
+        item { Spacer(modifier = Modifier.height(8.dp)) }
 
         item {
             FintrackOutlinedTextField(
                 value = state.description,
-                onValueChange = { onEvent(AddTransactionEvent.SetDescription(it)) },
+                onValueChange = { onIntent(AddTransactionIntent.SetDescription(it)) },
                 label = { FintrackBodyMediumText(text = stringResource(R.string.description)) },
                 singleLine = false,
                 maxLine = 5
             )
         }
 
-        item {
-            Spacer(modifier = Modifier.height(24.dp))
-        }
+        item { Spacer(modifier = Modifier.height(24.dp)) }
 
         item {
             Button(
-                onClick = { onEvent(AddTransactionEvent.Submit) },
+                onClick = { onIntent(AddTransactionIntent.Submit) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
                 colors = ButtonDefaults.buttonColors(
@@ -354,7 +371,6 @@ fun AddTransactionContent(
     }
 }
 
-
 @Composable
 private fun TransferScreen(
     state: AddTransactionState,
@@ -364,13 +380,13 @@ private fun TransferScreen(
 ) {
     Column {
         FintrackOutlinedTextField(
-            value = state.source?.second ?: "",
+            value = state.source?.name ?: "",
             onClick = onSourceClicked,
             readOnly = true,
             enabled = false,
             label = {
                 Row {
-                    if (state.source?.second != null) {
+                    if (state.source?.name != null) {
                         FintrackBodyMediumText(text = stringResource(R.string.source_from))
                     } else {
                         FintrackBodyMediumText(text = stringResource(R.string.select_source))
@@ -387,13 +403,13 @@ private fun TransferScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         FintrackOutlinedTextField(
-            value = state.sourceEnd?.second ?: "",
+            value = state.sourceEnd?.name ?: "",
             onClick = onSourceEndClicked,
             readOnly = true,
             enabled = false,
             label = {
                 Row {
-                    if (state.sourceEnd?.second != null) {
+                    if (state.sourceEnd?.name != null) {
                         FintrackBodyMediumText(text = stringResource(R.string.source_to))
                     } else {
                         FintrackBodyMediumText(text = stringResource(R.string.select_source))
@@ -433,13 +449,13 @@ private fun TransactionDetail(
 ) {
     Column {
         FintrackOutlinedTextField(
-            value = state.category?.second ?: "",
+            value = state.category?.name ?: "",
             onClick = onCategoryClicked,
             readOnly = true,
             enabled = false,
             label = {
                 Row {
-                    if (state.category?.second != null) {
+                    if (state.category?.name != null) {
                         FintrackBodyMediumText(text = stringResource(R.string.category))
                     } else {
                         FintrackBodyMediumText(text = stringResource(R.string.select_category))
@@ -456,13 +472,13 @@ private fun TransactionDetail(
 
 
         FintrackOutlinedTextField(
-            value = state.source?.second ?: "",
+            value = state.source?.name ?: "",
             onClick = onSourceClicked,
             readOnly = true,
             enabled = false,
             label = {
                 Row {
-                    if (state.source?.second != null) {
+                    if (state.source?.name != null) {
                         FintrackBodyMediumText(text = stringResource(R.string.source))
                     } else {
                         FintrackBodyMediumText(text = stringResource(R.string.select_source))

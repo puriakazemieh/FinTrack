@@ -26,15 +26,15 @@ import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
-import com.kazemieh.designsystem.component.list.ItemUi
+import com.kazemieh.common.model.ItemUi
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListBottomSheet(
     title: String,
-    items: List<ItemUi>,
-    onConfirm: (id: Int, name: String) -> Unit,
+    items: Set<ItemUi>,
+    onConfirm: (ItemUi) -> Unit,
     onAddClick: () -> Unit,
     onDismiss: () -> Unit,
     content: @Composable (ItemUi) -> Unit = {}
@@ -57,12 +57,12 @@ fun ListBottomSheet(
                 )
                 LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
                     if (items.isNotEmpty())
-                        items(items) { item ->
+                        items(items.toList()) { item ->
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 4.dp)
-                                    .clickable { onConfirm(item.id, item.title) },
+                                    .clickable { onConfirm(item) },
                                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                 shape = MaterialTheme.shapes.medium,
                                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)

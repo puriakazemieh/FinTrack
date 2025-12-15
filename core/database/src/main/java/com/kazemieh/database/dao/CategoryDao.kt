@@ -3,6 +3,7 @@ package com.kazemieh.database.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.database.entity.CategoryEntity
 import kotlinx.coroutines.flow.Flow
 

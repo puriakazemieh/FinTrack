@@ -88,7 +88,7 @@ fun ReportScreen(
 
         }
 
-        if (state.isCategorySheetVisible) {
+        /*if (state.isCategorySheetVisible) {
             CategoryListSelectionBottomSheet(
                 initialSelectionPairs = state.selectedCategories,
                 selectedTransactionType = state.selectedTransactionType,
@@ -163,7 +163,7 @@ fun ReportScreen(
                     )
                 }
             )
-        }
+        }*/
 
     }
 }

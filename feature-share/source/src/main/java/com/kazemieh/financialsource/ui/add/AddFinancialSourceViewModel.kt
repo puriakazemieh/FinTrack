@@ -2,9 +2,9 @@ package com.kazemieh.financialsource.ui.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.R
 import com.kazemieh.domain.usecase.AddFinancialSource
-import com.kazemieh.common.model.FinancialSource
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,24 +42,20 @@ class AddFinancialSourceViewModel(
         }
     }
 
-    fun addFinancialSource() = with(_state.value) {
+    private fun addFinancialSource() = with(_state.value) {
         viewModelScope.launch {
             if (sourceName?.isNotBlank() == true) {
-                val financialSource = FinancialSource(
+                val source = Source(
                     name = sourceName,
                     balance = balance,
                     cardNumber = cardNumber,
                     description = description,
                     type = selectedTypeFinancialSource.count
                 )
-                val sourceId = addFinancialSourceUseCase(financialSource)
+                val sourceId = addFinancialSourceUseCase(source)
                 if (sourceId >= 0) {
                     _effect.send(
-                        AddFinancialSourceEffect.AddedFinancialSource(
-                            sourceId.toInt(),
-                            _state.value.sourceName ?: "انتخاب کنید"
-                        )
-                    )
+                        AddFinancialSourceEffect.AddedFinancialSource(source))
                     _state.update { AddFinancialSourceState() }
                 }
 
@@ -99,6 +95,6 @@ enum class SelectedTypeFinancialSource(val count: Int, val value: Int) {
 
 sealed interface AddFinancialSourceEffect {
     data class ShowMessage(val message: Int) : AddFinancialSourceEffect
-    data class AddedFinancialSource(val id: Int, val name: String) : AddFinancialSourceEffect
+    data class AddedFinancialSource(val source: Source) : AddFinancialSourceEffect
     data object OnDismiss : AddFinancialSourceEffect
 }

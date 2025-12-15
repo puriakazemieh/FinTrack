@@ -2,10 +2,11 @@ package com.kazemieh.category.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.domain.usecase.GetAllCategoryByType
 import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.ItemUi
 import com.kazemieh.common.model.TransactionType
-import com.kazemieh.designsystem.component.list.ItemUi
+import com.kazemieh.common.model.toItemUi
+import com.kazemieh.domain.usecase.GetAllCategoryByType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -74,25 +75,31 @@ class CategoryViewModel(
                     selectedCategory = intent.selectedCategory
                 )
             }
+
+            CategoryIntent.OnAddCategoryClick -> _state.update {
+                it.copy(
+                    isAddShow = !_state.value.isAddShow
+                )
+            }
         }
 
     }
 
 
-    private fun loadAllCategory(type: Int, isAllCategorySelected: Boolean) {
+    private fun loadAllCategory(type: TransactionType, isAllCategorySelected: Boolean) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            if (type == 0) {
+            if (type == TransactionType.ALL) {
                 combine(
-                    getAllCategoryByType(TransactionType.INCOME.count),
-                    getAllCategoryByType(TransactionType.EXPENSE.count),
-                    getAllCategoryByType(TransactionType.TRANSFER.count),
+                    getAllCategoryByType(TransactionType.INCOME),
+                    getAllCategoryByType(TransactionType.EXPENSE),
+                    getAllCategoryByType(TransactionType.TRANSFER),
                 ) { categoryIncome, categoryExpense, categoryTransfer ->
                     val allCategory = categoryIncome + categoryExpense + categoryTransfer
                     _state.update {
                         it.copy(
                             categories = allCategory,
-                            items = allCategory.map { ItemUi(it.id?.toInt() ?: 0, it.name) },
+                            items = allCategory.map { it.toItemUi() }.toSet(),
                             isLoading = false,
                             selectedCategory = if (isAllCategorySelected) allCategorySelect(
                                 allCategory = allCategory
@@ -118,20 +125,23 @@ class CategoryViewModel(
 
 data class CategoryState(
     val categories: List<Category> = emptyList(),
-    val items: List<ItemUi> = emptyList(),
+    val items: Set<ItemUi> = emptySet(),
     val selectedCategory: Set<Pair<Int, String>> = emptySet(),
     val isLoading: Boolean = false,
+    val isAddShow: Boolean = false,
     val isAllCategorySelected: Boolean = true
 )
 
 sealed interface CategoryIntent {
-    data class LoadCategoryByType(val type: Int) : CategoryIntent
+    data class LoadCategoryByType(val type: TransactionType) : CategoryIntent
     data class SelectedCategory(val selectedCategory: Pair<Int, String>) : CategoryIntent
     data class SelectedCategories(val selectedCategory: Set<Pair<Int, String>>) : CategoryIntent
     data object SelectedAllCategory : CategoryIntent
     data class IsAllCategorySelected(
         val isAllCategorySelected: Boolean = true,
-        val selectedTransactionType: Int
+        val selectedTransactionType: TransactionType
     ) : CategoryIntent
+
+    data object OnAddCategoryClick : CategoryIntent
 
 }

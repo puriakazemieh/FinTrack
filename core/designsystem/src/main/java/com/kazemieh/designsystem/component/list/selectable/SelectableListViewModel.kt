@@ -3,7 +3,7 @@ package com.kazemieh.designsystem.component.list.selectable
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.designsystem.component.list.ItemUi
+import com.kazemieh.common.model.ItemUi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -30,13 +30,13 @@ class SelectableListViewModel : ViewModel() {
                 intent.showSelectAll
             )
 
-            is SelectableIntent.Toggle -> toggle(intent.id)
+            is SelectableIntent.Toggle -> toggle(intent.itemUi)
             SelectableIntent.ToggleSelectAll -> toggleSelectAll()
-            is SelectableIntent.SetSelection -> setSelection(intent.ids)
+            is SelectableIntent.SetSelection -> setSelection(intent.items)
             SelectableIntent.Confirm -> viewModelScope.launch {
                 _oneShot.emit(
                     SelectableOneShot.Confirmed(
-                        state.value.selectedIds,
+                        state.value.selectedItems,
                         state.value.isAllSelected
                     )
                 )
@@ -48,23 +48,22 @@ class SelectableListViewModel : ViewModel() {
     }
 
     private fun handleLoad(
-        items: List<ItemUi>,
-        initialSelection: Set<Int>,
+        items: Set<ItemUi>,
+        initialSelection: Set<ItemUi>,
         showSelectAll: Boolean
     ) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
-            val allIds = items.map { it.id }.toSet()
             val selected =
-                if (initialSelection.isEmpty() && showSelectAll) allIds
-                else initialSelection.intersect(allIds)
-            val allSelected = allIds.isNotEmpty() && selected == allIds
+                if (initialSelection.isEmpty() && showSelectAll) items.toSet()
+                else initialSelection.intersect(items.toSet())
+            val allSelected = items.isNotEmpty() && selected == items
 
             _state.update {
                 SelectableState(
                     items = items,
-                    selectedIds = selected,
+                    selectedItems = selected,
                     isAllSelected = allSelected,
                     isLoading = false
                 )
@@ -72,38 +71,37 @@ class SelectableListViewModel : ViewModel() {
         }
     }
 
-    private fun toggle(id: Int) {
-        _state.update { s ->
-            val current = s.selectedIds
-            val next = if (current.contains(id)) current - id else current + id
-            val allIds = s.items.map { it.id }.toSet()
-            val allSelected = allIds.isNotEmpty() && next == allIds
-            s.copy(selectedIds = next, isAllSelected = allSelected)
+    private fun toggle(itemUi: ItemUi) {
+        _state.update {
+            val current = it.selectedItems
+            val next = if (current.contains(itemUi)) current - itemUi else current + itemUi
+            val allSelected = it.items.isNotEmpty() && next == it.items
+            it.copy(selectedItems = next, isAllSelected = allSelected)
         }
     }
 
     private fun toggleSelectAll() {
-        _state.update { s ->
-            val allIds = s.items.map { it.id }.toSet()
-            if (s.isAllSelected) s.copy(selectedIds = emptySet(), isAllSelected = false)
-            else s.copy(selectedIds = allIds, isAllSelected = true)
+        _state.update {
+            if (it.isAllSelected) it.copy(selectedItems = emptySet(), isAllSelected = false)
+            else it.copy(selectedItems = it.items.toSet(), isAllSelected = true)
         }
     }
 
-    private fun setSelection(ids: Set<Int>) {
-        _state.update { s ->
-            val allIds = s.items.map { it.id }.toSet()
-            val normalized = ids.intersect(allIds)
-            s.copy(
-                selectedIds = normalized,
-                isAllSelected = allIds.isNotEmpty() && normalized == allIds
+    private fun setSelection(items: Set<ItemUi>) {
+        _state.update {
+            val normalized = items.intersect(it.items)
+            it.copy(
+                selectedItems = normalized,
+                isAllSelected = it.items.isNotEmpty() && normalized == it.items
             )
         }
     }
 }
 
 sealed interface SelectableOneShot {
-    data class Confirmed(val selectedId: Set<Int>, val isAllSelected: Boolean) : SelectableOneShot
+    data class Confirmed(val selectedItems: Set<ItemUi>, val isAllSelected: Boolean) :
+        SelectableOneShot
+
     object Dismissed : SelectableOneShot
     object AddClick : SelectableOneShot
 }
@@ -111,14 +109,14 @@ sealed interface SelectableOneShot {
 
 sealed interface SelectableIntent {
     data class Load(
-        val items: List<ItemUi>,
-        val initialSelection: Set<Int> = emptySet(),
+        val items: Set<ItemUi>,
+        val initialSelection: Set<ItemUi> = emptySet(),
         val showSelectAll: Boolean = true
     ) : SelectableIntent
 
-    data class Toggle(val id: Int) : SelectableIntent
+    data class Toggle(val itemUi: ItemUi) : SelectableIntent
     object ToggleSelectAll : SelectableIntent
-    data class SetSelection(val ids: Set<Int>) : SelectableIntent
+    data class SetSelection(val items: Set<ItemUi>) : SelectableIntent
     object Confirm : SelectableIntent
     object Dismiss : SelectableIntent
     object AddClick : SelectableIntent
@@ -126,8 +124,8 @@ sealed interface SelectableIntent {
 
 
 data class SelectableState(
-    val items: List<ItemUi> = emptyList(),
-    val selectedIds: Set<Int> = emptySet(),
+    val items: Set<ItemUi> = emptySet(),
+    val selectedItems: Set<ItemUi> = emptySet(),
     val isAllSelected: Boolean = false,
     val isLoading: Boolean = false
 )

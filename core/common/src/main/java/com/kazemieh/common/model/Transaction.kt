@@ -13,6 +13,8 @@ data class Transaction(
     val description: String? = null,
     val timeStamp: Long = System.currentTimeMillis(),
     val type: TransactionType,
+    val formatedAmount: String = 0.toString(),
+    val amountTransferFormated: String? = null,
 )
 
 @Serializable

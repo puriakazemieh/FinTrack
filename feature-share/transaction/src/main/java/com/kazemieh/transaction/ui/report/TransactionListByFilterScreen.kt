@@ -17,8 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.transaction.ui.component.transactionListContent
-import com.kazemieh.transaction.ui.component.TransactionWithRelationsUi
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -72,10 +72,10 @@ fun TransactionListByFilterScreen(
 
 @Composable
 fun TransactionListByFilterContent(
-    uiTransactionWithRelations: LazyPagingItems<TransactionWithRelationsUi>,
+    uiTransactionWithRelations: LazyPagingItems<TransactionWithRelations>,
     loading: Boolean,
     enableAnimationChart: Boolean,
-    onDelete: (TransactionWithRelationsUi) -> Unit = {}
+    onDelete: (TransactionWithRelations) -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier

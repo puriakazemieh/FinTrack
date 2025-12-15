@@ -47,12 +47,7 @@ class AddTagViewModel(
                 )
                 val tagId = addTagUseCase(tag)
                 if (tagId >= 0) {
-                    _effect.send(
-                        AddTagEffect.AddedTag(
-                            tagId.toInt(),
-                            _state.value.tagName ?: "انتخاب کنید"
-                        )
-                    )
+                    _effect.send(AddTagEffect.AddedTag(tag))
                     _state.update { AddTagState() }
                 }
 
@@ -78,6 +73,6 @@ sealed interface AddTagIntent {
 
 sealed interface AddTagEffect {
     data class ShowMessage(val message: Int) : AddTagEffect
-    data class AddedTag(val id: Int, val name: String) : AddTagEffect
+    data class AddedTag(val tag: Tag) : AddTagEffect
     data object OnDismiss : AddTagEffect
 }

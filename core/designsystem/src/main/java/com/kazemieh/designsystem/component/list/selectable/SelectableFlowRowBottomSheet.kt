@@ -29,19 +29,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kazemieh.common.model.ItemUi
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
-import com.kazemieh.designsystem.component.list.ItemUi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectableFlowRowBottomSheet(
     title: String,
-    items: List<ItemUi>,
-    initialSelection: Set<Int> = emptySet(),
-    onConfirm: (selectedIds: Set<Int>) -> Unit,
+    items: Set<ItemUi>,
+    initialSelection: Set<ItemUi> = emptySet(),
+    onConfirm: (selectedItem: Set<ItemUi>) -> Unit,
     onAddClick: () -> Unit,
     onDismiss: () -> Unit,
     content: @Composable () -> Unit = {}
@@ -57,10 +57,7 @@ fun SelectableFlowRowBottomSheet(
     LaunchedEffect(Unit) {
         viewModel.oneShot.collect { one ->
             when (one) {
-                is SelectableOneShot.Confirmed -> {
-                    onConfirm(one.selectedId)
-                }
-
+                is SelectableOneShot.Confirmed -> onConfirm(one.selectedItems)
                 is SelectableOneShot.Dismissed -> onDismiss()
                 is SelectableOneShot.AddClick -> onAddClick()
             }
@@ -70,7 +67,7 @@ fun SelectableFlowRowBottomSheet(
     SelectableFlowRowBottomSheetStateless(
         title = title,
         state = state,
-        onToggle = { id -> viewModel.onIntent(SelectableIntent.Toggle(id)) },
+        onToggle = {  viewModel.onIntent(SelectableIntent.Toggle(it)) },
         onConfirm = { viewModel.onIntent(SelectableIntent.Confirm) },
         onDismiss = { viewModel.onIntent(SelectableIntent.Dismiss) },
         onAddClick = { viewModel.onIntent(SelectableIntent.AddClick) },
@@ -84,7 +81,7 @@ fun SelectableFlowRowBottomSheet(
 fun SelectableFlowRowBottomSheetStateless(
     title: String,
     state: SelectableState,
-    onToggle: (Int) -> Unit,
+    onToggle: (ItemUi) -> Unit,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     onAddClick: () -> Unit,
@@ -116,10 +113,10 @@ fun SelectableFlowRowBottomSheetStateless(
                 ) {
                     if (state.items.isNotEmpty()) {
                         state.items.forEach { item ->
-                            val isSelected = state.selectedIds.contains(item.id)
+                            val isSelected = state.selectedItems.contains(item)
                             FilterChip(
                                 selected = isSelected,
-                                onClick = { onToggle(item.id) },
+                                onClick = { onToggle(item) },
                                 label = {
                                     FintrackBodyMediumText(
                                         text = item.title,

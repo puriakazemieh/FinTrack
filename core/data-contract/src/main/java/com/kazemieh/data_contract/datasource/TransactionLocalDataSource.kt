@@ -3,10 +3,11 @@ package com.kazemieh.data_contract.datasource
 import androidx.paging.PagingData
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
-import com.kazemieh.common.model.FinancialSource
+import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import kotlinx.coroutines.flow.Flow
 
@@ -43,16 +44,16 @@ interface TransactionLocalDataSource {
     ): Flow<List<CategorySum>>
 
     suspend fun insertCategory(category: Category): Long
-    suspend fun insertFinancialSource(financialSource: FinancialSource): Long
+    suspend fun insertFinancialSource(source: Source): Long
     suspend fun insertTag(tag: Tag): Long
-    suspend fun getAllCategory(type: Int): Flow<List<Category>>
-    suspend fun getAllFinancialSource(): Flow<List<FinancialSource>>
+    suspend fun getAllCategory(type: TransactionType): Flow<List<Category>>
+    suspend fun getAllFinancialSource(): Flow<List<Source>>
     suspend fun getAllTag(): Flow<List<Tag>>
     suspend fun increaseBalanceFinancialSource(id: Long, amount: Int)
     suspend fun decreaseBalanceFinancialSource(id: Long, amount: Int)
-    suspend fun getDefaultCategory(type: Int): Category
+    suspend fun getDefaultCategory(type: TransactionType): Category
     suspend fun getTransferCategory(): Category
-    suspend fun getDefaultSource(): FinancialSource
+    suspend fun getDefaultSource(): Source?
 
 
     suspend fun insertPerson(person: Person): Long

@@ -4,15 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.map
 import com.kazemieh.common.formatted
 import com.kazemieh.common.model.CategorySum
+import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.component.PieChartItem
 import com.kazemieh.domain.usecase.TransactionUseCases
-import com.kazemieh.transaction.ui.component.TransactionUi
-import com.kazemieh.transaction.ui.component.TransactionWithRelationsUi
-import com.kazemieh.transaction.ui.component.toDomain
-import com.kazemieh.transaction.ui.component.toUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -48,12 +45,12 @@ class TransactionReportViewModel(
         }
         .shareIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
             replay = 1
         )
 
 
-    val uiTransactionWithRelations: Flow<PagingData<TransactionWithRelationsUi>> =
+    val uiTransactionWithRelations: Flow<PagingData<TransactionWithRelations>> =
         filterParamsFlow
             .flatMapLatest { params ->
                 transactionUseCases.getAllTransactionsFiltered(
@@ -64,7 +61,7 @@ class TransactionReportViewModel(
                     personIds = params.selectedPersons.map { it.first },
                     fromTimestamp = params.fromTimestamp,
                     toTimestamp = params.toTimestamp
-                ).map { pagingData -> pagingData.map { it.toUi() } }
+                )
             }
             .cachedIn(viewModelScope)
 
@@ -181,16 +178,16 @@ class TransactionReportViewModel(
         }
     }
 
-    private fun deleteTransaction(transaction: TransactionUi) {
+    private fun deleteTransaction(transaction: Transaction) {
         viewModelScope.launch {
-            transactionUseCases.deleteTransaction(transaction.toDomain())
+            transactionUseCases.deleteTransaction(transaction)
         }
     }
 
 }
 
 sealed interface TransactionReportIntent {
-    data class DeleteTransactionReport(val transaction: TransactionUi) : TransactionReportIntent
+    data class DeleteTransactionReport(val transaction: Transaction) : TransactionReportIntent
 
     data class SelectedType(val selectedTransactionType: Int = 0) : TransactionReportIntent
 

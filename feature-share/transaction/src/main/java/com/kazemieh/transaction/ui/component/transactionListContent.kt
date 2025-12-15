@@ -12,12 +12,13 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.component.EmptyListScreen
 
 
 fun LazyListScope.transactionListContent(
-    lazyPagingItems: LazyPagingItems<TransactionWithRelationsUi>,
-    onDelete: (TransactionWithRelationsUi) -> Unit = {}
+    lazyPagingItems: LazyPagingItems<TransactionWithRelations>,
+    onDelete: (TransactionWithRelations) -> Unit = {}
 ) {
 
     val isListEmpty = lazyPagingItems.itemCount == 0

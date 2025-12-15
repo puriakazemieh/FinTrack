@@ -1,13 +1,15 @@
 package com.kazemieh.common.model
 
+import com.kazemieh.common.formatted
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class FinancialSource(
+data class Source(
     val id: Long? = null,
     val name: String,
     val balance: Int = 0,
     val cardNumber: String? = null,
     val description: String? = null,
-    val type: Int,
+    val type: Int = 0,
+    val formattedBalance: String = balance.formatted(),
 )

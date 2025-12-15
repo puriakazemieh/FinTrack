@@ -6,8 +6,8 @@ import com.kazemieh.common.model.TransactionWithRelations
 fun TransactionWithCategoryFinancialSourceAndTags.toTransactionWithRelations(): TransactionWithRelations =
     TransactionWithRelations(
         transaction = transaction.toTransaction(),
-        category = category.toCategory(),
-        financialSource = financialSource.toFinancialSource(),
-        tags = tags.map { it.toTag() },
-        persons = persons.map { it.toPerson() },
+        categoryName = category.name,
+        financialSourceName = financialSource.name,
+        tags = tags.joinToString { it.name },
+        persons = persons.joinToString { it.name }
     )

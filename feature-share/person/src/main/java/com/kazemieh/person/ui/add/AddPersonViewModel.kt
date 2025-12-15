@@ -2,9 +2,9 @@ package com.kazemieh.person.ui.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.domain.usecase.AddPerson
 import com.kazemieh.common.model.Person
 import com.kazemieh.designsystem.R
+import com.kazemieh.domain.usecase.AddPerson
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,12 +47,7 @@ class AddPersonViewModel(
                 )
                 val personId = addPersonUseCase(person)
                 if (personId >= 0) {
-                    _effect.send(
-                        AddPersonEffect.AddedPerson(
-                            personId.toInt(),
-                            _state.value.personName ?: "انتخاب کنید"
-                        )
-                    )
+                    _effect.send(AddPersonEffect.AddedPerson(person))
                     _state.update { AddPersonState() }
                 }
 
@@ -78,6 +73,6 @@ sealed interface AddPersonIntent {
 
 sealed interface AddPersonEffect {
     data class ShowMessage(val message: Int) : AddPersonEffect
-    data class AddedPerson(val id: Int, val name: String) : AddPersonEffect
+    data class AddedPerson(val person: Person) : AddPersonEffect
     data object OnDismiss : AddPersonEffect
 }

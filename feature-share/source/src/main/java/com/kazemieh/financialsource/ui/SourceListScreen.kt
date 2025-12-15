@@ -22,39 +22,37 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.toItemUi
+import com.kazemieh.common.model.toSource
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.designsystem.component.list.ItemUi
 import com.kazemieh.designsystem.component.list.normal.ListBottomSheet
 import com.kazemieh.designsystem.component.list.selectable.SelectableListBottomSheet
-import com.kazemieh.designsystem.component.list.toPairSetFrom
+import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SourceListBottomSheet(
-    viewModel: FinancialSourceViewModel = koinViewModel(),
-    onAddSourceClick: () -> Unit,
-    onSourceClick: (id: Int, name: String) -> Unit,
+    viewModel: SourceViewModel = koinViewModel(),
+    onSourceClick: (Source) -> Unit,
     onDismiss: () -> Unit,
 ) {
 
     LaunchedEffect(true) {
-        viewModel.onIntent(FinancialSourceIntent.LoadAllFinancialSource)
+        viewModel.onIntent(SourceIntent.LoadAllSource)
     }
 
     val state by viewModel.state.collectAsState()
 
-
-    val items = state.sources.map { ItemUi(it.id.toInt(), it.name, it.formattedBalance) }
-
     ListBottomSheet(
         title = stringResource(R.string.source),
-        items = items,
-        onConfirm = onSourceClick,
-        onAddClick = onAddSourceClick,
+        items = state.items,
+        onConfirm = { it.toSource() },
+        onAddClick = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
         onDismiss = onDismiss,
         content = { item ->
             FintrackBodySmallText(
@@ -66,16 +64,51 @@ fun SourceListBottomSheet(
             )
         }
     )
+
+    if (state.isAddShow) {
+        AddSourceBottomSheet(
+            onDismiss = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
+            setSource = { onSourceClick(it) }
+        )
+    }
+
+}
+
+
+@Composable
+fun SourceListSelectionBottomSheet(
+    viewModel: SourceViewModel = koinViewModel(),
+    initialSelectionPairs: Set<Source> = emptySet(),
+    onConfirmPairs: (Set<Source>, isAllSelected: Boolean) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(true) {
+        viewModel.onIntent(SourceIntent.LoadAllSource)
+    }
+
+    val initialSelectionIds = initialSelectionPairs.map { it.toItemUi() }.toSet()
+
+    SelectableListBottomSheet(
+        title = stringResource(R.string.source),
+        items = state.items,
+        initialSelection = initialSelectionIds,
+        onConfirm = { selectedItems, isAll ->
+            onConfirmPairs(selectedItems.map { it.toSource() }.toSet(), isAll)
+        },
+        onDismiss = onDismiss
+    )
 }
 
 
 @Composable
 fun SourceList(
-    viewModel: FinancialSourceViewModel = koinViewModel(),
+    viewModel: SourceViewModel = koinViewModel(),
     onAddSourceClick: () -> Unit
 ) {
     LaunchedEffect(true) {
-        viewModel.onIntent(FinancialSourceIntent.LoadAllFinancialSource)
+        viewModel.onIntent(SourceIntent.LoadAllSource)
     }
 
     val state by viewModel.state.collectAsState()
@@ -134,30 +167,3 @@ fun SourceList(
     }
 }
 
-
-@Composable
-fun SourceListSelectionBottomSheet(
-    viewModel: FinancialSourceViewModel = koinViewModel(),
-    initialSelectionPairs: Set<Pair<Int, String>> = emptySet(),
-    onConfirmPairs: (Set<Pair<Int, String>>, isAllSelected: Boolean) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val state by viewModel.state.collectAsState()
-
-    LaunchedEffect(true) {
-        viewModel.onIntent(FinancialSourceIntent.LoadAllFinancialSource)
-    }
-
-    val initialSelectionIds = initialSelectionPairs.map { it.first }.toSet()
-
-    SelectableListBottomSheet(
-        title = stringResource(R.string.source),
-        items = state.items,
-        initialSelection = initialSelectionIds,
-        onConfirm = { selectedIds, isAll ->
-            val pairSet = selectedIds.toPairSetFrom(state.items)
-            onConfirmPairs(pairSet, isAll)
-        },
-        onDismiss = onDismiss
-    )
-}

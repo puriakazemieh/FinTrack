@@ -3,10 +3,11 @@ package com.kazemieh.data.repository
 import androidx.paging.PagingData
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
-import com.kazemieh.common.model.FinancialSource
+import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
 import com.kazemieh.domain.repository.TransactionRepository
@@ -76,7 +77,7 @@ class TransactionRepositoryImpl(
         localDataSource.delete(transaction)
     }
 
-    override suspend fun getAllCategory(type: Int): Flow<List<Category>> {
+    override suspend fun getAllCategory(type: TransactionType): Flow<List<Category>> {
         return localDataSource.getAllCategory(type)
     }
 
@@ -92,11 +93,11 @@ class TransactionRepositoryImpl(
         return localDataSource.insertCategory(category)
     }
 
-    override suspend fun insertFinancialSource(financialSource: FinancialSource): Long {
-        return localDataSource.insertFinancialSource(financialSource)
+    override suspend fun insertFinancialSource(source: Source): Long {
+        return localDataSource.insertFinancialSource(source)
     }
 
-    override suspend fun getAllFinancialSource(): Flow<List<FinancialSource>> {
+    override suspend fun getAllFinancialSource(): Flow<List<Source>> {
         return localDataSource.getAllFinancialSource()
     }
 
@@ -116,7 +117,7 @@ class TransactionRepositoryImpl(
         localDataSource.decreaseBalanceFinancialSource(id, amount)
     }
 
-    override suspend fun getDefaultCategory(type: Int): Category {
+    override suspend fun getDefaultCategory(type: TransactionType): Category {
         return localDataSource.getDefaultCategory(type)
     }
 
@@ -124,7 +125,7 @@ class TransactionRepositoryImpl(
         return localDataSource.getTransferCategory()
     }
 
-    override suspend fun getDefaultSource(): FinancialSource {
+    override suspend fun getDefaultSource(): Source? {
         return localDataSource.getDefaultSource()
     }
 }

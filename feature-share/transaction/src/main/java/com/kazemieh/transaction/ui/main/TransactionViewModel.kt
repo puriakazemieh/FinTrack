@@ -4,23 +4,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.map
 import com.kazemieh.common.formatted
+import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toPositive
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.PieChartItem
 import com.kazemieh.domain.usecase.TransactionUseCases
-import com.kazemieh.transaction.ui.component.TransactionUi
-import com.kazemieh.transaction.ui.component.TransactionWithRelationsUi
-import com.kazemieh.transaction.ui.component.toDomain
-import com.kazemieh.transaction.ui.component.toUi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -35,9 +31,8 @@ class TransactionViewModel(
     private val _effect = Channel<TransactionEffect>()
     val effect = _effect.receiveAsFlow()
 
-    val uiTransactionWithRelations: Flow<PagingData<TransactionWithRelationsUi>> =
+    val uiTransactionWithRelations: Flow<PagingData<TransactionWithRelations>> =
         transactionUseCases.getAllTransactionsFiltered().cachedIn(viewModelScope)
-            .map { it.map { it.toUi() } }
 
     fun onIntent(intent: TransactionIntent) {
         when (intent) {
@@ -58,20 +53,20 @@ class TransactionViewModel(
                 var totalTransfer: Long = 0
                 var balance: Long = 0
 
-
+                // todo use it // categorySums.filter { it.type== TransactionType.INCOME.count}.sumOf { it.totalAmount }
                 categorySums.map { category ->
 
                     balance += category.totalAmount
                     when (category.type) {
-                        TransactionType.INCOME.count -> {
+                        TransactionType.INCOME -> {
                             totalIncome += category.totalAmount
                         }
 
-                        TransactionType.EXPENSE.count -> {
+                        TransactionType.EXPENSE -> {
                             totalExpense += category.totalAmount
                         }
 
-                        TransactionType.TRANSFER.count -> {
+                        TransactionType.TRANSFER -> {
                             totalTransfer += category.totalAmount
                         }
 
@@ -96,9 +91,9 @@ class TransactionViewModel(
         }
     }
 
-    private fun deleteTransaction(transaction: TransactionUi) {
+    private fun deleteTransaction(transaction: Transaction) {
         viewModelScope.launch {
-            transactionUseCases.deleteTransaction(transaction.toDomain())
+            transactionUseCases.deleteTransaction(transaction)
             _effect.send(TransactionEffect.ShowMessage(R.string.transaction_deleted))
             loadTransactions()
         }
@@ -107,7 +102,7 @@ class TransactionViewModel(
 }
 
 sealed interface TransactionIntent {
-    data class DeleteTransaction(val transaction: TransactionUi) : TransactionIntent
+    data class DeleteTransaction(val transaction: Transaction) : TransactionIntent
     data object LoadTransactions : TransactionIntent
 }
 

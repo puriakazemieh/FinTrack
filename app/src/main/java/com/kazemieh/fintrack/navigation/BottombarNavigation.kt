@@ -4,7 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.kazemieh.fintrack.dashboard.DashboardScreen
+import com.kazemieh.dashboard.DashboardScreen
 import com.kazemieh.fintrack.report.ReportScreen
 import kotlinx.serialization.Serializable
 
@@ -29,6 +29,7 @@ fun NavGraphBuilder.bottomBarNavGraph(
     navigation<BottomBarGraph>(startDestination = Dashboard) {
 
         composable<Dashboard> { backStackEntry ->
+//            DashboardScreen()
             DashboardScreen()
         }
 

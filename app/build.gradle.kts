@@ -45,5 +45,6 @@ dependencies {
     implementation(project(":feature-share:tags"))
     implementation(project(":feature-share:filter"))
     implementation(project(":feature-share:person"))
+    implementation(project(":feature-container:dashboard"))
 
 }

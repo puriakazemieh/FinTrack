@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kazemieh.common.model.Tag
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.R
@@ -39,7 +40,7 @@ import org.koin.androidx.compose.koinViewModel
 fun AddTagBottomSheet(
     viewModel: AddTagViewModel = koinViewModel(),
     onDismiss: () -> Unit,
-    setTag: (id: Int, name: String) -> Unit
+    setTag: (Tag) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -59,7 +60,7 @@ fun AddTagBottomSheet(
                     }
                 }
 
-                is AddTagEffect.AddedTag -> setTag(effect.id, effect.name)
+                is AddTagEffect.AddedTag -> setTag(effect.tag)
                 AddTagEffect.OnDismiss -> onDismiss()
             }
         }

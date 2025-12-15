@@ -16,5 +16,5 @@ data class CategorySum(
     val categoryId: Long,
     val name: String,
     val totalAmount: Long,
-    val type: Int
+    val type: TransactionType
 )

@@ -7,36 +7,44 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
+import com.kazemieh.category.ui.add.AddCategoryBottomSheet
+import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.Tag
+import com.kazemieh.common.model.TransactionType
+import com.kazemieh.common.model.toCategory
+import com.kazemieh.common.model.toItemUi
+import com.kazemieh.common.model.toPairSetFrom
 import com.kazemieh.designsystem.R
-import com.kazemieh.designsystem.component.list.ItemUi
 import com.kazemieh.designsystem.component.list.normal.ListBottomSheet
 import com.kazemieh.designsystem.component.list.selectable.SelectableListBottomSheet
-import com.kazemieh.designsystem.component.list.toPairSetFrom
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryListBottomSheet(
     viewModel: CategoryViewModel = koinViewModel(),
-    selectedTransactionType: Int,
-    onCategoryClick: (id: Int, name: String) -> Unit,
-    onAddCategoryClick: () -> Unit,
+    transactionType: TransactionType,
+    onCategoryClick: (Category) -> Unit,
     onDismiss: () -> Unit
 ) {
-    LaunchedEffect(true) {
-        viewModel.onIntent(CategoryIntent.LoadCategoryByType(selectedTransactionType))
+    LaunchedEffect(transactionType) {
+        viewModel.onIntent(CategoryIntent.LoadCategoryByType(transactionType))
     }
 
     val state by viewModel.state.collectAsState()
 
-    val items = state.categories.map { ItemUi(it.id?.toInt() ?: 0, it.name) }
-
     ListBottomSheet(
         title = stringResource(R.string.category),
-        items = items,
-        onConfirm = onCategoryClick,
-        onAddClick = onAddCategoryClick,
+        items = state.items,
+        onConfirm = { onCategoryClick(it.toCategory()) },
+        onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
         onDismiss = onDismiss
+    )
+
+    AddCategoryBottomSheet(
+        transactionType = transactionType,
+        onDismiss = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
+        setCategory = { onCategoryClick(it) }
     )
 
 }
@@ -45,9 +53,9 @@ fun CategoryListBottomSheet(
 @Composable
 fun CategoryListSelectionBottomSheet(
     viewModel: CategoryViewModel = koinViewModel(),
-    initialSelectionPairs: Set<Pair<Int, String>> = emptySet(),
-    onConfirmPairs: (Set<Pair<Int, String>>, isAllSelected: Boolean) -> Unit,
-    selectedTransactionType: Int,
+    initialSelectionPairs: Set<Category> = emptySet(),
+    onConfirmPairs: (Set<Category>, isAllSelected: Boolean) -> Unit,
+    selectedTransactionType: TransactionType,
     onDismiss: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
@@ -56,15 +64,14 @@ fun CategoryListSelectionBottomSheet(
         viewModel.onIntent(CategoryIntent.LoadCategoryByType(selectedTransactionType))
     }
 
-    val initialSelectionIds = initialSelectionPairs.map { it.first }.toSet()
+    val initialSelectionIds = initialSelectionPairs.map { it.toItemUi() }.toSet()
 
     SelectableListBottomSheet(
         title = stringResource(R.string.category),
         items = state.items,
         initialSelection = initialSelectionIds,
-        onConfirm = { selectedIds, isAll ->
-            val pairSet = selectedIds.toPairSetFrom(state.items)
-            onConfirmPairs(pairSet, isAll)
+        onConfirm = { selectedItems, isAll ->
+            onConfirmPairs(selectedItems.map { it.toCategory() }.toSet(), isAll)
         },
         onDismiss = onDismiss
     )

@@ -2,8 +2,9 @@ package com.kazemieh.tag.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.model.ItemUi
 import com.kazemieh.common.model.Tag
-import com.kazemieh.designsystem.component.list.ItemUi
+import com.kazemieh.common.model.toItemUi
 import com.kazemieh.domain.usecase.GetAllTag
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,7 +24,7 @@ class TagViewModel(
 
             is TagIntent.SetSelectedTag -> {
                 val current = _state.value.initialSelectionIds
-                val person = intent.tag.first
+                val person = intent.tag
                 val selectedPersons =
                     if (current.contains(person))
                         current - person
@@ -36,7 +37,7 @@ class TagViewModel(
             }
 
             is TagIntent.SetAllSelectedTags -> _state.update {
-                it.copy(initialSelectionIds = intent.tags?.map { it.first }?.toSet() ?: emptySet())
+                it.copy(initialSelectionIds = intent.tags ?: emptySet())
             }
 
             is TagIntent.ShowAddTag -> _state.update {
@@ -53,7 +54,7 @@ class TagViewModel(
                 _state.update {
                     it.copy(
                         tags = tags,
-                        items = tags.map { ItemUi(it.id?.toInt() ?: 0, it.name) },
+                        items = tags.map { it.toItemUi() }.toSet(),
                         isLoading = false
                     )
                 }
@@ -68,13 +69,13 @@ data class TagState(
     val tags: List<Tag> = emptyList(),
     val showAddTag: Boolean = false,
     val isLoading: Boolean = false,
-    val initialSelectionIds: Set<Int> = emptySet(),
-    val items: List<ItemUi> = emptyList(),
+    val initialSelectionIds: Set<Tag> = emptySet(),
+    val items: Set<ItemUi> = emptySet(),
 )
 
 sealed interface TagIntent {
-    data class SetSelectedTag(val tag: Pair<Int, String>) : TagIntent
-    data class SetAllSelectedTags(val tags: Set<Pair<Int, String>>? = null) : TagIntent
+    data class SetSelectedTag(val tag: Tag) : TagIntent
+    data class SetAllSelectedTags(val tags: Set<Tag>? = null) : TagIntent
     data object GetAllTag : TagIntent
     data object ShowAddTag : TagIntent
 }

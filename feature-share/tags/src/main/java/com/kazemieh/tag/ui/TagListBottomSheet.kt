@@ -7,11 +7,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
+import com.kazemieh.common.model.Tag
+import com.kazemieh.common.model.toItemUi
+import com.kazemieh.common.model.toTag
 import com.kazemieh.designsystem.R
-import com.kazemieh.designsystem.component.list.ItemUi
 import com.kazemieh.designsystem.component.list.selectable.SelectableFlowRowBottomSheet
 import com.kazemieh.designsystem.component.list.selectable.SelectableListBottomSheet
-import com.kazemieh.designsystem.component.list.toPairSetFrom
 import com.kazemieh.tag.ui.add.AddTagBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
@@ -19,8 +20,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun TagListBottomSheet(
     viewModel: TagViewModel = koinViewModel(),
-    selectedTags: Set<Pair<Int, String>>?,
-    onSubmitClick: (Set<Pair<Int, String>>?) -> Unit,
+    selectedTags: Set<Tag>?,
+    onSubmitClick: (Set<Tag>?) -> Unit,
     onDismiss: () -> Unit
 ) {
 
@@ -37,10 +38,9 @@ fun TagListBottomSheet(
     SelectableFlowRowBottomSheet(
         title = stringResource(R.string.tags),
         items = state.items,
-        initialSelection = state.initialSelectionIds,
-        onConfirm = { selectedIds ->
-            val pairSet = selectedIds.toPairSetFrom(state.items)
-            onSubmitClick(pairSet)
+        initialSelection = state.initialSelectionIds.map { it.toItemUi() }.toSet(),
+        onConfirm = {
+            onSubmitClick(it.map { it.toTag() }.toSet())
         },
         onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
         onDismiss = onDismiss,
@@ -49,7 +49,7 @@ fun TagListBottomSheet(
     if (state.showAddTag) {
         AddTagBottomSheet(
             onDismiss = { viewModel.onIntent(TagIntent.ShowAddTag) },
-            setTag = { id, name -> viewModel.onIntent(TagIntent.SetSelectedTag(id to name)) }
+            setTag = { viewModel.onIntent(TagIntent.SetSelectedTag(it)) }
         )
     }
 
@@ -59,8 +59,8 @@ fun TagListBottomSheet(
 @Composable
 fun TagListSelectionBottomSheet(
     viewModel: TagViewModel = koinViewModel(),
-    initialSelectionPairs: Set<Pair<Int, String>> = emptySet(),
-    onConfirmPairs: (Set<Pair<Int, String>>, isAllSelected: Boolean) -> Unit,
+    initialSelectionPairs: Set<Tag> = emptySet(),
+    onConfirmPairs: (Set<Tag>, isAllSelected: Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
@@ -69,16 +69,14 @@ fun TagListSelectionBottomSheet(
         viewModel.onIntent(TagIntent.GetAllTag)
     }
 
-    val items = state.tags.map { ItemUi(it.id?.toInt() ?: 0, it.name) }
-    val initialSelectionIds = initialSelectionPairs.map { it.first }.toSet()
+    val initialSelectionIds = initialSelectionPairs.map { it.toItemUi() }.toSet()
 
     SelectableListBottomSheet(
         title = stringResource(R.string.tags),
-        items = items,
+        items = state.items,
         initialSelection = initialSelectionIds,
-        onConfirm = { selectedIds, isAll ->
-            val pairSet = selectedIds.toPairSetFrom(items)
-            onConfirmPairs(pairSet, isAll)
+        onConfirm = { selectedItems, isAll ->
+            onConfirmPairs(selectedItems.map { it.toTag() }.toSet(), isAll)
         },
         onDismiss = onDismiss
     )

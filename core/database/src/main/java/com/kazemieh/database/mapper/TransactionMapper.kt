@@ -1,5 +1,7 @@
 package com.kazemieh.database.mapper
 
+import com.kazemieh.common.formatted
+import com.kazemieh.common.formattedOrNull
 import com.kazemieh.database.entity.TransactionEntity
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionType
@@ -14,6 +16,8 @@ fun TransactionEntity.toTransaction(): Transaction =
         financialSourceEndId = financialSourceEndId,
         description = description,
         timeStamp = timeStamp,
+        formatedAmount = amount.formatted(),
+        amountTransferFormated = amountTransfer.formattedOrNull(),
         type = TransactionType.fromInt(type)
     )
 

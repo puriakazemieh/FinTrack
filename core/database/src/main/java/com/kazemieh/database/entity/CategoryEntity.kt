@@ -2,6 +2,7 @@ package com.kazemieh.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.kazemieh.common.model.TransactionType
 import kotlinx.serialization.Serializable
 
 @Entity(tableName = "category")
@@ -18,5 +19,5 @@ data class CategorySumEntity(
     val categoryId: Long,
     val name: String,
     val totalAmount: Long,
-    val type: Int
+    val type: TransactionType
 )

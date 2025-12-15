@@ -2,8 +2,9 @@ package com.kazemieh.person.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.model.ItemUi
 import com.kazemieh.common.model.Person
-import com.kazemieh.designsystem.component.list.ItemUi
+import com.kazemieh.common.model.toItemUi
 import com.kazemieh.domain.usecase.GetAllPerson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,7 +24,7 @@ class PersonViewModel(
 
             is PersonIntent.SetSelectedPerson -> {
                 val current = _state.value.initialSelectionIds
-                val person = intent.person.first
+                val person = intent.person
                 val selectedPersons =
                     if (current.contains(person))
                         current - person
@@ -37,7 +38,7 @@ class PersonViewModel(
 
             is PersonIntent.SetAllSelectedPersons -> _state.update {
                 it.copy(
-                    initialSelectionIds = intent.persons?.map { it.first }?.toSet() ?: emptySet()
+                    initialSelectionIds = intent.persons?.toSet() ?: emptySet()
                 )
             }
 
@@ -56,7 +57,7 @@ class PersonViewModel(
                 _state.update {
                     it.copy(
                         persons = persons,
-                        items = persons.map { ItemUi(it.id?.toInt() ?: 0, it.name) },
+                        items = persons.map { it.toItemUi() }.toSet(),
                         isLoading = false
                     )
                 }
@@ -70,13 +71,13 @@ data class PersonState(
     val persons: List<Person> = emptyList(),
     val showAddPerson: Boolean = false,
     val isLoading: Boolean = false,
-    val initialSelectionIds: Set<Int> = emptySet(),
-    val items: List<ItemUi> = emptyList(),
+    val initialSelectionIds: Set<Person> = emptySet(),
+    val items: Set<ItemUi> = emptySet(),
 )
 
 sealed interface PersonIntent {
-    data class SetSelectedPerson(val person: Pair<Int, String>) : PersonIntent
-    data class SetAllSelectedPersons(val persons: Set<Pair<Int, String>>? = null) : PersonIntent
+    data class SetSelectedPerson(val person: Person) : PersonIntent
+    data class SetAllSelectedPersons(val persons: Set<Person>? = null) : PersonIntent
     data object GetAllPerson : PersonIntent
     data object ShowAddPerson : PersonIntent
 }

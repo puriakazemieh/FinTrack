@@ -2,10 +2,10 @@ package com.kazemieh.category.ui.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.designsystem.R
-import com.kazemieh.domain.usecase.AddCategory
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.designsystem.R
+import com.kazemieh.domain.usecase.AddCategory
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,16 +46,11 @@ class AddCategoryViewModel(
                 val category = Category(
                     name = categoryName,
                     description = description,
-                    type = TransactionType.fromInt(categoryType)
+                    type = categoryType
                 )
                 val categoryId = addCategoryUseCase(category)
                 if (categoryId >= 0) {
-                    _effect.send(
-                        AddCategoryEffect.AddedCategory(
-                            categoryId.toInt(),
-                            _state.value.categoryName ?: ""
-                        )
-                    )
+                    _effect.send(AddCategoryEffect.AddedCategory(category))
                     _state.update { AddCategoryState() }
                 }
 
@@ -70,19 +65,19 @@ class AddCategoryViewModel(
 data class AddCategoryState(
     val categoryName: String? = null,
     val description: String? = null,
-    val categoryType: Int = 1,
+    val categoryType: TransactionType = TransactionType.INCOME,
 )
 
 sealed interface AddCategoryIntent {
     data object AddCategory : AddCategoryIntent
     data class SetCategoryName(val categoryName: String? = null) : AddCategoryIntent
-    data class SetCategoryType(val categoryType: Int) : AddCategoryIntent
+    data class SetCategoryType(val categoryType: TransactionType) : AddCategoryIntent
     data class SetDescription(val description: String? = null) : AddCategoryIntent
     data object OnDismiss : AddCategoryIntent
 }
 
 sealed interface AddCategoryEffect {
     data class ShowMessage(val message: Int) : AddCategoryEffect
-    data class AddedCategory(val id: Int, val name: String) : AddCategoryEffect
+    data class AddedCategory(val category: Category) : AddCategoryEffect
     data object OnDismiss : AddCategoryEffect
 }

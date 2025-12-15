@@ -6,10 +6,11 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
-import com.kazemieh.common.model.FinancialSource
 import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
 import com.kazemieh.database.dao.CategoryDao
@@ -157,26 +158,19 @@ class TransactionLocalDataSourceImpl(
         return categoryDao.insertCategory(category.toCategoryEntity())
     }
 
-    override suspend fun insertFinancialSource(financialSource: FinancialSource): Long {
-        return financialSourceDao.insertFinancialSource(financialSource.toFinancialSourceEntity())
+    override suspend fun insertFinancialSource(source: Source): Long {
+        return financialSourceDao.insertFinancialSource(source.toFinancialSourceEntity())
     }
 
     override suspend fun insertTag(tag: Tag): Long {
         return tagDao.insertTag(tag.toTagEntity())
     }
 
-//    override fun getByTag(tagName: String): Flow<List<TransactionWithRelations>> = flow {
-//        emit(
-//            transactionDao.getTransactionsByTag(tagName)
-//                .map { it.toTransactionWithRelations() }
-//        )
-//    }
-
-    override suspend fun getAllCategory(type: Int): Flow<List<Category>> {
-        return categoryDao.getAllCategories(type).map { it.map { it.toCategory() } }
+    override suspend fun getAllCategory(type: TransactionType): Flow<List<Category>> {
+        return categoryDao.getAllCategories(type.count).map { it.map { it.toCategory() } }
     }
 
-    override suspend fun getAllFinancialSource(): Flow<List<FinancialSource>> {
+    override suspend fun getAllFinancialSource(): Flow<List<Source>> {
         return financialSourceDao.getAllFinancialSources().map {
             it.map { it.toFinancialSource() }
         }
@@ -194,16 +188,16 @@ class TransactionLocalDataSourceImpl(
         financialSourceDao.decreaseBalance(id, amount)
     }
 
-    override suspend fun getDefaultCategory(type: Int): Category {
-        return categoryDao.getDefaultCategory(type).toCategory()
+    override suspend fun getDefaultCategory(type: TransactionType): Category {
+        return categoryDao.getDefaultCategory(type.count).toCategory()
     }
 
     override suspend fun getTransferCategory(): Category {
         return categoryDao.getTransferCategory().toCategory()
     }
 
-    override suspend fun getDefaultSource(): FinancialSource {
-        return financialSourceDao.getDefaultSource().toFinancialSource()
+    override suspend fun getDefaultSource(): Source? {
+        return financialSourceDao.getDefaultSource()?.toFinancialSource()
     }
 
     override suspend fun insertPerson(person: Person): Long {

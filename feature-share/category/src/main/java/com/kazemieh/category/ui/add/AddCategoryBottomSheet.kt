@@ -28,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
@@ -38,13 +40,13 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AddCategoryBottomSheet(
     viewModel: AddCategoryViewModel = koinViewModel(),
-    selectedTransactionType: Int,
+    transactionType: TransactionType,
     onDismiss: () -> Unit,
-    setCategory: (id: Int, name: String) -> Unit
+    setCategory: (Category) -> Unit
 ) {
 
     LaunchedEffect(true) {
-        viewModel.onIntent(AddCategoryIntent.SetCategoryType(selectedTransactionType))
+        viewModel.onIntent(AddCategoryIntent.SetCategoryType(transactionType))
     }
 
     val state by viewModel.state.collectAsState()
@@ -66,7 +68,7 @@ fun AddCategoryBottomSheet(
                     }
                 }
 
-                is AddCategoryEffect.AddedCategory -> setCategory(effect.id, effect.name)
+                is AddCategoryEffect.AddedCategory -> setCategory(effect.category)
 
                 AddCategoryEffect.OnDismiss -> onDismiss()
             }

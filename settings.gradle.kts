@@ -37,3 +37,4 @@ include(":feature-share:tags")
 include(":feature-share:filter")
 include(":feature-share:person")
 
+include(":feature-container:dashboard")

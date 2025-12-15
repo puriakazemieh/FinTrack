@@ -23,12 +23,13 @@ import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.R
 
 
 @Composable
 fun TransactionItem(
-    uiTransactionWithRelation: TransactionWithRelationsUi,
+    uiTransactionWithRelation: TransactionWithRelations,
     onDelete: () -> Unit
 ) {
     Card(

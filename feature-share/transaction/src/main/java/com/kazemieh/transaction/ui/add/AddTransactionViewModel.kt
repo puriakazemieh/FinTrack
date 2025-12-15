@@ -3,6 +3,10 @@ package com.kazemieh.transaction.ui.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.R
@@ -25,89 +29,92 @@ class AddTransactionViewModel(
     private val _effect = Channel<AddTransactionEffect>()
     val effect = _effect.receiveAsFlow()
 
-    fun onEvent(event: AddTransactionEvent) {
+    fun onIntent(event: AddTransactionIntent) {
         when (event) {
-            is AddTransactionEvent.SetAmount -> _state.update {
+            is AddTransactionIntent.SetAmount -> _state.update {
                 it.copy(
                     amount = event.amount,
                     isAmountError = event.amount.isBlank()
                 )
             }
 
-            is AddTransactionEvent.SetAmountTransfer -> _state.update {
+            is AddTransactionIntent.SetAmountTransfer -> _state.update {
                 it.copy(amountTransfer = event.amount)
             }
 
-            is AddTransactionEvent.SetCategory -> _state.update {
+            is AddTransactionIntent.SetCategory -> _state.update {
                 it.copy(
                     category = event.category,
-                    isCategoryError = event.category?.second?.isBlank() == true
+                    isCategoryError = event.category?.name?.isBlank() == true,
+                    isCategoryShow = false
                 )
             }
 
-            is AddTransactionEvent.SetSource -> _state.update {
+            is AddTransactionIntent.SetSource -> _state.update {
                 it.copy(
                     source = event.source,
-                    isSourceError = event.source?.second?.isBlank() == true
+                    isSourceError = event.source?.name?.isBlank() == true,
+                    isSourceShow = false
                 )
             }
 
-            is AddTransactionEvent.SetSourceEnd -> _state.update {
+            is AddTransactionIntent.SetSourceEnd -> _state.update {
                 it.copy(
                     sourceEnd = event.source,
-                    isSourceEndError = event.source?.second?.isBlank() == true
+                    isSourceEndError = event.source?.name?.isBlank() == true,
+                    isSourceShow = false
                 )
             }
 
-            is AddTransactionEvent.SetDate -> _state.update {
-                it.copy(selectedDate = event.date, timeStamp = event.timeStamp)
+            is AddTransactionIntent.SetDate -> _state.update {
+                it.copy(date = event.date, timeStamp = event.timeStamp)
             }
 
-            is AddTransactionEvent.SetDescription -> _state.update { it.copy(description = event.description) }
-            is AddTransactionEvent.SetTags -> _state.update { it.copy(tags = event.tags) }
-            is AddTransactionEvent.SetPerson -> _state.update { it.copy(persons = event.persons) }
+            is AddTransactionIntent.SetDescription -> _state.update { it.copy(description = event.description) }
+            is AddTransactionIntent.SetTags -> _state.update {
+                it.copy(tags = event.tags, isTagShow = false)
+            }
 
-            AddTransactionEvent.Submit -> submitTransaction()
+            is AddTransactionIntent.SetPerson -> _state.update {
+                it.copy(persons = event.persons, isPersonShow = false)
+            }
 
-            AddTransactionEvent.OnDismiss -> {
+            AddTransactionIntent.Submit -> submitTransaction()
+
+            AddTransactionIntent.OnDismiss -> {
                 viewModelScope.launch {
                     _state.update { AddTransactionState() }
                     _effect.send(AddTransactionEffect.OnDismiss)
                 }
             }
 
-            is AddTransactionEvent.SelectedType -> _state.update {
+            is AddTransactionIntent.SelectedType -> _state.update {
                 it.copy(
-                    selectedTransactionType = event.selectedTransactionType,
+                    transactionType = event.selectedTransactionType,
                     category = null,
                     sourceEnd = null,
                     amountTransfer = null
                 )
             }
 
-            AddTransactionEvent.FetchDefaultData -> fetchDefaultData()
+            AddTransactionIntent.FetchDefaultData -> fetchDefaultData()
+
+            AddTransactionIntent.OnSourceClicked -> _state.update { it.copy(isSourceShow = !_state.value.isSourceShow) }
+            AddTransactionIntent.OnSourceEndClicked -> _state.update { it.copy(isSourceEndShow = !_state.value.isSourceEndShow) }
+            AddTransactionIntent.OnCategoryClicked -> _state.update { it.copy(isCategoryShow = !_state.value.isCategoryShow) }
+            AddTransactionIntent.OnTagClicked -> _state.update { it.copy(isTagShow = !_state.value.isTagShow) }
+            AddTransactionIntent.OnPersonClicked -> _state.update { it.copy(isPersonShow = !_state.value.isPersonShow) }
         }
     }
 
     private fun fetchDefaultData() {
         viewModelScope.launch {
             val defaultCategory =
-                transactionUseCases.getDefaultCategoryUseCase(TransactionType.INCOME.count)
+                transactionUseCases.getDefaultCategoryUseCase(_state.value.transactionType)
             val defaultSource = transactionUseCases.getDefaultFinancialSourceUseCase()
 
-            val category = if (defaultCategory.id != null) {
-                defaultCategory.id!!.toInt() to defaultCategory.name
-            } else null
-
-            val source = if (defaultSource.id != null) {
-                defaultSource.id!!.toInt() to defaultSource.name
-            } else null
-
             _state.update {
-                it.copy(
-                    category = category,
-                    source = source
-                )
+                it.copy(category = defaultCategory, source = defaultSource)
             }
         }
     }
@@ -116,24 +123,24 @@ class AddTransactionViewModel(
     private fun submitTransaction() {
         viewModelScope.launch {
             val current = _state.value
-            var categoryId = current.category?.first
-            val sourceId = current.source?.first
-            val sourceEndId = current.sourceEnd?.first
+            var categoryId = current.category?.id
+            val sourceId = current.source?.id
+            val sourceEndId = current.sourceEnd?.id
 
-            if (current.selectedTransactionType == TransactionType.TRANSFER) {
+            if (current.transactionType == TransactionType.TRANSFER) {
                 val category = transactionUseCases.getTransferCategoryUseCase()
                 _state.update {
-                    it.copy(category = (category.id?.toInt() ?: 1) to category.name)
+                    it.copy(category = category)
                 }
-                categoryId = category.id?.toInt() ?: 1
+                categoryId = category.id
             }
 
             val amount = current.amount.toIntOrNull()?.also { amount ->
-                if (current.selectedTransactionType == TransactionType.EXPENSE)
+                if (current.transactionType == TransactionType.EXPENSE)
                     amount.times(-1)
             }
 
-            if (amount == null || categoryId == null || sourceId == null || (current.selectedTransactionType == TransactionType.TRANSFER && sourceEndId == null)) {
+            if (amount == null || categoryId == null || sourceId == null || (current.transactionType == TransactionType.TRANSFER && sourceEndId == null)) {
                 _effect.send(AddTransactionEffect.ShowMessage(R.string.fill_all_field))
                 _state.update {
                     it.copy(
@@ -152,16 +159,16 @@ class AddTransactionViewModel(
                 id = 0L,
                 amount = amount,
                 amountTransfer = current.amountTransfer?.toIntOrNull() ?: 0,
-                categoryId = categoryId.toLong(),
-                financialSourceId = sourceId.toLong(),
-                financialSourceEndId = sourceEndId?.toLong(),
+                categoryId = categoryId,
+                financialSourceId = sourceId,
+                financialSourceEndId = sourceEndId,
                 description = current.description,
                 timeStamp = current.timeStamp,
-                type = current.selectedTransactionType
+                type = current.transactionType
             )
 
-            val tagsId = current.tags?.map { it.first.toLong() } ?: emptyList()
-            val personIds = current.persons?.map { it.first.toLong() } ?: emptyList()
+            val tagsId = current.tags?.map { it.id ?: 0 } ?: emptyList()
+            val personIds = current.persons?.map { it.id ?: 0 } ?: emptyList()
             val transactionId =
                 transactionUseCases.addTransaction(transaction, tagsId, personIds)
             if (transactionId >= 0) {
@@ -173,25 +180,30 @@ class AddTransactionViewModel(
     }
 }
 
-sealed interface AddTransactionEvent {
-    data class SetAmount(val amount: String) : AddTransactionEvent
-    data class SetAmountTransfer(val amount: String) : AddTransactionEvent
+sealed interface AddTransactionIntent {
+    data class SetAmount(val amount: String) : AddTransactionIntent
+    data class SetAmountTransfer(val amount: String) : AddTransactionIntent
 
-    data class SetCategory(val category: Pair<Int, String>? = null) : AddTransactionEvent
-    data class SetSource(val source: Pair<Int, String>? = null) : AddTransactionEvent
-    data class SetSourceEnd(val source: Pair<Int, String>? = null) : AddTransactionEvent
-    data class SetTags(val tags: Set<Pair<Int, String>>? = null) : AddTransactionEvent
-    data class SetPerson(val persons: Set<Pair<Int, String>>? = null) : AddTransactionEvent
+    data class SetCategory(val category: Category? = null) : AddTransactionIntent
+    data class SetSource(val source: Source? = null) : AddTransactionIntent
+    data class SetSourceEnd(val source: Source? = null) : AddTransactionIntent
+    data class SetTags(val tags: Set<Tag>? = null) : AddTransactionIntent
+    data class SetPerson(val persons: Set<Person>? = null) : AddTransactionIntent
 
-    data class SetDate(val date: String, val timeStamp: Long) : AddTransactionEvent
-    data class SetDescription(val description: String) : AddTransactionEvent
+    data class SetDate(val date: String, val timeStamp: Long) : AddTransactionIntent
+    data class SetDescription(val description: String) : AddTransactionIntent
 
-    object Submit : AddTransactionEvent
-    object FetchDefaultData : AddTransactionEvent
-    data object OnDismiss : AddTransactionEvent
+    object Submit : AddTransactionIntent
+    object FetchDefaultData : AddTransactionIntent
+    data object OnDismiss : AddTransactionIntent
+    data object OnSourceClicked : AddTransactionIntent
+    data object OnSourceEndClicked : AddTransactionIntent
+    data object OnCategoryClicked : AddTransactionIntent
+    data object OnTagClicked : AddTransactionIntent
+    data object OnPersonClicked : AddTransactionIntent
 
     data class SelectedType(val selectedTransactionType: TransactionType = TransactionType.INCOME) :
-        AddTransactionEvent
+        AddTransactionIntent
 }
 
 
@@ -199,14 +211,15 @@ data class AddTransactionState(
     val amount: String = "",
     val amountTransfer: String? = "",
     val description: String = "",
-    val selectedDate: String? = null,
+    val date: String? = null,
     val timeStamp: Long = System.currentTimeMillis(),
+    val transactionType: TransactionType = TransactionType.INCOME,
 
-    val category: Pair<Int, String>? = null,
-    val source: Pair<Int, String>? = null,
-    val sourceEnd: Pair<Int, String>? = null,
-    val tags: Set<Pair<Int, String>>? = null,
-    val persons: Set<Pair<Int, String>>? = null,
+    val category: Category? = null,
+    val source: Source? = null,
+    val sourceEnd: Source? = null,
+    val tags: Set<Tag>? = null,
+    val persons: Set<Person>? = null,
 
     val isAmountError: Boolean = false,
     val isCategoryError: Boolean = false,
@@ -216,7 +229,12 @@ data class AddTransactionState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
 
-    val selectedTransactionType: TransactionType = TransactionType.INCOME,
+    val isSourceShow: Boolean = false,
+    val isSourceEndShow: Boolean = false,
+    val isCategoryShow: Boolean = false,
+    val isTagShow: Boolean = false,
+    val isPersonShow: Boolean = false,
+
 
     val listTransactionType: List<TransactionType> =
         listOf(TransactionType.INCOME, TransactionType.EXPENSE, TransactionType.TRANSFER)

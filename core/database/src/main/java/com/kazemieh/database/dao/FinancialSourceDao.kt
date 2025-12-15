@@ -23,6 +23,6 @@ interface FinancialSourceDao {
     suspend fun decreaseBalance(id: Long, amount: Int)
 
     @Query("SELECT * FROM financial_source WHERE id = 0 LIMIT 1")
-    suspend fun getDefaultSource(): FinancialSourceEntity
+    suspend fun getDefaultSource(): FinancialSourceEntity?
 }
 
