@@ -16,33 +16,33 @@ class AddFinancialSourceViewModel(
     private val addFinancialSourceUseCase: AddFinancialSource
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(AddFinancialSourceState())
+    private val _state = MutableStateFlow(AddSourceState())
     val state = _state.asStateFlow()
 
     private val _effect = Channel<AddFinancialSourceEffect>()
     val effect = _effect.receiveAsFlow()
 
-    fun onIntent(intent: AddFinancialSourceIntent) {
+    fun onIntent(intent: AddSourceIntent) {
         when (intent) {
-            AddFinancialSourceIntent.AddFinancialSource -> addFinancialSource()
-            is AddFinancialSourceIntent.SelectedType -> _state.update {
+            AddSourceIntent.AddSource -> addSource()
+            is AddSourceIntent.SelectedType -> _state.update {
                 it.copy(selectedTypeFinancialSource = intent.selectedTypeFinancialSource)
             }
 
-            is AddFinancialSourceIntent.SetBalance -> _state.update { it.copy(balance = intent.balance) }
-            is AddFinancialSourceIntent.SetCardNumber -> _state.update { it.copy(cardNumber = intent.cardNumber) }
-            is AddFinancialSourceIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
-            is AddFinancialSourceIntent.SetSourceName -> _state.update { it.copy(sourceName = intent.sourceName) }
-            AddFinancialSourceIntent.OnDismiss -> {
+            is AddSourceIntent.SetBalance -> _state.update { it.copy(balance = intent.balance) }
+            is AddSourceIntent.SetCardNumber -> _state.update { it.copy(cardNumber = intent.cardNumber) }
+            is AddSourceIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
+            is AddSourceIntent.SetSourceName -> _state.update { it.copy(sourceName = intent.sourceName) }
+            AddSourceIntent.OnDismiss -> {
                 viewModelScope.launch {
-                    _state.update { AddFinancialSourceState() }
+                    _state.update { AddSourceState() }
                     _effect.send(AddFinancialSourceEffect.OnDismiss)
                 }
             }
         }
     }
 
-    private fun addFinancialSource() = with(_state.value) {
+    private fun addSource() = with(_state.value) {
         viewModelScope.launch {
             if (sourceName?.isNotBlank() == true) {
                 val source = Source(
@@ -55,8 +55,9 @@ class AddFinancialSourceViewModel(
                 val sourceId = addFinancialSourceUseCase(source)
                 if (sourceId >= 0) {
                     _effect.send(
-                        AddFinancialSourceEffect.AddedFinancialSource(source))
-                    _state.update { AddFinancialSourceState() }
+                        AddFinancialSourceEffect.AddedFinancialSource(source.copy(id = sourceId))
+                    )
+                    _state.update { AddSourceState() }
                 }
 
             } else {
@@ -67,7 +68,7 @@ class AddFinancialSourceViewModel(
 }
 
 
-data class AddFinancialSourceState(
+data class AddSourceState(
     val balance: Int = 0,
     val selectedTypeFinancialSource: SelectedTypeFinancialSource = SelectedTypeFinancialSource.CREDIT,
     val sourceName: String? = null,
@@ -75,16 +76,16 @@ data class AddFinancialSourceState(
     val description: String? = null,
 )
 
-sealed interface AddFinancialSourceIntent {
-    data class SetBalance(val balance: Int = 0) : AddFinancialSourceIntent
+sealed interface AddSourceIntent {
+    data class SetBalance(val balance: Int = 0) : AddSourceIntent
     data class SelectedType(val selectedTypeFinancialSource: SelectedTypeFinancialSource = SelectedTypeFinancialSource.CREDIT) :
-        AddFinancialSourceIntent
+        AddSourceIntent
 
-    data object AddFinancialSource : AddFinancialSourceIntent
-    data class SetSourceName(val sourceName: String? = null) : AddFinancialSourceIntent
-    data class SetCardNumber(val cardNumber: String? = null) : AddFinancialSourceIntent
-    data class SetDescription(val description: String? = null) : AddFinancialSourceIntent
-    data object OnDismiss : AddFinancialSourceIntent
+    data object AddSource : AddSourceIntent
+    data class SetSourceName(val sourceName: String? = null) : AddSourceIntent
+    data class SetCardNumber(val cardNumber: String? = null) : AddSourceIntent
+    data class SetDescription(val description: String? = null) : AddSourceIntent
+    data object OnDismiss : AddSourceIntent
 }
 
 enum class SelectedTypeFinancialSource(val count: Int, val value: Int) {

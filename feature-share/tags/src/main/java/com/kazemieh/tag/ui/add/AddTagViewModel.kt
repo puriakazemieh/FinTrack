@@ -47,7 +47,7 @@ class AddTagViewModel(
                 )
                 val tagId = addTagUseCase(tag)
                 if (tagId >= 0) {
-                    _effect.send(AddTagEffect.AddedTag(tag))
+                    _effect.send(AddTagEffect.AddedTag(tag.copy(id = tagId)))
                     _state.update { AddTagState() }
                 }
 

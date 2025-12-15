@@ -15,9 +15,9 @@ import kotlinx.serialization.Serializable
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
-            entity = FinancialSourceEntity::class,
+            entity = SourceEntity::class,
             parentColumns = ["id"],
-            childColumns = ["financialSourceId"],
+            childColumns = ["sourceId"],
             onDelete = ForeignKey.CASCADE
         )
     ]
@@ -28,8 +28,8 @@ data class TransactionEntity(
     val amount: Int,
     val amountTransfer: Int? = null,
     val categoryId: Long,
-    val financialSourceId: Long,
-    val financialSourceEndId: Long? = null,
+    val sourceId: Long,
+    val sourceEndId: Long? = null,
     val description: String?,
     val timeStamp: Long,
     val type: Int,

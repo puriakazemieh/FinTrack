@@ -3,6 +3,7 @@ package com.kazemieh.transaction.ui.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.ld
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
@@ -43,6 +44,8 @@ class AddTransactionViewModel(
             }
 
             is AddTransactionIntent.SetCategory -> _state.update {
+                (event.category?.name?.isBlank() == true).ld("==")
+                event.category?.name.ld("name")
                 it.copy(
                     category = event.category,
                     isCategoryError = event.category?.name?.isBlank() == true,
@@ -160,8 +163,8 @@ class AddTransactionViewModel(
                 amount = amount,
                 amountTransfer = current.amountTransfer?.toIntOrNull() ?: 0,
                 categoryId = categoryId,
-                financialSourceId = sourceId,
-                financialSourceEndId = sourceEndId,
+                sourceId = sourceId,
+                sourceEndId = sourceEndId,
                 description = current.description,
                 timeStamp = current.timeStamp,
                 type = current.transactionType

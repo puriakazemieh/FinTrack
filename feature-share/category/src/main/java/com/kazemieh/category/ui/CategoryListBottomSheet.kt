@@ -9,11 +9,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import com.kazemieh.category.ui.add.AddCategoryBottomSheet
 import com.kazemieh.common.model.Category
-import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.toCategory
 import com.kazemieh.common.model.toItemUi
-import com.kazemieh.common.model.toPairSetFrom
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.list.normal.ListBottomSheet
 import com.kazemieh.designsystem.component.list.selectable.SelectableListBottomSheet
@@ -33,19 +31,31 @@ fun CategoryListBottomSheet(
 
     val state by viewModel.state.collectAsState()
 
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is CategoryEffect.AddedCategory -> onCategoryClick(effect.category)
+                CategoryEffect.OnDismiss -> onDismiss()
+            }
+        }
+    }
+
     ListBottomSheet(
         title = stringResource(R.string.category),
         items = state.items,
-        onConfirm = { onCategoryClick(it.toCategory()) },
+        onConfirm = { viewModel.onIntent(CategoryIntent.SelectedCategory(it.toCategory())) },
         onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
-        onDismiss = onDismiss
+        onDismiss = { viewModel.onIntent(CategoryIntent.OnDismiss) }
     )
 
-    AddCategoryBottomSheet(
-        transactionType = transactionType,
-        onDismiss = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
-        setCategory = { onCategoryClick(it) }
-    )
+    if (state.isAddShow) {
+        AddCategoryBottomSheet(
+            transactionType = transactionType,
+            onDismiss = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
+            setCategory = { viewModel.onIntent(CategoryIntent.SelectedCategory(it)) }
+        )
+    }
 
 }
 

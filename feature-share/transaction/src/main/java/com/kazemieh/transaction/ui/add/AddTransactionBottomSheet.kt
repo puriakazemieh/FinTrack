@@ -73,21 +73,6 @@ fun AddTransactionBottomSheet(
     LaunchedEffect(true) {
         viewModel.onIntent(AddTransactionIntent.FetchDefaultData)
     }
-    /*    LaunchedEffect(source) {
-            viewModel.onIntent(AddTransactionIntent.SetSource(source))
-        }
-        LaunchedEffect(sourceEnd) {
-            viewModel.onIntent(AddTransactionIntent.SetSourceEnd(sourceEnd))
-        }
-        LaunchedEffect(category) {
-            viewModel.onIntent(AddTransactionIntent.SetCategory(category))
-        }
-        LaunchedEffect(tags) {
-            viewModel.onIntent(AddTransactionIntent.SetTags(tags))
-        }
-        LaunchedEffect(persons) {
-            viewModel.onIntent(AddTransactionIntent.SetPerson(persons))
-        }*/
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->

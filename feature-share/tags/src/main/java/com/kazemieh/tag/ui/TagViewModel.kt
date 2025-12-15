@@ -23,7 +23,7 @@ class TagViewModel(
             TagIntent.GetAllTag -> loadAllTags()
 
             is TagIntent.SetSelectedTag -> {
-                val current = _state.value.initialSelectionIds
+                val current = _state.value.initialSelectionItem
                 val person = intent.tag
                 val selectedPersons =
                     if (current.contains(person))
@@ -32,12 +32,12 @@ class TagViewModel(
                         current + person
 
                 _state.update {
-                    it.copy(initialSelectionIds = selectedPersons, showAddTag = false)
+                    it.copy(initialSelectionItem = selectedPersons, showAddTag = false)
                 }
             }
 
             is TagIntent.SetAllSelectedTags -> _state.update {
-                it.copy(initialSelectionIds = intent.tags ?: emptySet())
+                it.copy(initialSelectionItem = intent.tags ?: emptySet())
             }
 
             is TagIntent.ShowAddTag -> _state.update {
@@ -69,7 +69,7 @@ data class TagState(
     val tags: List<Tag> = emptyList(),
     val showAddTag: Boolean = false,
     val isLoading: Boolean = false,
-    val initialSelectionIds: Set<Tag> = emptySet(),
+    val initialSelectionItem: Set<Tag> = emptySet(),
     val items: Set<ItemUi> = emptySet(),
 )
 

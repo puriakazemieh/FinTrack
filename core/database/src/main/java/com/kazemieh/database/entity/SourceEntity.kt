@@ -4,10 +4,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 
-@Entity(tableName = "financial_source")
+@Entity(tableName = "source")
 @Serializable
-data class FinancialSourceEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long? = 0,
+data class SourceEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
     val balance: Int = 0,
     val cardNumber: String? = null,

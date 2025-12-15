@@ -50,7 +50,7 @@ class AddCategoryViewModel(
                 )
                 val categoryId = addCategoryUseCase(category)
                 if (categoryId >= 0) {
-                    _effect.send(AddCategoryEffect.AddedCategory(category))
+                    _effect.send(AddCategoryEffect.AddedCategory(category.copy(id = categoryId)))
                     _state.update { AddCategoryState() }
                 }
 

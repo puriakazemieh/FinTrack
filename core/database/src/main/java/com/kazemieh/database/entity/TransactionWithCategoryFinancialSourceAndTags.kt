@@ -14,10 +14,10 @@ data class TransactionWithCategoryFinancialSourceAndTags(
     val category: CategoryEntity,
 
     @Relation(
-        parentColumn = "financialSourceId",
+        parentColumn = "sourceId",
         entityColumn = "id"
     )
-    val financialSource: FinancialSourceEntity,
+    val financialSource: SourceEntity,
 
     @Relation(
         parentColumn = "id",

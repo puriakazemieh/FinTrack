@@ -3,13 +3,14 @@ package com.kazemieh.common.model
 import kotlinx.serialization.Serializable
 
 @Serializable
+@OptIn(kotlinx.serialization.InternalSerializationApi::class)
 data class Transaction(
     val id: Long,
     val amount: Int,
     val amountTransfer: Int = 0,
     val categoryId: Long,
-    val financialSourceId: Long,
-    val financialSourceEndId: Long? = null,
+    val sourceId: Long,
+    val sourceEndId: Long? = null,
     val description: String? = null,
     val timeStamp: Long = System.currentTimeMillis(),
     val type: TransactionType,

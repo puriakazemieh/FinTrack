@@ -18,7 +18,7 @@ val databaseModule = module {
             DatabaseModule::class.java,
             "fin_track.db"
         )
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
             .addCallback(PrepopulateCallback(koin = getKoin()))
             .build()
     }
@@ -41,16 +41,19 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(db: SupportSQLiteDatabase) {
 
         // ایجاد جدول person
-        db.execSQL("""
+        db.execSQL(
+            """
             CREATE TABLE IF NOT EXISTS person (
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 name TEXT NOT NULL,
                 description TEXT
             )
-        """.trimIndent())
+        """.trimIndent()
+        )
 
         // ایجاد جدول transaction_person
-        db.execSQL("""
+        db.execSQL(
+            """
             CREATE TABLE IF NOT EXISTS transaction_person (
                 transactionId INTEGER NOT NULL,
                 personId INTEGER NOT NULL,
@@ -58,7 +61,8 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                 FOREIGN KEY(transactionId) REFERENCES transactions(id) ON DELETE CASCADE,
                 FOREIGN KEY(personId) REFERENCES person(id) ON DELETE CASCADE
             )
-        """.trimIndent())
+        """.trimIndent()
+        )
 
         // ایندکس‌ها
         db.execSQL("CREATE INDEX IF NOT EXISTS index_transaction_person_transactionId ON transaction_person(transactionId)")
@@ -67,23 +71,120 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 
         db.execSQL(
             """
-            ALTER TABLE transactions 
-            ADD COLUMN financialSourceEndId INTEGER
-            """
-        )
-
-        db.execSQL(
-            """
-            ALTER TABLE transactions 
-            ADD COLUMN amountTransfer INTEGER
-            """
-        )
-
-        db.execSQL(
-            """
             INSERT INTO category (name, description, type)
             VALUES ('انتقال', NULL , 3)
             """
         )
+    }
+}
+
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+
+        db.execSQL("""
+            CREATE TABLE transactions_new (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                amount INTEGER NOT NULL,
+                amountTransfer INTEGER,
+                categoryId INTEGER NOT NULL,
+                sourceId INTEGER NOT NULL,
+                sourceEndId INTEGER,
+                description TEXT,
+                timeStamp INTEGER NOT NULL,
+                type INTEGER NOT NULL,
+                FOREIGN KEY(categoryId) REFERENCES category(id) ON DELETE CASCADE,
+                FOREIGN KEY(sourceId) REFERENCES financial_source(id) ON DELETE CASCADE
+            )
+        """)
+
+        db.execSQL("""
+            INSERT INTO transactions_new (
+                id, amount, amountTransfer, categoryId,
+                sourceId, sourceEndId, description, timeStamp, type
+            )
+            SELECT
+                id,
+                amount,
+                NULL,
+                categoryId,
+                financialSourceId,
+                NULL,
+                description,
+                timeStamp,
+                type
+            FROM transactions
+        """)
+
+        db.execSQL("DROP TABLE transactions")
+        db.execSQL("ALTER TABLE transactions_new RENAME TO transactions")
+    }
+}
+
+
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+
+        // 1. create source
+        db.execSQL(
+            """
+            CREATE TABLE source (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                name TEXT NOT NULL,
+                balance INTEGER NOT NULL,
+                cardNumber TEXT,
+                description TEXT,
+                type INTEGER NOT NULL
+            )
+        """
+        )
+
+        // 2. copy data
+        db.execSQL(
+            """
+            INSERT INTO source (id, name, balance, cardNumber, description, type)
+            SELECT id, name, balance, cardNumber, description, type
+            FROM financial_source
+        """
+        )
+
+        // 3. recreate transactions
+        db.execSQL(
+            """
+            CREATE TABLE transactions_new (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                amount INTEGER NOT NULL,
+                amountTransfer INTEGER,
+                categoryId INTEGER NOT NULL,
+                sourceId INTEGER NOT NULL,
+                sourceEndId INTEGER,
+                description TEXT,
+                timeStamp INTEGER NOT NULL,
+                type INTEGER NOT NULL,
+                FOREIGN KEY(categoryId) REFERENCES category(id) ON DELETE CASCADE,
+                FOREIGN KEY(sourceId) REFERENCES source(id) ON DELETE CASCADE
+            )
+        """
+        )
+
+        db.execSQL(
+            """
+            INSERT INTO transactions_new (
+                id, amount, amountTransfer, categoryId,
+                sourceId, sourceEndId, description, timeStamp, type
+            )
+            SELECT
+                id, amount, amountTransfer, categoryId,
+                sourceId, sourceEndId,
+                description, timeStamp, type
+            FROM transactions
+        """
+        )
+
+        // 4. drop old tables
+        db.execSQL("DROP TABLE transactions")
+        db.execSQL("DROP TABLE financial_source")
+
+        // 5. rename
+        db.execSQL("ALTER TABLE transactions_new RENAME TO transactions")
     }
 }

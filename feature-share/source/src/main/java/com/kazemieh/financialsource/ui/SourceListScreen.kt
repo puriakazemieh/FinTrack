@@ -48,12 +48,22 @@ fun SourceListBottomSheet(
 
     val state by viewModel.state.collectAsState()
 
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is SourceEffect.AddedSource -> onSourceClick(effect.source)
+                SourceEffect.OnDismiss -> onDismiss()
+            }
+        }
+    }
+
     ListBottomSheet(
         title = stringResource(R.string.source),
         items = state.items,
-        onConfirm = { it.toSource() },
+        onConfirm = { viewModel.onIntent(SourceIntent.SelectedSource(it.toSource())) },
         onAddClick = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
-        onDismiss = onDismiss,
+        onDismiss = { viewModel.onIntent(SourceIntent.OnDismiss) },
         content = { item ->
             FintrackBodySmallText(
                 text = stringResource(
@@ -68,7 +78,7 @@ fun SourceListBottomSheet(
     if (state.isAddShow) {
         AddSourceBottomSheet(
             onDismiss = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
-            setSource = { onSourceClick(it) }
+            setSource = { viewModel.onIntent(SourceIntent.SelectedSource(it)) }
         )
     }
 

@@ -44,7 +44,7 @@ interface TransactionDao {
         SELECT * FROM transactions
         WHERE (:type IS NULL OR type = :type)
           AND ((:categoryIdsSize = 0) OR categoryId IN (:categoryIds))
-          AND ((:sourceIdsSize = 0) OR financialSourceId IN (:sourceIds))
+          AND ((:sourceIdsSize = 0) OR sourceId IN (:sourceIds))
 
           AND (
                 :tagIdsSize = 0 OR id IN (
@@ -96,7 +96,7 @@ interface TransactionDao {
 
       AND ((:categoryIdsSize = 0) OR t.categoryId IN (:categoryIds))
 
-      AND ((:sourceIdsSize = 0) OR t.financialSourceId IN (:sourceIds))
+      AND ((:sourceIdsSize = 0) OR t.sourceId IN (:sourceIds))
 
       AND (
             :tagIdsSize = 0 OR t.id IN (

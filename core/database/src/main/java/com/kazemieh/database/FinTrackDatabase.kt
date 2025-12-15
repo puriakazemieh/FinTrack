@@ -2,6 +2,7 @@ package com.kazemieh.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.kazemieh.database.dao.CategoryDao
 import com.kazemieh.database.dao.FinancialSourceDao
@@ -9,7 +10,7 @@ import com.kazemieh.database.dao.PersonDao
 import com.kazemieh.database.dao.TagDao
 import com.kazemieh.database.dao.TransactionDao
 import com.kazemieh.database.entity.CategoryEntity
-import com.kazemieh.database.entity.FinancialSourceEntity
+import com.kazemieh.database.entity.SourceEntity
 import com.kazemieh.database.entity.PersonEntity
 import com.kazemieh.database.entity.TagEntity
 import com.kazemieh.database.entity.TransactionEntity
@@ -25,15 +26,16 @@ import org.koin.core.Koin
     entities = [
         TransactionEntity::class,
         CategoryEntity::class,
-        FinancialSourceEntity::class,
+        SourceEntity::class,
         TagEntity::class,
         TransactionTagCrossRef::class,
         PersonEntity::class,
         TransactionPersonCrossRef::class,
     ],
-    version = 2,
+    version = 4,
     exportSchema = false
 )
+@TypeConverters(TransactionTypeConverter::class)
 abstract class DatabaseModule : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun categoryDao(): CategoryDao
@@ -51,7 +53,7 @@ class PrepopulateCallback(
         CoroutineScope(Dispatchers.IO).launch {
             val prefsDao: FinancialSourceDao by koin.inject()
             prefsDao.insertFinancialSource(
-                FinancialSourceEntity(name = "منبع مالی پیش فرض", type = 1)
+                SourceEntity(name = "منبع مالی پیش فرض", type = 1)
             )
             val categoryDao: CategoryDao by koin.inject()
             val defaultCategory = listOf(

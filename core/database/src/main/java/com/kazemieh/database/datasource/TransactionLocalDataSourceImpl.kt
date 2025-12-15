@@ -23,8 +23,8 @@ import com.kazemieh.database.entity.TransactionPersonCrossRef
 import com.kazemieh.database.entity.TransactionTagCrossRef
 import com.kazemieh.database.mapper.toCategory
 import com.kazemieh.database.mapper.toCategoryEntity
-import com.kazemieh.database.mapper.toFinancialSource
-import com.kazemieh.database.mapper.toFinancialSourceEntity
+import com.kazemieh.database.mapper.toSource
+import com.kazemieh.database.mapper.toSourceEntity
 import com.kazemieh.database.mapper.toPerson
 import com.kazemieh.database.mapper.toPersonEntity
 import com.kazemieh.database.mapper.toTag
@@ -142,7 +142,7 @@ class TransactionLocalDataSourceImpl(
     }
 
     override suspend fun insertFinancialSource(source: Source): Long {
-        return financialSourceDao.insertFinancialSource(source.toFinancialSourceEntity())
+        return financialSourceDao.insertFinancialSource(source.toSourceEntity())
     }
 
     override suspend fun insertTag(tag: Tag): Long {
@@ -155,7 +155,7 @@ class TransactionLocalDataSourceImpl(
 
     override suspend fun getAllFinancialSource(): Flow<List<Source>> {
         return financialSourceDao.getAllFinancialSources().map {
-            it.map { it.toFinancialSource() }
+            it.map { it.toSource() }
         }
     }
 
@@ -180,7 +180,7 @@ class TransactionLocalDataSourceImpl(
     }
 
     override suspend fun getDefaultSource(): Source? {
-        return financialSourceDao.getDefaultSource()?.toFinancialSource()
+        return financialSourceDao.getDefaultSource()?.toSource()
     }
 
     override suspend fun insertPerson(person: Person): Long {

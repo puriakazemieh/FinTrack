@@ -1,7 +1,9 @@
 package com.kazemieh.common.model
 
+import android.annotation.SuppressLint
 import kotlinx.serialization.Serializable
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class Category(
     val id: Long? = null,
@@ -11,6 +13,7 @@ data class Category(
 )
 
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class CategorySum(
     val categoryId: Long,

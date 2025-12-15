@@ -79,7 +79,7 @@ fun AddSourceBottomSheet(
     }
 
     ModalBottomSheet(
-        onDismissRequest = { viewModel.onIntent(AddFinancialSourceIntent.OnDismiss) },
+        onDismissRequest = { viewModel.onIntent(AddSourceIntent.OnDismiss) },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background
     ) {
@@ -101,7 +101,7 @@ fun AddSourceBottomSheet(
                             SegmentedButton(
                                 selected = state.selectedTypeFinancialSource == option,
                                 onClick = {
-                                    viewModel.onIntent(AddFinancialSourceIntent.SelectedType(option))
+                                    viewModel.onIntent(AddSourceIntent.SelectedType(option))
                                 },
                                 shape = SegmentedButtonDefaults.itemShape(index = index, count = 2)
                             ) {
@@ -113,7 +113,7 @@ fun AddSourceBottomSheet(
 
                 FintrackOutlinedTextField(
                     value = state.sourceName ?: "",
-                    onValueChange = { viewModel.onIntent(AddFinancialSourceIntent.SetSourceName(it)) },
+                    onValueChange = { viewModel.onIntent(AddSourceIntent.SetSourceName(it)) },
                     label = {
                         Row {
                             FintrackBodyMediumText(text = stringResource(R.string.source_name_label))
@@ -131,10 +131,10 @@ fun AddSourceBottomSheet(
                     onValueChange = { input ->
                         val newValue = input.toIntOrNull()
                         if (newValue != null) viewModel.onIntent(
-                            AddFinancialSourceIntent.SetBalance(newValue)
+                            AddSourceIntent.SetBalance(newValue)
                         )
                         else if (input.isEmpty()) viewModel.onIntent(
-                            AddFinancialSourceIntent.SetBalance(0)
+                            AddSourceIntent.SetBalance(0)
                         )
                     },
                     label = { FintrackBodyMediumText(text = stringResource(R.string.initial_balance_label)) },
@@ -147,7 +147,7 @@ fun AddSourceBottomSheet(
                         value = state.cardNumber ?: "",
                         onValueChange = {
                             viewModel.onIntent(
-                                AddFinancialSourceIntent.SetCardNumber(it)
+                                AddSourceIntent.SetCardNumber(it)
                             )
                         },
                         label = { FintrackBodyMediumText(text = stringResource(R.string.card_number_label)) },
@@ -157,7 +157,7 @@ fun AddSourceBottomSheet(
 
                 FintrackOutlinedTextField(
                     value = state.description ?: "",
-                    onValueChange = { viewModel.onIntent(AddFinancialSourceIntent.SetDescription(it)) },
+                    onValueChange = { viewModel.onIntent(AddSourceIntent.SetDescription(it)) },
                     label = { FintrackBodyMediumText(text = stringResource(R.string.description_label)) }
                 )
 
@@ -165,7 +165,7 @@ fun AddSourceBottomSheet(
 
 
                 Button(
-                    onClick = { viewModel.onIntent(AddFinancialSourceIntent.AddFinancialSource) },
+                    onClick = { viewModel.onIntent(AddSourceIntent.AddSource) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,

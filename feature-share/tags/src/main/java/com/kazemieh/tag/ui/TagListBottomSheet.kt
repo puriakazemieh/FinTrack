@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
+import com.kazemieh.common.ld
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.toItemUi
 import com.kazemieh.common.model.toTag
@@ -35,13 +36,13 @@ fun TagListBottomSheet(
 
     val state by viewModel.state.collectAsState()
 
+    val initialSelection = state.initialSelectionItem.map { it.toItemUi() }.toSet()
+
     SelectableFlowRowBottomSheet(
         title = stringResource(R.string.tags),
         items = state.items,
-        initialSelection = state.initialSelectionIds.map { it.toItemUi() }.toSet(),
-        onConfirm = {
-            onSubmitClick(it.map { it.toTag() }.toSet())
-        },
+        initialSelection = initialSelection,
+        onConfirm = { onSubmitClick(it.map { it.toTag() }.toSet()) },
         onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
         onDismiss = onDismiss,
     )

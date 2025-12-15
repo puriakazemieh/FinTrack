@@ -11,18 +11,18 @@ class AddTransaction(
         tagIds: List<Long>,
         personIds: List<Long>,
     ): Long {
-        if (transaction.financialSourceEndId != null) {
+        if (transaction.sourceEndId != null) {
             repository.increaseBalanceFinancialSource(
-                transaction.financialSourceEndId!!,
+                transaction.sourceEndId!!,
                 transaction.amount
             )
             repository.increaseBalanceFinancialSource(
-                transaction.financialSourceId,
+                transaction.sourceId,
                 (transaction.amount + (transaction.amountTransfer)).times(-1)
             )
         } else {
             repository.increaseBalanceFinancialSource(
-                transaction.financialSourceId,
+                transaction.sourceId,
                 transaction.amount
             )
         }

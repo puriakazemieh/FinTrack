@@ -47,7 +47,7 @@ class AddPersonViewModel(
                 )
                 val personId = addPersonUseCase(person)
                 if (personId >= 0) {
-                    _effect.send(AddPersonEffect.AddedPerson(person))
+                    _effect.send(AddPersonEffect.AddedPerson(person.copy(id = personId)))
                     _state.update { AddPersonState() }
                 }
 

@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.model.ItemUi
 import com.kazemieh.designsystem.R
+import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
 
@@ -64,7 +65,7 @@ fun SelectableListBottomSheet(
     SelectableListBottomSheetStateless(
         title = title,
         state = state,
-        onToggle = {  viewModel.onIntent(SelectableIntent.Toggle(it)) },
+        onToggle = { viewModel.onIntent(SelectableIntent.Toggle(it)) },
         onToggleSelectAll = { viewModel.onIntent(SelectableIntent.ToggleSelectAll) },
         onConfirm = { viewModel.onIntent(SelectableIntent.Confirm) },
         onDismiss = { viewModel.onIntent(SelectableIntent.Dismiss) },
@@ -101,7 +102,7 @@ fun SelectableListBottomSheetStateless(
                 )
                 Spacer(Modifier.height(8.dp))
 
-                if (showSelectAll) {
+                if (showSelectAll && state.items.size > 1) {
                     val text = stringResource(R.string.select_All)
                     val item = ItemUi(id = 0, title = text)
                     ItemSelected(
@@ -114,16 +115,18 @@ fun SelectableListBottomSheetStateless(
 
                 HorizontalDivider()
 
-                LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
-                    items(state.items.toList()) { item ->
-                        val isSelected = state.selectedItems.contains(item)
-                        ItemSelected(
-                            modifier = Modifier.padding(12.dp),
-                            isSelected = isSelected,
-                            item = item,
-                            onToggle = { onToggle(item) })
+                if (!state.items.isEmpty()) {
+                    LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
+                        items(state.items.toList()) { item ->
+                            val isSelected = state.selectedItems.contains(item)
+                            ItemSelected(
+                                modifier = Modifier.padding(12.dp),
+                                isSelected = isSelected,
+                                item = item,
+                                onToggle = { onToggle(item) })
+                        }
                     }
-                }
+                } else EmptyListScreen()
 
                 Spacer(Modifier.height(12.dp))
 
