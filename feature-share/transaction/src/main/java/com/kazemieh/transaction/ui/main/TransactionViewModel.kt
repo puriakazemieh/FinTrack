@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.kazemieh.common.formatted
 import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toPositive
@@ -32,7 +33,8 @@ class TransactionViewModel(
     val effect = _effect.receiveAsFlow()
 
     val uiTransactionWithRelations: Flow<PagingData<TransactionWithRelations>> =
-        transactionUseCases.getAllTransactionsFiltered().cachedIn(viewModelScope)
+        transactionUseCases.getAllTransactionsFiltered(TransactionFilterParams())
+            .cachedIn(viewModelScope)
 
     fun onIntent(intent: TransactionIntent) {
         when (intent) {
@@ -46,33 +48,16 @@ class TransactionViewModel(
     private fun loadTransactions() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            transactionUseCases.getCategorySum().collect { categorySums ->
+            transactionUseCases.getCategorySum(TransactionFilterParams()).collect { categorySums ->
 
-                var totalIncome: Long = 0
-                var totalExpense: Long = 0
-                var totalTransfer: Long = 0
-                var balance: Long = 0
+                val totalIncome = categorySums.filter { it.type == TransactionType.INCOME }
+                    .sumOf { it.totalAmount }
+                val totalExpense = categorySums.filter { it.type == TransactionType.EXPENSE }
+                    .sumOf { it.totalAmount }
+                val totalTransfer = categorySums.filter { it.type == TransactionType.TRANSFER }
+                    .sumOf { it.totalAmount }
+                val balance = categorySums.sumOf { it.totalAmount }
 
-                // todo use it // categorySums.filter { it.type== TransactionType.INCOME.count}.sumOf { it.totalAmount }
-                categorySums.map { category ->
-
-                    balance += category.totalAmount
-                    when (category.type) {
-                        TransactionType.INCOME -> {
-                            totalIncome += category.totalAmount
-                        }
-
-                        TransactionType.EXPENSE -> {
-                            totalExpense += category.totalAmount
-                        }
-
-                        TransactionType.TRANSFER -> {
-                            totalTransfer += category.totalAmount
-                        }
-
-                        else -> {}
-                    }
-                }
 
                 _state.update {
                     it.copy(

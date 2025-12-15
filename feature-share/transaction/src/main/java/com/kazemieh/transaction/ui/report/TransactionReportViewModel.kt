@@ -5,8 +5,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.kazemieh.common.formatted
+import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
+import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionFilterParams
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.component.PieChartItem
 import com.kazemieh.domain.usecase.TransactionUseCases
@@ -35,10 +41,10 @@ class TransactionReportViewModel(
         .map { state ->
             TransactionFilterParams(
                 type = if (state.filterParams.type == 0) null else state.filterParams.type,
-                selectedCategories = state.filterParams.selectedCategories,
-                selectedSource = state.filterParams.selectedSource,
-                selectedTags = state.filterParams.selectedTags,
-                selectedPersons = state.filterParams.selectedPersons,
+                categories = state.filterParams.categories,
+                sources = state.filterParams.sources,
+                tags = state.filterParams.tags,
+                persons = state.filterParams.persons,
                 fromTimestamp = state.filterParams.fromTimestamp,
                 toTimestamp = state.filterParams.toTimestamp?.plus(24.hours.inWholeMilliseconds)
             )
@@ -52,38 +58,15 @@ class TransactionReportViewModel(
 
     val uiTransactionWithRelations: Flow<PagingData<TransactionWithRelations>> =
         filterParamsFlow
-            .flatMapLatest { params ->
-                transactionUseCases.getAllTransactionsFiltered(
-                    type = params.type,
-                    categoryIds = params.selectedCategories.map { it.first },
-                    sourceIds = params.selectedSource.map { it.first },
-                    tagIds = params.selectedTags.map { it.first },
-                    personIds = params.selectedPersons.map { it.first },
-                    fromTimestamp = params.fromTimestamp,
-                    toTimestamp = params.toTimestamp
-                )
-            }
+            .flatMapLatest { params -> transactionUseCases.getAllTransactionsFiltered(params) }
             .cachedIn(viewModelScope)
 
     init {
         viewModelScope.launch {
             filterParamsFlow
                 .onStart { _state.update { it.copy(isLoading = true) } }
-                .flatMapLatest { params ->
-                    transactionUseCases.getCategorySum(
-                        type = params.type,
-                        categoryIds = params.selectedCategories.map { it.first },
-                        sourceIds = params.selectedSource.map { it.first },
-                        tagIds = params.selectedTags.map { it.first },
-                        personIds = params.selectedPersons.map { it.first },
-                        fromTimestamp = params.fromTimestamp,
-                        toTimestamp = params.toTimestamp
-                    )
-                }
-                .collectLatest { categorySums ->
-                    updateCategorySums(categorySums)
-                }
-
+                .flatMapLatest { params -> transactionUseCases.getCategorySum(params) }
+                .collectLatest { categorySums -> updateCategorySums(categorySums) }
         }
 
     }
@@ -97,7 +80,7 @@ class TransactionReportViewModel(
                 _state.update { state ->
                     state.copy(
                         filterParams = state.filterParams.copy(
-                            type = intent.selectedTransactionType
+                            type = intent.selectedTransactionType.count
                         )
                     )
                 }
@@ -107,7 +90,7 @@ class TransactionReportViewModel(
                 _state.update { state ->
                     state.copy(
                         filterParams = state.filterParams.copy(
-                            selectedSource = intent.selectedSource
+                            sources = intent.selectedSource
                         )
                     )
                 }
@@ -117,7 +100,7 @@ class TransactionReportViewModel(
                 _state.update { state ->
                     state.copy(
                         filterParams = state.filterParams.copy(
-                            selectedCategories = intent.selectedCategories
+                            categories = intent.selectedCategories
                         )
                     )
                 }
@@ -127,7 +110,7 @@ class TransactionReportViewModel(
                 _state.update { state ->
                     state.copy(
                         filterParams = state.filterParams.copy(
-                            selectedTags = intent.selectedTag
+                            tags = intent.selectedTag
                         )
                     )
                 }
@@ -137,7 +120,7 @@ class TransactionReportViewModel(
                 _state.update { state ->
                     state.copy(
                         filterParams = state.filterParams.copy(
-                            selectedPersons = intent.selectedPerson
+                            persons = intent.selectedPerson
                         )
                     )
                 }
@@ -189,18 +172,19 @@ class TransactionReportViewModel(
 sealed interface TransactionReportIntent {
     data class DeleteTransactionReport(val transaction: Transaction) : TransactionReportIntent
 
-    data class SelectedType(val selectedTransactionType: Int = 0) : TransactionReportIntent
-
-    data class SelectedSource(val selectedSource: Set<Pair<Int, String>> = emptySet()) :
+    data class SelectedType(val selectedTransactionType: TransactionType = TransactionType.ALL) :
         TransactionReportIntent
 
-    data class SelectedTag(val selectedTag: Set<Pair<Int, String>> = emptySet()) :
+    data class SelectedSource(val selectedSource: Set<Source> = emptySet()) :
         TransactionReportIntent
 
-    data class SelectedPerson(val selectedPerson: Set<Pair<Int, String>> = emptySet()) :
+    data class SelectedTag(val selectedTag: Set<Tag> = emptySet()) :
         TransactionReportIntent
 
-    data class SelectedCategory(val selectedCategories: Set<Pair<Int, String>> = emptySet()) :
+    data class SelectedPerson(val selectedPerson: Set<Person> = emptySet()) :
+        TransactionReportIntent
+
+    data class SelectedCategory(val selectedCategories: Set<Category> = emptySet()) :
         TransactionReportIntent
 
     data class SelectedDate(val fromTimestamp: Long? = null, val toTimestamp: Long? = null) :
@@ -220,22 +204,3 @@ data class TransactionReportState(
     val error: String? = null,
 )
 
-data class TransactionFilterParams(
-    val type: Int? = null,
-    val selectedSource: Set<Pair<Int, String>> = emptySet(),
-    val selectedCategories: Set<Pair<Int, String>> = emptySet(),
-    val selectedTags: Set<Pair<Int, String>> = emptySet(),
-    val selectedPersons: Set<Pair<Int, String>> = emptySet(),
-    val fromTimestamp: Long? = null,
-    val toTimestamp: Long? = null
-)
-
-enum class TransactionFilterType(val count: Int) {
-    ALL(0),
-    INCOME(1),
-    EXPENSE(2);
-
-    companion object {
-        fun fromInt(value: Int) = entries.first { it.count == value }
-    }
-}

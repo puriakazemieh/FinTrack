@@ -3,10 +3,11 @@ package com.kazemieh.domain.repository
 import androidx.paging.PagingData
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
-import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import kotlinx.coroutines.flow.Flow
@@ -21,25 +22,8 @@ interface TransactionRepository {
     suspend fun deleteTransaction(transaction: Transaction)
     fun getAllTransactions(): Flow<PagingData<TransactionWithRelations>>
     fun getAllTransactionsByType(type: Int): Flow<List<TransactionWithRelations>>
-    fun getAllTransactionsFiltered(
-        type: Int? = null,
-        categoryIds: List<Int> = emptyList(),
-        sourceIds: List<Int> = emptyList(),
-        tagIds: List<Int> = emptyList(),
-        personIds: List<Int> = emptyList(),
-        fromTimestamp: Long? = null,
-        toTimestamp: Long? = null
-    ): Flow<PagingData<TransactionWithRelations>>
-
-    fun getCategorySums(
-        type: Int? = null,
-        categoryIds: List<Int> = emptyList(),
-        sourceIds: List<Int> = emptyList(),
-        tagIds: List<Int> = emptyList(),
-        personIds: List<Int> = emptyList(),
-        fromTimestamp: Long? = null,
-        toTimestamp: Long? = null
-    ): Flow<List<CategorySum>>
+    fun getAllTransactionsFiltered(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>>
+    fun getCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>>
 
     suspend fun getAllCategory(type: TransactionType): Flow<List<Category>>
     suspend fun insertTag(tag: Tag): Long

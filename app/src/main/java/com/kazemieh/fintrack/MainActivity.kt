@@ -16,10 +16,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FintrackTheme {
-                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                    val navController = rememberNavController()
-                    FinTrackHost(navController = navController)
-                }
+                FinTrackHost()
             }
         }
     }

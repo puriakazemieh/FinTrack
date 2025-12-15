@@ -1,4 +1,4 @@
-package com.kazemieh.fintrack.report
+package com.tosantechno.filter
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -20,11 +20,7 @@ import com.kazemieh.financialsource.ui.SourceListSelectionBottomSheet
 import com.kazemieh.person.ui.PersonListSelectionBottomSheet
 import com.kazemieh.tag.ui.TagListSelectionBottomSheet
 import com.kazemieh.transaction.ui.report.TransactionListByFilterScreen
-import com.tosantechno.filter.CustomDateBottomSheet
-import com.tosantechno.filter.DateFilterBottomSheet
-import com.tosantechno.filter.ReportTopBar
 import org.koin.androidx.compose.koinViewModel
-
 
 @Composable
 fun ReportScreen(
@@ -47,9 +43,7 @@ fun ReportScreen(
             }
             ReportTopBar(
                 onTransactionTypeSelected = state.selectedTransactionType,
-                onTransactionTypeClicked = {
-                    viewModel.onIntent(ReportIntent.OnTransactionTypeSelected(it))
-                },
+                onTransactionTypeClicked = { viewModel.onIntent(ReportIntent.OnTransactionTypeSelected(it)) },
 
                 selectedCategories = state.selectedCategories,
                 isAllCategorySelected = state.isAllCategorySelected,
@@ -88,7 +82,7 @@ fun ReportScreen(
 
         }
 
-        /*if (state.isCategorySheetVisible) {
+        if (state.isCategorySheetVisible) {
             CategoryListSelectionBottomSheet(
                 initialSelectionPairs = state.selectedCategories,
                 selectedTransactionType = state.selectedTransactionType,
@@ -102,7 +96,7 @@ fun ReportScreen(
 
         if (state.isTagSheetVisible) {
             TagListSelectionBottomSheet(
-                initialSelectionPairs = state.selectedPerson,
+                initialSelectionPairs = state.selectedTag,
                 onConfirmPairs = { pairs, isAll ->
                     viewModel.onIntent(ReportIntent.OnTagSelected(pairs, isAll))
                 },
@@ -163,7 +157,7 @@ fun ReportScreen(
                     )
                 }
             )
-        }*/
+        }
 
     }
 }

@@ -1,6 +1,7 @@
 package com.kazemieh.domain.usecase
 
 import androidx.paging.PagingData
+import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
@@ -8,23 +9,7 @@ import kotlinx.coroutines.flow.Flow
 class GetAllTransactionsFiltered(
     private val repository: TransactionRepository
 ) {
-    operator fun invoke(
-        type: Int? = null,
-        categoryIds: List<Int> = emptyList(),
-        sourceIds: List<Int> = emptyList(),
-        tagIds: List<Int> = emptyList(),
-        personIds: List<Int> = emptyList(),
-        fromTimestamp: Long? = null,
-        toTimestamp: Long? = null
-    ): Flow<PagingData<TransactionWithRelations>> {
-        return repository.getAllTransactionsFiltered(
-            type = type,
-            categoryIds = categoryIds,
-            sourceIds = sourceIds,
-            tagIds = tagIds,
-            personIds = personIds,
-            fromTimestamp = fromTimestamp,
-            toTimestamp = toTimestamp
-        )
+    operator fun invoke(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>> {
+        return repository.getAllTransactionsFiltered(transactionFilterParams)
     }
 }

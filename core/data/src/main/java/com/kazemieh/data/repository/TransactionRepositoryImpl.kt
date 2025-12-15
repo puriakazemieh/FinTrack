@@ -7,6 +7,7 @@ import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
@@ -25,44 +26,12 @@ class TransactionRepositoryImpl(
         return localDataSource.getAllTransactionsByType(type)
     }
 
-    override fun getAllTransactionsFiltered(
-        type: Int?,
-        categoryIds: List<Int>,
-        sourceIds: List<Int>,
-        tagIds: List<Int>,
-        personIds: List<Int>,
-        fromTimestamp: Long?,
-        toTimestamp: Long?
-    ): Flow<PagingData<TransactionWithRelations>> {
-        return localDataSource.getAllTransactionsFiltered(
-            type = type,
-            categoryIds = categoryIds,
-            sourceIds = sourceIds,
-            tagIds = tagIds,
-            personIds = personIds,
-            fromTimestamp = fromTimestamp,
-            toTimestamp = toTimestamp
-        )
+    override fun getAllTransactionsFiltered(transactionFilterParams: TransactionFilterParams ): Flow<PagingData<TransactionWithRelations>> {
+        return localDataSource.getAllTransactionsFiltered(transactionFilterParams )
     }
 
-    override fun getCategorySums(
-        type: Int?,
-        categoryIds: List<Int>,
-        sourceIds: List<Int>,
-        tagIds: List<Int>,
-        personIds: List<Int>,
-        fromTimestamp: Long?,
-        toTimestamp: Long?
-    ): Flow<List<CategorySum>> {
-        return localDataSource.getCategorySums(
-            type = type,
-            categoryIds = categoryIds,
-            sourceIds = sourceIds,
-            tagIds = tagIds,
-            personIds = personIds,
-            fromTimestamp = fromTimestamp,
-            toTimestamp = toTimestamp
-        )
+    override fun getCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>> {
+        return localDataSource.getCategorySums(transactionFilterParams)
     }
 
     override suspend fun insertTransaction(

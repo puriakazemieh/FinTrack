@@ -70,10 +70,10 @@ interface TransactionDao {
     )
     fun getAllTransactionsFiltered(
         type: Int? = null,
-        categoryIds: List<Int> = emptyList(),
-        sourceIds: List<Int> = emptyList(),
-        tagIds: List<Int> = emptyList(),
-        personIds: List<Int> = emptyList(),
+        categoryIds: List<Long?> = emptyList(),
+        sourceIds: List<Long?> = emptyList(),
+        tagIds: List<Long?> = emptyList(),
+        personIds: List<Long?> = emptyList(),
         tagIdsSize: Int = tagIds.size,
         personIdsSize: Int = personIds.size,
         categoryIdsSize: Int = categoryIds.size,
@@ -124,10 +124,10 @@ interface TransactionDao {
     )
     fun getCategorySums(
         type: Int?,
-        categoryIds: List<Int>,
-        sourceIds: List<Int>,
-        tagIds: List<Int>,
-        personIds: List<Int>,
+        categoryIds: List<Long?>,
+        sourceIds: List<Long?>,
+        tagIds: List<Long?>,
+        personIds: List<Long?>,
         tagIdsSize: Int = tagIds.size,
         personIdsSize: Int = personIds.size,
         categoryIdsSize: Int = categoryIds.size,

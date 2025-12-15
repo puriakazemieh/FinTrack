@@ -1,10 +1,15 @@
-package com.kazemieh.fintrack.report
+package com.tosantechno.filter
 
 
 import androidx.lifecycle.ViewModel
 import com.kazemieh.common.DateFilterHelper
 import com.kazemieh.common.DateFilterType
 import com.kazemieh.common.Direction
+import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.Tag
+import com.kazemieh.common.model.TransactionType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -183,7 +188,7 @@ class ReportViewModel() : ViewModel() {
 }
 
 data class ReportState(
-    val selectedTransactionType: Int = 0,
+    val selectedTransactionType: TransactionType = TransactionType.ALL,
 
     val dateFilterType: DateFilterType = DateFilterType.THIS_MONTH,
     val isDateSheetVisible: Boolean = false,
@@ -196,19 +201,19 @@ data class ReportState(
     val textDate: Any = DateFilterType.THIS_MONTH.titleResId,
 
     val isSourceSheetVisible: Boolean = false,
-    val selectedSources: Set<Pair<Int, String>> = emptySet(),
+    val selectedSources: Set<Source> = emptySet(),
     val isAllSourceSelected: Boolean = true,
 
     val isCategorySheetVisible: Boolean = false,
-    val selectedCategories: Set<Pair<Int, String>> = emptySet(),
+    val selectedCategories: Set<Category> = emptySet(),
     val isAllCategorySelected: Boolean = true,
 
     val isTagSheetVisible: Boolean = false,
-    val selectedTag: Set<Pair<Int, String>> = emptySet(),
+    val selectedTag: Set<Tag> = emptySet(),
     val isAllTAgSelected: Boolean = true,
 
     val isPersonSheetVisible: Boolean = false,
-    val selectedPerson: Set<Pair<Int, String>> = emptySet(),
+    val selectedPerson: Set<Person> = emptySet(),
     val isAllPersonSelected: Boolean = true,
 
     val isError: Boolean = false,
@@ -216,29 +221,29 @@ data class ReportState(
 )
 
 sealed interface ReportIntent {
-    data class OnTransactionTypeSelected(val type: Int) : ReportIntent
+    data class OnTransactionTypeSelected(val type: TransactionType) : ReportIntent
 
     data object OnToggleSourceSheet : ReportIntent
     data class OnSourcesSelected(
-        val sources: Set<Pair<Int, String>>,
+        val sources: Set<Source>,
         val isAllSourceSelected: Boolean = true
     ) : ReportIntent
 
     data object OnToggleCategorySheet : ReportIntent
     data class OnCategoriesSelected(
-        val categories: Set<Pair<Int, String>>,
+        val categories: Set<Category>,
         val isAllCategorySelected: Boolean = true
     ) : ReportIntent
 
     data object OnToggleTagSheet : ReportIntent
     data class OnTagSelected(
-        val tag: Set<Pair<Int, String>>,
+        val tag: Set<Tag>,
         val isAllTAgSelected: Boolean = true
     ) : ReportIntent
 
     data object OnTogglePersonSheet : ReportIntent
     data class OnPersonSelected(
-        val persons: Set<Pair<Int, String>>,
+        val persons: Set<Person>,
         val isAllPersonSelected: Boolean = true
     ) : ReportIntent
 

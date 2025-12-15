@@ -1,6 +1,8 @@
 package com.kazemieh.fintrack.navigation
 
 import com.kazemieh.fintrack.R
+import com.kazemieh.fintrack.navigation.navigationBar.Dashboard
+import com.kazemieh.fintrack.navigation.navigationBar.Report
 import kotlinx.serialization.Serializable
 
 enum class Destinations(

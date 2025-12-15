@@ -34,7 +34,7 @@ include(":feature-share:transaction")
 include(":feature-share:category")
 include(":feature-share:source")
 include(":feature-share:tags")
-include(":feature-share:filter")
 include(":feature-share:person")
 
+include(":feature-container:report")
 include(":feature-container:dashboard")

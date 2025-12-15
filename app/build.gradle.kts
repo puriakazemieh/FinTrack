@@ -43,7 +43,7 @@ dependencies {
     implementation(project(":feature-share:category"))
     implementation(project(":feature-share:source"))
     implementation(project(":feature-share:tags"))
-    implementation(project(":feature-share:filter"))
+    implementation(project(":feature-container:report"))
     implementation(project(":feature-share:person"))
     implementation(project(":feature-container:dashboard"))
 

@@ -40,7 +40,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.DateFilterType
+import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.ItemUi
+import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.common.model.toItemUi
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.DatePickerField
 import com.kazemieh.designsystem.component.FilterButton
@@ -51,23 +57,23 @@ import com.kazemieh.designsystem.component.FintrackTitleMediumText
 
 @Composable
 fun ReportTopBar(
-    onTransactionTypeSelected: Int,
-    onTransactionTypeClicked: (Int) -> Unit,
+    onTransactionTypeSelected: TransactionType,
+    onTransactionTypeClicked: (TransactionType) -> Unit,
 
     isAllSourceSelected: Boolean = true,
-    selectedSources: Set<Pair<Int, String>> = emptySet(),
+    selectedSources: Set<Source> = emptySet(),
     onSourceClicked: () -> Unit,
 
     isAllCategorySelected: Boolean = true,
-    selectedCategories: Set<Pair<Int, String>>,
+    selectedCategories: Set<Category>,
     onCategoryClicked: () -> Unit,
 
     isAllTAgSelected: Boolean = true,
-    selectedTags: Set<Pair<Int, String>> = emptySet(),
+    selectedTags: Set<Tag> = emptySet(),
     onTagClicked: () -> Unit,
 
     isAllPersonSelected: Boolean = true,
-    selectedPersons: Set<Pair<Int, String>> = emptySet(),
+    selectedPersons: Set<Person> = emptySet(),
     onPersonClicked: () -> Unit,
 
     isShowArrowButton: Boolean = true,
@@ -112,8 +118,8 @@ fun ReportTopBar(
 
                         }
                         SegmentedButton(
-                            selected = onTransactionTypeSelected == option.count,
-                            onClick = { onTransactionTypeClicked(option.count) },
+                            selected = onTransactionTypeSelected == option,
+                            onClick = { onTransactionTypeClicked(option) },
                             shape = SegmentedButtonDefaults.itemShape(
                                 index = index,
                                 count = TransactionType.entries.size
@@ -133,7 +139,7 @@ fun ReportTopBar(
                     else stringResource(R.string.sources, selectedSources.size)
 
                 Selector(
-                    selected = selectedSources,
+                    selected = selectedSources.map { it.toItemUi() }.toSet(),
                     isAllSelected = isAllSourceSelected,
                     modifier = Modifier
                         .weight(1f)
@@ -148,7 +154,7 @@ fun ReportTopBar(
                     else stringResource(R.string.categories, selectedCategories.size)
 
                 Selector(
-                    selected = selectedCategories,
+                    selected = selectedCategories.map { it.toItemUi() }.toSet(),
                     isAllSelected = isAllCategorySelected,
                     modifier = Modifier
                         .weight(1f)
@@ -167,7 +173,7 @@ fun ReportTopBar(
                     else stringResource(R.string.tags, selectedTags.size)
 
                 Selector(
-                    selected = selectedTags,
+                    selected = selectedTags.map { it.toItemUi() }.toSet(),
                     isAllSelected = isAllTAgSelected,
                     modifier = Modifier
                         .weight(1f)
@@ -182,7 +188,7 @@ fun ReportTopBar(
                     else stringResource(R.string.persons, selectedPersons.size)
 
                 Selector(
-                    selected = selectedPersons,
+                    selected = selectedPersons.map { it.toItemUi() }.toSet(),
                     isAllSelected = isAllPersonSelected,
                     modifier = Modifier
                         .weight(1f)
@@ -208,7 +214,7 @@ fun ReportTopBar(
 
 @Composable
 private fun Selector(
-    selected: Set<Pair<Int, String>> = emptySet(),
+    selected: Set<ItemUi> = emptySet(),
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
     labelText: String,
     isAllSelected: Boolean = false,
@@ -218,8 +224,8 @@ private fun Selector(
         if (selected.isEmpty()) MaterialTheme.typography.bodyMedium
         else MaterialTheme.typography.labelSmall
     FintrackOutlinedTextField(
-        value = if (isAllSelected) "" else if (selected.size == 1) selected.first().second
-        else selected.joinToString(", ") { it.second },
+        value = if (isAllSelected) "" else if (selected.size == 1) selected.first().title
+        else selected.joinToString(", ") { it.title },
         onClick = onClick,
         readOnly = true,
         enabled = false,

@@ -1,9 +1,8 @@
-package com.kazemieh.fintrack
+package com.tosantechno.filter.di
 
-import com.kazemieh.fintrack.report.ReportViewModel
+import com.tosantechno.filter.ReportViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
-
 
 
 val reportViewModel = module {

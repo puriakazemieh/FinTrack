@@ -10,6 +10,7 @@ import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
@@ -99,15 +100,7 @@ class TransactionLocalDataSourceImpl(
         }
     }
 
-    override fun getAllTransactionsFiltered(
-        type: Int?,
-        categoryIds: List<Int>,
-        sourceIds: List<Int>,
-        tagIds: List<Int>,
-        personIds: List<Int>,
-        fromTimestamp: Long?,
-        toTimestamp: Long?
-    ): Flow<PagingData<TransactionWithRelations>> {
+    override fun getAllTransactionsFiltered(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 3,
@@ -116,13 +109,13 @@ class TransactionLocalDataSourceImpl(
             ),
             pagingSourceFactory = {
                 transactionDao.getAllTransactionsFiltered(
-                    type = type,
-                    categoryIds = categoryIds,
-                    sourceIds = sourceIds,
-                    tagIds = tagIds,
-                    personIds = personIds,
-                    fromTimestamp = fromTimestamp,
-                    toTimestamp = toTimestamp
+                    type = transactionFilterParams.type,
+                    categoryIds = transactionFilterParams.categories.map { it.id },
+                    sourceIds = transactionFilterParams.sources.map { it.id },
+                    tagIds = transactionFilterParams.tags.map { it.id },
+                    personIds = transactionFilterParams.persons.map { it.id },
+                    fromTimestamp = transactionFilterParams.fromTimestamp,
+                    toTimestamp = transactionFilterParams.toTimestamp
                 )
             }
         ).flow.map { pagingData ->
@@ -132,26 +125,16 @@ class TransactionLocalDataSourceImpl(
         }
     }
 
-    override fun getCategorySums(
-        type: Int?,
-        categoryIds: List<Int>,
-        sourceIds: List<Int>,
-        tagIds: List<Int>,
-        personIds: List<Int>,
-        fromTimestamp: Long?,
-        toTimestamp: Long?
-    ): Flow<List<CategorySum>> {
+    override fun getCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>> {
         return transactionDao.getCategorySums(
-            type = type,
-            categoryIds = categoryIds,
-            sourceIds = sourceIds,
-            tagIds = tagIds,
-            personIds = personIds,
-            fromTimestamp = fromTimestamp,
-            toTimestamp = toTimestamp
-        ).map {
-            it.map { it.toCategory() }
-        }
+            type = transactionFilterParams.type,
+            categoryIds = transactionFilterParams.categories.map { it.id },
+            sourceIds = transactionFilterParams.sources.map { it.id },
+            tagIds = transactionFilterParams.tags.map { it.id },
+            personIds = transactionFilterParams.persons.map { it.id },
+            fromTimestamp = transactionFilterParams.fromTimestamp,
+            toTimestamp = transactionFilterParams.toTimestamp
+        ).map { it.map { it.toCategory() } }
     }
 
     override suspend fun insertCategory(category: Category): Long {

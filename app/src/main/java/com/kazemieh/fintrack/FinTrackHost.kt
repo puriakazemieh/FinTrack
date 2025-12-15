@@ -4,28 +4,37 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.kazemieh.fintrack.navigation.AppNavHost
 import com.kazemieh.fintrack.navigation.Destinations
+import com.kazemieh.fintrack.navigation.navigationBar.FintrackNavigationBar
 
 
 @Composable
-fun FinTrackHost(navController: NavHostController) {
+fun FinTrackHost() {
+
+    val navController = rememberNavController()
 
     val currentRoute =
         navController.currentBackStackEntryAsState().value?.destination?.route.orEmpty()
     val topLevelRoutes = Destinations.entries.map { it.path }
     val showBottomBar = currentRoute in topLevelRoutes
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            FintrackNavigationBar(navController = navController)
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            bottomBar = {
+                FintrackNavigationBar(navController = navController)
+            }
+        ) { innerPadding ->
+            AppNavHost(navController = navController, modifier = Modifier.padding(innerPadding))
         }
-    ) { innerPadding ->
-        AppNavHost(navController = navController, modifier = Modifier.padding(innerPadding))
     }
+
 }
 

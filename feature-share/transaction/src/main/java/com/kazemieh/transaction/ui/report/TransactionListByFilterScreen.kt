@@ -17,17 +17,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.Tag
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.transaction.ui.component.transactionListContent
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TransactionListByFilterScreen(
-    selectedSources: Set<Pair<Int, String>>,
-    selectedCategories: Set<Pair<Int, String>>,
-    selectedTags: Set<Pair<Int, String>>,
-    selectedPersons: Set<Pair<Int, String>>,
-    selectedTransactionType: Int,
+    selectedSources: Set<Source>,
+    selectedCategories: Set<Category>,
+    selectedTags: Set<Tag>,
+    selectedPersons: Set<Person>,
+    selectedTransactionType: TransactionType,
     fromTimestamp: Long? = null,
     toTimestamp: Long? = null,
     enableAnimationChart: Boolean = true,
