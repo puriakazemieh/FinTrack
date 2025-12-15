@@ -56,31 +56,31 @@ class PrepopulateCallback(
             val categoryDao: CategoryDao by koin.inject()
             val defaultCategory = listOf(
                 // Incomes
-                CategoryEntity(name = "حقوق و دستمزد", type = TransactionType.INCOME),
-                CategoryEntity(name = "پاداش و مزایا", type = TransactionType.INCOME),
-                CategoryEntity(name = "پروژه‌های جانبی", type = TransactionType.INCOME),
-                CategoryEntity(name = "فروش کالا/خدمات", type = TransactionType.INCOME),
-                CategoryEntity(name = "سود بانکی", type = TransactionType.INCOME),
-                CategoryEntity(name = "بازگشت وجه", type = TransactionType.INCOME),
-                CategoryEntity(name = "سرمایه‌گذاری", type = TransactionType.INCOME),
-                CategoryEntity(name = "اجاره دریافتی", type = TransactionType.INCOME),
-                CategoryEntity(name = "هدیه یا کمک مالی", type = TransactionType.INCOME),
-                CategoryEntity(name = "سایر دریافتی‌ها", type = TransactionType.INCOME),
+                CategoryEntity(name = "حقوق و دستمزد", type = TransactionType.INCOME.count),
+                CategoryEntity(name = "پاداش و مزایا", type = TransactionType.INCOME.count),
+                CategoryEntity(name = "پروژه‌های جانبی", type = TransactionType.INCOME.count),
+                CategoryEntity(name = "فروش کالا/خدمات", type = TransactionType.INCOME.count),
+                CategoryEntity(name = "سود بانکی", type = TransactionType.INCOME.count),
+                CategoryEntity(name = "بازگشت وجه", type = TransactionType.INCOME.count),
+                CategoryEntity(name = "سرمایه‌گذاری", type = TransactionType.INCOME.count),
+                CategoryEntity(name = "اجاره دریافتی", type = TransactionType.INCOME.count),
+                CategoryEntity(name = "هدیه یا کمک مالی", type = TransactionType.INCOME.count),
+                CategoryEntity(name = "سایر دریافتی‌ها", type = TransactionType.INCOME.count),
 
                 // Expenses
-                CategoryEntity(name = "خوراک و رستوران", type = TransactionType.EXPENSE),
-                CategoryEntity(name = "حمل‌ونقل و سوخت", type = TransactionType.EXPENSE),
-                CategoryEntity(name = "اجاره یا وام مسکن", type = TransactionType.EXPENSE),
-                CategoryEntity(name = "قبوض و خدمات", type = TransactionType.EXPENSE),
-                CategoryEntity(name = "خرید پوشاک", type = TransactionType.EXPENSE),
-                CategoryEntity(name = "بهداشت و درمان", type = TransactionType.EXPENSE),
-                CategoryEntity(name = "آموزش و تحصیل", type = TransactionType.EXPENSE),
-                CategoryEntity(name = "تفریح و سرگرمی", type = TransactionType.EXPENSE),
-                CategoryEntity(name = "کمک مالی و هدیه", type = TransactionType.EXPENSE),
-                CategoryEntity(name = "سایر هزینه‌ها", type = TransactionType.EXPENSE),
+                CategoryEntity(name = "خوراک و رستوران", type = TransactionType.EXPENSE.count),
+                CategoryEntity(name = "حمل‌ونقل و سوخت", type = TransactionType.EXPENSE.count),
+                CategoryEntity(name = "اجاره یا وام مسکن", type = TransactionType.EXPENSE.count),
+                CategoryEntity(name = "قبوض و خدمات", type = TransactionType.EXPENSE.count),
+                CategoryEntity(name = "خرید پوشاک", type = TransactionType.EXPENSE.count),
+                CategoryEntity(name = "بهداشت و درمان", type = TransactionType.EXPENSE.count),
+                CategoryEntity(name = "آموزش و تحصیل", type = TransactionType.EXPENSE.count),
+                CategoryEntity(name = "تفریح و سرگرمی", type = TransactionType.EXPENSE.count),
+                CategoryEntity(name = "کمک مالی و هدیه", type = TransactionType.EXPENSE.count),
+                CategoryEntity(name = "سایر هزینه‌ها", type = TransactionType.EXPENSE.count),
 
 
-                CategoryEntity(name = "انتقال", type = TransactionType.TRANSFER)
+                CategoryEntity(name = "انتقال", type = TransactionType.TRANSFER.count)
             )
             categoryDao.insertAllCategory(defaultCategory)
 
