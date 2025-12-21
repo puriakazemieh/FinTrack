@@ -27,11 +27,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.kazemieh.common.model.Person
+import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
-import com.kazemieh.designsystem.R
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -43,6 +43,7 @@ fun AddPersonBottomSheet(
     setPerson: (Person) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    val space = LocalSpacing.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -74,9 +75,9 @@ fun AddPersonBottomSheet(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
+                .padding(space.mediumLarge)
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(space.mediumLarge)) {
 
                 FintrackOutlinedTextField(
                     value = state.personName ?: "",
@@ -98,7 +99,7 @@ fun AddPersonBottomSheet(
                     label = { FintrackBodyMediumText(text = stringResource(R.string.description_label)) }
                 )
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(space.large))
 
                 Button(
                     onClick = { viewModel.onIntent(AddPersonIntent.AddPerson) },

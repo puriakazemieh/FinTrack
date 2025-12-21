@@ -19,9 +19,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
-import com.kazemieh.common.formatNumber
 import com.kazemieh.common.toPrice
+import com.kazemieh.designsystem.LocalSpacing
 
 @Composable
 fun FintrackOutlinedTextField(
@@ -39,7 +38,7 @@ fun FintrackOutlinedTextField(
     unfocusedBorderColor: Color = MaterialTheme.colorScheme.outlineVariant,
     cursorColor: Color = MaterialTheme.colorScheme.primary,
     errorColor: Color = MaterialTheme.colorScheme.error,
-    shape: Shape = RoundedCornerShape(12.dp),
+    shape: Shape = RoundedCornerShape(LocalSpacing.current.mediumLarge),
     enabled: Boolean = true,
     singleLine: Boolean = true,
     readOnly: Boolean = false,
@@ -67,13 +66,6 @@ fun FintrackOutlinedTextField(
         textStyle = textStyle.copy(color = textColor),
         label = {
             label()
-//            Box(
-//                modifier = Modifier
-//                    .background(MaterialTheme.colorScheme.surface)
-//                    .clip(RoundedCornerShape(topEnd = 8.dp, topStart = 8.dp))
-//            ) {
-//                label()
-//            }
         },
         enabled = enabled,
         singleLine = singleLine,

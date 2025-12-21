@@ -36,8 +36,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import com.kazemieh.common.model.Source
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
@@ -52,6 +52,7 @@ fun AddSourceBottomSheet(
     setSource: (Source) -> Unit
 ) {
 
+    val space = LocalSpacing.current
     val state by viewModel.state.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
@@ -87,10 +88,10 @@ fun AddSourceBottomSheet(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(space.mediumLarge),
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(space.mediumLarge)
             ) {
 
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -161,7 +162,7 @@ fun AddSourceBottomSheet(
                     label = { FintrackBodyMediumText(text = stringResource(R.string.description_label)) }
                 )
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(space.large))
 
 
                 Button(

@@ -47,6 +47,7 @@ import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.toItemUi
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.DatePickerField
 import com.kazemieh.designsystem.component.FilterButton
@@ -82,16 +83,17 @@ fun ReportTopBar(
     onNextClick: () -> Unit,
     textDate: String
 ) {
+    val space = LocalSpacing.current
 
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(space.large),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = space.small)
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp)
+            modifier = Modifier.padding(vertical = space.small, horizontal = space.large)
         ) {
 
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -131,7 +133,7 @@ fun ReportTopBar(
                 }
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(space.mediumLarge)) {
 
                 val labelTextSource =
                     if (isAllSourceSelected) stringResource(R.string.all_source)
@@ -165,7 +167,7 @@ fun ReportTopBar(
 
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(space.mediumLarge)) {
 
                 val labelTextSource =
                     if (isAllTAgSelected) stringResource(R.string.all_tags)
@@ -248,6 +250,7 @@ fun DatePeriodSelector(
     onNextClick: () -> Unit,
     onDateClick: () -> Unit,
 ) {
+    val space = LocalSpacing.current
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -264,7 +267,7 @@ fun DatePeriodSelector(
 
         FilterButton(
             modifier = Modifier
-                .padding(top = 8.dp, end = 8.dp, start = 8.dp, bottom = 4.dp)
+                .padding(top = space.mediumSmall, end = space.mediumSmall, start = space.mediumSmall, bottom = space.small)
                 .weight(0.6f),
             text = dateText,
             onClick = onDateClick
@@ -291,6 +294,7 @@ fun DateFilterBottomSheet(
     endDate: String? = null,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val space = LocalSpacing.current
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -324,7 +328,7 @@ fun DateFilterBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
+                .padding(space.mediumLarge)
         ) {
 
             LazyColumn {
@@ -334,19 +338,19 @@ fun DateFilterBottomSheet(
                         onToggleCustomDateSheet = onToggleCustomDateSheet,
                         onDateRange = onDateRange
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(space.mediumSmall))
                     FilterRow(
                         filters = weekFilters,
                         onToggleCustomDateSheet = onToggleCustomDateSheet,
                         onDateRange = onDateRange
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(space.mediumSmall))
                     FilterRow(
                         filters = monthFilters,
                         onToggleCustomDateSheet = onToggleCustomDateSheet,
                         onDateRange = onDateRange
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(space.mediumLarge))
                     FilterRow(
                         filters = listOf(DateFilterType.CUSTOM_RANGE),
                         onToggleCustomDateSheet = onToggleCustomDateSheet,
@@ -370,9 +374,10 @@ private fun FilterRow(
     startDate: String? = null,
     endDate: String? = null
 ) {
+    val space = LocalSpacing.current
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(space.mediumSmall)
     ) {
         filters.forEach { filter ->
             Card(
@@ -387,14 +392,14 @@ private fun FilterRow(
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
                 shape = MaterialTheme.shapes.medium,
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = space.one)
             ) {
                 val text =
                     if (isCustomDate && startDate != null && endDate != null) "$startDate - $endDate"
                     else stringResource(filter.titleResId)
 
                 FintrackBodyMediumText(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(space.large),
                     text = text
                 )
             }
@@ -413,6 +418,7 @@ fun CustomDateBottomSheet(
 ) {
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val space = LocalSpacing.current
 
     var startDate by remember { mutableStateOf(start) }
     var endDate by remember { mutableStateOf(end) }
@@ -427,12 +433,12 @@ fun CustomDateBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
+                .padding(space.mediumLarge)
         ) {
-            Column(Modifier.padding(16.dp)) {
+            Column(Modifier.padding(space.large)) {
 
                 FintrackTitleMediumText(stringResource(R.string.custom_date))
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(space.mediumSmall))
 
                 DatePickerField(
                     selectedDate = startDate?.first ?: stringResource(R.string.not_choose),
@@ -444,7 +450,7 @@ fun CustomDateBottomSheet(
                     }
                 )
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(space.mediumSmall))
 
                 DatePickerField(
                     selectedDate = endDate?.first ?: stringResource(R.string.not_choose),
@@ -457,7 +463,7 @@ fun CustomDateBottomSheet(
                     }
                 )
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(space.mediumSmall))
 
                 Button(
                     modifier = Modifier.fillMaxWidth(),

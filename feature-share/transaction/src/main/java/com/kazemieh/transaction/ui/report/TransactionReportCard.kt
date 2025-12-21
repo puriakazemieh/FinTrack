@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.PieChart
@@ -34,6 +35,7 @@ fun ShowTransactionReportCard(
 ) {
 
     val state by viewModel.state.collectAsState()
+    val space = LocalSpacing.current
 
 
     val text = when (state.filterParams.type) {
@@ -55,15 +57,15 @@ fun ShowTransactionReportCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = space.one)
     ) {
 
         Column(
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier.padding(space.large),
         ) {
 
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(space.mediumSmall))
 
             Row(
                 horizontalArrangement = Arrangement.SpaceAround
@@ -82,20 +84,20 @@ fun ShowTransactionReportCard(
 
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(space.mediumSmall))
 
             if (state.pieChartData.isNotEmpty()) {
                 Box(
                     modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .height(1.dp)
+                        .padding(vertical = space.mediumSmall)
+                        .height(space.one)
                         .fillMaxWidth()
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.secondary)
                 )
 
 
-                Box(modifier = Modifier.padding(top = 20.dp)) {
+                Box(modifier = Modifier.padding(top =space.large)) {
                     PieChart(
                         data = state.pieChartData,
                         radiusOuter = 40.dp,

@@ -21,7 +21,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,8 +49,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.formatNumber
-import com.kazemieh.common.ld
-import kotlinx.coroutines.delay
+import com.kazemieh.designsystem.LocalSpacing
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -112,6 +110,8 @@ fun PieChart(
     onSliceClick: ((PieChartItem) -> Unit)? = null
 ) {
     if (data.isEmpty()) return
+
+    val space = LocalSpacing.current
 
     val painters = data.map { it.icon?.let { rememberVectorPainter(it) } }
 
@@ -223,7 +223,7 @@ fun PieChart(
         }
 
         if (showLegend) {
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(space.mediumLarge))
             PieChartLegend(
                 data = data,
                 colors = colors,
@@ -327,7 +327,7 @@ private fun PieChartLegend(
                         .size(14.dp)
                         .background(colors[index], shape = CircleShape)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(space.mediumSmall))
                 item.icon?.let {
                     Icon(
                         imageVector = it,
@@ -352,12 +352,13 @@ private fun PieChartLegend(
     data: List<PieChartItem>,
     colors: List<Color>
 ) {
+    val space = LocalSpacing.current
     FlowRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 20.dp),
+            .padding(top = space.large),
         horizontalArrangement = Arrangement.spacedBy(
-            space = 4.dp,
+            space = space.small,
             alignment = Alignment.CenterHorizontally
         ),
     ) {
@@ -365,22 +366,22 @@ private fun PieChartLegend(
             val txtColor = textColorForBackground(colors[index])
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 6.dp)
+                modifier = Modifier.padding(horizontal = space.mediumSmall)
             ) {
                 Box(
                     modifier = Modifier
-                        .size(14.dp)
+                        .size(space.large)
                         .background(colors[index], shape = CircleShape)
                 )
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(space.small))
                 item.icon?.let {
                     Icon(
                         imageVector = it,
                         contentDescription = item.label,
                         tint = txtColor,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(space.large)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(space.small))
                 }
                 FintrackLabelSmallText(
                     text = "${item.label}: ${item.value.toInt().formatNumber()} تومان "

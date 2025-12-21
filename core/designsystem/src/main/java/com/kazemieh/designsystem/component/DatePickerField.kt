@@ -29,12 +29,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.gmail.hamedvakhide.compose_jalali_datepicker.JalaliCalendarView
 import com.gmail.hamedvakhide.compose_jalali_datepicker.ui.theme.textDisabledColor
 import com.kazemieh.designsystem.FintrackFontFamily
 import com.kazemieh.designsystem.FintrackTypography
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import ir.huri.jcal.JalaliCalendar
 import kotlinx.coroutines.launch
@@ -81,6 +81,7 @@ fun JalaliDatePickerDialog(
     openDialog: MutableState<Boolean>,
     onConfirm: (JalaliCalendar) -> Unit,
 ) {
+    val space = LocalSpacing.current
     if (openDialog.value) {
         Dialog(
             onDismissRequest = { openDialog.value = false },
@@ -97,7 +98,7 @@ fun JalaliDatePickerDialog(
                     ) {
                         openDialog.value = false
                     }
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = space.large)
             ) {
                 Surface(
                     modifier = Modifier
@@ -147,20 +148,20 @@ fun JalaliDatePickerBottomSheet(
     onConfirm: (JalaliCalendar) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    val space = LocalSpacing.current
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     if (openSheet.value) {
         ModalBottomSheet(
             onDismissRequest = { openSheet.value = false },
             sheetState = bottomSheetState,
-            containerColor = MaterialTheme.colorScheme.background,
-//            tonalElevation = 8.dp,
+            containerColor = MaterialTheme.colorScheme.background
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .padding(horizontal = space.large, vertical = space.mediumLarge)
+                    .clip(RoundedCornerShape(space.mediumLarge))
                     .background(MaterialTheme.colorScheme.surface),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

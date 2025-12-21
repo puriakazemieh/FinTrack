@@ -25,8 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.kazemieh.common.model.ItemUi
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -85,6 +85,7 @@ fun SelectableListBottomSheetStateless(
     showSelectAll: Boolean = true,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val space = LocalSpacing.current
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -93,20 +94,23 @@ fun SelectableListBottomSheetStateless(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
+                .padding(space.mediumLarge)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 FintrackTitleLargeText(
                     text = title,
-                    modifier = Modifier.padding(4.dp)
+                    modifier = Modifier.padding(space.small)
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(space.mediumSmall))
 
                 if (showSelectAll && state.items.size > 1) {
                     val text = stringResource(R.string.select_All)
                     val item = ItemUi(id = 0, title = text)
                     ItemSelected(
-                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp),
+                        modifier = Modifier.padding(
+                            vertical = space.mediumSmall,
+                            horizontal = space.small
+                        ),
                         isSelected = state.isAllSelected,
                         item = item,
                         onToggle = { onToggleSelectAll() }
@@ -120,7 +124,7 @@ fun SelectableListBottomSheetStateless(
                         items(state.items.toList()) { item ->
                             val isSelected = state.selectedItems.contains(item)
                             ItemSelected(
-                                modifier = Modifier.padding(12.dp),
+                                modifier = Modifier.padding(space.mediumLarge),
                                 isSelected = isSelected,
                                 item = item,
                                 onToggle = { onToggle(item) })
@@ -128,13 +132,13 @@ fun SelectableListBottomSheetStateless(
                     }
                 } else EmptyListScreen()
 
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(space.mediumLarge))
 
                 Button(modifier = Modifier.fillMaxWidth(), onClick = onConfirm) {
                     FintrackBodyMediumText(text = stringResource(R.string.confirm))
                 }
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(space.mediumSmall))
             }
         }
     }
@@ -148,6 +152,7 @@ fun ItemSelected(
     item: ItemUi,
     onToggle: () -> Unit
 ) {
+    val space = LocalSpacing.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -156,7 +161,7 @@ fun ItemSelected(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Checkbox(checked = isSelected, onCheckedChange = { onToggle() })
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(space.mediumLarge))
         FintrackBodyMediumText(text = item.title)
     }
 

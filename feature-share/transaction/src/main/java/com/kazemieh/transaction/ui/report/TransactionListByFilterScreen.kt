@@ -14,7 +14,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.kazemieh.common.model.Category
@@ -23,6 +22,7 @@ import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.transaction.ui.component.transactionListContent
 import org.koin.androidx.compose.koinViewModel
 
@@ -82,18 +82,19 @@ fun TransactionListByFilterContent(
     enableAnimationChart: Boolean,
     onDelete: (TransactionWithRelations) -> Unit = {}
 ) {
+    val space = LocalSpacing.current
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = space.large)
     ) {
-        item { Spacer(Modifier.height(8.dp)) }
+        item { Spacer(Modifier.height(space.mediumSmall)) }
 
         item {
             ShowTransactionReportCard(enableAnimationChart = enableAnimationChart)
         }
 
-        item { Spacer(Modifier.height(16.dp)) }
+        item { Spacer(Modifier.height(space.large)) }
 
         if (loading) {
             item {
@@ -108,7 +109,7 @@ fun TransactionListByFilterContent(
             transactionListContent(uiTransactionWithRelations, onDelete)
         }
 
-        item { Spacer(Modifier.height(8.dp)) }
+        item { Spacer(Modifier.height(space.mediumSmall)) }
     }
 
 }

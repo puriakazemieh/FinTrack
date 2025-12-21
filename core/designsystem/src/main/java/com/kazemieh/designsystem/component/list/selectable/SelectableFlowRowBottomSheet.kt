@@ -28,8 +28,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.kazemieh.common.model.ItemUi
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -67,7 +67,7 @@ fun SelectableFlowRowBottomSheet(
     SelectableFlowRowBottomSheetStateless(
         title = title,
         state = state,
-        onToggle = {  viewModel.onIntent(SelectableIntent.Toggle(it)) },
+        onToggle = { viewModel.onIntent(SelectableIntent.Toggle(it)) },
         onConfirm = { viewModel.onIntent(SelectableIntent.Confirm) },
         onDismiss = { viewModel.onIntent(SelectableIntent.Dismiss) },
         onAddClick = { viewModel.onIntent(SelectableIntent.AddClick) },
@@ -89,6 +89,8 @@ fun SelectableFlowRowBottomSheetStateless(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+    val space = LocalSpacing.current
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState
@@ -96,20 +98,20 @@ fun SelectableFlowRowBottomSheetStateless(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
+                .padding(space.medium)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 FintrackTitleLargeText(
                     text = title,
-                    modifier = Modifier.padding(4.dp)
+                    modifier = Modifier.padding(space.extraSmall)
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(space.small))
 
                 FlowRow(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f, fill = false),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(space.mediumSmall)
                 ) {
                     if (state.items.isNotEmpty()) {
                         state.items.forEach { item ->
@@ -134,12 +136,12 @@ fun SelectableFlowRowBottomSheetStateless(
                     } else EmptyListScreen()
                 }
 
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(space.mediumLarge))
 
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(4.dp)
+                        .padding(space.small)
                 ) {
                     FloatingActionButton(
                         onClick = { onAddClick() },
@@ -155,7 +157,7 @@ fun SelectableFlowRowBottomSheetStateless(
                     }
                 }
 
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(space.mediumLarge))
 
                 Button(
                     modifier = Modifier.fillMaxWidth(),
@@ -171,7 +173,7 @@ fun SelectableFlowRowBottomSheetStateless(
                     )
                 }
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(space.mediumSmall))
             }
 
             content()

@@ -27,9 +27,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
@@ -45,6 +45,7 @@ fun AddCategoryBottomSheet(
     setCategory: (Category) -> Unit
 ) {
 
+    val space = LocalSpacing.current
     LaunchedEffect(true) {
         viewModel.onIntent(AddCategoryIntent.SetCategoryType(transactionType))
     }
@@ -84,11 +85,11 @@ fun AddCategoryBottomSheet(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(space.mediumLarge),
         ) {
 
             Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(space.mediumLarge)
             ) {
 
                 FintrackOutlinedTextField(
@@ -111,7 +112,7 @@ fun AddCategoryBottomSheet(
                     label = { FintrackBodyMediumText(text = stringResource(R.string.description_label)) }
                 )
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(space.large))
 
 
                 Button(

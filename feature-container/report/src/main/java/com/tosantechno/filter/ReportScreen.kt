@@ -12,10 +12,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.CategoryListSelectionBottomSheet
 import com.kazemieh.common.DateFilterType
 import com.kazemieh.common.ld
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.financialsource.ui.SourceListSelectionBottomSheet
 import com.kazemieh.person.ui.PersonListSelectionBottomSheet
 import com.kazemieh.tag.ui.TagListSelectionBottomSheet
@@ -27,6 +27,7 @@ fun ReportScreen(
     viewModel: ReportViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val space = LocalSpacing.current
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -35,7 +36,7 @@ fun ReportScreen(
 
         Column {
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(space.mediumSmall))
             val label = when (val labelValue = state.textDate) {
                 is Int -> stringResource(id = labelValue)
                 is String -> labelValue
@@ -43,7 +44,13 @@ fun ReportScreen(
             }
             ReportTopBar(
                 onTransactionTypeSelected = state.selectedTransactionType,
-                onTransactionTypeClicked = { viewModel.onIntent(ReportIntent.OnTransactionTypeSelected(it)) },
+                onTransactionTypeClicked = {
+                    viewModel.onIntent(
+                        ReportIntent.OnTransactionTypeSelected(
+                            it
+                        )
+                    )
+                },
 
                 selectedCategories = state.selectedCategories,
                 isAllCategorySelected = state.isAllCategorySelected,

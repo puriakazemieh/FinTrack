@@ -5,14 +5,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 data class Dimensions(
-    val default: Dp = 0.dp,
-    val spaceExtraSmall: Dp = 4.dp,
-    val spaceSmall: Dp = 8.dp,
-    val spaceMedium: Dp = 16.dp,
-    val spaceLarge: Dp = 32.dp,
-    val spaceExtraLarge: Dp = 64.dp,
-
-    val strokeWidth: Dp = 2.dp,
+    val zero: Dp = 0.dp,
+    val one: Dp = 1.dp,
+    val extraSmall: Dp = 2.dp,
+    val small: Dp = 4.dp,
+    val mediumSmall: Dp = 8.dp,
+    val medium: Dp = 10.dp,
+    val mediumLarge: Dp = 12.dp,
+    val large: Dp = 16.dp,
+    val extraLarge: Dp = 32.dp,
+    val huge: Dp = 64.dp,
 
     )
 

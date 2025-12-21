@@ -18,13 +18,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import com.kazemieh.common.model.TransactionType
+import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.common.model.TransactionType
-import com.kazemieh.common.model.TransactionWithRelations
-import com.kazemieh.designsystem.R
 
 
 @Composable
@@ -32,17 +32,18 @@ fun TransactionItem(
     uiTransactionWithRelation: TransactionWithRelations,
     onDelete: () -> Unit
 ) {
+    val space = LocalSpacing.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = space.small),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = space.one)
     ) {
-        Column(Modifier.padding(16.dp)) {
+        Column(Modifier.padding(space.large)) {
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -62,14 +63,14 @@ fun TransactionItem(
                 }
             }
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(space.mediumSmall))
 
             FintrackTitleMediumText(
                 text = "${stringResource(R.string.source)} : ${uiTransactionWithRelation.financialSourceName}",
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(space.mediumSmall))
 
             val amountColor =
                 if (uiTransactionWithRelation.transaction.amount >= 0)
@@ -90,7 +91,7 @@ fun TransactionItem(
                 color = amountColor
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(space.small))
 
             if (uiTransactionWithRelation.tags.isNotEmpty()) {
                 FintrackBodySmallText(

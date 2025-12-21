@@ -38,10 +38,10 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.CategoryListBottomSheet
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.DatePickerField
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -177,11 +177,12 @@ fun AddTransactionContent(
     onIntent: (AddTransactionIntent) -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
+    val space = LocalSpacing.current
 
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp)
+            .padding(space.mediumLarge)
     ) {
 
         item {
@@ -219,7 +220,7 @@ fun AddTransactionContent(
             }
         }
 
-        item { Spacer(modifier = Modifier.height(16.dp)) }
+        item { Spacer(modifier = Modifier.height(space.large)) }
 
         item {
             FintrackOutlinedTextField(
@@ -243,7 +244,7 @@ fun AddTransactionContent(
             )
         }
 
-        item { Spacer(modifier = Modifier.height(16.dp)) }
+        item { Spacer(modifier = Modifier.height(space.large)) }
 
         item {
             AnimatedVisibility(visible = state.transactionType == TransactionType.TRANSFER) {
@@ -266,7 +267,7 @@ fun AddTransactionContent(
             }
         }
 
-        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item { Spacer(modifier = Modifier.height(space.mediumSmall)) }
 
         item {
             FintrackOutlinedTextField(
@@ -286,7 +287,7 @@ fun AddTransactionContent(
             )
         }
 
-        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item { Spacer(modifier = Modifier.height(space.mediumSmall)) }
 
         item {
             FintrackOutlinedTextField(
@@ -306,7 +307,7 @@ fun AddTransactionContent(
             )
         }
 
-        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item { Spacer(modifier = Modifier.height(space.mediumSmall)) }
 
         item {
             DatePickerField(
@@ -317,7 +318,7 @@ fun AddTransactionContent(
             )
         }
 
-        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item { Spacer(modifier = Modifier.height(space.mediumSmall)) }
 
         item {
             FintrackOutlinedTextField(
@@ -329,7 +330,7 @@ fun AddTransactionContent(
             )
         }
 
-        item { Spacer(modifier = Modifier.height(24.dp)) }
+        item { Spacer(modifier = Modifier.height(space.large)) }
 
         item {
             Button(
@@ -363,6 +364,7 @@ private fun TransferScreen(
     onSourceEndClicked: () -> Unit,
     setTransferAmount: (String) -> Unit,
 ) {
+    val space = LocalSpacing.current
     Column {
         FintrackOutlinedTextField(
             value = state.source?.name ?: "",
@@ -385,7 +387,7 @@ private fun TransferScreen(
             isError = state.isSourceError
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(space.mediumSmall))
 
         FintrackOutlinedTextField(
             value = state.sourceEnd?.name ?: "",
@@ -408,7 +410,7 @@ private fun TransferScreen(
             isError = state.isSourceEndError
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(space.mediumSmall))
 
         FintrackOutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
@@ -432,6 +434,7 @@ private fun TransactionDetail(
     onSourceClicked: () -> Unit,
     onCategoryClicked: () -> Unit,
 ) {
+    val space = LocalSpacing.current
     Column {
         FintrackOutlinedTextField(
             value = state.category?.name ?: "",
@@ -453,7 +456,7 @@ private fun TransactionDetail(
             },
             isError = state.isCategoryError
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(space.mediumSmall))
 
 
         FintrackOutlinedTextField(

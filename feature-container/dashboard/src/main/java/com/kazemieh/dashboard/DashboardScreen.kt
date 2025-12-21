@@ -13,10 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.FAB
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.financialsource.ui.SourceList
-import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.TotalTransactionCard
 import com.kazemieh.transaction.ui.main.TransactionListScreen
@@ -27,6 +26,7 @@ fun DashboardScreen(
     viewModel: DashboardViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val space = LocalSpacing.current
 
     Box(
         modifier = Modifier
@@ -37,17 +37,17 @@ fun DashboardScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = space.large)
         ) {
-            item { Spacer(modifier = Modifier.height(8.dp)) }
+            item { Spacer(modifier = Modifier.height(space.mediumSmall)) }
 
             item { TotalTransactionCard(enableAnimationChart = state.enableAnimationChart) }
 
-            item { Spacer(Modifier.height(16.dp)) }
+            item { Spacer(Modifier.height(space.large)) }
 
             item { SourceList { viewModel.onIntent(DashboardIntent.ShowAddSource) } }
 
-            item { Spacer(Modifier.height(16.dp)) }
+            item { Spacer(Modifier.height(space.large)) }
 
             item { TransactionListScreen() }
         }

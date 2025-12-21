@@ -21,10 +21,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.toItemUi
 import com.kazemieh.common.model.toSource
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
@@ -117,6 +117,7 @@ fun SourceList(
     viewModel: SourceViewModel = koinViewModel(),
     onAddSourceClick: () -> Unit
 ) {
+    val space = LocalSpacing.current
     LaunchedEffect(true) {
         viewModel.onIntent(SourceIntent.LoadAllSource)
     }
@@ -146,20 +147,20 @@ fun SourceList(
             modifier = Modifier.fillMaxWidth()
         ) {
 //        item {
-//            Spacer(modifier = Modifier.width(4.dp))
+//            Spacer(modifier = Modifier.width(space.small))
 //        }
 
             items(state.sources) { source ->
                 Card(
-                    modifier = Modifier.padding(horizontal = 4.dp),
+                    modifier = Modifier.padding(horizontal = space.small),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     ),
                     shape = MaterialTheme.shapes.medium,
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = space.one)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(space.large)
                     ) {
                         FintrackBodyMediumText(text = source.name)
                         FintrackBodySmallText(
@@ -171,7 +172,7 @@ fun SourceList(
             }
 
 //        item {
-//            Spacer(modifier = Modifier.width(4.dp))
+//            Spacer(modifier = Modifier.width(space.small))
 //        }
         }
     }

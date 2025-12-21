@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
 import com.kazemieh.designsystem.component.PieChart
 import com.kazemieh.designsystem.component.PieChartItem
@@ -35,6 +36,7 @@ fun TotalTransactionCard(
     viewModel: TransactionViewModel = koinViewModel(),
     enableAnimationChart: Boolean = true,
 ) {
+    val space = LocalSpacing.current
     LaunchedEffect(true) {
         viewModel.onIntent(TransactionIntent.LoadTransactions)
     }
@@ -64,10 +66,10 @@ fun TotalTransactionCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = space.one)
     ) {
         Column(
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier.padding(space.large),
         ) {
 
             Row(
@@ -90,15 +92,15 @@ fun TotalTransactionCard(
             if (piChartData.any { it.value.toInt() > 0 }) {
                 Box(
                     modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .height(1.dp)
+                        .padding(vertical = space.mediumSmall)
+                        .height(space.one)
                         .fillMaxWidth()
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.secondary)
                 )
 
 
-                Box(modifier = Modifier.padding(top = 20.dp)) {
+                Box(modifier = Modifier.padding(top = space.large)) {
                     PieChart(
                         data = piChartData,
                         radiusOuter = 40.dp,

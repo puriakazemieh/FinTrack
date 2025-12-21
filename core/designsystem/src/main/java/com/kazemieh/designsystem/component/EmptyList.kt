@@ -15,20 +15,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 
 @Composable
 fun EmptyListScreen(title: String = stringResource(R.string.empty_title)) {
+    val space = LocalSpacing.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(40.dp),
+            .padding(space.huge),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(Icons.Default.ErrorOutline, "", modifier = Modifier.size(40.dp))
-        Spacer(modifier = Modifier.height(8.dp))
+        Icon(Icons.Default.ErrorOutline, "", modifier = Modifier.size(space.huge))
+        Spacer(modifier = Modifier.height(space.mediumSmall))
         FintrackHeadlineSmallText(title, textAlign = TextAlign.Center)
     }
 }
