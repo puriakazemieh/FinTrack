@@ -1,6 +1,7 @@
 package com.kazemieh.transaction.ui.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.CircularProgressIndicator
@@ -18,13 +19,23 @@ import com.kazemieh.designsystem.component.EmptyListScreen
 
 fun LazyListScope.transactionListContent(
     lazyPagingItems: LazyPagingItems<TransactionWithRelations>,
+    loading: Boolean,
     onDelete: (TransactionWithRelations) -> Unit = {}
 ) {
 
     val isListEmpty = lazyPagingItems.itemCount == 0
     val isNotLoading = lazyPagingItems.loadState.refresh !is LoadState.Loading
     val isError = lazyPagingItems.loadState.refresh is LoadState.Error
-
+    if (loading) {
+        item {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            }
+        }
+    }
     if (isListEmpty && isNotLoading && !isError) {
         item {
             Box(

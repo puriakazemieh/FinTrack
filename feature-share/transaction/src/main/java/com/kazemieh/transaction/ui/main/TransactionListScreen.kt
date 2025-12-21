@@ -1,18 +1,15 @@
 package com.kazemieh.transaction.ui.main
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.kazemieh.common.model.TransactionWithRelations
@@ -21,6 +18,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TransactionListScreen(
+    screenHeight: Dp,
     viewModel: TransactionViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -32,7 +30,7 @@ fun TransactionListScreen(
     val uiTransactionWithRelations = viewModel.uiTransactionWithRelations.collectAsLazyPagingItems()
 
 
-    TransactionListContent(uiTransactionWithRelations, state.isLoading) {
+    TransactionListContent(uiTransactionWithRelations, state.isLoading, screenHeight) {
         viewModel.onIntent(TransactionIntent.DeleteTransaction(it.transaction))
     }
 
@@ -42,22 +40,35 @@ fun TransactionListScreen(
 private fun TransactionListContent(
     uiTransactionWithRelations: LazyPagingItems<TransactionWithRelations>,
     loading: Boolean,
+    screenHeight: Dp,
     onDelete: (TransactionWithRelations) -> Unit = {}
 ) {
-    if (loading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-        }
-    } else {
-        LazyColumn(
-            modifier = Modifier.height(300.dp)
-        ) {
-            transactionListContent(uiTransactionWithRelations, onDelete)
+    val state = rememberLazyListState()
+    LazyColumn(
+        state = state,
+        modifier = Modifier.height(screenHeight)
+    ) {
+        transactionListContent(uiTransactionWithRelations, loading, onDelete)
+    }
+
+}
+
+@Composable
+fun TransactionItemsProvider(
+    viewModel: TransactionViewModel = koinViewModel(),
+    onItemsReady: (LazyListScope.() -> Unit) -> Unit
+) {
+    val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(true) {
+        viewModel.onIntent(TransactionIntent.LoadTransactions)
+    }
+
+    val uiTransactionWithRelations = viewModel.uiTransactionWithRelations.collectAsLazyPagingItems()
+
+    onItemsReady {
+        transactionListContent(uiTransactionWithRelations, state.isLoading) {
+            viewModel.onIntent(TransactionIntent.DeleteTransaction(it.transaction))
         }
     }
 }
-
-

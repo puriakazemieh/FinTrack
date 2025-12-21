@@ -1,26 +1,36 @@
+@file:Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
+
 package com.kazemieh.dashboard
 
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.kazemieh.designsystem.FAB
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.financialsource.ui.SourceList
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.TotalTransactionCard
-import com.kazemieh.transaction.ui.main.TransactionListScreen
+import com.kazemieh.transaction.ui.main.TransactionItemsProvider
 import org.koin.androidx.compose.koinViewModel
 
+@SuppressLint("UnusedBoxWithConstraintsScope", "ConfigurationScreenWidthHeight")
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel = koinViewModel()
@@ -28,28 +38,43 @@ fun DashboardScreen(
     val state by viewModel.state.collectAsState()
     val space = LocalSpacing.current
 
+    val listState = rememberLazyListState()
+
+    var transactionItemsScope by remember { mutableStateOf<LazyListScope.() -> Unit>({}) }
+
+    TransactionItemsProvider { scope ->
+        transactionItemsScope = scope
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
 
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = space.large)
+                .padding(horizontal = space.large, vertical = space.mediumSmall)
         ) {
-            item { Spacer(modifier = Modifier.height(space.mediumSmall)) }
 
-            item { TotalTransactionCard(enableAnimationChart = state.enableAnimationChart) }
+            TotalTransactionCard(enableAnimationChart = state.enableAnimationChart)
 
-            item { Spacer(Modifier.height(space.large)) }
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+            ) {
 
-            item { SourceList { viewModel.onIntent(DashboardIntent.ShowAddSource) } }
+                item { SourceList { viewModel.onIntent(DashboardIntent.ShowAddSource) } }
 
-            item { Spacer(Modifier.height(space.large)) }
+                item { Spacer(Modifier.height(space.mediumSmall)) }
 
-            item { TransactionListScreen() }
+                transactionItemsScope()
+            }
+
+
         }
 
         FAB { viewModel.onIntent(DashboardIntent.ShowAddTransaction) }

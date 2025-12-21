@@ -146,9 +146,6 @@ fun SourceList(
         LazyRow(
             modifier = Modifier.fillMaxWidth()
         ) {
-//        item {
-//            Spacer(modifier = Modifier.width(space.small))
-//        }
 
             items(state.sources) { source ->
                 Card(
@@ -171,9 +168,6 @@ fun SourceList(
                 }
             }
 
-//        item {
-//            Spacer(modifier = Modifier.width(space.small))
-//        }
         }
     }
 }
