@@ -19,8 +19,11 @@ import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 
 @Composable
-fun EmptyListScreen(title: String = stringResource(R.string.empty_title)) {
+fun EmptyListScreen(title: String? ) {
     val space = LocalSpacing.current
+
+    val title = title ?: stringResource(R.string.empty_title_default)
+    val text = stringResource(R.string.empty_title, title)
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -30,6 +33,6 @@ fun EmptyListScreen(title: String = stringResource(R.string.empty_title)) {
     ) {
         Icon(Icons.Default.ErrorOutline, "", modifier = Modifier.size(space.huge))
         Spacer(modifier = Modifier.height(space.mediumSmall))
-        FintrackHeadlineSmallText(title, textAlign = TextAlign.Center)
+        FintrackHeadlineSmallText(text, textAlign = TextAlign.Center)
     }
 }

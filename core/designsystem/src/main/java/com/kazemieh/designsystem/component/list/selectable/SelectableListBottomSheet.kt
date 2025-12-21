@@ -130,7 +130,7 @@ fun SelectableListBottomSheetStateless(
                                 onToggle = { onToggle(item) })
                         }
                     }
-                } else EmptyListScreen()
+                } else EmptyListScreen(title)
 
                 Spacer(Modifier.height(space.mediumLarge))
 

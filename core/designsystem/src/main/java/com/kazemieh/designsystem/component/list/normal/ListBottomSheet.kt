@@ -80,7 +80,7 @@ fun ListBottomSheet(
                                     content(item)
                                 }
                             }
-                        } else item { EmptyListScreen() }
+                        } else item { EmptyListScreen(title) }
 
                     item {
                         Spacer(Modifier.height(space.extraLarge))

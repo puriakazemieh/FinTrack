@@ -133,7 +133,7 @@ fun SelectableFlowRowBottomSheetStateless(
                                 )
                             )
                         }
-                    } else EmptyListScreen()
+                    } else EmptyListScreen(title)
                 }
 
                 Spacer(Modifier.height(space.mediumLarge))

@@ -9,11 +9,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.EmptyListScreen
 
 
@@ -42,7 +44,7 @@ fun LazyListScope.transactionListContent(
                 modifier = Modifier.fillParentMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                EmptyListScreen()
+                EmptyListScreen(stringResource(R.string.transaction))
             }
         }
     }
