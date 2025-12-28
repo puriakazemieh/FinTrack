@@ -1,6 +1,7 @@
 package com.kazemieh.dashboard
 
 import androidx.lifecycle.ViewModel
+import com.kazemieh.common.model.TransactionWithRelations
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -13,8 +14,17 @@ class DashboardViewModel() : ViewModel() {
 
     fun onIntent(intent: DashboardIntent) {
         when (intent) {
-            is DashboardIntent.ShowAddTransaction -> _state.update {
-                it.copy(showAddTransaction = !_state.value.showAddTransaction)
+            is DashboardIntent.ShowTransactionBottomSheet -> _state.update {
+                it.copy(
+                    showAddTransaction = !_state.value.showAddTransaction,
+                    transactionWithRelations = intent.transactionWithRelations
+                )
+            }
+            is DashboardIntent.DeleteTransactionBottomSheet -> _state.update {
+                it.copy(
+                    showDeleteTransaction = !_state.value.showDeleteTransaction,
+                    transactionWithRelations = intent.transactionWithRelations
+                )
             }
 
             is DashboardIntent.ShowAddSource -> _state.update {
@@ -24,7 +34,8 @@ class DashboardViewModel() : ViewModel() {
             is DashboardIntent.AnimationEnabled -> _state.update {
                 it.copy(
                     enableAnimationChart = !_state.value.enableAnimationChart,
-                    showAddTransaction = false
+                    showAddTransaction = false,
+                    transactionWithRelations = null
                 )
             }
 
@@ -36,13 +47,16 @@ class DashboardViewModel() : ViewModel() {
 
 data class DashboardState(
     val showAddTransaction: Boolean = false,
+    val showDeleteTransaction: Boolean = false,
     val showAddSource: Boolean = false,
     val enableAnimationChart: Boolean = false,
+    val transactionWithRelations: TransactionWithRelations? = null,
 )
 
 
 sealed interface DashboardIntent {
-    data object ShowAddTransaction : DashboardIntent
+    data class ShowTransactionBottomSheet(val transactionWithRelations: TransactionWithRelations? = null) : DashboardIntent
+    data class DeleteTransactionBottomSheet(val transactionWithRelations: TransactionWithRelations? = null) : DashboardIntent
     data object AnimationEnabled : DashboardIntent
     data object ShowAddSource : DashboardIntent
 }

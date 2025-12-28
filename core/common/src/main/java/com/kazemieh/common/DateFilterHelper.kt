@@ -129,6 +129,11 @@ object DateFilterHelper {
         }
     }
 
+    fun getDateText(date: Long): String {
+        val startJalali = JalaliCalendar(Date(date))
+        return "${startJalali.day} ${startJalali.monthString} ${startJalali.year}"
+    }
+
 
     fun shiftDateRange(
         start: Long?,

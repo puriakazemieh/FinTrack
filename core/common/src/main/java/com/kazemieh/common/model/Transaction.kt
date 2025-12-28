@@ -13,6 +13,7 @@ data class Transaction(
     val sourceEndId: Long? = null,
     val description: String? = null,
     val timeStamp: Long = System.currentTimeMillis(),
+    val date: String = "",
     val type: TransactionType,
     val formatedAmount: String = 0.toString(),
     val amountTransferFormated: String? = null,

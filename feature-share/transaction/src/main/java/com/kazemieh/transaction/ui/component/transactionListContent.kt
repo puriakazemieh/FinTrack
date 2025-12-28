@@ -22,7 +22,8 @@ import com.kazemieh.designsystem.component.EmptyListScreen
 fun LazyListScope.transactionListContent(
     lazyPagingItems: LazyPagingItems<TransactionWithRelations>,
     loading: Boolean,
-    onDelete: (TransactionWithRelations) -> Unit = {}
+    onDelete: (TransactionWithRelations) -> Unit = {},
+    onEdit: (TransactionWithRelations) -> Unit = {}
 ) {
 
     val isListEmpty = lazyPagingItems.itemCount == 0
@@ -58,9 +59,8 @@ fun LazyListScope.transactionListContent(
             if (item != null) {
                 TransactionItem(
                     uiTransactionWithRelation = item,
-                    onDelete = {
-                        onDelete(item)
-                    }
+                    onDelete = { onDelete(item) },
+                    onEdit = { onEdit(item) }
                 )
             }
         }

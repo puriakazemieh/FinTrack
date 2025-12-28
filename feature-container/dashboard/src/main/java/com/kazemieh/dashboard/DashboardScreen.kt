@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.financialsource.ui.SourceList
+import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.TotalTransactionCard
 import com.kazemieh.transaction.ui.main.TransactionItemsProvider
@@ -42,9 +43,15 @@ fun DashboardScreen(
 
     var transactionItemsScope by remember { mutableStateOf<LazyListScope.() -> Unit>({}) }
 
-    TransactionItemsProvider { scope ->
-        transactionItemsScope = scope
-    }
+    TransactionItemsProvider(
+        onEdit = { transactionWithRelations ->
+            viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet(transactionWithRelations))
+        },
+        onDelete = { transactionWithRelations ->
+            viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet(transactionWithRelations))
+        },
+        onItemsReady = { scope -> transactionItemsScope = scope }
+    )
 
     Box(
         modifier = Modifier
@@ -77,20 +84,29 @@ fun DashboardScreen(
 
         }
 
-        FAB { viewModel.onIntent(DashboardIntent.ShowAddTransaction) }
+        FAB { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) }
 
         if (state.showAddTransaction) {
             AddTransactionBottomSheet(
-                onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddTransaction) },
+                transactionWithRelations = state.transactionWithRelations,
+                onDismiss = { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) },
                 transactionAdded = { viewModel.onIntent(DashboardIntent.AnimationEnabled) },
             )
         }
+        if (state.showDeleteTransaction) {
+//            AddTransactionBottomSheet(
+//                transactionWithRelations = state.transactionWithRelations,
+//                onDismiss = { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) },
+//                transactionAdded = { viewModel.onIntent(DashboardIntent.AnimationEnabled) },
+//            )
+        }
 
-        /* if (state.showAddSource) {
-             AddSourceBottomSheet(
-                 onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddTransaction) }
-             )
-         }*/
+        if (state.showAddSource) {
+            AddSourceBottomSheet(
+                onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddSource) },
+                setSource = { viewModel.onIntent(DashboardIntent.ShowAddSource) }
+            )
+        }
 
     }
 }

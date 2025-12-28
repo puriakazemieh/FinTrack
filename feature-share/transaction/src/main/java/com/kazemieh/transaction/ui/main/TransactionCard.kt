@@ -24,10 +24,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
 import com.kazemieh.designsystem.component.PieChart
 import com.kazemieh.designsystem.component.PieChartItem
-import com.kazemieh.designsystem.R
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -54,8 +54,8 @@ fun TotalTransactionCard(
                     add(PieChartItem(label = incoming, value = state.totalIncome))
                 if (state.totalExpense != 0L)
                     add(PieChartItem(label = outcoming, value = state.totalExpense))
-                if (state.totalExpense != 0L)
-                    add(PieChartItem(label = transfer, value = state.totalExpense))
+                if (state.totalTransfer != 0L)
+                    add(PieChartItem(label = transfer, value = state.totalTransfer))
             }
         }
     }

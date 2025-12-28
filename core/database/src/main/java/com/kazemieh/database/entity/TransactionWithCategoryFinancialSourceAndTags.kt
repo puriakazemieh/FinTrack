@@ -20,6 +20,12 @@ data class TransactionWithCategoryFinancialSourceAndTags(
     val financialSource: SourceEntity,
 
     @Relation(
+        parentColumn = "sourceEndId",
+        entityColumn = "id"
+    )
+    val sourceEnd: SourceEntity?,
+
+    @Relation(
         parentColumn = "id",
         entityColumn = "id",
         associateBy = Junction(

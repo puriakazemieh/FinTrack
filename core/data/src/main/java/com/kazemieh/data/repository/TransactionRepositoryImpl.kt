@@ -3,8 +3,8 @@ package com.kazemieh.data.repository
 import androidx.paging.PagingData
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
-import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionFilterParams
@@ -18,16 +18,8 @@ class TransactionRepositoryImpl(
     private val localDataSource: TransactionLocalDataSource
 ) : TransactionRepository {
 
-    override fun getAllTransactions(): Flow<PagingData<TransactionWithRelations>> {
-        return localDataSource.getAllTransactions()
-    }
-
-    override fun getAllTransactionsByType(type: Int): Flow<List<TransactionWithRelations>> {
-        return localDataSource.getAllTransactionsByType(type)
-    }
-
-    override fun getAllTransactionsFiltered(transactionFilterParams: TransactionFilterParams ): Flow<PagingData<TransactionWithRelations>> {
-        return localDataSource.getAllTransactionsFiltered(transactionFilterParams )
+    override fun getAllTransactionsFiltered(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>> {
+        return localDataSource.getAllTransactionsFiltered(transactionFilterParams)
     }
 
     override fun getCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>> {
@@ -44,6 +36,14 @@ class TransactionRepositoryImpl(
 
     override suspend fun deleteTransaction(transaction: Transaction) {
         localDataSource.delete(transaction)
+    }
+
+    override suspend fun updateTransaction(
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+    ): Long {
+        return localDataSource.update(transaction, tagIds, personIds)
     }
 
     override suspend fun getAllCategory(type: TransactionType): Flow<List<Category>> {

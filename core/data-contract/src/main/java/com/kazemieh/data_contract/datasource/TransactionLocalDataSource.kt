@@ -3,8 +3,8 @@ package com.kazemieh.data_contract.datasource
 import androidx.paging.PagingData
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
-import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionFilterParams
@@ -20,13 +20,16 @@ interface TransactionLocalDataSource {
         personIds: List<Long>,
     ): Long
 
-    suspend fun update(transaction: Transaction)
-    suspend fun delete(transaction: Transaction)
-    fun getAllTransactions(): Flow<PagingData<TransactionWithRelations>>
-    fun getAllTransactionsByType(type: Int): Flow<List<TransactionWithRelations>>
-    fun getAllTransactionsFiltered(transactionFilterParams: TransactionFilterParams ): Flow<PagingData<TransactionWithRelations>>
+    suspend fun update(
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+    ): Long
 
-    fun getCategorySums(transactionFilterParams: TransactionFilterParams ): Flow<List<CategorySum>>
+    suspend fun delete(transaction: Transaction)
+    fun getAllTransactionsFiltered(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>>
+
+    fun getCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>>
 
     suspend fun insertCategory(category: Category): Long
     suspend fun insertFinancialSource(source: Source): Long

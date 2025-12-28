@@ -62,11 +62,12 @@ fun TransactionListByFilterScreen(
 
     val lazyPagingItems = viewModel.uiTransactionWithRelations.collectAsLazyPagingItems()
 
-    TransactionListByFilterContent(lazyPagingItems, state.isLoading, enableAnimationChart) {
-        viewModel.onIntent(
-            TransactionReportIntent.DeleteTransactionReport(it.transaction)
-        )
-    }
+    TransactionListByFilterContent(
+        lazyPagingItems,
+        state.isLoading,
+        enableAnimationChart,
+        onDelete = {viewModel.onIntent(TransactionReportIntent.DeleteTransaction(it.transaction))},
+        onEdit = {viewModel.onIntent(TransactionReportIntent.EditTransaction(it.transaction))})
 
 
 }
@@ -76,7 +77,8 @@ fun TransactionListByFilterContent(
     uiTransactionWithRelations: LazyPagingItems<TransactionWithRelations>,
     loading: Boolean,
     enableAnimationChart: Boolean,
-    onDelete: (TransactionWithRelations) -> Unit = {}
+    onDelete: (TransactionWithRelations) -> Unit = {},
+    onEdit: (TransactionWithRelations) -> Unit = {}
 ) {
     val space = LocalSpacing.current
     LazyColumn(
@@ -89,7 +91,7 @@ fun TransactionListByFilterContent(
 
         item { Spacer(Modifier.height(space.mediumSmall)) }
 
-        transactionListContent(uiTransactionWithRelations, loading, onDelete)
+        transactionListContent(uiTransactionWithRelations, loading, onDelete, onEdit)
 
     }
 

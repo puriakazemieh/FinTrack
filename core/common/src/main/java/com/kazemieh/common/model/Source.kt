@@ -3,6 +3,7 @@ package com.kazemieh.common.model
 import com.kazemieh.common.formatted
 import kotlinx.serialization.Serializable
 
+@OptIn(kotlinx.serialization.InternalSerializationApi::class)
 @Serializable
 data class Source(
     val id: Long? = null,

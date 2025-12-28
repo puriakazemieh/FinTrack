@@ -20,8 +20,12 @@ interface TransactionRepository {
     ): Long
 
     suspend fun deleteTransaction(transaction: Transaction)
-    fun getAllTransactions(): Flow<PagingData<TransactionWithRelations>>
-    fun getAllTransactionsByType(type: Int): Flow<List<TransactionWithRelations>>
+    suspend fun updateTransaction(
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+    ): Long
+
     fun getAllTransactionsFiltered(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>>
     fun getCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>>
 

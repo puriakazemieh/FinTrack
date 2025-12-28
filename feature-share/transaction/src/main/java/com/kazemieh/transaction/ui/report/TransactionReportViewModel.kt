@@ -74,7 +74,9 @@ class TransactionReportViewModel(
     fun onIntent(intent: TransactionReportIntent) {
         when (intent) {
 
-            is TransactionReportIntent.DeleteTransactionReport -> deleteTransaction(intent.transaction)
+            is TransactionReportIntent.DeleteTransaction -> deleteTransaction(intent.transaction)
+
+            is TransactionReportIntent.EditTransaction -> editTransaction(intent.transaction)
 
             is TransactionReportIntent.SelectedType -> {
                 _state.update { state ->
@@ -167,10 +169,17 @@ class TransactionReportViewModel(
         }
     }
 
+    private fun editTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+//            transactionUseCases.updateTransaction(transaction)
+        }
+    }
+
 }
 
 sealed interface TransactionReportIntent {
-    data class DeleteTransactionReport(val transaction: Transaction) : TransactionReportIntent
+    data class DeleteTransaction(val transaction: Transaction) : TransactionReportIntent
+    data class EditTransaction(val transaction: Transaction) : TransactionReportIntent
 
     data class SelectedType(val selectedTransactionType: TransactionType = TransactionType.ALL) :
         TransactionReportIntent

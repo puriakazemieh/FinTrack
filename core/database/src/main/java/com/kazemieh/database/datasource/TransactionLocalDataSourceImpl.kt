@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import com.kazemieh.common.ld
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
 import com.kazemieh.common.model.Person
@@ -23,10 +24,10 @@ import com.kazemieh.database.entity.TransactionPersonCrossRef
 import com.kazemieh.database.entity.TransactionTagCrossRef
 import com.kazemieh.database.mapper.toCategory
 import com.kazemieh.database.mapper.toCategoryEntity
-import com.kazemieh.database.mapper.toSource
-import com.kazemieh.database.mapper.toSourceEntity
 import com.kazemieh.database.mapper.toPerson
 import com.kazemieh.database.mapper.toPersonEntity
+import com.kazemieh.database.mapper.toSource
+import com.kazemieh.database.mapper.toSourceEntity
 import com.kazemieh.database.mapper.toTag
 import com.kazemieh.database.mapper.toTagEntity
 import com.kazemieh.database.mapper.toTransactionEntity
@@ -72,33 +73,33 @@ class TransactionLocalDataSourceImpl(
         return transactionId
     }
 
-    override suspend fun update(transaction: Transaction) {
-        transactionDao.updateTransaction(transaction.toTransactionEntity())
-    }
+    override suspend fun update(
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+    ): Long {
+        val transactionRowUpdatedCount = transactionDao.updateTransaction(transaction.toTransactionEntity()).ld("updateTransaction updateTransaction ")
 
-
-    override fun getAllTransactions(): Flow<PagingData<TransactionWithRelations>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 3,
-                initialLoadSize = 3,
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = {
-                transactionDao.getAllTransactionsWithCategoryFinancialSourceAndTags()
-            }
-        ).flow.map { pagingData ->
-            pagingData.map { item ->
-                item.toTransactionWithRelations()
-            }
+        tagIds.forEach { tagId ->
+            transactionDao.updateTransactionTagCrossRef(
+                TransactionTagCrossRef(
+                    transactionId = transaction.id,
+                    tagId = tagId
+                )
+            )
         }
+        personIds.forEach { personId ->
+            transactionDao.updateTransactionPersonCrossRef(
+                TransactionPersonCrossRef(
+                    transactionId = transaction.id,
+                    personId = personId
+                )
+            )
+        }
+        return transactionRowUpdatedCount.toLong()
+
     }
 
-    override fun getAllTransactionsByType(type: Int): Flow<List<TransactionWithRelations>> {
-        return transactionDao.getAllTransactionsByTypeWithCategoryFinancialSourceAndTags(type).map {
-            it.map { it.toTransactionWithRelations() }
-        }
-    }
 
     override fun getAllTransactionsFiltered(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>> {
         return Pager(

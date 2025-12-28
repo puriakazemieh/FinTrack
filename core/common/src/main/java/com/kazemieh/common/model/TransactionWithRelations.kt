@@ -2,11 +2,13 @@ package com.kazemieh.common.model
 
 import kotlinx.serialization.Serializable
 
+@OptIn(kotlinx.serialization.InternalSerializationApi::class)
 @Serializable
 data class TransactionWithRelations(
     val transaction: Transaction,
-    val categoryName: String,
-    val financialSourceName: String,
-    val tags: String,
-    val persons: String
+    val category: Category,
+    val source: Source,
+    val sourceEnd: Source?,
+    val tags: List<Tag>,
+    val persons: List<Person>,
 )

@@ -28,15 +28,13 @@ interface TransactionDao {
     suspend fun insertTransactionPersonCrossRef(crossRef: TransactionPersonCrossRef)
 
     @Update
-    suspend fun updateTransaction(transaction: TransactionEntity)
+    suspend fun updateTransaction(transaction: TransactionEntity): Int
 
-    @Transaction
-    @Query("SELECT * FROM transactions")
-    fun getAllTransactionsWithCategoryFinancialSourceAndTags(): PagingSource<Int, TransactionWithCategoryFinancialSourceAndTags>
+    @Update
+    suspend fun updateTransactionTagCrossRef(crossRef: TransactionTagCrossRef)
 
-    @Transaction
-    @Query("SELECT * FROM transactions  WHERE type = :type")
-    fun getAllTransactionsByTypeWithCategoryFinancialSourceAndTags(type: Int): Flow<List<TransactionWithCategoryFinancialSourceAndTags>>
+    @Update
+    suspend fun updateTransactionPersonCrossRef(crossRef: TransactionPersonCrossRef)
 
     @Transaction
     @Query(
@@ -136,17 +134,6 @@ interface TransactionDao {
         toTimestamp: Long?
     ): Flow<List<CategorySumEntity>>
 
-
-    @Transaction
-    @Query(
-        """
-        SELECT * FROM transactions
-        INNER JOIN transaction_tag ON transactions.id = transaction_tag.transactionId
-        INNER JOIN tag ON transaction_tag.tagId = tag.id
-        WHERE tag.name = :tagName
-    """
-    )
-    suspend fun getTransactionsByTag(tagName: String): List<TransactionWithCategoryFinancialSourceAndTags>
 
     @Delete
     suspend fun deleteTransaction(transaction: TransactionEntity)

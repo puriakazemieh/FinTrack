@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.kazemieh.common.formatted
+import com.kazemieh.common.ld
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
@@ -40,8 +41,37 @@ class TransactionViewModel(
         when (intent) {
             is TransactionIntent.LoadTransactions -> loadTransactions()
 
-            is TransactionIntent.DeleteTransaction -> deleteTransaction(intent.transaction)
+            is TransactionIntent.OnDeleteClicked ->
+                _state.update {
+                    it.copy(
+                        transaction = intent.transaction,
+                        isDeleteDialogShow = true
+                    )
+                }
 
+            is TransactionIntent.OnEditClicked ->
+                _state.update {
+                    it.copy(
+                        transaction = intent.transaction,
+                        isEditBottomSheetShow = true
+                    )
+                }
+
+            TransactionIntent.LoadEditCanceled -> _state.update {
+                it.copy(
+                    transaction = null,
+                    isEditBottomSheetShow = false
+                )
+            }
+
+            TransactionIntent.OnDeleteCanceled -> _state.update {
+                it.copy(
+                    transaction = null,
+                    isDeleteDialogShow = false
+                )
+            }
+
+            TransactionIntent.OnDeleteConfirmed -> deleteTransaction()
         }
     }
 
@@ -51,11 +81,11 @@ class TransactionViewModel(
             transactionUseCases.getCategorySum(TransactionFilterParams()).collect { categorySums ->
 
                 val totalIncome = categorySums.filter { it.type == TransactionType.INCOME }
-                    .sumOf { it.totalAmount }
+                    .sumOf { it.totalAmount }.ld("totalIncome")
                 val totalExpense = categorySums.filter { it.type == TransactionType.EXPENSE }
-                    .sumOf { it.totalAmount }
+                    .sumOf { it.totalAmount }.ld("totalExpense")
                 val totalTransfer = categorySums.filter { it.type == TransactionType.TRANSFER }
-                    .sumOf { it.totalAmount }
+                    .sumOf { it.totalAmount }.ld("totalTransfer")
                 val balance = categorySums.sumOf { it.totalAmount }
 
 
@@ -76,22 +106,29 @@ class TransactionViewModel(
         }
     }
 
-    private fun deleteTransaction(transaction: Transaction) {
+    private fun deleteTransaction() {
         viewModelScope.launch {
-            transactionUseCases.deleteTransaction(transaction)
+            _state.value.transaction?.let { transactionUseCases.deleteTransaction(it) }
             _effect.send(TransactionEffect.ShowMessage(R.string.transaction_deleted))
-            loadTransactions()
         }
     }
 
 }
 
 sealed interface TransactionIntent {
-    data class DeleteTransaction(val transaction: Transaction) : TransactionIntent
+    data class OnDeleteClicked(val transaction: Transaction) : TransactionIntent
+    data class OnEditClicked(val transaction: Transaction) : TransactionIntent
+    data object OnDeleteConfirmed : TransactionIntent
+    data object OnDeleteCanceled : TransactionIntent
+    data object LoadEditCanceled : TransactionIntent
     data object LoadTransactions : TransactionIntent
 }
 
 data class TransactionState(
+
+    val transaction: Transaction? = null,
+    val isDeleteDialogShow: Boolean = false,
+    val isEditBottomSheetShow: Boolean = false,
 
     val isLoading: Boolean = false,
 

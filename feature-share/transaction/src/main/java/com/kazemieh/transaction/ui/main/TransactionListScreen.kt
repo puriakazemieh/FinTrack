@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.transaction.ui.component.transactionListContent
 import org.koin.androidx.compose.koinViewModel
@@ -31,7 +32,7 @@ fun TransactionListScreen(
 
 
     TransactionListContent(uiTransactionWithRelations, state.isLoading, screenHeight) {
-        viewModel.onIntent(TransactionIntent.DeleteTransaction(it.transaction))
+        viewModel.onIntent(TransactionIntent.OnDeleteClicked(it.transaction))
     }
 
 }
@@ -56,6 +57,8 @@ private fun TransactionListContent(
 @Composable
 fun TransactionItemsProvider(
     viewModel: TransactionViewModel = koinViewModel(),
+    onEdit: (TransactionWithRelations) -> Unit = {},
+    onDelete: (TransactionWithRelations) -> Unit = {},
     onItemsReady: (LazyListScope.() -> Unit) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
@@ -67,8 +70,11 @@ fun TransactionItemsProvider(
     val uiTransactionWithRelations = viewModel.uiTransactionWithRelations.collectAsLazyPagingItems()
 
     onItemsReady {
-        transactionListContent(uiTransactionWithRelations, state.isLoading) {
-            viewModel.onIntent(TransactionIntent.DeleteTransaction(it.transaction))
-        }
+        transactionListContent(
+            uiTransactionWithRelations,
+            state.isLoading,
+            onDelete = onDelete,
+            onEdit = onEdit
+        )
     }
 }

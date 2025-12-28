@@ -22,7 +22,7 @@ interface FinancialSourceDao {
     @Query("UPDATE source SET balance = balance - :amount WHERE id = :id")
     suspend fun decreaseBalance(id: Long, amount: Int)
 
-    @Query("SELECT * FROM source WHERE id = 0 LIMIT 1")
+    @Query("SELECT * FROM source WHERE id = 1 LIMIT 1")
     suspend fun getDefaultSource(): SourceEntity?
 }
 
