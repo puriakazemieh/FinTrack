@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.CategoryListBottomSheet
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.DatePickerField
@@ -59,6 +60,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AddTransactionBottomSheet(
     viewModel: AddTransactionViewModel = koinViewModel(),
+    transactionWithRelations: TransactionWithRelations? = null,
     onDismiss: () -> Unit,
     transactionAdded: () -> Unit
 ) {
@@ -70,8 +72,8 @@ fun AddTransactionBottomSheet(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(true) {
-        viewModel.onIntent(AddTransactionIntent.FetchDefaultData)
+    LaunchedEffect(transactionWithRelations) {
+        viewModel.onIntent(AddTransactionIntent.FetchDefaultData(transactionWithRelations))
     }
 
     LaunchedEffect(Unit) {
