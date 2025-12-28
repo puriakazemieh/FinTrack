@@ -19,6 +19,8 @@ import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.financialsource.ui.SourceListSelectionBottomSheet
 import com.kazemieh.person.ui.PersonListSelectionBottomSheet
 import com.kazemieh.tag.ui.TagListSelectionBottomSheet
+import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
+import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.report.TransactionListByFilterScreen
 import org.koin.androidx.compose.koinViewModel
 
@@ -84,7 +86,17 @@ fun ReportScreen(
                 selectedTransactionType = state.selectedTransactionType,
                 fromTimestamp = state.startDateTimeStamp,
                 toTimestamp = state.endDateTimeStamp,
-                enableAnimationChart = state.enableAnimationChart
+                enableAnimationChart = state.enableAnimationChart,
+                onEdit = { transactionWithRelations ->
+                    viewModel.onIntent(
+                        ReportIntent.ShowTransactionBottomSheet(transactionWithRelations)
+                    )
+                },
+                onDelete = { transactionWithRelations ->
+                    viewModel.onIntent(
+                        ReportIntent.DeleteTransactionBottomSheet(transactionWithRelations)
+                    )
+                },
             )
 
         }
@@ -166,6 +178,21 @@ fun ReportScreen(
             )
         }
 
+        if (state.showAddTransaction) {
+            AddTransactionBottomSheet(
+                transactionWithRelations = state.transactionWithRelations,
+                onDismiss = { viewModel.onIntent(ReportIntent.ShowTransactionBottomSheet()) },
+                transactionAdded = { viewModel.onIntent(ReportIntent.ShowTransactionBottomSheet()) },
+            )
+        }
+
+        if (state.showDeleteTransaction) {
+            DeleteTransactionBottomSheet(
+                transactionWithRelations = state.transactionWithRelations,
+                onDismiss = { viewModel.onIntent(ReportIntent.DeleteTransactionBottomSheet()) },
+                transactionDeleted = { viewModel.onIntent(ReportIntent.DeleteTransactionBottomSheet()) },
+            )
+        }
     }
 }
 

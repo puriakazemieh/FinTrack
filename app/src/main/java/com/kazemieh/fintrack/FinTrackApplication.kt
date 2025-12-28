@@ -15,6 +15,7 @@ import com.kazemieh.person.di.transactionPersonModule
 import com.kazemieh.tag.di.transactionAddTagModule
 import com.kazemieh.tag.di.transactionTagModule
 import com.kazemieh.transaction.di.addTransactionPresentationModule
+import com.kazemieh.transaction.di.transactionDeleteViewModelModule
 import com.kazemieh.transaction.di.transactionPresentationModule
 import com.kazemieh.transaction.di.transactionReportViewModelModule
 import com.tosantechno.filter.di.reportViewModel
@@ -34,6 +35,7 @@ class FinTrackApplication : Application() {
             transactionPresentationModule,
             addTransactionPresentationModule,
             transactionReportViewModelModule,
+            transactionDeleteViewModelModule,
             transactionCategoryModule,
             transactionAddCategoryModule,
             transactionFinancialSourceModule,

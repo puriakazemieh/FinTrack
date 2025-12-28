@@ -32,6 +32,8 @@ fun TransactionListByFilterScreen(
     fromTimestamp: Long? = null,
     toTimestamp: Long? = null,
     enableAnimationChart: Boolean = true,
+    onDelete: (TransactionWithRelations) -> Unit = {},
+    onEdit: (TransactionWithRelations) -> Unit = {},
     viewModel: TransactionReportViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -66,9 +68,9 @@ fun TransactionListByFilterScreen(
         lazyPagingItems,
         state.isLoading,
         enableAnimationChart,
-        onDelete = {viewModel.onIntent(TransactionReportIntent.DeleteTransaction(it.transaction))},
-        onEdit = {viewModel.onIntent(TransactionReportIntent.EditTransaction(it.transaction))})
-
+        onDelete = onDelete,
+        onEdit = onEdit
+    )
 
 }
 

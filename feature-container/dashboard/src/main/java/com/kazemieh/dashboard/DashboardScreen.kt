@@ -27,6 +27,7 @@ import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.financialsource.ui.SourceList
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
+import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.TotalTransactionCard
 import com.kazemieh.transaction.ui.main.TransactionItemsProvider
 import org.koin.androidx.compose.koinViewModel
@@ -93,12 +94,13 @@ fun DashboardScreen(
                 transactionAdded = { viewModel.onIntent(DashboardIntent.AnimationEnabled) },
             )
         }
+
         if (state.showDeleteTransaction) {
-//            AddTransactionBottomSheet(
-//                transactionWithRelations = state.transactionWithRelations,
-//                onDismiss = { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) },
-//                transactionAdded = { viewModel.onIntent(DashboardIntent.AnimationEnabled) },
-//            )
+            DeleteTransactionBottomSheet(
+                transactionWithRelations = state.transactionWithRelations,
+                onDismiss = { viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet()) },
+                transactionDeleted = { viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet()) },
+            )
         }
 
         if (state.showAddSource) {

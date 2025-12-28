@@ -35,6 +35,7 @@
     <string name="tag_list">لیست تگ‌ها</string>
     <string name="save_transaction">ذخیره تراکنش</string>
     <string name="transaction" > تراکنش</string>
+    <string name="transaction_delete" >آیا از حذف مطمئن هستید؟</string>
     <string name="transaction_deleted">تراکنش حذف شد</string>
     <string name="recent_transactions">تراکنش‌های اخیر</string>
     <string name="balance_total">موجودی کل:</string>
@@ -60,6 +61,7 @@
     <string name="person_name_label">نام شخص</string>
     <string name="save_person">ذخیره</string>
     <string name="confirm">تایید</string>
+    <string name="cancell_">لغو</string>
     <string name="report">گزارش</string>
     <string name="source_name_label">نام منبع</string>
     <string name="initial_balance_label">مبلغ اولیه</string>

@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.kazemieh.common.formatted
-import com.kazemieh.common.ld
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
@@ -81,12 +80,12 @@ class TransactionViewModel(
             transactionUseCases.getCategorySum(TransactionFilterParams()).collect { categorySums ->
 
                 val totalIncome = categorySums.filter { it.type == TransactionType.INCOME }
-                    .sumOf { it.totalAmount }.ld("totalIncome")
+                    .sumOf { it.totalAmount }
                 val totalExpense = categorySums.filter { it.type == TransactionType.EXPENSE }
-                    .sumOf { it.totalAmount }.ld("totalExpense")
+                    .sumOf { it.totalAmount }
                 val totalTransfer = categorySums.filter { it.type == TransactionType.TRANSFER }
-                    .sumOf { it.totalAmount }.ld("totalTransfer")
-                val balance = categorySums.sumOf { it.totalAmount }
+                    .sumOf { it.totalAmount }
+                val balance = totalIncome + totalExpense.times(-1) + totalTransfer
 
 
                 _state.update {
