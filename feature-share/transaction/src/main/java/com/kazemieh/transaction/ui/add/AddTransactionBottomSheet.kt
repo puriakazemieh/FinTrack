@@ -20,7 +20,6 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -29,7 +28,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -61,6 +59,7 @@ import org.koin.androidx.compose.koinViewModel
 fun AddTransactionBottomSheet(
     viewModel: AddTransactionViewModel = koinViewModel(),
     transactionWithRelations: TransactionWithRelations? = null,
+    snackbarHostState: SnackbarHostState,
     onDismiss: () -> Unit,
     transactionAdded: () -> Unit
 ) {
@@ -69,7 +68,6 @@ fun AddTransactionBottomSheet(
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(transactionWithRelations) {
@@ -112,7 +110,7 @@ private fun BottomSheetContent(
     state: AddTransactionState,
     onIntent: (intent: AddTransactionIntent) -> Unit,
     sheetState: SheetState,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
 ) {
     ModalBottomSheet(
         onDismissRequest = { onIntent(AddTransactionIntent.OnDismiss) },
@@ -125,15 +123,9 @@ private fun BottomSheetContent(
 
             AddTransactionContent(state = state, onIntent = onIntent)
 
-            Box {
-                SnackbarHost(
-                    hostState = snackbarHostState,
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                )
-            }
-
             if (state.isSourceShow) {
                 SourceListBottomSheet(
+                    snackbarHostState = snackbarHostState,
                     onSourceClick = { onIntent(AddTransactionIntent.SetSource(it)) },
                     onDismiss = { onIntent(AddTransactionIntent.OnSourceClicked) }
                 )
@@ -141,6 +133,7 @@ private fun BottomSheetContent(
 
             if (state.isSourceEndShow) {
                 SourceListBottomSheet(
+                    snackbarHostState = snackbarHostState,
                     onSourceClick = { onIntent(AddTransactionIntent.SetSourceEnd(it)) },
                     onDismiss = { onIntent(AddTransactionIntent.OnSourceEndClicked) }
                 )
@@ -149,6 +142,7 @@ private fun BottomSheetContent(
             if (state.isCategoryShow) {
                 CategoryListBottomSheet(
                     transactionType = state.transactionType,
+                    snackbarHostState = snackbarHostState,
                     onCategoryClick = { onIntent(AddTransactionIntent.SetCategory(it)) },
                     onDismiss = { onIntent(AddTransactionIntent.OnCategoryClicked) }
                 )
@@ -156,6 +150,7 @@ private fun BottomSheetContent(
 
             if (state.isTagShow) {
                 TagListBottomSheet(
+                    snackbarHostState = snackbarHostState,
                     selectedTags = state.tags,
                     onSubmitClick = { onIntent(AddTransactionIntent.SetTags(it)) },
                     onDismiss = { onIntent(AddTransactionIntent.OnTagClicked) }
@@ -164,6 +159,7 @@ private fun BottomSheetContent(
 
             if (state.isPersonShow) {
                 PersonListBottomSheet(
+                    snackbarHostState = snackbarHostState,
                     selectedPersons = state.persons,
                     onSubmitClick = { onIntent(AddTransactionIntent.SetPerson(it)) },
                     onDismiss = { onIntent(AddTransactionIntent.OnPersonClicked) }

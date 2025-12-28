@@ -14,6 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -38,6 +39,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SourceListBottomSheet(
     viewModel: SourceViewModel = koinViewModel(),
+    snackbarHostState: SnackbarHostState,
     onSourceClick: (Source) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -77,6 +79,7 @@ fun SourceListBottomSheet(
 
     if (state.isAddShow) {
         AddSourceBottomSheet(
+            snackbarHostState = snackbarHostState,
             onDismiss = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
             setSource = { viewModel.onIntent(SourceIntent.SelectedSource(it)) }
         )

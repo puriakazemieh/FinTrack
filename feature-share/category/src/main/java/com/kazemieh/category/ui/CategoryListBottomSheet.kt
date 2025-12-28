@@ -2,6 +2,7 @@ package com.kazemieh.category.ui
 
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -21,6 +22,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun CategoryListBottomSheet(
     viewModel: CategoryViewModel = koinViewModel(),
+    snackbarHostState: SnackbarHostState,
     transactionType: TransactionType,
     onCategoryClick: (Category) -> Unit,
     onDismiss: () -> Unit
@@ -51,6 +53,7 @@ fun CategoryListBottomSheet(
 
     if (state.isAddShow) {
         AddCategoryBottomSheet(
+            snackbarHostState = snackbarHostState,
             transactionType = transactionType,
             onDismiss = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
             setCategory = { viewModel.onIntent(CategoryIntent.SelectedCategory(it)) }

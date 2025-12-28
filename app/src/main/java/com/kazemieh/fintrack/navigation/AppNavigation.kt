@@ -1,5 +1,6 @@
 package com.kazemieh.fintrack.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -15,6 +16,7 @@ object Splash
 fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState,
 ) {
 
 
@@ -27,7 +29,7 @@ fun AppNavHost(
 //            }
 //        }
 
-        bottomBarNavGraph(navController) { }
+        bottomBarNavGraph(navController,snackbarHostState) { }
 
     }
 }

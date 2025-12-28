@@ -2,6 +2,7 @@ package com.kazemieh.person.ui
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -20,6 +21,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun PersonListBottomSheet(
     viewModel: PersonViewModel = koinViewModel(),
+    snackbarHostState: SnackbarHostState,
     selectedPersons: Set<Person>?,
     onSubmitClick: (Set<Person>?) -> Unit,
     onDismiss: () -> Unit
@@ -48,6 +50,7 @@ fun PersonListBottomSheet(
 
     if (state.showAddPerson) {
         AddPersonBottomSheet(
+            snackbarHostState = snackbarHostState,
             onDismiss = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
             setPerson = { viewModel.onIntent(PersonIntent.SetSelectedPerson(it)) }
         )

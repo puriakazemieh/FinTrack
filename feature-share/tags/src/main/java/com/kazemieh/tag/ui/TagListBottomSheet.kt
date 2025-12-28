@@ -2,6 +2,7 @@ package com.kazemieh.tag.ui
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -21,6 +22,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun TagListBottomSheet(
     viewModel: TagViewModel = koinViewModel(),
+    snackbarHostState: SnackbarHostState,
     selectedTags: Set<Tag>?,
     onSubmitClick: (Set<Tag>?) -> Unit,
     onDismiss: () -> Unit
@@ -49,6 +51,7 @@ fun TagListBottomSheet(
 
     if (state.showAddTag) {
         AddTagBottomSheet(
+            snackbarHostState = snackbarHostState,
             onDismiss = { viewModel.onIntent(TagIntent.ShowAddTag) },
             setTag = { viewModel.onIntent(TagIntent.SetSelectedTag(it)) }
         )

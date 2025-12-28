@@ -1,5 +1,6 @@
 package com.kazemieh.fintrack.navigation.navigationBar
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -24,16 +25,17 @@ Report
 
 fun NavGraphBuilder.bottomBarNavGraph(
     navController: NavHostController,
+    snackbarHostState: SnackbarHostState,
     onBackPressed: () -> Unit
 ) {
     navigation<BottomBarGraph>(startDestination = Dashboard) {
 
         composable<Dashboard> { backStackEntry ->
-            DashboardScreen()
+            DashboardScreen(snackbarHostState = snackbarHostState)
         }
 
         composable<Report> { backStackEntry ->
-            ReportScreen()
+            ReportScreen(snackbarHostState = snackbarHostState)
         }
 
     }

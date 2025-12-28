@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,7 +36,8 @@ import org.koin.androidx.compose.koinViewModel
 @SuppressLint("UnusedBoxWithConstraintsScope", "ConfigurationScreenWidthHeight")
 @Composable
 fun DashboardScreen(
-    viewModel: DashboardViewModel = koinViewModel()
+    viewModel: DashboardViewModel = koinViewModel(),
+    snackbarHostState: SnackbarHostState
 ) {
     val state by viewModel.state.collectAsState()
     val space = LocalSpacing.current
@@ -90,6 +92,7 @@ fun DashboardScreen(
         if (state.showAddTransaction) {
             AddTransactionBottomSheet(
                 transactionWithRelations = state.transactionWithRelations,
+                snackbarHostState = snackbarHostState,
                 onDismiss = { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) },
                 transactionAdded = { viewModel.onIntent(DashboardIntent.AnimationEnabled) },
             )
@@ -97,6 +100,7 @@ fun DashboardScreen(
 
         if (state.showDeleteTransaction) {
             DeleteTransactionBottomSheet(
+                snackbarHostState = snackbarHostState,
                 transactionWithRelations = state.transactionWithRelations,
                 onDismiss = { viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet()) },
                 transactionDeleted = { viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet()) },
@@ -105,6 +109,7 @@ fun DashboardScreen(
 
         if (state.showAddSource) {
             AddSourceBottomSheet(
+                snackbarHostState = snackbarHostState,
                 onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddSource) },
                 setSource = { viewModel.onIntent(DashboardIntent.ShowAddSource) }
             )

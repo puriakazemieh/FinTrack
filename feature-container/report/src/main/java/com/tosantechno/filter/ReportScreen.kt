@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,6 +27,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ReportScreen(
+    snackbarHostState: SnackbarHostState,
     viewModel: ReportViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -180,6 +182,7 @@ fun ReportScreen(
 
         if (state.showAddTransaction) {
             AddTransactionBottomSheet(
+                snackbarHostState = snackbarHostState,
                 transactionWithRelations = state.transactionWithRelations,
                 onDismiss = { viewModel.onIntent(ReportIntent.ShowTransactionBottomSheet()) },
                 transactionAdded = { viewModel.onIntent(ReportIntent.ShowTransactionBottomSheet()) },
@@ -188,6 +191,7 @@ fun ReportScreen(
 
         if (state.showDeleteTransaction) {
             DeleteTransactionBottomSheet(
+                snackbarHostState = snackbarHostState,
                 transactionWithRelations = state.transactionWithRelations,
                 onDismiss = { viewModel.onIntent(ReportIntent.DeleteTransactionBottomSheet()) },
                 transactionDeleted = { viewModel.onIntent(ReportIntent.DeleteTransactionBottomSheet()) },
