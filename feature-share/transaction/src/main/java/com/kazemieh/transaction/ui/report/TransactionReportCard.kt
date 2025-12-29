@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
@@ -37,14 +38,17 @@ fun ShowTransactionReportCard(
     val state by viewModel.state.collectAsState()
     val space = LocalSpacing.current
 
-
     val text = when (state.filterParams.type) {
-        1 -> {
+        TransactionType.INCOME.count -> {
             stringResource(R.string.incoming)
         }
 
-        2 -> {
+        TransactionType.EXPENSE.count -> {
             stringResource(R.string.outcoming)
+        }
+
+        TransactionType.TRANSFER.count -> {
+            stringResource(R.string.transfer)
         }
 
         else -> {
@@ -97,7 +101,7 @@ fun ShowTransactionReportCard(
                 )
 
 
-                Box(modifier = Modifier.padding(top =space.large)) {
+                Box(modifier = Modifier.padding(top = space.large)) {
                     PieChart(
                         data = state.pieChartData,
                         radiusOuter = 40.dp,
