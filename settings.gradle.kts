@@ -38,3 +38,4 @@ include(":feature-share:person")
 
 include(":feature-container:report")
 include(":feature-container:dashboard")
+include(":feature-container:setting")

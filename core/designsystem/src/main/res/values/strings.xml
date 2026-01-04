@@ -16,6 +16,7 @@
     <string name="balance">موجودی: %1$s</string>
     <string name="navigation_home">صفحه نخست</string>
     <string name="navigation_report">گزارش</string>
+    <string name="navigation_setting">تنظیمات</string>
     <string name="outcoming">خرج</string>
     <string name="all">همه</string>
     <string name="amount">مبلغ</string>

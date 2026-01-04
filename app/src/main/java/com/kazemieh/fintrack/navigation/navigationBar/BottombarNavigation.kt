@@ -22,6 +22,10 @@ Dashboard
 object
 Report
 
+@Serializable
+object
+Setting
+
 
 fun NavGraphBuilder.bottomBarNavGraph(
     navController: NavHostController,
@@ -35,6 +39,10 @@ fun NavGraphBuilder.bottomBarNavGraph(
         }
 
         composable<Report> { backStackEntry ->
+            ReportScreen(snackbarHostState = snackbarHostState)
+        }
+
+        composable<Setting> { backStackEntry ->
             ReportScreen(snackbarHostState = snackbarHostState)
         }
 

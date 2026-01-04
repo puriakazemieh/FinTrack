@@ -33,9 +33,6 @@ fun FinTrackHost() {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            snackbarHost = {
-
-            },
             bottomBar = {
                 FintrackNavigationBar(navController = navController)
             }
