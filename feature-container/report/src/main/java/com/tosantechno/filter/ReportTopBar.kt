@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
@@ -222,12 +223,15 @@ private fun Selector(
     isAllSelected: Boolean = false,
     onClick: () -> Unit
 ) {
+    val context = LocalContext.current
     val sourceTextStyle =
         if (selected.isEmpty()) MaterialTheme.typography.bodyMedium
         else MaterialTheme.typography.labelSmall
     FintrackOutlinedTextField(
-        value = if (isAllSelected) "" else if (selected.size == 1) selected.first().title
-        else selected.joinToString(", ") { it.title },
+        value = if (isAllSelected) "" else if (selected.size == 1) selected.first().title.asString(
+            context
+        )
+        else selected.joinToString(", ") { it.title.asString(context) },
         onClick = onClick,
         readOnly = true,
         enabled = false,
@@ -267,7 +271,12 @@ fun DatePeriodSelector(
 
         FilterButton(
             modifier = Modifier
-                .padding(top = space.mediumSmall, end = space.mediumSmall, start = space.mediumSmall, bottom = space.small)
+                .padding(
+                    top = space.mediumSmall,
+                    end = space.mediumSmall,
+                    start = space.mediumSmall,
+                    bottom = space.small
+                )
                 .weight(0.6f),
             text = dateText,
             onClick = onDateClick

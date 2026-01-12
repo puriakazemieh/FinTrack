@@ -24,7 +24,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.kazemieh.common.UiText
 import com.kazemieh.common.model.ItemUi
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
@@ -105,7 +107,7 @@ fun SelectableListBottomSheetStateless(
 
                 if (showSelectAll && state.items.size > 1) {
                     val text = stringResource(R.string.select_All)
-                    val item = ItemUi(id = 0, title = text)
+                    val item = ItemUi(id = 0, title = UiText.DynamicString(text))
                     ItemSelected(
                         modifier = Modifier.padding(
                             vertical = space.mediumSmall,
@@ -153,6 +155,8 @@ fun ItemSelected(
     onToggle: () -> Unit
 ) {
     val space = LocalSpacing.current
+    val context = LocalContext.current
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -162,7 +166,7 @@ fun ItemSelected(
     ) {
         Checkbox(checked = isSelected, onCheckedChange = { onToggle() })
         Spacer(modifier = Modifier.width(space.mediumLarge))
-        FintrackBodyMediumText(text = item.title)
+        FintrackBodyMediumText(text = item.title.asString(context))
     }
 
 }

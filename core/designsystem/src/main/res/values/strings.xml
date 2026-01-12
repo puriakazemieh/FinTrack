@@ -18,6 +18,7 @@
     <string name="navigation_report">گزارش</string>
     <string name="navigation_setting">تنظیمات</string>
     <string name="outcoming">خرج</string>
+    <string name="outcoming_category">دسته‌بندی خرج‌ها</string>
     <string name="all">همه</string>
     <string name="amount">مبلغ</string>
     <string name="amount_transfer">کارمزد جابه‌جایی</string>
@@ -70,6 +71,7 @@
     <string name="submit_source">ثبت منبع</string>
     <string name="financial_sources">منابع مالی</string>
     <string name="incoming">درآمد</string>
+    <string name="incoming_category">دسته‌بندی درآمدها</string>
     <string name="transfer">انتقال</string>
     <string name="start">شروع</string>
     <string name="end">پایان</string>

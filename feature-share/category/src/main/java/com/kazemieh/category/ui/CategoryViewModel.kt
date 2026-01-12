@@ -34,14 +34,27 @@ class CategoryViewModel(
             is CategoryIntent.SelectedCategory -> {
                 viewModelScope.launch {
                     _effect.send(CategoryEffect.AddedCategory(intent.selectedCategory))
-                    _state.update { CategoryState() }
+                    _state.update {
+                        if (intent.isShowEditCategory)
+                            it.copy(selectedCategory = intent.selectedCategory, isAddShow = true)
+                        else if (intent.isShowDeleteCategory)
+                            it.copy(selectedCategory = intent.selectedCategory, isDeleteShow = true)
+                        else
+                            CategoryState()
+                    }
                 }
             }
 
             CategoryIntent.OnAddCategoryClick -> _state.update {
                 it.copy(
-                    isAddShow = !_state.value.isAddShow
+                    isAddShow = !_state.value.isAddShow,
+                    selectedCategory = null,
+                    isDeleteShow = false
                 )
+            }
+
+            CategoryIntent.OnDeleteCategoryClick -> _state.update {
+                it.copy(isDeleteShow = !_state.value.isDeleteShow, selectedCategory = null)
             }
 
             CategoryIntent.OnDismiss -> {
@@ -56,6 +69,7 @@ class CategoryViewModel(
 
 
     private fun loadAllCategory(type: TransactionType) {
+        _state.update { it.copy(type = type) }
         viewModelScope.launch {
             if (type == TransactionType.ALL) {
                 combine(
@@ -89,15 +103,29 @@ class CategoryViewModel(
 
 data class CategoryState(
     val categories: List<Category> = emptyList(),
+    val selectedCategory: Category? = null,
     val items: Set<ItemUi> = emptySet(),
-    val isAddShow: Boolean = false
+    val type: TransactionType = TransactionType.INCOME,
+    val listTransactionType: List<TransactionType> = listOf(
+        TransactionType.INCOME,
+        TransactionType.EXPENSE
+    ),
+    val isAddShow: Boolean = false,
+    val isDeleteShow: Boolean = false
 )
 
 sealed interface CategoryIntent {
-    data class LoadCategoryByType(val type: TransactionType) : CategoryIntent
-    data class SelectedCategory(val selectedCategory: Category) : CategoryIntent
+    data class LoadCategoryByType(val type: TransactionType = TransactionType.INCOME) :
+        CategoryIntent
+
+    data class SelectedCategory(
+        val selectedCategory: Category,
+        val isShowEditCategory: Boolean = false,
+        val isShowDeleteCategory: Boolean = false,
+    ) : CategoryIntent
 
     data object OnAddCategoryClick : CategoryIntent
+    data object OnDeleteCategoryClick : CategoryIntent
     data object OnDismiss : CategoryIntent
 
 }

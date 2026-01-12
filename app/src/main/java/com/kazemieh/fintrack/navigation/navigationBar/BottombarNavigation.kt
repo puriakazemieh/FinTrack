@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.kazemieh.dashboard.DashboardScreen
+import com.kazemieh.setting.SettingScreen
 import com.tosantechno.filter.ReportScreen
 import kotlinx.serialization.Serializable
 
@@ -43,7 +44,7 @@ fun NavGraphBuilder.bottomBarNavGraph(
         }
 
         composable<Setting> { backStackEntry ->
-            ReportScreen(snackbarHostState = snackbarHostState)
+            SettingScreen(snackbarHostState = snackbarHostState)
         }
 
     }

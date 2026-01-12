@@ -1,6 +1,5 @@
 package com.kazemieh.designsystem.component.list.normal
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,10 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -22,8 +18,8 @@ import com.kazemieh.common.model.ItemUi
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FAB
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
+import com.kazemieh.designsystem.component.list.ItemScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,10 +27,16 @@ import com.kazemieh.designsystem.component.FintrackTitleLargeText
 fun ListBottomSheet(
     title: String,
     items: Set<ItemUi>,
-    onConfirm: (ItemUi) -> Unit,
+    onItemClicked: (ItemUi) -> Unit = {},
+    onItemEditClicked: (ItemUi) -> Unit = {},
+    onItemDeleteClicked: (ItemUi) -> Unit = {},
     onAddClick: () -> Unit,
     onDismiss: () -> Unit,
-    content: @Composable (ItemUi) -> Unit = {}
+    isDeleteShow: Boolean = false,
+    isEditShow: Boolean = false,
+    isShowTopContent: Boolean = false,
+    topContent: @Composable () -> Unit = { },
+    itemContent: @Composable (ItemUi) -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val space = LocalSpacing.current
@@ -48,32 +50,25 @@ fun ListBottomSheet(
                 .padding(space.medium)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                FintrackTitleLargeText(
-                    text = title,
-                    modifier = Modifier.padding(space.small)
-                )
+                if (!isShowTopContent) {
+                    FintrackTitleLargeText(
+                        text = title,
+                        modifier = Modifier.padding(space.small)
+                    )
+                } else topContent()
+
                 LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
                     if (items.isNotEmpty())
                         items(items.toList()) { item ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = space.small)
-                                    .clickable { onConfirm(item) },
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                                shape = MaterialTheme.shapes.medium,
-                                elevation = CardDefaults.cardElevation(defaultElevation = space.one)
-                            ) {
-                                Column(
-                                    modifier = Modifier.padding(
-                                        vertical = space.medium,
-                                        horizontal = space.large
-                                    )
-                                ) {
-                                    FintrackBodyMediumText(text = item.title)
-                                    content(item)
-                                }
-                            }
+                            ItemScreen(
+                                item = item,
+                                isDeleteShow = isDeleteShow,
+                                isEditShow = isEditShow,
+                                onItemClicked = onItemClicked,
+                                onItemEditClicked = onItemEditClicked,
+                                onItemDeleteClicked = onItemDeleteClicked,
+                                content = itemContent
+                            )
                         } else item { EmptyListScreen(title) }
 
                     item {

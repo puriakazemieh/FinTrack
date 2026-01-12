@@ -1,4 +1,4 @@
-package com.kazemieh.transaction.ui.delete
+package com.kazemieh.category.ui.delete
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarDuration
@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.common.model.Category
 import com.kazemieh.designsystem.component.BottomSheetContent
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -16,12 +16,12 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeleteTransactionBottomSheet(
-    viewModel: DeleteTransactionViewModel = koinViewModel(),
+fun DeleteCategoryBottomSheet(
+    viewModel: DeleteCategoryViewModel = koinViewModel(),
     snackbarHostState: SnackbarHostState,
-    transactionWithRelations: TransactionWithRelations? = null,
+    category: Category,
     onDismiss: () -> Unit,
-    transactionDeleted: () -> Unit
+    deleted: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -30,8 +30,8 @@ fun DeleteTransactionBottomSheet(
 
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(transactionWithRelations) {
-        viewModel.onIntent(DeleteTransactionIntent.SetData(transactionWithRelations))
+    LaunchedEffect(category) {
+        viewModel.onIntent(DeleteCategory.SetData(category))
     }
 
 
@@ -41,7 +41,7 @@ fun DeleteTransactionBottomSheet(
                 is DeleteTransactionEffect.DeletedTransaction -> {
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
-                            transactionDeleted()
+                            deleted()
                         }
                     }
                 }
@@ -61,9 +61,10 @@ fun DeleteTransactionBottomSheet(
     }
 
     BottomSheetContent(
-        dismiss = { viewModel.onIntent(DeleteTransactionIntent.OnDismiss) },
-        submit = { viewModel.onIntent(DeleteTransactionIntent.Submit) },
+        dismiss = {},
+        submit = {},
         sheetState = sheetState
     )
 
 }
+

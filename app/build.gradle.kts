@@ -46,5 +46,6 @@ dependencies {
     implementation(project(":feature-container:report"))
     implementation(project(":feature-share:person"))
     implementation(project(":feature-container:dashboard"))
+    implementation(project(":feature-container:setting"))
 
 }

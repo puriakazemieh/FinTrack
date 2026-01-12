@@ -10,6 +10,7 @@ fun CategoryEntity.toCategory(): Category =
     Category(id, name, description, TransactionType.fromInt(type))
 
 fun Category.toCategoryEntity(): CategoryEntity = CategoryEntity(
+    id = id ?: 0,
     name = name,
     description = description,
     type = type.count

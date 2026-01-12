@@ -1,63 +1,47 @@
 package com.kazemieh.common.model
 
+import android.content.Context
+import com.kazemieh.common.UiText
+
 
 data class ItemUi(
     val id: Long,
-    val title: String,
+    var title: UiText,
     val extraData: Any? = null
 )
 
-fun List<ItemUi>.toIdSet(): Set<Long> = this.map { it.id }.toSet()
-
-fun Set<Pair<Int, String>>.toIdSet(): Set<Int> = this.map { it.first }.toSet()
-
-fun Set<Long>.toPairSetFrom(items: List<ItemUi>): Set<Pair<Long, String>> =
-    this.mapNotNull { id ->
-        items.firstOrNull { it.id == id }?.let { id to it.title }
-    }.toSet()
-
-suspend fun convertIdsToPairs(
-    selectedIds: Set<Int>,
-    allCategories: List<Category>
-): Set<Pair<Int, String>> {
-    return selectedIds.mapNotNull { id ->
-        allCategories.firstOrNull { it.id?.toInt() == id }?.let { id to it.name }
-    }.toSet()
-}
-
-
-fun ItemUi.toSource(): Source {
-    return Source(id = id, name = title, formattedBalance = extraData as String)
+fun ItemUi.toSource(context: Context): Source {
+    return Source(id = id, name = title.asString(context), formattedBalance = extraData as String)
 }
 
 fun Source.toItemUi(): ItemUi {
-    return ItemUi(id = id ?: 0, title = name, extraData = formattedBalance)
+    return ItemUi(id = id ?: 0, title = UiText.DynamicString(name), extraData = formattedBalance)
 }
 
-fun ItemUi.toCategory(): Category {
-    return Category(id = id, name = title, type = extraData as TransactionType)
+fun ItemUi.toCategory(context: Context): Category {
+    return Category(id = id, name = title.asString(context), type = extraData as TransactionType)
 }
 
 
 fun Category.toItemUi(): ItemUi {
-    return ItemUi(id = id ?: 0, title = name, extraData = type)
+    return ItemUi(id = id ?: 0, title = UiText.DynamicString(name), extraData = type)
 }
 
 
-fun ItemUi.toTag(): Tag {
-    return Tag(id = id, name = title)
+fun ItemUi.toTag(context: Context): Tag {
+    return Tag(id = id, name = title.asString(context))
 }
 
 fun Tag.toItemUi(): ItemUi {
-    return ItemUi(id = id ?: 0, title = name)
+    return ItemUi(id = id ?: 0, title = UiText.DynamicString(name))
 }
 
 
-fun ItemUi.toPerson(): Person {
-    return Person(id = id, name = title)
+fun ItemUi.toPerson(context: Context): Person {
+    return Person(id = id, name = title.asString(context))
 }
 
 fun Person.toItemUi(): ItemUi {
-    return ItemUi(id = id ?: 0, title = name)
+    return ItemUi(id = id ?: 0, title = UiText.DynamicString(name))
 }
 

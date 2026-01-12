@@ -6,6 +6,8 @@ import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.R
 import com.kazemieh.domain.usecase.AddCategory
+import com.kazemieh.domain.usecase.DeleteCategory
+import com.kazemieh.domain.usecase.EditCategory
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +16,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AddCategoryViewModel(
-    private val addCategoryUseCase: AddCategory
+    private val addCategoryUseCase: AddCategory,
+    private val editCategoryUseCase: EditCategory
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddCategoryState())
@@ -37,6 +40,14 @@ class AddCategoryViewModel(
             is AddCategoryIntent.SetCategoryName -> _state.update { it.copy(categoryName = intent.categoryName) }
             is AddCategoryIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
             is AddCategoryIntent.SetCategoryType -> _state.update { it.copy(categoryType = intent.categoryType) }
+            is AddCategoryIntent.ShowEditData -> _state.update {
+                it.copy(
+                    selectedCategory = intent.selectedCategory,
+                    categoryName = intent.selectedCategory.name,
+                    description = intent.selectedCategory.description,
+                    categoryType = intent.selectedCategory.type
+                )
+            }
         }
     }
 
@@ -44,11 +55,16 @@ class AddCategoryViewModel(
         viewModelScope.launch {
             if (categoryName?.isNotBlank() == true) {
                 val category = Category(
+                    id = selectedCategory?.id,
                     name = categoryName,
                     description = description,
                     type = categoryType
                 )
-                val categoryId = addCategoryUseCase(category)
+                val categoryId = if (selectedCategory != null) {
+                    editCategoryUseCase(category).toLong()
+                } else {
+                    addCategoryUseCase(category)
+                }
                 if (categoryId >= 0) {
                     _effect.send(AddCategoryEffect.AddedCategory(category.copy(id = categoryId)))
                     _state.update { AddCategoryState() }
@@ -66,12 +82,14 @@ data class AddCategoryState(
     val categoryName: String? = null,
     val description: String? = null,
     val categoryType: TransactionType = TransactionType.INCOME,
+    val selectedCategory: Category? = null
 )
 
 sealed interface AddCategoryIntent {
     data object AddCategory : AddCategoryIntent
     data class SetCategoryName(val categoryName: String? = null) : AddCategoryIntent
     data class SetCategoryType(val categoryType: TransactionType) : AddCategoryIntent
+    data class ShowEditData(val selectedCategory: Category) : AddCategoryIntent
     data class SetDescription(val description: String? = null) : AddCategoryIntent
     data object OnDismiss : AddCategoryIntent
 }

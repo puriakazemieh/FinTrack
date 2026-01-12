@@ -21,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.toItemUi
@@ -50,6 +51,8 @@ fun SourceListBottomSheet(
 
     val state by viewModel.state.collectAsState()
 
+    val context = LocalContext.current
+
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -63,10 +66,10 @@ fun SourceListBottomSheet(
     ListBottomSheet(
         title = stringResource(R.string.source),
         items = state.items,
-        onConfirm = { viewModel.onIntent(SourceIntent.SelectedSource(it.toSource())) },
+        onItemClicked = { viewModel.onIntent(SourceIntent.SelectedSource(it.toSource(context))) },
         onAddClick = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
         onDismiss = { viewModel.onIntent(SourceIntent.OnDismiss) },
-        content = { item ->
+        itemContent = { item ->
             FintrackBodySmallText(
                 text = stringResource(
                     R.string.balance,
@@ -97,6 +100,8 @@ fun SourceListSelectionBottomSheet(
 ) {
     val state by viewModel.state.collectAsState()
 
+    val context = LocalContext.current
+
     LaunchedEffect(true) {
         viewModel.onIntent(SourceIntent.LoadAllSource)
     }
@@ -108,7 +113,7 @@ fun SourceListSelectionBottomSheet(
         items = state.items,
         initialSelection = initialSelectionIds,
         onConfirm = { selectedItems, isAll ->
-            onConfirmPairs(selectedItems.map { it.toSource() }.toSet(), isAll)
+            onConfirmPairs(selectedItems.map { it.toSource(context) }.toSet(), isAll)
         },
         onDismiss = onDismiss
     )

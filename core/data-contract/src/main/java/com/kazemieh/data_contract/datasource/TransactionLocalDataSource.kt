@@ -32,6 +32,8 @@ interface TransactionLocalDataSource {
     fun getCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>>
 
     suspend fun insertCategory(category: Category): Long
+    suspend fun updateCategory(category: Category): Int
+    suspend fun deleteCategory(category: Category)
     suspend fun insertFinancialSource(source: Source): Long
     suspend fun insertTag(tag: Tag): Long
     suspend fun getAllCategory(type: TransactionType): Flow<List<Category>>

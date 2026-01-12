@@ -45,8 +45,6 @@ class AddTransactionViewModel(
             }
 
             is AddTransactionIntent.SetCategory -> _state.update {
-                (intent.category?.name?.isBlank() == true).ld("==")
-                intent.category?.name.ld("name")
                 it.copy(
                     category = intent.category,
                     isCategoryError = intent.category?.name?.isBlank() == true,

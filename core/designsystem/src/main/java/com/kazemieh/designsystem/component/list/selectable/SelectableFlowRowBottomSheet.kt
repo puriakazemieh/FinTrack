@@ -22,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.kazemieh.common.model.ItemUi
 import com.kazemieh.designsystem.LocalSpacing
@@ -86,6 +87,7 @@ fun SelectableFlowRowBottomSheetStateless(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val space = LocalSpacing.current
+    val context = LocalContext.current
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -117,7 +119,7 @@ fun SelectableFlowRowBottomSheetStateless(
                                 onClick = { onToggle(item) },
                                 label = {
                                     FintrackBodyMediumText(
-                                        text = item.title,
+                                        text = item.title.asString(context),
                                         color = if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onBackground
                                     )
                                 },

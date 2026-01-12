@@ -78,7 +78,8 @@ class TransactionLocalDataSourceImpl(
         tagIds: List<Long>,
         personIds: List<Long>,
     ): Long {
-        val transactionRowUpdatedCount = transactionDao.updateTransaction(transaction.toTransactionEntity()).ld("updateTransaction updateTransaction ")
+        val transactionRowUpdatedCount =
+            transactionDao.updateTransaction(transaction.toTransactionEntity())
 
         tagIds.forEach { tagId ->
             transactionDao.updateTransactionTagCrossRef(
@@ -140,6 +141,17 @@ class TransactionLocalDataSourceImpl(
 
     override suspend fun insertCategory(category: Category): Long {
         return categoryDao.insertCategory(category.toCategoryEntity())
+    }
+
+
+    override suspend fun updateCategory(category: Category): Int {
+        return categoryDao.updateCategory(category.toCategoryEntity())
+
+    }
+
+    override suspend fun deleteCategory(category: Category) {
+        return categoryDao.deleteCategory(category.toCategoryEntity())
+
     }
 
     override suspend fun insertFinancialSource(source: Source): Long {

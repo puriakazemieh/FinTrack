@@ -37,6 +37,7 @@ fun AddCategoryBottomSheet(
     viewModel: AddCategoryViewModel = koinViewModel(),
     snackbarHostState: SnackbarHostState,
     transactionType: TransactionType,
+    selectedCategory: Category? = null,
     onDismiss: () -> Unit,
     setCategory: (Category) -> Unit
 ) {
@@ -44,6 +45,8 @@ fun AddCategoryBottomSheet(
     val space = LocalSpacing.current
     LaunchedEffect(true) {
         viewModel.onIntent(AddCategoryIntent.SetCategoryType(transactionType))
+        if (selectedCategory != null)
+            viewModel.onIntent(AddCategoryIntent.ShowEditData(selectedCategory))
     }
 
     val state by viewModel.state.collectAsState()

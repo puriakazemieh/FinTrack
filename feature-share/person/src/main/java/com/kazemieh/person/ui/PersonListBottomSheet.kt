@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.toItemUi
@@ -37,12 +38,14 @@ fun PersonListBottomSheet(
 
     val state by viewModel.state.collectAsState()
 
+    val context = LocalContext.current
+
     SelectableFlowRowBottomSheet(
         title = stringResource(R.string.persons),
         items = state.items,
         initialSelection = state.initialSelectionIds.map { it.toItemUi() }.toSet(),
         onConfirm = { selectedItems ->
-            onSubmitClick(selectedItems.map { it.toPerson() }.toSet())
+            onSubmitClick(selectedItems.map { it.toPerson(context) }.toSet())
         },
         onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
         onDismiss = onDismiss,
@@ -67,6 +70,8 @@ fun PersonListSelectionBottomSheet(
 ) {
     val state by viewModel.state.collectAsState()
 
+    val context = LocalContext.current
+
     LaunchedEffect(true) {
         viewModel.onIntent(PersonIntent.GetAllPerson)
     }
@@ -78,7 +83,7 @@ fun PersonListSelectionBottomSheet(
         items = state.items,
         initialSelection = initialSelectionIds,
         onConfirm = { selectedItems, isAll ->
-            onConfirmPairs(selectedItems.map { it.toPerson() }.toSet(), isAll)
+            onConfirmPairs(selectedItems.map { it.toPerson(context) }.toSet(), isAll)
         },
         onDismiss = onDismiss
     )
