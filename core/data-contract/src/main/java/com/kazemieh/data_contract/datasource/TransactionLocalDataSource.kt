@@ -33,7 +33,7 @@ interface TransactionLocalDataSource {
 
     suspend fun insertCategory(category: Category): Long
     suspend fun updateCategory(category: Category): Int
-    suspend fun deleteCategory(category: Category)
+    suspend fun deleteCategory(category: Category, moveCategory: Category?)
     suspend fun insertFinancialSource(source: Source): Long
     suspend fun insertTag(tag: Tag): Long
     suspend fun getAllCategory(type: TransactionType): Flow<List<Category>>

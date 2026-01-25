@@ -4,7 +4,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import com.kazemieh.common.ld
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
 import com.kazemieh.common.model.Person
@@ -149,9 +148,23 @@ class TransactionLocalDataSourceImpl(
 
     }
 
-    override suspend fun deleteCategory(category: Category) {
-        return categoryDao.deleteCategory(category.toCategoryEntity())
+    override suspend fun deleteCategory(category: Category, moveCategory: Category?) {
+        if (moveCategory != null) {
+            val allTransaction = transactionDao.getAllTransactionListFiltered(
+                type = category.type.count,
+                categoryIds = listOf(category.id)
+            )
 
+            allTransaction.forEach { transaction ->
+                transactionDao.updateTransaction(
+                    transaction.transaction.copy(
+                        categoryId = moveCategory.id ?: 0
+                    )
+                )
+            }
+        }
+
+        categoryDao.deleteCategory(category.toCategoryEntity())
     }
 
     override suspend fun insertFinancialSource(source: Source): Long {

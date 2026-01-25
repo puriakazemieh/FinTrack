@@ -1,4 +1,4 @@
-package com.kazemieh.category.ui
+package com.kazemieh.category.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,14 +34,7 @@ class CategoryViewModel(
             is CategoryIntent.SelectedCategory -> {
                 viewModelScope.launch {
                     _effect.send(CategoryEffect.AddedCategory(intent.selectedCategory))
-                    _state.update {
-                        if (intent.isShowEditCategory)
-                            it.copy(selectedCategory = intent.selectedCategory, isAddShow = true)
-                        else if (intent.isShowDeleteCategory)
-                            it.copy(selectedCategory = intent.selectedCategory, isDeleteShow = true)
-                        else
-                            CategoryState()
-                    }
+                    _state.update { CategoryState() }
                 }
             }
 
@@ -53,8 +46,18 @@ class CategoryViewModel(
                 )
             }
 
-            CategoryIntent.OnDeleteCategoryClick -> _state.update {
-                it.copy(isDeleteShow = !_state.value.isDeleteShow, selectedCategory = null)
+            is CategoryIntent.OnDeleteCategoryClick -> _state.update {
+                it.copy(
+                    isDeleteShow = !_state.value.isDeleteShow,
+                    selectedCategory = intent.category
+                )
+            }
+
+            is CategoryIntent.OnEditCategoryClick -> _state.update {
+                it.copy(
+                    isAddShow = true,
+                    selectedCategory = intent.category
+                )
             }
 
             CategoryIntent.OnDismiss -> {
@@ -118,14 +121,11 @@ sealed interface CategoryIntent {
     data class LoadCategoryByType(val type: TransactionType = TransactionType.INCOME) :
         CategoryIntent
 
-    data class SelectedCategory(
-        val selectedCategory: Category,
-        val isShowEditCategory: Boolean = false,
-        val isShowDeleteCategory: Boolean = false,
-    ) : CategoryIntent
+    data class SelectedCategory(val selectedCategory: Category) : CategoryIntent
 
     data object OnAddCategoryClick : CategoryIntent
-    data object OnDeleteCategoryClick : CategoryIntent
+    data class OnDeleteCategoryClick(val category: Category? = null) : CategoryIntent
+    data class OnEditCategoryClick(val category: Category? = null) : CategoryIntent
     data object OnDismiss : CategoryIntent
 
 }

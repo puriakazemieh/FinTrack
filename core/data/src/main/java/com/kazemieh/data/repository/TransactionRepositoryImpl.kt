@@ -66,8 +66,8 @@ class TransactionRepositoryImpl(
         return localDataSource.updateCategory(category)
     }
 
-    override suspend fun deleteCategory(category: Category) {
-        return localDataSource.deleteCategory(category)
+    override suspend fun deleteCategory(category: Category, moveCategory: Category?) {
+        return localDataSource.deleteCategory(category, moveCategory)
     }
 
     override suspend fun insertFinancialSource(source: Source): Long {

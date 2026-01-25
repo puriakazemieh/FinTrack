@@ -6,6 +6,7 @@
     <string name="empty_title_default">محتوایی </string>
 
     <string name="check_name_category_source">لطفاً نام دسته‌بندی را وارد کنید</string>
+    <string name="category_choose">لطفاً دسته‌بندی را انتخاب کنید</string>
     <string name="add_category">افزودن دسته‌بندی</string>
     <string name="select_All">انتخاب همه</string>
     <string name="category_name_label">نام دسته‌بندی</string>
@@ -37,6 +38,9 @@
     <string name="tag_list">لیست تگ‌ها</string>
     <string name="save_transaction">ذخیره تراکنش</string>
     <string name="transaction" > تراکنش</string>
+    <string name="move_to_another_category" > انتقال به یک دسته‌بندی دیگر</string>
+    <string name="delete_all_transaction" > پاک کردن همه تراکنش‌ها</string>
+    <string name="title_delete_category" > با حذف دسته‌بندی همه تراکنش‌ها به طور کامل پاک می شود</string>
     <string name="transaction_delete" >آیا از حذف مطمئن هستید؟</string>
     <string name="transaction_deleted">تراکنش حذف شد</string>
     <string name="recent_transactions">تراکنش‌های اخیر</string>

@@ -80,6 +80,50 @@ interface TransactionDao {
         toTimestamp: Long? = null
     ): PagingSource<Int, TransactionWithCategoryFinancialSourceAndTags>
 
+    @Transaction
+    @Query(
+        """
+        SELECT * FROM transactions
+        WHERE (:type IS NULL OR type = :type)
+          AND ((:categoryIdsSize = 0) OR categoryId IN (:categoryIds))
+          AND ((:sourceIdsSize = 0) OR sourceId IN (:sourceIds))
+
+          AND (
+                :tagIdsSize = 0 OR id IN (
+                    SELECT transactionId
+                    FROM transaction_tag
+                    WHERE tagId IN (:tagIds)
+                )
+          )
+
+          AND (
+                :personIdsSize = 0 OR id IN (
+                    SELECT transactionId
+                    FROM transaction_person
+                    WHERE personId IN (:personIds)
+                )
+          )
+
+          AND (
+              (:fromTimestamp IS NULL OR :toTimestamp IS NULL)
+              OR (timeStamp >= :fromTimestamp AND timeStamp < :toTimestamp)
+          )
+    """
+    )
+    fun getAllTransactionListFiltered(
+        type: Int? = null,
+        categoryIds: List<Long?> = emptyList(),
+        sourceIds: List<Long?> = emptyList(),
+        tagIds: List<Long?> = emptyList(),
+        personIds: List<Long?> = emptyList(),
+        tagIdsSize: Int = tagIds.size,
+        personIdsSize: Int = personIds.size,
+        categoryIdsSize: Int = categoryIds.size,
+        sourceIdsSize: Int = sourceIds.size,
+        fromTimestamp: Long? = null,
+        toTimestamp: Long? = null
+    ): List<TransactionWithCategoryFinancialSourceAndTags>
+
     @Query(
         """
     SELECT 

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -25,15 +26,26 @@ import com.kazemieh.designsystem.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomSheetContent(
-    dismiss: () -> Unit,
-    submit: () -> Unit,
+fun DeleteBottomSheet(
+    title: String = stringResource(R.string.transaction_delete),
+    confirmButtonText: String = stringResource(R.string.confirm),
+    dismissButtonText: String = stringResource(R.string.cancell_),
+    confirmButtonColors: ButtonColors = ButtonDefaults.buttonColors(
+        containerColor = MaterialTheme.colorScheme.error,
+        contentColor = MaterialTheme.colorScheme.onError
+    ),
+    dismissButtonColors: ButtonColors = ButtonDefaults.buttonColors(
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary
+    ),
+    dismissClicked: () -> Unit,
+    confirmClicked: () -> Unit,
     sheetState: SheetState,
 ) {
 
     val space = LocalSpacing.current
     ModalBottomSheet(
-        onDismissRequest = dismiss,
+        onDismissRequest = dismissClicked,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background
     ) {
@@ -42,7 +54,7 @@ fun BottomSheetContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = space.large),
-                text = stringResource(R.string.transaction_delete),
+                text = title,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(space.large))
@@ -54,30 +66,24 @@ fun BottomSheetContent(
                 horizontalArrangement = Arrangement.spacedBy(space.mediumSmall)
             ) {
                 Button(
-                    onClick = submit,
+                    onClick = confirmClicked,
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.medium,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.onError
-                    )
+                    colors = confirmButtonColors
                 ) {
                     FintrackTitleMediumText(
-                        text = stringResource(R.string.confirm),
+                        text = confirmButtonText,
                         color = MaterialTheme.colorScheme.background
                     )
                 }
                 Button(
-                    onClick = dismiss,
+                    onClick = dismissClicked,
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.medium,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
+                    colors = dismissButtonColors
                 ) {
                     FintrackTitleMediumText(
-                        text = stringResource(R.string.cancell_),
+                        text = dismissButtonText,
                         color = MaterialTheme.colorScheme.background
                     )
                 }

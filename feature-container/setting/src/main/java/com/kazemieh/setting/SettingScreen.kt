@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import com.kazemieh.category.ui.CategoryTabListBottomSheet
+import com.kazemieh.category.ui.list.CategoryTabListBottomSheet
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.list.ItemScreen
 import com.kazemieh.financialsource.ui.SourceListBottomSheet
@@ -34,7 +34,6 @@ fun SettingScreen(
         ItemId.ITEM_1.id -> {
             CategoryTabListBottomSheet(
                 snackbarHostState = snackbarHostState,
-//                onCategoryClick = { viewModel.onIntent(SettingIntent.SetCategory(it)) },
                 onDismiss = { viewModel.onIntent(SettingIntent.OnClick()) }
             )
         }

@@ -6,7 +6,7 @@ import com.kazemieh.common.model.Category
 class DeleteCategory(
     private val repository: TransactionRepository
 ) {
-    suspend operator fun invoke(category : Category) {
-        return repository.deleteCategory(category)
+    suspend operator fun invoke(deleteCategory: Category, moveCategory: Category?) {
+        return repository.deleteCategory(deleteCategory, moveCategory)
     }
 }

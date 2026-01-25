@@ -1,6 +1,6 @@
 package com.kazemieh.category.di
 
-import com.kazemieh.category.ui.CategoryViewModel
+import com.kazemieh.category.ui.list.CategoryViewModel
 import com.kazemieh.category.ui.add.AddCategoryViewModel
 import com.kazemieh.category.ui.delete.DeleteCategoryViewModel
 import org.koin.core.module.dsl.viewModel

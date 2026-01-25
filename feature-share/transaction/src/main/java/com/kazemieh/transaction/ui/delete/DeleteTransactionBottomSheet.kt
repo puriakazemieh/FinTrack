@@ -9,7 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import com.kazemieh.common.model.TransactionWithRelations
-import com.kazemieh.designsystem.component.BottomSheetContent
+import com.kazemieh.designsystem.component.DeleteBottomSheet
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -60,9 +60,9 @@ fun DeleteTransactionBottomSheet(
         }
     }
 
-    BottomSheetContent(
-        dismiss = { viewModel.onIntent(DeleteTransactionIntent.OnDismiss) },
-        submit = { viewModel.onIntent(DeleteTransactionIntent.Submit) },
+    DeleteBottomSheet(
+        dismissClicked = { viewModel.onIntent(DeleteTransactionIntent.OnDismiss) },
+        confirmClicked = { viewModel.onIntent(DeleteTransactionIntent.Submit) },
         sheetState = sheetState
     )
 

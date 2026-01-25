@@ -1,7 +1,8 @@
-package com.kazemieh.category.ui
+package com.kazemieh.category.ui.list
 
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -19,10 +20,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import com.kazemieh.category.ui.add.AddCategoryBottomSheet
 import com.kazemieh.category.ui.delete.DeleteCategoryBottomSheet
+import com.kazemieh.common.ld
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.toCategory
 import com.kazemieh.common.model.toItemUi
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.list.normal.ListBottomSheet
@@ -32,7 +35,7 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryListBottomSheet(
-    viewModel: CategoryViewModel = koinViewModel(),
+    viewModel: CategoryViewModel = koinViewModel(key = "CategoryListBottomSheet"),
     snackbarHostState: SnackbarHostState,
     transactionType: TransactionType,
     onCategoryClick: (Category) -> Unit,
@@ -77,7 +80,7 @@ fun CategoryListBottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryTabListBottomSheet(
-    viewModel: CategoryViewModel = koinViewModel(),
+    viewModel: CategoryViewModel = koinViewModel(key = "CategoryTabListBottomSheet"),
     snackbarHostState: SnackbarHostState,
     onDismiss: () -> Unit
 ) {
@@ -105,14 +108,10 @@ fun CategoryTabListBottomSheet(
         isDeleteShow = true,
         isEditShow = true,
         onItemEditClicked = {
-            viewModel.onIntent(
-                CategoryIntent.SelectedCategory(it.toCategory(context), isShowEditCategory = true)
-            )
+            viewModel.onIntent(CategoryIntent.OnEditCategoryClick(it.toCategory(context)))
         },
         onItemDeleteClicked = {
-            viewModel.onIntent(
-                CategoryIntent.SelectedCategory(it.toCategory(context), isShowDeleteCategory = true)
-            )
+            viewModel.onIntent(CategoryIntent.OnDeleteCategoryClick(it.toCategory(context)))
         },
         onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
         topContent = {
@@ -138,8 +137,8 @@ fun CategoryTabListBottomSheet(
         DeleteCategoryBottomSheet(
             snackbarHostState = snackbarHostState,
             category = state.selectedCategory!!,
-            onDismiss = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
-            deleted = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
+            onDismiss = { viewModel.onIntent(CategoryIntent.OnDeleteCategoryClick()) },
+            deleted = { viewModel.onIntent(CategoryIntent.OnDeleteCategoryClick()) },
         )
     }
 
@@ -151,9 +150,12 @@ fun TopCategoryContent(
     type: TransactionType,
     onConfirm: (TransactionType) -> Unit
 ) {
+    val space = LocalSpacing.current
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         SingleChoiceSegmentedButtonRow(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = space.mediumSmall)
         ) {
             listTransactionType.forEachIndexed { index, option ->
                 SegmentedButton(

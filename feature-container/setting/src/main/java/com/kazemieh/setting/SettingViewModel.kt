@@ -20,7 +20,13 @@ class SettingViewModel : ViewModel() {
     fun onIntent(intent: SettingIntent) {
         when (intent) {
             is SettingIntent.OnClick -> _state.update { it.copy(selectedItem = intent.item) }
-            is SettingIntent.SetCategory -> _state.update { it.copy(category = intent.category,selectedItem=null) }
+            is SettingIntent.SetCategory -> _state.update {
+                it.copy(
+                    category = intent.category,
+                    selectedItem = null
+                )
+            }
+
             is SettingIntent.SetPerson -> _state.update { it.copy(persons = intent.persons) }
             is SettingIntent.SetSource -> _state.update { it.copy(source = intent.source) }
             is SettingIntent.SetTags -> _state.update { it.copy(tags = intent.tags) }
@@ -66,13 +72,9 @@ enum class ItemId(val id: Long) {
 
 
 sealed interface SettingIntent {
-    data class OnClick(val item: ItemUi?=null) : SettingIntent
+    data class OnClick(val item: ItemUi? = null) : SettingIntent
     data class SetCategory(val category: Category? = null) : SettingIntent
-//    data object OnCategoryShow : SettingIntent
     data class SetSource(val source: Source? = null) : SettingIntent
-//    data object OnSourceShow : SettingIntent
     data class SetTags(val tags: Tag? = null) : SettingIntent
-//    data object OnTagsShow : SettingIntent
     data class SetPerson(val persons: Person? = null) : SettingIntent
-//    data object OnPersonShow : SettingIntent
 }
