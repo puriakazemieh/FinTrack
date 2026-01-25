@@ -45,7 +45,8 @@ class AddCategoryViewModel(
                     selectedCategory = intent.selectedCategory,
                     categoryName = intent.selectedCategory.name,
                     description = intent.selectedCategory.description,
-                    categoryType = intent.selectedCategory.type
+                    categoryType = intent.selectedCategory.type,
+
                 )
             }
         }

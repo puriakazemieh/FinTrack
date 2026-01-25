@@ -148,6 +148,12 @@ class TransactionLocalDataSourceImpl(
 
     }
 
+
+    override suspend fun updateSource(source: Source): Int {
+        return financialSourceDao.updateSource(source.toSourceEntity())
+
+    }
+
     override suspend fun deleteCategory(category: Category, moveCategory: Category?) {
         if (moveCategory != null) {
             val allTransaction = transactionDao.getAllTransactionListFiltered(
@@ -167,6 +173,24 @@ class TransactionLocalDataSourceImpl(
         categoryDao.deleteCategory(category.toCategoryEntity())
     }
 
+    override suspend fun deleteSource(deleteSource: Source, moveSource: Source?) {
+        if (moveSource != null) {
+            val allTransaction = transactionDao.getAllTransactionListFiltered(
+                sourceIds = listOf(deleteSource.id)
+            )
+
+            allTransaction.forEach { transaction ->
+                transactionDao.updateTransaction(
+                    transaction.transaction.copy(
+                        sourceId = moveSource.id ?: 0
+                    )
+                )
+            }
+        }
+
+        financialSourceDao.deleteSource(deleteSource.toSourceEntity())
+    }
+
     override suspend fun insertFinancialSource(source: Source): Long {
         return financialSourceDao.insertFinancialSource(source.toSourceEntity())
     }
@@ -183,6 +207,10 @@ class TransactionLocalDataSourceImpl(
         return financialSourceDao.getAllFinancialSources().map {
             it.map { it.toSource() }
         }
+    }
+
+    override fun getSource(sourceId: Long): Flow<Source?> {
+        return financialSourceDao.getFinancialSourceById(sourceId).map { it?.toSource() }
     }
 
     override suspend fun getAllTag(): Flow<List<Tag>> {

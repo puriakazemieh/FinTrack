@@ -66,8 +66,16 @@ class TransactionRepositoryImpl(
         return localDataSource.updateCategory(category)
     }
 
+    override suspend fun updateSource(source: Source): Int {
+        return localDataSource.updateSource(source)
+    }
+
     override suspend fun deleteCategory(category: Category, moveCategory: Category?) {
         return localDataSource.deleteCategory(category, moveCategory)
+    }
+
+    override suspend fun deleteSource(deleteSource: Source, moveSource: Source?) {
+        return localDataSource.deleteSource(deleteSource, moveSource)
     }
 
     override suspend fun insertFinancialSource(source: Source): Long {
@@ -76,6 +84,10 @@ class TransactionRepositoryImpl(
 
     override suspend fun getAllFinancialSource(): Flow<List<Source>> {
         return localDataSource.getAllFinancialSource()
+    }
+
+    override fun getSource(sourceId: Long): Flow<Source?> {
+        return localDataSource.getSource(sourceId)
     }
 
     override suspend fun getAllTag(): Flow<List<Tag>> {

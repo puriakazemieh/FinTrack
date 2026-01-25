@@ -9,6 +9,7 @@ import com.kazemieh.dashboard.di.dashboardModule
 import com.kazemieh.data.di.dataModule
 import com.kazemieh.database.di.databaseModule
 import com.kazemieh.domain.di.domainModule
+import com.kazemieh.financialsource.di.deleteSourceModule
 import com.kazemieh.financialsource.di.transactionAddFinancialSourceModule
 import com.kazemieh.financialsource.di.transactionFinancialSourceModule
 import com.kazemieh.person.di.transactionAddPersonModule
@@ -42,6 +43,7 @@ class FinTrackApplication : Application() {
             transactionDeleteCategoryModule,
             transactionAddCategoryModule,
             transactionFinancialSourceModule,
+            deleteSourceModule,
             transactionAddFinancialSourceModule,
             transactionAddTagModule,
             transactionTagModule,

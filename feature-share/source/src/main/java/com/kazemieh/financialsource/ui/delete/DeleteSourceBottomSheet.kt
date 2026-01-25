@@ -1,4 +1,4 @@
-package com.kazemieh.category.ui.delete
+package com.kazemieh.financialsource.ui.delete
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -30,8 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import com.kazemieh.category.ui.list.CategoryListBottomSheet
-import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -39,16 +38,17 @@ import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.financialsource.ui.list.SourceListBottomSheet
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeleteCategoryBottomSheet(
-    viewModel: DeleteCategoryViewModel = koinViewModel(),
+fun DeleteSourceBottomSheet(
+    viewModel: DeleteSourceViewModel = koinViewModel(),
     snackbarHostState: SnackbarHostState,
-    category: Category,
+    source: Source,
     onDismiss: () -> Unit,
     deleted: () -> Unit
 ) {
@@ -61,8 +61,8 @@ fun DeleteCategoryBottomSheet(
 
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(category) {
-        viewModel.onIntent(DeleteCategoryIntent.SetData(category))
+    LaunchedEffect(source) {
+        viewModel.onIntent(DeleteSourceIntent.SetData(source))
     }
 
 
@@ -70,7 +70,7 @@ fun DeleteCategoryBottomSheet(
         viewModel.effect.collect { effect ->
             when (effect) {
 
-                is DeleteCategoryEffect.DeletedTransaction -> {
+                is DeleteSourceEffect.DeletedTransaction -> {
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
                             deleted()
@@ -78,7 +78,7 @@ fun DeleteCategoryBottomSheet(
                     }
                 }
 
-                is DeleteCategoryEffect.ShowMessage -> {
+                is DeleteSourceEffect.ShowMessage -> {
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(
                             message = context.getString(effect.message),
@@ -87,7 +87,7 @@ fun DeleteCategoryBottomSheet(
                     }
                 }
 
-                DeleteCategoryEffect.OnDismiss -> onDismiss()
+                DeleteSourceEffect.OnDismiss -> onDismiss()
             }
         }
     }
@@ -96,16 +96,16 @@ fun DeleteCategoryBottomSheet(
         onIntent = viewModel::onIntent,
         sheetState = sheetState,
         isDeleteAllData = state.isDeleteAllData,
-        category = state.moveCategory,
-        isCategoryError = state.isCategoryError
+        source = state.moveSource,
+        isSourceError = state.isSourceError
     )
 
-    if (state.isCategoryListShow) {
-        CategoryListBottomSheet(
-            transactionType = category.type,
+    if (state.isSourceListShow) {
+        SourceListBottomSheet(
             snackbarHostState = snackbarHostState,
-            onCategoryClick = { viewModel.onIntent(DeleteCategoryIntent.SetMoveCategory(it)) },
-            onDismiss = { viewModel.onIntent(DeleteCategoryIntent.ShowAllCategoryList) }
+            keyViewmodel = "DeleteSourceBottomSheet",
+            onSourceClick = { viewModel.onIntent(DeleteSourceIntent.SetMoveSource(it)) },
+            onDismiss = { viewModel.onIntent(DeleteSourceIntent.ShowAllSourceList) }
         )
     }
 
@@ -126,16 +126,16 @@ fun BottomSheetContent(
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary
     ),
-    onIntent: (intent: DeleteCategoryIntent) -> Unit,
+    onIntent: (intent: DeleteSourceIntent) -> Unit,
     isDeleteAllData: Boolean,
-    category: Category? = null,
-    isCategoryError: Boolean = false,
+    source: Source? = null,
+    isSourceError: Boolean = false,
     sheetState: SheetState,
 ) {
 
     val space = LocalSpacing.current
     ModalBottomSheet(
-        onDismissRequest = { onIntent(DeleteCategoryIntent.Dismiss) },
+        onDismissRequest = { onIntent(DeleteSourceIntent.Dismiss) },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background
     ) {
@@ -152,12 +152,12 @@ fun BottomSheetContent(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.clickable {
-                    onIntent(DeleteCategoryIntent.DeleteAllTransaction)
+                    onIntent(DeleteSourceIntent.DeleteAllTransaction)
                 }
             ) {
                 RadioButton(
                     selected = isDeleteAllData,
-                    onClick = { onIntent(DeleteCategoryIntent.DeleteAllTransaction) })
+                    onClick = { onIntent(DeleteSourceIntent.DeleteAllTransaction) })
                 FintrackBodySmallText(text = stringResource(R.string.delete_all_transaction))
             }
 
@@ -166,13 +166,13 @@ fun BottomSheetContent(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.clickable {
-                    onIntent(DeleteCategoryIntent.MoveAllTransaction)
+                    onIntent(DeleteSourceIntent.MoveAllTransaction)
                 }
             ) {
                 RadioButton(
                     selected = !isDeleteAllData,
-                    onClick = { onIntent(DeleteCategoryIntent.MoveAllTransaction) })
-                FintrackBodySmallText(text = stringResource(R.string.move_to_another_category))
+                    onClick = { onIntent(DeleteSourceIntent.MoveAllTransaction) })
+                FintrackBodySmallText(text = stringResource(R.string.move_to_another_source))
             }
 
             AnimatedVisibility(
@@ -180,16 +180,16 @@ fun BottomSheetContent(
                 modifier = Modifier.padding(horizontal = space.mediumSmall)
             ) {
                 FintrackOutlinedTextField(
-                    value = category?.name ?: "",
-                    onClick = { onIntent(DeleteCategoryIntent.ShowAllCategoryList) },
+                    value = source?.name ?: "",
+                    onClick = { onIntent(DeleteSourceIntent.ShowAllSourceList) },
                     readOnly = true,
                     enabled = false,
                     label = {
                         Row {
-                            if (category?.name != null) {
-                                FintrackBodyMediumText(text = stringResource(R.string.category))
+                            if (source?.name != null) {
+                                FintrackBodyMediumText(text = stringResource(R.string.source))
                             } else {
-                                FintrackBodyMediumText(text = stringResource(R.string.select_category))
+                                FintrackBodyMediumText(text = stringResource(R.string.select_source))
                             }
                             FintrackBodyMediumText(
                                 text = stringResource(R.string.required_star),
@@ -197,7 +197,7 @@ fun BottomSheetContent(
                             )
                         }
                     },
-                    isError = isCategoryError
+                    isError = isSourceError
                 )
             }
 
@@ -211,7 +211,7 @@ fun BottomSheetContent(
                 horizontalArrangement = Arrangement.spacedBy(space.mediumSmall)
             ) {
                 Button(
-                    onClick = { onIntent(DeleteCategoryIntent.Submit) },
+                    onClick = { onIntent(DeleteSourceIntent.Submit) },
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.medium,
                     colors = confirmButtonColors
@@ -222,7 +222,7 @@ fun BottomSheetContent(
                     )
                 }
                 Button(
-                    onClick = { onIntent(DeleteCategoryIntent.Dismiss) },
+                    onClick = { onIntent(DeleteSourceIntent.Dismiss) },
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.medium,
                     colors = dismissButtonColors

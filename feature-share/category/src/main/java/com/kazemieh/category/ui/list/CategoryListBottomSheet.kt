@@ -20,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import com.kazemieh.category.ui.add.AddCategoryBottomSheet
 import com.kazemieh.category.ui.delete.DeleteCategoryBottomSheet
-import com.kazemieh.common.ld
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.toCategory
@@ -108,10 +107,10 @@ fun CategoryTabListBottomSheet(
         isDeleteShow = true,
         isEditShow = true,
         onItemEditClicked = {
-            viewModel.onIntent(CategoryIntent.OnEditCategoryClick(it.toCategory(context)))
+            viewModel.onIntent(CategoryIntent.OnEditClick(it.toCategory(context)))
         },
         onItemDeleteClicked = {
-            viewModel.onIntent(CategoryIntent.OnDeleteCategoryClick(it.toCategory(context)))
+            viewModel.onIntent(CategoryIntent.OnDeleteClick(it.toCategory(context)))
         },
         onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
         topContent = {
@@ -137,8 +136,8 @@ fun CategoryTabListBottomSheet(
         DeleteCategoryBottomSheet(
             snackbarHostState = snackbarHostState,
             category = state.selectedCategory!!,
-            onDismiss = { viewModel.onIntent(CategoryIntent.OnDeleteCategoryClick()) },
-            deleted = { viewModel.onIntent(CategoryIntent.OnDeleteCategoryClick()) },
+            onDismiss = { viewModel.onIntent(CategoryIntent.OnDeleteClick()) },
+            deleted = { viewModel.onIntent(CategoryIntent.OnDeleteClick()) },
         )
     }
 

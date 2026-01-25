@@ -44,6 +44,7 @@ import org.koin.androidx.compose.koinViewModel
 fun AddSourceBottomSheet(
     viewModel: AddFinancialSourceViewModel = koinViewModel(),
     snackbarHostState: SnackbarHostState,
+    selectedSource: Source? = null,
     onDismiss: () -> Unit,
     setSource: (Source) -> Unit
 ) {
@@ -53,6 +54,11 @@ fun AddSourceBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(true) {
+        if (selectedSource != null)
+            viewModel.onIntent(AddSourceIntent.ShowEditData(selectedSource))
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -86,9 +92,9 @@ fun AddSourceBottomSheet(
                 SingleChoiceSegmentedButtonRow(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    SelectedTypeFinancialSource.entries.forEachIndexed { index, option ->
+                    TypeSource.entries.forEachIndexed { index, option ->
                         SegmentedButton(
-                            selected = state.selectedTypeFinancialSource == option,
+                            selected = state.typeSource == option,
                             onClick = {
                                 viewModel.onIntent(AddSourceIntent.SelectedType(option))
                             },
@@ -131,7 +137,7 @@ fun AddSourceBottomSheet(
             )
 
 
-            AnimatedVisibility(visible = state.selectedTypeFinancialSource == SelectedTypeFinancialSource.CREDIT) {
+            AnimatedVisibility(visible = state.typeSource == TypeSource.CREDIT) {
                 FintrackOutlinedTextField(
                     value = state.cardNumber ?: "",
                     onValueChange = {

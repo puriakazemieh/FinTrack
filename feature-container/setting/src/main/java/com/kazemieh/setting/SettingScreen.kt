@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import com.kazemieh.category.ui.list.CategoryTabListBottomSheet
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.list.ItemScreen
-import com.kazemieh.financialsource.ui.SourceListBottomSheet
+import com.kazemieh.financialsource.ui.list.SourceListBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -41,7 +41,8 @@ fun SettingScreen(
         ItemId.ITEM_2.id -> {
             SourceListBottomSheet(
                 snackbarHostState = snackbarHostState,
-                onSourceClick = { viewModel.onIntent(SettingIntent.SetSource(it)) },
+                isEditShow = true,
+                isDeleteShow = true,
                 onDismiss = { viewModel.onIntent(SettingIntent.OnClick()) }
             )
         }

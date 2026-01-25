@@ -1,4 +1,4 @@
-package com.kazemieh.financialsource.ui
+package com.kazemieh.financialsource.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,7 +6,7 @@ import com.kazemieh.common.model.ItemUi
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.toItemUi
 import com.kazemieh.domain.usecase.GetAllSource
-import com.kazemieh.financialsource.ui.SourceEffect.AddedSource
+import com.kazemieh.financialsource.ui.list.SourceEffect.AddedSource
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,11 +29,12 @@ class SourceViewModel(
             SourceIntent.LoadAllSource -> loadAllFinancialSource()
 
             SourceIntent.OnAddSourceClick -> _state.update {
-                it.copy(isAddShow = !_state.value.isAddShow)
+                it.copy(isAddShow = !_state.value.isAddShow, selectedSources = null)
             }
 
             is SourceIntent.SelectedSource -> {
                 viewModelScope.launch {
+
                     _effect.send(AddedSource(intent.selectedSources))
                     _state.update { SourceState() }
                 }
@@ -44,6 +45,20 @@ class SourceViewModel(
                     _effect.send(SourceEffect.OnDismiss)
                     _state.update { SourceState() }
                 }
+            }
+
+            is SourceIntent.OnDeleteClick -> _state.update {
+                it.copy(
+                    isDeleteShow = !_state.value.isDeleteShow,
+                    selectedSources = intent.source
+                )
+            }
+
+            is SourceIntent.OnEditClick -> _state.update {
+                it.copy(
+                    isAddShow = true,
+                    selectedSources = intent.source
+                )
             }
         }
     }
@@ -66,7 +81,9 @@ class SourceViewModel(
 
 data class SourceState(
     val sources: List<Source> = emptyList(),
+    val selectedSources: Source? = null,
     val items: Set<ItemUi> = emptySet(),
+    val isDeleteShow: Boolean = false,
     val isAddShow: Boolean = false
 )
 
@@ -76,6 +93,8 @@ sealed interface SourceIntent {
     data object OnAddSourceClick : SourceIntent
     data object OnDismiss : SourceIntent
     data class SelectedSource(val selectedSources: Source) : SourceIntent
+    data class OnEditClick(val source: Source) : SourceIntent
+    data class OnDeleteClick(val source: Source? = null) : SourceIntent
 }
 
 sealed interface SourceEffect {

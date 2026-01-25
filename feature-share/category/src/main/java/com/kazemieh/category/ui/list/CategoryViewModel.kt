@@ -46,14 +46,14 @@ class CategoryViewModel(
                 )
             }
 
-            is CategoryIntent.OnDeleteCategoryClick -> _state.update {
+            is CategoryIntent.OnDeleteClick -> _state.update {
                 it.copy(
                     isDeleteShow = !_state.value.isDeleteShow,
                     selectedCategory = intent.category
                 )
             }
 
-            is CategoryIntent.OnEditCategoryClick -> _state.update {
+            is CategoryIntent.OnEditClick -> _state.update {
                 it.copy(
                     isAddShow = true,
                     selectedCategory = intent.category
@@ -124,8 +124,8 @@ sealed interface CategoryIntent {
     data class SelectedCategory(val selectedCategory: Category) : CategoryIntent
 
     data object OnAddCategoryClick : CategoryIntent
-    data class OnDeleteCategoryClick(val category: Category? = null) : CategoryIntent
-    data class OnEditCategoryClick(val category: Category? = null) : CategoryIntent
+    data class OnDeleteClick(val category: Category? = null) : CategoryIntent
+    data class OnEditClick(val category: Category? = null) : CategoryIntent
     data object OnDismiss : CategoryIntent
 
 }

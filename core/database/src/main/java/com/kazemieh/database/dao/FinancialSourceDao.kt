@@ -1,6 +1,7 @@
 package com.kazemieh.database.dao
 
 import androidx.room.*
+import com.kazemieh.database.entity.CategoryEntity
 import com.kazemieh.database.entity.SourceEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -13,8 +14,8 @@ interface FinancialSourceDao {
     @Query("SELECT * FROM source")
     fun getAllFinancialSources(): Flow<List<SourceEntity>>
 
-    @Query("SELECT * FROM source WHERE id = :financialSourceId")
-    suspend fun getFinancialSourceById(financialSourceId: Long): SourceEntity
+    @Query("SELECT * FROM source WHERE id = :id")
+    fun getFinancialSourceById(id: Long): Flow<SourceEntity?>
 
     @Query("UPDATE source SET balance = balance + :amount WHERE id = :id")
     suspend fun increaseBalance(id: Long, amount: Int)
@@ -24,5 +25,11 @@ interface FinancialSourceDao {
 
     @Query("SELECT * FROM source WHERE id = 1 LIMIT 1")
     suspend fun getDefaultSource(): SourceEntity?
+
+    @Delete
+    suspend fun deleteSource(source: SourceEntity)
+
+    @Update
+    suspend fun updateSource(source: SourceEntity): Int
 }
 

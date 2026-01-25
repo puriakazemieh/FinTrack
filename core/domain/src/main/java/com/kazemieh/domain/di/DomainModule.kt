@@ -4,11 +4,14 @@ package com.kazemieh.domain.di
 import com.kazemieh.domain.usecase.AddCategory
 import com.kazemieh.domain.usecase.AddFinancialSource
 import com.kazemieh.domain.usecase.AddPerson
+import com.kazemieh.domain.usecase.AddSourceUseCases
 import com.kazemieh.domain.usecase.AddTag
 import com.kazemieh.domain.usecase.AddTransaction
 import com.kazemieh.domain.usecase.DeleteCategory
+import com.kazemieh.domain.usecase.DeleteSource
 import com.kazemieh.domain.usecase.DeleteTransaction
 import com.kazemieh.domain.usecase.EditCategory
+import com.kazemieh.domain.usecase.EditSource
 import com.kazemieh.domain.usecase.GetAllCategoryByType
 import com.kazemieh.domain.usecase.GetAllPerson
 import com.kazemieh.domain.usecase.GetAllSource
@@ -17,6 +20,7 @@ import com.kazemieh.domain.usecase.GetAllTransactionsFiltered
 import com.kazemieh.domain.usecase.GetCategorySum
 import com.kazemieh.domain.usecase.GetDefaultCategoryUseCase
 import com.kazemieh.domain.usecase.GetDefaultFinancialSourceUseCase
+import com.kazemieh.domain.usecase.GetSource
 import com.kazemieh.domain.usecase.GetTransferCategoryUseCase
 import com.kazemieh.domain.usecase.TransactionUseCases
 import com.kazemieh.domain.usecase.UpdateTransaction
@@ -41,8 +45,18 @@ val domainModule = module {
     factory { GetDefaultFinancialSourceUseCase(get()) }
     factory { AddPerson(get()) }
     factory { GetAllPerson(get()) }
+    factory { DeleteSource(get()) }
+    factory { EditSource(get()) }
+    factory { GetSource(get()) }
 
 
+    single {
+        AddSourceUseCases(
+            editSource = get(),
+            addSource = get(),
+            getSource = get()
+        )
+    }
     single {
         TransactionUseCases(
             addTransaction = get(),

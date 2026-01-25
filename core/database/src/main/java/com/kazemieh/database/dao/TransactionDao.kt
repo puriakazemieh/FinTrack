@@ -110,7 +110,7 @@ interface TransactionDao {
           )
     """
     )
-    fun getAllTransactionListFiltered(
+    suspend fun getAllTransactionListFiltered(
         type: Int? = null,
         categoryIds: List<Long?> = emptyList(),
         sourceIds: List<Long?> = emptyList(),

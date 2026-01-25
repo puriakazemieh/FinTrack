@@ -1,4 +1,4 @@
-package com.kazemieh.financialsource.ui
+package com.kazemieh.financialsource.ui.list
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,14 +34,18 @@ import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.list.normal.ListBottomSheet
 import com.kazemieh.designsystem.component.list.selectable.SelectableListBottomSheet
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
+import com.kazemieh.financialsource.ui.delete.DeleteSourceBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SourceListBottomSheet(
-    viewModel: SourceViewModel = koinViewModel(),
+    keyViewmodel: String = "SourceListBottomSheet",
     snackbarHostState: SnackbarHostState,
-    onSourceClick: (Source) -> Unit,
+    isDeleteShow: Boolean = false,
+    isEditShow: Boolean = false,
+    viewModel: SourceViewModel = koinViewModel(key = keyViewmodel),
+    onSourceClick: (Source) -> Unit = {},
     onDismiss: () -> Unit,
 ) {
 
@@ -69,6 +73,10 @@ fun SourceListBottomSheet(
         onItemClicked = { viewModel.onIntent(SourceIntent.SelectedSource(it.toSource(context))) },
         onAddClick = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
         onDismiss = { viewModel.onIntent(SourceIntent.OnDismiss) },
+        isDeleteShow = isDeleteShow,
+        isEditShow = isEditShow,
+        onItemEditClicked = { viewModel.onIntent(SourceIntent.OnEditClick(it.toSource(context))) },
+        onItemDeleteClicked = { viewModel.onIntent(SourceIntent.OnDeleteClick(it.toSource(context))) },
         itemContent = { item ->
             FintrackBodySmallText(
                 text = stringResource(
@@ -83,8 +91,18 @@ fun SourceListBottomSheet(
     if (state.isAddShow) {
         AddSourceBottomSheet(
             snackbarHostState = snackbarHostState,
+            selectedSource = state.selectedSources,
             onDismiss = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
             setSource = { viewModel.onIntent(SourceIntent.SelectedSource(it)) }
+        )
+    }
+
+    if (state.isDeleteShow && state.selectedSources != null) {
+        DeleteSourceBottomSheet(
+            snackbarHostState = snackbarHostState,
+            source = state.selectedSources!!,
+            onDismiss = { viewModel.onIntent(SourceIntent.OnDeleteClick()) },
+            deleted = { viewModel.onIntent(SourceIntent.OnDeleteClick()) }
         )
     }
 

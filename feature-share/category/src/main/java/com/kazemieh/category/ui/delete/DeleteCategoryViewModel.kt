@@ -86,11 +86,6 @@ sealed interface DeleteCategoryIntent {
     data class SetMoveCategory(val category: Category? = null) : DeleteCategoryIntent
 }
 
-enum class CategoryDeleteState {
-    DeleteAllTransaction, MoveAllTransaction
-}
-
-
 data class DeleteCategoryState(
     val category: Category? = null,
     val moveCategory: Category? = null,
