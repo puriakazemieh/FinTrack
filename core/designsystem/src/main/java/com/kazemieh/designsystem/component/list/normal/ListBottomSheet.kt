@@ -35,6 +35,7 @@ fun ListBottomSheet(
     isDeleteShow: Boolean = false,
     isEditShow: Boolean = false,
     isShowTopContent: Boolean = false,
+    clickable: Boolean = true,
     topContent: @Composable () -> Unit = { },
     itemContent: @Composable (ItemUi) -> Unit = {}
 ) {
@@ -64,6 +65,7 @@ fun ListBottomSheet(
                                 item = item,
                                 isDeleteShow = isDeleteShow,
                                 isEditShow = isEditShow,
+                                clickable = clickable,
                                 onItemClicked = onItemClicked,
                                 onItemEditClicked = onItemEditClicked,
                                 onItemDeleteClicked = onItemDeleteClicked,

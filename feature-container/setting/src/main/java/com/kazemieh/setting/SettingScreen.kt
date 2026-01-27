@@ -12,6 +12,7 @@ import com.kazemieh.category.ui.list.CategoryTabListBottomSheet
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.list.ItemScreen
 import com.kazemieh.financialsource.ui.list.SourceListBottomSheet
+import com.kazemieh.tag.ui.list.TagListBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -43,17 +44,19 @@ fun SettingScreen(
                 snackbarHostState = snackbarHostState,
                 isEditShow = true,
                 isDeleteShow = true,
+                clickable = false,
                 onDismiss = { viewModel.onIntent(SettingIntent.OnClick()) }
             )
         }
 
         ItemId.ITEM_3.id -> {
-            /*TagListBottomSheet(
+            TagListBottomSheet(
                 snackbarHostState = snackbarHostState,
-                selectedTags = state.tags,
-                onSubmitClick = { viewModel.onIntent(SettingIntent.SetTags(it)) },
+                isEditShow = true,
+                isDeleteShow = true,
+                clickable = false,
                 onDismiss = { viewModel.onIntent(SettingIntent.OnClick()) }
-            )*/
+            )
         }
 
         ItemId.ITEM_4.id -> {

@@ -35,6 +35,7 @@ import org.koin.androidx.compose.koinViewModel
 fun AddTagBottomSheet(
     viewModel: AddTagViewModel = koinViewModel(),
     snackbarHostState: SnackbarHostState,
+    selectedTag: Tag? = null,
     onDismiss: () -> Unit,
     setTag: (Tag) -> Unit
 ) {
@@ -43,6 +44,11 @@ fun AddTagBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(selectedTag) {
+        if (selectedTag != null)
+            viewModel.onIntent(AddTagIntent.ShowEditData(selectedTag))
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->

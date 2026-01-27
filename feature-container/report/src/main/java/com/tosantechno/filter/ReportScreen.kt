@@ -19,7 +19,7 @@ import com.kazemieh.common.ld
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.financialsource.ui.list.SourceListSelectionBottomSheet
 import com.kazemieh.person.ui.PersonListSelectionBottomSheet
-import com.kazemieh.tag.ui.TagListSelectionBottomSheet
+import com.kazemieh.tag.ui.list.TagListSelectionBottomSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.report.TransactionListByFilterScreen

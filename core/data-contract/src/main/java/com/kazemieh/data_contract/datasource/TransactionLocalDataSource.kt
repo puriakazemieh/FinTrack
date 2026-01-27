@@ -34,7 +34,9 @@ interface TransactionLocalDataSource {
     suspend fun insertCategory(category: Category): Long
     suspend fun updateCategory(category: Category): Int
     suspend fun updateSource(source: Source): Int
+    suspend fun updateTag(tag: Tag): Int
     suspend fun deleteCategory(category: Category, moveCategory: Category?)
+    suspend fun deleteTag(deleteTag: Tag, moveTag: Tag?)
     suspend fun deleteSource(deleteSource: Source, moveSource: Source?)
     suspend fun insertFinancialSource(source: Source): Long
     suspend fun insertTag(tag: Tag): Long

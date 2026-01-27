@@ -154,6 +154,11 @@ class TransactionLocalDataSourceImpl(
 
     }
 
+    override suspend fun updateTag(tag: Tag): Int {
+        return tagDao.updateTag(tag.toTagEntity())
+
+    }
+
     override suspend fun deleteCategory(category: Category, moveCategory: Category?) {
         if (moveCategory != null) {
             val allTransaction = transactionDao.getAllTransactionListFiltered(
@@ -171,6 +176,24 @@ class TransactionLocalDataSourceImpl(
         }
 
         categoryDao.deleteCategory(category.toCategoryEntity())
+    }
+
+    override suspend fun deleteTag(deleteTag: Tag, moveTag: Tag?) {
+        if (moveTag != null) {
+            val allTransaction = transactionDao.getAllTransactionListFiltered(
+                tagIds = listOf(deleteTag.id)
+            )
+
+            allTransaction.forEach { transaction ->
+                transactionDao.updateTransaction(
+                    transaction.transaction.copy(
+                        categoryId = moveTag.id ?: 0
+                    )
+                )
+            }
+        }
+
+        tagDao.deleteTag(deleteTag.toTagEntity())
     }
 
     override suspend fun deleteSource(deleteSource: Source, moveSource: Source?) {

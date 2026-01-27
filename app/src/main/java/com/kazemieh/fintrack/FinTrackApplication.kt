@@ -16,6 +16,7 @@ import com.kazemieh.person.di.transactionAddPersonModule
 import com.kazemieh.person.di.transactionPersonModule
 import com.kazemieh.setting.di.settingModule
 import com.kazemieh.tag.di.transactionAddTagModule
+import com.kazemieh.tag.di.transactionDeleteTagModule
 import com.kazemieh.tag.di.transactionTagModule
 import com.kazemieh.transaction.di.addTransactionPresentationModule
 import com.kazemieh.transaction.di.transactionDeleteViewModelModule
@@ -46,6 +47,7 @@ class FinTrackApplication : Application() {
             deleteSourceModule,
             transactionAddFinancialSourceModule,
             transactionAddTagModule,
+            transactionDeleteTagModule,
             transactionTagModule,
             settingModule,
             reportViewModel,

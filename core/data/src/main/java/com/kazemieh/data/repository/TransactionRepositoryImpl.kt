@@ -66,12 +66,20 @@ class TransactionRepositoryImpl(
         return localDataSource.updateCategory(category)
     }
 
+    override suspend fun updateTag(tag: Tag): Int {
+        return localDataSource.updateTag(tag)
+    }
+
     override suspend fun updateSource(source: Source): Int {
         return localDataSource.updateSource(source)
     }
 
     override suspend fun deleteCategory(category: Category, moveCategory: Category?) {
         return localDataSource.deleteCategory(category, moveCategory)
+    }
+
+    override suspend fun deleteTag(deleteTag: Tag, moveTag: Tag?) {
+        return localDataSource.deleteTag(deleteTag, moveTag)
     }
 
     override suspend fun deleteSource(deleteSource: Source, moveSource: Source?) {

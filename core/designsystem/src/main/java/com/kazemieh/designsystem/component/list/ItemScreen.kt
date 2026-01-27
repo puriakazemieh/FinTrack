@@ -30,6 +30,7 @@ fun ItemScreen(
     onItemClicked: (ItemUi) -> Unit,
     isDeleteShow: Boolean = false,
     isEditShow: Boolean = false,
+    clickable: Boolean = true,
     onItemEditClicked: (ItemUi) -> Unit = {},
     onItemDeleteClicked: (ItemUi) -> Unit = {},
     content: @Composable (ItemUi) -> Unit = {}
@@ -40,7 +41,10 @@ fun ItemScreen(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = space.small)
-            .clickable { onItemClicked(item) },
+            .clickable {
+                if (clickable)
+                    onItemClicked(item)
+            },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = space.one)

@@ -44,6 +44,7 @@ fun SourceListBottomSheet(
     snackbarHostState: SnackbarHostState,
     isDeleteShow: Boolean = false,
     isEditShow: Boolean = false,
+    clickable: Boolean = true,
     viewModel: SourceViewModel = koinViewModel(key = keyViewmodel),
     onSourceClick: (Source) -> Unit = {},
     onDismiss: () -> Unit,
@@ -75,6 +76,7 @@ fun SourceListBottomSheet(
         onDismiss = { viewModel.onIntent(SourceIntent.OnDismiss) },
         isDeleteShow = isDeleteShow,
         isEditShow = isEditShow,
+        clickable = clickable,
         onItemEditClicked = { viewModel.onIntent(SourceIntent.OnEditClick(it.toSource(context))) },
         onItemDeleteClicked = { viewModel.onIntent(SourceIntent.OnDeleteClick(it.toSource(context))) },
         itemContent = { item ->
