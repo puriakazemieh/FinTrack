@@ -70,6 +70,10 @@ class TransactionRepositoryImpl(
         return localDataSource.updateTag(tag)
     }
 
+    override suspend fun updatePerson(person: Person): Int {
+        return localDataSource.updatePerson(person)
+    }
+
     override suspend fun updateSource(source: Source): Int {
         return localDataSource.updateSource(source)
     }
@@ -80,6 +84,10 @@ class TransactionRepositoryImpl(
 
     override suspend fun deleteTag(deleteTag: Tag, moveTag: Tag?) {
         return localDataSource.deleteTag(deleteTag, moveTag)
+    }
+
+    override suspend fun deletePerson(deletePerson: Person, movePerson: Person?) {
+        return localDataSource.deletePerson(deletePerson, movePerson)
     }
 
     override suspend fun deleteSource(deleteSource: Source, moveSource: Source?) {

@@ -35,6 +35,7 @@ import org.koin.androidx.compose.koinViewModel
 fun AddPersonBottomSheet(
     viewModel: AddPersonViewModel = koinViewModel(),
     snackbarHostState: SnackbarHostState,
+    selectedPerson: Person? = null,
     onDismiss: () -> Unit,
     setPerson: (Person) -> Unit
 ) {
@@ -44,6 +45,10 @@ fun AddPersonBottomSheet(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
+    LaunchedEffect(selectedPerson) {
+        if (selectedPerson != null)
+            viewModel.onIntent(AddPersonIntent.ShowEditData(selectedPerson))
+    }
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {

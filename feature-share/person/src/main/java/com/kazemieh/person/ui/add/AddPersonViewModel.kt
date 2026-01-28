@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Person
 import com.kazemieh.designsystem.R
 import com.kazemieh.domain.usecase.AddPerson
+import com.kazemieh.domain.usecase.EditPerson
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +14,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AddPersonViewModel(
-    private val addPersonUseCase: AddPerson
+    private val addPersonUseCase: AddPerson,
+    private val editPerson: EditPerson
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddPersonState())
@@ -35,6 +37,14 @@ class AddPersonViewModel(
 
             is AddPersonIntent.SetPersonName -> _state.update { it.copy(personName = intent.personName) }
             is AddPersonIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
+
+            is AddPersonIntent.ShowEditData -> _state.update {
+                it.copy(
+                    description = intent.person.description,
+                    personName = intent.person.name,
+                    person = intent.person
+                )
+            }
         }
     }
 
@@ -42,10 +52,15 @@ class AddPersonViewModel(
         viewModelScope.launch {
             if (personName?.isNotBlank() == true) {
                 val person = Person(
+                    id = _state.value.person?.id,
                     name = personName,
                     description = description
                 )
-                val personId = addPersonUseCase(person)
+                val personId = if (_state.value.person != null) {
+                    editPerson(person).toLong()
+                } else {
+                    addPersonUseCase(person)
+                }
                 if (personId >= 0) {
                     _effect.send(AddPersonEffect.AddedPerson(person.copy(id = personId)))
                     _state.update { AddPersonState() }
@@ -62,6 +77,7 @@ class AddPersonViewModel(
 data class AddPersonState(
     val personName: String? = null,
     val description: String? = null,
+    val person: Person? = null
 )
 
 sealed interface AddPersonIntent {
@@ -69,6 +85,7 @@ sealed interface AddPersonIntent {
     data class SetPersonName(val personName: String? = null) : AddPersonIntent
     data class SetDescription(val description: String? = null) : AddPersonIntent
     data object OnDismiss : AddPersonIntent
+    data class ShowEditData(val person: Person) : AddPersonIntent
 }
 
 sealed interface AddPersonEffect {

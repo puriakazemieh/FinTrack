@@ -159,6 +159,11 @@ class TransactionLocalDataSourceImpl(
 
     }
 
+    override suspend fun updatePerson(person: Person): Int {
+        return personDao.updatePerson(person.toPersonEntity())
+
+    }
+
     override suspend fun deleteCategory(category: Category, moveCategory: Category?) {
         if (moveCategory != null) {
             val allTransaction = transactionDao.getAllTransactionListFiltered(
@@ -179,21 +184,41 @@ class TransactionLocalDataSourceImpl(
     }
 
     override suspend fun deleteTag(deleteTag: Tag, moveTag: Tag?) {
-        if (moveTag != null) {
+        if (moveTag != null && moveTag.id != null) {
             val allTransaction = transactionDao.getAllTransactionListFiltered(
                 tagIds = listOf(deleteTag.id)
             )
 
             allTransaction.forEach { transaction ->
-                transactionDao.updateTransaction(
-                    transaction.transaction.copy(
-                        categoryId = moveTag.id ?: 0
+                transactionDao.updateTransactionTagCrossRef(
+                    TransactionTagCrossRef(
+                        transactionId = transaction.transaction.id,
+                        tagId = moveTag.id!!
                     )
                 )
             }
         }
 
         tagDao.deleteTag(deleteTag.toTagEntity())
+    }
+
+    override suspend fun deletePerson(deletePerson: Person, movePerson: Person?) {
+        if (movePerson != null && movePerson.id != null) {
+            val allTransaction = transactionDao.getAllTransactionListFiltered(
+                personIds = listOf(deletePerson.id)
+            )
+
+            allTransaction.forEach { transaction ->
+                transactionDao.updateTransactionPersonCrossRef(
+                    TransactionPersonCrossRef(
+                        transactionId = transaction.transaction.id,
+                        personId = movePerson.id!!
+                    )
+                )
+            }
+        }
+
+        personDao.deletePerson(deletePerson.toPersonEntity())
     }
 
     override suspend fun deleteSource(deleteSource: Source, moveSource: Source?) {

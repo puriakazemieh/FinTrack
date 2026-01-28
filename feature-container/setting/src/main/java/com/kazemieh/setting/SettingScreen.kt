@@ -12,6 +12,7 @@ import com.kazemieh.category.ui.list.CategoryTabListBottomSheet
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.list.ItemScreen
 import com.kazemieh.financialsource.ui.list.SourceListBottomSheet
+import com.kazemieh.person.ui.list.PersonListBottomSheet
 import com.kazemieh.tag.ui.list.TagListBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
@@ -60,12 +61,13 @@ fun SettingScreen(
         }
 
         ItemId.ITEM_4.id -> {
-            /* PersonListBottomSheet(
-                 snackbarHostState = snackbarHostState,
-                 selectedPersons = state.persons,
-                 onSubmitClick = { viewModel.onIntent(SettingIntent.SetPerson(it)) },
-                 onDismiss = { viewModel.onIntent(SettingIntent.OnClick()) }
-             )*/
+            PersonListBottomSheet(
+                snackbarHostState = snackbarHostState,
+                isEditShow = true,
+                isDeleteShow = true,
+                clickable = false,
+                onDismiss = { viewModel.onIntent(SettingIntent.OnClick()) }
+            )
         }
     }
 

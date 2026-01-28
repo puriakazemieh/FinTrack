@@ -1,8 +1,10 @@
 package com.kazemieh.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.kazemieh.database.entity.PersonEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -20,5 +22,11 @@ interface PersonDao {
 
     @Query("SELECT * FROM person WHERE id = :personId")
     suspend fun getPersonById(personId: Long): PersonEntity
+
+    @Delete
+    suspend fun deletePerson(person: PersonEntity)
+
+    @Update
+    suspend fun updatePerson(person: PersonEntity): Int
 }
 

@@ -8,10 +8,12 @@ import com.kazemieh.domain.usecase.AddSourceUseCases
 import com.kazemieh.domain.usecase.AddTag
 import com.kazemieh.domain.usecase.AddTransaction
 import com.kazemieh.domain.usecase.DeleteCategory
+import com.kazemieh.domain.usecase.DeletePerson
 import com.kazemieh.domain.usecase.DeleteSource
 import com.kazemieh.domain.usecase.DeleteTag
 import com.kazemieh.domain.usecase.DeleteTransaction
 import com.kazemieh.domain.usecase.EditCategory
+import com.kazemieh.domain.usecase.EditPerson
 import com.kazemieh.domain.usecase.EditSource
 import com.kazemieh.domain.usecase.EditTag
 import com.kazemieh.domain.usecase.GetAllCategoryByType
@@ -41,6 +43,7 @@ val domainModule = module {
     factory { EditCategory(get()) }
     factory { EditTag(get()) }
     factory { DeleteCategory(get()) }
+    factory { DeletePerson(get()) }
     factory { DeleteTag(get()) }
     factory { AddFinancialSource(get()) }
     factory { AddTag(get()) }
@@ -52,6 +55,7 @@ val domainModule = module {
     factory { DeleteSource(get()) }
     factory { EditSource(get()) }
     factory { GetSource(get()) }
+    factory { EditPerson(get()) }
 
 
     single {

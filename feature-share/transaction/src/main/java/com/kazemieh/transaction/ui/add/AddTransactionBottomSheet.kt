@@ -47,7 +47,7 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.financialsource.ui.list.SourceListBottomSheet
-import com.kazemieh.person.ui.PersonListBottomSheet
+import com.kazemieh.person.ui.list.PersonListBottomSheet
 import com.kazemieh.tag.ui.list.TagListBottomSheet
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

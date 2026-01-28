@@ -8,6 +8,7 @@
     <string name="check_name_category_source">لطفاً نام دسته‌بندی را وارد کنید</string>
     <string name="category_choose">لطفاً دسته‌بندی را انتخاب کنید</string>
     <string name="tag_choose">لطفاً تگ را انتخاب کنید</string>
+    <string name="person_choose">لطفاً شخض را انتخاب کنید</string>
     <string name="source_choose">لطفاً منبع را انتخاب کنید</string>
     <string name="add_category">افزودن دسته‌بندی</string>
     <string name="select_All">انتخاب همه</string>
