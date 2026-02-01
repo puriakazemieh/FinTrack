@@ -1,32 +1,20 @@
 package com.kazemieh.person.ui.add
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.kazemieh.common.model.Person
-import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackOutlinedTextField
+import com.kazemieh.designsystem.component.bottomsheet.FormBottomSheetScaffold
+import com.kazemieh.designsystem.component.form.NameDescriptionFields
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -39,16 +27,17 @@ fun AddPersonBottomSheet(
     onDismiss: () -> Unit,
     setPerson: (Person) -> Unit
 ) {
-    val state by viewModel.state.collectAsState()
-    val space = LocalSpacing.current
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(selectedPerson) {
-        if (selectedPerson != null)
+        if (selectedPerson != null) {
             viewModel.onIntent(AddPersonIntent.ShowEditData(selectedPerson))
+        }
     }
+
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
@@ -60,53 +49,25 @@ fun AddPersonBottomSheet(
                         )
                     }
                 }
-
                 is AddPersonEffect.AddedPerson -> setPerson(effect.person)
                 AddPersonEffect.OnDismiss -> onDismiss()
             }
         }
     }
 
-    ModalBottomSheet(
+    FormBottomSheetScaffold(
+        sheetState = sheetState,
         onDismissRequest = { viewModel.onIntent(AddPersonIntent.OnDismiss) },
-        sheetState = sheetState
+        primaryButtonText = stringResource(R.string.save_person),
+        onPrimaryClick = { viewModel.onIntent(AddPersonIntent.AddPerson) }
     ) {
-
-        Column(verticalArrangement = Arrangement.spacedBy(space.mediumLarge)) {
-
-            FintrackOutlinedTextField(
-                value = state.personName ?: "",
-                onValueChange = { viewModel.onIntent(AddPersonIntent.SetPersonName(it)) },
-                label = {
-                    Row {
-                        FintrackBodyMediumText(text = stringResource(R.string.person_name_label))
-                        FintrackBodyMediumText(
-                            text = stringResource(R.string.required_star),
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                }
-            )
-
-            FintrackOutlinedTextField(
-                value = state.description ?: "",
-                onValueChange = { viewModel.onIntent(AddPersonIntent.SetDescription(it)) },
-                label = { FintrackBodyMediumText(text = stringResource(R.string.description_label)) }
-            )
-
-            Spacer(Modifier.height(space.large))
-
-            Button(
-                onClick = { viewModel.onIntent(AddPersonIntent.AddPerson) },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                FintrackBodyMediumText(text = stringResource(R.string.save_person))
-            }
-        }
+        NameDescriptionFields(
+            name = state.personName.orEmpty(),
+            onNameChange = { viewModel.onIntent(AddPersonIntent.SetPersonName(it)) },
+            nameLabel = stringResource(R.string.person_name_label),
+            description = state.description.orEmpty(),
+            onDescriptionChange = { viewModel.onIntent(AddPersonIntent.SetDescription(it)) },
+            descriptionLabel = stringResource(R.string.description_label),
+        )
     }
 }
-

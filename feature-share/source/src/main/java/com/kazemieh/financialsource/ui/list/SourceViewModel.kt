@@ -2,9 +2,9 @@ package com.kazemieh.financialsource.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.common.model.ItemUi
+import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.common.model.Source
-import com.kazemieh.common.model.toItemUi
+import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.domain.usecase.GetAllSource
 import com.kazemieh.financialsource.ui.list.SourceEffect.AddedSource
 import kotlinx.coroutines.channels.Channel

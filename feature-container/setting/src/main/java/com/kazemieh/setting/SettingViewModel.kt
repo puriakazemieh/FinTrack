@@ -1,12 +1,8 @@
 package com.kazemieh.setting
 
 import androidx.lifecycle.ViewModel
-import com.kazemieh.common.UiText
-import com.kazemieh.common.model.Category
-import com.kazemieh.common.model.ItemUi
-import com.kazemieh.common.model.Person
-import com.kazemieh.common.model.Source
-import com.kazemieh.common.model.Tag
+import com.kazemieh.designsystem.component.model.UiText
+import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

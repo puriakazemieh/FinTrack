@@ -1,6 +1,6 @@
 package com.kazemieh.financialsource.di
 
-import com.kazemieh.financialsource.ui.add.AddFinancialSourceViewModel
+import com.kazemieh.financialsource.ui.add.AddSourceViewModel
 import com.kazemieh.financialsource.ui.delete.DeleteSourceViewModel
 import com.kazemieh.financialsource.ui.list.SourceViewModel
 import org.koin.core.module.dsl.viewModel
@@ -23,7 +23,7 @@ val deleteSourceModule = module {
 }
 val transactionAddFinancialSourceModule = module {
     viewModel {
-        AddFinancialSourceViewModel(
+        AddSourceViewModel(
             sourceUseCases = get()
         )
     }

@@ -1,4 +1,4 @@
-package com.kazemieh.designsystem.component.list.normal
+package com.kazemieh.designsystem.component.bottomsheet
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,14 +12,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.kazemieh.common.model.ItemUi
+import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
-import com.kazemieh.designsystem.component.list.ItemScreen
+import com.kazemieh.designsystem.component.ItemScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,9 +59,10 @@ fun ListBottomSheet(
                     )
                 } else topContent()
 
+                val list = remember(items) { items.toList().sortedBy { it.id } }
                 LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
-                    if (items.isNotEmpty())
-                        items(items.toList()) { item ->
+                    if (list.isNotEmpty()) {
+                        items(list, key = { it.id }) { item ->
                             ItemScreen(
                                 item = item,
                                 isDeleteShow = isDeleteShow,
@@ -71,11 +73,10 @@ fun ListBottomSheet(
                                 onItemDeleteClicked = onItemDeleteClicked,
                                 content = itemContent
                             )
-                        } else item { EmptyListScreen(title) }
+                        }
+                    } else item { EmptyListScreen(title) }
 
-                    item {
-                        Spacer(Modifier.height(space.huge))
-                    }
+                    item { Spacer(Modifier.height(space.huge)) }
                 }
 
             }

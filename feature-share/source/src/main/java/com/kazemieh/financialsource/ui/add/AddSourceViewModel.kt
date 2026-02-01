@@ -12,14 +12,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class AddFinancialSourceViewModel(
+class AddSourceViewModel(
     private val sourceUseCases: AddSourceUseCases
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddSourceState())
     val state = _state.asStateFlow()
 
-    private val _effect = Channel<AddFinancialSourceEffect>()
+    private val _effect = Channel<AddSourceEffect>()
     val effect = _effect.receiveAsFlow()
 
     fun onIntent(intent: AddSourceIntent) {
@@ -33,7 +33,7 @@ class AddFinancialSourceViewModel(
             AddSourceIntent.OnDismiss -> {
                 viewModelScope.launch {
                     _state.update { AddSourceState() }
-                    _effect.send(AddFinancialSourceEffect.OnDismiss)
+                    _effect.send(AddSourceEffect.OnDismiss)
                 }
             }
 
@@ -80,13 +80,13 @@ class AddFinancialSourceViewModel(
                 }
                 if (sourceId >= 0) {
                     _effect.send(
-                        AddFinancialSourceEffect.AddedFinancialSource(source.copy(id = sourceId))
+                        AddSourceEffect.AddedSource(source.copy(id = sourceId))
                     )
                     _state.update { AddSourceState() }
                 }
 
             } else {
-                _effect.send(AddFinancialSourceEffect.ShowMessage(R.string.check_name_financial_source))
+                _effect.send(AddSourceEffect.ShowMessage(R.string.check_name_financial_source))
             }
         }
     }
@@ -120,8 +120,8 @@ enum class TypeSource(val count: Int, val value: Int) {
 }
 
 
-sealed interface AddFinancialSourceEffect {
-    data class ShowMessage(val message: Int) : AddFinancialSourceEffect
-    data class AddedFinancialSource(val source: Source) : AddFinancialSourceEffect
-    data object OnDismiss : AddFinancialSourceEffect
+sealed interface AddSourceEffect {
+    data class ShowMessage(val message: Int) : AddSourceEffect
+    data class AddedSource(val source: Source) : AddSourceEffect
+    data object OnDismiss : AddSourceEffect
 }

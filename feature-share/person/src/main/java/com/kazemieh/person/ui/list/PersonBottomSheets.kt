@@ -10,44 +10,37 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.kazemieh.common.model.Person
-import com.kazemieh.common.model.toItemUi
-import com.kazemieh.common.model.toPerson
+import com.kazemieh.designsystem.component.model.toItemUi
+import com.kazemieh.designsystem.component.model.toPerson
 import com.kazemieh.designsystem.R
-import com.kazemieh.designsystem.component.list.normal.ListBottomSheet
-import com.kazemieh.designsystem.component.list.selectable.SelectableFlowRowBottomSheet
-import com.kazemieh.designsystem.component.list.selectable.SelectableListBottomSheet
+import com.kazemieh.designsystem.component.bottomsheet.ListBottomSheet
+import com.kazemieh.designsystem.component.bottomsheet.SelectableFlowRowBottomSheet
+import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
 import com.kazemieh.person.ui.add.AddPersonBottomSheet
 import com.kazemieh.person.ui.delete.DeletePersonBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun PersonListBottomSheet(
-    viewModel: PersonViewModel = koinViewModel(),
+fun PersonPickerBottomSheet(
+    viewModel: PersonViewModel = koinViewModel(key = "PersonPickerBottomSheet"),
     snackbarHostState: SnackbarHostState,
     selectedPersons: Set<Person>?,
     onSubmitClick: (Set<Person>?) -> Unit,
     onDismiss: () -> Unit
 ) {
-
-    LaunchedEffect(true) {
-        viewModel.onIntent(PersonIntent.GetAllPerson)
-    }
-
-    LaunchedEffect(selectedPersons) {
-        viewModel.onIntent(PersonIntent.SetAllSelectedPersons(selectedPersons))
-    }
+    LaunchedEffect(Unit) { viewModel.onIntent(PersonIntent.GetAllPerson) }
+    LaunchedEffect(selectedPersons) { viewModel.onIntent(PersonIntent.SetAllSelectedPersons(selectedPersons)) }
 
     val state by viewModel.state.collectAsState()
 
-    val context = LocalContext.current
 
     SelectableFlowRowBottomSheet(
         title = stringResource(R.string.persons),
         items = state.items,
         initialSelection = state.initialSelectionIds.map { it.toItemUi() }.toSet(),
         onConfirm = { selectedItems ->
-            onSubmitClick(selectedItems.map { it.toPerson(context) }.toSet())
+            onSubmitClick(selectedItems.map { it.toPerson() }.toSet())
         },
         onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
         onDismiss = onDismiss,
@@ -62,10 +55,10 @@ fun PersonListBottomSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PersonListBottomSheet(
-    keyViewmodel: String = "PersonListBottomSheet",
+fun PersonManageBottomSheet(
+    keyViewmodel: String = "PersonManageBottomSheet",
     viewModel: PersonViewModel = koinViewModel(key = keyViewmodel),
     snackbarHostState: SnackbarHostState,
     isDeleteShow: Boolean = true,
@@ -74,14 +67,9 @@ fun PersonListBottomSheet(
     onPersonClick: (Person) -> Unit = {},
     onDismiss: () -> Unit
 ) {
-
-    LaunchedEffect(true) {
-        viewModel.onIntent(PersonIntent.GetAllPerson)
-    }
+    LaunchedEffect(Unit) { viewModel.onIntent(PersonIntent.GetAllPerson) }
 
     val state by viewModel.state.collectAsState()
-
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -92,18 +80,17 @@ fun PersonListBottomSheet(
         }
     }
 
-
     ListBottomSheet(
         title = stringResource(R.string.persons),
         items = state.items,
-        onItemClicked = { viewModel.onIntent(PersonIntent.SelectedPerson(it.toPerson(context))) },
+        onItemClicked = { viewModel.onIntent(PersonIntent.SelectedPerson(it.toPerson())) },
         onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
         onDismiss = { viewModel.onIntent(PersonIntent.OnDismiss) },
         isDeleteShow = isDeleteShow,
         isEditShow = isEditShow,
         clickable = clickable,
-        onItemEditClicked = { viewModel.onIntent(PersonIntent.OnEditClick(it.toPerson(context))) },
-        onItemDeleteClicked = { viewModel.onIntent(PersonIntent.OnDeleteClick(it.toPerson(context))) },
+        onItemEditClicked = { viewModel.onIntent(PersonIntent.OnEditClick(it.toPerson())) },
+        onItemDeleteClicked = { viewModel.onIntent(PersonIntent.OnDeleteClick(it.toPerson())) },
     )
 
     if (state.showAddPerson) {
@@ -126,19 +113,16 @@ fun PersonListBottomSheet(
 }
 
 @Composable
-fun PersonListSelectionBottomSheet(
-    viewModel: PersonViewModel = koinViewModel(),
+fun PersonSelectionBottomSheet(
+    viewModel: PersonViewModel = koinViewModel(key = "PersonSelectionBottomSheet"),
     initialSelectionPairs: Set<Person> = emptySet(),
     onConfirmPairs: (Set<Person>, isAllSelected: Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
-    val context = LocalContext.current
 
-    LaunchedEffect(true) {
-        viewModel.onIntent(PersonIntent.GetAllPerson)
-    }
+    LaunchedEffect(Unit) { viewModel.onIntent(PersonIntent.GetAllPerson) }
 
     val initialSelectionIds = initialSelectionPairs.map { it.toItemUi() }.toSet()
 
@@ -147,7 +131,7 @@ fun PersonListSelectionBottomSheet(
         items = state.items,
         initialSelection = initialSelectionIds,
         onConfirm = { selectedItems, isAll ->
-            onConfirmPairs(selectedItems.map { it.toPerson(context) }.toSet(), isAll)
+            onConfirmPairs(selectedItems.map { it.toPerson() }.toSet(), isAll)
         },
         onDismiss = onDismiss
     )

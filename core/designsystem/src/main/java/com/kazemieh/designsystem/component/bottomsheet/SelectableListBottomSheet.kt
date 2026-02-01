@@ -1,6 +1,28 @@
-package com.kazemieh.designsystem.component.list.selectable
+package com.kazemieh.designsystem.component.bottomsheet
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.kazemieh.designsystem.component.model.UiText
+import com.kazemieh.designsystem.component.model.ItemUi
+import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.R
+import com.kazemieh.designsystem.component.EmptyListScreen
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackTitleLargeText
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,30 +31,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import com.kazemieh.common.UiText
-import com.kazemieh.common.model.ItemUi
-import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.R
-import com.kazemieh.designsystem.component.EmptyListScreen
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackTitleLargeText
+import com.kazemieh.designsystem.component.model.asString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,50 +46,25 @@ fun SelectableListBottomSheet(
     onConfirm: (selectedIds: Set<ItemUi>, isAllSelected: Boolean) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val viewModel = remember { SelectableListViewModel() }
-    val state by viewModel.state.collectAsState()
-
-    LaunchedEffect(items, initialSelection, showSelectAll) {
-        viewModel.onIntent(SelectableIntent.Load(items, initialSelection, showSelectAll))
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.oneShot.collect { one ->
-            when (one) {
-                is SelectableOneShot.Confirmed -> {
-                    onConfirm(one.selectedItems, one.isAllSelected)
-                }
-
-                is SelectableOneShot.Dismissed -> onDismiss()
-                else -> {}
-            }
-        }
-    }
-
-    SelectableListBottomSheetStateless(
-        title = title,
-        state = state,
-        onToggle = { viewModel.onIntent(SelectableIntent.Toggle(it)) },
-        onToggleSelectAll = { viewModel.onIntent(SelectableIntent.ToggleSelectAll) },
-        onConfirm = { viewModel.onIntent(SelectableIntent.Confirm) },
-        onDismiss = { viewModel.onIntent(SelectableIntent.Dismiss) },
-        showSelectAll = showSelectAll
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SelectableListBottomSheetStateless(
-    title: String,
-    state: SelectableState,
-    onToggle: (ItemUi) -> Unit,
-    onToggleSelectAll: () -> Unit,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
-    showSelectAll: Boolean = true,
-) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val space = LocalSpacing.current
+
+    val itemsList = remember(items) { items.toList().sortedBy { it.id } }
+
+    var selected by remember(items, initialSelection, showSelectAll) {
+        mutableStateOf(
+            if (initialSelection.isEmpty() && showSelectAll) items
+            else initialSelection.intersect(items)
+        )
+    }
+
+    LaunchedEffect(items, initialSelection, showSelectAll) {
+        selected =
+            if (initialSelection.isEmpty() && showSelectAll) items
+            else initialSelection.intersect(items)
+    }
+
+    val isAllSelected = items.isNotEmpty() && selected.size == items.size
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -105,38 +82,49 @@ fun SelectableListBottomSheetStateless(
                 )
                 Spacer(Modifier.height(space.mediumSmall))
 
-                if (showSelectAll && state.items.size > 1) {
+                if (showSelectAll && itemsList.size > 1) {
                     val text = stringResource(R.string.select_All)
-                    val item = ItemUi(id = 0, title = UiText.DynamicString(text))
+                    val allItem = ItemUi(id = 0, title = UiText.DynamicString(text))
+
                     ItemSelected(
                         modifier = Modifier.padding(
                             vertical = space.mediumSmall,
                             horizontal = space.small
                         ),
-                        isSelected = state.isAllSelected,
-                        item = item,
-                        onToggle = { onToggleSelectAll() }
+                        isSelected = isAllSelected,
+                        item = allItem,
+                        onToggle = {
+                            selected = if (isAllSelected) emptySet() else items
+                        }
                     )
                 }
 
                 HorizontalDivider()
 
-                if (!state.items.isEmpty()) {
+                if (itemsList.isNotEmpty()) {
                     LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
-                        items(state.items.toList()) { item ->
-                            val isSelected = state.selectedItems.contains(item)
+                        items(itemsList, key = { it.id }) { item ->
+                            val isSelected = selected.contains(item)
                             ItemSelected(
                                 modifier = Modifier.padding(space.mediumLarge),
                                 isSelected = isSelected,
                                 item = item,
-                                onToggle = { onToggle(item) })
+                                onToggle = {
+                                    selected = if (isSelected) selected - item else selected + item
+                                }
+                            )
                         }
                     }
-                } else EmptyListScreen(title)
+                } else {
+                    EmptyListScreen(title)
+                }
 
                 Spacer(Modifier.height(space.mediumLarge))
 
-                Button(modifier = Modifier.fillMaxWidth(), onClick = onConfirm) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { onConfirm(selected, isAllSelected) }
+                ) {
                     FintrackBodyMediumText(text = stringResource(R.string.confirm))
                 }
 
@@ -155,7 +143,7 @@ fun ItemSelected(
     onToggle: () -> Unit
 ) {
     val space = LocalSpacing.current
-    val context = LocalContext.current
+
 
     Row(
         modifier = Modifier
@@ -166,7 +154,7 @@ fun ItemSelected(
     ) {
         Checkbox(checked = isSelected, onCheckedChange = { onToggle() })
         Spacer(modifier = Modifier.width(space.mediumLarge))
-        FintrackBodyMediumText(text = item.title.asString(context))
+        FintrackBodyMediumText(text = item.title.asString())
     }
 
 }

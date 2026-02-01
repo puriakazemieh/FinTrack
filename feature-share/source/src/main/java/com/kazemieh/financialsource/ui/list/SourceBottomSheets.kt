@@ -21,26 +21,26 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.kazemieh.common.model.Source
-import com.kazemieh.common.model.toItemUi
-import com.kazemieh.common.model.toSource
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.designsystem.component.list.normal.ListBottomSheet
-import com.kazemieh.designsystem.component.list.selectable.SelectableListBottomSheet
+import com.kazemieh.designsystem.component.bottomsheet.ListBottomSheet
+import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
+import com.kazemieh.designsystem.component.model.ItemPayload
+import com.kazemieh.designsystem.component.model.toItemUi
+import com.kazemieh.designsystem.component.model.toSource
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.financialsource.ui.delete.DeleteSourceBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SourceListBottomSheet(
-    keyViewmodel: String = "SourceListBottomSheet",
+fun SourceManageBottomSheet(
+    keyViewmodel: String = "SourceManageBottomSheet",
     snackbarHostState: SnackbarHostState,
     isDeleteShow: Boolean = false,
     isEditShow: Boolean = false,
@@ -49,14 +49,11 @@ fun SourceListBottomSheet(
     onSourceClick: (Source) -> Unit = {},
     onDismiss: () -> Unit,
 ) {
-
-    LaunchedEffect(true) {
+    LaunchedEffect(Unit) {
         viewModel.onIntent(SourceIntent.LoadAllSource)
     }
 
     val state by viewModel.state.collectAsState()
-
-    val context = LocalContext.current
 
 
     LaunchedEffect(Unit) {
@@ -71,20 +68,18 @@ fun SourceListBottomSheet(
     ListBottomSheet(
         title = stringResource(R.string.source),
         items = state.items,
-        onItemClicked = { viewModel.onIntent(SourceIntent.SelectedSource(it.toSource(context))) },
+        onItemClicked = { viewModel.onIntent(SourceIntent.SelectedSource(it.toSource())) },
         onAddClick = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
         onDismiss = { viewModel.onIntent(SourceIntent.OnDismiss) },
         isDeleteShow = isDeleteShow,
         isEditShow = isEditShow,
         clickable = clickable,
-        onItemEditClicked = { viewModel.onIntent(SourceIntent.OnEditClick(it.toSource(context))) },
-        onItemDeleteClicked = { viewModel.onIntent(SourceIntent.OnDeleteClick(it.toSource(context))) },
+        onItemEditClicked = { viewModel.onIntent(SourceIntent.OnEditClick(it.toSource())) },
+        onItemDeleteClicked = { viewModel.onIntent(SourceIntent.OnDeleteClick(it.toSource())) },
         itemContent = { item ->
+            val p = item.payload as ItemPayload.SourcePayload
             FintrackBodySmallText(
-                text = stringResource(
-                    R.string.balance,
-                    item.extraData as String
-                ),
+                text = stringResource(R.string.balance, p.formattedBalance),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -107,22 +102,18 @@ fun SourceListBottomSheet(
             deleted = { viewModel.onIntent(SourceIntent.OnDeleteClick()) }
         )
     }
-
 }
 
-
 @Composable
-fun SourceListSelectionBottomSheet(
-    viewModel: SourceViewModel = koinViewModel(),
+fun SourceSelectionBottomSheet(
+    viewModel: SourceViewModel = koinViewModel(key = "SourceSelectionBottomSheet"),
     initialSelectionPairs: Set<Source> = emptySet(),
     onConfirmPairs: (Set<Source>, isAllSelected: Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
-    val context = LocalContext.current
-
-    LaunchedEffect(true) {
+    LaunchedEffect(Unit) {
         viewModel.onIntent(SourceIntent.LoadAllSource)
     }
 
@@ -133,7 +124,7 @@ fun SourceListSelectionBottomSheet(
         items = state.items,
         initialSelection = initialSelectionIds,
         onConfirm = { selectedItems, isAll ->
-            onConfirmPairs(selectedItems.map { it.toSource(context) }.toSet(), isAll)
+            onConfirmPairs(selectedItems.map { it.toSource() }.toSet(), isAll)
         },
         onDismiss = onDismiss
     )

@@ -14,7 +14,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -41,7 +41,7 @@ fun TotalTransactionCard(
         viewModel.onIntent(TransactionIntent.LoadTransactions)
     }
 
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     val incoming = stringResource(R.string.incoming)
     val outcoming = stringResource(R.string.outcoming)

@@ -4,6 +4,9 @@ plugins {
 
 android {
     namespace = "com.kazemieh.designsystem"
+    kotlinOptions {
+        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+    }
 }
 
 dependencies {

@@ -42,12 +42,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.DateFilterType
 import com.kazemieh.common.model.Category
-import com.kazemieh.common.model.ItemUi
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
-import com.kazemieh.common.model.toItemUi
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.DatePickerField
@@ -55,6 +53,9 @@ import com.kazemieh.designsystem.component.FilterButton
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.model.ItemUi
+import com.kazemieh.designsystem.component.model.asString
+import com.kazemieh.designsystem.component.model.toItemUi
 
 
 @Composable
@@ -227,10 +228,9 @@ private fun Selector(
     val sourceTextStyle =
         if (selected.isEmpty()) MaterialTheme.typography.bodyMedium
         else MaterialTheme.typography.labelSmall
+
     FintrackOutlinedTextField(
-        value = if (isAllSelected) "" else if (selected.size == 1) selected.first().title.asString(
-            context
-        )
+        value = if (isAllSelected) "" else if (selected.size == 1) selected.first().title.asString()
         else selected.joinToString(", ") { it.title.asString(context) },
         onClick = onClick,
         readOnly = true,

@@ -2,9 +2,9 @@ package com.kazemieh.person.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.common.model.ItemUi
+import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.common.model.Person
-import com.kazemieh.common.model.toItemUi
+import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.domain.usecase.GetAllPerson
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

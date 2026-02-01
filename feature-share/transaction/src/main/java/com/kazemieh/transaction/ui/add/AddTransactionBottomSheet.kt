@@ -37,7 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.kazemieh.category.ui.list.CategoryListBottomSheet
+import com.kazemieh.category.ui.list.CategoryPickerBottomSheet
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.LocalSpacing
@@ -46,9 +46,10 @@ import com.kazemieh.designsystem.component.DatePickerField
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.financialsource.ui.list.SourceListBottomSheet
-import com.kazemieh.person.ui.list.PersonListBottomSheet
-import com.kazemieh.tag.ui.list.TagListBottomSheet
+import com.kazemieh.designsystem.component.model.asString
+import com.kazemieh.financialsource.ui.list.SourceManageBottomSheet
+import com.kazemieh.person.ui.list.PersonPickerBottomSheet
+import com.kazemieh.tag.ui.list.TagPickerBottomSheet
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -89,7 +90,7 @@ fun AddTransactionBottomSheet(
                 is AddTransactionEffect.ShowMessage -> {
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(
-                            message = context.getString(effect.message),
+                            message = effect.message.asString(context),
                             duration = SnackbarDuration.Short
                         )
                     }
@@ -124,7 +125,7 @@ private fun BottomSheetContent(
             AddTransactionContent(state = state, onIntent = onIntent)
 
             if (state.isSourceShow) {
-                SourceListBottomSheet(
+                SourceManageBottomSheet(
                     snackbarHostState = snackbarHostState,
                     onSourceClick = { onIntent(AddTransactionIntent.SetSource(it)) },
                     onDismiss = { onIntent(AddTransactionIntent.OnSourceClicked) }
@@ -132,7 +133,7 @@ private fun BottomSheetContent(
             }
 
             if (state.isSourceEndShow) {
-                SourceListBottomSheet(
+                SourceManageBottomSheet(
                     snackbarHostState = snackbarHostState,
                     onSourceClick = { onIntent(AddTransactionIntent.SetSourceEnd(it)) },
                     onDismiss = { onIntent(AddTransactionIntent.OnSourceEndClicked) }
@@ -140,7 +141,7 @@ private fun BottomSheetContent(
             }
 
             if (state.isCategoryShow) {
-                CategoryListBottomSheet(
+                CategoryPickerBottomSheet(
                     transactionType = state.transactionType,
                     snackbarHostState = snackbarHostState,
                     onCategoryClick = { onIntent(AddTransactionIntent.SetCategory(it)) },
@@ -149,7 +150,7 @@ private fun BottomSheetContent(
             }
 
             if (state.isTagShow) {
-                TagListBottomSheet(
+                TagPickerBottomSheet(
                     snackbarHostState = snackbarHostState,
                     selectedTags = state.tags,
                     onSubmitClick = { onIntent(AddTransactionIntent.SetTags(it)) },
@@ -158,7 +159,7 @@ private fun BottomSheetContent(
             }
 
             if (state.isPersonShow) {
-                PersonListBottomSheet(
+                PersonPickerBottomSheet(
                     snackbarHostState = snackbarHostState,
                     selectedPersons = state.persons,
                     onSubmitClick = { onIntent(AddTransactionIntent.SetPerson(it)) },

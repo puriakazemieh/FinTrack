@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.paging.compose.LazyPagingItems
@@ -36,7 +36,7 @@ fun TransactionListByFilterScreen(
     onEdit: (TransactionWithRelations) -> Unit = {},
     viewModel: TransactionReportViewModel = koinViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(selectedCategories) {
         viewModel.onIntent(TransactionReportIntent.SelectedCategory(selectedCategories))

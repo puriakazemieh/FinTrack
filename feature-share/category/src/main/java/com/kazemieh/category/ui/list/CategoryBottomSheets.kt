@@ -1,6 +1,5 @@
 package com.kazemieh.category.ui.list
 
-
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,19 +21,19 @@ import com.kazemieh.category.ui.add.AddCategoryBottomSheet
 import com.kazemieh.category.ui.delete.DeleteCategoryBottomSheet
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
-import com.kazemieh.common.model.toCategory
-import com.kazemieh.common.model.toItemUi
+import com.kazemieh.designsystem.component.model.toCategory
+import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.list.normal.ListBottomSheet
-import com.kazemieh.designsystem.component.list.selectable.SelectableListBottomSheet
+import com.kazemieh.designsystem.component.bottomsheet.ListBottomSheet
+import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoryListBottomSheet(
-    viewModel: CategoryViewModel = koinViewModel(key = "CategoryListBottomSheet"),
+fun CategoryPickerBottomSheet(
+    viewModel: CategoryViewModel = koinViewModel(key = "CategoryPickerBottomSheet"),
     snackbarHostState: SnackbarHostState,
     transactionType: TransactionType,
     onCategoryClick: (Category) -> Unit,
@@ -46,7 +45,6 @@ fun CategoryListBottomSheet(
 
     val state by viewModel.state.collectAsState()
 
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -60,7 +58,7 @@ fun CategoryListBottomSheet(
     ListBottomSheet(
         title = stringResource(R.string.category),
         items = state.items,
-        onItemClicked = { viewModel.onIntent(CategoryIntent.SelectedCategory(it.toCategory(context))) },
+        onItemClicked = { viewModel.onIntent(CategoryIntent.SelectedCategory(it.toCategory())) },
         onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
         onDismiss = { viewModel.onIntent(CategoryIntent.OnDismiss) }
     )
@@ -73,23 +71,21 @@ fun CategoryListBottomSheet(
             setCategory = { viewModel.onIntent(CategoryIntent.SelectedCategory(it)) }
         )
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoryTabListBottomSheet(
-    viewModel: CategoryViewModel = koinViewModel(key = "CategoryTabListBottomSheet"),
+fun CategoryManageBottomSheet(
+    viewModel: CategoryViewModel = koinViewModel(key = "CategoryManageBottomSheet"),
     snackbarHostState: SnackbarHostState,
     onDismiss: () -> Unit
 ) {
-
-    LaunchedEffect(true) {
+    LaunchedEffect(Unit) {
         viewModel.onIntent(CategoryIntent.LoadCategoryByType())
     }
 
     val state by viewModel.state.collectAsState()
-    val context = LocalContext.current
+
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -106,12 +102,8 @@ fun CategoryTabListBottomSheet(
         isShowTopContent = true,
         isDeleteShow = true,
         isEditShow = true,
-        onItemEditClicked = {
-            viewModel.onIntent(CategoryIntent.OnEditClick(it.toCategory(context)))
-        },
-        onItemDeleteClicked = {
-            viewModel.onIntent(CategoryIntent.OnDeleteClick(it.toCategory(context)))
-        },
+        onItemEditClicked = { viewModel.onIntent(CategoryIntent.OnEditClick(it.toCategory())) },
+        onItemDeleteClicked = { viewModel.onIntent(CategoryIntent.OnDeleteClick(it.toCategory())) },
         onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
         topContent = {
             TopCategoryContent(state.listTransactionType, state.type) {
@@ -131,7 +123,6 @@ fun CategoryTabListBottomSheet(
         )
     }
 
-
     if (state.isDeleteShow && state.selectedCategory != null) {
         DeleteCategoryBottomSheet(
             snackbarHostState = snackbarHostState,
@@ -140,7 +131,6 @@ fun CategoryTabListBottomSheet(
             deleted = { viewModel.onIntent(CategoryIntent.OnDeleteClick()) },
         )
     }
-
 }
 
 @Composable
@@ -166,17 +156,10 @@ fun TopCategoryContent(
                     ),
                 ) {
                     val text = when (option.count) {
-                        1 -> {
-                            stringResource(R.string.incoming_category)
-                        }
-
-                        2 -> {
-                            stringResource(R.string.outcoming_category)
-                        }
-
+                        1 -> stringResource(R.string.incoming_category)
+                        2 -> stringResource(R.string.outcoming_category)
                         else -> ""
                     }
-
                     FintrackBodyMediumText(text = text)
                 }
             }
@@ -184,10 +167,9 @@ fun TopCategoryContent(
     }
 }
 
-
 @Composable
-fun CategoryListSelectionBottomSheet(
-    viewModel: CategoryViewModel = koinViewModel(),
+fun CategorySelectionBottomSheet(
+    viewModel: CategoryViewModel = koinViewModel(key = "CategorySelectionBottomSheet"),
     initialSelectionPairs: Set<Category> = emptySet(),
     onConfirmPairs: (Set<Category>, isAllSelected: Boolean) -> Unit,
     selectedTransactionType: TransactionType,
@@ -195,7 +177,6 @@ fun CategoryListSelectionBottomSheet(
 ) {
     val state by viewModel.state.collectAsState()
 
-    val context = LocalContext.current
 
     LaunchedEffect(selectedTransactionType) {
         viewModel.onIntent(CategoryIntent.LoadCategoryByType(selectedTransactionType))
@@ -208,7 +189,7 @@ fun CategoryListSelectionBottomSheet(
         items = state.items,
         initialSelection = initialSelectionIds,
         onConfirm = { selectedItems, isAll ->
-            onConfirmPairs(selectedItems.map { it.toCategory(context) }.toSet(), isAll)
+            onConfirmPairs(selectedItems.map { it.toCategory() }.toSet(), isAll)
         },
         onDismiss = onDismiss
     )

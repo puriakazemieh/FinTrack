@@ -1,33 +1,21 @@
 package com.kazemieh.category.ui.add
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
-import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackOutlinedTextField
+import com.kazemieh.designsystem.component.bottomsheet.FormBottomSheetScaffold
+import com.kazemieh.designsystem.component.form.NameDescriptionFields
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -41,18 +29,20 @@ fun AddCategoryBottomSheet(
     onDismiss: () -> Unit,
     setCategory: (Category) -> Unit
 ) {
-
-    val space = LocalSpacing.current
-    LaunchedEffect(true) {
-        viewModel.onIntent(AddCategoryIntent.SetCategoryType(transactionType))
-        if (selectedCategory != null)
-            viewModel.onIntent(AddCategoryIntent.ShowEditData(selectedCategory))
-    }
-
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(transactionType) {
+        viewModel.onIntent(AddCategoryIntent.SetCategoryType(transactionType))
+    }
+
+    LaunchedEffect(selectedCategory) {
+        if (selectedCategory != null) {
+            viewModel.onIntent(AddCategoryIntent.ShowEditData(selectedCategory))
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -67,58 +57,24 @@ fun AddCategoryBottomSheet(
                 }
 
                 is AddCategoryEffect.AddedCategory -> setCategory(effect.category)
-
                 AddCategoryEffect.OnDismiss -> onDismiss()
             }
         }
     }
 
-    ModalBottomSheet(
-        onDismissRequest = { viewModel.onIntent(AddCategoryIntent.OnDismiss) },
+    FormBottomSheetScaffold(
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.background
+        onDismissRequest = { viewModel.onIntent(AddCategoryIntent.OnDismiss) },
+        primaryButtonText = stringResource(R.string.save_category),
+        onPrimaryClick = { viewModel.onIntent(AddCategoryIntent.AddCategory) }
     ) {
-
-        Column(
-            verticalArrangement = Arrangement.spacedBy(space.mediumLarge)
-        ) {
-
-            FintrackOutlinedTextField(
-                value = state.categoryName ?: "",
-                onValueChange = { viewModel.onIntent(AddCategoryIntent.SetCategoryName(it)) },
-                label = {
-                    Row {
-                        FintrackBodyMediumText(text = stringResource(R.string.category_name_label))
-                        FintrackBodyMediumText(
-                            text = stringResource(R.string.required_star),
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                }
-            )
-
-            FintrackOutlinedTextField(
-                value = state.description ?: "",
-                onValueChange = { viewModel.onIntent(AddCategoryIntent.SetDescription(it)) },
-                label = { FintrackBodyMediumText(text = stringResource(R.string.description_label)) }
-            )
-
-            Spacer(Modifier.height(space.large))
-
-
-            Button(
-                onClick = { viewModel.onIntent(AddCategoryIntent.AddCategory) },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                FintrackBodyMediumText(
-                    text = stringResource(R.string.save_category),
-                    color = MaterialTheme.colorScheme.background
-                )
-            }
-        }
+        NameDescriptionFields(
+            name = state.categoryName.orEmpty(),
+            onNameChange = { viewModel.onIntent(AddCategoryIntent.SetCategoryName(it)) },
+            nameLabel = stringResource(R.string.category_name_label),
+            description = state.description.orEmpty(),
+            onDescriptionChange = { viewModel.onIntent(AddCategoryIntent.SetDescription(it)) },
+            descriptionLabel = stringResource(R.string.description_label),
+        )
     }
 }

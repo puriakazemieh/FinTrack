@@ -1,4 +1,4 @@
-package com.kazemieh.designsystem.component.list.selectable
+package com.kazemieh.designsystem.component.bottomsheet
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,19 +18,21 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import com.kazemieh.common.model.ItemUi
+import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
+import com.kazemieh.designsystem.component.model.asString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,51 +45,20 @@ fun SelectableFlowRowBottomSheet(
     onDismiss: () -> Unit,
     content: @Composable () -> Unit = {}
 ) {
-
-    val viewModel = remember { SelectableListViewModel() }
-    val state by viewModel.state.collectAsState()
-
-    LaunchedEffect(items, initialSelection) {
-        viewModel.onIntent(SelectableIntent.Load(items, initialSelection, false))
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.oneShot.collect { one ->
-            when (one) {
-                is SelectableOneShot.Confirmed -> onConfirm(one.selectedItems)
-                is SelectableOneShot.Dismissed -> onDismiss()
-                is SelectableOneShot.AddClick -> onAddClick()
-            }
-        }
-    }
-
-    SelectableFlowRowBottomSheetStateless(
-        title = title,
-        state = state,
-        onToggle = { viewModel.onIntent(SelectableIntent.Toggle(it)) },
-        onConfirm = { viewModel.onIntent(SelectableIntent.Confirm) },
-        onDismiss = { viewModel.onIntent(SelectableIntent.Dismiss) },
-        onAddClick = { viewModel.onIntent(SelectableIntent.AddClick) },
-        content = content
-    )
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SelectableFlowRowBottomSheetStateless(
-    title: String,
-    state: SelectableState,
-    onToggle: (ItemUi) -> Unit,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
-    onAddClick: () -> Unit,
-    content: @Composable () -> Unit = {}
-) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
     val space = LocalSpacing.current
-    val context = LocalContext.current
+
+
+    val itemsList = remember(items) { items.toList().sortedBy { it.id } }
+
+    var selected by remember(items, initialSelection) {
+        mutableStateOf(initialSelection.intersect(items))
+    }
+
+    // اگر initialSelection از بیرون تغییر کرد هم sync شو
+    LaunchedEffect(initialSelection, items) {
+        selected = initialSelection.intersect(items)
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -111,16 +82,23 @@ fun SelectableFlowRowBottomSheetStateless(
                         .weight(1f, fill = false),
                     horizontalArrangement = Arrangement.spacedBy(space.mediumSmall)
                 ) {
-                    if (state.items.isNotEmpty()) {
-                        state.items.forEach { item ->
-                            val isSelected = state.selectedItems.contains(item)
+                    if (itemsList.isEmpty()) {
+                        EmptyListScreen(title)
+                    } else {
+                        itemsList.forEach { item ->
+                            val isSelected = selected.contains(item)
                             FilterChip(
                                 selected = isSelected,
-                                onClick = { onToggle(item) },
+                                onClick = {
+                                    selected = if (isSelected) selected - item else selected + item
+                                },
                                 label = {
                                     FintrackBodyMediumText(
-                                        text = item.title.asString(context),
-                                        color = if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onBackground
+                                        text = item.title.asString(),
+                                        color = if (isSelected)
+                                            MaterialTheme.colorScheme.surface
+                                        else
+                                            MaterialTheme.colorScheme.onBackground
                                     )
                                 },
                                 colors = FilterChipDefaults.filterChipColors(
@@ -131,11 +109,10 @@ fun SelectableFlowRowBottomSheetStateless(
                                 )
                             )
                         }
-                    } else EmptyListScreen(title)
+                    }
                 }
 
                 Spacer(Modifier.height(space.mediumLarge))
-
 
                 FAB(
                     modifier = Modifier
@@ -146,7 +123,7 @@ fun SelectableFlowRowBottomSheetStateless(
 
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = onConfirm,
+                    onClick = { onConfirm(selected) },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary

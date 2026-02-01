@@ -1,4 +1,4 @@
-package com.kazemieh.designsystem.component.list
+package com.kazemieh.designsystem.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,10 +19,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import com.kazemieh.common.model.ItemUi
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.model.ItemUi
+import com.kazemieh.designsystem.component.model.asString
 
 @Composable
 fun ItemScreen(
@@ -36,7 +36,7 @@ fun ItemScreen(
     content: @Composable (ItemUi) -> Unit = {}
 ) {
     val space = LocalSpacing.current
-    val context = LocalContext.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -65,7 +65,7 @@ fun ItemScreen(
                         .fillMaxWidth()
                         .weight(1f),
                 ) {
-                    FintrackBodyMediumText(text = item.title.asString(context))
+                    FintrackBodyMediumText(text = item.title.asString())
                     content(item)
                 }
 

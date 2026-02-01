@@ -107,4 +107,8 @@
     <string name="fill_all_field">لطفاً تمام فیلدها را پر کنید.</string>
     <string name="transaction_failed">خطا در ثبت تراکنش</string>
 
+    <string name="move_to_another_tag">انتقال به تگ دیگر</string>
+    <string name="select_tag">انتخاب تگ</string>
+    <string name="move_to_another_person">انتقال به شخص دیگر</string>
+    <string name="save_source">ثبت منبع</string>
 </resources>

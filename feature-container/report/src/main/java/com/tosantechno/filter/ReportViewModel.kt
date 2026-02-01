@@ -11,6 +11,7 @@ import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.designsystem.component.model.UiText
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -29,12 +30,14 @@ class ReportViewModel() : ViewModel() {
                     transactionWithRelations = intent.transactionWithRelations
                 )
             }
+
             is ReportIntent.DeleteTransactionBottomSheet -> _state.update {
                 it.copy(
                     showDeleteTransaction = !_state.value.showDeleteTransaction,
                     transactionWithRelations = intent.transactionWithRelations
                 )
             }
+
             is ReportIntent.OnTransactionTypeSelected -> _state.update {
                 it.copy(
                     selectedTransactionType = intent.type,
@@ -239,8 +242,11 @@ data class ReportState(
 
 sealed interface ReportIntent {
     data class OnTransactionTypeSelected(val type: TransactionType) : ReportIntent
-    data class ShowTransactionBottomSheet(val transactionWithRelations: TransactionWithRelations? = null) : ReportIntent
-    data class DeleteTransactionBottomSheet(val transactionWithRelations: TransactionWithRelations? = null) : ReportIntent
+    data class ShowTransactionBottomSheet(val transactionWithRelations: TransactionWithRelations? = null) :
+        ReportIntent
+
+    data class DeleteTransactionBottomSheet(val transactionWithRelations: TransactionWithRelations? = null) :
+        ReportIntent
 
     data object OnToggleSourceSheet : ReportIntent
     data class OnSourcesSelected(

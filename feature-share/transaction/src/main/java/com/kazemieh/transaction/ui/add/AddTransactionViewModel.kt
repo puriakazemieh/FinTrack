@@ -3,7 +3,6 @@ package com.kazemieh.transaction.ui.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.common.ld
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
@@ -12,6 +11,7 @@ import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.R
+import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.TransactionUseCases
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -159,7 +159,7 @@ class AddTransactionViewModel(
 
 
             if (amount == null || categoryId == null || sourceId == null || (current.transactionType == TransactionType.TRANSFER && sourceEndId == null)) {
-                _effect.send(AddTransactionEffect.ShowMessage(R.string.fill_all_field))
+                _effect.send(AddTransactionEffect.ShowMessage(UiText.StringResource(R.string.fill_all_field)))
                 _state.update {
                     it.copy(
                         isSourceError = sourceId == null,
@@ -201,7 +201,7 @@ class AddTransactionViewModel(
             if (transactionId >= 0) {
                 _effect.send(AddTransactionEffect.AddedTransaction)
                 _state.update { AddTransactionState() }
-            } else _effect.send(AddTransactionEffect.ShowMessage(R.string.transaction_failed))
+            } else _effect.send(AddTransactionEffect.ShowMessage(UiText.StringResource(R.string.transaction_failed)))
 
         }
     }
@@ -279,6 +279,6 @@ data class AddTransactionState(
 
 sealed interface AddTransactionEffect {
     object AddedTransaction : AddTransactionEffect
-    data class ShowMessage(val message: Int) : AddTransactionEffect
+    data class ShowMessage(val message: UiText) : AddTransactionEffect
     data object OnDismiss : AddTransactionEffect
 }

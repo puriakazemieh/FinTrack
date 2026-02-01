@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
@@ -22,7 +22,7 @@ fun TransactionListScreen(
     screenHeight: Dp,
     viewModel: TransactionViewModel = koinViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(true) {
         viewModel.onIntent(TransactionIntent.LoadTransactions)
@@ -61,7 +61,7 @@ fun TransactionItemsProvider(
     onDelete: (TransactionWithRelations) -> Unit = {},
     onItemsReady: (LazyListScope.() -> Unit) -> Unit
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(true) {
         viewModel.onIntent(TransactionIntent.LoadTransactions)

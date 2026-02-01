@@ -9,17 +9,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.kazemieh.category.ui.list.CategoryListSelectionBottomSheet
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.category.ui.list.CategorySelectionBottomSheet
 import com.kazemieh.common.DateFilterType
-import com.kazemieh.common.ld
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.financialsource.ui.list.SourceListSelectionBottomSheet
-import com.kazemieh.person.ui.list.PersonListSelectionBottomSheet
-import com.kazemieh.tag.ui.list.TagListSelectionBottomSheet
+import com.kazemieh.financialsource.ui.list.SourceSelectionBottomSheet
+import com.kazemieh.person.ui.list.PersonSelectionBottomSheet
+import com.kazemieh.tag.ui.list.TagSelectionBottomSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.report.TransactionListByFilterScreen
@@ -30,30 +29,27 @@ fun ReportScreen(
     snackbarHostState: SnackbarHostState,
     viewModel: ReportViewModel = koinViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-
         Column {
-
             Spacer(modifier = Modifier.height(space.mediumSmall))
+
             val label = when (val labelValue = state.textDate) {
                 is Int -> stringResource(id = labelValue)
                 is String -> labelValue
                 else -> ""
             }
+
             ReportTopBar(
                 onTransactionTypeSelected = state.selectedTransactionType,
                 onTransactionTypeClicked = {
-                    viewModel.onIntent(
-                        ReportIntent.OnTransactionTypeSelected(
-                            it
-                        )
-                    )
+                    viewModel.onIntent(ReportIntent.OnTransactionTypeSelected(it))
                 },
 
                 selectedCategories = state.selectedCategories,
@@ -77,7 +73,6 @@ fun ReportScreen(
                 onNextClick = { viewModel.onIntent(ReportIntent.OnNextClick) },
                 onPrevClick = { viewModel.onIntent(ReportIntent.OnPrevClick) },
                 textDate = label
-
             )
 
             TransactionListByFilterScreen(
@@ -100,15 +95,14 @@ fun ReportScreen(
                     )
                 },
             )
-
         }
 
+        // ✅ اسم‌های جدید selection bottom sheet ها
         if (state.isCategorySheetVisible) {
-            CategoryListSelectionBottomSheet(
+            CategorySelectionBottomSheet(
                 initialSelectionPairs = state.selectedCategories,
                 selectedTransactionType = state.selectedTransactionType,
                 onConfirmPairs = { pairs, isAll ->
-                    pairs.ld("pairs")
                     viewModel.onIntent(ReportIntent.OnCategoriesSelected(pairs, isAll))
                 },
                 onDismiss = { viewModel.onIntent(ReportIntent.OnToggleCategorySheet) }
@@ -116,38 +110,32 @@ fun ReportScreen(
         }
 
         if (state.isTagSheetVisible) {
-            TagListSelectionBottomSheet(
+            TagSelectionBottomSheet(
                 initialSelectionPairs = state.selectedTag,
                 onConfirmPairs = { pairs, isAll ->
                     viewModel.onIntent(ReportIntent.OnTagSelected(pairs, isAll))
                 },
-                onDismiss = {
-                    viewModel.onIntent(ReportIntent.OnToggleTagSheet)
-                }
+                onDismiss = { viewModel.onIntent(ReportIntent.OnToggleTagSheet) }
             )
         }
 
         if (state.isPersonSheetVisible) {
-            PersonListSelectionBottomSheet(
+            PersonSelectionBottomSheet(
                 initialSelectionPairs = state.selectedPerson,
                 onConfirmPairs = { pairs, isAll ->
                     viewModel.onIntent(ReportIntent.OnPersonSelected(pairs, isAll))
                 },
-                onDismiss = {
-                    viewModel.onIntent(ReportIntent.OnTogglePersonSheet)
-                }
+                onDismiss = { viewModel.onIntent(ReportIntent.OnTogglePersonSheet) }
             )
         }
 
         if (state.isSourceSheetVisible) {
-            SourceListSelectionBottomSheet(
+            SourceSelectionBottomSheet(
                 initialSelectionPairs = state.selectedSources,
                 onConfirmPairs = { pairs, isAll ->
                     viewModel.onIntent(ReportIntent.OnSourcesSelected(pairs, isAll))
                 },
-                onDismiss = {
-                    viewModel.onIntent(ReportIntent.OnToggleSourceSheet)
-                }
+                onDismiss = { viewModel.onIntent(ReportIntent.OnToggleSourceSheet) }
             )
         }
 
@@ -164,8 +152,12 @@ fun ReportScreen(
         if (state.isCustomDateSheetVisible) {
             CustomDateBottomSheet(
                 onDismiss = { viewModel.onIntent(ReportIntent.OnToggleCustomDateSheet) },
-                start = if (state.dateFilterType == DateFilterType.CUSTOM_RANGE) state.startDate to state.startDateTimeStamp else null,
-                end = if (state.dateFilterType == DateFilterType.CUSTOM_RANGE) state.endDate to state.endDateTimeStamp else null,
+                start = if (state.dateFilterType == DateFilterType.CUSTOM_RANGE)
+                    state.startDate to state.startDateTimeStamp
+                else null,
+                end = if (state.dateFilterType == DateFilterType.CUSTOM_RANGE)
+                    state.endDate to state.endDateTimeStamp
+                else null,
                 isError = state.isError,
                 onSubmit = { startDate, endDate ->
                     viewModel.onIntent(
