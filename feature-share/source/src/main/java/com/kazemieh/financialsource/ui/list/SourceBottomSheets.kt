@@ -39,22 +39,19 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SourceManageBottomSheet(
-    keyViewmodel: String = "SourceManageBottomSheet",
+private fun SourceBottomSheetCore(
+    keyViewmodel: String,
     snackbarHostState: SnackbarHostState,
-    isDeleteShow: Boolean = false,
-    isEditShow: Boolean = false,
-    clickable: Boolean = true,
-    viewModel: SourceViewModel = koinViewModel(key = keyViewmodel),
-    onSourceClick: (Source) -> Unit = {},
+    isDeleteShow: Boolean,
+    isEditShow: Boolean,
+    clickable: Boolean,
+    onSourceClick: (Source) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.onIntent(SourceIntent.LoadAllSource)
-    }
+    val viewModel: SourceViewModel = koinViewModel(key = keyViewmodel)
 
+    LaunchedEffect(Unit) { viewModel.onIntent(SourceIntent.LoadAllSource) }
     val state by viewModel.state.collectAsState()
-
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -103,6 +100,37 @@ fun SourceManageBottomSheet(
         )
     }
 }
+
+@Composable
+fun SourceManageBottomSheet(
+    snackbarHostState: SnackbarHostState,
+    onDismiss: () -> Unit,
+    onSourceClick: (Source) -> Unit = {},
+) = SourceBottomSheetCore(
+    keyViewmodel = "SourceManageBottomSheet",
+    snackbarHostState = snackbarHostState,
+    isDeleteShow = true,
+    isEditShow = true,
+    clickable = false,
+    onSourceClick = onSourceClick,
+    onDismiss = onDismiss,
+)
+
+@Composable
+fun SourcePickerBottomSheet(
+    snackbarHostState: SnackbarHostState,
+    onDismiss: () -> Unit,
+    onSourceClick: (Source) -> Unit = {},
+) = SourceBottomSheetCore(
+    keyViewmodel = "SourcePickerBottomSheet",
+    snackbarHostState = snackbarHostState,
+    isDeleteShow = false,
+    isEditShow = false,
+    clickable = true,
+    onSourceClick = onSourceClick,
+    onDismiss = onDismiss,
+)
+
 
 @Composable
 fun SourceSelectionBottomSheet(

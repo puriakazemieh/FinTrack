@@ -14,7 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.bottomsheet.DeleteWithMoveBottomSheetContent
-import com.kazemieh.financialsource.ui.list.SourceManageBottomSheet
+import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -79,12 +79,8 @@ fun DeleteSourceBottomSheet(
     )
 
     if (state.isSourceListShow) {
-        SourceManageBottomSheet(
-            keyViewmodel = "DeleteSourceBottomSheet",
+        SourcePickerBottomSheet(
             snackbarHostState = snackbarHostState,
-            isEditShow = false,
-            isDeleteShow = false,
-            clickable = true,
             onSourceClick = { viewModel.onIntent(DeleteSourceIntent.SetMoveSource(it)) },
             onDismiss = { viewModel.onIntent(DeleteSourceIntent.ShowAllSourceList) }
         )

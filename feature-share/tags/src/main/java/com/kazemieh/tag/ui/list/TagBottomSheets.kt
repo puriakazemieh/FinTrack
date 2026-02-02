@@ -29,6 +29,7 @@ fun TagPickerBottomSheet(
     onDismiss: () -> Unit
 ) {
     LaunchedEffect(Unit) { viewModel.onIntent(TagIntent.GetAllTag) }
+
     LaunchedEffect(selectedTags) { viewModel.onIntent(TagIntent.SetAllSelectedTags(selectedTags)) }
 
     val state by viewModel.state.collectAsState()

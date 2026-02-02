@@ -47,10 +47,9 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.model.asString
-import com.kazemieh.financialsource.ui.list.SourceManageBottomSheet
+import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import com.kazemieh.person.ui.list.PersonPickerBottomSheet
 import com.kazemieh.tag.ui.list.TagPickerBottomSheet
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -124,47 +123,52 @@ private fun BottomSheetContent(
 
             AddTransactionContent(state = state, onIntent = onIntent)
 
-            if (state.isSourceShow) {
-                SourceManageBottomSheet(
-                    snackbarHostState = snackbarHostState,
-                    onSourceClick = { onIntent(AddTransactionIntent.SetSource(it)) },
-                    onDismiss = { onIntent(AddTransactionIntent.OnSourceClicked) }
-                )
-            }
 
-            if (state.isSourceEndShow) {
-                SourceManageBottomSheet(
-                    snackbarHostState = snackbarHostState,
-                    onSourceClick = { onIntent(AddTransactionIntent.SetSourceEnd(it)) },
-                    onDismiss = { onIntent(AddTransactionIntent.OnSourceEndClicked) }
-                )
-            }
+            when (state.topSheet) {
+                AddTransactionSheet.SourcePicker -> {
+                    SourcePickerBottomSheet(
+                        snackbarHostState = snackbarHostState,
+                        onSourceClick = { onIntent(AddTransactionIntent.SetSource(it)) },
+                        onDismiss = { onIntent(AddTransactionIntent.PopSheet) }
+                    )
+                }
 
-            if (state.isCategoryShow) {
-                CategoryPickerBottomSheet(
-                    transactionType = state.transactionType,
-                    snackbarHostState = snackbarHostState,
-                    onCategoryClick = { onIntent(AddTransactionIntent.SetCategory(it)) },
-                    onDismiss = { onIntent(AddTransactionIntent.OnCategoryClicked) }
-                )
-            }
+                AddTransactionSheet.SourceEndPicker -> {
+                    SourcePickerBottomSheet(
+                        snackbarHostState = snackbarHostState,
+                        onSourceClick = { onIntent(AddTransactionIntent.SetSourceEnd(it)) },
+                        onDismiss = { onIntent(AddTransactionIntent.PopSheet) }
+                    )
+                }
 
-            if (state.isTagShow) {
-                TagPickerBottomSheet(
-                    snackbarHostState = snackbarHostState,
-                    selectedTags = state.tags,
-                    onSubmitClick = { onIntent(AddTransactionIntent.SetTags(it)) },
-                    onDismiss = { onIntent(AddTransactionIntent.OnTagClicked) }
-                )
-            }
+                AddTransactionSheet.CategoryPicker -> {
+                    CategoryPickerBottomSheet(
+                        transactionType = state.transactionType,
+                        snackbarHostState = snackbarHostState,
+                        onCategoryClick = { onIntent(AddTransactionIntent.SetCategory(it)) },
+                        onDismiss = { onIntent(AddTransactionIntent.PopSheet) }
+                    )
+                }
 
-            if (state.isPersonShow) {
-                PersonPickerBottomSheet(
-                    snackbarHostState = snackbarHostState,
-                    selectedPersons = state.persons,
-                    onSubmitClick = { onIntent(AddTransactionIntent.SetPerson(it)) },
-                    onDismiss = { onIntent(AddTransactionIntent.OnPersonClicked) }
-                )
+                AddTransactionSheet.TagPicker -> {
+                    TagPickerBottomSheet(
+                        snackbarHostState = snackbarHostState,
+                        selectedTags = state.tags,
+                        onSubmitClick = { onIntent(AddTransactionIntent.SetTags(it)) },
+                        onDismiss = { onIntent(AddTransactionIntent.PopSheet) }
+                    )
+                }
+
+                AddTransactionSheet.PersonPicker -> {
+                    PersonPickerBottomSheet(
+                        snackbarHostState = snackbarHostState,
+                        selectedPersons = state.persons,
+                        onSubmitClick = { onIntent(AddTransactionIntent.SetPerson(it)) },
+                        onDismiss = { onIntent(AddTransactionIntent.PopSheet) }
+                    )
+                }
+
+                null -> Unit
             }
         }
     }
@@ -249,8 +253,12 @@ fun AddTransactionContent(
             AnimatedVisibility(visible = state.transactionType == TransactionType.TRANSFER) {
                 TransferScreen(
                     state = state,
-                    onSourceClicked = { onIntent(AddTransactionIntent.OnSourceClicked) },
-                    onSourceEndClicked = { onIntent(AddTransactionIntent.OnSourceEndClicked) },
+                    onSourceClicked = {
+                        onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.SourcePicker))
+                    },
+                    onSourceEndClicked = {
+                        onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.SourceEndPicker))
+                    },
                     setTransferAmount = { onIntent(AddTransactionIntent.SetAmountTransfer(it)) }
                 )
             }
@@ -260,8 +268,12 @@ fun AddTransactionContent(
             AnimatedVisibility(visible = state.transactionType != TransactionType.TRANSFER) {
                 TransactionDetail(
                     state = state,
-                    onSourceClicked = { onIntent(AddTransactionIntent.OnSourceClicked) },
-                    onCategoryClicked = { onIntent(AddTransactionIntent.OnCategoryClicked) }
+                    onCategoryClicked = {
+                        onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.CategoryPicker))
+                    },
+                    onSourceClicked = {
+                        onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.SourcePicker))
+                    }
                 )
             }
         }
@@ -271,7 +283,7 @@ fun AddTransactionContent(
         item {
             FintrackOutlinedTextField(
                 value = state.tags?.joinToString("") { " #${it.name}" } ?: "",
-                onClick = { onIntent(AddTransactionIntent.OnTagClicked) },
+                onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.TagPicker)) },
                 readOnly = true,
                 enabled = false,
                 singleLine = false,
@@ -291,7 +303,7 @@ fun AddTransactionContent(
         item {
             FintrackOutlinedTextField(
                 value = state.persons?.joinToString("") { " #${it.name}" } ?: "",
-                onClick = { onIntent(AddTransactionIntent.OnPersonClicked) },
+                onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.PersonPicker)) },
                 readOnly = true,
                 enabled = false,
                 singleLine = false,
@@ -335,6 +347,7 @@ fun AddTransactionContent(
             Button(
                 onClick = { onIntent(AddTransactionIntent.Submit) },
                 modifier = Modifier.fillMaxWidth(),
+                enabled = !state.isLoading,
                 shape = MaterialTheme.shapes.medium,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -351,9 +364,10 @@ fun AddTransactionContent(
     }
 
     LaunchedEffect(Unit) {
-        delay(100)
+        kotlinx.coroutines.yield()
         focusRequester.requestFocus()
     }
+
 }
 
 @Composable

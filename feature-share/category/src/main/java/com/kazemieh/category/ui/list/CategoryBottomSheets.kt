@@ -45,7 +45,6 @@ fun CategoryPickerBottomSheet(
 
     val state by viewModel.state.collectAsState()
 
-
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
@@ -85,7 +84,6 @@ fun CategoryManageBottomSheet(
     }
 
     val state by viewModel.state.collectAsState()
-
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->

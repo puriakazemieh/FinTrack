@@ -42,34 +42,22 @@ fun SettingScreen(
         }
 
         ItemId.ITEM_2.id -> {
-            // قبلاً: SourceListBottomSheet
             SourceManageBottomSheet(
                 snackbarHostState = snackbarHostState,
-                isEditShow = true,
-                isDeleteShow = true,
-                clickable = false,
                 onDismiss = { viewModel.onIntent(SettingIntent.OnClick()) }
             )
         }
 
         ItemId.ITEM_3.id -> {
-            // قبلاً: TagListBottomSheet
             TagManageBottomSheet(
                 snackbarHostState = snackbarHostState,
-                isEditShow = true,
-                isDeleteShow = true,
-                clickable = false,
                 onDismiss = { viewModel.onIntent(SettingIntent.OnClick()) }
             )
         }
 
         ItemId.ITEM_4.id -> {
-            // قبلاً: PersonListBottomSheet
             PersonManageBottomSheet(
                 snackbarHostState = snackbarHostState,
-                isEditShow = true,
-                isDeleteShow = true,
-                clickable = false,
                 onDismiss = { viewModel.onIntent(SettingIntent.OnClick()) }
             )
         }
