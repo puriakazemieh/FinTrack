@@ -21,25 +21,41 @@ import com.kazemieh.designsystem.component.EmptyListScreen
 
 fun LazyListScope.transactionListContent(
     lazyPagingItems: LazyPagingItems<TransactionWithRelations>,
-    loading: Boolean,
     onDelete: (TransactionWithRelations) -> Unit = {},
     onEdit: (TransactionWithRelations) -> Unit = {}
 ) {
+    val refreshState = lazyPagingItems.loadState.refresh
+    val appendState = lazyPagingItems.loadState.append
+    val isEmpty = lazyPagingItems.itemCount == 0
 
-    val isListEmpty = lazyPagingItems.itemCount == 0
-    val isNotLoading = lazyPagingItems.loadState.refresh !is LoadState.Loading
-    val isError = lazyPagingItems.loadState.refresh is LoadState.Error
-    if (loading) {
+
+    if (refreshState is LoadState.Loading && isEmpty) {
         item {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillParentMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         }
+        return
     }
-    if (isListEmpty && isNotLoading && !isError) {
+
+
+    if (refreshState is LoadState.Error && isEmpty) {
+        item {
+            Box(
+                modifier = Modifier.fillParentMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "Error: ${refreshState.error.localizedMessage}")
+            }
+        }
+        return
+    }
+
+
+    if (isEmpty) {
         item {
             Box(
                 modifier = Modifier.fillParentMaxSize(),
@@ -48,48 +64,36 @@ fun LazyListScope.transactionListContent(
                 EmptyListScreen(stringResource(R.string.transaction))
             }
         }
+        return
     }
-    if (!isListEmpty) {
-        items(
-            count = lazyPagingItems.itemCount,
-            key = lazyPagingItems.itemKey { it.transaction.id },
-            contentType = lazyPagingItems.itemContentType { "MyPagingItems" },
-        ) { index ->
-            val item = lazyPagingItems[index]
-            if (item != null) {
-                TransactionItem(
-                    uiTransactionWithRelation = item,
-                    onDelete = { onDelete(item) },
-                    onEdit = { onEdit(item) }
-                )
+
+    items(
+        count = lazyPagingItems.itemCount,
+        key = lazyPagingItems.itemKey { it.transaction.id },
+        contentType = lazyPagingItems.itemContentType { "TransactionItem" },
+    ) { index ->
+        val item = lazyPagingItems[index] ?: return@items
+        TransactionItem(
+            uiTransactionWithRelation = item,
+            onDelete = { onDelete(item) },
+            onEdit = { onEdit(item) }
+        )
+    }
+
+    if (appendState is LoadState.Loading) {
+        item {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         }
     }
 
-    lazyPagingItems.apply {
-        when {
-            loadState.refresh is LoadState.Loading -> item {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                }
-            }
-
-            loadState.append is LoadState.Loading -> item {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                }
-            }
-
-            loadState.refresh is LoadState.Error -> item {
-                val e = lazyPagingItems.loadState.refresh as LoadState.Error
-                Text("Error: ${e.error.localizedMessage}")
-            }
+    if (appendState is LoadState.Error) {
+        item {
+            Text(text = "Error: ${appendState.error.localizedMessage}")
         }
     }
 }

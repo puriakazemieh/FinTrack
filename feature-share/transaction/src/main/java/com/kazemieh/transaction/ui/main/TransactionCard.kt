@@ -13,8 +13,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -23,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
@@ -37,17 +36,16 @@ fun TotalTransactionCard(
     enableAnimationChart: Boolean = true,
 ) {
     val space = LocalSpacing.current
-    LaunchedEffect(true) {
-        viewModel.onIntent(TransactionIntent.LoadTransactions)
-    }
-
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val incoming = stringResource(R.string.incoming)
     val outcoming = stringResource(R.string.outcoming)
     val transfer = stringResource(R.string.transfer)
 
-    val piChartData by remember(state.totalIncome, state.totalExpense, state.totalTransfer) {
+    val piChartData by remember(
+        incoming, outcoming, transfer,
+        state.totalIncome, state.totalExpense, state.totalTransfer
+    ) {
         derivedStateOf {
             buildList {
                 if (state.totalIncome != 0L)

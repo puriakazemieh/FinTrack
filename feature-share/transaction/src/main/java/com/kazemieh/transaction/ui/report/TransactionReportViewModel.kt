@@ -10,7 +10,6 @@ import com.kazemieh.common.model.CategorySum
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
-import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
@@ -24,7 +23,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -64,7 +62,6 @@ class TransactionReportViewModel(
     init {
         viewModelScope.launch {
             filterParamsFlow
-                .onStart { _state.update { it.copy(isLoading = true) } }
                 .flatMapLatest { params -> transactionUseCases.getCategorySum(params) }
                 .collectLatest { categorySums -> updateCategorySums(categorySums) }
         }
@@ -134,6 +131,23 @@ class TransactionReportViewModel(
                     )
                 }
             }
+
+            is TransactionReportIntent.SetFilters -> {
+                _state.update { s ->
+                    s.copy(
+                        filterParams = s.filterParams.copy(
+                            sources = intent.sources,
+                            categories = intent.categories,
+                            tags = intent.tags,
+                            persons = intent.persons,
+                            type = intent.type.count,
+                            fromTimestamp = intent.fromTimestamp,
+                            toTimestamp = intent.toTimestamp
+                        )
+                    )
+                }
+            }
+
         }
     }
 
@@ -153,7 +167,6 @@ class TransactionReportViewModel(
             it.copy(
                 balance = balance.toInt().formatted(),
                 isPositiveBalance = balance >= 0,
-                isLoading = false,
                 pieChartData = pieChartItems
             )
         }
@@ -180,11 +193,20 @@ sealed interface TransactionReportIntent {
 
     data class SelectedDate(val fromTimestamp: Long? = null, val toTimestamp: Long? = null) :
         TransactionReportIntent
+
+    data class SetFilters(
+        val sources: Set<Source>,
+        val categories: Set<Category>,
+        val tags: Set<Tag>,
+        val persons: Set<Person>,
+        val type: TransactionType,
+        val fromTimestamp: Long?,
+        val toTimestamp: Long?,
+    ) : TransactionReportIntent
 }
 
 data class TransactionReportState(
     val filterParams: TransactionFilterParams = TransactionFilterParams(),
-    val isLoading: Boolean = false,
     val balance: String = "0",
     val isPositiveBalance: Boolean = true,
     val formatedTotalIncome: String = "0",

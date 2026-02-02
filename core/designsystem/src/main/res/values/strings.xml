@@ -106,9 +106,15 @@
     <string name="save_tag">ذخیره</string>
     <string name="fill_all_field">لطفاً تمام فیلدها را پر کنید.</string>
     <string name="transaction_failed">خطا در ثبت تراکنش</string>
+    <string name="transaction_delete_failed">خطا در حذف تراکنش</string>
 
     <string name="move_to_another_tag">انتقال به تگ دیگر</string>
     <string name="select_tag">انتخاب تگ</string>
     <string name="move_to_another_person">انتقال به شخص دیگر</string>
     <string name="save_source">ثبت منبع</string>
+    <string name="source_with_value">منبع: %1$s</string>
+    <string name="description_with_value">وضیحات: %1$s</string>
+    <string name="transfer_from_to_label">از %1$s به %2$s</string>
+    <string name="amount_transfer_label">مبلغ انتقال: %1$s</string>
+    <string name="edit">ویرایش</string>
 </resources>

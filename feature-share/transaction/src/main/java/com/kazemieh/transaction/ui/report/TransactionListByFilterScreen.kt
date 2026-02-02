@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -36,37 +34,27 @@ fun TransactionListByFilterScreen(
     onEdit: (TransactionWithRelations) -> Unit = {},
     viewModel: TransactionReportViewModel = koinViewModel()
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
-    LaunchedEffect(selectedCategories) {
-        viewModel.onIntent(TransactionReportIntent.SelectedCategory(selectedCategories))
-    }
-
-    LaunchedEffect(selectedSources) {
-        viewModel.onIntent(TransactionReportIntent.SelectedSource(selectedSources))
-    }
-
-    LaunchedEffect(selectedTags) {
-        viewModel.onIntent(TransactionReportIntent.SelectedTag(selectedTags))
-    }
-
-    LaunchedEffect(selectedPersons) {
-        viewModel.onIntent(TransactionReportIntent.SelectedPerson(selectedPersons))
-    }
-
-    LaunchedEffect(selectedTransactionType) {
-        viewModel.onIntent(TransactionReportIntent.SelectedType(selectedTransactionType))
-    }
-
-    LaunchedEffect(fromTimestamp, toTimestamp) {
-        viewModel.onIntent(TransactionReportIntent.SelectedDate(fromTimestamp, toTimestamp))
+    LaunchedEffect(
+        selectedSources, selectedCategories, selectedTags, selectedPersons,
+        selectedTransactionType, fromTimestamp, toTimestamp
+    ) {
+        viewModel.onIntent(
+            TransactionReportIntent.SetFilters(
+                sources = selectedSources,
+                categories = selectedCategories,
+                tags = selectedTags,
+                persons = selectedPersons,
+                type = selectedTransactionType,
+                fromTimestamp = fromTimestamp,
+                toTimestamp = toTimestamp
+            )
+        )
     }
 
     val lazyPagingItems = viewModel.uiTransactionWithRelations.collectAsLazyPagingItems()
 
     TransactionListByFilterContent(
         lazyPagingItems,
-        state.isLoading,
         enableAnimationChart,
         onDelete = onDelete,
         onEdit = onEdit
@@ -77,7 +65,6 @@ fun TransactionListByFilterScreen(
 @Composable
 fun TransactionListByFilterContent(
     uiTransactionWithRelations: LazyPagingItems<TransactionWithRelations>,
-    loading: Boolean,
     enableAnimationChart: Boolean,
     onDelete: (TransactionWithRelations) -> Unit = {},
     onEdit: (TransactionWithRelations) -> Unit = {}
@@ -93,7 +80,7 @@ fun TransactionListByFilterContent(
 
         item { Spacer(Modifier.height(space.mediumSmall)) }
 
-        transactionListContent(uiTransactionWithRelations, loading, onDelete, onEdit)
+        transactionListContent(uiTransactionWithRelations, onDelete, onEdit)
 
     }
 

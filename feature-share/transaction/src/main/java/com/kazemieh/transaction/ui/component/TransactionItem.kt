@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -38,41 +39,58 @@ fun TransactionItem(
     onEdit: () -> Unit
 ) {
     val space = LocalSpacing.current
+
+    val trx = uiTransactionWithRelation.transaction
+    val isTransfer = trx.type == TransactionType.TRANSFER
+
+    val personsText = remember(uiTransactionWithRelation.persons) {
+        uiTransactionWithRelation.persons.joinToString { it.name }
+    }
+    val tagsText = remember(uiTransactionWithRelation.tags) {
+        uiTransactionWithRelation.tags.joinToString { it.name }
+    }
+
+    val typeLabel = when (trx.type) {
+        TransactionType.INCOME -> stringResource(R.string.incoming)
+        TransactionType.EXPENSE -> stringResource(R.string.outcoming)
+        TransactionType.TRANSFER -> stringResource(R.string.transfer)
+        else -> stringResource(R.string.all)
+    }
+
+    val amountColor =
+        if (trx.type == TransactionType.EXPENSE) MaterialTheme.colorScheme.error
+        else MaterialTheme.colorScheme.secondary
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = space.small),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = space.one)
     ) {
         Column(Modifier.padding(space.large)) {
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 FintrackTitleMediumText(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
+                    modifier = Modifier.weight(1f),
                     text = uiTransactionWithRelation.category.name,
                     color = MaterialTheme.colorScheme.onSurface
                 )
+
                 IconButton(onClick = onEdit) {
                     Icon(
-                        modifier = Modifier.weight(0.1f),
                         imageVector = Icons.Default.Edit,
-                        contentDescription = Icons.Default.Edit.name,
+                        contentDescription = stringResource(R.string.edit),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
+
                 IconButton(onClick = onDelete) {
                     Icon(
-                        modifier = Modifier.weight(0.1f),
                         imageVector = Icons.Default.Delete,
                         contentDescription = stringResource(R.string.delete),
                         tint = MaterialTheme.colorScheme.error
@@ -82,117 +100,86 @@ fun TransactionItem(
 
             Spacer(modifier = Modifier.height(space.mediumSmall))
 
-            FintrackTitleMediumText(
-                text = "${stringResource(R.string.source)} : ${uiTransactionWithRelation.source.name}",
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            // ---------- Source / Transfer Info ----------
+            if (isTransfer) {
 
-            if (uiTransactionWithRelation.transaction.type == TransactionType.TRANSFER) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    FintrackLabelSmallText(
-                        text = "${
-                            stringResource(R.string.source_from)
-                        } : ${
-                            uiTransactionWithRelation.source.name
-                        } ${
-                            stringResource(R.string.source_to)
-                        } : ${
-                            uiTransactionWithRelation.sourceEnd?.name
-                        }",
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    FintrackLabelSmallText(
-                        text = "${stringResource(R.string.amount_transfer)} : ${uiTransactionWithRelation.transaction.amountTransferFormated} ",
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(space.mediumSmall))
-
-            val amountColor =
-                if (uiTransactionWithRelation.transaction.type == TransactionType.EXPENSE)
-                    MaterialTheme.colorScheme.error
-                else
-                    MaterialTheme.colorScheme.secondary
-
-            val text = when (uiTransactionWithRelation.transaction.type) {
-                TransactionType.INCOME -> {
-                    stringResource(R.string.incoming)
-                }
-
-                TransactionType.EXPENSE -> {
-                    stringResource(R.string.outcoming)
-                }
-
-                TransactionType.TRANSFER -> {
-                    stringResource(R.string.transfer)
-                }
-
-                else -> {
-                    stringResource(R.string.all)
-                }
-
-            }
-
-            FintrackBodyLargeText(
-                text = stringResource(
-                    R.string.amount_label,
-                    text,
-                    uiTransactionWithRelation.transaction.formatedAmount
-                ),
-                color = amountColor
-            )
-
-            Spacer(modifier = Modifier.height(space.small))
-
-            if (uiTransactionWithRelation.persons.isNotEmpty()) {
-                FintrackBodySmallText(
+                FintrackTitleMediumText(
                     text = stringResource(
-                        R.string.person_label,
-                        uiTransactionWithRelation.persons.joinToString { it.name }),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                        R.string.transfer_from_to_label,
+                        uiTransactionWithRelation.source.name,
+                        uiTransactionWithRelation.sourceEnd?.name.orEmpty()
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-            }
 
-            Spacer(modifier = Modifier.height(space.small))
+                Spacer(modifier = Modifier.height(space.small))
 
-            if (!uiTransactionWithRelation.transaction.description.isNullOrEmpty()) {
-                FintrackBodyMediumText(
-                    text = "${stringResource(R.string.description)} :" +
-                            " ${uiTransactionWithRelation.transaction.description}",
+                trx.amountTransferFormated?.let {
+                    FintrackLabelSmallText(
+                        text = stringResource(
+                            R.string.amount_transfer_label,
+                            it
+                        ),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                FintrackTitleMediumText(
+                    text = stringResource(R.string.source_with_value, uiTransactionWithRelation.source.name),
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
-            Spacer(modifier = Modifier.height(space.small))
+            Spacer(modifier = Modifier.height(space.mediumSmall))
 
-            if (uiTransactionWithRelation.tags.isNotEmpty()) {
+            // ---------- Amount ----------
+            FintrackBodyLargeText(
+                text = stringResource(
+                    R.string.amount_label,
+                    typeLabel,
+                    trx.formatedAmount
+                ),
+                color = amountColor
+            )
+
+            // ---------- Persons ----------
+            if (uiTransactionWithRelation.persons.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(space.small))
                 FintrackBodySmallText(
-                    text = stringResource(
-                        R.string.tags_label,
-                        uiTransactionWithRelation.tags.joinToString { it.name }),
+                    text = stringResource(R.string.person_label, personsText),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
-            Spacer(modifier = Modifier.height(space.small))
+            // ---------- Description ----------
+            val desc = trx.description
+            if (!desc.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(space.small))
+                FintrackBodyMediumText(
+                    text = stringResource(R.string.description_with_value, desc),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
 
+            // ---------- Tags ----------
+            if (uiTransactionWithRelation.tags.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(space.small))
+                FintrackBodySmallText(
+                    text = stringResource(R.string.tags_label, tagsText),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            // ---------- Date ----------
+            Spacer(modifier = Modifier.height(space.small))
             FintrackBodySmallText(
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.End,
-                text = uiTransactionWithRelation.transaction.date,
+                text = trx.date,
                 color = MaterialTheme.colorScheme.onSurface
             )
-
         }
-
-
     }
 }
+
 

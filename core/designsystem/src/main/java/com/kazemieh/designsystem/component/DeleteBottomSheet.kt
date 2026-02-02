@@ -41,11 +41,15 @@ fun DeleteBottomSheet(
     dismissClicked: () -> Unit,
     confirmClicked: () -> Unit,
     sheetState: SheetState,
-) {
 
+    confirmEnabled: Boolean = true,
+    dismissEnabled: Boolean = true,
+    isLoading: Boolean = false,
+) {
     val space = LocalSpacing.current
+
     ModalBottomSheet(
-        onDismissRequest = dismissClicked,
+        onDismissRequest = { if (dismissEnabled && !isLoading) dismissClicked() },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background
     ) {
@@ -57,7 +61,9 @@ fun DeleteBottomSheet(
                 text = title,
                 textAlign = TextAlign.Center
             )
+
             Spacer(modifier = Modifier.height(space.large))
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -67,6 +73,7 @@ fun DeleteBottomSheet(
             ) {
                 Button(
                     onClick = confirmClicked,
+                    enabled = confirmEnabled && !isLoading,
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.medium,
                     colors = confirmButtonColors
@@ -76,8 +83,10 @@ fun DeleteBottomSheet(
                         color = MaterialTheme.colorScheme.background
                     )
                 }
+
                 Button(
                     onClick = dismissClicked,
+                    enabled = dismissEnabled && !isLoading,
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.medium,
                     colors = dismissButtonColors
@@ -91,3 +100,4 @@ fun DeleteBottomSheet(
         }
     }
 }
+

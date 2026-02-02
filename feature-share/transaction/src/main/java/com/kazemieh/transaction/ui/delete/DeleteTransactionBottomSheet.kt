@@ -6,11 +6,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.component.DeleteBottomSheet
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -23,47 +23,45 @@ fun DeleteTransactionBottomSheet(
     onDismiss: () -> Unit,
     transactionDeleted: () -> Unit
 ) {
-
     val context = LocalContext.current
-
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(transactionWithRelations) {
+    LaunchedEffect(transactionWithRelations?.transaction?.id) {
         viewModel.onIntent(DeleteTransactionIntent.SetData(transactionWithRelations))
     }
-
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is DeleteTransactionEffect.DeletedTransaction -> {
-                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            transactionDeleted()
-                        }
-                    }
+                DeleteTransactionEffect.DeletedTransaction -> {
+                    sheetState.hide()
+                    transactionDeleted()
+                    onDismiss()
                 }
 
                 is DeleteTransactionEffect.ShowMessage -> {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = context.getString(effect.message),
-                            duration = SnackbarDuration.Short
-                        )
-                    }
+                    snackbarHostState.showSnackbar(
+                        message = context.getString(effect.message),
+                        duration = SnackbarDuration.Short
+                    )
                 }
 
-                DeleteTransactionEffect.OnDismiss -> onDismiss()
+                DeleteTransactionEffect.OnDismiss -> {
+                    sheetState.hide()
+                    onDismiss()
+                }
             }
         }
     }
 
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
     DeleteBottomSheet(
         dismissClicked = { viewModel.onIntent(DeleteTransactionIntent.OnDismiss) },
         confirmClicked = { viewModel.onIntent(DeleteTransactionIntent.Submit) },
-        sheetState = sheetState
+        sheetState = sheetState,
+        confirmEnabled = !state.isLoading,
+        dismissEnabled = !state.isLoading,
+        isLoading = state.isLoading
     )
-
 }

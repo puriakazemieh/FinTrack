@@ -12,25 +12,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FAB
-import com.kazemieh.financialsource.ui.list.SourceList
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
+import com.kazemieh.financialsource.ui.list.SourceList
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.TotalTransactionCard
-import com.kazemieh.transaction.ui.main.TransactionItemsProvider
+import com.kazemieh.transaction.ui.main.rememberTransactionItemsProvider
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedBoxWithConstraintsScope", "ConfigurationScreenWidthHeight")
@@ -44,16 +40,9 @@ fun DashboardScreen(
 
     val listState = rememberLazyListState()
 
-    var transactionItemsScope by remember { mutableStateOf<LazyListScope.() -> Unit>({}) }
-
-    TransactionItemsProvider(
-        onEdit = { transactionWithRelations ->
-            viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet(transactionWithRelations))
-        },
-        onDelete = { transactionWithRelations ->
-            viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet(transactionWithRelations))
-        },
-        onItemsReady = { scope -> transactionItemsScope = scope }
+    val transactionItems = rememberTransactionItemsProvider(
+        onEdit = { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet(it)) },
+        onDelete = { viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet(it)) }
     )
 
     Box(
@@ -81,7 +70,7 @@ fun DashboardScreen(
 
                 item { Spacer(Modifier.height(space.mediumSmall)) }
 
-                transactionItemsScope()
+                transactionItems()
             }
 
 

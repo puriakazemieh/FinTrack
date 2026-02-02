@@ -4,6 +4,7 @@ package com.kazemieh.transaction.ui.delete
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.designsystem.R
 import com.kazemieh.domain.usecase.TransactionUseCases
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+
 class DeleteTransactionViewModel(
     private val transactionUseCases: TransactionUseCases
 ) : ViewModel() {
@@ -20,35 +22,50 @@ class DeleteTransactionViewModel(
     private val _state = MutableStateFlow(DeleteTransactionState())
     val state: StateFlow<DeleteTransactionState> = _state.asStateFlow()
 
-    private val _effect = Channel<DeleteTransactionEffect>()
+    private val _effect = Channel<DeleteTransactionEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
     fun onIntent(intent: DeleteTransactionIntent) {
         when (intent) {
-
-            is DeleteTransactionIntent.SetData -> _state.update { it.copy(transactionWithRelations = intent.transactionWithRelations) }
+            is DeleteTransactionIntent.SetData -> _state.update {
+                it.copy(transactionWithRelations = intent.transactionWithRelations, isLoading = false)
+            }
 
             DeleteTransactionIntent.Submit -> deleteTransaction()
 
-            DeleteTransactionIntent.OnDismiss -> {
-                viewModelScope.launch {
-                    _state.update { DeleteTransactionState() }
-                    _effect.send(DeleteTransactionEffect.OnDismiss)
-                }
+            DeleteTransactionIntent.OnDismiss -> viewModelScope.launch {
+                _state.update { DeleteTransactionState() }
+                _effect.send(DeleteTransactionEffect.OnDismiss)
             }
-
         }
     }
 
     private fun deleteTransaction() {
+        if (_state.value.isLoading) return
+
         viewModelScope.launch {
-            _state.value.transactionWithRelations?.transaction?.let {
-                transactionUseCases.deleteTransaction(it)
+            val tx = _state.value.transactionWithRelations?.transaction
+            if (tx == null) {
+                _effect.send(DeleteTransactionEffect.ShowMessage(/* مثلا */ R.string.transaction_failed))
+                _effect.send(DeleteTransactionEffect.OnDismiss)
+                return@launch
+            }
+
+            _state.update { it.copy(isLoading = true) }
+
+            val ok = runCatching {
+                transactionUseCases.deleteTransaction(tx)
+            }.isSuccess
+
+            if (ok) {
                 _effect.send(DeleteTransactionEffect.DeletedTransaction)
+                _state.update { DeleteTransactionState() }
+            } else {
+                _state.update { it.copy(isLoading = false) }
+                _effect.send(DeleteTransactionEffect.ShowMessage(R.string.transaction_delete_failed))
             }
         }
     }
-
 }
 
 sealed interface DeleteTransactionIntent {
@@ -61,7 +78,8 @@ sealed interface DeleteTransactionIntent {
 
 
 data class DeleteTransactionState(
-    val transactionWithRelations: TransactionWithRelations? = null
+    val transactionWithRelations: TransactionWithRelations? = null,
+    val isLoading: Boolean = false
 )
 
 sealed interface DeleteTransactionEffect {
