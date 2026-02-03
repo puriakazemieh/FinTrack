@@ -6,16 +6,17 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.bottomsheet.FormBottomSheetScaffold
 import com.kazemieh.designsystem.component.form.NameDescriptionFields
+import com.kazemieh.designsystem.picker.ColorIconPickerBottomSheet
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -75,6 +76,20 @@ fun AddCategoryBottomSheet(
             description = state.description.orEmpty(),
             onDescriptionChange = { viewModel.onIntent(AddCategoryIntent.SetDescription(it)) },
             descriptionLabel = stringResource(R.string.description_label),
+            initialColorId = null,
+            initialIconId = null,
+            isIconShow = true,
+        )
+
+
+        ColorIconPickerBottomSheet(
+            initialColorId = null,
+            initialIconId = null,
+            onDismiss = {
+            },
+            onSave = { color, icon ->
+                //   color.id + icon.id
+            }
         )
     }
 }
