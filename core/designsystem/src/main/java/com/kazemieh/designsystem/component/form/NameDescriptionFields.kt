@@ -1,32 +1,22 @@
 package com.kazemieh.designsystem.component.form
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
+import com.kazemieh.designsystem.component.LeadingIconStyle
 import com.kazemieh.designsystem.picker.FinTrackCategoryIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
-import com.kazemieh.designsystem.picker.bestOnColor
-
 
 
 @Composable
@@ -56,23 +46,15 @@ fun NameDescriptionFields(
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         if (isIconShow) {
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(selectedColor.color)
-                    .clickable(enabled = onIconClick != null) { onIconClick?.invoke() }, // ✅ کلیک
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(selectedIcon.resId),
-                    contentDescription = null,
-                    tint = bestOnColor(selectedColor.color),
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-
-            Spacer(Modifier.width(12.dp))
+            FinTrackLeadingIcon(
+                colorId = selectedColor.id,
+                iconId = selectedIcon.resId,
+                style = LeadingIconStyle.Badge,
+                size = 44,
+                iconSize = 22,
+                modifier = Modifier.clickable(enabled = onIconClick != null) { onIconClick?.invoke() },
+            )
+            Spacer(Modifier.width(LocalSpacing.current.medium))
         }
 
         FintrackOutlinedTextField(

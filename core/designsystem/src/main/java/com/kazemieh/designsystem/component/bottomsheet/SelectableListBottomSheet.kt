@@ -34,6 +34,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Checkbox
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
+import com.kazemieh.designsystem.component.FinTrackLeadingIcon
+import com.kazemieh.designsystem.component.LeadingIconStyle
 import com.kazemieh.designsystem.component.model.asString
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -154,6 +156,17 @@ fun ItemSelected(
     ) {
         Checkbox(checked = isSelected, onCheckedChange = { onToggle() })
         Spacer(modifier = Modifier.width(space.mediumLarge))
+        if (item.iconId != null || item.colorId != null) {
+            FinTrackLeadingIcon(
+                colorId = item.colorId,
+                iconId = item.iconId,
+                style = LeadingIconStyle.Badge,
+                size = 32,
+                iconSize = 16,
+                corner = 12
+            )
+            Spacer(modifier = Modifier.width(space.mediumSmall))
+        }
         FintrackBodyMediumText(text = item.title.asString())
     }
 

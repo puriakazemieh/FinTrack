@@ -24,7 +24,7 @@ val transactionAddTagModule = module {
     viewModel {
         AddTagViewModel(
             addTagUseCase = get(),
-            editTag = get()
+            editTagUseCase = get()
         )
     }
 }

@@ -4,8 +4,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -65,6 +67,16 @@ fun ItemScreen(
                         .fillMaxWidth()
                         .weight(1f),
                 ) {
+                    if (item.iconId != null || item.colorId != null) {
+                        FinTrackLeadingIcon(
+                            colorId = item.colorId,
+                            iconId = item.iconId,
+                            style = LeadingIconStyle.Badge,
+                            size = 40,
+                            iconSize = 20
+                        )
+                        Spacer(Modifier.width(LocalSpacing.current.medium))
+                    }
                     FintrackBodyMediumText(text = item.title.asString())
                     content(item)
                 }

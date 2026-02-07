@@ -2,8 +2,10 @@ package com.kazemieh.financialsource.ui.list
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -25,9 +27,11 @@ import androidx.compose.ui.res.stringResource
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
+import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.LeadingIconStyle
 import com.kazemieh.designsystem.component.bottomsheet.ListBottomSheet
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
 import com.kazemieh.designsystem.component.model.ItemPayload
@@ -206,7 +210,17 @@ fun SourceList(
                     Column(
                         modifier = Modifier.padding(space.large)
                     ) {
-                        FintrackBodyMediumText(text = source.name)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            FinTrackLeadingIcon(
+                                colorId = source.colorId,
+                                iconId = source.iconId,
+                                style = LeadingIconStyle.Badge,
+                                size = 36,
+                                iconSize = 18
+                            )
+                            Spacer(Modifier.width(space.medium))
+                            FintrackBodyMediumText(text = source.name)
+                        }
                         FintrackBodySmallText(
                             text = stringResource(R.string.balance, source.formattedBalance),
                             color = MaterialTheme.colorScheme.onSurfaceVariant

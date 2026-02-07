@@ -24,7 +24,7 @@ val transactionAddPersonModule = module {
     viewModel {
         AddPersonViewModel(
             addPersonUseCase = get(),
-            editPerson = get()
+            editPersonUseCase = get()
         )
     }
 }

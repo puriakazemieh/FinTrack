@@ -9,7 +9,9 @@ import com.kazemieh.common.model.Tag
 data class ItemUi(
     val id: Long,
     var title: UiText,
-    val payload: ItemPayload? = null
+    val payload: ItemPayload? = null,
+    val iconId: Int? = null,
+    val colorId: Int? = null
 )
 
 // ---------- TAG ----------
@@ -18,7 +20,9 @@ fun Tag.toItemUi(): ItemUi {
     return ItemUi(
         id = safeId,
         title = UiText.DynamicString(name),
-        payload = ItemPayload.TagPayload(safeId, name)
+        payload = ItemPayload.TagPayload(safeId, name),
+        iconId = iconId,
+        colorId = colorId
     )
 }
 
@@ -50,7 +54,9 @@ fun Category.toItemUi(): ItemUi {
     return ItemUi(
         id = safeId,
         title = UiText.DynamicString(name),
-        payload = ItemPayload.CategoryPayload(safeId, name, type)
+        payload = ItemPayload.CategoryPayload(safeId, name, type),
+        iconId = iconId,
+        colorId = colorId
     )
 }
 
@@ -66,7 +72,9 @@ fun Source.toItemUi(): ItemUi {
     return ItemUi(
         id = safeId,
         title = UiText.DynamicString(name),
-        payload = ItemPayload.SourcePayload(safeId, name, formattedBalance)
+        payload = ItemPayload.SourcePayload(safeId, name, formattedBalance),
+        iconId = iconId,
+        colorId = colorId
     )
 }
 
