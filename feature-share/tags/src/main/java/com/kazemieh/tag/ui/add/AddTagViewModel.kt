@@ -15,80 +15,149 @@ import kotlinx.coroutines.launch
 
 class AddTagViewModel(
     private val addTagUseCase: AddTag,
-    private val editTag: EditTag
+    private val editTagUseCase: EditTag
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddTagState())
     val state = _state.asStateFlow()
 
-    private val _effect = Channel<AddTagEffect>()
+    private val _effect = Channel<AddTagEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
-
 
     fun onIntent(intent: AddTagIntent) {
         when (intent) {
-            AddTagIntent.AddTag -> addTag()
-            AddTagIntent.OnDismiss -> {
-                viewModelScope.launch {
-                    _state.update { AddTagState() }
-                    _effect.send(AddTagEffect.OnDismiss)
-                }
-            }
+            is AddTagIntent.StartAdd -> startAdd()
+            is AddTagIntent.StartEdit -> startEdit(intent.tag)
 
-            is AddTagIntent.SetTagName -> _state.update { it.copy(tagName = intent.tagName) }
-            is AddTagIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
-            is AddTagIntent.ShowEditData -> _state.update {
+            is AddTagIntent.UpdateName -> updateDraft { it.copy(name = intent.value) }
+            is AddTagIntent.UpdateDescription -> updateDraft { it.copy(description = intent.value) }
+
+            AddTagIntent.OpenPicker -> _state.update { it.copy(isPickerOpen = true) }
+            AddTagIntent.ClosePicker -> _state.update { it.copy(isPickerOpen = false) }
+            is AddTagIntent.SetColorIcon -> _state.update {
                 it.copy(
-                    description = intent.tag.description,
-                    tagName = intent.tag.name,
-                    tag = intent.tag
+                    draft = it.draft.copy(colorId = intent.colorId, iconId = intent.iconId),
+                    isPickerOpen = false
                 )
             }
+
+            AddTagIntent.Save -> save()
+            AddTagIntent.OnDismiss -> dismiss()
         }
     }
 
-    private fun addTag() = with(_state.value) {
-        viewModelScope.launch {
-            if (tagName?.isNotBlank() == true) {
-                val tag = Tag(
-                    id = tag?.id,
-                    name = tagName,
-                    description = description
-                )
-                val tagId = if (_state.value.tag != null) {
-                    editTag(tag).toLong()
-                } else {
-                    addTagUseCase(tag)
-                }
-                if (tagId >= 0) {
-                    _effect.send(AddTagEffect.AddedTag(tag.copy(id = tagId)))
-                    _state.update { AddTagState() }
-                }
+    private fun updateDraft(transform: (TagDraft) -> TagDraft) {
+        _state.update { it.copy(draft = transform(it.draft)) }
+    }
 
-            } else {
+    private fun startAdd() {
+        _state.update {
+            AddTagState(
+                mode = AddTagMode.Add,
+                draft = TagDraft(),
+                isPickerOpen = false
+            )
+        }
+    }
+
+    private fun startEdit(tag: Tag) {
+        _state.update {
+            AddTagState(
+                mode = AddTagMode.Edit(tag.id ?: 0L),
+                draft = tag.toDraft(),
+                isPickerOpen = false
+            )
+        }
+    }
+
+    private fun dismiss() {
+        viewModelScope.launch {
+            _state.update { AddTagState() }
+            _effect.send(AddTagEffect.OnDismiss)
+        }
+    }
+
+    private fun save() = with(_state.value) {
+        viewModelScope.launch {
+            val name = draft.name.trim()
+            if (name.isBlank()) {
                 _effect.send(AddTagEffect.ShowMessage(R.string.check_name_tag_source))
+                return@launch
+            }
+
+            val tag = draft.toTag(id = mode.tagIdOrNull)
+
+            val tagId = when (mode) {
+                is AddTagMode.Add -> addTagUseCase(tag)
+                is AddTagMode.Edit -> editTagUseCase(tag).toLong()
+            }
+
+            if (tagId >= 0) {
+                val saved = tag.copy(id = tagId)
+                _effect.send(AddTagEffect.SavedTag(saved))
+                _state.update { AddTagState() }
             }
         }
     }
 }
 
+/** --- State / Mode / Draft --- **/
 
 data class AddTagState(
-    val tagName: String? = null,
-    val description: String? = null,
-    val tag: Tag? = null,
+    val mode: AddTagMode = AddTagMode.Add,
+    val draft: TagDraft = TagDraft(),
+    val isPickerOpen: Boolean = false
 )
 
+sealed interface AddTagMode {
+    data object Add : AddTagMode
+    data class Edit(val tagId: Long) : AddTagMode
+}
+
+private val AddTagMode.tagIdOrNull: Long?
+    get() = (this as? AddTagMode.Edit)?.tagId
+
+data class TagDraft(
+    val name: String = "",
+    val description: String? = null,
+    val colorId: Int? = null,
+    val iconId: Int? = null
+)
+
+private fun Tag.toDraft(): TagDraft = TagDraft(
+    name = this.name.orEmpty(),
+    description = this.description,
+    colorId = this.colorId,
+    iconId = this.iconId
+)
+
+private fun TagDraft.toTag(id: Long?): Tag = Tag(
+    id = id,
+    name = name,
+    description = description,
+    colorId = colorId,
+    iconId = iconId
+)
+
+/** --- Intent / Effect --- **/
+
 sealed interface AddTagIntent {
-    data object AddTag : AddTagIntent
-    data class SetTagName(val tagName: String? = null) : AddTagIntent
-    data class SetDescription(val description: String? = null) : AddTagIntent
+    data object StartAdd : AddTagIntent
+    data class StartEdit(val tag: Tag) : AddTagIntent
+
+    data class UpdateName(val value: String) : AddTagIntent
+    data class UpdateDescription(val value: String?) : AddTagIntent
+
+    data object OpenPicker : AddTagIntent
+    data object ClosePicker : AddTagIntent
+    data class SetColorIcon(val colorId: Int?, val iconId: Int?) : AddTagIntent
+
+    data object Save : AddTagIntent
     data object OnDismiss : AddTagIntent
-    data class ShowEditData(val tag: Tag) : AddTagIntent
 }
 
 sealed interface AddTagEffect {
     data class ShowMessage(val message: Int) : AddTagEffect
-    data class AddedTag(val tag: Tag) : AddTagEffect
+    data class SavedTag(val tag: Tag) : AddTagEffect
     data object OnDismiss : AddTagEffect
 }
