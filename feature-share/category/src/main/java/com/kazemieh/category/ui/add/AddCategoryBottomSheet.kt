@@ -35,13 +35,12 @@ fun AddCategoryBottomSheet(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(transactionType) {
-        viewModel.onIntent(AddCategoryIntent.SetCategoryType(transactionType))
-    }
 
-    LaunchedEffect(selectedCategory) {
+    LaunchedEffect(selectedCategory?.id, transactionType) {
         if (selectedCategory != null) {
-            viewModel.onIntent(AddCategoryIntent.ShowEditData(selectedCategory))
+            viewModel.onIntent(AddCategoryIntent.StartEdit(selectedCategory))
+        } else {
+            viewModel.onIntent(AddCategoryIntent.StartAdd(transactionType))
         }
     }
 
@@ -57,7 +56,7 @@ fun AddCategoryBottomSheet(
                     }
                 }
 
-                is AddCategoryEffect.AddedCategory -> setCategory(effect.category)
+                is AddCategoryEffect.SavedCategory -> setCategory(effect.category)
                 AddCategoryEffect.OnDismiss -> onDismiss()
             }
         }
@@ -67,29 +66,33 @@ fun AddCategoryBottomSheet(
         sheetState = sheetState,
         onDismissRequest = { viewModel.onIntent(AddCategoryIntent.OnDismiss) },
         primaryButtonText = stringResource(R.string.save_category),
-        onPrimaryClick = { viewModel.onIntent(AddCategoryIntent.AddCategory) }
+        onPrimaryClick = { viewModel.onIntent(AddCategoryIntent.Save) }
     ) {
         NameDescriptionFields(
-            name = state.categoryName.orEmpty(),
-            onNameChange = { viewModel.onIntent(AddCategoryIntent.SetCategoryName(it)) },
+            name = state.draft.name,
+            onNameChange = { viewModel.onIntent(AddCategoryIntent.UpdateName(it)) },
             nameLabel = stringResource(R.string.category_name_label),
-            description = state.description.orEmpty(),
-            onDescriptionChange = { viewModel.onIntent(AddCategoryIntent.SetDescription(it)) },
+
+            description = state.draft.description.orEmpty(),
+            onDescriptionChange = { viewModel.onIntent(AddCategoryIntent.UpdateDescription(it)) },
             descriptionLabel = stringResource(R.string.description_label),
-            initialColorId = null,
-            initialIconId = null,
+
+            initialColorId = state.draft.colorId,
+            initialIconId = state.draft.iconId,
             isIconShow = true,
+
+            onIconClick = { viewModel.onIntent(AddCategoryIntent.OpenPicker) }
         )
 
-
-        ColorIconPickerBottomSheet(
-            initialColorId = null,
-            initialIconId = null,
-            onDismiss = {
-            },
-            onSave = { color, icon ->
-                //   color.id + icon.id
-            }
-        )
+        if (state.isPickerOpen) {
+            ColorIconPickerBottomSheet(
+                initialColorId = state.draft.colorId,
+                initialIconId = state.draft.iconId,
+                onDismiss = { viewModel.onIntent(AddCategoryIntent.ClosePicker) },
+                onSave = { color, icon ->
+                    viewModel.onIntent(AddCategoryIntent.SetColorIcon(color.id, icon.id))
+                }
+            )
+        }
     }
 }

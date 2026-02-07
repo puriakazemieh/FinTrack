@@ -9,7 +9,9 @@ data class Category(
     val id: Long? = null,
     val name: String,
     val description: String? = null,
-    val type: TransactionType,
+    val type: TransactionType = TransactionType.INCOME,
+    val colorId: Int? = null,
+    val iconId: Int? = null
 )
 
 

@@ -1,6 +1,7 @@
 package com.kazemieh.designsystem.component.form
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,6 +28,7 @@ import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import com.kazemieh.designsystem.picker.bestOnColor
 
 
+
 @Composable
 fun NameDescriptionFields(
     name: String,
@@ -39,27 +41,17 @@ fun NameDescriptionFields(
     initialColorId: Int? = null,
     initialIconId: Int? = null,
     isIconShow: Boolean = true,
+    onIconClick: (() -> Unit)? = null,
     between: @Composable () -> Unit = {}
 ) {
-
     val colors = FinTrackPickerColors.appTheme()
-    val defaultColor = remember(colors, initialColorId) {
+
+    val selectedColor = remember(colors, initialColorId) {
         colors.firstOrNull { it.id == initialColorId } ?: colors.first()
     }
-    val defaultIcon = remember(FinTrackCategoryIcons.icons, initialIconId) {
+    val selectedIcon = remember(FinTrackCategoryIcons.icons, initialIconId) {
         FinTrackCategoryIcons.icons.firstOrNull { it.id == initialIconId }
             ?: FinTrackCategoryIcons.icons.first()
-    }
-
-    var selectedColor by remember(colors, initialColorId) {
-        mutableStateOf(
-            defaultColor
-        )
-    }
-    var selectedIcon by remember(FinTrackCategoryIcons.icons, initialIconId) {
-        mutableStateOf(
-            defaultIcon
-        )
     }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -68,7 +60,8 @@ fun NameDescriptionFields(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(RoundedCornerShape(14.dp))
-                    .background(selectedColor.color),
+                    .background(selectedColor.color)
+                    .clickable(enabled = onIconClick != null) { onIconClick?.invoke() }, // ✅ کلیک
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -81,6 +74,7 @@ fun NameDescriptionFields(
 
             Spacer(Modifier.width(12.dp))
         }
+
         FintrackOutlinedTextField(
             value = name,
             onValueChange = onNameChange,
@@ -99,6 +93,7 @@ fun NameDescriptionFields(
     }
 
     between()
+
     FintrackOutlinedTextField(
         value = description,
         onValueChange = onDescriptionChange,
