@@ -13,4 +13,6 @@ data class SourceEntity(
     val cardNumber: String? = null,
     val description: String? = null,
     val type: Int,
+    val colorId: Int = 1,
+    val iconId: Int = 1
 )

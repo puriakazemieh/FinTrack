@@ -29,7 +29,12 @@ fun Tag.toItemUi(): ItemUi {
 fun ItemUi.toTag(): Tag {
     val p = payload as? ItemPayload.TagPayload
         ?: error("ItemUi payload is not TagPayload")
-    return Tag(id = p.id, name = p.name)
+    return Tag(
+        id = p.id,
+        name = p.name,
+        colorId = colorId ?: 1,
+        iconId = iconId ?: 1
+    )
 }
 
 // ---------- PERSON ----------
@@ -63,7 +68,13 @@ fun Category.toItemUi(): ItemUi {
 fun ItemUi.toCategory(): Category {
     val p = payload as? ItemPayload.CategoryPayload
         ?: error("ItemUi payload is not CategoryPayload")
-    return Category(id = p.id, name = p.name, type = p.type)
+    return Category(
+        id = p.id,
+        name = p.name,
+        type = p.type,
+        colorId = colorId ?: 1,
+        iconId = iconId ?: 1
+    )
 }
 
 // ---------- SOURCE ----------
@@ -81,6 +92,12 @@ fun Source.toItemUi(): ItemUi {
 fun ItemUi.toSource(): Source {
     val p = payload as? ItemPayload.SourcePayload
         ?: error("ItemUi payload is not SourcePayload")
-    return Source(id = p.id, name = p.name, formattedBalance = p.formattedBalance)
+    return Source(
+        id = p.id,
+        name = p.name,
+        formattedBalance = p.formattedBalance,
+        colorId = colorId ?: 1,
+        iconId = iconId ?: 1
+    )
 }
 

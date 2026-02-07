@@ -18,7 +18,7 @@ val databaseModule = module {
             DatabaseModule::class.java,
             "fin_track.db"
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
             .addCallback(PrepopulateCallback(koin = getKoin()))
             .build()
     }
@@ -81,7 +81,8 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(db: SupportSQLiteDatabase) {
 
-        db.execSQL("""
+        db.execSQL(
+            """
             CREATE TABLE transactions_new (
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 amount INTEGER NOT NULL,
@@ -95,9 +96,11 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
                 FOREIGN KEY(categoryId) REFERENCES category(id) ON DELETE CASCADE,
                 FOREIGN KEY(sourceId) REFERENCES financial_source(id) ON DELETE CASCADE
             )
-        """)
+        """
+        )
 
-        db.execSQL("""
+        db.execSQL(
+            """
             INSERT INTO transactions_new (
                 id, amount, amountTransfer, categoryId,
                 sourceId, sourceEndId, description, timeStamp, type
@@ -113,7 +116,8 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
                 timeStamp,
                 type
             FROM transactions
-        """)
+        """
+        )
 
         db.execSQL("DROP TABLE transactions")
         db.execSQL("ALTER TABLE transactions_new RENAME TO transactions")
@@ -186,5 +190,45 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
 
         // 5. rename
         db.execSQL("ALTER TABLE transactions_new RENAME TO transactions")
+    }
+}
+
+
+private const val COLOR_COUNT = 12
+private const val ICON_COUNT = 100
+
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+
+        // --- category ---
+        db.execSQL("ALTER TABLE category ADD COLUMN colorId INTEGER NOT NULL DEFAULT 1")
+        db.execSQL("ALTER TABLE category ADD COLUMN iconId INTEGER NOT NULL DEFAULT 1")
+
+        // برای کاربران آپدیتی: مقدارهای متفاوت بر اساس id
+        db.execSQL("""
+            UPDATE category
+            SET colorId = ((id + 3) % $COLOR_COUNT) + 1,
+                iconId  = ((id + 17) % $ICON_COUNT) + 1
+        """.trimIndent())
+
+        // --- tag ---
+        db.execSQL("ALTER TABLE tag ADD COLUMN colorId INTEGER NOT NULL DEFAULT 1")
+        db.execSQL("ALTER TABLE tag ADD COLUMN iconId INTEGER NOT NULL DEFAULT 1")
+
+        db.execSQL("""
+            UPDATE tag
+            SET colorId = ((id + 5) % $COLOR_COUNT) + 1,
+                iconId  = ((id + 29) % $ICON_COUNT) + 1
+        """.trimIndent())
+
+        // --- source ---
+        db.execSQL("ALTER TABLE source ADD COLUMN colorId INTEGER NOT NULL DEFAULT 1")
+        db.execSQL("ALTER TABLE source ADD COLUMN iconId INTEGER NOT NULL DEFAULT 1")
+
+        db.execSQL("""
+            UPDATE source
+            SET colorId = ((id + 7) % $COLOR_COUNT) + 1,
+                iconId  = ((id + 41) % $ICON_COUNT) + 1
+        """.trimIndent())
     }
 }

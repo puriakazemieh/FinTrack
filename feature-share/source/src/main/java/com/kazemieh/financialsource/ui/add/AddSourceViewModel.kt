@@ -87,7 +87,12 @@ class AddSourceViewModel(
         editJob = viewModelScope.launch {
             sourceUseCases.getSource(id).collect { db ->
                 db?.let {
-                    _state.update { st -> st.copy(mode = AddSourceMode.Edit(it.id ?: id), draft = it.toDraft()) }
+                    _state.update { st ->
+                        st.copy(
+                            mode = AddSourceMode.Edit(it.id ?: id),
+                            draft = it.toDraft()
+                        )
+                    }
                 }
             }
         }
@@ -145,8 +150,6 @@ data class SourceDraft(
     val balance: Int = 0,
     val type: TypeSource = TypeSource.CREDIT,
     val cardNumber: String? = null,
-
-    // ✅ جدید
     val colorId: Int? = null,
     val iconId: Int? = null
 )
@@ -168,8 +171,8 @@ private fun SourceDraft.toSource(id: Long?): Source = Source(
     cardNumber = cardNumber,
     description = description,
     type = type.count,
-    colorId = colorId,
-    iconId = iconId
+    colorId = colorId ?: 1,
+    iconId = iconId ?: 1
 )
 
 /** --- Intent / Effect --- */

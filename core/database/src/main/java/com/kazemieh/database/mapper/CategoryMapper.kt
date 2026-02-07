@@ -7,13 +7,22 @@ import com.kazemieh.database.entity.CategoryEntity
 import com.kazemieh.database.entity.CategorySumEntity
 
 fun CategoryEntity.toCategory(): Category =
-    Category(id, name, description, TransactionType.fromInt(type))
+    Category(
+        id,
+        name,
+        description,
+        TransactionType.fromInt(type),
+        colorId = colorId,
+        iconId = iconId
+    )
 
 fun Category.toCategoryEntity(): CategoryEntity = CategoryEntity(
     id = id ?: 0,
     name = name,
     description = description,
-    type = type.count
+    type = type.count,
+    colorId = colorId,
+    iconId = iconId
 )
 
 fun CategorySumEntity.toCategory(): CategorySum =

@@ -13,6 +13,6 @@ data class Source(
     val description: String? = null,
     val type: Int = 0,
     val formattedBalance: String = balance.formatted(),
-    val colorId: Int? = null,
-    val iconId: Int? = null
+    val colorId: Int,
+    val iconId: Int
 )

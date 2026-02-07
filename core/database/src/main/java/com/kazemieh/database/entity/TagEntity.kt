@@ -10,5 +10,7 @@ data class TagEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
     val description: String? = null,
+    val colorId: Int = 1,
+    val iconId: Int = 1
 )
 

@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 fun ColorIconPickerBottomSheet(
     initialColorId: Int? = null,
     initialIconId: Int? = null,
-//    colors: List<PickableColor> = FinTrackPickerColors.colors,
     icons: List<PickableIcon> = FinTrackCategoryIcons.icons,
     onDismiss: () -> Unit,
     onSave: (color: PickableColor, icon: PickableIcon) -> Unit,

@@ -11,7 +11,9 @@ fun SourceEntity.toSource(): Source = Source(
     cardNumber = cardNumber,
     description = description,
     formattedBalance = balance.formatted(),
-    type = type
+    type = type,
+    colorId = colorId,
+    iconId = iconId
 )
 
 fun Source.toSourceEntity(): SourceEntity =
@@ -21,5 +23,7 @@ fun Source.toSourceEntity(): SourceEntity =
         balance = balance,
         cardNumber = cardNumber,
         description = description,
-        type = type
+        type = type,
+        colorId = colorId,
+        iconId = iconId
     )

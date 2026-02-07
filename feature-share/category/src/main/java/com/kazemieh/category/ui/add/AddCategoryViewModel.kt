@@ -144,8 +144,8 @@ private fun CategoryDraft.toCategory(id: Long?): Category = Category(
     name = name,
     description = description,
     type = type,
-    colorId = colorId,
-    iconId = iconId
+    colorId = colorId ?: 1,
+    iconId = iconId ?: 1
 )
 
 /** --- Intent / Effect --- **/

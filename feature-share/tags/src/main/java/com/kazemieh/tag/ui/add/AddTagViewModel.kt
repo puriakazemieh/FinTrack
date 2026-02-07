@@ -135,8 +135,8 @@ private fun TagDraft.toTag(id: Long?): Tag = Tag(
     id = id,
     name = name,
     description = description,
-    colorId = colorId,
-    iconId = iconId
+    colorId = colorId?:1,
+    iconId = iconId?:1
 )
 
 /** --- Intent / Effect --- **/

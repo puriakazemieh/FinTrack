@@ -4,19 +4,19 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.database.dao.CategoryDao
 import com.kazemieh.database.dao.FinancialSourceDao
 import com.kazemieh.database.dao.PersonDao
 import com.kazemieh.database.dao.TagDao
 import com.kazemieh.database.dao.TransactionDao
 import com.kazemieh.database.entity.CategoryEntity
-import com.kazemieh.database.entity.SourceEntity
 import com.kazemieh.database.entity.PersonEntity
+import com.kazemieh.database.entity.SourceEntity
 import com.kazemieh.database.entity.TagEntity
 import com.kazemieh.database.entity.TransactionEntity
 import com.kazemieh.database.entity.TransactionPersonCrossRef
 import com.kazemieh.database.entity.TransactionTagCrossRef
-import com.kazemieh.common.model.TransactionType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,7 +32,7 @@ import org.koin.core.Koin
         PersonEntity::class,
         TransactionPersonCrossRef::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(TransactionTypeConverter::class)
@@ -45,6 +45,12 @@ abstract class DatabaseModule : RoomDatabase() {
 
 }
 
+private const val COLOR_COUNT = 12
+private const val ICON_COUNT = 100
+
+private fun colorForIndex(i: Int) = (i % COLOR_COUNT) + 1
+private fun iconForIndex(i: Int) = (i % ICON_COUNT) + 1
+
 class PrepopulateCallback(
     private val koin: Koin
 ) : RoomDatabase.Callback() {
@@ -53,8 +59,14 @@ class PrepopulateCallback(
         CoroutineScope(Dispatchers.IO).launch {
             val prefsDao: FinancialSourceDao by koin.inject()
             prefsDao.insertFinancialSource(
-                SourceEntity(name = "منبع مالی پیش فرض", type = 1)
+                SourceEntity(
+                    name = "منبع مالی پیش فرض",
+                    type = 1,
+                    colorId = colorForIndex(0),
+                    iconId = iconForIndex(0)
+                )
             )
+
             val categoryDao: CategoryDao by koin.inject()
             val defaultCategory = listOf(
                 // Incomes
@@ -83,7 +95,12 @@ class PrepopulateCallback(
 
 
                 CategoryEntity(name = "انتقال", type = TransactionType.TRANSFER.count)
-            )
+            ).mapIndexed { index, c ->
+                c.copy(
+                    colorId = colorForIndex(index),
+                    iconId = iconForIndex(index)
+                )
+            }
             categoryDao.insertAllCategory(defaultCategory)
 
             val tagDao: TagDao by koin.inject()
@@ -98,7 +115,12 @@ class PrepopulateCallback(
                 TagEntity(name = "سرمایه‌گذاری", description = "سرمایه‌گذاری‌ها و پس‌اندازها"),
                 TagEntity(name = "حمل و نقل", description = "سوخت، تاکسی، حمل و نقل عمومی"),
                 TagEntity(name = "هدیه", description = "هدیه‌ها و کمک‌های مالی به دیگران")
-            )
+            ).mapIndexed { index, t ->
+                t.copy(
+                    colorId = colorForIndex(index + 50),
+                    iconId = iconForIndex(index + 50)
+                )
+            }
             tagDao.insertAllTag(defaultTags)
         }
 
