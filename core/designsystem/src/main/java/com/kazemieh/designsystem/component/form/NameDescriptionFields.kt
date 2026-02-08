@@ -34,7 +34,7 @@ fun NameDescriptionFields(
     onIconClick: (() -> Unit)? = null,
     between: @Composable () -> Unit = {}
 ) {
-    val colors = FinTrackPickerColors.appTheme()
+    val colors = FinTrackPickerColors.rainbow()
 
     val selectedColor = remember(colors, initialColorId) {
         colors.firstOrNull { it.id == initialColorId } ?: colors.first()
@@ -48,7 +48,7 @@ fun NameDescriptionFields(
         if (isIconShow) {
             FinTrackLeadingIcon(
                 colorId = selectedColor.id,
-                iconId = selectedIcon.resId,
+                iconId = selectedIcon.id,
                 style = LeadingIconStyle.Badge,
                 size = 44,
                 iconSize = 22,

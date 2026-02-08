@@ -117,4 +117,11 @@
     <string name="transfer_from_to_label">از %1$s به %2$s</string>
     <string name="amount_transfer_label">مبلغ انتقال: %1$s</string>
     <string name="edit">ویرایش</string>
+
+
+    <string name="save_">ذخیره</string>
+    <string name="choose_icon">انتخاب آیکون</string>
+    <string name="choose_color">انتخاب رنگ</string>
+
+
 </resources>

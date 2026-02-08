@@ -28,7 +28,7 @@ fun FinTrackLeadingIcon(
     iconSize: Int = 20,  // dp
     corner: Int = 14     // dp
 ) {
-    val colors = FinTrackPickerColors.appTheme()
+    val colors = FinTrackPickerColors.rainbow()
 
     val pickedColor = remember(colors, colorId) {
         colors.firstOrNull { it.id == colorId } ?: colors.first()
