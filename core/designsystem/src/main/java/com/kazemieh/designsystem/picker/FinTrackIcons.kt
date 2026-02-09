@@ -2,7 +2,7 @@ package com.kazemieh.designsystem.picker
 
 import com.kazemieh.designsystem.R
 
-object FinTrackCategoryIcons {
+object FinTrackIcons {
 
     // Generated list of drawable resource IDs: ic_1 .. ic_998
     private val RES_IDS = intArrayOf(

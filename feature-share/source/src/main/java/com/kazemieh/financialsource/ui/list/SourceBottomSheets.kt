@@ -215,8 +215,8 @@ fun SourceList(
                                 colorId = source.colorId,
                                 iconId = source.iconId,
                                 style = LeadingIconStyle.Badge,
-                                size = 36,
-                                iconSize = 18
+                                size = space.extraLarge,
+                                iconSize = space.large,
                             )
                             Spacer(Modifier.width(space.medium))
                             FintrackBodyMediumText(text = source.name)

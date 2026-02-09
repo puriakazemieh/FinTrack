@@ -24,6 +24,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -45,8 +47,9 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
-import com.kazemieh.designsystem.component.FilterButton
+import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import kotlinx.coroutines.android.awaitFrame
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,8 +61,9 @@ fun ColorIconPickerBottomSheet(
     onSave: (color: PickableColor, icon: PickableIcon) -> Unit,
 ) {
 
+    val space = LocalSpacing.current
     val colors = FinTrackPickerColors.rainbow()
-    val icons = FinTrackCategoryIcons.icons
+    val icons = FinTrackIcons.icons
 
     val initialColorIndex = remember(initialColorId, colors) {
         colors.indexOfFirst { it.id == initialColorId }
@@ -170,14 +174,43 @@ fun ColorIconPickerBottomSheet(
                 }
             }
 
+
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(space.large),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(space.mediumSmall)
             ) {
-                FilterButton(text = stringResource(R.string.cancell_), onClick = onDismiss)
-                FilterButton(
-                    text = stringResource(R.string.save_),
-                    onClick = { onSave(selectedColor, selectedIcon) })
+                Button(
+                    onClick = { onSave(selectedColor, selectedIcon) },
+                    modifier = Modifier.weight(1f),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    FintrackTitleMediumText(
+                        text = stringResource(R.string.save_),
+                        color = MaterialTheme.colorScheme.background
+                    )
+                }
+
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    )
+                ) {
+                    FintrackTitleMediumText(
+                        text = stringResource(R.string.cancell_),
+                        color = MaterialTheme.colorScheme.background
+                    )
+                }
             }
         }
     }

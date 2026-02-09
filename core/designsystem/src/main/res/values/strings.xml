@@ -113,7 +113,7 @@
     <string name="move_to_another_person">انتقال به شخص دیگر</string>
     <string name="save_source">ثبت منبع</string>
     <string name="source_with_value">منبع: %1$s</string>
-    <string name="description_with_value">وضیحات: %1$s</string>
+    <string name="description_with_value">توضیحات: %1$s</string>
     <string name="transfer_from_to_label">از %1$s به %2$s</string>
     <string name="amount_transfer_label">مبلغ انتقال: %1$s</string>
     <string name="edit">ویرایش</string>

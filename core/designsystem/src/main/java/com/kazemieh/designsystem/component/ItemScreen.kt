@@ -72,8 +72,8 @@ fun ItemScreen(
                             colorId = item.colorId,
                             iconId = item.iconId,
                             style = LeadingIconStyle.Badge,
-                            size = 40,
-                            iconSize = 20
+                            size = space.extraLarge,
+                            iconSize = space.large
                         )
                         Spacer(Modifier.width(LocalSpacing.current.medium))
                     }

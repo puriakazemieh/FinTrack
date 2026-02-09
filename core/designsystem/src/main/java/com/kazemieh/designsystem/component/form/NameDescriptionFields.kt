@@ -15,7 +15,7 @@ import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.LeadingIconStyle
-import com.kazemieh.designsystem.picker.FinTrackCategoryIcons
+import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
 
 
@@ -34,14 +34,16 @@ fun NameDescriptionFields(
     onIconClick: (() -> Unit)? = null,
     between: @Composable () -> Unit = {}
 ) {
+
+    val space = LocalSpacing.current
     val colors = FinTrackPickerColors.rainbow()
 
     val selectedColor = remember(colors, initialColorId) {
         colors.firstOrNull { it.id == initialColorId } ?: colors.first()
     }
-    val selectedIcon = remember(FinTrackCategoryIcons.icons, initialIconId) {
-        FinTrackCategoryIcons.icons.firstOrNull { it.id == initialIconId }
-            ?: FinTrackCategoryIcons.icons.first()
+    val selectedIcon = remember(FinTrackIcons.icons, initialIconId) {
+        FinTrackIcons.icons.firstOrNull { it.id == initialIconId }
+            ?: FinTrackIcons.icons.first()
     }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -50,8 +52,8 @@ fun NameDescriptionFields(
                 colorId = selectedColor.id,
                 iconId = selectedIcon.id,
                 style = LeadingIconStyle.Badge,
-                size = 44,
-                iconSize = 22,
+                size = space.extraLarge,
+                iconSize = space.large,
                 modifier = Modifier.clickable(enabled = onIconClick != null) { onIconClick?.invoke() },
             )
             Spacer(Modifier.width(LocalSpacing.current.medium))

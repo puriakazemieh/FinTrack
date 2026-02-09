@@ -102,7 +102,7 @@ fun SelectableFlowRowBottomSheet(
                                                 colorId = item.colorId,
                                                 iconId = item.iconId,
                                                 style = LeadingIconStyle.TintOnly,
-                                                iconSize = 16
+                                                iconSize = space.large
                                             )
                                             Spacer(Modifier.width(space.extraSmall))
                                         }

@@ -1,12 +1,17 @@
 package com.kazemieh.transaction.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -19,18 +24,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
+import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-
+import com.kazemieh.designsystem.component.LeadingIconStyle
+import com.kazemieh.designsystem.picker.FinTrackIcons
+import com.kazemieh.designsystem.picker.FinTrackPickerColors
 
 @Composable
 fun TransactionItem(
@@ -46,9 +58,6 @@ fun TransactionItem(
     val personsText = remember(uiTransactionWithRelation.persons) {
         uiTransactionWithRelation.persons.joinToString { it.name }
     }
-    val tagsText = remember(uiTransactionWithRelation.tags) {
-        uiTransactionWithRelation.tags.joinToString { it.name }
-    }
 
     val typeLabel = when (trx.type) {
         TransactionType.INCOME -> stringResource(R.string.incoming)
@@ -61,6 +70,21 @@ fun TransactionItem(
         if (trx.type == TransactionType.EXPENSE) MaterialTheme.colorScheme.error
         else MaterialTheme.colorScheme.secondary
 
+    // ---------------------------
+    val icons = FinTrackIcons.icons
+    val sourceIcon = remember(icons, uiTransactionWithRelation.source.iconId) {
+        icons.firstOrNull { it.id == uiTransactionWithRelation.source.iconId } ?: icons.first()
+    }
+
+    val colors = FinTrackPickerColors.rainbow()
+    val color = remember(colors, uiTransactionWithRelation.category.colorId) {
+        colors.firstOrNull { it.id == uiTransactionWithRelation.category.colorId } ?: colors.first()
+    }
+
+    // ---------------------------
+
+    val barWidth = space.extraSmall
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -69,117 +93,192 @@ fun TransactionItem(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = space.one)
     ) {
-        Column(Modifier.padding(space.large)) {
+        val barWidthPx = with(LocalDensity.current) { barWidth.toPx() }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .drawBehind {
+                    val x = size.width - barWidthPx
+                    drawRect(
+                        color = color.color,
+                        topLeft = Offset(x, 0f),
+                        size = Size(barWidthPx, size.height)
+                    )
+                }
+                .padding(space.mediumSmall)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(start = barWidth + space.small)
             ) {
-                FintrackTitleMediumText(
-                    modifier = Modifier.weight(1f),
-                    text = uiTransactionWithRelation.category.name,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                // ---------- Header (Category + Edit/Delete) ----------
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        FinTrackLeadingIcon(
+                            colorId = uiTransactionWithRelation.category.colorId,
+                            iconId = uiTransactionWithRelation.category.iconId,
+                            style = LeadingIconStyle.Badge,
+                            size = space.extraLarge,
+                            iconSize = space.large,
+                        )
+                        Spacer(modifier = Modifier.width(space.small))
 
-                IconButton(onClick = onEdit) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = stringResource(R.string.edit),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                        FintrackTitleMediumText(
+                            text = uiTransactionWithRelation.category.name,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    IconButton(onClick = onEdit) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.edit),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    IconButton(onClick = onDelete) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.delete),
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
 
-                IconButton(onClick = onDelete) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = stringResource(R.string.delete),
-                        tint = MaterialTheme.colorScheme.error
+                Spacer(modifier = Modifier.height(space.mediumSmall))
+
+                // ---------- Source / Transfer Info ----------
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    FintrackTitleMediumText(
+                        text = stringResource(R.string.source),
+                        color = MaterialTheme.colorScheme.onSurface
                     )
+
+                    Spacer(modifier = Modifier.width(space.small))
+                    // 2) آیکون + نام منبع
+                    FinTrackLeadingIcon(
+                        colorId = uiTransactionWithRelation.source.colorId,
+                        iconId = uiTransactionWithRelation.source.iconId,
+                        style = LeadingIconStyle.Badge,
+                        size = space.large,
+                        iconSize = space.mediumSmall,
+                    )
+                    Spacer(modifier = Modifier.width(space.small))
+                    FintrackTitleMediumText(
+                        text = uiTransactionWithRelation.source.name,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    if (isTransfer) {
+                        Spacer(modifier = Modifier.width(space.small))
+                        FintrackLabelSmallText(
+                            text = "←",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.width(space.small))
+
+                        uiTransactionWithRelation.sourceEnd?.let { sourceEnd ->
+                            FinTrackLeadingIcon(
+                                colorId = sourceEnd.colorId,
+                                iconId = sourceEnd.iconId,
+                                style = LeadingIconStyle.Badge,
+                                size = space.large,
+                                iconSize = space.mediumSmall,
+                            )
+                            Spacer(modifier = Modifier.width(space.small))
+                            FintrackTitleMediumText(
+                                text = sourceEnd.name,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
+                    }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(space.mediumSmall))
+                if (isTransfer) {
+                    trx.amountTransferFormated?.let {
+                        FintrackLabelSmallText(
+                            text = stringResource(R.string.amount_transfer_label, it),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(space.mediumSmall))
 
-            // ---------- Source / Transfer Info ----------
-            if (isTransfer) {
-
-                FintrackTitleMediumText(
+                // ---------- Amount ----------
+                FintrackBodyLargeText(
                     text = stringResource(
-                        R.string.transfer_from_to_label,
-                        uiTransactionWithRelation.source.name,
-                        uiTransactionWithRelation.sourceEnd?.name.orEmpty()
+                        R.string.amount_label,
+                        typeLabel,
+                        trx.formatedAmount
                     ),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = amountColor
                 )
 
-                Spacer(modifier = Modifier.height(space.small))
-
-                trx.amountTransferFormated?.let {
-                    FintrackLabelSmallText(
-                        text = stringResource(
-                            R.string.amount_transfer_label,
-                            it
-                        ),
+                // ---------- Persons ----------
+                if (uiTransactionWithRelation.persons.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(space.small))
+                    FintrackBodySmallText(
+                        text = stringResource(R.string.person_label, personsText),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-            } else {
-                FintrackTitleMediumText(
-                    text = stringResource(R.string.source_with_value, uiTransactionWithRelation.source.name),
+
+                // ---------- Description ----------
+                val desc = trx.description
+                if (!desc.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(space.small))
+                    FintrackBodyMediumText(
+                        text = stringResource(R.string.description_with_value, desc),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                // ---------- Tags ----------
+                if (uiTransactionWithRelation.tags.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(space.small))
+
+                    // نمایش چیپ‌های تگ با آیکون (اضافه)
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(space.small),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        items(uiTransactionWithRelation.tags) { tag ->
+                            val tagIcon = remember(icons) {
+                                icons.firstOrNull { it.id == tag.iconId } ?: icons.first()
+                            }
+                            EntityChip(
+                                name = tag.name,
+                                iconRes = tagIcon.resId,
+                                tint = MaterialTheme.colorScheme.tertiary
+                            )
+                        }
+                    }
+                }
+
+                // ---------- Date ----------
+                Spacer(modifier = Modifier.height(space.small))
+                FintrackBodySmallText(
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.End,
+                    text = trx.date,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
-
-            Spacer(modifier = Modifier.height(space.mediumSmall))
-
-            // ---------- Amount ----------
-            FintrackBodyLargeText(
-                text = stringResource(
-                    R.string.amount_label,
-                    typeLabel,
-                    trx.formatedAmount
-                ),
-                color = amountColor
-            )
-
-            // ---------- Persons ----------
-            if (uiTransactionWithRelation.persons.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(space.small))
-                FintrackBodySmallText(
-                    text = stringResource(R.string.person_label, personsText),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            // ---------- Description ----------
-            val desc = trx.description
-            if (!desc.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(space.small))
-                FintrackBodyMediumText(
-                    text = stringResource(R.string.description_with_value, desc),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            // ---------- Tags ----------
-            if (uiTransactionWithRelation.tags.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(space.small))
-                FintrackBodySmallText(
-                    text = stringResource(R.string.tags_label, tagsText),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            // ---------- Date ----------
-            Spacer(modifier = Modifier.height(space.small))
-            FintrackBodySmallText(
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.End,
-                text = trx.date,
-                color = MaterialTheme.colorScheme.onSurface
-            )
         }
     }
 }
-
 

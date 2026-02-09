@@ -161,9 +161,9 @@ fun ItemSelected(
                 colorId = item.colorId,
                 iconId = item.iconId,
                 style = LeadingIconStyle.Badge,
-                size = 32,
-                iconSize = 16,
-                corner = 12
+                size = space.extraLarge,
+                iconSize = space.large,
+                corner = space.mediumLarge
             )
             Spacer(modifier = Modifier.width(space.mediumSmall))
         }

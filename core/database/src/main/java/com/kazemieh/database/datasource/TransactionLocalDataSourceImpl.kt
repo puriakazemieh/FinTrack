@@ -278,7 +278,12 @@ class TransactionLocalDataSourceImpl(
     }
 
     override suspend fun getTransferCategory(): Category {
-        return categoryDao.getTransferCategory().toCategory()
+        var transferCategory = categoryDao.getTransferCategory()?.toCategory()
+        if (transferCategory == null) {
+            categoryDao.createTransferCategory()
+            transferCategory = categoryDao.getTransferCategory()?.toCategory()
+        }
+        return transferCategory!!
     }
 
     override suspend fun getDefaultSource(): Source? {

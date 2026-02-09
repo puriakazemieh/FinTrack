@@ -11,8 +11,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.kazemieh.designsystem.picker.FinTrackCategoryIcons
+import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import com.kazemieh.designsystem.picker.bestOnColor
 
@@ -24,25 +25,25 @@ fun FinTrackLeadingIcon(
     iconId: Int?,
     modifier: Modifier = Modifier,
     style: LeadingIconStyle = LeadingIconStyle.Badge,
-    size: Int = 40,      // dp
-    iconSize: Int = 20,  // dp
-    corner: Int = 14     // dp
+    size: Dp = 40.dp,
+    iconSize: Dp = 20.dp,
+    corner: Dp = 14.dp
 ) {
     val colors = FinTrackPickerColors.rainbow()
 
     val pickedColor = remember(colors, colorId) {
         colors.firstOrNull { it.id == colorId } ?: colors.first()
     }
-    val pickedIcon = remember(FinTrackCategoryIcons.icons, iconId) {
-        FinTrackCategoryIcons.icons.firstOrNull { it.id == iconId } ?: FinTrackCategoryIcons.icons.first()
+    val pickedIcon = remember(FinTrackIcons.icons, iconId) {
+        FinTrackIcons.icons.firstOrNull { it.id == iconId } ?: FinTrackIcons.icons.first()
     }
 
     when (style) {
         LeadingIconStyle.Badge -> {
             Box(
                 modifier = modifier
-                    .size(size.dp)
-                    .clip(RoundedCornerShape(corner.dp))
+                    .size(size)
+                    .clip(RoundedCornerShape(corner))
                     .background(pickedColor.color),
                 contentAlignment = Alignment.Center
             ) {
@@ -50,7 +51,7 @@ fun FinTrackLeadingIcon(
                     painter = painterResource(pickedIcon.resId),
                     contentDescription = null,
                     tint = bestOnColor(pickedColor.color),
-                    modifier = Modifier.size(iconSize.dp)
+                    modifier = Modifier.size(iconSize)
                 )
             }
         }
@@ -61,7 +62,7 @@ fun FinTrackLeadingIcon(
                 painter = painterResource(pickedIcon.resId),
                 contentDescription = null,
                 tint = pickedColor.color,
-                modifier = modifier.size(iconSize.dp)
+                modifier = modifier.size(iconSize)
             )
         }
     }

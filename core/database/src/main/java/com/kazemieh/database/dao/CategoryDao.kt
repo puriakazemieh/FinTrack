@@ -32,7 +32,10 @@ interface CategoryDao {
     suspend fun getDefaultCategory(type: Int): CategoryEntity
 
     @Query("SELECT * FROM category WHERE type = 3 LIMIT 1")
-    suspend fun getTransferCategory(): CategoryEntity
+    suspend fun getTransferCategory(): CategoryEntity?
+
+    @Insert
+    suspend fun createTransferCategory(category: CategoryEntity = CategoryEntity(name = "انتقال", type = TransactionType.TRANSFER.count)): Long
 
     @Delete
     suspend fun deleteCategory(category: CategoryEntity)
