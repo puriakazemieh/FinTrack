@@ -3,10 +3,10 @@ package com.kazemieh.domain.usecase
 import com.kazemieh.common.model.Person
 import com.kazemieh.domain.repository.TransactionRepository
 
-class EditPerson(
+class DeletePersonUseCase(
     private val repository: TransactionRepository
 ) {
-    suspend operator fun invoke(person: Person): Int {
-        return repository.updatePerson(person)
+    suspend operator fun invoke(deletePerson: Person, movePerson: Person?) {
+        return repository.deletePerson(deletePerson, movePerson)
     }
 }

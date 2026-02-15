@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.common.model.Tag
 import com.kazemieh.designsystem.component.model.toItemUi
-import com.kazemieh.domain.usecase.GetAllTag
+import com.kazemieh.domain.usecase.ObserveTagsUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class TagViewModel(
-    private val getAllTag: GetAllTag
+    private val observeTagsUseCase: ObserveTagsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TagState())
@@ -84,7 +84,7 @@ class TagViewModel(
     private fun loadAllTags() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            getAllTag().collect { tags ->
+            observeTagsUseCase().collect { tags ->
                 _state.update {
                     it.copy(
                         tags = tags,

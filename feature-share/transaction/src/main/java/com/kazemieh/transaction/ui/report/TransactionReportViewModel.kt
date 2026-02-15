@@ -14,7 +14,7 @@ import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.component.PieChartItem
-import com.kazemieh.domain.usecase.TransactionUseCases
+import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.hours
 
 class TransactionReportViewModel(
-    private val transactionUseCases: TransactionUseCases
+    private val transactionUseCaseGroup: TransactionUseCaseGroup
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TransactionReportState())
@@ -56,13 +56,13 @@ class TransactionReportViewModel(
 
     val uiTransactionWithRelations: Flow<PagingData<TransactionWithRelations>> =
         filterParamsFlow
-            .flatMapLatest { params -> transactionUseCases.getAllTransactionsFiltered(params) }
+            .flatMapLatest { params -> transactionUseCaseGroup.observeTransactionsUseCase(params) }
             .cachedIn(viewModelScope)
 
     init {
         viewModelScope.launch {
             filterParamsFlow
-                .flatMapLatest { params -> transactionUseCases.getCategorySum(params) }
+                .flatMapLatest { params -> transactionUseCaseGroup.observeCategorySumsUseCase(params) }
                 .collectLatest { categorySums -> updateCategorySums(categorySums) }
         }
 

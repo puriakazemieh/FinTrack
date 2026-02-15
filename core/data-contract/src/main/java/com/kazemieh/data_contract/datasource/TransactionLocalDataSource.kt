@@ -42,17 +42,16 @@ interface TransactionLocalDataSource {
     suspend fun deleteSource(deleteSource: Source, moveSource: Source?)
     suspend fun insertFinancialSource(source: Source): Long
     suspend fun insertTag(tag: Tag): Long
-    suspend fun getAllCategory(type: TransactionType): Flow<List<Category>>
-    suspend fun getAllFinancialSource(): Flow<List<Source>>
+    fun getAllCategory(type: TransactionType): Flow<List<Category>>
+    fun getAllFinancialSource(): Flow<List<Source>>
     fun getSource(sourceId: Long): Flow<Source?>
-    suspend fun getAllTag(): Flow<List<Tag>>
-    suspend fun increaseBalanceFinancialSource(id: Long, amount: Int)
-    suspend fun decreaseBalanceFinancialSource(id: Long, amount: Int)
+    fun getAllTag(): Flow<List<Tag>>
+    suspend fun adjustSourceBalance(id: Long, amount: Int)
     suspend fun getDefaultCategory(type: TransactionType): Category
     suspend fun getTransferCategory(): Category
     suspend fun getDefaultSource(): Source?
 
 
     suspend fun insertPerson(person: Person): Long
-    suspend fun getAllPersons(): Flow<List<Person>>
+    fun getAllPersons(): Flow<List<Person>>
 }

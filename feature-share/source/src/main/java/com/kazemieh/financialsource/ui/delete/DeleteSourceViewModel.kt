@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.ld
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.R
-import com.kazemieh.domain.usecase.DeleteSource
-import com.kazemieh.domain.usecase.GetSource
+import com.kazemieh.domain.usecase.DeleteSourceUseCase
+import com.kazemieh.domain.usecase.ObserveSourceUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,8 +17,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DeleteSourceViewModel(
-    private val deleteSourceUseCase: DeleteSource,
-    private val getSource: GetSource,
+    private val deleteSourceUseCase: DeleteSourceUseCase,
+    private val observeSourceUseCase: ObserveSourceUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DeleteSourceState())
@@ -65,7 +65,7 @@ class DeleteSourceViewModel(
     private fun getDefaultData(selectedSource: Source?) {
         if (selectedSource == null) return
         viewModelScope.launch {
-            getSource(selectedSource.id ?: 0).collect { source ->
+            observeSourceUseCase(selectedSource.id ?: 0).collect { source ->
                 _state.update {
                     it.copy(source = source)
                 }

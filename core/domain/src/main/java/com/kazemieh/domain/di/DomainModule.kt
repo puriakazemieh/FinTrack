@@ -1,80 +1,79 @@
 package com.kazemieh.domain.di
 
-//import com.kazemieh.domain.usecase.ExportTransactionsUseCase
-import com.kazemieh.domain.usecase.AddCategory
-import com.kazemieh.domain.usecase.AddFinancialSource
-import com.kazemieh.domain.usecase.AddPerson
-import com.kazemieh.domain.usecase.AddSourceUseCases
-import com.kazemieh.domain.usecase.AddTag
-import com.kazemieh.domain.usecase.AddTransaction
-import com.kazemieh.domain.usecase.DeleteCategory
-import com.kazemieh.domain.usecase.DeletePerson
-import com.kazemieh.domain.usecase.DeleteSource
-import com.kazemieh.domain.usecase.DeleteTag
-import com.kazemieh.domain.usecase.DeleteTransaction
-import com.kazemieh.domain.usecase.EditCategory
-import com.kazemieh.domain.usecase.EditPerson
-import com.kazemieh.domain.usecase.EditSource
-import com.kazemieh.domain.usecase.EditTag
-import com.kazemieh.domain.usecase.GetAllCategoryByType
-import com.kazemieh.domain.usecase.GetAllPerson
+import com.kazemieh.domain.usecase.AddCategoryUseCase
+import com.kazemieh.domain.usecase.AddSourceUseCase
+import com.kazemieh.domain.usecase.AddPersonUseCase
+import com.kazemieh.domain.usecase.SourceUseCases
+import com.kazemieh.domain.usecase.AddTagUseCase
+import com.kazemieh.domain.usecase.AddTransactionUseCase
+import com.kazemieh.domain.usecase.DeleteCategoryUseCase
+import com.kazemieh.domain.usecase.DeletePersonUseCase
+import com.kazemieh.domain.usecase.DeleteSourceUseCase
+import com.kazemieh.domain.usecase.DeleteTagUseCase
+import com.kazemieh.domain.usecase.DeleteTransactionUseCase
+import com.kazemieh.domain.usecase.UpdateCategory
+import com.kazemieh.domain.usecase.UpdatePerson
+import com.kazemieh.domain.usecase.UpdateSourceUseCase
+import com.kazemieh.domain.usecase.UpdateTag
+import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
+import com.kazemieh.domain.usecase.ObservePersonsUseCase
 import com.kazemieh.domain.usecase.GetAllSource
-import com.kazemieh.domain.usecase.GetAllTag
-import com.kazemieh.domain.usecase.GetAllTransactionsFiltered
-import com.kazemieh.domain.usecase.GetCategorySum
+import com.kazemieh.domain.usecase.ObserveTagsUseCase
+import com.kazemieh.domain.usecase.ObserveTransactionsUseCase
+import com.kazemieh.domain.usecase.ObserveCategorySumsUseCase
 import com.kazemieh.domain.usecase.GetDefaultCategoryUseCase
 import com.kazemieh.domain.usecase.GetDefaultFinancialSourceUseCase
-import com.kazemieh.domain.usecase.GetSource
+import com.kazemieh.domain.usecase.ObserveSourceUseCase
 import com.kazemieh.domain.usecase.GetTransferCategoryUseCase
-import com.kazemieh.domain.usecase.TransactionUseCases
-import com.kazemieh.domain.usecase.UpdateTransaction
+import com.kazemieh.domain.usecase.TransactionUseCaseGroup
+import com.kazemieh.domain.usecase.UpdateTransactionUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
-    factory { AddTransaction(get()) }
-    factory { DeleteTransaction(get()) }
-    factory { UpdateTransaction(get()) }
-    factory { GetAllTransactionsFiltered(get()) }
-    factory { GetCategorySum(get()) }
-    factory { GetAllTag(get()) }
+    factory { AddTransactionUseCase(get()) }
+    factory { DeleteTransactionUseCase(get()) }
+    factory { UpdateTransactionUseCase(get()) }
+    factory { ObserveTransactionsUseCase(get()) }
+    factory { ObserveCategorySumsUseCase(get()) }
+    factory { ObserveTagsUseCase(get()) }
     factory { GetAllSource(get()) }
-    factory { GetAllCategoryByType(get()) }
-    factory { AddCategory(get()) }
-    factory { EditCategory(get()) }
-    factory { EditTag(get()) }
-    factory { DeleteCategory(get()) }
-    factory { DeletePerson(get()) }
-    factory { DeleteTag(get()) }
-    factory { AddFinancialSource(get()) }
-    factory { AddTag(get()) }
+    factory { ObserveCategoriesUseCase(get()) }
+    factory { AddCategoryUseCase(get()) }
+    factory { UpdateCategory(get()) }
+    factory { UpdateTag(get()) }
+    factory { DeleteCategoryUseCase(get()) }
+    factory { DeletePersonUseCase(get()) }
+    factory { DeleteTagUseCase(get()) }
+    factory { AddSourceUseCase(get()) }
+    factory { AddTagUseCase(get()) }
     factory { GetDefaultCategoryUseCase(get()) }
     factory { GetTransferCategoryUseCase(get()) }
     factory { GetDefaultFinancialSourceUseCase(get()) }
-    factory { AddPerson(get()) }
-    factory { GetAllPerson(get()) }
-    factory { DeleteSource(get()) }
-    factory { EditSource(get()) }
-    factory { GetSource(get()) }
-    factory { EditPerson(get()) }
+    factory { AddPersonUseCase(get()) }
+    factory { ObservePersonsUseCase(get()) }
+    factory { DeleteSourceUseCase(get()) }
+    factory { UpdateSourceUseCase(get()) }
+    factory { ObserveSourceUseCase(get()) }
+    factory { UpdatePerson(get()) }
 
 
     single {
-        AddSourceUseCases(
-            editSource = get(),
+        SourceUseCases(
+            updateSourceUseCase = get(),
             addSource = get(),
-            getSource = get()
+            observeSourceUseCase = get()
         )
     }
     single {
-        TransactionUseCases(
-            addTransaction = get(),
-            deleteTransaction = get(),
+        TransactionUseCaseGroup(
+            addTransactionUseCase = get(),
+            deleteTransactionUseCase = get(),
             getDefaultCategoryUseCase = get(),
             getTransferCategoryUseCase = get(),
             getDefaultFinancialSourceUseCase = get(),
-            getAllTransactionsFiltered = get(),
-            updateTransaction = get(),
-            getCategorySum = get(),
+            observeTransactionsUseCase = get(),
+            updateTransactionUseCase = get(),
+            observeCategorySumsUseCase = get(),
         )
     }
 

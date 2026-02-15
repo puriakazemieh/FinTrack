@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.R
-import com.kazemieh.domain.usecase.TransactionUseCases
+import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 
 class DeleteTransactionViewModel(
-    private val transactionUseCases: TransactionUseCases
+    private val transactionUseCaseGroup: TransactionUseCaseGroup
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DeleteTransactionState())
@@ -54,7 +54,7 @@ class DeleteTransactionViewModel(
             _state.update { it.copy(isLoading = true) }
 
             val ok = runCatching {
-                transactionUseCases.deleteTransaction(tx)
+                transactionUseCaseGroup.deleteTransactionUseCase(tx)
             }.isSuccess
 
             if (ok) {

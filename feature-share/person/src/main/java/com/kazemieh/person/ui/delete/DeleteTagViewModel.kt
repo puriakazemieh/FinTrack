@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Person
 import com.kazemieh.designsystem.R
-import com.kazemieh.domain.usecase.DeletePerson
+import com.kazemieh.domain.usecase.DeletePersonUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DeletePersonViewModel(
-    private val deletePerson: DeletePerson
+    private val deletePersonUseCase: DeletePersonUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DeletePersonState())
@@ -68,7 +68,7 @@ class DeletePersonViewModel(
                 return@launch
             }
             _state.value.person?.let { deletePerson ->
-                deletePerson(deletePerson, _state.value.movePerson)
+                deletePersonUseCase(deletePerson, _state.value.movePerson)
                 _effect.send(DeletePersonEffect.DeletedTransaction)
             }
         }

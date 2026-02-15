@@ -12,7 +12,7 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.model.UiText
-import com.kazemieh.domain.usecase.TransactionUseCases
+import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AddTransactionViewModel(
-    private val transactionUseCases: TransactionUseCases
+    private val transactionUseCaseGroup: TransactionUseCaseGroup
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddTransactionState())
@@ -104,8 +104,8 @@ class AddTransactionViewModel(
         viewModelScope.launch {
             if (transactionWithRelations == null) {
                 val defaultCategory =
-                    transactionUseCases.getDefaultCategoryUseCase(_state.value.transactionType)
-                val defaultSource = transactionUseCases.getDefaultFinancialSourceUseCase()
+                    transactionUseCaseGroup.getDefaultCategoryUseCase(_state.value.transactionType)
+                val defaultSource = transactionUseCaseGroup.getDefaultFinancialSourceUseCase()
 
                 _state.update {
                     it.copy(category = defaultCategory, source = defaultSource)
@@ -158,7 +158,7 @@ class AddTransactionViewModel(
             }
 
             val categoryId = if (current.transactionType == TransactionType.TRANSFER) {
-                val transferCategory = transactionUseCases.getTransferCategoryUseCase()
+                val transferCategory = transactionUseCaseGroup.getTransferCategoryUseCase()
                 _state.update { it.copy(category = transferCategory) }
                 transferCategory.id!!
             } else {
@@ -184,14 +184,14 @@ class AddTransactionViewModel(
 
             val transactionId = runCatching {
                 if (current.oldTransaction != null) {
-                    transactionUseCases.updateTransaction(
+                    transactionUseCaseGroup.updateTransactionUseCase(
                         oldTransaction = current.oldTransaction,
                         newTransaction = transaction,
                         tagIds = tagIds,
                         personIds = personIds
                     )
                 } else {
-                    transactionUseCases.addTransaction(transaction, tagIds, personIds)
+                    transactionUseCaseGroup.addTransactionUseCase(transaction, tagIds, personIds)
                 }
             }.getOrElse {
                 -1L

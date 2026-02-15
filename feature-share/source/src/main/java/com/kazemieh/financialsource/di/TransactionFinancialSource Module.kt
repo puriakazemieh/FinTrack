@@ -17,7 +17,7 @@ val deleteSourceModule = module {
     viewModel {
         DeleteSourceViewModel(
             deleteSourceUseCase = get(),
-            getSource = get()
+            observeSourceUseCase = get()
         )
     }
 }

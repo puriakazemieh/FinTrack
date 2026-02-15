@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Tag
 import com.kazemieh.designsystem.R
-import com.kazemieh.domain.usecase.DeleteTag
+import com.kazemieh.domain.usecase.DeleteTagUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DeleteTagViewModel(
-    private val deleteTag: DeleteTag
+    private val deleteTagUseCase: DeleteTagUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DeleteTagState())
@@ -68,7 +68,7 @@ class DeleteTagViewModel(
                 return@launch
             }
             _state.value.tag?.let { deleteTag ->
-                deleteTag(deleteTag, _state.value.moveTag)
+                deleteTagUseCase(deleteTag, _state.value.moveTag)
                 _effect.send(DeleteTagEffect.DeletedTransaction)
             }
         }

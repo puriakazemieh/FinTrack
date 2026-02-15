@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Category
 import com.kazemieh.designsystem.R
-import com.kazemieh.domain.usecase.DeleteCategory
+import com.kazemieh.domain.usecase.DeleteCategoryUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DeleteCategoryViewModel(
-    private val deleteCategoryUseCase: DeleteCategory
+    private val deleteCategoryUseCase: DeleteCategoryUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DeleteCategoryState())

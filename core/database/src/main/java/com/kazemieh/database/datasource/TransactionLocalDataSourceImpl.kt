@@ -247,11 +247,11 @@ class TransactionLocalDataSourceImpl(
         return tagDao.insertTag(tag.toTagEntity())
     }
 
-    override suspend fun getAllCategory(type: TransactionType): Flow<List<Category>> {
+    override fun getAllCategory(type: TransactionType): Flow<List<Category>> {
         return categoryDao.getAllCategories(type.count).map { it.map { it.toCategory() } }
     }
 
-    override suspend fun getAllFinancialSource(): Flow<List<Source>> {
+    override fun getAllFinancialSource(): Flow<List<Source>> {
         return financialSourceDao.getAllFinancialSources().map {
             it.map { it.toSource() }
         }
@@ -261,16 +261,12 @@ class TransactionLocalDataSourceImpl(
         return financialSourceDao.getFinancialSourceById(sourceId).map { it?.toSource() }
     }
 
-    override suspend fun getAllTag(): Flow<List<Tag>> {
+    override fun getAllTag(): Flow<List<Tag>> {
         return tagDao.getAllTags().map { it.map { it.toTag() } }
     }
 
-    override suspend fun increaseBalanceFinancialSource(id: Long, amount: Int) {
-        financialSourceDao.increaseBalance(id, amount)
-    }
-
-    override suspend fun decreaseBalanceFinancialSource(id: Long, amount: Int) {
-        financialSourceDao.decreaseBalance(id, amount)
+    override suspend fun adjustSourceBalance(id: Long, delta: Int) {
+        financialSourceDao.adjustBalance(id, delta)
     }
 
     override suspend fun getDefaultCategory(type: TransactionType): Category {
@@ -294,7 +290,7 @@ class TransactionLocalDataSourceImpl(
         return personDao.insertPerson(person.toPersonEntity())
     }
 
-    override suspend fun getAllPersons(): Flow<List<Person>> {
+    override fun getAllPersons(): Flow<List<Person>> {
         return personDao.getAllPersons().map { it.map { it.toPerson() } }
     }
 }

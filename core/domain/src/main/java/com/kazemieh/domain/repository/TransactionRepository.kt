@@ -13,42 +13,52 @@ import com.kazemieh.common.model.TransactionWithRelations
 import kotlinx.coroutines.flow.Flow
 
 interface TransactionRepository {
-    suspend fun insertTransaction(
+
+    suspend fun addTransaction(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
     ): Long
 
-    suspend fun deleteTransaction(transaction: Transaction)
     suspend fun updateTransaction(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
     ): Long
 
-    fun getAllTransactionsFiltered(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>>
-    fun getCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>>
+    suspend fun deleteTransaction(transaction: Transaction)
+    fun observeTransactions(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>>
 
-    suspend fun getAllCategory(type: TransactionType): Flow<List<Category>>
-    suspend fun insertTag(tag: Tag): Long
-    suspend fun insertPerson(person: Person): Long
-    suspend fun insertCategory(category: Category): Long
+
+    suspend fun addCategory(category: Category): Long
     suspend fun updateCategory(category: Category): Int
-    suspend fun updateTag(tag: Tag): Int
-    suspend fun updatePerson(person: Person): Int
-    suspend fun updateSource(source: Source): Int
     suspend fun deleteCategory(category: Category, moveCategory: Category?)
-    suspend fun deleteTag(deleteTag: Tag, moveTag: Tag?)
-    suspend fun deletePerson(deletePerson: Person, movePerson: Person?)
-    suspend fun deleteSource(deleteSource: Source, moveSource: Source?)
-    suspend fun insertFinancialSource(source: Source): Long
-    suspend fun getAllFinancialSource(): Flow<List<Source>>
-    fun getSource(sourceId: Long): Flow<Source?>
-    suspend fun getAllTag(): Flow<List<Tag>>
-    suspend fun getAllPersons(): Flow<List<Person>>
-    suspend fun increaseBalanceFinancialSource(id: Long, amount: Int)
-    suspend fun decreaseBalanceFinancialSource(id: Long, amount: Int)
+    fun observeCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>>
+    fun observeCategories(type: TransactionType): Flow<List<Category>>
     suspend fun getDefaultCategory(type: TransactionType): Category
     suspend fun getTransferCategory(): Category
+
+
+    suspend fun addTag(tag: Tag): Long
+    suspend fun updateTag(tag: Tag): Int
+    suspend fun deleteTag(from: Tag, to: Tag?)
+    fun observeTags(): Flow<List<Tag>>
+
+
+    suspend fun addPerson(person: Person): Long
+    suspend fun updatePerson(person: Person): Int
+    suspend fun deletePerson(from: Person, to: Person?)
+    fun observePersons(): Flow<List<Person>>
+
+
+    suspend fun addSource(source: Source): Long
+    suspend fun updateSource(source: Source): Int
+    suspend fun deleteSource(from: Source, to: Source?)
+    fun observeSources(): Flow<List<Source>>
+    fun observeSource(sourceId: Long): Flow<Source?>
     suspend fun getDefaultSource(): Source?
+
+    suspend fun adjustSourceBalance(id: Long, delta: Int)
+
+
 }

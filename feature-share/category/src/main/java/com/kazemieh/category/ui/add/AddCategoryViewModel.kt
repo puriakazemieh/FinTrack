@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.R
-import com.kazemieh.domain.usecase.AddCategory
-import com.kazemieh.domain.usecase.EditCategory
+import com.kazemieh.domain.usecase.AddCategoryUseCase
+import com.kazemieh.domain.usecase.UpdateCategory
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AddCategoryViewModel(
-    private val addCategoryUseCase: AddCategory,
-    private val editCategoryUseCase: EditCategory
+    private val addCategoryUseCase: AddCategoryUseCase,
+    private val updateCategoryUseCase: UpdateCategory
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddCategoryState())
@@ -95,7 +95,7 @@ class AddCategoryViewModel(
 
             val categoryId = when (mode) {
                 is AddCategoryMode.Add -> addCategoryUseCase(category)
-                is AddCategoryMode.Edit -> editCategoryUseCase(category).toLong()
+                is AddCategoryMode.Edit -> updateCategoryUseCase(category).toLong()
             }
 
             if (categoryId >= 0) {

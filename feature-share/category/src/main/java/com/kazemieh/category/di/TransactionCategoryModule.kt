@@ -9,7 +9,7 @@ import org.koin.dsl.module
 val transactionCategoryModule = module {
     viewModel {
         CategoryViewModel(
-            getAllCategoryByType = get()
+            observeCategoriesUseCase = get()
         )
     }
 }
@@ -24,7 +24,7 @@ val transactionAddCategoryModule = module {
     viewModel {
         AddCategoryViewModel(
             addCategoryUseCase = get(),
-            editCategoryUseCase = get()
+            updateCategoryUseCase = get()
         )
     }
 }

@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.R
-import com.kazemieh.domain.usecase.AddSourceUseCases
+import com.kazemieh.domain.usecase.SourceUseCases
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 
 class AddSourceViewModel(
-    private val sourceUseCases: AddSourceUseCases
+    private val sourceUseCases: SourceUseCases
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddSourceState())
@@ -85,7 +85,7 @@ class AddSourceViewModel(
 
         // اگر لازم داری از DB نسخه کامل رو بخونی:
         editJob = viewModelScope.launch {
-            sourceUseCases.getSource(id).collect { db ->
+            sourceUseCases.observeSourceUseCase(id).collect { db ->
                 db?.let {
                     _state.update { st ->
                         st.copy(
@@ -117,7 +117,7 @@ class AddSourceViewModel(
 
             val sourceId = when (mode) {
                 AddSourceMode.Add -> sourceUseCases.addSource(source)
-                is AddSourceMode.Edit -> sourceUseCases.editSource(source).toLong()
+                is AddSourceMode.Edit -> sourceUseCases.updateSourceUseCase(source).toLong()
             }
 
             if (sourceId >= 0) {

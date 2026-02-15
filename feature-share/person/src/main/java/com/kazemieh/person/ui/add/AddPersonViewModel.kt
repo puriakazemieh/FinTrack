@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Person
 import com.kazemieh.designsystem.R
-import com.kazemieh.domain.usecase.AddPerson
-import com.kazemieh.domain.usecase.EditPerson
+import com.kazemieh.domain.usecase.AddPersonUseCase
+import com.kazemieh.domain.usecase.UpdatePerson
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AddPersonViewModel(
-    private val addPersonUseCase: AddPerson,
-    private val editPersonUseCase: EditPerson
+    private val addPersonUseCase: AddPersonUseCase,
+    private val updatePersonUseCase: UpdatePerson
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddPersonState())
@@ -78,7 +78,7 @@ class AddPersonViewModel(
 
             val personId = when (mode) {
                 is AddPersonMode.Add -> addPersonUseCase(person)
-                is AddPersonMode.Edit -> editPersonUseCase(person).toLong()
+                is AddPersonMode.Edit -> updatePersonUseCase(person).toLong()
             }
 
             if (personId >= 0) {

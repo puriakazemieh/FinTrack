@@ -5,32 +5,27 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.kazemieh.common.formatted
-import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toPositive
-import com.kazemieh.designsystem.R
-import com.kazemieh.designsystem.component.PieChartItem
-import com.kazemieh.domain.usecase.TransactionUseCases
-import kotlinx.coroutines.channels.Channel
+import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class TransactionViewModel(
-    private val transactionUseCases: TransactionUseCases
+    private val transactionUseCaseGroup: TransactionUseCaseGroup
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TransactionState())
     val state: StateFlow<TransactionState> = _state.asStateFlow()
 
     val uiTransactionWithRelations: Flow<PagingData<TransactionWithRelations>> =
-        transactionUseCases.getAllTransactionsFiltered(TransactionFilterParams())
+        transactionUseCaseGroup.observeTransactionsUseCase(TransactionFilterParams())
             .cachedIn(viewModelScope)
 
     init {
@@ -40,7 +35,7 @@ class TransactionViewModel(
     private fun observeSummary() {
         viewModelScope.launch {
             runCatching {
-                transactionUseCases.getCategorySum(TransactionFilterParams())
+                transactionUseCaseGroup.observeCategorySumsUseCase(TransactionFilterParams())
                     .collect { categorySums ->
                         val totalIncome = categorySums.filter { it.type == TransactionType.INCOME }
                             .sumOf { it.totalAmount }

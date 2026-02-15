@@ -6,10 +6,10 @@ import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
 
-class GetAllTransactionsFiltered(
+class ObserveTransactionsUseCase(
     private val repository: TransactionRepository
 ) {
     operator fun invoke(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>> {
-        return repository.getAllTransactionsFiltered(transactionFilterParams)
+        return repository.observeTransactions(transactionFilterParams)
     }
 }

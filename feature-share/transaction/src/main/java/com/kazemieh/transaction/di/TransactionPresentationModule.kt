@@ -10,28 +10,28 @@ import org.koin.dsl.module
 val transactionPresentationModule = module {
     viewModel {
         TransactionViewModel(
-            transactionUseCases = get()
+            transactionUseCaseGroup = get()
         )
     }
 }
 val addTransactionPresentationModule = module {
     viewModel {
         AddTransactionViewModel(
-            transactionUseCases = get()
+            transactionUseCaseGroup = get()
         )
     }
 }
 val transactionReportViewModelModule = module {
     viewModel {
         TransactionReportViewModel(
-            transactionUseCases = get()
+            transactionUseCaseGroup = get()
         )
     }
 }
 val transactionDeleteViewModelModule = module {
     viewModel {
         DeleteTransactionViewModel(
-            transactionUseCases = get()
+            transactionUseCaseGroup = get()
         )
     }
 }

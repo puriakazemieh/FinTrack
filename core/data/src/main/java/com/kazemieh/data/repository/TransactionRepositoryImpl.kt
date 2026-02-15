@@ -18,15 +18,15 @@ class TransactionRepositoryImpl(
     private val localDataSource: TransactionLocalDataSource
 ) : TransactionRepository {
 
-    override fun getAllTransactionsFiltered(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>> {
+    override fun observeTransactions(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>> {
         return localDataSource.getAllTransactionsFiltered(transactionFilterParams)
     }
 
-    override fun getCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>> {
+    override fun observeCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>> {
         return localDataSource.getCategorySums(transactionFilterParams)
     }
 
-    override suspend fun insertTransaction(
+    override suspend fun addTransaction(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
@@ -46,19 +46,19 @@ class TransactionRepositoryImpl(
         return localDataSource.update(transaction, tagIds, personIds)
     }
 
-    override suspend fun getAllCategory(type: TransactionType): Flow<List<Category>> {
+    override fun observeCategories(type: TransactionType): Flow<List<Category>> {
         return localDataSource.getAllCategory(type)
     }
 
-    override suspend fun insertTag(tag: Tag): Long {
+    override suspend fun addTag(tag: Tag): Long {
         return localDataSource.insertTag(tag)
     }
 
-    override suspend fun insertPerson(person: Person): Long {
+    override suspend fun addPerson(person: Person): Long {
         return localDataSource.insertPerson(person)
     }
 
-    override suspend fun insertCategory(category: Category): Long {
+    override suspend fun addCategory(category: Category): Long {
         return localDataSource.insertCategory(category)
     }
 
@@ -82,44 +82,40 @@ class TransactionRepositoryImpl(
         return localDataSource.deleteCategory(category, moveCategory)
     }
 
-    override suspend fun deleteTag(deleteTag: Tag, moveTag: Tag?) {
-        return localDataSource.deleteTag(deleteTag, moveTag)
+    override suspend fun deleteTag(from: Tag, to: Tag?) {
+        return localDataSource.deleteTag(from, to)
     }
 
-    override suspend fun deletePerson(deletePerson: Person, movePerson: Person?) {
-        return localDataSource.deletePerson(deletePerson, movePerson)
+    override suspend fun deletePerson(from: Person, to: Person?) {
+        return localDataSource.deletePerson(from, to)
     }
 
-    override suspend fun deleteSource(deleteSource: Source, moveSource: Source?) {
-        return localDataSource.deleteSource(deleteSource, moveSource)
+    override suspend fun deleteSource(from: Source, to: Source?) {
+        return localDataSource.deleteSource(from, to)
     }
 
-    override suspend fun insertFinancialSource(source: Source): Long {
+    override suspend fun addSource(source: Source): Long {
         return localDataSource.insertFinancialSource(source)
     }
 
-    override suspend fun getAllFinancialSource(): Flow<List<Source>> {
+    override fun observeSources(): Flow<List<Source>> {
         return localDataSource.getAllFinancialSource()
     }
 
-    override fun getSource(sourceId: Long): Flow<Source?> {
+    override fun observeSource(sourceId: Long): Flow<Source?> {
         return localDataSource.getSource(sourceId)
     }
 
-    override suspend fun getAllTag(): Flow<List<Tag>> {
+    override fun observeTags(): Flow<List<Tag>> {
         return localDataSource.getAllTag()
     }
 
-    override suspend fun getAllPersons(): Flow<List<Person>> {
+    override fun observePersons(): Flow<List<Person>> {
         return localDataSource.getAllPersons()
     }
 
-    override suspend fun increaseBalanceFinancialSource(id: Long, amount: Int) {
-        localDataSource.increaseBalanceFinancialSource(id, amount)
-    }
-
-    override suspend fun decreaseBalanceFinancialSource(id: Long, amount: Int) {
-        localDataSource.decreaseBalanceFinancialSource(id, amount)
+    override suspend fun adjustSourceBalance(id: Long, delta: Int) {
+        localDataSource.adjustSourceBalance(id, delta)
     }
 
     override suspend fun getDefaultCategory(type: TransactionType): Category {

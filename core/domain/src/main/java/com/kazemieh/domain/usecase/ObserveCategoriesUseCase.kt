@@ -5,10 +5,10 @@ import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
 import kotlinx.coroutines.flow.Flow
 
-class GetAllCategoryByType(
+class ObserveCategoriesUseCase(
     private val repository: TransactionRepository
 ) {
     suspend operator fun invoke(type: TransactionType): Flow<List<Category>> {
-        return repository.getAllCategory(type)
+        return repository.observeCategories(type)
     }
 }

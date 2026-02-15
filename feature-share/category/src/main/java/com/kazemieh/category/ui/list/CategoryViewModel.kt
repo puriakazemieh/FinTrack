@@ -6,7 +6,7 @@ import com.kazemieh.common.model.Category
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.component.model.toItemUi
-import com.kazemieh.domain.usecase.GetAllCategoryByType
+import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 
 class CategoryViewModel(
-    private val getAllCategoryByType: GetAllCategoryByType
+    private val observeCategoriesUseCase: ObserveCategoriesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CategoryState())
@@ -76,9 +76,9 @@ class CategoryViewModel(
         viewModelScope.launch {
             if (type == TransactionType.ALL) {
                 combine(
-                    getAllCategoryByType(TransactionType.INCOME),
-                    getAllCategoryByType(TransactionType.EXPENSE),
-                    getAllCategoryByType(TransactionType.TRANSFER),
+                    observeCategoriesUseCase(TransactionType.INCOME),
+                    observeCategoriesUseCase(TransactionType.EXPENSE),
+                    observeCategoriesUseCase(TransactionType.TRANSFER),
                 ) { categoryIncome, categoryExpense, categoryTransfer ->
                     val allCategory = categoryIncome + categoryExpense + categoryTransfer
                     _state.update {
@@ -89,7 +89,7 @@ class CategoryViewModel(
                     }
                 }.stateIn(viewModelScope)
             } else {
-                getAllCategoryByType(type).collect { categories ->
+                observeCategoriesUseCase(type).collect { categories ->
                     _state.update {
                         it.copy(
                             categories = categories,

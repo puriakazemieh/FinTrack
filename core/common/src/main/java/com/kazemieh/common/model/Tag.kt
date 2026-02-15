@@ -1,9 +1,8 @@
 package com.kazemieh.common.model
 
-import android.annotation.SuppressLint
 import kotlinx.serialization.Serializable
 
-@SuppressLint("UnsafeOptInUsageError")
+@OptIn(kotlinx.serialization.InternalSerializationApi::class)
 @Serializable
 data class Tag(
     val id: Long? = null,

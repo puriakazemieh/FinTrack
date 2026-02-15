@@ -4,10 +4,10 @@ import com.kazemieh.common.model.Source
 import com.kazemieh.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
 
-class GetAllSource(
+class ObserveSourceUseCase(
     private val repository: TransactionRepository
 ) {
-    suspend operator fun invoke(): Flow<List<Source>> {
-        return repository.getAllFinancialSource()
+    operator fun invoke(sourceId: Long): Flow<Source?> {
+        return repository.observeSource(sourceId)
     }
 }

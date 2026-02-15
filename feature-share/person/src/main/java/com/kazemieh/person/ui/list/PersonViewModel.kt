@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.common.model.Person
 import com.kazemieh.designsystem.component.model.toItemUi
-import com.kazemieh.domain.usecase.GetAllPerson
+import com.kazemieh.domain.usecase.ObservePersonsUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PersonViewModel(
-    private val getAllPerson: GetAllPerson
+    private val observePersonsUseCase: ObservePersonsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PersonState())
@@ -88,7 +88,7 @@ class PersonViewModel(
     private fun loadAllPersons() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            getAllPerson().collect { persons ->
+            observePersonsUseCase().collect { persons ->
                 _state.update {
                     it.copy(
                         persons = persons,

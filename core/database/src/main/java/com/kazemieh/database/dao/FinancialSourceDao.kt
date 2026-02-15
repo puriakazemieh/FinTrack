@@ -17,11 +17,8 @@ interface FinancialSourceDao {
     @Query("SELECT * FROM source WHERE id = :id")
     fun getFinancialSourceById(id: Long): Flow<SourceEntity?>
 
-    @Query("UPDATE source SET balance = balance + :amount WHERE id = :id")
-    suspend fun increaseBalance(id: Long, amount: Int)
-
-    @Query("UPDATE source SET balance = balance - :amount WHERE id = :id")
-    suspend fun decreaseBalance(id: Long, amount: Int)
+    @Query("UPDATE source SET balance = balance + :delta WHERE id = :id")
+    suspend fun adjustBalance(id: Long, delta: Int)
 
     @Query("SELECT * FROM source WHERE id = 1 LIMIT 1")
     suspend fun getDefaultSource(): SourceEntity?

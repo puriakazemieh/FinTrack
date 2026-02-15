@@ -9,14 +9,14 @@ import org.koin.dsl.module
 val transactionTagModule = module {
     viewModel {
         TagViewModel(
-            getAllTag = get()
+            observeTagsUseCase = get()
         )
     }
 }
 val transactionDeleteTagModule = module {
     viewModel {
         DeleteTagViewModel(
-            deleteTag = get()
+            deleteTagUseCase = get()
         )
     }
 }
@@ -24,7 +24,7 @@ val transactionAddTagModule = module {
     viewModel {
         AddTagViewModel(
             addTagUseCase = get(),
-            editTagUseCase = get()
+            updateTagUseCase = get()
         )
     }
 }
