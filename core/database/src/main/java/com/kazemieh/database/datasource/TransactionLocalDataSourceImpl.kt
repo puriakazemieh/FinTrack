@@ -15,10 +15,10 @@ import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
-import com.kazemieh.database.DatabaseModule
+import com.kazemieh.database.FinTrackDatabase
 import com.kazemieh.database.dao.CategoryDao
-import com.kazemieh.database.dao.FinancialSourceDao
 import com.kazemieh.database.dao.PersonDao
+import com.kazemieh.database.dao.SourceDao
 import com.kazemieh.database.dao.TagDao
 import com.kazemieh.database.dao.TransactionDao
 import com.kazemieh.database.entity.TransactionPersonCrossRef
@@ -37,17 +37,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class TransactionLocalDataSourceImpl(
-    private val db: DatabaseModule,
+    private val db: FinTrackDatabase,
     private val transactionDao: TransactionDao,
     private val tagDao: TagDao,
-    private val financialSourceDao: FinancialSourceDao,
+    private val sourceDao: SourceDao,
     private val categoryDao: CategoryDao,
     private val personDao: PersonDao,
 ) : TransactionLocalDataSource {
 
-    override suspend fun delete(transaction: Transaction) {
-        transactionDao.deleteTransaction(transaction.toTransactionEntity())
-    }
 
     override suspend fun insertTransaction(
         transaction: Transaction,
@@ -76,7 +73,7 @@ class TransactionLocalDataSourceImpl(
     }
 
 
-    override suspend fun update(
+    override suspend fun updateTransaction(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
@@ -106,7 +103,7 @@ class TransactionLocalDataSourceImpl(
     }
 
 
-    override fun getAllTransactionsFiltered(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>> {
+    override fun observeTransactions(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 20,
@@ -131,8 +128,8 @@ class TransactionLocalDataSourceImpl(
         }
     }
 
-    override fun getCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>> {
-        return transactionDao.getCategorySums(
+    override fun observeCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>> {
+        return transactionDao.observeCategorySumsByFilter(
             type = transactionFilterParams.type,
             categoryIds = transactionFilterParams.categories.map { it.id },
             sourceIds = transactionFilterParams.sources.map { it.id },
@@ -143,8 +140,8 @@ class TransactionLocalDataSourceImpl(
         ).map { it.map { it.toCategory() } }
     }
 
-    override suspend fun insertCategory(category: Category): Long {
-        return categoryDao.insertCategory(category.toCategoryEntity())
+    override suspend fun addCategory(category: Category): Long {
+        return categoryDao.addCategory(category.toCategoryEntity())
     }
 
 
@@ -155,7 +152,7 @@ class TransactionLocalDataSourceImpl(
 
 
     override suspend fun updateSource(source: Source): Int {
-        return financialSourceDao.updateSource(source.toSourceEntity())
+        return sourceDao.updateSource(source.toSourceEntity())
 
     }
 
@@ -178,7 +175,7 @@ class TransactionLocalDataSourceImpl(
                 transactionDao.moveTransactionsCategory(fromId, toId)
             }
 
-            categoryDao.deleteCategory(category.toCategoryEntity())
+            categoryDao.insertTransferCategoryIfMissing(category.toCategoryEntity())
         }
 
 
@@ -217,67 +214,67 @@ class TransactionLocalDataSourceImpl(
                 transactionDao.nullifySourceEnd(fromId)
             }
 
-            financialSourceDao.deleteSource(deleteSource.toSourceEntity())
+            sourceDao.deleteSource(deleteSource.toSourceEntity())
         }
 
 
-    override suspend fun insertFinancialSource(source: Source): Long {
-        return financialSourceDao.insertFinancialSource(source.toSourceEntity())
+    override suspend fun addSource(source: Source): Long {
+        return sourceDao.addSource(source.toSourceEntity())
     }
 
-    override suspend fun insertTag(tag: Tag): Long {
-        return tagDao.insertTag(tag.toTagEntity())
+    override suspend fun addTag(tag: Tag): Long {
+        return tagDao.addTag(tag.toTagEntity())
     }
 
-    override fun getAllCategory(type: TransactionType): Flow<List<Category>> {
-        return categoryDao.getAllCategories(type.count).map { it.map { it.toCategory() } }
+    override fun observeCategories(type: TransactionType): Flow<List<Category>> {
+        return categoryDao.observeCategories(type.count).map { it.map { it.toCategory() } }
     }
 
-    override fun getAllFinancialSource(): Flow<List<Source>> {
-        return financialSourceDao.getAllFinancialSources().map {
+    override fun observeSources(): Flow<List<Source>> {
+        return sourceDao.observeSources().map {
             it.map { it.toSource() }
         }
     }
 
-    override fun getSource(sourceId: Long): Flow<Source?> {
-        return financialSourceDao.getFinancialSourceById(sourceId).map { it?.toSource() }
+    override fun observeSource(sourceId: Long): Flow<Source?> {
+        return sourceDao.observeSourceById(sourceId).map { it?.toSource() }
     }
 
-    override fun getAllTag(): Flow<List<Tag>> {
-        return tagDao.getAllTags().map { it.map { it.toTag() } }
+    override fun observeTags(): Flow<List<Tag>> {
+        return tagDao.observeTags().map { it.map { it.toTag() } }
     }
 
     override suspend fun adjustSourceBalance(id: Long, delta: Int) {
-        financialSourceDao.adjustBalance(id, delta)
+        sourceDao.adjustBalance(id, delta)
     }
 
     override suspend fun getDefaultCategory(type: TransactionType): Category {
-        return categoryDao.getDefaultCategory(type.count).toCategory()
+        return categoryDao.getFirstByType(type.count).toCategory()
     }
 
     override suspend fun getTransferCategory(): Category = db.withTransaction {
-        var transfer = categoryDao.getTransferCategory()?.toCategory()
+        var transfer = categoryDao.getTransferCategoryOrNull()?.toCategory()
         if (transfer == null) {
             categoryDao.createTransferCategory()
-            transfer = categoryDao.getTransferCategory()?.toCategory()
+            transfer = categoryDao.getTransferCategoryOrNull()?.toCategory()
         }
         transfer!!
     }
 
 
     override suspend fun getDefaultSource(): Source? {
-        return financialSourceDao.getDefaultSource()?.toSource()
+        return sourceDao.getDefaultSource()?.toSource()
     }
 
-    override suspend fun insertPerson(person: Person): Long {
-        return personDao.insertPerson(person.toPersonEntity())
+    override suspend fun addPerson(person: Person): Long {
+        return personDao.addPerson(person.toPersonEntity())
     }
 
-    override fun getAllPersons(): Flow<List<Person>> {
-        return personDao.getAllPersons().map { it.map { it.toPerson() } }
+    override fun observePersons(): Flow<List<Person>> {
+        return personDao.observePersons().map { it.map { it.toPerson() } }
     }
 
-    override suspend fun insertTransactionWithBalance(
+    override suspend fun addTransactionWithBalance(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
@@ -286,7 +283,7 @@ class TransactionLocalDataSourceImpl(
         val id = insertTransaction(transaction, tagIds, personIds)
 
         balanceDeltas.forEach { (sourceId, delta) ->
-            financialSourceDao.adjustBalance(sourceId, delta)
+            sourceDao.adjustBalance(sourceId, delta)
         }
 
         id
@@ -298,10 +295,10 @@ class TransactionLocalDataSourceImpl(
         personIds: List<Long>,
         balanceDeltas: Map<Long, Int>
     ): Long = db.withTransaction {
-        val row = update(transaction, tagIds, personIds) // همون متد فعلی خودت
+        val row = updateTransaction(transaction, tagIds, personIds)
 
         balanceDeltas.forEach { (sourceId, delta) ->
-            financialSourceDao.adjustBalance(sourceId, delta)
+            sourceDao.adjustBalance(sourceId, delta)
         }
 
         row
@@ -314,7 +311,7 @@ class TransactionLocalDataSourceImpl(
         transactionDao.deleteTransaction(transaction.toTransactionEntity())
 
         balanceDeltas.forEach { (sourceId, delta) ->
-            financialSourceDao.adjustBalance(sourceId, delta)
+            sourceDao.adjustBalance(sourceId, delta)
         }
     }
 

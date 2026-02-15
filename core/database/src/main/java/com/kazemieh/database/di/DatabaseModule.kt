@@ -4,7 +4,7 @@ import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
-import com.kazemieh.database.DatabaseModule
+import com.kazemieh.database.FinTrackDatabase
 import com.kazemieh.database.PrepopulateCallback
 import com.kazemieh.database.datasource.TransactionLocalDataSourceImpl
 import org.koin.android.ext.koin.androidContext
@@ -15,7 +15,7 @@ val databaseModule = module {
     single {
         Room.databaseBuilder(
             androidContext(),
-            DatabaseModule::class.java,
+            FinTrackDatabase::class.java,
             "fin_track.db"
         )
             .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
@@ -24,11 +24,11 @@ val databaseModule = module {
     }
 
     // Provide each DAO
-    single { get<DatabaseModule>().transactionDao() }
-    single { get<DatabaseModule>().categoryDao() }
-    single { get<DatabaseModule>().financialSourceDao() }
-    single { get<DatabaseModule>().tagDao() }
-    single { get<DatabaseModule>().personDao() }
+    single { get<FinTrackDatabase>().transactionDao() }
+    single { get<FinTrackDatabase>().categoryDao() }
+    single { get<FinTrackDatabase>().financialSourceDao() }
+    single { get<FinTrackDatabase>().tagDao() }
+    single { get<FinTrackDatabase>().personDao() }
 
 
     single<TransactionLocalDataSource> {
@@ -36,13 +36,12 @@ val databaseModule = module {
             db = get(),
             transactionDao = get(),
             tagDao = get(),
-            financialSourceDao = get(),
+            sourceDao = get(),
             categoryDao = get(),
             personDao = get()
         )
     }
 }
-
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(db: SupportSQLiteDatabase) {
@@ -131,7 +130,6 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     }
 }
 
-
 val MIGRATION_3_4 = object : Migration(3, 4) {
     override fun migrate(db: SupportSQLiteDatabase) {
 
@@ -199,7 +197,6 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL("ALTER TABLE transactions_new RENAME TO transactions")
     }
 }
-
 
 private const val COLOR_COUNT = 12
 private const val ICON_COUNT = 100

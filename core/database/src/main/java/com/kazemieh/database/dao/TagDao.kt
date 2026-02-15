@@ -12,13 +12,13 @@ import kotlinx.coroutines.flow.Flow
 interface TagDao {
 
     @Insert
-    suspend fun insertTag(tag: TagEntity): Long
+    suspend fun addTag(tag: TagEntity): Long
 
     @Insert
     suspend fun insertAllTag(tag: List<TagEntity>): List<Long>
 
     @Query("SELECT * FROM tag")
-    fun getAllTags(): Flow<List<TagEntity>>
+    fun observeTags(): Flow<List<TagEntity>>
 
     @Query("SELECT * FROM tag WHERE id = :tagId")
     suspend fun getTagById(tagId: Long): TagEntity

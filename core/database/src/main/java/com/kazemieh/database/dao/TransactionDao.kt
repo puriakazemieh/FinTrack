@@ -21,20 +21,9 @@ interface TransactionDao {
     @Insert
     suspend fun insertTransaction(transaction: TransactionEntity): Long
 
-//    @Insert(onConflict = OnConflictStrategy.IGNORE)
-//    suspend fun insertTransactionTagCrossRef(crossRef: TransactionTagCrossRef)
-
-//    @Insert(onConflict = OnConflictStrategy.IGNORE)
-//    suspend fun insertTransactionPersonCrossRef(crossRef: TransactionPersonCrossRef)
-
     @Update
     suspend fun updateTransaction(transaction: TransactionEntity): Int
 
-//    @Update
-//    suspend fun updateTransactionTagCrossRef(crossRef: TransactionTagCrossRef)
-//
-//    @Update
-//    suspend fun updateTransactionPersonCrossRef(crossRef: TransactionPersonCrossRef)
 
     @Transaction
     @Query(
@@ -164,7 +153,7 @@ interface TransactionDao {
     GROUP BY c.id
     """
     )
-    fun getCategorySums(
+    fun observeCategorySumsByFilter(
         type: Int?,
         categoryIds: List<Long?>,
         sourceIds: List<Long?>,
@@ -181,7 +170,6 @@ interface TransactionDao {
 
     @Delete
     suspend fun deleteTransaction(transaction: TransactionEntity)
-
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertTransactionTagCrossRefs(crossRefs: List<TransactionTagCrossRef>)

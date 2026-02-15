@@ -20,43 +20,13 @@ interface TransactionLocalDataSource {
         personIds: List<Long>,
     ): Long
 
-    suspend fun update(
+    suspend fun updateTransaction(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
     ): Long
 
-    suspend fun delete(transaction: Transaction)
-    fun getAllTransactionsFiltered(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>>
-
-    fun getCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>>
-
-    suspend fun insertCategory(category: Category): Long
-    suspend fun updateCategory(category: Category): Int
-    suspend fun updateSource(source: Source): Int
-    suspend fun updateTag(tag: Tag): Int
-    suspend fun updatePerson(person: Person): Int
-    suspend fun deleteCategory(category: Category, moveCategory: Category?)
-    suspend fun deleteTag(deleteTag: Tag, moveTag: Tag?)
-    suspend fun deletePerson(deletePerson: Person, movePerson: Person?)
-    suspend fun deleteSource(deleteSource: Source, moveSource: Source?)
-    suspend fun insertFinancialSource(source: Source): Long
-    suspend fun insertTag(tag: Tag): Long
-    fun getAllCategory(type: TransactionType): Flow<List<Category>>
-    fun getAllFinancialSource(): Flow<List<Source>>
-    fun getSource(sourceId: Long): Flow<Source?>
-    fun getAllTag(): Flow<List<Tag>>
-    suspend fun adjustSourceBalance(id: Long, delta: Int)
-    suspend fun getDefaultCategory(type: TransactionType): Category
-    suspend fun getTransferCategory(): Category
-    suspend fun getDefaultSource(): Source?
-
-
-    suspend fun insertPerson(person: Person): Long
-    fun getAllPersons(): Flow<List<Person>>
-
-
-    suspend fun insertTransactionWithBalance(
+    suspend fun addTransactionWithBalance(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
@@ -74,4 +44,33 @@ interface TransactionLocalDataSource {
         transaction: Transaction,
         balanceDeltas: Map<Long, Int>
     )
+    fun observeTransactions(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>>
+
+    fun observeCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>>
+
+    suspend fun addCategory(category: Category): Long
+    suspend fun updateCategory(category: Category): Int
+    suspend fun updateSource(source: Source): Int
+    suspend fun updateTag(tag: Tag): Int
+    suspend fun updatePerson(person: Person): Int
+    suspend fun deleteCategory(category: Category, moveCategory: Category?)
+    suspend fun deleteTag(deleteTag: Tag, moveTag: Tag?)
+    suspend fun deletePerson(deletePerson: Person, movePerson: Person?)
+    suspend fun deleteSource(deleteSource: Source, moveSource: Source?)
+    suspend fun addSource(source: Source): Long
+    suspend fun addTag(tag: Tag): Long
+    fun observeCategories(type: TransactionType): Flow<List<Category>>
+    fun observeSources(): Flow<List<Source>>
+    fun observeSource(sourceId: Long): Flow<Source?>
+    fun observeTags(): Flow<List<Tag>>
+    suspend fun adjustSourceBalance(id: Long, delta: Int)
+    suspend fun getDefaultCategory(type: TransactionType): Category
+    suspend fun getTransferCategory(): Category
+    suspend fun getDefaultSource(): Source?
+
+
+    suspend fun addPerson(person: Person): Long
+    fun observePersons(): Flow<List<Person>>
+
+
 }

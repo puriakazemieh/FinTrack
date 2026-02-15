@@ -14,20 +14,25 @@ import kotlinx.coroutines.flow.Flow
 
 interface TransactionRepository {
 
-    suspend fun addTransaction(
+    suspend fun addTransactionWithBalance(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
-        delta: Int
+        balanceDeltas: Map<Long, Int>
     ): Long
 
-    suspend fun updateTransaction(
+    suspend fun updateTransactionWithBalance(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
+        balanceDeltas: Map<Long, Int>
     ): Long
 
-    suspend fun deleteTransaction(transaction: Transaction)
+    suspend fun deleteTransactionWithBalance(
+        transaction: Transaction,
+        balanceDeltas: Map<Long, Int>
+    )
+
     fun observeTransactions(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>>
 
 
@@ -59,25 +64,5 @@ interface TransactionRepository {
     fun observeSource(sourceId: Long): Flow<Source?>
     suspend fun getDefaultSource(): Source?
 
-    suspend fun adjustSourceBalance(id: Long, delta: Int)
-
-    suspend fun addTransactionWithBalance(
-        transaction: Transaction,
-        tagIds: List<Long>,
-        personIds: List<Long>,
-        balanceDeltas: Map<Long, Int>
-    ): Long
-
-    suspend fun updateTransactionWithBalance(
-        transaction: Transaction,
-        tagIds: List<Long>,
-        personIds: List<Long>,
-        balanceDeltas: Map<Long, Int>
-    ): Long
-
-    suspend fun deleteTransactionWithBalance(
-        transaction: Transaction,
-        balanceDeltas: Map<Long, Int>
-    )
 
 }

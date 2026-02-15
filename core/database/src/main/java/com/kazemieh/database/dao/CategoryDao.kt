@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 interface CategoryDao {
 
     @Insert
-    suspend fun insertCategory(category: CategoryEntity): Long
+    suspend fun addCategory(category: CategoryEntity): Long
 
     @Insert
     suspend fun insertAllCategory(category: List<CategoryEntity>): List<Long>
@@ -22,10 +22,7 @@ interface CategoryDao {
     suspend fun updateCategory(category: CategoryEntity): Int
 
     @Query("SELECT * FROM category WHERE type = :type")
-    fun getAllCategories(type: Int): Flow<List<CategoryEntity>>
-
-    @Query("SELECT * FROM category WHERE id = :categoryId")
-    fun getCategoryById(categoryId: Long): Flow<CategoryEntity>
+    fun observeCategories(type: Int): Flow<List<CategoryEntity>>
 
     @Insert
     suspend fun createTransferCategory(
@@ -36,13 +33,13 @@ interface CategoryDao {
     ): Long
 
     @Delete
-    suspend fun deleteCategory(category: CategoryEntity)
+    suspend fun insertTransferCategoryIfMissing(category: CategoryEntity)
 
     @Query("SELECT * FROM category WHERE type = :type ORDER BY id LIMIT 1")
-    suspend fun getDefaultCategory(type: Int): CategoryEntity
+    suspend fun getFirstByType(type: Int): CategoryEntity
 
     @Query("SELECT * FROM category WHERE type = 3 ORDER BY id LIMIT 1")
-    suspend fun getTransferCategory(): CategoryEntity?
+    suspend fun getTransferCategoryOrNull(): CategoryEntity?
 
 
 }

@@ -12,13 +12,13 @@ import kotlinx.coroutines.flow.Flow
 interface PersonDao {
 
     @Insert
-    suspend fun insertPerson(person: PersonEntity): Long
+    suspend fun addPerson(person: PersonEntity): Long
 
     @Insert
     suspend fun insertAllPerson(person: List<PersonEntity>): List<Long>
 
     @Query("SELECT * FROM person")
-    fun getAllPersons(): Flow<List<PersonEntity>>
+    fun observePersons(): Flow<List<PersonEntity>>
 
     @Query("SELECT * FROM person WHERE id = :personId")
     suspend fun getPersonById(personId: Long): PersonEntity

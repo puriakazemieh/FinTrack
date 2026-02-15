@@ -19,48 +19,46 @@ class TransactionRepositoryImpl(
 ) : TransactionRepository {
 
     override fun observeTransactions(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>> {
-        return localDataSource.getAllTransactionsFiltered(transactionFilterParams)
+        return localDataSource.observeTransactions(transactionFilterParams)
     }
 
     override fun observeCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>> {
-        return localDataSource.getCategorySums(transactionFilterParams)
+        return localDataSource.observeCategorySums(transactionFilterParams)
     }
 
-    override suspend fun addTransaction(
+    override suspend fun addTransactionWithBalance(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
-        delta: Int,
-    ): Long {
-        return localDataSource.insertTransaction(transaction, tagIds, personIds)
-    }
+        balanceDeltas: Map<Long, Int>
+    ): Long = localDataSource.addTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
 
-    override suspend fun deleteTransaction(transaction: Transaction) {
-        localDataSource.delete(transaction)
-    }
-
-    override suspend fun updateTransaction(
+    override suspend fun updateTransactionWithBalance(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
-    ): Long {
-        return localDataSource.update(transaction, tagIds, personIds)
-    }
+        balanceDeltas: Map<Long, Int>
+    ): Long = localDataSource.updateTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
+
+    override suspend fun deleteTransactionWithBalance(
+        transaction: Transaction,
+        balanceDeltas: Map<Long, Int>
+    ) = localDataSource.deleteTransactionWithBalance(transaction, balanceDeltas)
 
     override fun observeCategories(type: TransactionType): Flow<List<Category>> {
-        return localDataSource.getAllCategory(type)
+        return localDataSource.observeCategories(type)
     }
 
     override suspend fun addTag(tag: Tag): Long {
-        return localDataSource.insertTag(tag)
+        return localDataSource.addTag(tag)
     }
 
     override suspend fun addPerson(person: Person): Long {
-        return localDataSource.insertPerson(person)
+        return localDataSource.addPerson(person)
     }
 
     override suspend fun addCategory(category: Category): Long {
-        return localDataSource.insertCategory(category)
+        return localDataSource.addCategory(category)
     }
 
     override suspend fun updateCategory(category: Category): Int {
@@ -96,27 +94,23 @@ class TransactionRepositoryImpl(
     }
 
     override suspend fun addSource(source: Source): Long {
-        return localDataSource.insertFinancialSource(source)
+        return localDataSource.addSource(source)
     }
 
     override fun observeSources(): Flow<List<Source>> {
-        return localDataSource.getAllFinancialSource()
+        return localDataSource.observeSources()
     }
 
     override fun observeSource(sourceId: Long): Flow<Source?> {
-        return localDataSource.getSource(sourceId)
+        return localDataSource.observeSource(sourceId)
     }
 
     override fun observeTags(): Flow<List<Tag>> {
-        return localDataSource.getAllTag()
+        return localDataSource.observeTags()
     }
 
     override fun observePersons(): Flow<List<Person>> {
-        return localDataSource.getAllPersons()
-    }
-
-    override suspend fun adjustSourceBalance(id: Long, delta: Int) {
-        localDataSource.adjustSourceBalance(id, delta)
+        return localDataSource.observePersons()
     }
 
     override suspend fun getDefaultCategory(type: TransactionType): Category {
@@ -130,24 +124,5 @@ class TransactionRepositoryImpl(
     override suspend fun getDefaultSource(): Source? {
         return localDataSource.getDefaultSource()
     }
-
-    override suspend fun addTransactionWithBalance(
-        transaction: Transaction,
-        tagIds: List<Long>,
-        personIds: List<Long>,
-        balanceDeltas: Map<Long, Int>
-    ): Long = localDataSource.insertTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
-
-    override suspend fun updateTransactionWithBalance(
-        transaction: Transaction,
-        tagIds: List<Long>,
-        personIds: List<Long>,
-        balanceDeltas: Map<Long, Int>
-    ): Long = localDataSource.updateTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
-
-    override suspend fun deleteTransactionWithBalance(
-        transaction: Transaction,
-        balanceDeltas: Map<Long, Int>
-    ) = localDataSource.deleteTransactionWithBalance(transaction, balanceDeltas)
 
 }

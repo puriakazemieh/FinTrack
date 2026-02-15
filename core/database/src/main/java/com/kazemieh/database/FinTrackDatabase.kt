@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.database.dao.CategoryDao
-import com.kazemieh.database.dao.FinancialSourceDao
+import com.kazemieh.database.dao.SourceDao
 import com.kazemieh.database.dao.PersonDao
 import com.kazemieh.database.dao.TagDao
 import com.kazemieh.database.dao.TransactionDao
@@ -36,10 +36,10 @@ import org.koin.core.Koin
     exportSchema = false
 )
 @TypeConverters(TransactionTypeConverter::class)
-abstract class DatabaseModule : RoomDatabase() {
+abstract class FinTrackDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun categoryDao(): CategoryDao
-    abstract fun financialSourceDao(): FinancialSourceDao
+    abstract fun financialSourceDao(): SourceDao
     abstract fun tagDao(): TagDao
     abstract fun personDao(): PersonDao
 
@@ -57,8 +57,8 @@ class PrepopulateCallback(
     override fun onCreate(db: SupportSQLiteDatabase) {
         super.onCreate(db)
         CoroutineScope(Dispatchers.IO).launch {
-            val prefsDao: FinancialSourceDao by koin.inject()
-            prefsDao.insertFinancialSource(
+            val prefsDao: SourceDao by koin.inject()
+            prefsDao.addSource(
                 SourceEntity(
                     name = "منبع مالی پیش فرض",
                     type = 1,
