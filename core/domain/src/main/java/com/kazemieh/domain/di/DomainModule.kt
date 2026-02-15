@@ -11,13 +11,13 @@ import com.kazemieh.domain.usecase.DeletePersonUseCase
 import com.kazemieh.domain.usecase.DeleteSourceUseCase
 import com.kazemieh.domain.usecase.DeleteTagUseCase
 import com.kazemieh.domain.usecase.DeleteTransactionUseCase
-import com.kazemieh.domain.usecase.UpdateCategory
-import com.kazemieh.domain.usecase.UpdatePerson
+import com.kazemieh.domain.usecase.UpdateCategoryUseCase
+import com.kazemieh.domain.usecase.UpdatePersonUseCase
 import com.kazemieh.domain.usecase.UpdateSourceUseCase
-import com.kazemieh.domain.usecase.UpdateTag
+import com.kazemieh.domain.usecase.UpdateTagUseCase
 import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
 import com.kazemieh.domain.usecase.ObservePersonsUseCase
-import com.kazemieh.domain.usecase.GetAllSource
+import com.kazemieh.domain.usecase.ObserveSourcesUseCase
 import com.kazemieh.domain.usecase.ObserveTagsUseCase
 import com.kazemieh.domain.usecase.ObserveTransactionsUseCase
 import com.kazemieh.domain.usecase.ObserveCategorySumsUseCase
@@ -36,11 +36,11 @@ val domainModule = module {
     factory { ObserveTransactionsUseCase(get()) }
     factory { ObserveCategorySumsUseCase(get()) }
     factory { ObserveTagsUseCase(get()) }
-    factory { GetAllSource(get()) }
+    factory { ObserveSourcesUseCase(get()) }
     factory { ObserveCategoriesUseCase(get()) }
     factory { AddCategoryUseCase(get()) }
-    factory { UpdateCategory(get()) }
-    factory { UpdateTag(get()) }
+    factory { UpdateCategoryUseCase(get()) }
+    factory { UpdateTagUseCase(get()) }
     factory { DeleteCategoryUseCase(get()) }
     factory { DeletePersonUseCase(get()) }
     factory { DeleteTagUseCase(get()) }
@@ -54,7 +54,7 @@ val domainModule = module {
     factory { DeleteSourceUseCase(get()) }
     factory { UpdateSourceUseCase(get()) }
     factory { ObserveSourceUseCase(get()) }
-    factory { UpdatePerson(get()) }
+    factory { UpdatePersonUseCase(get()) }
 
 
     single {

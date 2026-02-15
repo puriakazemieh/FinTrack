@@ -20,13 +20,14 @@ interface FinancialSourceDao {
     @Query("UPDATE source SET balance = balance + :delta WHERE id = :id")
     suspend fun adjustBalance(id: Long, delta: Int)
 
-    @Query("SELECT * FROM source WHERE id = 1 LIMIT 1")
-    suspend fun getDefaultSource(): SourceEntity?
-
     @Delete
     suspend fun deleteSource(source: SourceEntity)
 
     @Update
     suspend fun updateSource(source: SourceEntity): Int
+
+    @Query("SELECT * FROM source ORDER BY id LIMIT 1")
+    suspend fun getDefaultSource(): SourceEntity?
+
 }
 

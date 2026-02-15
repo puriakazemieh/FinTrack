@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import androidx.room.withTransaction
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
 import com.kazemieh.common.model.Person
@@ -14,6 +15,7 @@ import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
+import com.kazemieh.database.DatabaseModule
 import com.kazemieh.database.dao.CategoryDao
 import com.kazemieh.database.dao.FinancialSourceDao
 import com.kazemieh.database.dao.PersonDao
@@ -35,6 +37,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class TransactionLocalDataSourceImpl(
+    private val db: DatabaseModule,
     private val transactionDao: TransactionDao,
     private val tagDao: TagDao,
     private val financialSourceDao: FinancialSourceDao,
@@ -50,62 +53,64 @@ class TransactionLocalDataSourceImpl(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
-    ): Long {
+    ): Long = db.withTransaction {
+
         val transactionId = transactionDao.insertTransaction(transaction.toTransactionEntity())
 
-        tagIds.forEach { tagId ->
-            transactionDao.insertTransactionTagCrossRef(
-                TransactionTagCrossRef(
-                    transactionId = transactionId,
-                    tagId = tagId
-                )
+        val distinctTags = tagIds.distinct()
+        val distinctPersons = personIds.distinct()
+
+        if (distinctTags.isNotEmpty()) {
+            transactionDao.insertTransactionTagCrossRefs(
+                distinctTags.map { TransactionTagCrossRef(transactionId, it) }
             )
         }
-        personIds.forEach { personId ->
-            transactionDao.insertTransactionPersonCrossRef(
-                TransactionPersonCrossRef(
-                    transactionId = transactionId,
-                    personId = personId
-                )
+
+        if (distinctPersons.isNotEmpty()) {
+            transactionDao.insertTransactionPersonCrossRefs(
+                distinctPersons.map { TransactionPersonCrossRef(transactionId, it) }
             )
         }
-        return transactionId
+
+        transactionId
     }
+
 
     override suspend fun update(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
-    ): Long {
-        val transactionRowUpdatedCount =
-            transactionDao.updateTransaction(transaction.toTransactionEntity())
+    ): Long = db.withTransaction {
 
-        tagIds.forEach { tagId ->
-            transactionDao.updateTransactionTagCrossRef(
-                TransactionTagCrossRef(
-                    transactionId = transaction.id,
-                    tagId = tagId
-                )
+        val rowCount = transactionDao.updateTransaction(transaction.toTransactionEntity())
+
+        transactionDao.deleteAllTagRefsForTransaction(transaction.id)
+        transactionDao.deleteAllPersonRefsForTransaction(transaction.id)
+
+        val distinctTags = tagIds.distinct()
+        val distinctPersons = personIds.distinct()
+
+        if (distinctTags.isNotEmpty()) {
+            transactionDao.insertTransactionTagCrossRefs(
+                distinctTags.map { TransactionTagCrossRef(transaction.id, it) }
             )
         }
-        personIds.forEach { personId ->
-            transactionDao.updateTransactionPersonCrossRef(
-                TransactionPersonCrossRef(
-                    transactionId = transaction.id,
-                    personId = personId
-                )
+
+        if (distinctPersons.isNotEmpty()) {
+            transactionDao.insertTransactionPersonCrossRefs(
+                distinctPersons.map { TransactionPersonCrossRef(transaction.id, it) }
             )
         }
-        return transactionRowUpdatedCount.toLong()
 
+        rowCount.toLong()
     }
 
 
     override fun getAllTransactionsFiltered(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>> {
         return Pager(
             config = PagingConfig(
-                pageSize = 3,
-                initialLoadSize = 3,
+                pageSize = 20,
+                initialLoadSize = 40,
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
@@ -164,80 +169,57 @@ class TransactionLocalDataSourceImpl(
 
     }
 
-    override suspend fun deleteCategory(category: Category, moveCategory: Category?) {
-        if (moveCategory != null) {
-            val allTransaction = transactionDao.getAllTransactionListFiltered(
-                type = category.type.count,
-                categoryIds = listOf(category.id)
-            )
+    override suspend fun deleteCategory(category: Category, moveCategory: Category?) =
+        db.withTransaction {
+            val fromId = requireNotNull(category.id) { "deleteCategory: category.id is null" }
 
-            allTransaction.forEach { transaction ->
-                transactionDao.updateTransaction(
-                    transaction.transaction.copy(
-                        categoryId = moveCategory.id ?: 0
-                    )
-                )
+            val toId = moveCategory?.id
+            if (toId != null) {
+                transactionDao.moveTransactionsCategory(fromId, toId)
             }
+
+            categoryDao.deleteCategory(category.toCategoryEntity())
         }
 
-        categoryDao.deleteCategory(category.toCategoryEntity())
-    }
 
-    override suspend fun deleteTag(deleteTag: Tag, moveTag: Tag?) {
-        if (moveTag != null && moveTag.id != null) {
-            val allTransaction = transactionDao.getAllTransactionListFiltered(
-                tagIds = listOf(deleteTag.id)
-            )
+    override suspend fun deleteTag(deleteTag: Tag, moveTag: Tag?) = db.withTransaction {
+        val fromId = requireNotNull(deleteTag.id) { "deleteTag: tag.id is null" }
+        val toId = moveTag?.id
 
-            allTransaction.forEach { transaction ->
-                transactionDao.updateTransactionTagCrossRef(
-                    TransactionTagCrossRef(
-                        transactionId = transaction.transaction.id,
-                        tagId = moveTag.id!!
-                    )
-                )
-            }
-        }
+        if (toId != null) transactionDao.copyTagRefs(fromId, toId)
+        transactionDao.deleteTagRefs(fromId)
 
         tagDao.deleteTag(deleteTag.toTagEntity())
     }
 
-    override suspend fun deletePerson(deletePerson: Person, movePerson: Person?) {
-        if (movePerson != null && movePerson.id != null) {
-            val allTransaction = transactionDao.getAllTransactionListFiltered(
-                personIds = listOf(deletePerson.id)
-            )
 
-            allTransaction.forEach { transaction ->
-                transactionDao.updateTransactionPersonCrossRef(
-                    TransactionPersonCrossRef(
-                        transactionId = transaction.transaction.id,
-                        personId = movePerson.id!!
-                    )
-                )
-            }
+    override suspend fun deletePerson(deletePerson: Person, movePerson: Person?) =
+        db.withTransaction {
+            val fromId = requireNotNull(deletePerson.id) { "deletePerson: person.id is null" }
+            val toId = movePerson?.id
+
+            if (toId != null) transactionDao.copyPersonRefs(fromId, toId)
+            transactionDao.deletePersonRefs(fromId)
+
+            personDao.deletePerson(deletePerson.toPersonEntity())
         }
 
-        personDao.deletePerson(deletePerson.toPersonEntity())
-    }
 
-    override suspend fun deleteSource(deleteSource: Source, moveSource: Source?) {
-        if (moveSource != null) {
-            val allTransaction = transactionDao.getAllTransactionListFiltered(
-                sourceIds = listOf(deleteSource.id)
-            )
+    override suspend fun deleteSource(deleteSource: Source, moveSource: Source?) =
+        db.withTransaction {
+            val fromId = requireNotNull(deleteSource.id) { "deleteSource: source.id is null" }
+            val toId = moveSource?.id
 
-            allTransaction.forEach { transaction ->
-                transactionDao.updateTransaction(
-                    transaction.transaction.copy(
-                        sourceId = moveSource.id ?: 0
-                    )
-                )
+            if (toId != null) {
+                transactionDao.moveTransactionsSource(fromId, toId)
+                transactionDao.moveTransactionsSourceEnd(fromId, toId)
+            } else {
+                transactionDao.nullifySourceEnd(fromId)
             }
+
+            financialSourceDao.deleteSource(deleteSource.toSourceEntity())
         }
 
-        financialSourceDao.deleteSource(deleteSource.toSourceEntity())
-    }
 
     override suspend fun insertFinancialSource(source: Source): Long {
         return financialSourceDao.insertFinancialSource(source.toSourceEntity())
@@ -273,14 +255,15 @@ class TransactionLocalDataSourceImpl(
         return categoryDao.getDefaultCategory(type.count).toCategory()
     }
 
-    override suspend fun getTransferCategory(): Category {
-        var transferCategory = categoryDao.getTransferCategory()?.toCategory()
-        if (transferCategory == null) {
+    override suspend fun getTransferCategory(): Category = db.withTransaction {
+        var transfer = categoryDao.getTransferCategory()?.toCategory()
+        if (transfer == null) {
             categoryDao.createTransferCategory()
-            transferCategory = categoryDao.getTransferCategory()?.toCategory()
+            transfer = categoryDao.getTransferCategory()?.toCategory()
         }
-        return transferCategory!!
+        transfer!!
     }
+
 
     override suspend fun getDefaultSource(): Source? {
         return financialSourceDao.getDefaultSource()?.toSource()
@@ -293,4 +276,47 @@ class TransactionLocalDataSourceImpl(
     override fun getAllPersons(): Flow<List<Person>> {
         return personDao.getAllPersons().map { it.map { it.toPerson() } }
     }
+
+    override suspend fun insertTransactionWithBalance(
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+        balanceDeltas: Map<Long, Int>
+    ): Long = db.withTransaction {
+        val id = insertTransaction(transaction, tagIds, personIds)
+
+        balanceDeltas.forEach { (sourceId, delta) ->
+            financialSourceDao.adjustBalance(sourceId, delta)
+        }
+
+        id
+    }
+
+    override suspend fun updateTransactionWithBalance(
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+        balanceDeltas: Map<Long, Int>
+    ): Long = db.withTransaction {
+        val row = update(transaction, tagIds, personIds) // همون متد فعلی خودت
+
+        balanceDeltas.forEach { (sourceId, delta) ->
+            financialSourceDao.adjustBalance(sourceId, delta)
+        }
+
+        row
+    }
+
+    override suspend fun deleteTransactionWithBalance(
+        transaction: Transaction,
+        balanceDeltas: Map<Long, Int>
+    ) = db.withTransaction {
+        transactionDao.deleteTransaction(transaction.toTransactionEntity())
+
+        balanceDeltas.forEach { (sourceId, delta) ->
+            financialSourceDao.adjustBalance(sourceId, delta)
+        }
+    }
+
+
 }

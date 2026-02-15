@@ -3,7 +3,7 @@ package com.kazemieh.domain.usecase
 import com.kazemieh.domain.repository.TransactionRepository
 import com.kazemieh.common.model.Category
 
-class UpdateCategory(
+class UpdateCategoryUseCase(
     private val repository: TransactionRepository
 ) {
     suspend operator fun invoke(category : Category): Int {

@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Tag
 import com.kazemieh.designsystem.R
 import com.kazemieh.domain.usecase.AddTagUseCase
-import com.kazemieh.domain.usecase.UpdateTag
+import com.kazemieh.domain.usecase.UpdateTagUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class AddTagViewModel(
     private val addTagUseCase: AddTagUseCase,
-    private val updateTagUseCase: UpdateTag
+    private val updateTagUseCase: UpdateTagUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddTagState())

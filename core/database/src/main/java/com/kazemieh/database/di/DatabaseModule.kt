@@ -32,7 +32,14 @@ val databaseModule = module {
 
 
     single<TransactionLocalDataSource> {
-        TransactionLocalDataSourceImpl(get(), get(), get(), get(), get())
+        TransactionLocalDataSourceImpl(
+            db = get(),
+            transactionDao = get(),
+            tagDao = get(),
+            financialSourceDao = get(),
+            categoryDao = get(),
+            personDao = get()
+        )
     }
 }
 
@@ -205,30 +212,36 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
         db.execSQL("ALTER TABLE category ADD COLUMN iconId INTEGER NOT NULL DEFAULT 1")
 
         // برای کاربران آپدیتی: مقدارهای متفاوت بر اساس id
-        db.execSQL("""
+        db.execSQL(
+            """
             UPDATE category
             SET colorId = ((id + 3) % $COLOR_COUNT) + 1,
                 iconId  = ((id + 17) % $ICON_COUNT) + 1
-        """.trimIndent())
+        """.trimIndent()
+        )
 
         // --- tag ---
         db.execSQL("ALTER TABLE tag ADD COLUMN colorId INTEGER NOT NULL DEFAULT 1")
         db.execSQL("ALTER TABLE tag ADD COLUMN iconId INTEGER NOT NULL DEFAULT 1")
 
-        db.execSQL("""
+        db.execSQL(
+            """
             UPDATE tag
             SET colorId = ((id + 5) % $COLOR_COUNT) + 1,
                 iconId  = ((id + 29) % $ICON_COUNT) + 1
-        """.trimIndent())
+        """.trimIndent()
+        )
 
         // --- source ---
         db.execSQL("ALTER TABLE source ADD COLUMN colorId INTEGER NOT NULL DEFAULT 1")
         db.execSQL("ALTER TABLE source ADD COLUMN iconId INTEGER NOT NULL DEFAULT 1")
 
-        db.execSQL("""
+        db.execSQL(
+            """
             UPDATE source
             SET colorId = ((id + 7) % $COLOR_COUNT) + 1,
                 iconId  = ((id + 41) % $ICON_COUNT) + 1
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 }

@@ -7,7 +7,6 @@ import androidx.room.Query
 import androidx.room.Update
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.database.entity.CategoryEntity
-import com.kazemieh.database.entity.TransactionEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -28,15 +27,22 @@ interface CategoryDao {
     @Query("SELECT * FROM category WHERE id = :categoryId")
     fun getCategoryById(categoryId: Long): Flow<CategoryEntity>
 
-    @Query("SELECT * FROM category WHERE type = :type AND id = 1 LIMIT 1")
-    suspend fun getDefaultCategory(type: Int): CategoryEntity
-
-    @Query("SELECT * FROM category WHERE type = 3 LIMIT 1")
-    suspend fun getTransferCategory(): CategoryEntity?
-
     @Insert
-    suspend fun createTransferCategory(category: CategoryEntity = CategoryEntity(name = "انتقال", type = TransactionType.TRANSFER.count)): Long
+    suspend fun createTransferCategory(
+        category: CategoryEntity = CategoryEntity(
+            name = "انتقال",
+            type = TransactionType.TRANSFER.count
+        )
+    ): Long
 
     @Delete
     suspend fun deleteCategory(category: CategoryEntity)
+
+    @Query("SELECT * FROM category WHERE type = :type ORDER BY id LIMIT 1")
+    suspend fun getDefaultCategory(type: Int): CategoryEntity
+
+    @Query("SELECT * FROM category WHERE type = 3 ORDER BY id LIMIT 1")
+    suspend fun getTransferCategory(): CategoryEntity?
+
+
 }

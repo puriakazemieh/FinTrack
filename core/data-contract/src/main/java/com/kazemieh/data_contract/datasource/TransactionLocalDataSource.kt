@@ -46,7 +46,7 @@ interface TransactionLocalDataSource {
     fun getAllFinancialSource(): Flow<List<Source>>
     fun getSource(sourceId: Long): Flow<Source?>
     fun getAllTag(): Flow<List<Tag>>
-    suspend fun adjustSourceBalance(id: Long, amount: Int)
+    suspend fun adjustSourceBalance(id: Long, delta: Int)
     suspend fun getDefaultCategory(type: TransactionType): Category
     suspend fun getTransferCategory(): Category
     suspend fun getDefaultSource(): Source?
@@ -54,4 +54,24 @@ interface TransactionLocalDataSource {
 
     suspend fun insertPerson(person: Person): Long
     fun getAllPersons(): Flow<List<Person>>
+
+
+    suspend fun insertTransactionWithBalance(
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+        balanceDeltas: Map<Long, Int>
+    ): Long
+
+    suspend fun updateTransactionWithBalance(
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+        balanceDeltas: Map<Long, Int>
+    ): Long
+
+    suspend fun deleteTransactionWithBalance(
+        transaction: Transaction,
+        balanceDeltas: Map<Long, Int>
+    )
 }

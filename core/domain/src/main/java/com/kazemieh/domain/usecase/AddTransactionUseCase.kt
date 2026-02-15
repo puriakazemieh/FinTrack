@@ -12,13 +12,7 @@ class AddTransactionUseCase(
         tagIds: List<Long>,
         personIds: List<Long>,
     ): Long {
-        val idTransaction = repository.addTransaction(transaction, tagIds, personIds)
-        if (idTransaction >= 0L) {
-            val impact = transaction.balanceImpact()
-            impact.forEach { (sourceId, delta) ->
-                repository.adjustSourceBalance(sourceId, delta)
-            }
-        }
-        return idTransaction
+        val impact = transaction.balanceImpact()
+        return repository.addTransactionWithBalance(transaction, tagIds, personIds, impact)
     }
 }

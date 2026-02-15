@@ -6,7 +6,7 @@ import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.R
 import com.kazemieh.domain.usecase.AddCategoryUseCase
-import com.kazemieh.domain.usecase.UpdateCategory
+import com.kazemieh.domain.usecase.UpdateCategoryUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class AddCategoryViewModel(
     private val addCategoryUseCase: AddCategoryUseCase,
-    private val updateCategoryUseCase: UpdateCategory
+    private val updateCategoryUseCase: UpdateCategoryUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddCategoryState())

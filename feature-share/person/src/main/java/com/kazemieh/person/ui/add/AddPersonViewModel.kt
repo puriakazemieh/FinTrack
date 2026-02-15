@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Person
 import com.kazemieh.designsystem.R
 import com.kazemieh.domain.usecase.AddPersonUseCase
-import com.kazemieh.domain.usecase.UpdatePerson
+import com.kazemieh.domain.usecase.UpdatePersonUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class AddPersonViewModel(
     private val addPersonUseCase: AddPersonUseCase,
-    private val updatePersonUseCase: UpdatePerson
+    private val updatePersonUseCase: UpdatePersonUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddPersonState())

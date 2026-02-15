@@ -30,6 +30,7 @@ class TransactionRepositoryImpl(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
+        delta: Int,
     ): Long {
         return localDataSource.insertTransaction(transaction, tagIds, personIds)
     }
@@ -129,4 +130,24 @@ class TransactionRepositoryImpl(
     override suspend fun getDefaultSource(): Source? {
         return localDataSource.getDefaultSource()
     }
+
+    override suspend fun addTransactionWithBalance(
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+        balanceDeltas: Map<Long, Int>
+    ): Long = localDataSource.insertTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
+
+    override suspend fun updateTransactionWithBalance(
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+        balanceDeltas: Map<Long, Int>
+    ): Long = localDataSource.updateTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
+
+    override suspend fun deleteTransactionWithBalance(
+        transaction: Transaction,
+        balanceDeltas: Map<Long, Int>
+    ) = localDataSource.deleteTransactionWithBalance(transaction, balanceDeltas)
+
 }

@@ -8,10 +8,7 @@ class DeleteTransactionUseCase(
     private val repository: TransactionRepository
 ) {
     suspend operator fun invoke(transaction: Transaction) {
-        val impact = transaction.balanceImpact()
-        impact.forEach { (sourceId, delta) ->
-            repository.adjustSourceBalance(sourceId, -delta) // reverse
-        }
-        repository.deleteTransaction(transaction)
+        val impact = transaction.balanceImpact().mapValues { -it.value }
+        repository.deleteTransactionWithBalance(transaction, impact)
     }
 }

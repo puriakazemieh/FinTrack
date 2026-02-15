@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.component.model.toItemUi
-import com.kazemieh.domain.usecase.GetAllSource
+import com.kazemieh.domain.usecase.ObserveSourcesUseCase
 import com.kazemieh.financialsource.ui.list.SourceEffect.AddedSource
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SourceViewModel(
-    private val getAllSource: GetAllSource
+    private val observeSourcesUseCase: ObserveSourcesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SourceState())
@@ -65,7 +65,7 @@ class SourceViewModel(
 
     private fun loadAllFinancialSource() {
         viewModelScope.launch {
-            getAllSource().collect { financialSource ->
+            observeSourcesUseCase().collect { financialSource ->
                 _state.update {
                     it.copy(
                         sources = financialSource,
