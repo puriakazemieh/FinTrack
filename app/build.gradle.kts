@@ -1,8 +1,8 @@
 plugins {
     id("convention.android.application")
-    id("convention.android.koin")
     id("convention.android.application.compose")
-    id("convention.android.serialization")
+    id("convention.koin")
+    id("convention.kotlin.serialization")
 }
 
 android {
@@ -31,9 +31,11 @@ android {
 }
 
 dependencies {
+    // اگر در convention اضافه‌اش نکردی:
+    // implementation(libs.androidx.activity.compose)
 
+//    implementation(project(":composeApp"))
     implementation(libs.navigation.compose)
-
     implementation(project(":core:common"))
     implementation(project(":core:data"))
     implementation(project(":core:designsystem"))
@@ -47,5 +49,4 @@ dependencies {
     implementation(project(":feature-share:person"))
     implementation(project(":feature-container:dashboard"))
     implementation(project(":feature-container:setting"))
-
 }

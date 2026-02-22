@@ -1,5 +1,6 @@
 package com.kazemieh.fintrack.navigation.navigationBar
 
+import androidx.annotation.Keep
 import androidx.compose.material3.SnackbarHostState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -11,21 +12,10 @@ import com.tosantechno.filter.ReportScreen
 import kotlinx.serialization.Serializable
 
 
-@Serializable
-object
-BottomBarGraph
-
-@Serializable
-object
-Dashboard
-
-@Serializable
-object
-Report
-
-@Serializable
-object
-Setting
+@Keep @Serializable object BottomBarGraph
+@Keep @Serializable object Dashboard
+@Keep @Serializable object Report
+@Keep @Serializable object Setting
 
 
 fun NavGraphBuilder.bottomBarNavGraph(

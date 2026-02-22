@@ -3,63 +3,113 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
+
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
+}
+
+repositories {
+    maven {url = uri("https://maven.myket.ir") }
+//    maven {url = uri("https://srepo.tosantechno.net/repository/maven-group/") }
+    google()
+    mavenCentral()
+    gradlePluginPortal()
 }
 
 dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
+    compileOnly(libs.android.gradleApi)
 }
+
 
 gradlePlugin {
     plugins {
-        register("androidApplicationCompose")
-        {
-            id = "convention.android.application.compose"
-            implementationClass = "ApplicationComposeConvention"
-        }
 
-        register("androidLibraryCompose")
-        {
-            id = "convention.android.library.compose"
-            implementationClass = "LibraryComposeConvention"
-        }
-
-        register("application")
-        {
+        // --- Android base ---
+        register("androidApplicationConvention") {
             id = "convention.android.application"
-            implementationClass = "ApplicationConvention"
+            implementationClass = "convention.android.AndroidApplicationConventionPlugin"
         }
 
-        register("applicationLibrary")
-        {
+        register("androidLibraryConvention") {
             id = "convention.android.library"
-            implementationClass = "LibraryConvention"
+            implementationClass = "convention.android.AndroidLibraryConventionPlugin"
         }
 
-        register("androidKoin") {
-            id = "convention.android.koin"
-            implementationClass = "KoinConvention"
+        register("androidComposeConvention") {
+            id = "convention.android.compose"
+            implementationClass = "convention.android.AndroidComposeConventionPlugin"
         }
 
-        register("androidSerialization") {
-            id = "convention.android.serialization"
-            implementationClass = "SerializationConvention"
-        }
-
-        register("androidFeature") {
+        register("androidFeatureConvention") {
             id = "convention.android.feature"
-            implementationClass = "FeatureConvention"
+            implementationClass = "convention.android.AndroidFeatureConventionPlugin"
         }
 
-        register("room") {
+        // --- Android composite ---
+        register("androidApplicationComposeConvention") {
+            id = "convention.android.application.compose"
+            implementationClass =
+                "convention.android.composite.AndroidApplicationComposeConventionPlugin"
+        }
+
+        register("androidLibraryComposeConvention") {
+            id = "convention.android.library.compose"
+            implementationClass =
+                "convention.android.composite.AndroidLibraryComposeConventionPlugin"
+        }
+
+        // --- Android capabilities ---
+        register("androidRoomConvention") {
             id = "convention.android.room"
-            implementationClass = "RoomConvention"
+            implementationClass = "convention.android.capability.RoomConventionPlugin"
+        }
+
+        // --- Kotlin/JVM ---
+        register("kotlinLibraryConvention") {
+            id = "convention.kotlin.library"
+            implementationClass = "convention.kotlin.KotlinLibraryConventionPlugin"
+        }
+
+        // --- KMP base ---
+        register("kotlinMultiplatformConvention") {
+            id = "convention.kotlin.multiplatform"
+            implementationClass =
+                "convention.kotlin.multiplatform.KotlinMultiplatformConventionPlugin"
+        }
+
+        // --- KMP Compose (جدید) ---
+        register("kotlinMultiplatformComposeConvention") {
+            id = "convention.kotlin.multiplatform.compose"
+            implementationClass =
+                "convention.kotlin.multiplatform.ComposeMultiplatformConventionPlugin"
+        }
+
+        // --- Kotlin capabilities ---
+        register("kotlinSerializationConvention") {
+            id = "convention.kotlin.serialization"
+            implementationClass = "convention.kotlin.capability.SerializationConventionPlugin"
+        }
+
+        register("kotlinSqlDelightConvention") {
+            id = "convention.kotlin.sqldelight"
+            implementationClass = "convention.kotlin.capability.SqlDelightConventionPlugin"
+        }
+
+        register("koinConvention") {
+            id = "convention.koin"
+            implementationClass = "convention.kotlin.capability.KoinConventionPlugin"
+        }
+
+        register("ktorConvention") {
+            id = "convention.ktor"
+            implementationClass = "convention.kotlin.capability.KtorConventionPlugin"
         }
 
     }
+
 }

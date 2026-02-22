@@ -1,7 +1,7 @@
 plugins {
     id("convention.android.library")
-    id("convention.android.serialization")
-    id("convention.android.koin")
+    id("convention.kotlin.serialization")
+    id("convention.koin")
 }
 
 android {

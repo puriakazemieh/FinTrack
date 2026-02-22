@@ -1,6 +1,6 @@
 plugins {
     id("convention.android.library")
-    id("convention.android.serialization")
+    id("convention.kotlin.serialization")
 }
 
 

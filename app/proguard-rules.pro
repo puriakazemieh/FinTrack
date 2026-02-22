@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep type-safe Navigation routes + generated serializers (kotlinx.serialization)
+-keep @kotlinx.serialization.Serializable class com.kazemieh.fintrack.navigation.** { *; }
+-keepclassmembers class com.kazemieh.fintrack.navigation.**$$serializer { *; }
