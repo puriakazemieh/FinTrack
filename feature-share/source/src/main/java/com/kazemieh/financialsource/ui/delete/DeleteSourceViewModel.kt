@@ -3,7 +3,6 @@ package com.kazemieh.financialsource.ui.delete
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.common.ld
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.R
 import com.kazemieh.domain.usecase.DeleteSourceUseCase
@@ -82,7 +81,7 @@ class DeleteSourceViewModel(
                 return@launch
             }
             _state.value.source?.let { deleteSource ->
-                deleteSourceUseCase(deleteSource.ld("deleteSource"), _state.value.moveSource.ld("moveSource"))
+                deleteSourceUseCase(deleteSource, _state.value.moveSource)
                 _effect.send(DeleteSourceEffect.DeletedTransaction)
             }
         }

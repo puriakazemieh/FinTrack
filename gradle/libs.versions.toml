@@ -2,6 +2,7 @@
 # --- Tooling ---
 agp = "9.0.0-rc03"
 kotlin = "2.3.0" # :contentReference[oaicite:10]{index=10}
+kotlinxDatetime = "0.7.1"
 ksp = "2.3.2" # :contentReference[oaicite:11]{index=11}
 
 # --- Compose (use BOM) ---
@@ -42,6 +43,7 @@ constraintlayoutCompose = "1.1.1" # :contentReference[oaicite:26]{index=26}
 # --- Jalali ---
 jalalicalendar = "1.3.3"
 jalaliDatepickerCompose = "1.2.0"
+persianDateTime = "0.2.3"
 
 # --- Unit test ---
 junit5 = "6.0.1" # :contentReference[oaicite:27]{index=27}
@@ -52,6 +54,8 @@ junit4 = "4.13.2"
 hilt = "2.54"
 hilt-navigation = "1.2.0"
 navigationCommonKtx = "2.9.6"
+
+
 
 
 [libraries]
@@ -138,6 +142,8 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 # --- Jalali ---
 jalalicalendar = { module = "ir.huri:JalaliCalendar", version.ref = "jalalicalendar" }
 jalali-datepicker-compose = { module = "com.github.hamooo90:jalali-datepicker-compose", version.ref = "jalaliDatepickerCompose" }
+persianDateTime = { module = "io.github.faridsolgi:persianDateTime", version.ref = "persianDateTime" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 
 # --- hilt ---
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }

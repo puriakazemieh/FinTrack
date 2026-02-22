@@ -116,7 +116,7 @@ class ReportViewModel() : ViewModel() {
                         startDateTimeStamp = range?.start,
                         endDateTimeStamp = range?.end,
                         isShowArrowButton = true,
-                        textDate = range?.label ?: DateFilterType.THIS_MONTH.titleResId,
+                        textDate = range?.label ?: DateFilterType.THIS_MONTH,
                         startDate = null,
                         endDate = null,
                         enableAnimationChart = !_state.value.enableAnimationChart
@@ -142,7 +142,7 @@ class ReportViewModel() : ViewModel() {
                             isDateSheetVisible = false,
                             startDateTimeStamp = range?.start,
                             endDateTimeStamp = range?.end,
-                            textDate = range?.label ?: DateFilterType.CUSTOM_RANGE.titleResId,
+                            textDate = range?.label ?: DateFilterType.CUSTOM_RANGE,
                             startDate = intent.startDate,
                             endDate = intent.endDate,
                             isShowArrowButton = false,
@@ -214,7 +214,7 @@ data class ReportState(
     val endDate: String? = null,
     val startDateTimeStamp: Long? = null,
     val endDateTimeStamp: Long? = null,
-    val textDate: Any = DateFilterType.THIS_MONTH.titleResId,
+    val textDate: Any = DateFilterType.THIS_MONTH,
 
     val isSourceSheetVisible: Boolean = false,
     val selectedSources: Set<Source> = emptySet(),

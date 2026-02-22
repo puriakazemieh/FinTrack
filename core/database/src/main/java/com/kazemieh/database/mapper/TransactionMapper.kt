@@ -3,7 +3,6 @@ package com.kazemieh.database.mapper
 import com.kazemieh.common.DateFilterHelper
 import com.kazemieh.common.formatted
 import com.kazemieh.common.formattedOrNull
-import com.kazemieh.common.ld
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.database.entity.TransactionEntity

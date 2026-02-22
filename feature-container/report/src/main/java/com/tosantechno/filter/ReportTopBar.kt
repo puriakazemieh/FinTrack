@@ -403,13 +403,14 @@ private fun FilterRow(
                 shape = MaterialTheme.shapes.medium,
                 elevation = CardDefaults.cardElevation(defaultElevation = space.one)
             ) {
-                val text =
-                    if (isCustomDate && startDate != null && endDate != null) "$startDate - $endDate"
-                    else stringResource(filter.titleResId)
+                //todo chane this
+//                val text =
+//                    if (isCustomDate && startDate != null && endDate != null) "$startDate - $endDate"
+                 //   else stringResource(filter.titleResId)
 
                 FintrackBodyMediumText(
                     modifier = Modifier.padding(space.large),
-                    text = text
+                    text = "text"
                 )
             }
         }
