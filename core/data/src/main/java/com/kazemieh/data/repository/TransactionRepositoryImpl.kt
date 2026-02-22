@@ -1,8 +1,9 @@
 package com.kazemieh.data.repository
 
-import androidx.paging.PagingData
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
+import com.kazemieh.common.model.Page
+import com.kazemieh.common.model.PageRequest
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
@@ -18,8 +19,11 @@ class TransactionRepositoryImpl(
     private val localDataSource: TransactionLocalDataSource
 ) : TransactionRepository {
 
-    override fun observeTransactions(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>> {
-        return localDataSource.observeTransactions(transactionFilterParams)
+    override fun observeTransactions(
+        transactionFilterParams: TransactionFilterParams,
+        request: PageRequest
+    ): Flow<Page<TransactionWithRelations>> {
+        return localDataSource.observeTransactions(transactionFilterParams, request)
     }
 
     override fun observeCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>> {
@@ -31,14 +35,16 @@ class TransactionRepositoryImpl(
         tagIds: List<Long>,
         personIds: List<Long>,
         balanceDeltas: Map<Long, Int>
-    ): Long = localDataSource.addTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
+    ): Long =
+        localDataSource.addTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
 
     override suspend fun updateTransactionWithBalance(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
         balanceDeltas: Map<Long, Int>
-    ): Long = localDataSource.updateTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
+    ): Long =
+        localDataSource.updateTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
 
     override suspend fun deleteTransactionWithBalance(
         transaction: Transaction,

@@ -1,35 +1,36 @@
 package com.kazemieh.transaction.ui.component
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.itemContentType
-import androidx.paging.compose.itemKey
+import androidx.compose.ui.unit.dp
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.EmptyListScreen
-
+import com.kazemieh.transaction.ui.main.TransactionState
 
 fun LazyListScope.transactionListContent(
-    lazyPagingItems: LazyPagingItems<TransactionWithRelations>,
+    state: TransactionState,
     onDelete: (TransactionWithRelations) -> Unit = {},
-    onEdit: (TransactionWithRelations) -> Unit = {}
+    onEdit: (TransactionWithRelations) -> Unit = {},
+    onRetryRefresh: () -> Unit = {},
+    onRetryAppend: () -> Unit = {},
 ) {
-    val refreshState = lazyPagingItems.loadState.refresh
-    val appendState = lazyPagingItems.loadState.append
-    val isEmpty = lazyPagingItems.itemCount == 0
+    val isEmpty = state.items.isEmpty()
 
-
-    if (refreshState is LoadState.Loading && isEmpty) {
+    if (state.isRefreshing && isEmpty) {
         item {
             Box(
                 modifier = Modifier.fillParentMaxSize(),
@@ -41,20 +42,23 @@ fun LazyListScope.transactionListContent(
         return
     }
 
-
-    if (refreshState is LoadState.Error && isEmpty) {
+    if (state.refreshError != null && isEmpty) {
         item {
             Box(
                 modifier = Modifier.fillParentMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "Error: ${refreshState.error.localizedMessage}")
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = "Error: ${state.refreshError}")
+                    Spacer(Modifier.height(12.dp))
+                    Button(onClick = onRetryRefresh) { Text("Retry") }
+                }
             }
         }
         return
     }
 
-
+    // ===== Empty =====
     if (isEmpty) {
         item {
             Box(
@@ -67,12 +71,11 @@ fun LazyListScope.transactionListContent(
         return
     }
 
+    // ===== Items =====
     items(
-        count = lazyPagingItems.itemCount,
-        key = lazyPagingItems.itemKey { it.transaction.id },
-        contentType = lazyPagingItems.itemContentType { "TransactionItem" },
-    ) { index ->
-        val item = lazyPagingItems[index] ?: return@items
+        items = state.items,
+        key = { it.transaction.id }
+    ) { item ->
         TransactionItem(
             uiTransactionWithRelation = item,
             onDelete = { onDelete(item) },
@@ -80,10 +83,13 @@ fun LazyListScope.transactionListContent(
         )
     }
 
-    if (appendState is LoadState.Loading) {
+    // ===== Append Loading =====
+    if (state.isAppending) {
         item {
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
@@ -91,9 +97,19 @@ fun LazyListScope.transactionListContent(
         }
     }
 
-    if (appendState is LoadState.Error) {
+    // ===== Append Error =====
+    if (state.appendError != null) {
         item {
-            Text(text = "Error: ${appendState.error.localizedMessage}")
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "Error: ${state.appendError}")
+                Spacer(Modifier.height(8.dp))
+                Button(onClick = onRetryAppend) { Text("Retry") }
+            }
         }
     }
 }

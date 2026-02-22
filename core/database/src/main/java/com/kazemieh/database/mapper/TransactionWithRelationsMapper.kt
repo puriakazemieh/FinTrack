@@ -10,5 +10,5 @@ fun TransactionWithCategoryFinancialSourceAndTags.toTransactionWithRelations(): 
         source = financialSource.toSource(),
         sourceEnd = sourceEnd?.toSource(),
         tags = tags.map { it.toTag() },
-        persons = persons.map { it.toPerson() }
+        persons = persons.map { it.toPerson() },
     )

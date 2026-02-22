@@ -41,6 +41,7 @@ fun DashboardScreen(
     val listState = rememberLazyListState()
 
     val transactionItems = rememberTransactionItemsProvider(
+        listState = listState,
         onEdit = { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet(it)) },
         onDelete = { viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet(it)) }
     )

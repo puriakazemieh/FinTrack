@@ -1,6 +1,5 @@
 package com.kazemieh.database.dao
 
-import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -53,6 +52,8 @@ interface TransactionDao {
               (:fromTimestamp IS NULL OR :toTimestamp IS NULL)
               OR (timeStamp >= :fromTimestamp AND timeStamp < :toTimestamp)
           )
+          ORDER BY timeStamp DESC, id DESC
+          LIMIT :limit OFFSET :offset
     """
     )
     fun getAllTransactionsFiltered(
@@ -66,8 +67,10 @@ interface TransactionDao {
         categoryIdsSize: Int = categoryIds.size,
         sourceIdsSize: Int = sourceIds.size,
         fromTimestamp: Long? = null,
-        toTimestamp: Long? = null
-    ): PagingSource<Int, TransactionWithCategoryFinancialSourceAndTags>
+        toTimestamp: Long? = null,
+        limit: Int,
+        offset: Int,
+    ): Flow<List<TransactionWithCategoryFinancialSourceAndTags>>
 
     @Transaction
     @Query(

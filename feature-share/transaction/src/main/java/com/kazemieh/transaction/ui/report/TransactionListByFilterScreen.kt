@@ -5,11 +5,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
@@ -51,39 +53,60 @@ fun TransactionListByFilterScreen(
         )
     }
 
-    val lazyPagingItems = viewModel.uiTransactionWithRelations.collectAsLazyPagingItems()
+    val state = viewModel.state.collectAsStateWithLifecycle().value
+    val listState = rememberLazyListState()
 
     TransactionListByFilterContent(
-        lazyPagingItems,
-        enableAnimationChart,
+        state = state,
+        listState = listState,
+        enableAnimationChart = enableAnimationChart,
         onDelete = onDelete,
-        onEdit = onEdit
+        onEdit = onEdit,
+        onLoadMore = { viewModel.onIntent(TransactionReportIntent.LoadNextPage) },
+        onRetryRefresh = { viewModel.onIntent(TransactionReportIntent.RetryRefresh) },
+        onRetryAppend = { viewModel.onIntent(TransactionReportIntent.RetryAppend) }
     )
-
 }
+
 
 @Composable
 fun TransactionListByFilterContent(
-    uiTransactionWithRelations: LazyPagingItems<TransactionWithRelations>,
+    state: TransactionReportState,
+    listState: LazyListState,
     enableAnimationChart: Boolean,
     onDelete: (TransactionWithRelations) -> Unit = {},
-    onEdit: (TransactionWithRelations) -> Unit = {}
+    onEdit: (TransactionWithRelations) -> Unit = {},
+    onLoadMore: () -> Unit,
+    onRetryRefresh: () -> Unit,
+    onRetryAppend: () -> Unit,
 ) {
     val space = LocalSpacing.current
+
+    LaunchedEffect(state.items.size, state.endReached, state.isAppending, state.isRefreshing) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0 }
+            .collect { lastVisible ->
+                val shouldLoadMore = lastVisible >= (state.items.size - 5).coerceAtLeast(0)
+                if (shouldLoadMore && !state.endReached && !state.isAppending && !state.isRefreshing) {
+                    onLoadMore()
+                }
+            }
+    }
+
     LazyColumn(
+        state = listState,
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = space.large, vertical = space.mediumSmall)
     ) {
-
         item { ShowTransactionReportCard(enableAnimationChart = enableAnimationChart) }
-
         item { Spacer(Modifier.height(space.mediumSmall)) }
 
-        transactionListContent(uiTransactionWithRelations, onDelete, onEdit)
-
+        transactionListContent(
+            state = state.toListState(),
+            onDelete = onDelete,
+            onEdit = onEdit,
+            onRetryRefresh = onRetryRefresh,
+            onRetryAppend = onRetryAppend
+        )
     }
-
 }
-
-

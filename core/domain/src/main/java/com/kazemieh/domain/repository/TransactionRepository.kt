@@ -1,8 +1,9 @@
 package com.kazemieh.domain.repository
 
-import androidx.paging.PagingData
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
+import com.kazemieh.common.model.Page
+import com.kazemieh.common.model.PageRequest
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
@@ -33,7 +34,10 @@ interface TransactionRepository {
         balanceDeltas: Map<Long, Int>
     )
 
-    fun observeTransactions(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>>
+    fun observeTransactions(
+        transactionFilterParams: TransactionFilterParams,
+        request: PageRequest
+    ): Flow<Page<TransactionWithRelations>>
 
 
     suspend fun addCategory(category: Category): Long

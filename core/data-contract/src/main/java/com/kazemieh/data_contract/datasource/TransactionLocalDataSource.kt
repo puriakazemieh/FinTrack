@@ -1,8 +1,9 @@
 package com.kazemieh.data_contract.datasource
 
-import androidx.paging.PagingData
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
+import com.kazemieh.common.model.Page
+import com.kazemieh.common.model.PageRequest
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
@@ -44,7 +45,11 @@ interface TransactionLocalDataSource {
         transaction: Transaction,
         balanceDeltas: Map<Long, Int>
     )
-    fun observeTransactions(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>>
+
+    fun observeTransactions(
+        transactionFilterParams: TransactionFilterParams,
+        request: PageRequest
+    ): Flow<Page<TransactionWithRelations>>
 
     fun observeCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>>
 

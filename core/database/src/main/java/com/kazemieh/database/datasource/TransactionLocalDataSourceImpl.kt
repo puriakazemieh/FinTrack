@@ -1,12 +1,10 @@
 package com.kazemieh.database.datasource
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.map
 import androidx.room.withTransaction
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
+import com.kazemieh.common.model.Page
+import com.kazemieh.common.model.PageRequest
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
@@ -103,29 +101,21 @@ class TransactionLocalDataSourceImpl(
     }
 
 
-    override fun observeTransactions(transactionFilterParams: TransactionFilterParams): Flow<PagingData<TransactionWithRelations>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 20,
-                initialLoadSize = 40,
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = {
-                transactionDao.getAllTransactionsFiltered(
-                    type = transactionFilterParams.type,
-                    categoryIds = transactionFilterParams.categories.map { it.id },
-                    sourceIds = transactionFilterParams.sources.map { it.id },
-                    tagIds = transactionFilterParams.tags.map { it.id },
-                    personIds = transactionFilterParams.persons.map { it.id },
-                    fromTimestamp = transactionFilterParams.fromTimestamp,
-                    toTimestamp = transactionFilterParams.toTimestamp
-                )
-            }
-        ).flow.map { pagingData ->
-            pagingData.map { item ->
-                item.toTransactionWithRelations()
-            }
-        }
+    override fun observeTransactions(
+        transactionFilterParams: TransactionFilterParams,
+        request: PageRequest
+    ): Flow<Page<TransactionWithRelations>> {
+        return transactionDao.getAllTransactionsFiltered(
+            type = transactionFilterParams.type,
+            categoryIds = transactionFilterParams.categories.map { it.id },
+            sourceIds = transactionFilterParams.sources.map { it.id },
+            tagIds = transactionFilterParams.tags.map { it.id },
+            personIds = transactionFilterParams.persons.map { it.id },
+            fromTimestamp = transactionFilterParams.fromTimestamp,
+            toTimestamp = transactionFilterParams.toTimestamp,
+            limit = request.limit,
+            offset = request.offset,
+        ).map { Page(items = it.map { it.toTransactionWithRelations() }, request = request) }
     }
 
     override fun observeCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>> {
