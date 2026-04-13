@@ -44,7 +44,6 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
-//                implementation(libs.persianDateTime)
                 implementation(libs.kotlinx.datetime)
             }
         }
