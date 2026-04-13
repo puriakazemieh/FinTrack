@@ -1,6 +1,7 @@
 package com.kazemieh.common.model
 
 import kotlinx.serialization.Serializable
+import kotlin.time.Clock
 
 @Serializable
 @OptIn(kotlinx.serialization.InternalSerializationApi::class)
@@ -12,7 +13,7 @@ data class Transaction(
     val sourceId: Long,
     val sourceEndId: Long? = null,
     val description: String? = null,
-    val timeStamp: Long = System.currentTimeMillis(),
+    val timeStamp: Long = Clock.System.now().toEpochMilliseconds(),
     val date: String = "",
     val type: TransactionType,
     val formatedAmount: String = 0.toString(),

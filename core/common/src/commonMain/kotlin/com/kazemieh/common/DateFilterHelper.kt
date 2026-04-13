@@ -1,12 +1,12 @@
 package com.kazemieh.common
 
-import io.github.faridsolgi.persiandatetime.domain.PersianDateTime
-import io.github.faridsolgi.persiandatetime.extensions.minus
-import io.github.faridsolgi.persiandatetime.extensions.monthLength
-import io.github.faridsolgi.persiandatetime.extensions.persianMonth
-import io.github.faridsolgi.persiandatetime.extensions.plus
-import io.github.faridsolgi.persiandatetime.extensions.toLocalDate
-import io.github.faridsolgi.persiandatetime.extensions.toPersianDateTime
+import com.kazemieh.common.persiandatetime.domain.PersianDateTime
+import com.kazemieh.common.persiandatetime.extensions.minus
+import com.kazemieh.common.persiandatetime.extensions.monthLength
+import com.kazemieh.common.persiandatetime.extensions.persianMonth
+import com.kazemieh.common.persiandatetime.extensions.plus
+import com.kazemieh.common.persiandatetime.extensions.toLocalDate
+import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek

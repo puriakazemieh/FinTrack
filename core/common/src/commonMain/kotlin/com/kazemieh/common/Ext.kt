@@ -1,19 +1,8 @@
 package com.kazemieh.common
 
 
-import java.text.DecimalFormat
-import java.util.Locale
-
-//fun <T> T.ld(param: String? = "param"): T {
-//    return this.apply {
-//        Log.d("949494", "$param = $this")
-//    }
-//}
-
-
 fun Int.formatNumber(): String {
-    val decimalFormat = DecimalFormat("#,###")
-    return decimalFormat.format(this)
+    return this.toString().chunked(3).reversed().joinToString(" ").reversed()
 }
 
 
@@ -41,11 +30,8 @@ fun Int.toPositive(): Int =
         else -> 0
     }
 
-
 fun String.toPrice(): String {
-    this.toIntOrNull()?.let { number ->
-        return String.format(Locale.getDefault(), "%,d", number)
-    } ?: return ""
+    return this.toIntOrNull()?.formatNumber() ?: ""
 }
 
 
