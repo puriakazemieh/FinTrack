@@ -1,16 +1,91 @@
 plugins {
-    id("convention.android.feature")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
+    alias(libs.plugins.android.lint)
+    alias(libs.plugins.composeMultiplatformPlugin)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.composeHotReload)
+    id("convention.kotlin.serialization")
+//    id("convention.kotlin.multiplatform.compose")
 }
 
-android {
-    namespace = "com.kazemieh.designsystem"
-//    kotlinOptions {
-//        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
-//    }
-}
+kotlin {
+    androidLibrary {
+        namespace = "com.kazemieh.designsystem"
+        compileSdk {
+            version = release(36)
+        }
+        minSdk = 24
+    }
 
-dependencies {
-    implementation(project(":core:common"))
-    implementation(libs.jalali.datepicker.compose)
-    implementation(libs.jalalicalendar)
+    val xcfName = "core:commonKit"
+
+    iosX64 {
+        binaries.framework {
+            baseName = xcfName
+        }
+    }
+
+    iosArm64 {
+        binaries.framework {
+            baseName = xcfName
+        }
+    }
+
+    iosSimulatorArm64 {
+        binaries.framework {
+            baseName = xcfName
+        }
+    }
+
+    js {
+        browser()
+    }
+
+    jvm()
+
+    sourceSets {
+        commonMain {
+            dependencies {
+//                implementation(libs.jalali.datepicker.compose)
+//                implementation(libs.jalalicalendar)
+                implementation(project(":core:common"))
+                implementation(libs.kotlin.stdlib)
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.foundation)
+                implementation(libs.compose.material3)
+                implementation(libs.compose.ui)
+                implementation(libs.compose.material.icons.core)
+                implementation(libs.compose.material.icons.extended)
+                implementation(libs.compose.components.resources)
+                implementation(libs.compose.uiToolingPreview)
+                implementation(libs.androidx.lifecycle.runtimeCompose)
+                implementation(compose.components.resources)
+
+                implementation(libs.kotlinx.datetime)
+            }
+        }
+
+
+        androidMain {
+            dependencies {
+            }
+        }
+
+        iosMain {
+            dependencies {
+            }
+        }
+
+        jsMain {
+            dependencies {
+            }
+        }
+
+        jvmMain {
+            dependencies {
+            }
+        }
+    }
+
 }

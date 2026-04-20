@@ -1,5 +1,6 @@
 package convention.kotlin.multiplatform
 
+import ext.implementation
 import ext.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -20,7 +21,8 @@ class ComposeMultiplatformConventionPlugin : Plugin<Project> {
 
             kotlin.sourceSets.getByName("commonMain").dependencies {
                 // bundle جدیدی که پایین در toml می‌سازیم
-                implementation(libs.findBundle("composeMultiplatform").get())
+//                api(libs.findLibrary("compose.bom").get())
+                implementation(libs.findBundle("compose.multiplatform").get())
             }
         }
     }

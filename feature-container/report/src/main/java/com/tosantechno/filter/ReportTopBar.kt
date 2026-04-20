@@ -48,7 +48,7 @@ import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.R
-import com.kazemieh.designsystem.component.DatePickerField
+import com.kazemieh.designsystem.component.model.DatePickerField
 import com.kazemieh.designsystem.component.FilterButton
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField

@@ -137,7 +137,7 @@ class AddTransactionViewModel(
         viewModelScope.launch {
 
             if (!validateAndUpdateErrors()) {
-                _effect.send(AddTransactionEffect.ShowMessage(UiText.StringResource(R.string.fill_all_field)))
+                _effect.send(AddTransactionEffect.ShowMessage(UiText.StringResourceText(R.string.fill_all_field)))
                 return@launch
             }
 
@@ -153,7 +153,7 @@ class AddTransactionViewModel(
 
             if (current.transactionType == TransactionType.TRANSFER && sourceEndId == sourceId) {
                 _state.update { it.copy(isLoading = false, isSourceEndError = true) }
-                _effect.send(AddTransactionEffect.ShowMessage(UiText.StringResource(R.string.fill_all_field)))
+                _effect.send(AddTransactionEffect.ShowMessage(UiText.StringResourceText(R.string.fill_all_field)))
                 return@launch
             }
 
@@ -202,7 +202,7 @@ class AddTransactionViewModel(
                 _state.update { AddTransactionState() }
             } else {
                 _state.update { it.copy(isLoading = false) }
-                _effect.send(AddTransactionEffect.ShowMessage(UiText.StringResource(R.string.transaction_failed)))
+                _effect.send(AddTransactionEffect.ShowMessage(UiText.StringResourceText(R.string.transaction_failed)))
             }
         }
     }

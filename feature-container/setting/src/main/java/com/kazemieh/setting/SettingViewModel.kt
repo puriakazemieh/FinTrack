@@ -3,7 +3,6 @@ package com.kazemieh.setting
 import androidx.lifecycle.ViewModel
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.designsystem.component.model.ItemUi
-import com.kazemieh.designsystem.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -28,10 +27,10 @@ data class SettingState(
 )
 
 val items: List<ItemUi> = listOf(
-    ItemUi(id = ItemId.ITEM_1.id, title = UiText.StringResource(R.string.category)),
-    ItemUi(id = ItemId.ITEM_2.id, title = UiText.StringResource(R.string.source)),
-    ItemUi(id = ItemId.ITEM_3.id, title = UiText.StringResource(R.string.tags)),
-    ItemUi(id = ItemId.ITEM_4.id, title = UiText.StringResource(R.string.persons)),
+    ItemUi(id = ItemId.ITEM_1.id, title = UiText.StringResourceText(R.string.category)),
+    ItemUi(id = ItemId.ITEM_2.id, title = UiText.StringResourceText(R.string.source)),
+    ItemUi(id = ItemId.ITEM_3.id, title = UiText.StringResourceText(R.string.tags)),
+    ItemUi(id = ItemId.ITEM_4.id, title = UiText.StringResourceText(R.string.persons)),
 )
 
 enum class ItemId(val id: Long) {

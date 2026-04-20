@@ -7,6 +7,10 @@ ksp = "2.3.2" # :contentReference[oaicite:11]{index=11}
 
 # --- Compose (use BOM) ---
 composeBom = "2025.12.01" # :contentReference[oaicite:12]{index=12}
+composeHotReload = "1.0.0"
+material3 = "1.10.0-alpha05"
+compose-multiplatform = "1.10.0"
+androidx-lifecycle = "2.9.6"
 
 # --- AndroidX (Stable channel) ---
 coreKtx = "1.17.0" # :contentReference[oaicite:13]{index=13}
@@ -159,6 +163,25 @@ kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.re
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
 
+
+#composeMultiplatform
+compose-animation = { group = "org.jetbrains.compose.animation", name = "animation" }
+compose-material-icons-core = { group = "org.jetbrains.compose.material", name = "material-icons-core", version = "1.7.3" }
+compose-material-icons-extended = { group = "org.jetbrains.compose.material", name = "material-icons-extended", version = "1.7.3" }
+
+# KMP-friendly libraries
+image-loader = { module = "io.github.qdsfdhvh:image-loader", version = "1.9.0" }
+paging-compose-multiplatform = { module = "androidx.paging:paging-compose", version = "3.4.0-rc01" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-multiplatform" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-multiplatform" }
+compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-multiplatform" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-multiplatform" }
+androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+
+
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
@@ -179,6 +202,11 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 # New KMP+AGP direction (AGP 9+ friendly)
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 android-lint = { id = "com.android.lint", version.ref = "agp" }
+
+
+#composeMultiplatform
+composeMultiplatformPlugin = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
 
 
 [bundles]
