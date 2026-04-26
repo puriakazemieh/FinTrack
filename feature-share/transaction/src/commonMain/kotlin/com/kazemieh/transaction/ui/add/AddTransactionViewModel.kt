@@ -10,7 +10,7 @@ import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
-import com.kazemieh.designsystem.R
+import fintrack.core.designsystem.generated.resources.*
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import kotlinx.coroutines.channels.Channel
@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
 
 class AddTransactionViewModel(
     private val transactionUseCaseGroup: TransactionUseCaseGroup
@@ -137,7 +138,7 @@ class AddTransactionViewModel(
         viewModelScope.launch {
 
             if (!validateAndUpdateErrors()) {
-                _effect.send(AddTransactionEffect.ShowMessage(UiText.StringResourceText(R.string.fill_all_field)))
+                _effect.send(AddTransactionEffect.ShowMessage(UiText.StringResourceText(Res.string.fill_all_field)))
                 return@launch
             }
 
@@ -153,7 +154,7 @@ class AddTransactionViewModel(
 
             if (current.transactionType == TransactionType.TRANSFER && sourceEndId == sourceId) {
                 _state.update { it.copy(isLoading = false, isSourceEndError = true) }
-                _effect.send(AddTransactionEffect.ShowMessage(UiText.StringResourceText(R.string.fill_all_field)))
+                _effect.send(AddTransactionEffect.ShowMessage(UiText.StringResourceText(Res.string.fill_all_field)))
                 return@launch
             }
 
@@ -202,7 +203,7 @@ class AddTransactionViewModel(
                 _state.update { AddTransactionState() }
             } else {
                 _state.update { it.copy(isLoading = false) }
-                _effect.send(AddTransactionEffect.ShowMessage(UiText.StringResourceText(R.string.transaction_failed)))
+                _effect.send(AddTransactionEffect.ShowMessage(UiText.StringResourceText(Res.string.transaction_failed)))
             }
         }
     }
@@ -282,7 +283,7 @@ data class AddTransactionState(
     val amountTransfer: String? = "",
     val description: String = "",
     val date: String? = null,
-    val timeStamp: Long = System.currentTimeMillis(),
+    val timeStamp: Long = Clock.System.now().toEpochMilliseconds(),
     val transactionType: TransactionType = TransactionType.INCOME,
 
     val category: Category? = null,

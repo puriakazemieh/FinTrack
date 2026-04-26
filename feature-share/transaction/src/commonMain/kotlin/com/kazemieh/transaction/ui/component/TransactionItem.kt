@@ -28,12 +28,10 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -43,6 +41,19 @@ import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.LeadingIconStyle
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.all
+import fintrack.core.designsystem.generated.resources.amount_label
+import fintrack.core.designsystem.generated.resources.amount_transfer_label
+import fintrack.core.designsystem.generated.resources.delete
+import fintrack.core.designsystem.generated.resources.description_with_value
+import fintrack.core.designsystem.generated.resources.edit
+import fintrack.core.designsystem.generated.resources.incoming
+import fintrack.core.designsystem.generated.resources.outcoming
+import fintrack.core.designsystem.generated.resources.person_label
+import fintrack.core.designsystem.generated.resources.source
+import fintrack.core.designsystem.generated.resources.transfer
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun TransactionItem(
@@ -60,10 +71,10 @@ fun TransactionItem(
     }
 
     val typeLabel = when (trx.type) {
-        TransactionType.INCOME -> stringResource(R.string.incoming)
-        TransactionType.EXPENSE -> stringResource(R.string.outcoming)
-        TransactionType.TRANSFER -> stringResource(R.string.transfer)
-        else -> stringResource(R.string.all)
+        TransactionType.INCOME -> stringResource(Res.string.incoming)
+        TransactionType.EXPENSE -> stringResource(Res.string.outcoming)
+        TransactionType.TRANSFER -> stringResource(Res.string.transfer)
+        else -> stringResource(Res.string.all)
     }
 
     val amountColor =
@@ -139,7 +150,7 @@ fun TransactionItem(
                     IconButton(onClick = onEdit) {
                         Icon(
                             imageVector = Icons.Default.Edit,
-                            contentDescription = stringResource(R.string.edit),
+                            contentDescription = stringResource(Res.string.edit),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -147,7 +158,7 @@ fun TransactionItem(
                     IconButton(onClick = onDelete) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = stringResource(R.string.delete),
+                            contentDescription = stringResource(Res.string.delete),
                             tint = MaterialTheme.colorScheme.error
                         )
                     }
@@ -163,7 +174,7 @@ fun TransactionItem(
                 ) {
 
                     FintrackTitleMediumText(
-                        text = stringResource(R.string.source),
+                        text = stringResource(Res.string.source),
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
@@ -210,7 +221,7 @@ fun TransactionItem(
                 if (isTransfer) {
                     trx.amountTransferFormated?.let {
                         FintrackLabelSmallText(
-                            text = stringResource(R.string.amount_transfer_label, it),
+                            text = stringResource(Res.string.amount_transfer_label, it),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -220,7 +231,7 @@ fun TransactionItem(
                 // ---------- Amount ----------
                 FintrackBodyLargeText(
                     text = stringResource(
-                        R.string.amount_label,
+                        Res.string.amount_label,
                         typeLabel,
                         trx.formatedAmount
                     ),
@@ -231,7 +242,7 @@ fun TransactionItem(
                 if (uiTransactionWithRelation.persons.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(space.small))
                     FintrackBodySmallText(
-                        text = stringResource(R.string.person_label, personsText),
+                        text = stringResource(Res.string.person_label, personsText),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -241,7 +252,7 @@ fun TransactionItem(
                 if (!desc.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(space.small))
                     FintrackBodyMediumText(
-                        text = stringResource(R.string.description_with_value, desc),
+                        text = stringResource(Res.string.description_with_value, desc),
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
@@ -262,7 +273,7 @@ fun TransactionItem(
                             }
                             EntityChip(
                                 name = tag.name,
-                                iconRes = tagIcon.resId,
+                                iconRes = tagIcon.resource,
                                 tint = MaterialTheme.colorScheme.tertiary
                             )
                         }

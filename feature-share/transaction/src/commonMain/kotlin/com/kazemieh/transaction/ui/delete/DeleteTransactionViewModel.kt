@@ -4,7 +4,8 @@ package com.kazemieh.transaction.ui.delete
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.TransactionWithRelations
-import com.kazemieh.designsystem.R
+import com.kazemieh.designsystem.component.model.UiText
+import fintrack.core.designsystem.generated.resources.*
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +47,7 @@ class DeleteTransactionViewModel(
         viewModelScope.launch {
             val tx = _state.value.transactionWithRelations?.transaction
             if (tx == null) {
-                _effect.send(DeleteTransactionEffect.ShowMessage(/* مثلا */ R.string.transaction_failed))
+                _effect.send(DeleteTransactionEffect.ShowMessage(UiText.StringResourceText(Res.string.transaction_failed)))
                 _effect.send(DeleteTransactionEffect.OnDismiss)
                 return@launch
             }
@@ -62,7 +63,7 @@ class DeleteTransactionViewModel(
                 _state.update { DeleteTransactionState() }
             } else {
                 _state.update { it.copy(isLoading = false) }
-                _effect.send(DeleteTransactionEffect.ShowMessage(R.string.transaction_delete_failed))
+                _effect.send(DeleteTransactionEffect.ShowMessage(UiText.StringResourceText(Res.string.transaction_delete_failed)))
             }
         }
     }
@@ -84,6 +85,6 @@ data class DeleteTransactionState(
 
 sealed interface DeleteTransactionEffect {
     object DeletedTransaction : DeleteTransactionEffect
-    data class ShowMessage(val message: Int) : DeleteTransactionEffect
+    data class ShowMessage(val message: UiText) : DeleteTransactionEffect
     data object OnDismiss : DeleteTransactionEffect
 }

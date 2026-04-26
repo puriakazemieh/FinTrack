@@ -25,7 +25,7 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "FinTrack"
-include(":app")
+//include(":app")
 include(":core:common")
 include(":core:data")
 include(":core:data-contract")

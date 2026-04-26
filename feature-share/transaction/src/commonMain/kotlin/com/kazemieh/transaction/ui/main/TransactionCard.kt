@@ -18,16 +18,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
 import com.kazemieh.designsystem.component.PieChart
 import com.kazemieh.designsystem.component.PieChartItem
-import org.koin.androidx.compose.koinViewModel
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
@@ -38,9 +38,9 @@ fun TotalTransactionCard(
     val space = LocalSpacing.current
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    val incoming = stringResource(R.string.incoming)
-    val outcoming = stringResource(R.string.outcoming)
-    val transfer = stringResource(R.string.transfer)
+    val incoming = stringResource(Res.string.incoming)
+    val outcoming = stringResource(Res.string.outcoming)
+    val transfer = stringResource(Res.string.transfer)
 
     val piChartData by remember(
         incoming, outcoming, transfer,
@@ -76,9 +76,9 @@ fun TotalTransactionCard(
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
 
-                FintrackHeadlineSmallText(text = stringResource(R.string.balance_total))
+                FintrackHeadlineSmallText(text = stringResource(Res.string.balance_total))
 
-                val balanceTotalLabel = stringResource(R.string.balance_total_label, state.balance)
+                val balanceTotalLabel = stringResource(Res.string.balance_total_label, state.balance)
 
                 FintrackHeadlineSmallText(
                     modifier = Modifier.weight(1f),

@@ -11,7 +11,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.transaction.ui.component.transactionListContent
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable

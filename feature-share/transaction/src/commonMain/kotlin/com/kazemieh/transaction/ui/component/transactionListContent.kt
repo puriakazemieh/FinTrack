@@ -14,12 +14,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import fintrack.core.designsystem.generated.resources.*
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.model.TransactionWithRelations
-import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.transaction.ui.main.TransactionState
+import org.jetbrains.compose.resources.stringResource
 
 fun LazyListScope.transactionListContent(
     state: TransactionState,
@@ -65,7 +65,7 @@ fun LazyListScope.transactionListContent(
                 modifier = Modifier.fillParentMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                EmptyListScreen(stringResource(R.string.transaction))
+                EmptyListScreen(stringResource(Res.string.transaction))
             }
         }
         return

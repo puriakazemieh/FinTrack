@@ -31,9 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,17 +39,18 @@ import com.kazemieh.category.ui.list.CategoryPickerBottomSheet
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.R
-import com.kazemieh.designsystem.component.model.DatePickerField
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.designsystem.component.model.asString
+import com.kazemieh.designsystem.component.jalali.DatePickerField
+import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import com.kazemieh.person.ui.list.PersonPickerBottomSheet
 import com.kazemieh.tag.ui.list.TagPickerBottomSheet
+import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,7 +63,6 @@ fun AddTransactionBottomSheet(
     transactionAdded: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -89,7 +87,7 @@ fun AddTransactionBottomSheet(
                 is AddTransactionEffect.ShowMessage -> {
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(
-                            message = effect.message.asString(context),
+                            message = effect.message.resolveString(),
                             duration = SnackbarDuration.Short
                         )
                     }
@@ -204,15 +202,15 @@ fun AddTransactionContent(
                         ) {
                             val text = when (option.count) {
                                 1 -> {
-                                    stringResource(R.string.incoming)
+                                    stringResource(Res.string.incoming)
                                 }
 
                                 2 -> {
-                                    stringResource(R.string.outcoming)
+                                    stringResource(Res.string.outcoming)
                                 }
 
                                 else -> {
-                                    stringResource(R.string.transfer)
+                                    stringResource(Res.string.transfer)
                                 }
                             }
 
@@ -235,9 +233,9 @@ fun AddTransactionContent(
                 onValueChange = { onIntent(AddTransactionIntent.SetAmount(it)) },
                 label = {
                     Row {
-                        FintrackBodyMediumText(text = stringResource(R.string.amount))
+                        FintrackBodyMediumText(text = stringResource(Res.string.amount))
                         FintrackBodyMediumText(
-                            text = stringResource(R.string.required_star),
+                            text = stringResource(Res.string.required_star),
                             color = MaterialTheme.colorScheme.error
                         )
                     }
@@ -289,9 +287,9 @@ fun AddTransactionContent(
                 singleLine = false,
                 label = {
                     if (!state.tags.isNullOrEmpty()) {
-                        FintrackBodyMediumText(text = stringResource(R.string.tags))
+                        FintrackBodyMediumText(text = stringResource(Res.string.tags))
                     } else {
-                        FintrackBodyMediumText(text = stringResource(R.string.select_tags))
+                        FintrackBodyMediumText(text = stringResource(Res.string.select_tags))
                     }
                 }
 
@@ -309,9 +307,9 @@ fun AddTransactionContent(
                 singleLine = false,
                 label = {
                     if (!state.persons.isNullOrEmpty()) {
-                        FintrackBodyMediumText(text = stringResource(R.string.persons))
+                        FintrackBodyMediumText(text = stringResource(Res.string.persons))
                     } else {
-                        FintrackBodyMediumText(text = stringResource(R.string.select_person))
+                        FintrackBodyMediumText(text = stringResource(Res.string.select_person))
                     }
                 }
 
@@ -335,7 +333,7 @@ fun AddTransactionContent(
             FintrackOutlinedTextField(
                 value = state.description,
                 onValueChange = { onIntent(AddTransactionIntent.SetDescription(it)) },
-                label = { FintrackBodyMediumText(text = stringResource(R.string.description)) },
+                label = { FintrackBodyMediumText(text = stringResource(Res.string.description)) },
                 singleLine = false,
                 maxLine = 5
             )
@@ -355,7 +353,7 @@ fun AddTransactionContent(
                 )
             ) {
                 FintrackTitleMediumText(
-                    text = stringResource(R.string.save_transaction),
+                    text = stringResource(Res.string.save_transaction),
                     color = MaterialTheme.colorScheme.background
                 )
             }
@@ -387,12 +385,12 @@ private fun TransferScreen(
             label = {
                 Row {
                     if (state.source?.name != null) {
-                        FintrackBodyMediumText(text = stringResource(R.string.source_from))
+                        FintrackBodyMediumText(text = stringResource(Res.string.source_from))
                     } else {
-                        FintrackBodyMediumText(text = stringResource(R.string.select_source))
+                        FintrackBodyMediumText(text = stringResource(Res.string.select_source))
                     }
                     FintrackBodyMediumText(
-                        text = stringResource(R.string.required_star),
+                        text = stringResource(Res.string.required_star),
                         color = MaterialTheme.colorScheme.error
                     )
                 }
@@ -410,12 +408,12 @@ private fun TransferScreen(
             label = {
                 Row {
                     if (state.sourceEnd?.name != null) {
-                        FintrackBodyMediumText(text = stringResource(R.string.source_to))
+                        FintrackBodyMediumText(text = stringResource(Res.string.source_to))
                     } else {
-                        FintrackBodyMediumText(text = stringResource(R.string.select_source))
+                        FintrackBodyMediumText(text = stringResource(Res.string.select_source))
                     }
                     FintrackBodyMediumText(
-                        text = stringResource(R.string.required_star),
+                        text = stringResource(Res.string.required_star),
                         color = MaterialTheme.colorScheme.error
                     )
                 }
@@ -432,7 +430,7 @@ private fun TransferScreen(
             onValueChange = { setTransferAmount(it) },
             label = {
                 Row {
-                    FintrackBodyMediumText(text = stringResource(R.string.amount_transfer))
+                    FintrackBodyMediumText(text = stringResource(Res.string.amount_transfer))
                 }
             },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
@@ -457,12 +455,12 @@ private fun TransactionDetail(
             label = {
                 Row {
                     if (state.category?.name != null) {
-                        FintrackBodyMediumText(text = stringResource(R.string.category))
+                        FintrackBodyMediumText(text = stringResource(Res.string.category))
                     } else {
-                        FintrackBodyMediumText(text = stringResource(R.string.select_category))
+                        FintrackBodyMediumText(text = stringResource(Res.string.select_category))
                     }
                     FintrackBodyMediumText(
-                        text = stringResource(R.string.required_star),
+                        text = stringResource(Res.string.required_star),
                         color = MaterialTheme.colorScheme.error
                     )
                 }
@@ -480,12 +478,12 @@ private fun TransactionDetail(
             label = {
                 Row {
                     if (state.source?.name != null) {
-                        FintrackBodyMediumText(text = stringResource(R.string.source))
+                        FintrackBodyMediumText(text = stringResource(Res.string.source))
                     } else {
-                        FintrackBodyMediumText(text = stringResource(R.string.select_source))
+                        FintrackBodyMediumText(text = stringResource(Res.string.select_source))
                     }
                     FintrackBodyMediumText(
-                        text = stringResource(R.string.required_star),
+                        text = stringResource(Res.string.required_star),
                         color = MaterialTheme.colorScheme.error
                     )
                 }

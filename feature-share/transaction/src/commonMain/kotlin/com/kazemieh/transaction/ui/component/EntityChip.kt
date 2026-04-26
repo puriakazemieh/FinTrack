@@ -1,7 +1,6 @@
 package com.kazemieh.transaction.ui.component
 
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -16,12 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import org.jetbrains.compose.resources.DrawableResource
 
 
 @Composable
 fun EntityChip(
     name: String,
-    @DrawableRes iconRes: Int?,
+    iconRes: DrawableResource?,
     tint: Color,
     modifier: Modifier = Modifier
 ) {
@@ -41,7 +41,7 @@ fun EntityChip(
                 background = Color.Transparent,
                 modifier = Modifier.size(16.dp)
             )
-            if (iconRes != null && iconRes != 0) {
+            if (iconRes != null ) {
                 Spacer(modifier = Modifier.width(6.dp))
             }
             FintrackLabelSmallText(

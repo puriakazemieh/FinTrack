@@ -7,11 +7,11 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.component.DeleteBottomSheet
-import org.koin.androidx.compose.koinViewModel
+import com.kazemieh.designsystem.component.model.resolveString
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -23,7 +23,6 @@ fun DeleteTransactionBottomSheet(
     onDismiss: () -> Unit,
     transactionDeleted: () -> Unit
 ) {
-    val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(transactionWithRelations?.transaction?.id) {
@@ -41,7 +40,7 @@ fun DeleteTransactionBottomSheet(
 
                 is DeleteTransactionEffect.ShowMessage -> {
                     snackbarHostState.showSnackbar(
-                        message = context.getString(effect.message),
+                        message = effect.message.resolveString(),
                         duration = SnackbarDuration.Short
                     )
                 }
