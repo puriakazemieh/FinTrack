@@ -18,22 +18,28 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.bottomsheet.FormBottomSheetScaffold
 import com.kazemieh.designsystem.component.form.NameDescriptionFields
+import com.kazemieh.designsystem.component.model.asString
+import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.designsystem.picker.ColorIconPickerBottomSheet
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.card_number_label
+import fintrack.core.designsystem.generated.resources.description_label
+import fintrack.core.designsystem.generated.resources.initial_balance_label
+import fintrack.core.designsystem.generated.resources.source_name_label
+import fintrack.core.designsystem.generated.resources.submit_source
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +52,6 @@ fun AddSourceBottomSheet(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(selectedSource?.id) {
@@ -59,7 +64,7 @@ fun AddSourceBottomSheet(
             when (effect) {
                 is AddSourceEffect.ShowMessage -> coroutineScope.launch {
                     snackbarHostState.showSnackbar(
-                        message = context.getString(effect.message),
+                        message = effect.message.resolveString(),
                         duration = SnackbarDuration.Short
                     )
                 }
@@ -73,7 +78,7 @@ fun AddSourceBottomSheet(
     FormBottomSheetScaffold(
         sheetState = sheetState,
         onDismissRequest = { viewModel.onIntent(AddSourceIntent.OnDismiss) },
-        primaryButtonText = stringResource(R.string.submit_source),
+        primaryButtonText = stringResource(Res.string.submit_source),
         onPrimaryClick = { viewModel.onIntent(AddSourceIntent.Save) }
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.mediumLarge)) {
@@ -86,7 +91,7 @@ fun AddSourceBottomSheet(
                             onClick = { viewModel.onIntent(AddSourceIntent.UpdateType(option)) },
                             shape = SegmentedButtonDefaults.itemShape(index = index, count = 2)
                         ) {
-                            FintrackBodyMediumText(text = stringResource(option.value))
+                            FintrackBodyMediumText(text = option.value.asString())
                         }
                     }
                 }
@@ -95,11 +100,11 @@ fun AddSourceBottomSheet(
             NameDescriptionFields(
                 name = state.draft.name,
                 onNameChange = { viewModel.onIntent(AddSourceIntent.UpdateName(it)) },
-                nameLabel = stringResource(R.string.source_name_label),
+                nameLabel = stringResource(Res.string.source_name_label),
 
                 description = state.draft.description.orEmpty(),
                 onDescriptionChange = { viewModel.onIntent(AddSourceIntent.UpdateDescription(it)) },
-                descriptionLabel = stringResource(R.string.description_label),
+                descriptionLabel = stringResource(Res.string.description_label),
 
                 // ✅ آیکون فعال
                 isIconShow = true,
@@ -114,11 +119,20 @@ fun AddSourceBottomSheet(
                         onValueChange = { input ->
                             val newValue = input.toIntOrNull()
                             when {
-                                newValue != null -> viewModel.onIntent(AddSourceIntent.UpdateBalance(newValue))
-                                input.isEmpty() -> viewModel.onIntent(AddSourceIntent.UpdateBalance(0))
+                                newValue != null -> viewModel.onIntent(
+                                    AddSourceIntent.UpdateBalance(
+                                        newValue
+                                    )
+                                )
+
+                                input.isEmpty() -> viewModel.onIntent(
+                                    AddSourceIntent.UpdateBalance(
+                                        0
+                                    )
+                                )
                             }
                         },
-                        label = { FintrackBodyMediumText(text = stringResource(R.string.initial_balance_label)) },
+                        label = { FintrackBodyMediumText(text = stringResource(Res.string.initial_balance_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
 
@@ -126,7 +140,7 @@ fun AddSourceBottomSheet(
                         FintrackOutlinedTextField(
                             value = state.draft.cardNumber.orEmpty(),
                             onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateCardNumber(it)) },
-                            label = { FintrackBodyMediumText(text = stringResource(R.string.card_number_label)) },
+                            label = { FintrackBodyMediumText(text = stringResource(Res.string.card_number_label)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
                     }

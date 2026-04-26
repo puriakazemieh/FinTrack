@@ -23,10 +23,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
@@ -39,7 +37,13 @@ import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.designsystem.component.model.toSource
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.financialsource.ui.delete.DeleteSourceBottomSheet
-import org.koin.androidx.compose.koinViewModel
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.add_source
+import fintrack.core.designsystem.generated.resources.balance
+import fintrack.core.designsystem.generated.resources.financial_sources
+import fintrack.core.designsystem.generated.resources.source
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +71,7 @@ private fun SourceBottomSheetCore(
     }
 
     ListBottomSheet(
-        title = stringResource(R.string.source),
+        title = stringResource(Res.string.source),
         items = state.items,
         onItemClicked = { viewModel.onIntent(SourceIntent.SelectedSource(it.toSource())) },
         onAddClick = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
@@ -80,7 +84,7 @@ private fun SourceBottomSheetCore(
         itemContent = { item ->
             val p = item.payload as ItemPayload.SourcePayload
             FintrackBodySmallText(
-                text = stringResource(R.string.balance, p.formattedBalance),
+                text = stringResource(Res.string.balance, p.formattedBalance),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -152,7 +156,7 @@ fun SourceSelectionBottomSheet(
     val initialSelectionIds = initialSelectionPairs.map { it.toItemUi() }.toSet()
 
     SelectableListBottomSheet(
-        title = stringResource(R.string.source),
+        title = stringResource(Res.string.source),
         items = state.items,
         initialSelection = initialSelectionIds,
         onConfirm = { selectedItems, isAll ->
@@ -179,7 +183,7 @@ fun SourceList(
             verticalAlignment = Alignment.CenterVertically
         ) {
             FintrackTitleMediumText(
-                text = stringResource(R.string.financial_sources),
+                text = stringResource(Res.string.financial_sources),
                 modifier = Modifier.weight(1f),
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -188,7 +192,7 @@ fun SourceList(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_source),
+                    contentDescription = stringResource(Res.string.add_source),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -222,7 +226,7 @@ fun SourceList(
                             FintrackBodyMediumText(text = source.name)
                         }
                         FintrackBodySmallText(
-                            text = stringResource(R.string.balance, source.formattedBalance),
+                            text = stringResource(Res.string.balance, source.formattedBalance),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }

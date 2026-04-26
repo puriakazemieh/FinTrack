@@ -3,7 +3,8 @@ package com.kazemieh.financialsource.ui.add
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Source
-import com.kazemieh.designsystem.R
+import com.kazemieh.designsystem.component.model.UiText
+import fintrack.core.designsystem.generated.resources.*
 import com.kazemieh.domain.usecase.SourceUseCases
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.Resource
 
 
 class AddSourceViewModel(
@@ -109,7 +111,7 @@ class AddSourceViewModel(
     private fun save() = with(_state.value) {
         viewModelScope.launch {
             if (draft.name.isBlank()) {
-                _effect.send(AddSourceEffect.ShowMessage(R.string.check_name_financial_source))
+                _effect.send(AddSourceEffect.ShowMessage(UiText.StringResourceText(Res.string.check_name_financial_source)))
                 return@launch
             }
 
@@ -196,14 +198,14 @@ sealed interface AddSourceIntent {
     data object OnDismiss : AddSourceIntent
 }
 
-enum class TypeSource(val count: Int, val value: Int) {
-    CREDIT(1, R.string.credit_),
-    CASH(2, R.string.cash_)
+enum class TypeSource(val count: Int, val value: UiText) {
+    CREDIT(1, UiText.StringResourceText(Res.string.credit_)),
+    CASH(2,UiText.StringResourceText( Res.string.cash_))
 }
 
 
 sealed interface AddSourceEffect {
-    data class ShowMessage(val message: Int) : AddSourceEffect
+    data class ShowMessage(val message: UiText) : AddSourceEffect
     data class SavedSource(val source: Source) : AddSourceEffect
     data object OnDismiss : AddSourceEffect
 }

@@ -8,15 +8,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import fintrack.core.designsystem.generated.resources.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Source
-import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.bottomsheet.DeleteWithMoveBottomSheetContent
+import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,7 +28,6 @@ fun DeleteSourceBottomSheet(
     deleted: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
 
@@ -48,7 +47,7 @@ fun DeleteSourceBottomSheet(
                 is DeleteSourceEffect.ShowMessage -> {
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(
-                            message = context.getString(effect.message),
+                            message = effect.message.resolveString(),
                             duration = SnackbarDuration.Short
                         )
                     }
@@ -61,11 +60,11 @@ fun DeleteSourceBottomSheet(
 
     DeleteWithMoveBottomSheetContent(
         sheetState = sheetState,
-        title = stringResource(R.string.transaction_delete),
-        deleteAllText = stringResource(R.string.delete_all_transaction),
-        moveToAnotherText = stringResource(R.string.move_to_another_source),
-        targetTitleText = stringResource(R.string.source_name_label),
-        targetPlaceholderText = stringResource(R.string.select_source),
+        title = stringResource(Res.string.transaction_delete),
+        deleteAllText = stringResource(Res.string.delete_all_transaction),
+        moveToAnotherText = stringResource(Res.string.move_to_another_source),
+        targetTitleText = stringResource(Res.string.source_name_label),
+        targetPlaceholderText = stringResource(Res.string.select_source),
         targetValue = state.moveSource?.name,
         isDeleteAll = state.isDeleteAllData,
         isTargetError = state.isSourceError,
@@ -74,8 +73,8 @@ fun DeleteSourceBottomSheet(
         onPickTarget = { viewModel.onIntent(DeleteSourceIntent.ShowAllSourceList) },
         onConfirm = { viewModel.onIntent(DeleteSourceIntent.Submit) },
         onDismiss = { viewModel.onIntent(DeleteSourceIntent.Dismiss) },
-        confirmButtonText = stringResource(R.string.confirm),
-        dismissButtonText = stringResource(R.string.cancell_),
+        confirmButtonText = stringResource(Res.string.confirm),
+        dismissButtonText = stringResource(Res.string.cancell_),
     )
 
     if (state.isSourceListShow) {
