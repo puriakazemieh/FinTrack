@@ -25,11 +25,11 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "FinTrack"
-//include(":app")
+include(":app")
 include(":core:common")
 include(":core:data")
 include(":core:data-contract")
-//include(":core:database")
+include(":core:database")
 include(":core:designsystem")
 include(":core:domain")
 include(":feature-share:transaction")
@@ -40,4 +40,4 @@ include(":feature-share:person")
 
 include(":feature-container:report")
 include(":feature-container:dashboard")
-//include(":feature-container:setting")
+include(":feature-container:setting")

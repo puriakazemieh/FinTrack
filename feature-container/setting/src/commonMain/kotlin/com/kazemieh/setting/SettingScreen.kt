@@ -13,7 +13,7 @@ import com.kazemieh.designsystem.component.ItemScreen
 import com.kazemieh.financialsource.ui.list.SourceManageBottomSheet
 import com.kazemieh.person.ui.list.PersonManageBottomSheet
 import com.kazemieh.tag.ui.list.TagManageBottomSheet
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SettingScreen(
