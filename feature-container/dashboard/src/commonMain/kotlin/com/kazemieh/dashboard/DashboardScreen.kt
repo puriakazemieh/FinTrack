@@ -3,7 +3,6 @@
 package com.kazemieh.dashboard
 
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,9 +26,8 @@ import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.TotalTransactionCard
 import com.kazemieh.transaction.ui.main.rememberTransactionItemsProvider
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
-@SuppressLint("UnusedBoxWithConstraintsScope", "ConfigurationScreenWidthHeight")
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel = koinViewModel(),
