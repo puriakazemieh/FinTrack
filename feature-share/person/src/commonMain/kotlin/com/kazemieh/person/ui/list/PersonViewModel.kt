@@ -2,8 +2,8 @@ package com.kazemieh.person.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.common.model.Person
+import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.domain.usecase.ObservePersonsUseCase
 import kotlinx.coroutines.channels.Channel

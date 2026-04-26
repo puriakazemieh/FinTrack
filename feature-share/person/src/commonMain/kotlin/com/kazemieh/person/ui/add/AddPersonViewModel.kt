@@ -3,9 +3,11 @@ package com.kazemieh.person.ui.add
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Person
-import com.kazemieh.designsystem.R
+import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.AddPersonUseCase
 import com.kazemieh.domain.usecase.UpdatePersonUseCase
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.check_name_person_source
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -70,7 +72,7 @@ class AddPersonViewModel(
         viewModelScope.launch {
             val name = draft.name.trim()
             if (name.isBlank()) {
-                _effect.send(AddPersonEffect.ShowMessage(R.string.check_name_person_source))
+                _effect.send(AddPersonEffect.ShowMessage(UiText.StringResourceText(Res.string.check_name_person_source)))
                 return@launch
             }
 
@@ -135,7 +137,7 @@ sealed interface AddPersonIntent {
 }
 
 sealed interface AddPersonEffect {
-    data class ShowMessage(val message: Int) : AddPersonEffect
+    data class ShowMessage(val message: UiText) : AddPersonEffect
     data class SavedPerson(val person: Person) : AddPersonEffect
     data object OnDismiss : AddPersonEffect
 }

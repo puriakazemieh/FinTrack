@@ -1,10 +1,10 @@
 package com.kazemieh.person.ui.delete
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Person
-import com.kazemieh.designsystem.R
+import com.kazemieh.designsystem.component.model.UiText
+import fintrack.core.designsystem.generated.resources.*
 import com.kazemieh.domain.usecase.DeletePersonUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -64,7 +64,7 @@ class DeletePersonViewModel(
             val isError = !_state.value.isDeleteAllData && _state.value.movePerson == null
             if (isError) {
                 _state.update { it.copy(isPersonError = true) }
-                _effect.send(DeletePersonEffect.ShowMessage(R.string.person_choose))
+                _effect.send(DeletePersonEffect.ShowMessage(UiText.StringResourceText(Res.string.person_choose)))
                 return@launch
             }
             _state.value.person?.let { deletePerson ->
@@ -95,7 +95,7 @@ data class DeletePersonState(
 )
 
 sealed interface DeletePersonEffect {
-    data class ShowMessage(val message: Int) : DeletePersonEffect
+    data class ShowMessage(val message: UiText) : DeletePersonEffect
     object DeletedTransaction : DeletePersonEffect
     data object OnDismiss : DeletePersonEffect
 }

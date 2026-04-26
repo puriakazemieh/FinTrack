@@ -8,15 +8,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Person
-import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.bottomsheet.FormBottomSheetScaffold
 import com.kazemieh.designsystem.component.form.NameDescriptionFields
+import com.kazemieh.designsystem.component.model.resolveString
+import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +29,6 @@ fun AddPersonBottomSheet(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(selectedPerson?.id) {
@@ -46,7 +45,7 @@ fun AddPersonBottomSheet(
                 is AddPersonEffect.ShowMessage -> {
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(
-                            message = context.getString(effect.message),
+                            message = effect.message.resolveString(),
                             duration = SnackbarDuration.Short
                         )
                     }
@@ -61,16 +60,16 @@ fun AddPersonBottomSheet(
     FormBottomSheetScaffold(
         sheetState = sheetState,
         onDismissRequest = { viewModel.onIntent(AddPersonIntent.OnDismiss) },
-        primaryButtonText = stringResource(R.string.save_person),
+        primaryButtonText = stringResource(Res.string.save_person),
         onPrimaryClick = { viewModel.onIntent(AddPersonIntent.Save) }
     ) {
         NameDescriptionFields(
             name = state.draft.name,
             onNameChange = { viewModel.onIntent(AddPersonIntent.UpdateName(it)) },
-            nameLabel = stringResource(R.string.person_name_label),
+            nameLabel = stringResource(Res.string.person_name_label),
             description = state.draft.description.orEmpty(),
             onDescriptionChange = { viewModel.onIntent(AddPersonIntent.UpdateDescription(it)) },
-            descriptionLabel = stringResource(R.string.description_label),
+            descriptionLabel = stringResource(Res.string.description_label),
 
             isIconShow = false
         )
