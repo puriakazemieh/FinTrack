@@ -38,6 +38,6 @@ include(":feature-share:source")
 include(":feature-share:tags")
 include(":feature-share:person")
 
-//include(":feature-container:report")
+include(":feature-container:report")
 include(":feature-container:dashboard")
 //include(":feature-container:setting")

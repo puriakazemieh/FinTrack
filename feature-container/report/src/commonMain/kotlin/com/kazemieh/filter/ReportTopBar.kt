@@ -1,6 +1,5 @@
-package com.tosantechno.filter
+package com.kazemieh.filter
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,9 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.DateFilterType
@@ -47,15 +44,17 @@ import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.R
-import com.kazemieh.designsystem.component.model.DatePickerField
 import com.kazemieh.designsystem.component.FilterButton
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.jalali.DatePickerField
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.component.model.asString
+import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.designsystem.component.model.toItemUi
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 
 
 @Composable
@@ -105,19 +104,19 @@ fun ReportTopBar(
                     TransactionType.entries.forEachIndexed { index, option ->
                         val text = when (option) {
                             TransactionType.INCOME -> {
-                                stringResource(R.string.incoming)
+                                stringResource(Res.string.incoming)
                             }
 
                             TransactionType.EXPENSE -> {
-                                stringResource(R.string.outcoming)
+                                stringResource(Res.string.outcoming)
                             }
 
                             TransactionType.TRANSFER -> {
-                                stringResource(R.string.transfer)
+                                stringResource(Res.string.transfer)
                             }
 
                             else -> {
-                                stringResource(R.string.all)
+                                stringResource(Res.string.all)
                             }
 
                         }
@@ -138,9 +137,9 @@ fun ReportTopBar(
             Row(horizontalArrangement = Arrangement.spacedBy(space.mediumLarge)) {
 
                 val labelTextSource =
-                    if (isAllSourceSelected) stringResource(R.string.all_source)
-                    else if (selectedSources.isEmpty()) stringResource(R.string.empty_source)
-                    else stringResource(R.string.sources, selectedSources.size)
+                    if (isAllSourceSelected) stringResource(Res.string.all_source)
+                    else if (selectedSources.isEmpty()) stringResource(Res.string.empty_source)
+                    else stringResource(Res.string.sources, selectedSources.size)
 
                 Selector(
                     selected = selectedSources.map { it.toItemUi() }.toSet(),
@@ -153,9 +152,9 @@ fun ReportTopBar(
                 )
 
                 val labelTextCategory =
-                    if (isAllCategorySelected) stringResource(R.string.all_category)
-                    else if (selectedCategories.isEmpty()) stringResource(R.string.empty_category)
-                    else stringResource(R.string.categories, selectedCategories.size)
+                    if (isAllCategorySelected) stringResource(Res.string.all_category)
+                    else if (selectedCategories.isEmpty()) stringResource(Res.string.empty_category)
+                    else stringResource(Res.string.categories, selectedCategories.size)
 
                 Selector(
                     selected = selectedCategories.map { it.toItemUi() }.toSet(),
@@ -172,9 +171,9 @@ fun ReportTopBar(
             Row(horizontalArrangement = Arrangement.spacedBy(space.mediumLarge)) {
 
                 val labelTextSource =
-                    if (isAllTAgSelected) stringResource(R.string.all_tags)
-                    else if (selectedTags.isEmpty()) stringResource(R.string.empty_tag)
-                    else stringResource(R.string.tags, selectedTags.size)
+                    if (isAllTAgSelected) stringResource(Res.string.all_tags)
+                    else if (selectedTags.isEmpty()) stringResource(Res.string.empty_tag)
+                    else stringResource(Res.string.tags, selectedTags.size)
 
                 Selector(
                     selected = selectedTags.map { it.toItemUi() }.toSet(),
@@ -187,9 +186,9 @@ fun ReportTopBar(
                 )
 
                 val labelTextCategory =
-                    if (isAllPersonSelected) stringResource(R.string.all_person)
-                    else if (selectedPersons.isEmpty()) stringResource(R.string.empty_person)
-                    else stringResource(R.string.persons, selectedPersons.size)
+                    if (isAllPersonSelected) stringResource(Res.string.all_person)
+                    else if (selectedPersons.isEmpty()) stringResource(Res.string.empty_person)
+                    else stringResource(Res.string.persons, selectedPersons.size)
 
                 Selector(
                     selected = selectedPersons.map { it.toItemUi() }.toSet(),
@@ -219,19 +218,18 @@ fun ReportTopBar(
 @Composable
 private fun Selector(
     selected: Set<ItemUi> = emptySet(),
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier,
     labelText: String,
     isAllSelected: Boolean = false,
     onClick: () -> Unit
 ) {
-    val context = LocalContext.current
     val sourceTextStyle =
         if (selected.isEmpty()) MaterialTheme.typography.bodyMedium
         else MaterialTheme.typography.labelSmall
 
     FintrackOutlinedTextField(
         value = if (isAllSelected) "" else if (selected.size == 1) selected.first().title.asString()
-        else selected.joinToString(", ") { it.title.asString(context) },
+        else selected.joinToString(", ") { it.title.resolveString() },
         onClick = onClick,
         readOnly = true,
         enabled = false,
@@ -447,12 +445,12 @@ fun CustomDateBottomSheet(
         ) {
             Column(Modifier.padding(space.large)) {
 
-                FintrackTitleMediumText(stringResource(R.string.custom_date))
+                FintrackTitleMediumText(stringResource(Res.string.custom_date))
                 Spacer(Modifier.height(space.mediumSmall))
 
                 DatePickerField(
-                    selectedDate = startDate?.first ?: stringResource(R.string.not_choose),
-                    labelText = stringResource(R.string.start),
+                    selectedDate = startDate?.first ?: stringResource(Res.string.not_choose),
+                    labelText = stringResource(Res.string.start),
                     isError = isError && startDate == null,
                     onDateSelected = { date, timeStamp ->
                         startDate = date to timeStamp
@@ -463,8 +461,8 @@ fun CustomDateBottomSheet(
                 Spacer(Modifier.height(space.mediumSmall))
 
                 DatePickerField(
-                    selectedDate = endDate?.first ?: stringResource(R.string.not_choose),
-                    labelText = stringResource(R.string.end),
+                    selectedDate = endDate?.first ?: stringResource(Res.string.not_choose),
+                    labelText = stringResource(Res.string.end),
                     isError = isError && endDate == null,
                     disableBeforeDate = startDateTimeStamp,
                     clickable = startDate != null,
@@ -484,7 +482,7 @@ fun CustomDateBottomSheet(
                     )
                 ) {
                     FintrackBodyMediumText(
-                        text = stringResource(R.string.confirm),
+                        text = stringResource(Res.string.confirm),
                         color = MaterialTheme.colorScheme.background
                     )
                 }

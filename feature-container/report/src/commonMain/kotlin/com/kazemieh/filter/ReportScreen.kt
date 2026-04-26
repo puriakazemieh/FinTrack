@@ -1,4 +1,4 @@
-package com.tosantechno.filter
+package com.kazemieh.filter
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -11,18 +11,18 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.list.CategorySelectionBottomSheet
 import com.kazemieh.common.DateFilterType
 import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.model.asString
 import com.kazemieh.financialsource.ui.list.SourceSelectionBottomSheet
 import com.kazemieh.person.ui.list.PersonSelectionBottomSheet
 import com.kazemieh.tag.ui.list.TagSelectionBottomSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.report.TransactionListByFilterScreen
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ReportScreen(
@@ -39,12 +39,7 @@ fun ReportScreen(
     ) {
         Column {
             Spacer(modifier = Modifier.height(space.mediumSmall))
-
-            val label = when (val labelValue = state.textDate) {
-                is Int -> stringResource(id = labelValue)
-                is String -> labelValue
-                else -> ""
-            }
+            val label = state.textDate.asString()
 
             ReportTopBar(
                 onTransactionTypeSelected = state.selectedTransactionType,
@@ -97,7 +92,6 @@ fun ReportScreen(
             )
         }
 
-        // ✅ اسم‌های جدید selection bottom sheet ها
         if (state.isCategorySheetVisible) {
             CategorySelectionBottomSheet(
                 initialSelectionPairs = state.selectedCategories,

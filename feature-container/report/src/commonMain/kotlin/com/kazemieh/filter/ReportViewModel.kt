@@ -1,9 +1,12 @@
-package com.tosantechno.filter
+package com.kazemieh.filter
 
 
 import androidx.lifecycle.ViewModel
 import com.kazemieh.common.DateFilterHelper
+import com.kazemieh.common.DateFilterHelper.getRange
 import com.kazemieh.common.DateFilterType
+import com.kazemieh.common.DateRange
+import com.kazemieh.common.DateRangeLabel
 import com.kazemieh.common.Direction
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Person
@@ -12,9 +15,21 @@ import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.component.model.UiText
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.custom_range
+import fintrack.core.designsystem.generated.resources.last_month
+import fintrack.core.designsystem.generated.resources.last_week
+import fintrack.core.designsystem.generated.resources.next_month
+import fintrack.core.designsystem.generated.resources.next_week
+import fintrack.core.designsystem.generated.resources.this_month
+import fintrack.core.designsystem.generated.resources.this_week
+import fintrack.core.designsystem.generated.resources.today
+import fintrack.core.designsystem.generated.resources.tomorrow
+import fintrack.core.designsystem.generated.resources.yesterday
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.datetime.TimeZone
 
 
 class ReportViewModel() : ViewModel() {
@@ -107,8 +122,10 @@ class ReportViewModel() : ViewModel() {
             }
 
             is ReportIntent.OnDateRange -> {
-                val range = DateFilterHelper.getRange(intent.dateFilterType)
-
+//                val range = getRange(intent.dateFilterType)
+                val result = getRangeAsUiText(intent.dateFilterType)
+                val range = result.first
+                val uiText = result.second
                 _state.update {
                     it.copy(
                         dateFilterType = range?.filterType ?: DateFilterType.THIS_MONTH,
@@ -116,7 +133,7 @@ class ReportViewModel() : ViewModel() {
                         startDateTimeStamp = range?.start,
                         endDateTimeStamp = range?.end,
                         isShowArrowButton = true,
-                        textDate = range?.label ?: DateFilterType.THIS_MONTH,
+                        textDate = uiText,
                         startDate = null,
                         endDate = null,
                         enableAnimationChart = !_state.value.enableAnimationChart
@@ -125,24 +142,24 @@ class ReportViewModel() : ViewModel() {
             }
 
             is ReportIntent.OnDateSheetSubmit -> {
-                if (
-                    intent.endTimeStamp != null &&
-                    intent.startTimeStamp != null &&
-                    intent.endDate != null &&
-                    intent.startDate != null
+                if (intent.endTimeStamp != null && intent.startTimeStamp != null &&
+                    intent.endDate != null && intent.startDate != null
                 ) {
-                    val range = DateFilterHelper.getRange(
+                    val result = getRangeAsUiText(
                         DateFilterType.CUSTOM_RANGE,
                         intent.startTimeStamp,
                         intent.endTimeStamp
                     )
+                    val range = result.first
+                    val uiText = result.second
+
                     _state.update {
                         it.copy(
                             dateFilterType = range?.filterType ?: DateFilterType.THIS_MONTH,
                             isDateSheetVisible = false,
                             startDateTimeStamp = range?.start,
                             endDateTimeStamp = range?.end,
-                            textDate = range?.label ?: DateFilterType.CUSTOM_RANGE,
+                            textDate = uiText,
                             startDate = intent.startDate,
                             endDate = intent.endDate,
                             isShowArrowButton = false,
@@ -151,9 +168,7 @@ class ReportViewModel() : ViewModel() {
                         )
                     }
                 } else {
-                    _state.update {
-                        it.copy(isError = true)
-                    }
+                    _state.update { it.copy(isError = true) }
                 }
 
             }
@@ -165,9 +180,27 @@ class ReportViewModel() : ViewModel() {
                     filterType = state.value.dateFilterType,
                     direction = Direction.NEXT
                 )
+                val uiText = when (result.label) {
+                    is DateRangeLabel.Text -> UiText.DynamicString((result.label as DateRangeLabel.Text).value)
+                    is DateRangeLabel.Filter -> {
+                        val resource = when ((result.label as DateRangeLabel.Filter).type) {
+                            DateFilterType.TODAY -> Res.string.today
+                            DateFilterType.YESTERDAY -> Res.string.yesterday
+                            DateFilterType.TOMORROW -> Res.string.tomorrow
+                            DateFilterType.THIS_WEEK -> Res.string.this_week
+                            DateFilterType.LAST_WEEK -> Res.string.last_week
+                            DateFilterType.NEXT_WEEK -> Res.string.next_week
+                            DateFilterType.THIS_MONTH -> Res.string.this_month
+                            DateFilterType.LAST_MONTH -> Res.string.last_month
+                            DateFilterType.NEXT_MONTH -> Res.string.next_month
+                            DateFilterType.CUSTOM_RANGE -> Res.string.custom_range
+                        }
+                        UiText.StringResourceText(resource)
+                    }
+                }
                 _state.update {
                     it.copy(
-                        textDate = result.label,
+                        textDate = uiText,
                         dateFilterType = result.filterType,
                         startDateTimeStamp = result.start,
                         endDateTimeStamp = result.end,
@@ -184,9 +217,27 @@ class ReportViewModel() : ViewModel() {
                     filterType = state.value.dateFilterType,
                     direction = Direction.PREVIOUS
                 )
+                val uiText = when (result.label) {
+                    is DateRangeLabel.Text -> UiText.DynamicString((result.label as DateRangeLabel.Text).value)
+                    is DateRangeLabel.Filter -> {
+                        val resource = when ((result.label as DateRangeLabel.Filter).type) {
+                            DateFilterType.TODAY -> Res.string.today
+                            DateFilterType.YESTERDAY -> Res.string.yesterday
+                            DateFilterType.TOMORROW -> Res.string.tomorrow
+                            DateFilterType.THIS_WEEK -> Res.string.this_week
+                            DateFilterType.LAST_WEEK -> Res.string.last_week
+                            DateFilterType.NEXT_WEEK -> Res.string.next_week
+                            DateFilterType.THIS_MONTH -> Res.string.this_month
+                            DateFilterType.LAST_MONTH -> Res.string.last_month
+                            DateFilterType.NEXT_MONTH -> Res.string.next_month
+                            DateFilterType.CUSTOM_RANGE -> Res.string.custom_range
+                        }
+                        UiText.StringResourceText(resource)
+                    }
+                }
                 _state.update {
                     it.copy(
-                        textDate = result.label,
+                        textDate = uiText,
                         dateFilterType = result.filterType,
                         startDateTimeStamp = result.start,
                         endDateTimeStamp = result.end,
@@ -198,6 +249,39 @@ class ReportViewModel() : ViewModel() {
 
 
         }
+    }
+
+    fun getRangeAsUiText(
+        type: DateFilterType,
+        customFrom: Long? = null,
+        customTo: Long? = null,
+        timeZone: TimeZone = TimeZone.currentSystemDefault()
+    ): Pair<DateRange?, UiText> {
+        val range = getRange(type, customFrom, customTo, timeZone)
+
+        val uiText = when (val label = range?.label) {
+            is DateRangeLabel.Text -> UiText.DynamicString(label.value)
+            is DateRangeLabel.Filter -> {
+
+                val resource = when (label.type) {
+                    DateFilterType.TODAY -> Res.string.today
+                    DateFilterType.YESTERDAY -> Res.string.yesterday
+                    DateFilterType.TOMORROW -> Res.string.tomorrow
+                    DateFilterType.THIS_WEEK -> Res.string.this_week
+                    DateFilterType.LAST_WEEK -> Res.string.last_week
+                    DateFilterType.NEXT_WEEK -> Res.string.next_week
+                    DateFilterType.THIS_MONTH -> Res.string.this_month
+                    DateFilterType.LAST_MONTH -> Res.string.last_month
+                    DateFilterType.NEXT_MONTH -> Res.string.next_month
+                    DateFilterType.CUSTOM_RANGE -> Res.string.custom_range
+                }
+                UiText.StringResourceText(resource)
+            }
+
+            null -> UiText.DynamicString("")
+        }
+
+        return Pair(range, uiText)
     }
 
 
@@ -214,7 +298,7 @@ data class ReportState(
     val endDate: String? = null,
     val startDateTimeStamp: Long? = null,
     val endDateTimeStamp: Long? = null,
-    val textDate: Any = DateFilterType.THIS_MONTH,
+    val textDate: UiText = UiText.DynamicString(""),
 
     val isSourceSheetVisible: Boolean = false,
     val selectedSources: Set<Source> = emptySet(),

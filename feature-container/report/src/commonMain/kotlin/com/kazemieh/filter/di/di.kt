@@ -1,6 +1,6 @@
-package com.tosantechno.filter.di
+package com.kazemieh.filter.di
 
-import com.tosantechno.filter.ReportViewModel
+import com.kazemieh.filter.ReportViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
