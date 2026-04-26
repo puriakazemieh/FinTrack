@@ -6,9 +6,12 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.composeHotReload)
     id("convention.kotlin.serialization")
+
 //    id("convention.kotlin.multiplatform.compose")
 }
-
+compose.resources {
+    publicResClass = true
+}
 kotlin {
     androidLibrary {
         namespace = "com.kazemieh.designsystem"
@@ -18,7 +21,7 @@ kotlin {
         minSdk = 24
     }
 
-    val xcfName = "core:commonKit"
+    val xcfName = "core:designsystemKit"
 
     iosX64 {
         binaries.framework {
@@ -61,6 +64,7 @@ kotlin {
                 implementation(libs.compose.uiToolingPreview)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
                 implementation(compose.components.resources)
+
 
                 implementation(libs.kotlinx.datetime)
             }

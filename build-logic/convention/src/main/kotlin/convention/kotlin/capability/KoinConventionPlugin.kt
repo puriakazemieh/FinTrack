@@ -25,10 +25,11 @@ class KoinConventionPlugin : Plugin<Project> {
 
                     commonMain.dependencies {
                         implementation(libs.findLibrary("koin.core").get())
+                        implementation(libs.findLibrary("koin.compose").get())
                     }
                     androidMain.dependencies {
                         implementation(libs.findLibrary("koin.android").get())
-                        implementation(libs.findLibrary("koin.compose").get())
+                        implementation(libs.findLibrary("koin.androidx.compose").get())
                     }
                 }
             }
@@ -40,7 +41,7 @@ class KoinConventionPlugin : Plugin<Project> {
             implementation(libs.findLibrary("koin.core").get())
             if (hasAndroid) {
                 implementation(libs.findLibrary("koin.android").get())
-                implementation(libs.findLibrary("koin.compose").get())
+                implementation(libs.findLibrary("koin.androidx.compose").get())
             }
         }
     }

@@ -14,7 +14,7 @@ kotlin {
         minSdk = 24
     }
 
-    val xcfName = "core:commonKit"
+    val xcfName = "core:data_contractKit"
 
     iosX64 {
         binaries.framework {

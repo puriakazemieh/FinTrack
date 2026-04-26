@@ -120,7 +120,9 @@ kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collec
 # --- Koin ---
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
-koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
 
 # --- Ktor ---
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -208,6 +210,7 @@ android-lint = { id = "com.android.lint", version.ref = "agp" }
 composeMultiplatformPlugin = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
 
+koin = { id = "io.insert-koin.koin", version.ref = "koin" }
 
 [bundles]
 compose = [

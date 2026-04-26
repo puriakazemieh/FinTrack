@@ -15,7 +15,7 @@ kotlin {
         minSdk = 24
     }
 
-    val xcfName = "core:commonKit"
+    val xcfName = "core:domainKit"
 
     iosX64 {
         binaries.framework {
