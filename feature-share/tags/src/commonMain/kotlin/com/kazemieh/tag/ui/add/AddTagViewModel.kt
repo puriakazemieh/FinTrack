@@ -3,9 +3,11 @@ package com.kazemieh.tag.ui.add
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Tag
-import com.kazemieh.designsystem.R
+import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.AddTagUseCase
 import com.kazemieh.domain.usecase.UpdateTagUseCase
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.check_name_tag_source
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -81,7 +83,7 @@ class AddTagViewModel(
         viewModelScope.launch {
             val name = draft.name.trim()
             if (name.isBlank()) {
-                _effect.send(AddTagEffect.ShowMessage(R.string.check_name_tag_source))
+                _effect.send(AddTagEffect.ShowMessage(UiText.StringResourceText(Res.string.check_name_tag_source)))
                 return@launch
             }
 
@@ -135,8 +137,8 @@ private fun TagDraft.toTag(id: Long?): Tag = Tag(
     id = id,
     name = name,
     description = description,
-    colorId = colorId?:1,
-    iconId = iconId?:1
+    colorId = colorId ?: 1,
+    iconId = iconId ?: 1
 )
 
 /** --- Intent / Effect --- **/
@@ -157,7 +159,7 @@ sealed interface AddTagIntent {
 }
 
 sealed interface AddTagEffect {
-    data class ShowMessage(val message: Int) : AddTagEffect
+    data class ShowMessage(val message: UiText) : AddTagEffect
     data class SavedTag(val tag: Tag) : AddTagEffect
     data object OnDismiss : AddTagEffect
 }

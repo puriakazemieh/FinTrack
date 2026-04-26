@@ -7,9 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.stringResource
 import com.kazemieh.common.model.Tag
-import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.bottomsheet.ListBottomSheet
 import com.kazemieh.designsystem.component.bottomsheet.SelectableFlowRowBottomSheet
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
@@ -17,7 +15,10 @@ import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.designsystem.component.model.toTag
 import com.kazemieh.tag.ui.add.AddTagBottomSheet
 import com.kazemieh.tag.ui.delete.DeleteTagBottomSheet
-import org.koin.androidx.compose.koinViewModel
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.tags
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -36,7 +37,7 @@ fun TagPickerBottomSheet(
     val initialSelection = state.initialSelectionItem.map { it.toItemUi() }.toSet()
 
     SelectableFlowRowBottomSheet(
-        title = stringResource(R.string.tags),
+        title = stringResource(Res.string.tags),
         items = state.items,
         initialSelection = initialSelection,
         onConfirm = { onSubmitClick(it.map { item -> item.toTag() }.toSet()) },
@@ -79,7 +80,7 @@ fun TagManageBottomSheet(
     }
 
     ListBottomSheet(
-        title = stringResource(R.string.tags),
+        title = stringResource(Res.string.tags),
         items = state.items,
         onItemClicked = { viewModel.onIntent(TagIntent.SelectedTag(it.toTag())) },
         onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
@@ -125,7 +126,7 @@ fun TagSelectionBottomSheet(
     val initialSelectionIds = initialSelectionPairs.map { it.toItemUi() }.toSet()
 
     SelectableListBottomSheet(
-        title = stringResource(R.string.tags),
+        title = stringResource(Res.string.tags),
         items = state.items,
         initialSelection = initialSelectionIds,
         onConfirm = { selectedItems, isAll ->

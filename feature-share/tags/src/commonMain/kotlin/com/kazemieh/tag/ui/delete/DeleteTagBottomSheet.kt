@@ -9,14 +9,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import com.kazemieh.common.model.Tag
-import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.bottomsheet.DeleteWithMoveBottomSheetContent
+import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.tag.ui.list.TagManageBottomSheet
+import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,8 +30,6 @@ fun DeleteTagBottomSheet(
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
-
-    val context = LocalContext.current
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -57,7 +55,7 @@ fun DeleteTagBottomSheet(
                 is DeleteTagEffect.ShowMessage -> {
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(
-                            message = context.getString(effect.message),
+                            message = effect.message.resolveString(),
                             duration = SnackbarDuration.Short
                         )
                     }
@@ -71,12 +69,12 @@ fun DeleteTagBottomSheet(
 
     DeleteWithMoveBottomSheetContent(
         sheetState = sheetState,
-        title = stringResource(R.string.transaction_delete),
-        deleteAllText = stringResource(R.string.delete_all_transaction),
+        title = stringResource(Res.string.transaction_delete),
+        deleteAllText = stringResource(Res.string.delete_all_transaction),
 
-        moveToAnotherText = stringResource(R.string.move_to_another_tag),
-        targetTitleText = stringResource(R.string.tags),
-        targetPlaceholderText = stringResource(R.string.select_tag),
+        moveToAnotherText = stringResource(Res.string.move_to_another_tag),
+        targetTitleText = stringResource(Res.string.tags),
+        targetPlaceholderText = stringResource(Res.string.select_tag),
 
         targetValue = state.moveTag?.name,
         isDeleteAll = state.isDeleteAllData,
@@ -88,8 +86,8 @@ fun DeleteTagBottomSheet(
         onConfirm = { viewModel.onIntent(DeleteTagIntent.Submit) },
         onDismiss = { viewModel.onIntent(DeleteTagIntent.Dismiss) },
 
-        confirmButtonText = stringResource(R.string.confirm),
-        dismissButtonText = stringResource(R.string.cancell_),
+        confirmButtonText = stringResource(Res.string.confirm),
+        dismissButtonText = stringResource(Res.string.cancell_),
     )
 
     if (state.isTagListShow) {
