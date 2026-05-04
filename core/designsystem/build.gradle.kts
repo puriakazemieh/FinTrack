@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.composeMultiplatformPlugin)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.composeHotReload)
-    id("convention.kotlin.serialization")
+    alias(libs.plugins.kotlinxSerialization)
 
 //    id("convention.kotlin.multiplatform.compose")
 }
@@ -53,7 +53,6 @@ kotlin {
 //                implementation(libs.jalali.datepicker.compose)
 //                implementation(libs.jalalicalendar)
                 implementation(project(":core:common"))
-                implementation(libs.kotlin.stdlib)
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)
@@ -63,7 +62,7 @@ kotlin {
                 implementation(libs.compose.components.resources)
                 implementation(libs.compose.uiToolingPreview)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
-                implementation(compose.components.resources)
+                implementation(libs.kotlinx.serialization)
 
 
                 implementation(libs.kotlinx.datetime)

@@ -1,0 +1,42 @@
+CREATE TABLE source (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    name TEXT NOT NULL,
+    balance INTEGER NOT NULL DEFAULT 0,
+    cardNumber TEXT,
+    description TEXT,
+    type INTEGER NOT NULL,
+    colorId INTEGER NOT NULL DEFAULT 1,
+    iconId INTEGER NOT NULL DEFAULT 1
+);
+
+addSource:
+INSERT INTO source(name, balance, cardNumber, description, type, colorId, iconId)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+observeSources:
+SELECT * FROM source;
+
+observeSourceById:
+SELECT * FROM source WHERE id = ?;
+
+adjustBalance:
+UPDATE source
+SET balance = balance + ?
+WHERE id = ?;
+
+deleteSource:
+DELETE FROM source WHERE id = ?;
+
+updateSource:
+UPDATE source
+SET name = ?, balance = ?, cardNumber = ?, description = ?, type = ?, colorId = ?, iconId = ?
+WHERE id = ?;
+
+getDefaultSource:
+SELECT * FROM source ORDER BY id LIMIT 1;
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+getSourceById:
+SELECT * FROM source WHERE id = ?;

@@ -1,0 +1,33 @@
+CREATE TABLE tag (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    colorId INTEGER NOT NULL DEFAULT 1,
+    iconId INTEGER NOT NULL DEFAULT 1
+);
+
+addTag:
+INSERT INTO tag(name, description, colorId, iconId)
+VALUES (?, ?, ?, ?);
+
+insertAllTag:
+INSERT INTO tag(name, description, colorId, iconId)
+VALUES ?;
+
+observeTags:
+SELECT * FROM tag;
+
+getTagById:
+SELECT * FROM tag WHERE id = ?;
+
+deleteTag:
+DELETE FROM tag WHERE id = ?;
+
+updateTag:
+UPDATE tag
+SET name = ?, description = ?, colorId = ?, iconId = ?
+WHERE id = ?;
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+

@@ -1,0 +1,31 @@
+CREATE TABLE person (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT
+);
+
+addPerson:
+INSERT INTO person(name, description)
+VALUES (?, ?);
+
+insertAllPerson:
+INSERT INTO person(name, description)
+VALUES ?;
+
+observePersons:
+SELECT * FROM person;
+
+getPersonById:
+SELECT * FROM person WHERE id = ?;
+
+deletePerson:
+DELETE FROM person WHERE id = ?;
+
+updatePerson:
+UPDATE person
+SET name = ?, description = ?
+WHERE id = ?;
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+

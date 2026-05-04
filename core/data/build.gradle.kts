@@ -2,8 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.android.lint)
-    id("convention.kotlin.serialization")
-    id("convention.koin")
+    alias(libs.plugins.kotlinxSerialization)
 }
 
 kotlin {
@@ -45,9 +44,11 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kotlinx.serialization)
                 implementation(project(":core:common"))
                 implementation(project(":core:domain"))
                 implementation(project(":core:data-contract"))
+                implementation(libs.koin.core)
             }
         }
 

@@ -1,0 +1,34 @@
+CREATE TABLE transaction_person (
+    transactionId INTEGER NOT NULL,
+    personId INTEGER NOT NULL,
+    PRIMARY KEY (transactionId, personId),
+    FOREIGN KEY (transactionId) REFERENCES transactions(id) ON DELETE CASCADE,
+    FOREIGN KEY (personId) REFERENCES person(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_transaction_person_transaction ON transaction_person(transactionId);
+CREATE INDEX idx_transaction_person_person ON transaction_person(personId);
+
+insertTransactionPersonCrossRefs:
+INSERT OR IGNORE INTO transaction_person(transactionId, personId)
+VALUES (?, ?);
+
+deleteAllPersonRefsForTransaction:
+DELETE FROM transaction_person WHERE transactionId = ?;
+
+copyPersonRefs:
+INSERT OR IGNORE INTO transaction_person(transactionId, personId)
+SELECT transactionId, :toPersonId
+FROM transaction_person
+WHERE personId = :fromPersonId;
+
+deletePersonRefs:
+DELETE FROM transaction_person WHERE personId = ?;
+
+getPersonsForTransaction:
+SELECT p.* FROM person p
+INNER JOIN transaction_person tp ON p.id = tp.personId
+WHERE tp.transactionId = ?;
+
+lastInsertRowId:
+SELECT last_insert_rowid();

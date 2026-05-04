@@ -1,0 +1,163 @@
+package com.kazemieh.database.mapper
+
+import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.CategorySum
+import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.Tag
+import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionType
+import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.database.GetAllTransactionsFiltered
+import com.kazemieh.database.transaction.ObserveCategorySumsByFilter
+import com.kazemieh.database.Category as CategoryDb
+import com.kazemieh.database.Person as PersonDb
+import com.kazemieh.database.Source as SourceDb
+import com.kazemieh.database.Tag as TagDb
+import com.kazemieh.database.Transactions as TransactionDb
+
+fun GetAllTransactionsFiltered.toTransactionWithRelations(): TransactionWithRelations {
+    // Parse tags
+    val tags = if (tag_ids.isNullOrEmpty()) {
+        emptyList()
+    } else {
+        val ids = tag_ids.split(",")
+        val names = tag_names?.split(",") ?: emptyList()
+        val descriptions = tag_descriptions?.split(",") ?: emptyList()
+        val colorIds = tag_colorIds?.split(",") ?: emptyList()
+        val iconIds = tag_iconIds?.split(",") ?: emptyList()
+
+        ids.mapIndexed { index, id ->
+            Tag(
+                id = id.toLong(),
+                name = names.getOrNull(index) ?: "",
+                description = descriptions.getOrNull(index),
+                colorId = colorIds.getOrNull(index)?.toIntOrNull() ?: 1,
+                iconId = iconIds.getOrNull(index)?.toIntOrNull() ?: 1
+            )
+        }
+    }
+
+    // Parse persons
+    val persons = if (person_ids.isNullOrEmpty()) {
+        emptyList()
+    } else {
+        val ids = person_ids.split(",")
+        val names = person_names?.split(",") ?: emptyList()
+        val descriptions = person_descriptions?.split(",") ?: emptyList()
+
+        ids.mapIndexed { index, id ->
+            Person(
+                id = id.toLong(),
+                name = names.getOrNull(index) ?: "",
+                description = descriptions.getOrNull(index)
+            )
+        }
+    }
+
+    return TransactionWithRelations(
+        transaction = Transaction(
+            id = id,
+            amount = amount.toInt(),
+            amountTransfer = amountTransfer!!.toInt(),
+            categoryId = categoryId,
+            sourceId = sourceId,
+            sourceEndId = sourceEndId,
+            description = description,
+            timeStamp = timeStamp,
+            type = TransactionType.fromInt(type.toInt())
+        ),
+        category = Category(
+            id = category_id,
+            name = category_name,
+            description = category_description,
+            type = TransactionType.fromInt(category_type.toInt()),
+            colorId = category_colorId.toInt(),
+            iconId = category_iconId.toInt()
+        ),
+        source = Source(
+            id = source_id,
+            name = source_name,
+            balance = source_balance.toInt(),
+            cardNumber = source_cardNumber,
+            description = source_description,
+            type = source_type.toInt(),
+            colorId = source_colorId.toInt(),
+            iconId = source_iconId.toInt()
+        ),
+        sourceEnd = sourceEnd_id?.let {
+            Source(
+                id = it,
+                name = sourceEnd_name!!,
+                balance = sourceEnd_balance!!.toInt(),
+                cardNumber = sourceEnd_cardNumber,
+                description = sourceEnd_description,
+                type = sourceEnd_type!!.toInt(),
+                colorId = sourceEnd_colorId!!.toInt(),
+                iconId = sourceEnd_iconId!!.toInt()
+            )
+        },
+        tags = tags,
+        persons = persons
+    )
+}
+
+// Category Mappers
+fun CategoryDb.toCategory() = Category(
+    id = id,
+    name = name,
+    description = description,
+    type = TransactionType.fromInt(type.toInt()),
+    colorId = colorId.toInt(),
+    iconId = iconId.toInt()
+)
+
+fun ObserveCategorySumsByFilter.toCategorySum(): CategorySum {
+    return CategorySum(
+        categoryId = categoryId,
+        name = name,
+        totalAmount = totalAmount ?: 0,
+        type = TransactionType.fromInt(type.toInt())
+    )
+}
+
+// Source Mappers
+fun SourceDb.toSource() = Source(
+    id = id,
+    name = name,
+    balance = balance.toInt(),
+    cardNumber = cardNumber,
+    description = description,
+    type = type.toInt(),
+    colorId = colorId.toInt(),
+    iconId = iconId.toInt()
+)
+
+// Tag Mappers
+fun TagDb.toTag() = Tag(
+    id = id,
+    name = name,
+    description = description,
+    colorId = colorId.toInt(),
+    iconId = iconId.toInt()
+)
+
+// Person Mappers
+fun PersonDb.toPerson() = Person(
+    id = id,
+    name = name,
+    description = description
+)
+
+// Transaction Mappers
+fun TransactionDb.toTransaction() = Transaction(
+    id = id,
+    amount = amount.toInt(),
+    amountTransfer = amountTransfer!!.toInt(),
+    categoryId = categoryId,
+    sourceId = sourceId,
+    sourceEndId = sourceEndId,
+    description = description,
+    timeStamp = timeStamp,
+    type = TransactionType.fromInt(type.toInt())
+)

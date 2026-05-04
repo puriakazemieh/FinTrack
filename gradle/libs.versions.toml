@@ -65,6 +65,7 @@ core = "1.5.0"
 
 
 
+kotlinx-serialization = "1.9.0"
 
 [libraries]
 # --- Build logic compileOnly ---
@@ -182,6 +183,7 @@ compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-previ
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-multiplatform" }
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 
+kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
 
 [plugins]
@@ -211,6 +213,8 @@ composeMultiplatformPlugin = { id = "org.jetbrains.compose", version.ref = "comp
 composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
 
 koin = { id = "io.insert-koin.koin", version.ref = "koin" }
+kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
 
 [bundles]
 compose = [

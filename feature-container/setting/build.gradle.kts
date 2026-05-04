@@ -5,8 +5,7 @@ plugins {
     alias(libs.plugins.composeMultiplatformPlugin)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.composeHotReload)
-    id("convention.kotlin.serialization")
-    id("convention.koin")
+    alias(libs.plugins.kotlinxSerialization)
 }
 
 kotlin {
@@ -47,7 +46,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(libs.kotlin.stdlib)
+                implementation(libs.kotlinx.serialization)
                 implementation(libs.kotlinx.datetime)
 
                 implementation(project(":core:common"))
@@ -68,7 +67,6 @@ kotlin {
                 implementation(libs.compose.components.resources)
                 implementation(libs.compose.uiToolingPreview)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
-                implementation(compose.components.resources)
                 implementation(libs.kotlinx.datetime)
 
                 implementation(libs.koin.compose)

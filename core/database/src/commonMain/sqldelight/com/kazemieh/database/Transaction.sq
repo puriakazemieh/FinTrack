@@ -1,0 +1,140 @@
+CREATE TABLE transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    amount INTEGER NOT NULL,
+    amountTransfer INTEGER,
+    categoryId INTEGER NOT NULL,
+    sourceId INTEGER NOT NULL,
+    sourceEndId INTEGER,
+    description TEXT,
+    timeStamp INTEGER NOT NULL,
+    type INTEGER NOT NULL,
+    FOREIGN KEY (categoryId) REFERENCES category(id) ON DELETE CASCADE,
+    FOREIGN KEY (sourceId) REFERENCES source(id) ON DELETE CASCADE,
+    FOREIGN KEY (sourceEndId) REFERENCES source(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_transaction_category ON transactions(categoryId);
+CREATE INDEX idx_transaction_source ON transactions(sourceId);
+CREATE INDEX idx_transaction_sourceEnd ON transactions(sourceEndId);
+CREATE INDEX idx_transaction_timestamp ON transactions(timeStamp);
+
+insertTransaction:
+INSERT INTO transactions(amount, amountTransfer, categoryId, sourceId, sourceEndId, description, timeStamp, type)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+updateTransaction:
+UPDATE transactions
+SET amount = ?, amountTransfer = ?, categoryId = ?, sourceId = ?, sourceEndId = ?, description = ?, timeStamp = ?, type = ?
+WHERE id = ?;
+
+deleteTransaction:
+DELETE FROM transactions WHERE id = ?;
+
+moveTransactionsCategory:
+UPDATE transactions SET categoryId = ? WHERE categoryId = ?;
+
+moveTransactionsSource:
+UPDATE transactions SET sourceId = ? WHERE sourceId = ?;
+
+moveTransactionsSourceEnd:
+UPDATE transactions SET sourceEndId = ? WHERE sourceEndId = ?;
+
+nullifySourceEnd:
+UPDATE transactions SET sourceEndId = NULL WHERE sourceEndId = ?;
+
+getAllTransactionsFiltered:
+SELECT
+    t.id,
+    t.amount,
+    t.amountTransfer,
+    t.categoryId,
+    t.sourceId,
+    t.sourceEndId,
+    t.description,
+    t.timeStamp,
+    t.type,
+    c.id AS category_id,
+    c.name AS category_name,
+    c.description AS category_description,
+    c.type AS category_type,
+    c.colorId AS category_colorId,
+    c.iconId AS category_iconId,
+    s.id AS source_id,
+    s.name AS source_name,
+    s.balance AS source_balance,
+    s.cardNumber AS source_cardNumber,
+    s.description AS source_description,
+    s.type AS source_type,
+    s.colorId AS source_colorId,
+    s.iconId AS source_iconId,
+    se.id AS sourceEnd_id,
+    se.name AS sourceEnd_name,
+    se.balance AS sourceEnd_balance,
+    se.cardNumber AS sourceEnd_cardNumber,
+    se.description AS sourceEnd_description,
+    se.type AS sourceEnd_type,
+    se.colorId AS sourceEnd_colorId,
+    se.iconId AS sourceEnd_iconId,
+    GROUP_CONCAT(DISTINCT tag.id) AS tag_ids,
+    GROUP_CONCAT(DISTINCT tag.name) AS tag_names,
+    GROUP_CONCAT(DISTINCT tag.description) AS tag_descriptions,
+    GROUP_CONCAT(DISTINCT tag.colorId) AS tag_colorIds,
+    GROUP_CONCAT(DISTINCT tag.iconId) AS tag_iconIds,
+    GROUP_CONCAT(DISTINCT person.id) AS person_ids,
+    GROUP_CONCAT(DISTINCT person.name) AS person_names,
+    GROUP_CONCAT(DISTINCT person.description) AS person_descriptions
+FROM transactions t
+INNER JOIN category c ON t.categoryId = c.id
+INNER JOIN source s ON t.sourceId = s.id
+LEFT JOIN source se ON t.sourceEndId = se.id
+LEFT JOIN transaction_tag tt ON t.id = tt.transactionId
+LEFT JOIN tag ON tt.tagId = tag.id
+LEFT JOIN transaction_person tp ON t.id = tp.transactionId
+LEFT JOIN person ON tp.personId = person.id
+WHERE
+    (:type IS NULL OR t.type = :type)
+    AND (:categoryIdsSize = 0 OR t.categoryId IN :categoryIds)
+    AND (:sourceIdsSize = 0 OR t.sourceId IN :sourceIds)
+    AND (:tagIdsSize = 0 OR EXISTS (
+        SELECT 1 FROM transaction_tag WHERE transactionId = t.id AND tagId IN :tagIds
+    ))
+    AND (:personIdsSize = 0 OR EXISTS (
+        SELECT 1 FROM transaction_person WHERE transactionId = t.id AND personId IN :personIds
+    ))
+    AND (:fromTimestamp IS NULL OR t.timeStamp >= :fromTimestamp)
+    AND (:toTimestamp IS NULL OR t.timeStamp < :toTimestamp)
+GROUP BY t.id
+ORDER BY t.timeStamp DESC, t.id DESC
+LIMIT :limit OFFSET :offset;
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+insertTransferCategoryIfMissing:
+INSERT OR IGNORE INTO category (name, type, colorId, iconId, description)
+VALUES ('انتقال', 3, 1, 1, NULL);
+
+
+observeCategorySumsByFilter:
+SELECT
+    c.id AS categoryId,
+    c.name AS name,
+    SUM(t.amount) AS totalAmount,
+    c.type AS type
+FROM transactions t
+INNER JOIN category c ON t.categoryId = c.id
+WHERE (:type IS NULL OR t.type = :type)
+  AND (:categoryIdsSize = 0 OR t.categoryId IN :categoryIds)
+  AND (:sourceIdsSize = 0 OR t.sourceId IN :sourceIds)
+  AND (:tagIdsSize = 0 OR t.id IN (
+      SELECT transactionId FROM transaction_tag WHERE tagId IN :tagIds
+  ))
+  AND (:personIdsSize = 0 OR t.id IN (
+      SELECT transactionId FROM transaction_person WHERE personId IN :personIds
+  ))
+  AND ((:fromTimestamp IS NULL OR :toTimestamp IS NULL)
+       OR (t.timeStamp >= :fromTimestamp AND t.timeStamp < :toTimestamp))
+GROUP BY c.id;
+
+getTransactionById:
+SELECT * FROM transactions WHERE id = ?;

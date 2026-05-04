@@ -15,18 +15,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface TransactionLocalDataSource {
 
-    suspend fun insertTransaction(
-        transaction: Transaction,
-        tagIds: List<Long>,
-        personIds: List<Long>,
-    ): Long
-
-    suspend fun updateTransaction(
-        transaction: Transaction,
-        tagIds: List<Long>,
-        personIds: List<Long>,
-    ): Long
-
     suspend fun addTransactionWithBalance(
         transaction: Transaction,
         tagIds: List<Long>,

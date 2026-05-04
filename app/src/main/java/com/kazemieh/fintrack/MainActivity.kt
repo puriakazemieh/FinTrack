@@ -14,6 +14,21 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+//        startKoin {
+//            androidContext(this@YourApplication)
+//            modules(databaseModule, /* other modules */)
+//        }
+//        // اجرای مایگریشن
+//        lifecycleScope.launch {
+//            val migration = get<RoomToSQLDelightMigration>()
+//            try {
+//                migration.migrate()
+//            } catch (e: MigrationException) {
+//                // لاگ خطا یا نمایش به کاربر
+//                Log.e("Migration", "Failed to migrate database", e)
+//            }
+//        }
+
         setContent {
             FintrackTheme {
                 FinTrackHost()
