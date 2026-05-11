@@ -20,3 +20,5 @@ local.properties
 .idea
 /.idea
 .kotlin
+composeApp/build
+app/build
