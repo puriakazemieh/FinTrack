@@ -51,7 +51,6 @@ import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.jalali.DatePickerField
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.component.model.asString
-import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.designsystem.component.model.toItemUi
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -229,7 +228,7 @@ private fun Selector(
 
     FintrackOutlinedTextField(
         value = if (isAllSelected) "" else if (selected.size == 1) selected.first().title.asString()
-        else selected.joinToString(", ") { it.title.resolveString() },
+        else "${selected.size} انتخاب شده است ",
         onClick = onClick,
         readOnly = true,
         enabled = false,

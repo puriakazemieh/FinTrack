@@ -20,7 +20,7 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.transaction.ui.component.transactionListContent
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun TransactionListByFilterScreen(

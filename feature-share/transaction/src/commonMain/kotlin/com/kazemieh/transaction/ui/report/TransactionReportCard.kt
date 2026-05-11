@@ -18,15 +18,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.R
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.PieChart
-import org.koin.androidx.compose.koinViewModel
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
@@ -40,19 +40,19 @@ fun ShowTransactionReportCard(
 
     val text = when (state.filterParams.type) {
         TransactionType.INCOME.count -> {
-            stringResource(R.string.incoming)
+            stringResource(Res.string.incoming)
         }
 
         TransactionType.EXPENSE.count -> {
-            stringResource(R.string.outcoming)
+            stringResource(Res.string.outcoming)
         }
 
         TransactionType.TRANSFER.count -> {
-            stringResource(R.string.transfer)
+            stringResource(Res.string.transfer)
         }
 
         else -> {
-            stringResource(R.string.all)
+            stringResource(Res.string.all)
         }
     }
     Card(
@@ -75,9 +75,9 @@ fun ShowTransactionReportCard(
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
 
-                FintrackTitleSmallText(text = stringResource(R.string.balance_with_label, text))
+                FintrackTitleSmallText(text = stringResource(Res.string.balance_with_label, text))
 
-                val balanceTotalLabel = stringResource(R.string.balance_total_label, state.balance)
+                val balanceTotalLabel = stringResource(Res.string.balance_total_label, state.balance)
 
                 FintrackTitleSmallText(
                     modifier = Modifier.weight(1f),

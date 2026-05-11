@@ -1,16 +1,18 @@
 plugins {
-    id("convention.android.application")
-    id("convention.android.application.compose")
-    id("convention.koin")
-    id("convention.kotlin.serialization")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
     namespace = "com.kazemieh.fintrack"
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.kazemieh.fintrack"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        minSdk = 24
+        targetSdk = 36
+        versionCode = 3
+        versionName = "2.0.0"
     }
 
     buildTypes {
@@ -23,30 +25,47 @@ android {
             )
         }
         debug {
-            isDebuggable = true
             isMinifyEnabled = false
-            isShrinkResources = false
+            isDebuggable = true
         }
+    }
+
+    buildFeatures {
+        compose = true
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 
 dependencies {
-    // اگر در convention اضافه‌اش نکردی:
-    // implementation(libs.androidx.activity.compose)
-
-//    implementation(project(":composeApp"))
-    implementation(libs.navigation.compose)
-    implementation(project(":core:common"))
-    implementation(project(":core:data"))
+    implementation(project(":composeApp"))
     implementation(project(":core:designsystem"))
-    implementation(project(":core:database"))
-    implementation(project(":core:domain"))
-    implementation(project(":feature-share:transaction"))
-    implementation(project(":feature-share:category"))
-    implementation(project(":feature-share:source"))
-    implementation(project(":feature-share:tags"))
-    implementation(project(":feature-container:report"))
-    implementation(project(":feature-share:person"))
-    implementation(project(":feature-container:dashboard"))
-    implementation(project(":feature-container:setting"))
+
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.material3)
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+}
+
+afterEvaluate {
+    val designSystemProject = project(":core:designsystem")
+    val dsProcessedResources =
+        File(designSystemProject.buildDir, "processedResources/jvm/main/composeResources")
+
+    android.sourceSets["main"].assets.srcDir(dsProcessedResources.absolutePath)
+
+    tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }
+        .configureEach {
+            dependsOn(
+                designSystemProject.tasks.matching {
+                    it.name.equals("copyJvmMainComposeResourcesForAndroid", ignoreCase = true) ||
+                            it.name.equals("processJvmMainResources", ignoreCase = true) ||
+                            it.name.equals("jvmProcessResources", ignoreCase = true)
+                }
+            )
+        }
 }
