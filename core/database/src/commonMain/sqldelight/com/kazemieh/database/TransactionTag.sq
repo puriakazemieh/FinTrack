@@ -1,4 +1,4 @@
-CREATE TABLE transaction_tag (
+CREATE TABLE IF NOT EXISTS transaction_tag (
     transactionId INTEGER NOT NULL,
     tagId INTEGER NOT NULL,
     PRIMARY KEY (transactionId, tagId),
@@ -6,8 +6,8 @@ CREATE TABLE transaction_tag (
     FOREIGN KEY (tagId) REFERENCES tag(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_transaction_tag_transaction ON transaction_tag(transactionId);
-CREATE INDEX idx_transaction_tag_tag ON transaction_tag(tagId);
+CREATE INDEX IF NOT EXISTS  idx_transaction_tag_transaction ON transaction_tag(transactionId);
+CREATE INDEX IF NOT EXISTS  idx_transaction_tag_tag ON transaction_tag(tagId);
 
 insertTransactionTagCrossRefs:
 INSERT OR IGNORE INTO transaction_tag(transactionId, tagId)

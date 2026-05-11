@@ -14,9 +14,10 @@ class DatabaseInitializer(
     private val database: FinTrackDatabase
 ) {
     suspend fun initialize() = withContext(Dispatchers.Default) {
-        // چک کن که آیا قبلاً initialize شده یا نه
-        val sourceCount = database.sourceQueries.lastInsertRowId().executeAsList().size
-        if (sourceCount > 0) return@withContext // قبلاً initialize شده
+
+        val sourceCount = database.sourceQueries.observeSources().executeAsList().size
+        println(sourceCount)
+        if (sourceCount > 0L) return@withContext
 
         // منبع مالی پیش‌فرض
         database.sourceQueries.addSource(

@@ -29,6 +29,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.koin.core.component.inject
 
@@ -47,9 +48,11 @@ class TransactionLocalDataSourceImpl(
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     init {
-        scope.launch {
+//        scope.launch {
+        runBlocking {
             initializer.initialize()
         }
+//        }
     }
 
     override fun observeTransactions(
