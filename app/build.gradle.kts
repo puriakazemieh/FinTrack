@@ -35,14 +35,15 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
 dependencies {
     implementation(project(":composeApp"))
     implementation(project(":core:designsystem"))
+
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.compose.ui)
@@ -52,11 +53,28 @@ dependencies {
 }
 
 afterEvaluate {
-    val designSystemProject = project(":core:designsystem")
-    val dsProcessedResources =
-        File(designSystemProject.buildDir, "processedResources/jvm/main/composeResources")
+    // ---------- :composeApp ----------
+    val composeAppProject = project(":composeApp")
+    val composeParentResources =
+        File(composeAppProject.buildDir, "processedResources/jvm/main")
+    android.sourceSets["main"].assets.srcDir(composeParentResources.absolutePath)
 
-    android.sourceSets["main"].assets.srcDir(dsProcessedResources.absolutePath)
+    tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }
+        .configureEach {
+            dependsOn(
+                composeAppProject.tasks.matching {
+                    it.name.equals("copyJvmMainComposeResourcesForAndroid", ignoreCase = true) ||
+                            it.name.equals("processJvmMainResources", ignoreCase = true) ||
+                            it.name.equals("jvmProcessResources", ignoreCase = true)
+                }
+            )
+        }
+
+    // ---------- :core:designsystem ----------
+    val designSystemProject = project(":core:designsystem")
+    val designSystemParentResources =
+        File(designSystemProject.buildDir, "processedResources/jvm/main")
+    android.sourceSets["main"].assets.srcDir(designSystemParentResources.absolutePath)
 
     tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }
         .configureEach {

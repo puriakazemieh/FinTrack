@@ -9,10 +9,10 @@ plugins {
     alias(libs.plugins.kotlinxSerialization)
 }
 
-//compose.resources {
-//    publicResClass = true
-//    packageOfResClass = "com.kazemieh.composeApp.generated.resources"
-//}
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "fintrack.composeapp.generated.resources"
+}
 
 kotlin {
 

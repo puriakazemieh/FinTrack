@@ -1,6 +1,5 @@
 package com.kazemieh.composeApp
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.kazemieh.category.di.transactionAddCategoryModule
 import com.kazemieh.category.di.transactionCategoryModule
@@ -25,19 +24,13 @@ import com.kazemieh.transaction.di.addTransactionPresentationModule
 import com.kazemieh.transaction.di.transactionDeleteViewModelModule
 import com.kazemieh.transaction.di.transactionPresentationModule
 import com.kazemieh.transaction.di.transactionReportViewModelModule
-import org.jetbrains.compose.resources.stringResource
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
-import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.test_ok
 
 @Composable
 fun App() {
     FintrackTheme {
-        Text("tessssst")
-        Text(stringResource(Res.string.test_ok))
-
-//        FinTrackHost()
+        FinTrackHost()
     }
 }
 
