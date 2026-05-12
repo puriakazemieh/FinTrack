@@ -67,6 +67,7 @@ kotlin {
 
             implementation(libs.kotlinx.serialization)
             implementation(libs.koin.core)
+            implementation(libs.koin.compose)
 
 
             implementation(libs.navigation.compose)
@@ -114,4 +115,21 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+
+tasks.register<Copy>("copySqlWasm") {
+    // فایل wasm که توی resources/jsMain گذاشتی
+    from("src/jsMain/resources/sql-wasm.wasm")
+    // پوشهٔ خروجی نهایی webpack (فایل worker اینجاست)
+    into("build/js/packages/${project.name}/kotlin/")
+}
+
+// اتصال به تسک بیلد JS
+tasks.named("jsDevelopmentExecutableCompileSync") {
+    finalizedBy("copySqlWasm")
+}
+// اتصال به تسک بیلد JS
+tasks.named("jsBrowserDevelopmentRun") {
+    finalizedBy("copySqlWasm")
 }

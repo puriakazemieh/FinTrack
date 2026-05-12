@@ -1,6 +1,12 @@
 package com.kazemieh.database
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitCreate
+import app.cash.sqldelight.db.SqlDriver
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.database.FinTrackDatabase.Companion.Schema
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -11,11 +17,16 @@ private fun colorForIndex(i: Int) = (i % COLOR_COUNT) + 1
 private fun iconForIndex(i: Int) = (i % ICON_COUNT) + 1
 
 class DatabaseInitializer(
-    private val database: FinTrackDatabase
+    private val database: FinTrackDatabase,
+    private val driver: SqlDriver,
 ) {
-    suspend fun initialize() = withContext(Dispatchers.Default) {
 
-        val sourceCount = database.sourceQueries.observeSources().executeAsList().size
+    private val _ready = CompletableDeferred<Unit>()
+    val ready: Deferred<Unit> = _ready
+    suspend fun initialize() = withContext(Dispatchers.Default) {
+        Schema.awaitCreate(driver)
+        _ready.complete(Unit)
+        val sourceCount = database.sourceQueries.observeSources().awaitAsList().size
         println(sourceCount)
         if (sourceCount > 0L) return@withContext
 

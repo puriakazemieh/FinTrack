@@ -1,5 +1,6 @@
 package com.kazemieh.database
 
+import app.cash.sqldelight.async.coroutines.synchronous
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import org.koin.core.scope.Scope
@@ -10,6 +11,6 @@ actual fun Scope.createDriver(): SqlDriver {
     databasePath.parentFile?.mkdirs()
 
     return JdbcSqliteDriver("jdbc:sqlite:${databasePath.absolutePath}").also {
-        FinTrackDatabase.Schema.create(it)
+        FinTrackDatabase.Schema.synchronous().create(it)
     }
 }

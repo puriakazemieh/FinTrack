@@ -17,16 +17,9 @@ val databaseModule = module {
         FinTrackDatabase(driver = get())
     }
 
-    single {
-        DatabaseInitializer(database = get())
-    }
-
-
+    single { DatabaseInitializer(database = get(), get()) }
 
     single<TransactionLocalDataSource> {
-        TransactionLocalDataSourceImpl(
-            db = get(),
-            initializer = get()
-        )
+        TransactionLocalDataSourceImpl(db = get())
     }
 }

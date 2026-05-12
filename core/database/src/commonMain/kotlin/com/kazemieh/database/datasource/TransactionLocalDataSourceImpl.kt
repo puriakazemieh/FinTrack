@@ -15,7 +15,6 @@ import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
-import com.kazemieh.database.DatabaseInitializer
 import com.kazemieh.database.FinTrackDatabase
 import com.kazemieh.database.mapper.toCategory
 import com.kazemieh.database.mapper.toCategorySum
@@ -23,19 +22,13 @@ import com.kazemieh.database.mapper.toPerson
 import com.kazemieh.database.mapper.toSource
 import com.kazemieh.database.mapper.toTag
 import com.kazemieh.database.mapper.toTransactionWithRelations
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import org.koin.core.component.inject
 
 class TransactionLocalDataSourceImpl(
-    private val db: FinTrackDatabase,
-    private val initializer: DatabaseInitializer
+    private val db: FinTrackDatabase
 ) : TransactionLocalDataSource {
 
     private val transactionQueries = db.transactionQueries
@@ -46,14 +39,6 @@ class TransactionLocalDataSourceImpl(
     private val transactionTagQueries = db.transactionTagQueries
     private val transactionPersonQueries = db.transactionPersonQueries
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    init {
-//        scope.launch {
-        runBlocking {
-            initializer.initialize()
-        }
-//        }
-    }
 
     override fun observeTransactions(
         transactionFilterParams: TransactionFilterParams,

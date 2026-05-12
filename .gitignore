@@ -22,3 +22,4 @@ local.properties
 .kotlin
 composeApp/build
 app/build
+kotlin-js-store

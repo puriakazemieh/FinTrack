@@ -1,11 +1,17 @@
 package com.kazemieh.composeApp
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.kazemieh.category.di.transactionAddCategoryModule
 import com.kazemieh.category.di.transactionCategoryModule
 import com.kazemieh.category.di.transactionDeleteCategoryModule
 import com.kazemieh.dashboard.di.dashboardModule
 import com.kazemieh.data.di.dataModule
+import com.kazemieh.database.DatabaseInitializer
 import com.kazemieh.database.di.databaseModule
 import com.kazemieh.designsystem.FintrackTheme
 import com.kazemieh.domain.di.domainModule
@@ -24,13 +30,24 @@ import com.kazemieh.transaction.di.addTransactionPresentationModule
 import com.kazemieh.transaction.di.transactionDeleteViewModelModule
 import com.kazemieh.transaction.di.transactionPresentationModule
 import com.kazemieh.transaction.di.transactionReportViewModelModule
+import org.koin.compose.koinInject
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 
 @Composable
 fun App() {
-    FintrackTheme {
-        FinTrackHost()
+    val initializer = koinInject<DatabaseInitializer>()
+    var isReady by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        initializer.initialize()
+        isReady = true
+    }
+
+    if (isReady) {
+        FintrackTheme {
+            FinTrackHost()
+        }
     }
 }
 

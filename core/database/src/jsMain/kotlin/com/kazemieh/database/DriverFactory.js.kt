@@ -6,9 +6,8 @@ import org.koin.core.scope.Scope
 import org.w3c.dom.Worker
 
 actual fun Scope.createDriver(): SqlDriver {
-    return WebWorkerDriver(
-        Worker(js("""new URL("@cashapp/sqldelight-sqljs-worker/sqljs.worker.js", import.meta.url)"""))
-    ).also {
-        FinTrackDatabase.Schema.create(it)
-    }
+    val worker = Worker(
+        js("""new URL("@cashapp/sqldelight-sqljs-worker/sqljs.worker.js", import.meta.url)""")
+    )
+    return WebWorkerDriver(worker)
 }
