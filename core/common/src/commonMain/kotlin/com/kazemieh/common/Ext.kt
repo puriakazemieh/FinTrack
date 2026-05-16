@@ -6,7 +6,7 @@ import kotlin.math.pow
 
 
 fun Int.formatNumber(): String {
-    return this.toString().chunked(3).reversed().joinToString(" ").reversed()
+    return this.toString().reversed().chunked(3).joinToString(",").reversed()
 }
 
 

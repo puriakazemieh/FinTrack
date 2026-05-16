@@ -24,14 +24,15 @@ fun FintrackNavigationBar(
     modifier: Modifier = Modifier,
     navController: NavHostController
 ) {
-    val currentDestination = navController.currentBackStackEntryAsState().value?.destination
-    val selectedDestination by remember {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+    val selectedDestination by remember(currentDestination) {
         derivedStateOf {
             val route = currentDestination?.route.toString()
             when {
-                route.contains(Destinations.DASHBOARD.route.toString()) -> Destinations.DASHBOARD
-                route.contains(Destinations.REPORT.route.toString()) -> Destinations.REPORT
-                route.contains(Destinations.SETTING.route.toString()) -> Destinations.SETTING
+                route.contains("Dashboard") -> Destinations.DASHBOARD
+                route.contains("Report") -> Destinations.REPORT
+                route.contains("Setting") -> Destinations.SETTING
                 else -> Destinations.DASHBOARD
             }
         }
@@ -47,8 +48,6 @@ fun FintrackNavigationBar(
                 icon = {
                     Icon(
                         painter = painterResource(destination.icon),
-//                        painter = painterResource(fintrack.composeapp.generated.resources.Res.drawable.ic_navigation_report),
-//                        imageVector = ImageVector.vectorResource(id = destination.icon),
                         contentDescription = stringResource(destination.label)
                     )
                 },

@@ -90,15 +90,36 @@ fun FintrackOutlinedTextField(
 
 class NumberCommaTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
+        val originalText = text.text
+        val transformedText = originalText.toPrice()
+        
         return TransformedText(
-            text = AnnotatedString(text.text.toPrice()),
+            text = AnnotatedString(transformedText),
             offsetMapping = object : OffsetMapping {
                 override fun originalToTransformed(offset: Int): Int {
-                    return text.text.toPrice().length
+                    if (offset <= 0) return 0
+                    if (offset >= originalText.length) return transformedText.length
+                    
+                    var result = offset
+                    for (i in 1 until originalText.length) {
+                        if ((originalText.length - i) % 3 == 0) {
+                            if (i < offset) result++
+                        }
+                    }
+                    return result
                 }
 
                 override fun transformedToOriginal(offset: Int): Int {
-                    return text.length
+                    if (offset <= 0) return 0
+                    if (offset >= transformedText.length) return originalText.length
+                    
+                    var commasBefore = 0
+                    for (i in 0 until offset) {
+                        if (i < transformedText.length && transformedText[i] == ',') {
+                            commasBefore++
+                        }
+                    }
+                    return (offset - commasBefore).coerceIn(0, originalText.length)
                 }
             }
         )
