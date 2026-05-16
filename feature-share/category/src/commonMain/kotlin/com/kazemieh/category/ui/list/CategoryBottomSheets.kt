@@ -168,6 +168,7 @@ fun TopCategoryContent(
 fun CategorySelectionBottomSheet(
     viewModel: CategoryViewModel = koinViewModel(key = "CategorySelectionBottomSheet"),
     initialSelectionPairs: Set<Category> = emptySet(),
+    isAllSelected: Boolean = true,
     onConfirmPairs: (Set<Category>, isAllSelected: Boolean) -> Unit,
     selectedTransactionType: TransactionType,
     onDismiss: () -> Unit
@@ -179,7 +180,7 @@ fun CategorySelectionBottomSheet(
         viewModel.onIntent(CategoryIntent.LoadCategoryByType(selectedTransactionType))
     }
 
-    val initialSelectionIds = initialSelectionPairs.map { it.toItemUi() }.toSet()
+    val initialSelectionIds = if (isAllSelected) state.items else initialSelectionPairs.map { it.toItemUi() }.toSet()
 
     SelectableListBottomSheet(
         title = stringResource(Res.string.category),

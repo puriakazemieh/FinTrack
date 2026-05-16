@@ -183,38 +183,36 @@ class TransactionViewModel(
 
     private fun observeSummary() {
         viewModelScope.launch {
-            runCatching {
-                transactionUseCaseGroup.observeCategorySumsUseCase(TransactionFilterParams())
-                    .collect { categorySums ->
-                        val totalIncome = categorySums.filter { it.type == TransactionType.INCOME }
-                            .sumOf { it.totalAmount }
+            combine(
+                transactionUseCaseGroup.observeCategorySumsUseCase(TransactionFilterParams()),
+                transactionUseCaseGroup.observeSourcesUseCase()
+            ) { categorySums, sources ->
+                val totalIncome = categorySums.filter { it.type == TransactionType.INCOME }
+                    .sumOf { it.totalAmount }
 
-                        val totalExpense =
-                            categorySums.filter { it.type == TransactionType.EXPENSE }
-                                .sumOf { it.totalAmount }
+                val totalExpense = categorySums.filter { it.type == TransactionType.EXPENSE }
+                    .sumOf { it.totalAmount }
 
-                        val totalTransfer =
-                            categorySums.filter { it.type == TransactionType.TRANSFER }
-                                .sumOf { it.totalAmount }
+                val totalTransfer = categorySums.filter { it.type == TransactionType.TRANSFER }
+                    .sumOf { it.totalAmount }
 
-                        val balance = totalIncome + totalExpense.times(-1) + totalTransfer
+                val balance = sources.sumOf { it.balance.toLong() }
 
-                        _state.update {
-                            it.copy(
-                                formatedTotalIncome = totalIncome.toInt().formatted(),
-                                totalIncome = totalIncome.toInt().toPositive().toLong(),
-                                formatedTotalExpense = totalExpense.toInt().formatted(),
-                                totalExpense = totalExpense.toInt().toPositive().toLong(),
-                                formatedTotalTransfer = totalTransfer.toInt().formatted(),
-                                totalTransfer = totalTransfer.toInt().toPositive().toLong(),
-                                balance = balance.toInt().formatted(),
-                                isPositiveBalance = balance >= 0
-                            )
-                        }
-                    }
-            }.onFailure { e ->
+                _state.update {
+                    it.copy(
+                        formatedTotalIncome = totalIncome.toInt().formatted(),
+                        totalIncome = totalIncome,
+                        formatedTotalExpense = totalExpense.toInt().formatted(),
+                        totalExpense = totalExpense,
+                        formatedTotalTransfer = totalTransfer.toInt().formatted(),
+                        totalTransfer = totalTransfer,
+                        balance = balance.toInt().formatted(),
+                        isPositiveBalance = balance >= 0L
+                    )
+                }
+            }.catch { e ->
                 _state.update { it.copy(refreshError = e.message) }
-            }
+            }.collectLatest { }
         }
     }
 }

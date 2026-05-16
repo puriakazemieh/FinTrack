@@ -55,17 +55,12 @@ fun SelectableListBottomSheet(
 
     val itemsList = remember(items) { items.toList().sortedBy { it.id } }
 
-    var selected by remember(items, initialSelection, showSelectAll) {
-        mutableStateOf(
-            if (initialSelection.isEmpty() && showSelectAll) items
-            else initialSelection.intersect(items)
-        )
+    var selected by remember(items, initialSelection) {
+        mutableStateOf(initialSelection.intersect(items))
     }
 
-    LaunchedEffect(items, initialSelection, showSelectAll) {
-        selected =
-            if (initialSelection.isEmpty() && showSelectAll) items
-            else initialSelection.intersect(items)
+    LaunchedEffect(items, initialSelection) {
+        selected = initialSelection.intersect(items)
     }
 
     val isAllSelected = items.isNotEmpty() && selected.size == items.size

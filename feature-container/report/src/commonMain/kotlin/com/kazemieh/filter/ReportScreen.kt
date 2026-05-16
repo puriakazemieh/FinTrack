@@ -72,9 +72,13 @@ fun ReportScreen(
 
             TransactionListByFilterScreen(
                 selectedSources = state.selectedSources,
+                isAllSources = state.isAllSourceSelected,
                 selectedCategories = state.selectedCategories,
+                isAllCategories = state.isAllCategorySelected,
                 selectedTags = state.selectedTag,
+                isAllTags = state.isAllTAgSelected,
                 selectedPersons = state.selectedPerson,
+                isAllPersons = state.isAllPersonSelected,
                 selectedTransactionType = state.selectedTransactionType,
                 fromTimestamp = state.startDateTimeStamp,
                 toTimestamp = state.endDateTimeStamp,
@@ -95,6 +99,7 @@ fun ReportScreen(
         if (state.isCategorySheetVisible) {
             CategorySelectionBottomSheet(
                 initialSelectionPairs = state.selectedCategories,
+                isAllSelected = state.isAllCategorySelected,
                 selectedTransactionType = state.selectedTransactionType,
                 onConfirmPairs = { pairs, isAll ->
                     viewModel.onIntent(ReportIntent.OnCategoriesSelected(pairs, isAll))
@@ -106,6 +111,7 @@ fun ReportScreen(
         if (state.isTagSheetVisible) {
             TagSelectionBottomSheet(
                 initialSelectionPairs = state.selectedTag,
+                isAllSelected = state.isAllTAgSelected,
                 onConfirmPairs = { pairs, isAll ->
                     viewModel.onIntent(ReportIntent.OnTagSelected(pairs, isAll))
                 },
@@ -116,6 +122,7 @@ fun ReportScreen(
         if (state.isPersonSheetVisible) {
             PersonSelectionBottomSheet(
                 initialSelectionPairs = state.selectedPerson,
+                isAllSelected = state.isAllPersonSelected,
                 onConfirmPairs = { pairs, isAll ->
                     viewModel.onIntent(ReportIntent.OnPersonSelected(pairs, isAll))
                 },
@@ -126,6 +133,7 @@ fun ReportScreen(
         if (state.isSourceSheetVisible) {
             SourceSelectionBottomSheet(
                 initialSelectionPairs = state.selectedSources,
+                isAllSelected = state.isAllSourceSelected,
                 onConfirmPairs = { pairs, isAll ->
                     viewModel.onIntent(ReportIntent.OnSourcesSelected(pairs, isAll))
                 },

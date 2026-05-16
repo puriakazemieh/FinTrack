@@ -115,6 +115,7 @@ fun TagManageBottomSheet(
 fun TagSelectionBottomSheet(
     viewModel: TagViewModel = koinViewModel(key = "TagSelectionBottomSheet"),
     initialSelectionPairs: Set<Tag> = emptySet(),
+    isAllSelected: Boolean = true,
     onConfirmPairs: (Set<Tag>, isAllSelected: Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -123,7 +124,7 @@ fun TagSelectionBottomSheet(
 
     LaunchedEffect(Unit) { viewModel.onIntent(TagIntent.GetAllTag) }
 
-    val initialSelectionIds = initialSelectionPairs.map { it.toItemUi() }.toSet()
+    val initialSelectionIds = if (isAllSelected) state.items else initialSelectionPairs.map { it.toItemUi() }.toSet()
 
     SelectableListBottomSheet(
         title = stringResource(Res.string.tags),

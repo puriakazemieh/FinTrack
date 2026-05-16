@@ -25,9 +25,13 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun TransactionListByFilterScreen(
     selectedSources: Set<Source>,
+    isAllSources: Boolean = true,
     selectedCategories: Set<Category>,
+    isAllCategories: Boolean = true,
     selectedTags: Set<Tag>,
+    isAllTags: Boolean = true,
     selectedPersons: Set<Person>,
+    isAllPersons: Boolean = true,
     selectedTransactionType: TransactionType,
     fromTimestamp: Long? = null,
     toTimestamp: Long? = null,
@@ -37,15 +41,20 @@ fun TransactionListByFilterScreen(
     viewModel: TransactionReportViewModel = koinViewModel()
 ) {
     LaunchedEffect(
-        selectedSources, selectedCategories, selectedTags, selectedPersons,
+        selectedSources, isAllSources, selectedCategories, isAllCategories,
+        selectedTags, isAllTags, selectedPersons, isAllPersons,
         selectedTransactionType, fromTimestamp, toTimestamp
     ) {
         viewModel.onIntent(
             TransactionReportIntent.SetFilters(
                 sources = selectedSources,
+                isAllSources = isAllSources,
                 categories = selectedCategories,
+                isAllCategories = isAllCategories,
                 tags = selectedTags,
+                isAllTags = isAllTags,
                 persons = selectedPersons,
+                isAllPersons = isAllPersons,
                 type = selectedTransactionType,
                 fromTimestamp = fromTimestamp,
                 toTimestamp = toTimestamp

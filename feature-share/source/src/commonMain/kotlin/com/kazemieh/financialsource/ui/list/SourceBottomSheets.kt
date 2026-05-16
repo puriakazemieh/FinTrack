@@ -144,6 +144,7 @@ fun SourcePickerBottomSheet(
 fun SourceSelectionBottomSheet(
     viewModel: SourceViewModel = koinViewModel(key = "SourceSelectionBottomSheet"),
     initialSelectionPairs: Set<Source> = emptySet(),
+    isAllSelected: Boolean = true,
     onConfirmPairs: (Set<Source>, isAllSelected: Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -153,7 +154,7 @@ fun SourceSelectionBottomSheet(
         viewModel.onIntent(SourceIntent.LoadAllSource)
     }
 
-    val initialSelectionIds = initialSelectionPairs.map { it.toItemUi() }.toSet()
+    val initialSelectionIds = if (isAllSelected) state.items else initialSelectionPairs.map { it.toItemUi() }.toSet()
 
     SelectableListBottomSheet(
         title = stringResource(Res.string.source),

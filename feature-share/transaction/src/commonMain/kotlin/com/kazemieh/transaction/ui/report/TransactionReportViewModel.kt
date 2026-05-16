@@ -46,9 +46,13 @@ class TransactionReportViewModel(
             TransactionFilterParams(
                 type = if (s.filterParams.type == 0) null else s.filterParams.type,
                 categories = s.filterParams.categories,
+                isAllCategories = s.filterParams.isAllCategories,
                 sources = s.filterParams.sources,
+                isAllSources = s.filterParams.isAllSources,
                 tags = s.filterParams.tags,
+                isAllTags = s.filterParams.isAllTags,
                 persons = s.filterParams.persons,
+                isAllPersons = s.filterParams.isAllPersons,
                 fromTimestamp = s.filterParams.fromTimestamp,
                 toTimestamp = s.filterParams.toTimestamp?.plus(24.hours.inWholeMilliseconds)
             )
@@ -120,9 +124,13 @@ class TransactionReportViewModel(
                     s.copy(
                         filterParams = s.filterParams.copy(
                             sources = intent.sources,
+                            isAllSources = intent.isAllSources,
                             categories = intent.categories,
+                            isAllCategories = intent.isAllCategories,
                             tags = intent.tags,
+                            isAllTags = intent.isAllTags,
                             persons = intent.persons,
+                            isAllPersons = intent.isAllPersons,
                             type = intent.type.count,
                             fromTimestamp = intent.fromTimestamp,
                             toTimestamp = intent.toTimestamp
@@ -235,7 +243,12 @@ class TransactionReportViewModel(
     private fun updateCategorySums(categorySums: List<CategorySum>) {
         var balance: Long = 0
         val pieChartItems = categorySums.map { c ->
-            balance += c.totalAmount
+            when (c.type) {
+                TransactionType.INCOME -> balance += c.totalAmount
+                TransactionType.EXPENSE -> balance -= c.totalAmount
+                TransactionType.TRANSFER -> Unit // Usually net balance doesn't change
+                else -> Unit
+            }
             PieChartItem(id = c.categoryId, label = c.name, value = c.totalAmount)
         }
 
@@ -268,9 +281,13 @@ sealed interface TransactionReportIntent {
 
     data class SetFilters(
         val sources: Set<Source>,
+        val isAllSources: Boolean = true,
         val categories: Set<Category>,
+        val isAllCategories: Boolean = true,
         val tags: Set<Tag>,
+        val isAllTags: Boolean = true,
         val persons: Set<Person>,
+        val isAllPersons: Boolean = true,
         val type: TransactionType,
         val fromTimestamp: Long?,
         val toTimestamp: Long?,
@@ -281,9 +298,22 @@ sealed interface TransactionReportIntent {
     data object RetryAppend : TransactionReportIntent
 }
 
-data class TransactionReportState(
-    val filterParams: TransactionFilterParams = TransactionFilterParams(),
+data class TransactionFilterParamsState(
+    val type: Int? = null,
+    val sources: Set<Source> = emptySet(),
+    val isAllSources: Boolean = true,
+    val categories: Set<Category> = emptySet(),
+    val isAllCategories: Boolean = true,
+    val tags: Set<Tag> = emptySet(),
+    val isAllTags: Boolean = true,
+    val persons: Set<Person> = emptySet(),
+    val isAllPersons: Boolean = true,
+    val fromTimestamp: Long? = null,
+    val toTimestamp: Long? = null
+)
 
+data class TransactionReportState(
+    val filterParams: TransactionFilterParamsState = TransactionFilterParamsState(),
     val balance: String = "0",
     val isPositiveBalance: Boolean = true,
     val pieChartData: List<PieChartItem> = emptyList(),

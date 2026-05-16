@@ -121,6 +121,7 @@ fun PersonManageBottomSheet(
 fun PersonSelectionBottomSheet(
     viewModel: PersonViewModel = koinViewModel(key = "PersonSelectionBottomSheet"),
     initialSelectionPairs: Set<Person> = emptySet(),
+    isAllSelected: Boolean = true,
     onConfirmPairs: (Set<Person>, isAllSelected: Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -129,7 +130,7 @@ fun PersonSelectionBottomSheet(
 
     LaunchedEffect(Unit) { viewModel.onIntent(PersonIntent.GetAllPerson) }
 
-    val initialSelectionIds = initialSelectionPairs.map { it.toItemUi() }.toSet()
+    val initialSelectionIds = if (isAllSelected) state.items else initialSelectionPairs.map { it.toItemUi() }.toSet()
 
     SelectableListBottomSheet(
         title = stringResource(Res.string.persons),

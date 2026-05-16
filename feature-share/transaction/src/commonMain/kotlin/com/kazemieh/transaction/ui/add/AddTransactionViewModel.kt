@@ -254,23 +254,26 @@ class AddTransactionViewModel(
     }
 
     private fun onTypeChanged(newType: TransactionType) {
-        _state.update { s ->
+        viewModelScope.launch {
             val isTransfer = newType == TransactionType.TRANSFER
+            val defaultCategory = if (isTransfer) null else transactionUseCaseGroup.getDefaultCategoryUseCase(newType)
+            
+            _state.update { s ->
+                s.copy(
+                    transactionType = newType,
 
-            s.copy(
-                transactionType = newType,
+                    sheetStack = emptyList(),
 
-                sheetStack = emptyList(),
+                    category = defaultCategory,
+                    sourceEnd = if (isTransfer) s.sourceEnd else null,
+                    amountTransfer = if (isTransfer) s.amountTransfer else null,
 
-                category = if (isTransfer) null else s.category,
-                sourceEnd = if (isTransfer) s.sourceEnd else null,
-                amountTransfer = if (isTransfer) s.amountTransfer else null,
-
-                isCategoryError = false,
-                isSourceError = false,
-                isSourceEndError = false,
-                isAmountError = false,
-            )
+                    isCategoryError = false,
+                    isSourceError = false,
+                    isSourceEndError = false,
+                    isAmountError = false,
+                )
+            }
         }
     }
 

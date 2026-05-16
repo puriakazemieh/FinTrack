@@ -12,16 +12,16 @@ fun Int.formatNumber(): String {
 
 fun Int.formatted(): String =
     when {
-        this < 0 -> "${(-this).formatNumber()} -"
-        this > 0 -> "${this.formatNumber()} +"
+        this < 0 -> "- ${(-this).formatNumber()}"
+        this > 0 -> "+ ${this.formatNumber()}"
         else -> "0"
     }
 
 fun Int?.formattedOrNull(): String? {
     if (this == null) return null
     return when {
-        this < 0 -> "${(-this).formatNumber()} -"
-        this > 0 -> "${this.formatNumber()} +"
+        this < 0 -> "- ${(-this).formatNumber()}"
+        this > 0 -> "+ ${this.formatNumber()}"
         else -> "0"
     }
 }

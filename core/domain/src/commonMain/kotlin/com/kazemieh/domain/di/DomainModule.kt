@@ -74,6 +74,7 @@ val domainModule = module {
             observeTransactionsUseCase = get(),
             updateTransactionUseCase = get(),
             observeCategorySumsUseCase = get(),
+            observeSourcesUseCase = get()
         )
     }
 

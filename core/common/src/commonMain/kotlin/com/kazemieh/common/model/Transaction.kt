@@ -1,10 +1,10 @@
 package com.kazemieh.common.model
 
+import com.kazemieh.common.formatNumber
 import kotlinx.serialization.Serializable
 import kotlin.time.Clock
 
 @Serializable
-@OptIn(kotlinx.serialization.InternalSerializationApi::class)
 data class Transaction(
     val id: Long,
     val amount: Int,
@@ -15,10 +15,18 @@ data class Transaction(
     val description: String? = null,
     val timeStamp: Long = Clock.System.now().toEpochMilliseconds(),
     val date: String = "",
-    val type: TransactionType,
-    val formatedAmount: String = 0.toString(),
-    val amountTransferFormated: String? = null,
-)
+    val type: TransactionType
+) {
+    val formatedAmount: String
+        get() = when (type) {
+            TransactionType.INCOME -> "+ ${amount.formatNumber()}"
+            TransactionType.EXPENSE -> "- ${amount.formatNumber()}"
+            else -> amount.formatNumber()
+        }
+
+    val amountTransferFormated: String?
+        get() = if (type == TransactionType.TRANSFER) amountTransfer.formatNumber() else null
+}
 
 @Serializable
 enum class TransactionType(val count: Int) {
