@@ -9,9 +9,14 @@ import org.koin.mp.KoinPlatform
 
 actual fun Scope.createDriver(): SqlDriver {
     val context = KoinPlatform.getKoin().get<Context>()
+
+    val oldDb = context.getDatabasePath("fin_track.db")
+    if (oldDb.exists()) {
+        context.deleteDatabase("fin_track.db")
+    }
     return AndroidSqliteDriver(
         schema = FinTrackDatabase.Schema.synchronous(),
         context = context,
-        name = "fin_track.db"
+        name = "fintrack.db"
     )
 }

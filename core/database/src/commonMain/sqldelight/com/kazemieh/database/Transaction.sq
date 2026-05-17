@@ -138,3 +138,7 @@ GROUP BY c.id;
 
 getTransactionById:
 SELECT * FROM transactions WHERE id = ?;
+
+insertFullTransaction:
+INSERT OR REPLACE INTO transactions(id, amount, amountTransfer, categoryId, sourceId, sourceEndId, description, timeStamp, type)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);

@@ -31,3 +31,7 @@ WHERE id = ?;
 lastInsertRowId:
 SELECT last_insert_rowid();
 
+insertFullTag:
+INSERT OR REPLACE INTO tag(id, name, description, colorId, iconId)
+VALUES (?, ?, ?, ?, ?);
+

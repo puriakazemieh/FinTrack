@@ -70,3 +70,7 @@ GROUP BY c.id, c.name, c.type;
 
 deleteCategory:
 DELETE FROM category WHERE id = ?;
+
+insertFullCategory:
+INSERT OR REPLACE INTO category(id, name, description, type, colorId, iconId)
+VALUES (?, ?, ?, ?, ?, ?);

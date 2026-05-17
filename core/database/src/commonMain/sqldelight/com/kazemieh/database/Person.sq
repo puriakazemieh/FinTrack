@@ -29,3 +29,7 @@ WHERE id = ?;
 lastInsertRowId:
 SELECT last_insert_rowid();
 
+insertFullPerson:
+INSERT OR REPLACE INTO person(id, name, description)
+VALUES (?, ?, ?);
+

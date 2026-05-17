@@ -40,3 +40,7 @@ SELECT last_insert_rowid();
 
 getSourceById:
 SELECT * FROM source WHERE id = ?;
+
+insertFullSource:
+INSERT OR REPLACE INTO source(id, name, balance, cardNumber, description, type, colorId, iconId)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
