@@ -111,4 +111,8 @@ object FinTrackSourceIcons {
             PickableIcon(id = index + 1000, resource = resId, isTintable = false)
         }
     }
+
+    fun findIdByResource(resId: DrawableResource): Int {
+        return icons.firstOrNull { it.resource == resId }?.id ?: 1000
+    }
 }

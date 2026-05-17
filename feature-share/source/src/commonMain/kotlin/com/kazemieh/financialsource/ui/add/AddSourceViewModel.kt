@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.component.model.UiText
+import com.kazemieh.designsystem.model.Bank
+import com.kazemieh.designsystem.picker.FinTrackSourceIcons
 import fintrack.core.designsystem.generated.resources.*
 import com.kazemieh.domain.usecase.SourceUseCases
 import kotlinx.coroutines.Job
@@ -36,7 +38,15 @@ class AddSourceViewModel(
             is AddSourceIntent.UpdateName -> updateDraft { it.copy(name = intent.value) }
             is AddSourceIntent.UpdateDescription -> updateDraft { it.copy(description = intent.value) }
             is AddSourceIntent.UpdateBalance -> updateDraft { it.copy(balance = intent.value) }
-            is AddSourceIntent.UpdateCardNumber -> updateDraft { it.copy(cardNumber = intent.value) }
+            is AddSourceIntent.UpdateCardNumber -> updateDraft {
+                val bank = Bank.fromCardNumber(intent.value.orEmpty())
+                if (bank != Bank.Unknown) {
+                    val bankIconId = FinTrackSourceIcons.findIdByResource(bank.logo)
+                    it.copy(cardNumber = intent.value, iconId = bankIconId)
+                } else {
+                    it.copy(cardNumber = intent.value)
+                }
+            }
 
             is AddSourceIntent.UpdateType -> updateDraft {
                 if (intent.value == TypeSource.CASH) {

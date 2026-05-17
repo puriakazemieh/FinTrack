@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -16,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -30,9 +33,11 @@ import com.kazemieh.designsystem.component.bottomsheet.FormBottomSheetScaffold
 import com.kazemieh.designsystem.component.form.NameDescriptionFields
 import com.kazemieh.designsystem.component.model.asString
 import com.kazemieh.designsystem.component.model.resolveString
+import com.kazemieh.designsystem.model.Bank
 import com.kazemieh.designsystem.picker.ColorIconPickerBottomSheet
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackSourceIcons
+import com.kazemieh.designsystem.component.CardItem
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.card_number_label
 import fintrack.core.designsystem.generated.resources.description_label
@@ -90,7 +95,10 @@ fun AddSourceBottomSheet(
         primaryButtonText = stringResource(Res.string.submit_source),
         onPrimaryClick = { viewModel.onIntent(AddSourceIntent.Save) }
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.mediumLarge)) {
+        Column(
+            modifier = Modifier.verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.mediumLarge)
+        ) {
 
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                 SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
@@ -104,6 +112,18 @@ fun AddSourceBottomSheet(
                         }
                     }
                 }
+            }
+
+            AnimatedVisibility(visible = state.draft.type == TypeSource.CREDIT) {
+                val bank = remember(state.draft.cardNumber) {
+                    Bank.fromCardNumber(state.draft.cardNumber.orEmpty())
+                }
+                CardItem(
+                    name = state.draft.name,
+                    cardNumber = state.draft.cardNumber.orEmpty(),
+                    bank = bank,
+                    colorId = state.draft.colorId
+                )
             }
 
             NameDescriptionFields(
