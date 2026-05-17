@@ -37,7 +37,7 @@ fun FintrackNavigationBar(
             }
         }
     }
-    NavigationBar(modifier = modifier) {
+    NavigationBar(modifier = modifier,containerColor = MaterialTheme.colorScheme.background,) {
         Destinations.entries.forEach { destination ->
             val selected = selectedDestination.route == destination.route
             NavigationBarItem(
