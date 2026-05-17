@@ -6,7 +6,11 @@ import kotlin.math.pow
 
 
 fun Int.formatNumber(): String {
-    return this.toString().reversed().chunked(3).joinToString(",").reversed()
+    return this.toString().formatNumber()
+}
+
+fun String.formatNumber(): String {
+    return this.reversed().chunked(3).joinToString(",").reversed()
 }
 
 
@@ -35,7 +39,7 @@ fun Int.toPositive(): Int =
     }
 
 fun String.toPrice(): String {
-    return this.toIntOrNull()?.formatNumber() ?: ""
+    return this.formatNumber()
 }
 
 

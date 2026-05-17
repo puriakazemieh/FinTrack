@@ -31,6 +31,8 @@ import com.kazemieh.designsystem.component.form.NameDescriptionFields
 import com.kazemieh.designsystem.component.model.asString
 import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.designsystem.picker.ColorIconPickerBottomSheet
+import com.kazemieh.designsystem.picker.FinTrackIcons
+import com.kazemieh.designsystem.picker.FinTrackSourceIcons
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.card_number_label
 import fintrack.core.designsystem.generated.resources.description_label
@@ -159,6 +161,7 @@ fun AddSourceBottomSheet(
             ColorIconPickerBottomSheet(
                 initialColorId = state.draft.colorId,
                 initialIconId = state.draft.iconId,
+                icons = if (state.draft.type == TypeSource.CREDIT) FinTrackSourceIcons.icons else FinTrackIcons.icons,
                 onDismiss = { viewModel.onIntent(AddSourceIntent.ClosePicker) },
                 onSave = { color, icon ->
                     viewModel.onIntent(AddSourceIntent.SetColorIcon(color.id, icon.id))

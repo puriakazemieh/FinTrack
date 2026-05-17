@@ -82,9 +82,8 @@ fun TransactionItem(
         else MaterialTheme.colorScheme.secondary
 
     // ---------------------------
-    val icons = FinTrackIcons.icons
-    val sourceIcon = remember(icons, uiTransactionWithRelation.source.iconId) {
-        icons.firstOrNull { it.id == uiTransactionWithRelation.source.iconId } ?: icons.first()
+    val sourceIcon = remember(uiTransactionWithRelation.source.iconId) {
+        FinTrackIcons.findIcon(uiTransactionWithRelation.source.iconId)
     }
 
     val colors = FinTrackPickerColors.rainbow()
@@ -268,8 +267,8 @@ fun TransactionItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         items(uiTransactionWithRelation.tags) { tag ->
-                            val tagIcon = remember(icons) {
-                                icons.firstOrNull { it.id == tag.iconId } ?: icons.first()
+                            val tagIcon = remember(tag.iconId) {
+                                FinTrackIcons.findIcon(tag.iconId)
                             }
                             EntityChip(
                                 name = tag.name,

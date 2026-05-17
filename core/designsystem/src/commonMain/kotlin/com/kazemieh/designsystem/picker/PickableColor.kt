@@ -12,7 +12,8 @@ data class PickableColor(
 
 data class PickableIcon(
     val id: Int,
-    val resource: DrawableResource
+    val resource: DrawableResource,
+    val isTintable: Boolean = true
 )
 
 data class PickableIconAlternative(

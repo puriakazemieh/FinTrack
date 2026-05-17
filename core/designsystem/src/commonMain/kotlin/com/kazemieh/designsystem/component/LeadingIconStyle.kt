@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.picker.FinTrackIcons
@@ -34,8 +35,8 @@ fun FinTrackLeadingIcon(
     val pickedColor = remember(colors, colorId) {
         colors.firstOrNull { it.id == colorId } ?: colors.first()
     }
-    val pickedIcon = remember(FinTrackIcons.icons, iconId) {
-        FinTrackIcons.icons.firstOrNull { it.id == iconId } ?: FinTrackIcons.icons.first()
+    val pickedIcon = remember(iconId) {
+        FinTrackIcons.findIcon(iconId)
     }
 
     when (style) {
@@ -44,13 +45,13 @@ fun FinTrackLeadingIcon(
                 modifier = modifier
                     .size(size)
                     .clip(RoundedCornerShape(corner))
-                    .background(pickedColor.color),
+                    .background(if (pickedIcon.isTintable) pickedColor.color else Color.Transparent),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(pickedIcon.resource),
                     contentDescription = null,
-                    tint = bestOnColor(pickedColor.color),
+                    tint = if (pickedIcon.isTintable) bestOnColor(pickedColor.color) else Color.Unspecified,
                     modifier = Modifier.size(iconSize)
                 )
             }
@@ -61,7 +62,7 @@ fun FinTrackLeadingIcon(
             Icon(
                 painter = painterResource(pickedIcon.resource),
                 contentDescription = null,
-                tint = pickedColor.color,
+                tint = if (pickedIcon.isTintable) pickedColor.color else Color.Unspecified,
                 modifier = modifier.size(iconSize)
             )
         }

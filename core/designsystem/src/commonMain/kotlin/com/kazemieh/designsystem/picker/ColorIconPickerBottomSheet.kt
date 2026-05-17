@@ -61,13 +61,13 @@ import org.jetbrains.compose.resources.stringResource
 fun ColorIconPickerBottomSheet(
     initialColorId: Int? = null,
     initialIconId: Int? = null,
+    icons: List<PickableIcon> = FinTrackIcons.icons,
     onDismiss: () -> Unit,
     onSave: (color: PickableColor, icon: PickableIcon) -> Unit,
 ) {
 
     val space = LocalSpacing.current
     val colors = FinTrackPickerColors.rainbow()
-    val icons = FinTrackIcons.icons
 
     val initialColorIndex = remember(initialColorId, colors) {
         colors.indexOfFirst { it.id == initialColorId }
@@ -135,22 +135,26 @@ fun ColorIconPickerBottomSheet(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            Text(
-                text = stringResource(Res.string.choose_color),
-                style = MaterialTheme.typography.titleMedium
-            )
+            val isAnyIconTintable = remember(icons) { icons.any { it.isTintable } }
 
-            LazyRow(
-                state = colorListState,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = PaddingValues(horizontal = 2.dp)
-            ) {
-                items(colors, key = { it.id }) { item ->
-                    ColorChip(
-                        item = item,
-                        selected = item.id == selectedColor.id,
-                        onClick = { selectedColor = item }
-                    )
+            if (isAnyIconTintable) {
+                Text(
+                    text = stringResource(Res.string.choose_color),
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                LazyRow(
+                    state = colorListState,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = PaddingValues(horizontal = 2.dp)
+                ) {
+                    items(colors, key = { it.id }) { item ->
+                        ColorChip(
+                            item = item,
+                            selected = item.id == selectedColor.id,
+                            onClick = { selectedColor = item }
+                        )
+                    }
                 }
             }
 
@@ -171,7 +175,7 @@ fun ColorIconPickerBottomSheet(
                 items(icons, key = { it.id }) { icon ->
                     IconCell(
                         icon = icon,
-                        tint = selectedColor.color,
+                        tint = if (icon.isTintable) selectedColor.color else Color.Unspecified,
                         selected = icon.id == selectedIcon.id,
                         onClick = { selectedIcon = icon }
                     )

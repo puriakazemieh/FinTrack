@@ -214,4 +214,10 @@ object FinTrackIcons {
             PickableIcon(id = index + 1, resource = resId)
         }
     }
+
+    fun findIcon(id: Int?): PickableIcon {
+        return icons.firstOrNull { it.id == id }
+            ?: FinTrackSourceIcons.icons.firstOrNull { it.id == id }
+            ?: icons.first()
+    }
 }

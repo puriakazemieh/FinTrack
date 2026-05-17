@@ -43,9 +43,8 @@ fun NameDescriptionFields(
     val selectedColor = remember(colors, initialColorId) {
         colors.firstOrNull { it.id == initialColorId } ?: colors.first()
     }
-    val selectedIcon = remember(FinTrackIcons.icons, initialIconId) {
-        FinTrackIcons.icons.firstOrNull { it.id == initialIconId }
-            ?: FinTrackIcons.icons.first()
+    val selectedIcon = remember(initialIconId) {
+        FinTrackIcons.findIcon(initialIconId)
     }
 
     Row(verticalAlignment = Alignment.CenterVertically) {

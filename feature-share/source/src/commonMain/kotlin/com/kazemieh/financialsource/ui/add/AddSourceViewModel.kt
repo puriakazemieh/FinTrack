@@ -39,8 +39,13 @@ class AddSourceViewModel(
             is AddSourceIntent.UpdateCardNumber -> updateDraft { it.copy(cardNumber = intent.value) }
 
             is AddSourceIntent.UpdateType -> updateDraft {
-                if (intent.value == TypeSource.CASH) it.copy(type = intent.value, cardNumber = null)
-                else it.copy(type = intent.value)
+                if (intent.value == TypeSource.CASH) {
+                    val newIconId = if ((it.iconId ?: 0) >= 1000) 1 else it.iconId
+                    it.copy(type = intent.value, cardNumber = null, iconId = newIconId)
+                } else {
+                    val newIconId = if ((it.iconId ?: 0) < 1000) 1000 else it.iconId
+                    it.copy(type = intent.value, iconId = newIconId)
+                }
             }
 
             // ✅ Picker

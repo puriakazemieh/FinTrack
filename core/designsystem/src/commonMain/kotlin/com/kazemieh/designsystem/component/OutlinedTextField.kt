@@ -106,7 +106,7 @@ class NumberCommaTransformation : VisualTransformation {
                             if (i < offset) result++
                         }
                     }
-                    return result
+                    return result.coerceIn(0, transformedText.length)
                 }
 
                 override fun transformedToOriginal(offset: Int): Int {
