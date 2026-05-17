@@ -5,7 +5,6 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -44,10 +42,12 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.format
@@ -137,7 +137,7 @@ fun PieChart(
     data: List<PieChartItem>,
     radiusOuter: Dp = 80.dp,
     chartBarWidth: Dp = 15.dp,
-    textDistanceExtra: Dp = 40.dp,
+    textDistanceExtra: Dp = 80.dp,
     animDuration: Int = 500,
     labelTextStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     legendTextStyle: TextStyle = MaterialTheme.typography.bodySmall,
@@ -273,64 +273,140 @@ private fun PieChartLabelsCanvas(
     rotation: Float,
     painters: List<Painter?>
 ) {
+    // چون ممکن است متن‌ها دو خطی شوند، فاصله عمودی مینیمم را کمی بیشتر می‌کنیم تا روی هم نیفتند
+    val minGap = 38.dp
+
     Canvas(modifier = Modifier.size(radiusOuter * 2 + textDistanceExtra * 2)) {
         val center = Offset(size.width / 2, size.height / 2)
         val radius = radiusOuter.toPx()
+
+        val radialOffset = 12.dp.toPx()
+        val horizontalLineLen = 20.dp.toPx() // خط افقی را کمی کوتاه‌تر کردم تا جای متن بیشتر شود
+
+        class LabelInfo(
+            val index: Int,
+            val edge: Offset,
+            var elbowX: Float,
+            var lineEndX: Float,
+            var yPos: Float,
+            val isRightSide: Boolean,
+            val layout: androidx.compose.ui.text.TextLayoutResult
+        )
+
+        val labels = mutableListOf<LabelInfo>()
         var startAngle = 0f
 
+        // ---------- فاز ۱: محاسبه نقاط و محدود کردن عرض متن (دو خطی شدن) ----------
         sliceAngles.forEachIndexed { index, sweep ->
-            val middleAngle = (startAngle + sweep / 2 + rotation) % 360
-            val rad = middleAngle.toDouble().toRadians()
+            val midAngle = (startAngle + sweep / 2 + rotation) % 360
+            val rad = midAngle.toDouble().toRadians()
 
-            // استفاده از kotlin.math به جای Math جاوا
-            val cosRad = kotlin.math.cos(rad)
-            val sinRad = kotlin.math.sin(rad)
+            val cos = kotlin.math.cos(rad).toFloat()
+            val sin = kotlin.math.sin(rad).toFloat()
 
-            val edge = Offset(
-                x = center.x + (radius * cosRad).toFloat(),
-                y = center.y + (radius * sinRad).toFloat()
-            )
-            val textDistance = radius + textDistanceExtra.toPx()
-            val textPoint = Offset(
-                x = center.x + (textDistance * cosRad).toFloat(),
-                y = center.y + (textDistance * sinRad).toFloat()
-            )
+            val edge = Offset(center.x + radius * cos, center.y + radius * sin)
+            val elbowX = center.x + (radius + radialOffset) * cos
+            val initialYPos = center.y + (radius + radialOffset) * sin
 
-            drawLine(colors[index], edge, textPoint, strokeWidth = 2f)
+            val isRightSide = cos >= 0
+
+            // محاسبه محل پایان خط افقی همینجا انجام می‌شود تا بدانیم چقدر فضا برای متن داریم
+            val lineEndX =
+                if (isRightSide) elbowX + horizontalLineLen else elbowX - horizontalLineLen
+
+            val iconSize = if (painters[index] != null) 18.dp.toPx() else 0f
+            val iconMargin = if (iconSize > 0f) 8f else 0f
+            val spaceFromLine = 8f
+            val canvasPadding = 12.dp.toPx() // مقداری حاشیه امن برای نچسبیدن به لبه صفحه
+
+            // محاسبه دقیق فضای خالی باقیمانده تا لبه صفحه
+            val maxAvailableTextWidth = if (isRightSide) {
+                size.width - lineEndX - iconSize - iconMargin - spaceFromLine - canvasPadding
+            } else {
+                lineEndX - iconSize - iconMargin - spaceFromLine - canvasPadding
+            }
+
+            // جلوگیری از کرش کردن در صورتی که فضای محاسبه شده منفی یا خیلی کم شود
+            val safeMaxWidth = maxOf(300f, maxAvailableTextWidth).toInt()
 
             val labelText = "${data[index].label} ${percentages[index].format(0)}%"
-            val txtColor = textColorForBackground(colors[index])
+
+            // تنظیمات جدید متن: تراز کردن + محدودیت سایز + دو خطی شدن
             val layout = textMeasurer.measure(
-                AnnotatedString(labelText),
-                style = textStyle.copy(color = txtColor)
+                text = androidx.compose.ui.text.AnnotatedString(labelText),
+                style = textStyle.copy(
+                    color = colors[index],
+                    textAlign = if (isRightSide) TextAlign.Start else TextAlign.End // تراز هوشمند
+                ),
+                softWrap = true, // اجازه شکستن خط
+                maxLines = 2, // نهایتاً دو خط
+                overflow = TextOverflow.Ellipsis, // سه نقطه شدن در صورت کمبود جا
+                constraints = Constraints(maxWidth = safeMaxWidth) // اعمال محدودیت عرض
             )
 
-            val textOffset = when (middleAngle.toInt()) {
-                in 45..135 -> Offset(textPoint.x - layout.size.width / 2, textPoint.y + 5f)
-                in 135..225 -> Offset(
-                    textPoint.x - layout.size.width - 5f,
-                    textPoint.y - layout.size.height / 2
-                )
-
-                in 225..315 -> Offset(
-                    textPoint.x - layout.size.width / 2,
-                    textPoint.y - layout.size.height - 5f
-                )
-
-                else -> Offset(textPoint.x + 5f, textPoint.y - layout.size.height / 2)
-            }
-
-            painters[index]?.let { painter ->
-                val iconSize = 18.dp.toPx()
-                val iconOffset = Offset(
-                    x = textOffset.x - iconSize - 6f,
-                    y = textOffset.y + (layout.size.height - iconSize) / 2f
-                )
-                drawPainterAt(painter, iconOffset, iconSize, txtColor)
-            }
-
-            drawText(layout, topLeft = textOffset)
+            labels.add(LabelInfo(index, edge, elbowX, lineEndX, initialYPos, isRightSide, layout))
             startAngle += sweep
+        }
+
+        // ---------- فاز ۲: حل مشکل روی هم افتادگی عمودی ----------
+        val minGapPx = minGap.toPx()
+        fun fixOverlaps(list: List<LabelInfo>) {
+            if (list.size <= 1) return
+            val sorted = list.sortedBy { it.yPos }
+            val originalMidY = (sorted.first().yPos + sorted.last().yPos) / 2
+
+            for (i in 1 until sorted.size) {
+                val prev = sorted[i - 1]
+                val current = sorted[i]
+                if (current.yPos - prev.yPos < minGapPx) {
+                    current.yPos = prev.yPos + minGapPx
+                }
+            }
+
+            val newMidY = (sorted.first().yPos + sorted.last().yPos) / 2
+            val shiftOffset = originalMidY - newMidY
+            sorted.forEach { it.yPos += shiftOffset }
+        }
+
+        fixOverlaps(labels.filter { it.isRightSide })
+        fixOverlaps(labels.filter { !it.isRightSide })
+
+        // ---------- فاز ۳: رسم نهایی ----------
+        labels.forEach { info ->
+            val itemColor = colors[info.index]
+
+            val path = androidx.compose.ui.graphics.Path().apply {
+                moveTo(info.edge.x, info.edge.y)
+                lineTo(info.elbowX, info.yPos)
+                lineTo(info.lineEndX, info.yPos)
+            }
+            drawPath(path, color = itemColor, style = Stroke(width = 2f))
+
+            val iconSize = if (painters[info.index] != null) 18.dp.toPx() else 0f
+            val iconMargin = if (iconSize > 0f) 8f else 0f
+            val totalContentWidth = iconSize + iconMargin + info.layout.size.width
+
+            val startX = if (info.isRightSide) {
+                info.lineEndX + 8f
+            } else {
+                info.lineEndX - 8f - totalContentWidth
+            }
+
+            // رسم آیکون
+            painters[info.index]?.let { painter ->
+                val iconOffset = Offset(
+                    x = startX,
+                    y = info.yPos - iconSize / 2f
+                )
+                drawPainterAt(painter, iconOffset, iconSize, itemColor)
+            }
+
+            // رسم متن
+            val textOffset = Offset(
+                x = startX + iconSize + iconMargin,
+                y = info.yPos - info.layout.size.height / 2f
+            )
+            drawText(info.layout, topLeft = textOffset)
         }
     }
 }
@@ -357,12 +433,12 @@ private fun PieChartLegend(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = space.mediumSmall)
             ) {
-                Box(
+                /*Box(
                     modifier = Modifier
                         .size(space.large)
                         .background(colors[index], shape = CircleShape)
                 )
-                Spacer(modifier = Modifier.width(space.small))
+                Spacer(modifier = Modifier.width(space.small))*/
                 painters[index]?.let {
                     Icon(
                         painter = it,
