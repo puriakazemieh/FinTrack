@@ -6,12 +6,19 @@ CREATE TABLE IF NOT EXISTS source (
     description TEXT,
     type INTEGER NOT NULL,
     colorId INTEGER NOT NULL DEFAULT 1,
-    iconId INTEGER NOT NULL DEFAULT 1
+    iconId INTEGER NOT NULL DEFAULT 1,
+    shabaNumber TEXT,
+    accountNumber TEXT,
+    cvv2 TEXT,
+    expirationMonth TEXT,
+    expirationYear TEXT,
+    branchCode TEXT,
+    branchName TEXT
 );
 
 addSource:
-INSERT INTO source(name, balance, cardNumber, description, type, colorId, iconId)
-VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT INTO source(name, balance, cardNumber, description, type, colorId, iconId, shabaNumber, accountNumber, cvv2, expirationMonth, expirationYear, branchCode, branchName)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 observeSources:
 SELECT * FROM source;
@@ -29,7 +36,7 @@ DELETE FROM source WHERE id = ?;
 
 updateSource:
 UPDATE source
-SET name = ?, balance = ?, cardNumber = ?, description = ?, type = ?, colorId = ?, iconId = ?
+SET name = ?, balance = ?, cardNumber = ?, description = ?, type = ?, colorId = ?, iconId = ?, shabaNumber = ?, accountNumber = ?, cvv2 = ?, expirationMonth = ?, expirationYear = ?, branchCode = ?, branchName = ?
 WHERE id = ?;
 
 getDefaultSource:
@@ -42,5 +49,5 @@ getSourceById:
 SELECT * FROM source WHERE id = ?;
 
 insertFullSource:
-INSERT OR REPLACE INTO source(id, name, balance, cardNumber, description, type, colorId, iconId)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO source(id, name, balance, cardNumber, description, type, colorId, iconId, shabaNumber, accountNumber, cvv2, expirationMonth, expirationYear, branchCode, branchName)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);

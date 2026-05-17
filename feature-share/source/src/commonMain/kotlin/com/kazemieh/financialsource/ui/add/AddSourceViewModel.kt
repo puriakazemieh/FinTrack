@@ -39,22 +39,40 @@ class AddSourceViewModel(
             is AddSourceIntent.UpdateDescription -> updateDraft { it.copy(description = intent.value) }
             is AddSourceIntent.UpdateBalance -> updateDraft { it.copy(balance = intent.value) }
             is AddSourceIntent.UpdateCardNumber -> updateDraft {
-                val bank = Bank.fromCardNumber(intent.value.orEmpty())
-                if (bank != Bank.Unknown) {
+                val limitedValue = intent.value?.take(16)
+                val bank = Bank.fromCardNumber(limitedValue.orEmpty())
+                if (bank != Bank.Unknown && it.isIconManuallySelected.not()) {
                     val bankIconId = FinTrackSourceIcons.findIdByResource(bank.logo)
-                    it.copy(cardNumber = intent.value, iconId = bankIconId)
+                    it.copy(cardNumber = limitedValue, iconId = bankIconId)
                 } else {
-                    it.copy(cardNumber = intent.value)
+                    it.copy(cardNumber = limitedValue)
                 }
             }
+
+            is AddSourceIntent.UpdateAccountNumber -> updateDraft { it.copy(accountNumber = intent.value) }
+            is AddSourceIntent.UpdateBranchCode -> updateDraft { it.copy(branchCode = intent.value) }
+            is AddSourceIntent.UpdateBranchName -> updateDraft { it.copy(branchName = intent.value) }
+            is AddSourceIntent.UpdateCvv2 -> updateDraft { it.copy(cvv2 = intent.value?.take(4)) }
+            is AddSourceIntent.UpdateExpirationMonth -> updateDraft { it.copy(expirationMonth = intent.value?.take(2)) }
+            is AddSourceIntent.UpdateExpirationYear -> updateDraft { it.copy(expirationYear = intent.value?.take(2)) }
+            is AddSourceIntent.UpdateShabaNumber -> updateDraft { it.copy(shabaNumber = intent.value) }
 
             is AddSourceIntent.UpdateType -> updateDraft {
                 if (intent.value == TypeSource.CASH) {
                     val newIconId = if ((it.iconId ?: 0) >= 1000) 1 else it.iconId
-                    it.copy(type = intent.value, cardNumber = null, iconId = newIconId)
+                    it.copy(
+                        type = intent.value,
+                        cardNumber = null,
+                        iconId = newIconId,
+                        isIconManuallySelected = false
+                    )
                 } else {
                     val newIconId = if ((it.iconId ?: 0) < 1000) 1000 else it.iconId
-                    it.copy(type = intent.value, iconId = newIconId)
+                    it.copy(
+                        type = intent.value,
+                        iconId = newIconId,
+                        isIconManuallySelected = false
+                    )
                 }
             }
 
@@ -63,7 +81,11 @@ class AddSourceViewModel(
             AddSourceIntent.ClosePicker -> _state.update { it.copy(isPickerOpen = false) }
             is AddSourceIntent.SetColorIcon -> _state.update {
                 it.copy(
-                    draft = it.draft.copy(colorId = intent.colorId, iconId = intent.iconId),
+                    draft = it.draft.copy(
+                        colorId = intent.colorId,
+                        iconId = intent.iconId,
+                        isIconManuallySelected = true
+                    ),
                     isPickerOpen = false
                 )
             }
@@ -168,7 +190,15 @@ data class SourceDraft(
     val type: TypeSource = TypeSource.CREDIT,
     val cardNumber: String? = null,
     val colorId: Int? = null,
-    val iconId: Int? = null
+    val iconId: Int? = null,
+    val shabaNumber: String? = null,
+    val accountNumber: String? = null,
+    val cvv2: String? = null,
+    val expirationMonth: String? = null,
+    val expirationYear: String? = null,
+    val branchCode: String? = null,
+    val branchName: String? = null,
+    val isIconManuallySelected: Boolean = false
 )
 
 private fun Source.toDraft(): SourceDraft = SourceDraft(
@@ -178,7 +208,14 @@ private fun Source.toDraft(): SourceDraft = SourceDraft(
     type = if (this.type == 1) TypeSource.CREDIT else TypeSource.CASH,
     cardNumber = this.cardNumber,
     colorId = this.colorId,
-    iconId = this.iconId
+    iconId = this.iconId,
+    shabaNumber = this.shabaNumber,
+    accountNumber = this.accountNumber,
+    cvv2 = this.cvv2,
+    expirationMonth = this.expirationMonth,
+    expirationYear = this.expirationYear,
+    branchCode = this.branchCode,
+    branchName = this.branchName
 )
 
 private fun SourceDraft.toSource(id: Long?): Source = Source(
@@ -189,7 +226,14 @@ private fun SourceDraft.toSource(id: Long?): Source = Source(
     description = description,
     type = type.count,
     colorId = colorId ?: 1,
-    iconId = iconId ?: 1
+    iconId = iconId ?: 1,
+    shabaNumber = shabaNumber,
+    accountNumber = accountNumber,
+    cvv2 = cvv2,
+    expirationMonth = expirationMonth,
+    expirationYear = expirationYear,
+    branchCode = branchCode,
+    branchName = branchName
 )
 
 /** --- Intent / Effect --- */
@@ -203,6 +247,13 @@ sealed interface AddSourceIntent {
     data class UpdateBalance(val value: Int) : AddSourceIntent
     data class UpdateType(val value: TypeSource) : AddSourceIntent
     data class UpdateCardNumber(val value: String?) : AddSourceIntent
+    data class UpdateShabaNumber(val value: String?) : AddSourceIntent
+    data class UpdateAccountNumber(val value: String?) : AddSourceIntent
+    data class UpdateCvv2(val value: String?) : AddSourceIntent
+    data class UpdateExpirationMonth(val value: String?) : AddSourceIntent
+    data class UpdateExpirationYear(val value: String?) : AddSourceIntent
+    data class UpdateBranchCode(val value: String?) : AddSourceIntent
+    data class UpdateBranchName(val value: String?) : AddSourceIntent
 
     // ✅ Picker
     data object OpenPicker : AddSourceIntent

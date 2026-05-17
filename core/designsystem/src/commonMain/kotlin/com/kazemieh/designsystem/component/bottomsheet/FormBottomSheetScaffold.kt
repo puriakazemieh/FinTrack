@@ -3,9 +3,8 @@ package com.kazemieh.designsystem.component.bottomsheet
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,10 +32,18 @@ fun FormBottomSheetScaffold(
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(space.mediumLarge)) {
-            content()
-
-            Spacer(Modifier.height(space.large))
+        Column(
+            modifier = Modifier
+                .padding(space.mediumLarge)
+                .padding(bottom = space.mediumLarge),
+            verticalArrangement = Arrangement.spacedBy(space.mediumLarge)
+        ) {
+            Column(
+                modifier = Modifier.weight(1f, fill = false),
+                verticalArrangement = Arrangement.spacedBy(space.mediumLarge)
+            ) {
+                content()
+            }
 
             Button(
                 onClick = onPrimaryClick,

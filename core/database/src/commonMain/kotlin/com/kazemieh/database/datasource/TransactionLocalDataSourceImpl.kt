@@ -145,6 +145,13 @@ class TransactionLocalDataSourceImpl(
             type = source.type.toLong(),
             colorId = source.colorId.toLong(),
             iconId = source.iconId.toLong(),
+            shabaNumber = source.shabaNumber,
+            accountNumber = source.accountNumber,
+            cvv2 = source.cvv2,
+            expirationMonth = source.expirationMonth,
+            expirationYear = source.expirationYear,
+            branchCode = source.branchCode,
+            branchName = source.branchName,
             id = id
         )
 
@@ -259,7 +266,14 @@ class TransactionLocalDataSourceImpl(
             description = source.description,
             type = source.type.toLong(),
             colorId = source.colorId.toLong(),
-            iconId = source.iconId.toLong()
+            iconId = source.iconId.toLong(),
+            shabaNumber = source.shabaNumber,
+            accountNumber = source.accountNumber,
+            cvv2 = source.cvv2,
+            expirationMonth = source.expirationMonth,
+            expirationYear = source.expirationYear,
+            branchCode = source.branchCode,
+            branchName = source.branchName
         )
         sourceQueries.lastInsertRowId().awaitAsOne()
     }

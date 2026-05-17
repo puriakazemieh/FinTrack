@@ -14,5 +14,12 @@ data class Source(
     val type: Int = 0,
     val formattedBalance: String = balance.formatted(),
     val colorId: Int,
-    val iconId: Int
+    val iconId: Int,
+    val shabaNumber: String? = null,
+    val accountNumber: String? = null,
+    val cvv2: String? = null,
+    val expirationMonth: String? = null,
+    val expirationYear: String? = null,
+    val branchCode: String? = null,
+    val branchName: String? = null
 )

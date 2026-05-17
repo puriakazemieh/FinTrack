@@ -3,6 +3,7 @@ package com.kazemieh.financialsource.ui.add
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.rememberScrollState
@@ -42,6 +43,11 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.card_number_label
 import fintrack.core.designsystem.generated.resources.description_label
 import fintrack.core.designsystem.generated.resources.initial_balance_label
+import fintrack.core.designsystem.generated.resources.label_account_number
+import fintrack.core.designsystem.generated.resources.label_cvv2
+import fintrack.core.designsystem.generated.resources.label_exp_month
+import fintrack.core.designsystem.generated.resources.label_exp_year
+import fintrack.core.designsystem.generated.resources.label_shaba_number
 import fintrack.core.designsystem.generated.resources.source_name_label
 import fintrack.core.designsystem.generated.resources.submit_source
 import kotlinx.coroutines.launch
@@ -122,7 +128,7 @@ fun AddSourceBottomSheet(
                     name = state.draft.name,
                     cardNumber = state.draft.cardNumber.orEmpty(),
                     bank = bank,
-                    colorId = state.draft.colorId
+                    iconId = state.draft.iconId
                 )
             }
 
@@ -166,12 +172,74 @@ fun AddSourceBottomSheet(
                     )
 
                     AnimatedVisibility(visible = state.draft.type == TypeSource.CREDIT) {
-                        FintrackOutlinedTextField(
-                            value = state.draft.cardNumber.orEmpty(),
-                            onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateCardNumber(it)) },
-                            label = { FintrackBodyMediumText(text = stringResource(Res.string.card_number_label)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.mediumLarge)) {
+                            FintrackOutlinedTextField(
+                                value = state.draft.cardNumber.orEmpty(),
+                                onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateCardNumber(it)) },
+                                label = { FintrackBodyMediumText(text = stringResource(Res.string.card_number_label)) },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                            )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.medium)
+                            ) {
+                                FintrackOutlinedTextField(
+                                    value = state.draft.cvv2.orEmpty(),
+                                    onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateCvv2(it)) },
+                                    label = { FintrackBodyMediumText(text = stringResource(Res.string.label_cvv2)) },
+                                    modifier = Modifier.weight(1f),
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                                )
+                                FintrackOutlinedTextField(
+                                    value = state.draft.expirationMonth.orEmpty(),
+                                    onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateExpirationMonth(it)) },
+                                    label = { FintrackBodyMediumText(text = stringResource(Res.string.label_exp_month)) },
+                                    modifier = Modifier.weight(0.5f),
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                                )
+                                FintrackOutlinedTextField(
+                                    value = state.draft.expirationYear.orEmpty(),
+                                    onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateExpirationYear(it)) },
+                                    label = { FintrackBodyMediumText(text = stringResource(Res.string.label_exp_year)) },
+                                    modifier = Modifier.weight(0.5f),
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                                )
+                            }
+
+                            FintrackOutlinedTextField(
+                                value = state.draft.shabaNumber.orEmpty(),
+                                onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateShabaNumber(it)) },
+                                label = { FintrackBodyMediumText(text = stringResource(Res.string.label_shaba_number)) },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                            )
+
+                            FintrackOutlinedTextField(
+                                value = state.draft.accountNumber.orEmpty(),
+                                onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateAccountNumber(it)) },
+                                label = { FintrackBodyMediumText(text = stringResource(Res.string.label_account_number)) },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                            )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.medium)
+                            ) {
+                                FintrackOutlinedTextField(
+                                    value = state.draft.branchCode.orEmpty(),
+                                    onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateBranchCode(it)) },
+                                    label = { FintrackBodyMediumText(text = "کد شعبه") },
+                                    modifier = Modifier.weight(1f),
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                                )
+                                FintrackOutlinedTextField(
+                                    value = state.draft.branchName.orEmpty(),
+                                    onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateBranchName(it)) },
+                                    label = { FintrackBodyMediumText(text = "نام شعبه") },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
                     }
                 }
             )

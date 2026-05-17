@@ -38,7 +38,14 @@ class DatabaseInitializer(
             balance = 0,
             colorId = colorForIndex(0).toLong(),
             iconId = iconForIndex(0).toLong(),
-            cardNumber = null
+            cardNumber = null,
+            shabaNumber = null,
+            accountNumber = null,
+            cvv2 = null,
+            expirationMonth = null,
+            expirationYear = null,
+            branchCode = null,
+            branchName = null
         )
 
         // دسته‌بندی‌های پیش‌فرض

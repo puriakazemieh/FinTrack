@@ -83,7 +83,14 @@ fun GetAllTransactionsFiltered.toTransactionWithRelations(): TransactionWithRela
             description = source_description,
             type = source_type.toInt(),
             colorId = source_colorId.toInt(),
-            iconId = source_iconId.toInt()
+            iconId = source_iconId.toInt(),
+            shabaNumber = source_shabaNumber,
+            accountNumber = source_accountNumber,
+            cvv2 = source_cvv2,
+            expirationMonth = source_expirationMonth,
+            expirationYear = source_expirationYear,
+            branchCode = source_branchCode,
+            branchName = source_branchName
         ),
         sourceEnd = sourceEnd_id?.let {
             Source(
@@ -94,7 +101,14 @@ fun GetAllTransactionsFiltered.toTransactionWithRelations(): TransactionWithRela
                 description = sourceEnd_description,
                 type = sourceEnd_type!!.toInt(),
                 colorId = sourceEnd_colorId!!.toInt(),
-                iconId = sourceEnd_iconId!!.toInt()
+                iconId = sourceEnd_iconId!!.toInt(),
+                shabaNumber = sourceEnd_shabaNumber,
+                accountNumber = sourceEnd_accountNumber,
+                cvv2 = sourceEnd_cvv2,
+                expirationMonth = sourceEnd_expirationMonth,
+                expirationYear = sourceEnd_expirationYear,
+                branchCode = sourceEnd_branchCode,
+                branchName = sourceEnd_branchName
             )
         },
         tags = tags,
@@ -130,7 +144,14 @@ fun SourceDb.toSource() = Source(
     description = description,
     type = type.toInt(),
     colorId = colorId.toInt(),
-    iconId = iconId.toInt()
+    iconId = iconId.toInt(),
+    shabaNumber = shabaNumber,
+    accountNumber = accountNumber,
+    cvv2 = cvv2,
+    expirationMonth = expirationMonth,
+    expirationYear = expirationYear,
+    branchCode = branchCode,
+    branchName = branchName
 )
 
 // Tag Mappers

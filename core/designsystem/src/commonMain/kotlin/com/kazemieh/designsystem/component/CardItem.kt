@@ -5,8 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,16 +17,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.model.Bank
-import com.kazemieh.designsystem.picker.FinTrackPickerColors
+import com.kazemieh.designsystem.picker.FinTrackIcons
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -35,79 +33,71 @@ fun CardItem(
     name: String,
     cardNumber: String,
     bank: Bank,
-    colorId: Int?,
+    iconId: Int?,
     modifier: Modifier = Modifier
 ) {
     val space = LocalSpacing.current
-    val colors = FinTrackPickerColors.rainbow()
-    val pickedColor = colors.firstOrNull { it.id == colorId }?.color ?: MaterialTheme.colorScheme.primary
+    val selectedIcon = remember(iconId) {
+        FinTrackIcons.findIcon(iconId)
+    }
 
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(1.586f), // standard card ratio
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            .height(100.dp),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Box(
             modifier = Modifier
-                .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            pickedColor,
-                            pickedColor.copy(alpha = 0.7f)
-                        )
-                    )
-                )
-                .padding(space.large)
+                .fillMaxSize()
+                .padding(space.medium)
         ) {
-            Column(verticalArrangement = Arrangement.SpaceBetween) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(space.medium)
+            ) {
+                // Bank Logo or Selected Icon
+                Box(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.White.copy(alpha = 0.2f)),
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        painter = painterResource(bank.logo),
+                        painter = painterResource(selectedIcon.resource),
                         contentDescription = null,
-                        tint = Color.Unspecified,
-                        modifier = Modifier.height(32.dp)
-                    )
-                    FintrackTitleMediumText(
-                        text = bank.name,
-                        color = Color.White
+                        tint = if (selectedIcon.isTintable) Color.White else Color.Unspecified,
+                        modifier = Modifier.size(35.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.weight(1f))
-
-                Text(
-                    text = cardNumber.chunked(4).joinToString("  "),
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        letterSpacing = 2.sp,
-                        color = Color.White
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Column {
-                        FintrackBodySmallText(text = "صاحب کارت", color = Color.White.copy(alpha = 0.7f))
-                        FintrackBodyMediumText(text = name, color = Color.White)
+                    if (bank != Bank.Unknown) {
+                        FintrackTitleMediumText(
+                            text = bank.name,
+                            color = Color.White
+                        )
                     }
-                    
-                    Icon(
-                        painter = painterResource(bank.icon),
-                        contentDescription = null,
-                        tint = Color.Unspecified,
-                        modifier = Modifier.size(32.dp)
+                    FintrackBodySmallText(
+                        text = name,
+                        color = Color.White.copy(alpha = 0.7f)
+                    )
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = cardNumber,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White
                     )
                 }
             }

@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -53,8 +54,8 @@ fun NameDescriptionFields(
                 colorId = selectedColor.id,
                 iconId = selectedIcon.id,
                 style = LeadingIconStyle.Badge,
-                size = space.extraLarge,
-                iconSize = space.large,
+                size = 48.dp,
+                iconSize = 32.dp,
                 modifier = Modifier.clickable(enabled = onIconClick != null) { onIconClick?.invoke() },
             )
             Spacer(Modifier.width(LocalSpacing.current.medium))
