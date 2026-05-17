@@ -298,7 +298,7 @@ data class ReportState(
     val endDate: String? = null,
     val startDateTimeStamp: Long? = null,
     val endDateTimeStamp: Long? = null,
-    val textDate: UiText = UiText.DynamicString(""),
+    val textDate: UiText = UiText.StringResourceText(Res.string.this_month),
 
     val isSourceSheetVisible: Boolean = false,
     val selectedSources: Set<Source> = emptySet(),

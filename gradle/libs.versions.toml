@@ -63,6 +63,7 @@ core = "1.5.0"
 
 coroutines = "1.8.1"
 
+kermit = "2.0.4"
 
 kotlinx-serialization = "1.9.0"
 
@@ -183,6 +184,8 @@ androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinxCoroutines" }
+
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

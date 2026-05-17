@@ -50,6 +50,7 @@ import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.jalali.DatePickerField
 import com.kazemieh.designsystem.component.model.ItemUi
+import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.designsystem.component.model.asString
 import com.kazemieh.designsystem.component.model.toItemUi
 import fintrack.core.designsystem.generated.resources.*
@@ -401,13 +402,27 @@ private fun FilterRow(
                 elevation = CardDefaults.cardElevation(defaultElevation = space.one)
             ) {
                 //todo chane this
-//                val text =
-//                    if (isCustomDate && startDate != null && endDate != null) "$startDate - $endDate"
-                 //   else stringResource(filter.titleResId)
+                val text =
+                    if (isCustomDate && startDate != null && endDate != null) UiText.DynamicString("$startDate - $endDate")
+                    else {
+                        val resource = when (filter) {
+                            DateFilterType.TODAY -> Res.string.today
+                            DateFilterType.YESTERDAY -> Res.string.yesterday
+                            DateFilterType.TOMORROW -> Res.string.tomorrow
+                            DateFilterType.THIS_WEEK -> Res.string.this_week
+                            DateFilterType.LAST_WEEK -> Res.string.last_week
+                            DateFilterType.NEXT_WEEK -> Res.string.next_week
+                            DateFilterType.THIS_MONTH -> Res.string.this_month
+                            DateFilterType.LAST_MONTH -> Res.string.last_month
+                            DateFilterType.NEXT_MONTH -> Res.string.next_month
+                            DateFilterType.CUSTOM_RANGE -> Res.string.custom_range
+                        }
+                        UiText.StringResourceText(resource)
+                    }
 
                 FintrackBodyMediumText(
                     modifier = Modifier.padding(space.large),
-                    text = "text"
+                    text = text.asString()
                 )
             }
         }

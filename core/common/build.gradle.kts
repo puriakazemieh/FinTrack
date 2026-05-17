@@ -45,6 +45,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.kotlinx.serialization)
+                implementation(libs.kermit)
             }
         }
 
