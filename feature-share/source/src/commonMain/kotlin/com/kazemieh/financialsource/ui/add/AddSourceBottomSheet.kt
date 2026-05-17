@@ -69,7 +69,14 @@ fun AddSourceBottomSheet(
                     )
                 }
 
-                is AddSourceEffect.SavedSource -> setSource(effect.source)
+                is AddSourceEffect.SavedSource -> {
+                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            setSource(effect.source)
+                            onDismiss()
+                        }
+                    }
+                }
                 AddSourceEffect.OnDismiss -> onDismiss()
             }
         }

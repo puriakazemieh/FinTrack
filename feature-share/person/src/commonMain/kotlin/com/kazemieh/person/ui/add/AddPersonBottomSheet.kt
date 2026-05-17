@@ -51,7 +51,14 @@ fun AddPersonBottomSheet(
                     }
                 }
 
-                is AddPersonEffect.SavedPerson -> setPerson(effect.person)
+                is AddPersonEffect.SavedPerson -> {
+                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            setPerson(effect.person)
+                            onDismiss()
+                        }
+                    }
+                }
                 AddPersonEffect.OnDismiss -> onDismiss()
             }
         }

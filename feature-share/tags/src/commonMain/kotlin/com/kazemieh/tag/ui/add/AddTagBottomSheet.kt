@@ -52,7 +52,14 @@ fun AddTagBottomSheet(
                     }
                 }
 
-                is AddTagEffect.SavedTag -> setTag(effect.tag)
+                is AddTagEffect.SavedTag -> {
+                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            setTag(effect.tag)
+                            onDismiss()
+                        }
+                    }
+                }
                 AddTagEffect.OnDismiss -> onDismiss()
             }
         }

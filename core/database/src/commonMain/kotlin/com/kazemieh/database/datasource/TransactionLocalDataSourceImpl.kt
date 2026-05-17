@@ -1,5 +1,8 @@
 package com.kazemieh.database.datasource
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOne
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
@@ -106,7 +109,7 @@ class TransactionLocalDataSourceImpl(
             colorId = category.colorId.toLong(),
             iconId = category.iconId.toLong()
         )
-        categoryQueries.lastInsertRowId().executeAsOne()
+        categoryQueries.lastInsertRowId().awaitAsOne()
     }
 
     override suspend fun updateCategory(category: Category): Int =
@@ -122,7 +125,7 @@ class TransactionLocalDataSourceImpl(
 
             // بررسی کن که واقعاً update شده
             val updated = categoryQueries.getCategoryById(category.id ?: 0)
-                .executeAsOneOrNull()
+                .awaitAsOneOrNull()
 
             if (updated == null) {
                 throw IllegalStateException("Category update failed")
@@ -146,7 +149,7 @@ class TransactionLocalDataSourceImpl(
         )
 
         // بررسی موفقیت
-        val updated = sourceQueries.getSourceById(id).executeAsOneOrNull()
+        val updated = sourceQueries.getSourceById(id).awaitAsOneOrNull()
         if (updated == null) {
             throw IllegalStateException("Source update failed")
         }
@@ -258,7 +261,7 @@ class TransactionLocalDataSourceImpl(
             colorId = source.colorId.toLong(),
             iconId = source.iconId.toLong()
         )
-        sourceQueries.lastInsertRowId().executeAsOne()
+        sourceQueries.lastInsertRowId().awaitAsOne()
     }
 
     override suspend fun addTag(tag: Tag): Long = withContext(Dispatchers.Default) {
@@ -268,7 +271,7 @@ class TransactionLocalDataSourceImpl(
             colorId = tag.colorId.toLong(),
             iconId = tag.iconId.toLong()
         )
-        tagQueries.lastInsertRowId().executeAsOne()
+        tagQueries.lastInsertRowId().awaitAsOne()
     }
 
     override fun observeCategories(type: TransactionType): Flow<List<Category>> {
@@ -307,7 +310,7 @@ class TransactionLocalDataSourceImpl(
     override suspend fun getDefaultCategory(type: TransactionType): Category =
         withContext(Dispatchers.Default) {
             categoryQueries.getFirstByType(type.count.toLong())
-                .executeAsOne()
+                .awaitAsOne()
                 .toCategory()
         }
 
@@ -315,13 +318,13 @@ class TransactionLocalDataSourceImpl(
         withContext(Dispatchers.Default) {
             db.transactionWithResult {
                 var transfer = categoryQueries.getTransferCategoryOrNull()
-                    .executeAsOneOrNull()
+                    .awaitAsOneOrNull()
                     ?.toCategory()
 
                 if (transfer == null) {
                     categoryQueries.createTransferCategory()
                     transfer = categoryQueries.getTransferCategoryOrNull()
-                        .executeAsOne()
+                        .awaitAsOne()
                         .toCategory()
                 }
 
@@ -332,7 +335,7 @@ class TransactionLocalDataSourceImpl(
     override suspend fun getDefaultSource(): Source? =
         withContext(Dispatchers.Default) {
             sourceQueries.getDefaultSource()
-                .executeAsOneOrNull()
+                .awaitAsOneOrNull()
                 ?.toSource()
         }
 
@@ -342,7 +345,7 @@ class TransactionLocalDataSourceImpl(
                 name = person.name,
                 description = person.description
             )
-            personQueries.lastInsertRowId().executeAsOne()
+            personQueries.lastInsertRowId().awaitAsOne()
         }
 
     override fun observePersons(): Flow<List<Person>> {
@@ -371,7 +374,7 @@ class TransactionLocalDataSourceImpl(
                 type = transaction.type.count.toLong()
             )
 
-            val transactionId = transactionQueries.lastInsertRowId().executeAsOne()
+            val transactionId = transactionQueries.lastInsertRowId().awaitAsOne()
 
             tagIds.distinct().forEach { tagId ->
                 transactionTagQueries.insertTransactionTagCrossRefs(transactionId, tagId)
@@ -411,7 +414,7 @@ class TransactionLocalDataSourceImpl(
             )
 
             val exists = transactionQueries.getTransactionById(transaction.id)
-                .executeAsOneOrNull() != null
+                .awaitAsOneOrNull() != null
 
             if (!exists) {
                 throw IllegalStateException("Transaction update failed: record not found")

@@ -59,7 +59,14 @@ fun AddCategoryBottomSheet(
                     }
                 }
 
-                is AddCategoryEffect.SavedCategory -> setCategory(effect.category)
+                is AddCategoryEffect.SavedCategory -> {
+                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            setCategory(effect.category)
+                            onDismiss()
+                        }
+                    }
+                }
                 AddCategoryEffect.OnDismiss -> onDismiss()
             }
         }
