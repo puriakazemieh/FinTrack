@@ -131,7 +131,9 @@ fun ObserveCategorySumsByFilter.toCategorySum(): CategorySum {
         categoryId = categoryId,
         name = name,
         totalAmount = totalAmount ?: 0,
-        type = TransactionType.fromInt(type.toInt())
+        type = TransactionType.fromInt(type.toInt()),
+        colorId = colorId.toInt(),
+        iconId = iconId.toInt()
     )
 }
 

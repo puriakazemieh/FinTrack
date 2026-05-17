@@ -51,7 +51,9 @@ SELECT
     c.id AS categoryId,
     c.name AS name,
     SUM(t.amount) AS totalAmount,
-    c.type AS type
+    c.type AS type,
+    c.colorId AS colorId,
+    c.iconId AS iconId
 FROM transactions t
 INNER JOIN category c ON t.categoryId = c.id
 WHERE
@@ -66,7 +68,7 @@ WHERE
     ))
     AND (:fromTimestamp IS NULL OR t.timeStamp >= :fromTimestamp)
     AND (:toTimestamp IS NULL OR t.timeStamp < :toTimestamp)
-GROUP BY c.id, c.name, c.type;
+GROUP BY c.id, c.name, c.type, c.colorId, c.iconId;
 
 deleteCategory:
 DELETE FROM category WHERE id = ?;

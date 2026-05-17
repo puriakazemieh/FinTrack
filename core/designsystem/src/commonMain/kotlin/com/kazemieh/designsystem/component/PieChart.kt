@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,6 +54,9 @@ import com.kazemieh.common.format
 import com.kazemieh.common.toDegrees
 import com.kazemieh.common.toRadians
 import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.picker.FinTrackIcons
+import com.kazemieh.designsystem.picker.FinTrackPickerColors
+import org.jetbrains.compose.resources.painterResource
 
 // ---------- Data class ----------
 data class PieChartItem(
@@ -60,7 +64,9 @@ data class PieChartItem(
     val label: String,
     val value: Long,
     val color: Color? = null,
-    val icon: ImageVector? = null
+    val icon: ImageVector? = null,
+    val colorId: Int? = null,
+    val iconId: Int? = null
 )
 
 // ---------- Helper: draw painter at offset ----------
@@ -142,17 +148,22 @@ fun PieChart(
     if (data.isEmpty()) return
 
     val space = LocalSpacing.current
+    val isDark = isSystemInDarkTheme()
 
-    val painters = data.map { it.icon?.let { rememberVectorPainter(it) } }
+    val painters = data.map { item ->
+        val res = item.iconId?.let { FinTrackIcons.findIcon(it).resource }
+        res?.let { painterResource(it) } ?: item.icon?.let { rememberVectorPainter(it) }
+    }
 
     val percentages = remember(data) { calculatePercentages(data) }
     val total = data.sumOf { it.value.toDouble() }.takeIf { it != 0.0 } ?: 1.0
     val sliceAngles = remember(data) { data.map { 360f * (it.value.toFloat() / total.toFloat()) } }
 
-    val colors = remember(data) {
-        val provided = data.map { it.color }
-        if (provided.any { it == null }) generateDynamicColors(data.size)
-        else provided.filterNotNull()
+    val colors = remember(data, isDark) {
+        data.map { item ->
+            item.color ?: item.colorId?.let { FinTrackPickerColors.getColorById(it, isDark) }
+            ?: generateDynamicColors(1).first()
+        }
     }
 
     val textMeasurer = rememberTextMeasurer()
@@ -242,6 +253,7 @@ fun PieChart(
             PieChartLegend(
                 data = data,
                 colors = colors,
+                painters = painters
             )
         }
     }
@@ -327,7 +339,8 @@ private fun PieChartLabelsCanvas(
 @Composable
 private fun PieChartLegend(
     data: List<PieChartItem>,
-    colors: List<Color>
+    colors: List<Color>,
+    painters: List<Painter?>
 ) {
     val space = LocalSpacing.current
     FlowRow(
@@ -340,7 +353,6 @@ private fun PieChartLegend(
         ),
     ) {
         data.forEachIndexed { index, item ->
-            val txtColor = textColorForBackground(colors[index])
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = space.mediumSmall)
@@ -351,11 +363,11 @@ private fun PieChartLegend(
                         .background(colors[index], shape = CircleShape)
                 )
                 Spacer(modifier = Modifier.width(space.small))
-                item.icon?.let {
+                painters[index]?.let {
                     Icon(
-                        imageVector = it,
+                        painter = it,
                         contentDescription = item.label,
-                        tint = txtColor,
+                        tint = colors[index],
                         modifier = Modifier.size(space.large)
                     )
                     Spacer(modifier = Modifier.width(space.small))

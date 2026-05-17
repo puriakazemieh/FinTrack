@@ -142,4 +142,12 @@ object FinTrackPickerColors {
     fun material3(isDark: Boolean) = material3Palette.forTheme(isDark)
     fun pastel(isDark: Boolean)    = pastelPalette.forTheme(isDark)
     fun appTheme(isDark: Boolean)  = appThemePalette.forTheme(isDark)
+
+    fun getColorById(id: Int, isDark: Boolean): Color {
+        return rainbow(isDark).find { it.id == id }?.color
+            ?: material3(isDark).find { it.id == id }?.color
+            ?: pastel(isDark).find { it.id == id }?.color
+            ?: appTheme(isDark).find { it.id == id }?.color
+            ?: Color.Gray
+    }
 }

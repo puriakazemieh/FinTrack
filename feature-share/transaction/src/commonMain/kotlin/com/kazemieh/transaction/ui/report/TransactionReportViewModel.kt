@@ -249,7 +249,13 @@ class TransactionReportViewModel(
                 TransactionType.TRANSFER -> Unit // Usually net balance doesn't change
                 else -> Unit
             }
-            PieChartItem(id = c.categoryId, label = c.name, value = c.totalAmount)
+            PieChartItem(
+                id = c.categoryId,
+                label = c.name,
+                value = c.totalAmount,
+                colorId = c.colorId,
+                iconId = c.iconId
+            )
         }
 
         _state.update {
