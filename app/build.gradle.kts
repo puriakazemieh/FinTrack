@@ -11,8 +11,8 @@ android {
         applicationId = "com.kazemieh.fintrack"
         minSdk = 24
         targetSdk = 36
-        versionCode = 3
-        versionName = "2.0.0"
+        versionCode = 4
+        versionName = "2.5.0"
     }
 
     buildTypes {
@@ -59,7 +59,10 @@ afterEvaluate {
         File(composeAppProject.buildDir, "processedResources/jvm/main")
     android.sourceSets["main"].assets.srcDir(composeParentResources.absolutePath)
 
-    tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }
+    tasks.matching { 
+        (it.name.startsWith("merge") && it.name.endsWith("Assets")) ||
+        it.name.contains("Lint", ignoreCase = true)
+    }
         .configureEach {
             dependsOn(
                 composeAppProject.tasks.matching {
@@ -76,7 +79,10 @@ afterEvaluate {
         File(designSystemProject.buildDir, "processedResources/jvm/main")
     android.sourceSets["main"].assets.srcDir(designSystemParentResources.absolutePath)
 
-    tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }
+    tasks.matching { 
+        (it.name.startsWith("merge") && it.name.endsWith("Assets")) ||
+        it.name.contains("Lint", ignoreCase = true)
+    }
         .configureEach {
             dependsOn(
                 designSystemProject.tasks.matching {
