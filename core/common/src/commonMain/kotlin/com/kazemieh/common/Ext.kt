@@ -13,19 +13,20 @@ fun String.formatNumber(): String {
     return this.reversed().chunked(3).joinToString(",").reversed()
 }
 
+fun String.withLRM(): String = "\u200E$this"
 
 fun Int.formatted(): String =
     when {
-        this < 0 -> "- ${(-this).formatNumber()}"
-        this > 0 -> "+ ${this.formatNumber()}"
+        this < 0 -> "- ${(-this).formatNumber()}".withLRM()
+        this > 0 -> "+ ${this.formatNumber()}".withLRM()
         else -> "0"
     }
 
 fun Int?.formattedOrNull(): String? {
     if (this == null) return null
     return when {
-        this < 0 -> "- ${(-this).formatNumber()}"
-        this > 0 -> "+ ${this.formatNumber()}"
+        this < 0 -> "- ${(-this).formatNumber()}".withLRM()
+        this > 0 -> "+ ${this.formatNumber()}".withLRM()
         else -> "0"
     }
 }

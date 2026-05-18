@@ -9,9 +9,11 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toPositive
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,6 +23,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -74,6 +77,8 @@ class TransactionViewModel(
 
     private val requestFlow = MutableStateFlow(PageRequest(limit = pageSize, offset = 0))
 
+    private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1)
+
     private var listJob: Job? = null
 
     fun onIntent(intent: TransactionIntent) {
@@ -106,6 +111,7 @@ class TransactionViewModel(
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun startObservingTransactionsIfNeeded() {
         if (listJob != null) return
 
@@ -114,7 +120,11 @@ class TransactionViewModel(
                 .map { it.filterParams }
                 .distinctUntilChanged()
 
-            combine(filterFlow, requestFlow) { params, req -> params to req }
+            combine(
+                filterFlow,
+                requestFlow,
+                refreshTrigger.onStart { emit(Unit) }
+            ) { params, req, _ -> params to req }
                 .flatMapLatest { (params, req) ->
                     transactionUseCaseGroup.observeTransactionsUseCase(
                         transactionFilterParams = params,
@@ -162,6 +172,7 @@ class TransactionViewModel(
             )
         }
         requestFlow.value = PageRequest(limit = pageSize, offset = 0)
+        refreshTrigger.tryEmit(Unit)
     }
 
     private fun loadNextPage() {

@@ -19,8 +19,8 @@ data class Transaction(
 ) {
     val formatedAmount: String
         get() = when (type) {
-            TransactionType.INCOME -> "+ ${amount.formatNumber()}"
-            TransactionType.EXPENSE -> "- ${amount.formatNumber()}"
+            TransactionType.INCOME -> "\u200E+ ${amount.formatNumber()}"
+            TransactionType.EXPENSE -> "\u200E- ${amount.formatNumber()}"
             else -> amount.formatNumber()
         }
 

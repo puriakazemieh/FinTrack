@@ -362,7 +362,7 @@ fun AddTransactionContent(
     }
 
     LaunchedEffect(Unit) {
-        kotlinx.coroutines.yield()
+        kotlinx.coroutines.delay(300)
         focusRequester.requestFocus()
     }
 

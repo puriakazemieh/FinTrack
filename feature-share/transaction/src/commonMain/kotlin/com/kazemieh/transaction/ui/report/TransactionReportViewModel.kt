@@ -14,7 +14,9 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.component.PieChartItem
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +27,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -40,6 +43,8 @@ class TransactionReportViewModel(
     val state: StateFlow<TransactionReportState> = _state.asStateFlow()
 
     private val requestFlow = MutableStateFlow(PageRequest(limit = pageSize, offset = 0))
+
+    private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1)
 
     private val filterParamsFlow: Flow<TransactionFilterParams> = state
         .map { s ->
@@ -146,9 +151,14 @@ class TransactionReportViewModel(
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeTransactions() {
         viewModelScope.launch {
-            combine(filterParamsFlow, requestFlow) { params, req -> params to req }
+            combine(
+                filterParamsFlow,
+                requestFlow,
+                refreshTrigger.onStart { emit(Unit) }
+            ) { params, req, _ -> params to req }
                 .flatMapLatest { (params, req) ->
                     transactionUseCaseGroup.observeTransactionsUseCase(
                         transactionFilterParams = params,
@@ -197,6 +207,7 @@ class TransactionReportViewModel(
         }
 
         requestFlow.value = PageRequest(limit = pageSize, offset = 0)
+        refreshTrigger.tryEmit(Unit)
     }
 
     private fun loadNextPage() {
@@ -229,6 +240,7 @@ class TransactionReportViewModel(
             )
         }
         requestFlow.value = PageRequest(limit = pageSize, offset = 0)
+        refreshTrigger.tryEmit(Unit)
     }
 
     private fun observeCategorySums() {

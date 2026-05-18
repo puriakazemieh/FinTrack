@@ -100,12 +100,16 @@ fun TotalTransactionCard(
                 )
 
 
-                Box(modifier = Modifier.padding(top = space.large)) {
+                Box(
+                    modifier = Modifier
+                        .padding(top = space.large)
+                        .padding(horizontal = space.mediumSmall)
+                ) {
                     PieChart(
                         data = piChartData,
                         radiusOuter = 40.dp,
                         chartBarWidth = 20.dp,
-                        textDistanceExtra = 20.dp,
+                        textDistanceExtra = 30.dp,
                         animDuration = 500,
                         enableAnimation = enableAnimationChart
                     )

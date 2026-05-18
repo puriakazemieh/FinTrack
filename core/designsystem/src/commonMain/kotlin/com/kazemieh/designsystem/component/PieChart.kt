@@ -5,6 +5,7 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -135,9 +137,10 @@ fun Long.formatNumber(): String {
 @Composable
 fun PieChart(
     data: List<PieChartItem>,
+    modifier: Modifier = Modifier,
     radiusOuter: Dp = 80.dp,
     chartBarWidth: Dp = 15.dp,
-    textDistanceExtra: Dp = 80.dp,
+    textDistanceExtra: Dp = 60.dp,
     animDuration: Int = 500,
     labelTextStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     legendTextStyle: TextStyle = MaterialTheme.typography.bodySmall,
@@ -160,9 +163,10 @@ fun PieChart(
     val sliceAngles = remember(data) { data.map { 360f * (it.value.toFloat() / total.toFloat()) } }
 
     val colors = remember(data, isDark) {
-        data.map { item ->
+        val dynamicColors = generateDynamicColors(data.size)
+        data.mapIndexed { index, item ->
             item.color ?: item.colorId?.let { FinTrackPickerColors.getColorById(it, isDark) }
-            ?: generateDynamicColors(1).first()
+            ?: dynamicColors[index]
         }
     }
 
@@ -180,7 +184,7 @@ fun PieChart(
     )
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
@@ -317,7 +321,7 @@ private fun PieChartLabelsCanvas(
             val iconSize = if (painters[index] != null) 18.dp.toPx() else 0f
             val iconMargin = if (iconSize > 0f) 8f else 0f
             val spaceFromLine = 8f
-            val canvasPadding = 12.dp.toPx() // مقداری حاشیه امن برای نچسبیدن به لبه صفحه
+            val canvasPadding = 4.dp.toPx() // مقداری حاشیه امن برای نچسبیدن به لبه صفحه
 
             // محاسبه دقیق فضای خالی باقیمانده تا لبه صفحه
             val maxAvailableTextWidth = if (isRightSide) {
@@ -327,7 +331,7 @@ private fun PieChartLabelsCanvas(
             }
 
             // جلوگیری از کرش کردن در صورتی که فضای محاسبه شده منفی یا خیلی کم شود
-            val safeMaxWidth = maxOf(300f, maxAvailableTextWidth).toInt()
+            val safeMaxWidth = maxOf(200f, maxAvailableTextWidth).toInt()
 
             val labelText = "${data[index].label} ${percentages[index].format(0)}%"
 
@@ -425,7 +429,7 @@ private fun PieChartLegend(
             .padding(top = space.large),
         horizontalArrangement = Arrangement.spacedBy(
             space = space.small,
-            alignment = Alignment.CenterHorizontally
+            alignment = Alignment.Start
         ),
     ) {
         data.forEachIndexed { index, item ->
@@ -433,12 +437,6 @@ private fun PieChartLegend(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = space.mediumSmall)
             ) {
-                /*Box(
-                    modifier = Modifier
-                        .size(space.large)
-                        .background(colors[index], shape = CircleShape)
-                )
-                Spacer(modifier = Modifier.width(space.small))*/
                 painters[index]?.let {
                     Icon(
                         painter = it,
@@ -446,8 +444,14 @@ private fun PieChartLegend(
                         tint = colors[index],
                         modifier = Modifier.size(space.large)
                     )
-                    Spacer(modifier = Modifier.width(space.small))
+                } ?: run {
+                    Box(
+                        modifier = Modifier
+                            .size(space.large)
+                            .background(colors[index], shape = CircleShape)
+                    )
                 }
+                Spacer(modifier = Modifier.width(space.small))
                 FintrackLabelSmallText(
                     text = "${item.label}: ${item.value.formatNumber()} تومان"
                 )
