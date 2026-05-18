@@ -27,6 +27,7 @@ object FinTrackIcons {
         Res.drawable.ic_cat_transfer,
         Res.drawable.ic_cat_travel,
         Res.drawable.ic_cat_work,
+        Res.drawable.ic_source_default,
         Res.drawable.ic_1,
         Res.drawable.ic_2,
         Res.drawable.ic_3,
