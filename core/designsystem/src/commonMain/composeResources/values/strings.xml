@@ -206,5 +206,8 @@
     <string name="account_not_selected">انتخاب نشده</string>
     <string name="action_choose_exp">انتخاب تاریخ انقضا</string>
     <string name="short_term_deposit">سپرده کوتاه‌مدت</string>
+    <string name="currency_toman">تومان</string>
+    <string name="more_details">مشاهده بیشتر</string>
+    <string name="search_placeholder">جستجو...</string>
 
 </resources>
