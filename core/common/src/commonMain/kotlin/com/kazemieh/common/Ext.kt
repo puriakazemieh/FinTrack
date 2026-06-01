@@ -43,6 +43,10 @@ fun String.toPrice(): String {
     return this.formatNumber()
 }
 
+fun Long.toFa(): String = toString().map { if (it in '0'..'9') '۰' + (it - '0') else it }.joinToString("")
+fun Int.toFa(): String = this.toLong().toFa()
+fun String.toFa(): String = this.map { if (it in '0'..'9') '۰' + (it - '0') else it }.joinToString("")
+
 
 fun Double.toDegrees(): Double = this * 180.0 / PI
 fun Float.toDegrees(): Float = this * 180f / PI.toFloat()

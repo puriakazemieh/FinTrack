@@ -32,7 +32,7 @@ import androidx.compose.ui.window.Dialog
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
-import com.kazemieh.designsystem.fontFamily
+import com.kazemieh.designsystem.vazirmatnFontFamily
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.date
 import kotlinx.coroutines.launch
@@ -126,7 +126,7 @@ fun JalaliDatePickerDialog(
                         confirmBtnColor = MaterialTheme.colorScheme.primary,
                         todayBtnColor = MaterialTheme.colorScheme.primary,
                         nextPreviousBtnColor = MaterialTheme.colorScheme.primary,
-                        fontFamily = fontFamily(),
+                        fontFamily = vazirmatnFontFamily(),
                         fontSize = MaterialTheme.typography.bodyMedium.fontSize
                     )
                 }
@@ -187,7 +187,7 @@ fun JalaliDatePickerBottomSheet(
                     confirmBtnColor = MaterialTheme.colorScheme.primary,
                     todayBtnColor = MaterialTheme.colorScheme.primary,
                     nextPreviousBtnColor = MaterialTheme.colorScheme.primary,
-                    fontFamily = fontFamily(),
+                        fontFamily = vazirmatnFontFamily(),
                     fontSize = MaterialTheme.typography.bodyMedium.fontSize
                 )
             }
