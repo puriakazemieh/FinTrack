@@ -240,6 +240,7 @@ fun AddTransactionContent(
                         )
                     }
                 },
+                textStyle = MaterialTheme.typography.titleLarge,
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 isError = state.isAmountError
             )
@@ -433,6 +434,7 @@ private fun TransferScreen(
                     FintrackBodyMediumText(text = stringResource(Res.string.amount_transfer))
                 }
             },
+            textStyle = MaterialTheme.typography.titleLarge,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
         )
 

@@ -23,3 +23,7 @@ local.properties
 composeApp/build
 app/build
 kotlin-js-store
+/.artifacts
+.artifacts
+reference
+/reference

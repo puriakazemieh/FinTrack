@@ -19,6 +19,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import com.kazemieh.common.toFa
 import com.kazemieh.common.toPrice
 import com.kazemieh.designsystem.LocalSpacing
 
@@ -44,17 +45,24 @@ fun FintrackOutlinedTextField(
     readOnly: Boolean = false,
     isError: Boolean = false,
     isPrice: Boolean = false,
+    isPersianNumber: Boolean = false,
     minLine : Int = 1,
     maxLine : Int = if (singleLine) 1 else Int.MAX_VALUE,
     onClick: () -> Unit = {},
 ) {
+
+    val visualTransformation = when {
+        isPrice -> NumberCommaTransformation()
+        isPersianNumber -> PersianNumberTransformation()
+        else -> VisualTransformation.None
+    }
 
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         minLines = minLine,
         maxLines = maxLine,
-        visualTransformation = if (isPrice) NumberCommaTransformation() else VisualTransformation.None,
+        visualTransformation = visualTransformation,
         modifier = modifier
             .clickable(
                 indication = null,
@@ -91,7 +99,7 @@ fun FintrackOutlinedTextField(
 class NumberCommaTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         val originalText = text.text
-        val transformedText = originalText.toPrice()
+        val transformedText = originalText.toPrice().toFa()
         
         return TransformedText(
             text = AnnotatedString(transformedText),
@@ -122,6 +130,16 @@ class NumberCommaTransformation : VisualTransformation {
                     return (offset - commasBefore).coerceIn(0, originalText.length)
                 }
             }
+        )
+    }
+}
+
+class PersianNumberTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val transformedText = text.text.toFa()
+        return TransformedText(
+            text = AnnotatedString(transformedText),
+            offsetMapping = OffsetMapping.Identity
         )
     }
 }

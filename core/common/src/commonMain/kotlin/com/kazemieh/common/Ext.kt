@@ -17,17 +17,17 @@ fun String.withLRM(): String = "\u200E$this"
 
 fun Int.formatted(): String =
     when {
-        this < 0 -> "- ${(-this).formatNumber()}".withLRM()
-        this > 0 -> "+ ${this.formatNumber()}".withLRM()
-        else -> "0"
+        this < 0 -> "- ${(-this).formatNumber()}".withLRM().toFa()
+        this > 0 -> "+ ${this.formatNumber()}".withLRM().toFa()
+        else -> "0".toFa()
     }
 
 fun Int?.formattedOrNull(): String? {
     if (this == null) return null
     return when {
-        this < 0 -> "- ${(-this).formatNumber()}".withLRM()
-        this > 0 -> "+ ${this.formatNumber()}".withLRM()
-        else -> "0"
+        this < 0 -> "- ${(-this).formatNumber()}".withLRM().toFa()
+        this > 0 -> "+ ${this.formatNumber()}".withLRM().toFa()
+        else -> "0".toFa()
     }
 }
 

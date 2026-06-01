@@ -76,7 +76,10 @@ fun TotalTransactionCard(
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
 
-                FintrackHeadlineSmallText(text = stringResource(Res.string.balance_total))
+                FintrackHeadlineSmallText(
+                    text = stringResource(Res.string.balance_total),
+                    style = MaterialTheme.typography.titleLarge
+                )
 
                 val balanceTotalLabel = stringResource(Res.string.balance_total_label, state.balance)
 
@@ -84,6 +87,7 @@ fun TotalTransactionCard(
                     modifier = Modifier.weight(1f),
                     text = balanceTotalLabel,
                     textAlign = TextAlign.End,
+                    style = MaterialTheme.typography.titleLarge,
                     color = if (state.isPositiveBalance) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
                 )
 

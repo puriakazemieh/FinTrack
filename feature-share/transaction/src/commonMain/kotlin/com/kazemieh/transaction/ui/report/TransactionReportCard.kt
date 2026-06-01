@@ -75,7 +75,10 @@ fun ShowTransactionReportCard(
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
 
-                FintrackTitleSmallText(text = stringResource(Res.string.balance_with_label, text))
+                FintrackTitleSmallText(
+                    text = stringResource(Res.string.balance_with_label, text),
+                    style = MaterialTheme.typography.titleLarge
+                )
 
                 val balanceTotalLabel = stringResource(Res.string.balance_total_label, state.balance)
 
@@ -83,6 +86,7 @@ fun ShowTransactionReportCard(
                     modifier = Modifier.weight(1f),
                     text = balanceTotalLabel,
                     textAlign = TextAlign.End,
+                    style = MaterialTheme.typography.titleLarge,
                     color = if (state.isPositiveBalance) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
                 )
 

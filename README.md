@@ -51,21 +51,31 @@ cd FinTrack
 
 ## 🔮 Roadmap
 
-- Add support for Kotlin Multiplatform (KMP)
-- Add advanced analytics (monthly / yearly charts)
-- Notifications & reminders for expenses
-- Backup & restore support
+## Platforms
+- Android
+- iOS
+- Desktop
+- Web
 
----
+## Stack
+- Compose Multiplatform
+- Koin
+- Ktor
+- Coroutines
+- Flow
 
-## 🤝 Contributing
+## Module Rules
+- commonMain first
+- no Android APIs in shared modules
+- immutable UI state
+- business logic in domain
+- repositories in data layer
 
-Pull requests are welcome!  
-Before submitting, please read the **CONTRIBUTING.md** file (coming soon).  
-Feel free to open issues or suggest improvements.
+## Navigation
+[explain briefly]
 
----
+## State Management
+[explain briefly]
 
-## 📄 License
-
-This project is licensed under the **MIT License** — feel free to use, modify, and distribute.
+## DI
+[explain briefly]

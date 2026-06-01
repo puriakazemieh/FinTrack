@@ -54,8 +54,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.format
 import com.kazemieh.common.toDegrees
+import com.kazemieh.common.toFa
 import com.kazemieh.common.toRadians
 import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.vazirmatnFontFamily
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import org.jetbrains.compose.resources.painterResource
@@ -130,7 +132,7 @@ fun formatCurrency(amount: Long): String {
 
 // نسخه ساده‌تر برای فرمت اعداد
 fun Long.formatNumber(): String {
-    return toString().reversed().chunked(3).joinToString(",").reversed()
+    return toString().reversed().chunked(3).joinToString(",").reversed().toFa()
 }
 
 // ---------- Main PieChart ----------
@@ -142,8 +144,8 @@ fun PieChart(
     chartBarWidth: Dp = 15.dp,
     textDistanceExtra: Dp = 60.dp,
     animDuration: Int = 500,
-    labelTextStyle: TextStyle = MaterialTheme.typography.bodyMedium,
-    legendTextStyle: TextStyle = MaterialTheme.typography.bodySmall,
+    labelTextStyle: TextStyle = MaterialTheme.typography.bodyMedium.copy(fontFamily = vazirmatnFontFamily()),
+    legendTextStyle: TextStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = vazirmatnFontFamily()),
     showLegend: Boolean = true,
     enableAnimation: Boolean = true,
     onSliceClick: ((PieChartItem) -> Unit)? = null
@@ -333,7 +335,7 @@ private fun PieChartLabelsCanvas(
             // جلوگیری از کرش کردن در صورتی که فضای محاسبه شده منفی یا خیلی کم شود
             val safeMaxWidth = maxOf(200f, maxAvailableTextWidth).toInt()
 
-            val labelText = "${data[index].label} ${percentages[index].format(0)}%"
+            val labelText = "${data[index].label} ${percentages[index].format(0).toFa()}%"
 
             // تنظیمات جدید متن: تراز کردن + محدودیت سایز + دو خطی شدن
             val layout = textMeasurer.measure(

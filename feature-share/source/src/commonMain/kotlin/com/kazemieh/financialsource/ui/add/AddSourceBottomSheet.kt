@@ -9,6 +9,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -168,6 +169,7 @@ fun AddSourceBottomSheet(
                             }
                         },
                         label = { FintrackBodyMediumText(text = stringResource(Res.string.initial_balance_label)) },
+                        textStyle = MaterialTheme.typography.titleLarge,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
 
@@ -175,8 +177,10 @@ fun AddSourceBottomSheet(
                         Column(verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.mediumLarge)) {
                             FintrackOutlinedTextField(
                                 value = state.draft.cardNumber.orEmpty(),
+                                isPersianNumber = true,
                                 onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateCardNumber(it)) },
                                 label = { FintrackBodyMediumText(text = stringResource(Res.string.card_number_label)) },
+                                textStyle = MaterialTheme.typography.titleLarge,
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                             )
 
@@ -186,38 +190,48 @@ fun AddSourceBottomSheet(
                             ) {
                                 FintrackOutlinedTextField(
                                     value = state.draft.cvv2.orEmpty(),
+                                    isPersianNumber = true,
                                     onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateCvv2(it)) },
                                     label = { FintrackBodyMediumText(text = stringResource(Res.string.label_cvv2)) },
                                     modifier = Modifier.weight(1f),
+                                    textStyle = MaterialTheme.typography.titleLarge,
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                                 )
                                 FintrackOutlinedTextField(
                                     value = state.draft.expirationMonth.orEmpty(),
+                                    isPersianNumber = true,
                                     onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateExpirationMonth(it)) },
                                     label = { FintrackBodyMediumText(text = stringResource(Res.string.label_exp_month)) },
                                     modifier = Modifier.weight(0.5f),
+                                    textStyle = MaterialTheme.typography.titleLarge,
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                                 )
                                 FintrackOutlinedTextField(
                                     value = state.draft.expirationYear.orEmpty(),
+                                    isPersianNumber = true,
                                     onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateExpirationYear(it)) },
                                     label = { FintrackBodyMediumText(text = stringResource(Res.string.label_exp_year)) },
                                     modifier = Modifier.weight(0.5f),
+                                    textStyle = MaterialTheme.typography.titleLarge,
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                                 )
                             }
 
                             FintrackOutlinedTextField(
                                 value = state.draft.shabaNumber.orEmpty(),
+                                isPersianNumber = true,
                                 onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateShabaNumber(it)) },
                                 label = { FintrackBodyMediumText(text = stringResource(Res.string.label_shaba_number)) },
+                                textStyle = MaterialTheme.typography.titleLarge,
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                             )
 
                             FintrackOutlinedTextField(
                                 value = state.draft.accountNumber.orEmpty(),
+                                isPersianNumber = true,
                                 onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateAccountNumber(it)) },
                                 label = { FintrackBodyMediumText(text = stringResource(Res.string.label_account_number)) },
+                                textStyle = MaterialTheme.typography.titleLarge,
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                             )
 
@@ -227,15 +241,18 @@ fun AddSourceBottomSheet(
                             ) {
                                 FintrackOutlinedTextField(
                                     value = state.draft.branchCode.orEmpty(),
+                                    isPersianNumber = true,
                                     onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateBranchCode(it)) },
                                     label = { FintrackBodyMediumText(text = "کد شعبه") },
                                     modifier = Modifier.weight(1f),
+                                    textStyle = MaterialTheme.typography.titleLarge,
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                                 )
                                 FintrackOutlinedTextField(
                                     value = state.draft.branchName.orEmpty(),
                                     onValueChange = { viewModel.onIntent(AddSourceIntent.UpdateBranchName(it)) },
                                     label = { FintrackBodyMediumText(text = "نام شعبه") },
+                                    textStyle = MaterialTheme.typography.titleLarge,
                                     modifier = Modifier.weight(1f)
                                 )
                             }

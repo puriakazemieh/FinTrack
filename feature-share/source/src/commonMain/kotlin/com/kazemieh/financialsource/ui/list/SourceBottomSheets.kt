@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.kazemieh.common.model.Source
+import com.kazemieh.common.toFa
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -84,7 +85,7 @@ private fun SourceBottomSheetCore(
         itemContent = { item ->
             val p = item.payload as ItemPayload.SourcePayload
             FintrackBodySmallText(
-                text = stringResource(Res.string.balance, p.formattedBalance),
+                text = stringResource(Res.string.balance, p.formattedBalance.toFa()),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -227,7 +228,7 @@ fun SourceList(
                             FintrackBodyMediumText(text = source.name)
                         }
                         FintrackBodySmallText(
-                            text = stringResource(Res.string.balance, source.formattedBalance),
+                            text = stringResource(Res.string.balance, source.formattedBalance.toFa()),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
