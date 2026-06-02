@@ -36,10 +36,10 @@ fun FinTrackHost() {
                 FintrackNavigationBar(navController = navController)
             }
         ) { innerPadding ->
-            Box {
+            Box(modifier = Modifier.fillMaxSize()) {
                 AppNavHost(
                     navController = navController,
-                    modifier = Modifier.padding(innerPadding),
+                    modifier = Modifier.fillMaxSize(), // Don't apply innerPadding here
                     snackbarHostState = snackbarHostState
                 )
                 Box(
