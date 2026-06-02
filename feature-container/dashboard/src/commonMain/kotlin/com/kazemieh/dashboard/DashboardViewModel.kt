@@ -4,13 +4,14 @@ import androidx.lifecycle.ViewModel
 import com.kazemieh.common.model.TransactionWithRelations
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 
-class DashboardViewModel() : ViewModel() {
+class DashboardViewModel : ViewModel() {
 
     private val _state = MutableStateFlow(DashboardState())
-    val state: StateFlow<DashboardState> = _state
+    val state: StateFlow<DashboardState> = _state.asStateFlow()
 
     fun onIntent(intent: DashboardIntent) {
         when (intent) {
@@ -20,6 +21,7 @@ class DashboardViewModel() : ViewModel() {
                     transactionWithRelations = intent.transactionWithRelations
                 )
             }
+
             is DashboardIntent.DeleteTransactionBottomSheet -> _state.update {
                 it.copy(
                     showDeleteTransaction = !_state.value.showDeleteTransaction,
@@ -39,10 +41,11 @@ class DashboardViewModel() : ViewModel() {
                 )
             }
 
+            DashboardIntent.ToggleBalanceVisibility -> _state.update {
+                it.copy(isBalanceVisible = !it.isBalanceVisible)
+            }
         }
     }
-
-
 }
 
 data class DashboardState(
@@ -51,12 +54,19 @@ data class DashboardState(
     val showAddSource: Boolean = false,
     val enableAnimationChart: Boolean = false,
     val transactionWithRelations: TransactionWithRelations? = null,
+    val isBalanceVisible: Boolean = true,
+    val growthPercentage: String = "+2.5%" // Placeholder
 )
 
 
 sealed interface DashboardIntent {
-    data class ShowTransactionBottomSheet(val transactionWithRelations: TransactionWithRelations? = null) : DashboardIntent
-    data class DeleteTransactionBottomSheet(val transactionWithRelations: TransactionWithRelations? = null) : DashboardIntent
+    data class ShowTransactionBottomSheet(val transactionWithRelations: TransactionWithRelations? = null) :
+        DashboardIntent
+
+    data class DeleteTransactionBottomSheet(val transactionWithRelations: TransactionWithRelations? = null) :
+        DashboardIntent
+
     data object AnimationEnabled : DashboardIntent
     data object ShowAddSource : DashboardIntent
+    data object ToggleBalanceVisibility : DashboardIntent
 }

@@ -5,15 +5,18 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
@@ -56,61 +59,47 @@ fun FintrackNavigationBar(
         }
     }
 
-    // Use a simpler Box with NO fixed height for the wrapper to let content flow
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .navigationBarsPadding(),
+            .navigationBarsPadding()
+            .height(84.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
-        // 1. The Blurred Background Layer (Fixed height: 64dp)
+        // The Glass Bar
+
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .height(64.dp)
-                .padding(horizontal = 14.dp)
-                .padding(bottom = 12.dp) // Gap from bottom of screen
                 .clip(MaterialTheme.shapes.extraLarge)
-                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.45f)) // Much more transparent
-                .glassBlur(10.dp) // Reduced blur
-                .border(
-                    1.dp,
-                    MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                    MaterialTheme.shapes.extraLarge
-                )
+                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.78f))
+                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(22.dp))
+                .glassBlur(5.dp)
+                .padding(horizontal = 14.dp)
         )
 
-        // 2. The Sharp Content Layer (Icons)
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .padding(horizontal = 14.dp)
-                .padding(bottom = 12.dp),
+            modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Destinations.entries.forEachIndexed { index, destination ->
-                // Center slot for FAB (Keep it empty here)
+                // Center slot for FAB
                 if (index == 2) {
                     Spacer(modifier = Modifier.weight(1f))
                 }
 
                 val isSelected = selectedDestination == destination
-                val tint = if (isSelected) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                }
+                val color =
+                    if (isSelected) MaterialTheme.colorScheme.primary else
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.42f)
 
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .clickable(
-                            interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                            indication = null
-                        ) {
+                        .clickable {
                             if (!isSelected) {
                                 navController.navigate(destination.route) {
                                     popUpTo(navController.graph.findStartDestination().id) {
@@ -123,20 +112,22 @@ fun FintrackNavigationBar(
                         },
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        painter = painterResource(destination.icon),
-                        contentDescription = stringResource(destination.label),
-                        tint = tint,
-                        modifier = Modifier.size(24.dp)
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            painter = painterResource(destination.icon),
+                            contentDescription = stringResource(destination.label),
+                            tint = color,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
             }
         }
 
-        // 3. Center FAB (Floats independently, doesn't block background)
+
         Box(
             modifier = Modifier
-                .padding(bottom = 4.dp) // Offset to sit partially above the bar
+                .padding(bottom = 16.dp)
                 .size(56.dp)
                 .clip(CircleShape)
                 .background(
