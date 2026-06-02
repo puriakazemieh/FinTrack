@@ -15,7 +15,13 @@ fun String.formatNumber(): String {
 
 fun String.withLRM(): String = "\u200E$this"
 
-fun Int.formatted(): String =
+fun Int.formatted(): String = toLong().formatted()
+
+fun Long.formatNumberLong(): String {
+    return toString().reversed().chunked(3).joinToString(",").reversed().toFa()
+}
+
+fun Long.formatted(): String =
     when {
         this < 0 -> "- ${(-this).formatNumber()}".withLRM().toFa()
         this > 0 -> "+ ${this.formatNumber()}".withLRM().toFa()
@@ -46,6 +52,12 @@ fun String.toPrice(): String {
 fun Long.toFa(): String = toString().map { if (it in '0'..'9') '۰' + (it - '0') else it }.joinToString("")
 fun Int.toFa(): String = this.toLong().toFa()
 fun String.toFa(): String = this.map { if (it in '0'..'9') '۰' + (it - '0') else it }.joinToString("")
+
+fun Long.toFormattedFa(): String = formatNumber().toFa()
+fun Int.toFormattedFa(): String = toLong().toFormattedFa()
+fun String.toFormattedFa(): String = formatNumber().toFa()
+
+fun Long.formatNumber(): String = toString().formatNumber()
 
 
 fun Double.toDegrees(): Double = this * 180.0 / PI

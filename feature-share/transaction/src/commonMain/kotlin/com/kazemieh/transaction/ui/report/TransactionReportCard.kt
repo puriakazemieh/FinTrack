@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.toFa
+import com.kazemieh.common.toFormattedFa
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.GlassCard
@@ -87,7 +88,7 @@ private fun SummaryRow(label: String, value: Long, color: Color, isBold: Boolean
         Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(color))
         FintrackLabelSmallText(text = label, color = GlassText2, modifier = Modifier.weight(1f))
         FintrackTitleSmallText(
-            text = stringResource(Res.string.label_amount_with_unit, value.toFa(), stringResource(Res.string.unit_toman_short)),
+            text = stringResource(Res.string.label_amount_with_unit, value.toFormattedFa(), stringResource(Res.string.unit_toman_short)),
             fontSize = 13.sp,
             fontWeight = if (isBold) FontWeight.Bold else FontWeight.SemiBold,
             color = color
@@ -160,7 +161,7 @@ fun CategoryStrip(
                             corner = 7.dp
                         )
                         FintrackLabelSmallText(text = cat.name, color = GlassText, modifier = Modifier.weight(1f))
-                        FintrackLabelSmallText(text = stringResource(Res.string.label_amount_with_unit, cat.totalAmount.toFa(), stringResource(Res.string.unit_toman_short)), fontWeight = FontWeight.Bold, color = GlassText)
+                        FintrackLabelSmallText(text = stringResource(Res.string.label_amount_with_unit, cat.totalAmount.toFormattedFa(), stringResource(Res.string.unit_toman_short)), fontWeight = FontWeight.Bold, color = GlassText)
                     }
                     
                     val progress = (cat.totalAmount.toFloat() / maxAmount).coerceIn(0f, 1f)

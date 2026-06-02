@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.format
+import com.kazemieh.common.formatNumberLong
 import com.kazemieh.common.toDegrees
 import com.kazemieh.common.toFa
 import com.kazemieh.common.toRadians
@@ -133,9 +134,6 @@ fun formatCurrency(amount: Long): String {
 }
 
 // نسخه ساده‌تر برای فرمت اعداد
-fun Long.formatNumber(): String {
-    return toString().reversed().chunked(3).joinToString(",").reversed().toFa()
-}
 
 // ---------- Main PieChart ----------
 @Composable
@@ -466,7 +464,7 @@ private fun PieChartLegend(
                 }
                 Spacer(modifier = Modifier.width(space.small))
                 FintrackLabelSmallText(
-                    text = stringResource(Res.string.label_amount_with_unit, item.value.formatNumber().toFa(), stringResource(Res.string.currency_toman)),
+                    text = stringResource(Res.string.label_amount_with_unit, item.value.formatNumberLong(), stringResource(Res.string.currency_toman)),
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }

@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.toFa
+import com.kazemieh.common.toFormattedFa
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.GlassTone
@@ -145,7 +146,7 @@ fun LargeAmountCard(
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 FintrackDisplaySmallText(
-                    text = if (amount.isEmpty()) stringResource(Res.string.label_zero) else amount.toLongOrNull()?.toFa() ?: amount,
+                    text = if (amount.isEmpty()) stringResource(Res.string.label_zero) else amount.toLongOrNull()?.toFormattedFa() ?: amount.toFa(),
                     color = GlassText
                 )
             }

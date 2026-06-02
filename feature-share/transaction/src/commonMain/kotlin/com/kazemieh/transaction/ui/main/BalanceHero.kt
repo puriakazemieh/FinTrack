@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.toFa
@@ -56,50 +57,41 @@ fun BalanceHero(
     GlassCard(
         modifier = modifier.fillMaxWidth(),
         tone = GlassTone.Strong,
-        padding = 20.dp
+        padding = 16.dp
     ) {
         Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                FintrackBodyMediumText(
-                    text = stringResource(Res.string.balance_total),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                )
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FintrackTitleLargeText(
+                        text = stringResource(Res.string.balance_total),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.width(space.medium))
+                    FintrackDisplayLargeText(
+                        text = if (isBalanceVisible) state.balance.toFa() else "****",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.width(space.small))
+                    FintrackTitleLargeText(
+                        text = stringResource(Res.string.currency_toman),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
                 IconButton(onClick = onToggleVisibility) {
                     Icon(
                         imageVector = if (isBalanceVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                FintrackDisplaySmallText(
-                    text = if (isBalanceVisible) state.balance.toFa() else "****",
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(Modifier.width(space.mediumSmall))
-                FintrackBodyMediumText(
-                    text = stringResource(Res.string.currency_toman),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                )
-
-                Spacer(Modifier.weight(1f))
-
-                // Growth Pill
-                Box(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                ) {
-                    FintrackLabelSmallText(
-                        text = growthPercentage.toFa(),
-                        color = MaterialTheme.colorScheme.primary
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }

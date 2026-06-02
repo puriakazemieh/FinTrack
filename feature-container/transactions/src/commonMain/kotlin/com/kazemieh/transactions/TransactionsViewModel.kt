@@ -34,26 +34,26 @@ import kotlinx.datetime.TimeZone
 
 class TransactionsViewModel() : ViewModel() {
 
-    private val _state = MutableStateFlow(ReportState())
+    private val _state = MutableStateFlow(TransactionsState())
     val state = _state.asStateFlow()
 
-    fun onIntent(intent: ReportIntent) {
+    fun onIntent(intent: TransactionsIntent) {
         when (intent) {
-            is ReportIntent.ShowTransactionBottomSheet -> _state.update {
+            is TransactionsIntent.ShowTransactionBottomSheet -> _state.update {
                 it.copy(
                     showAddTransaction = !_state.value.showAddTransaction,
                     transactionWithRelations = intent.transactionWithRelations
                 )
             }
 
-            is ReportIntent.DeleteTransactionBottomSheet -> _state.update {
+            is TransactionsIntent.DeleteTransactionBottomSheet -> _state.update {
                 it.copy(
                     showDeleteTransaction = !_state.value.showDeleteTransaction,
                     transactionWithRelations = intent.transactionWithRelations
                 )
             }
 
-            is ReportIntent.OnTransactionTypeSelected -> _state.update {
+            is TransactionsIntent.OnTransactionTypeSelected -> _state.update {
                 it.copy(
                     selectedTransactionType = intent.type,
                     selectedCategories = emptySet(),
@@ -61,11 +61,11 @@ class TransactionsViewModel() : ViewModel() {
                 )
             }
 
-            ReportIntent.OnToggleSourceSheet -> _state.update {
+            TransactionsIntent.OnToggleSourceSheet -> _state.update {
                 it.copy(isSourceSheetVisible = !it.isSourceSheetVisible)
             }
 
-            is ReportIntent.OnSourcesSelected -> _state.update {
+            is TransactionsIntent.OnSourcesSelected -> _state.update {
                 it.copy(
                     selectedSources = intent.sources,
                     isSourceSheetVisible = false,
@@ -74,11 +74,11 @@ class TransactionsViewModel() : ViewModel() {
                 )
             }
 
-            ReportIntent.OnToggleTagSheet -> _state.update {
+            TransactionsIntent.OnToggleTagSheet -> _state.update {
                 it.copy(isTagSheetVisible = !it.isTagSheetVisible)
             }
 
-            is ReportIntent.OnTagSelected -> _state.update {
+            is TransactionsIntent.OnTagSelected -> _state.update {
                 it.copy(
                     selectedTag = intent.tag,
                     isTagSheetVisible = false,
@@ -87,11 +87,11 @@ class TransactionsViewModel() : ViewModel() {
                 )
             }
 
-            ReportIntent.OnTogglePersonSheet -> _state.update {
+            TransactionsIntent.OnTogglePersonSheet -> _state.update {
                 it.copy(isPersonSheetVisible = !it.isPersonSheetVisible)
             }
 
-            is ReportIntent.OnPersonSelected -> _state.update {
+            is TransactionsIntent.OnPersonSelected -> _state.update {
                 it.copy(
                     selectedPerson = intent.persons,
                     isPersonSheetVisible = false,
@@ -100,11 +100,11 @@ class TransactionsViewModel() : ViewModel() {
                 )
             }
 
-            ReportIntent.OnToggleCategorySheet -> _state.update {
+            TransactionsIntent.OnToggleCategorySheet -> _state.update {
                 it.copy(isCategorySheetVisible = !it.isCategorySheetVisible)
             }
 
-            is ReportIntent.OnCategoriesSelected -> _state.update {
+            is TransactionsIntent.OnCategoriesSelected -> _state.update {
                 it.copy(
                     selectedCategories = intent.categories,
                     isCategorySheetVisible = false,
@@ -113,15 +113,15 @@ class TransactionsViewModel() : ViewModel() {
                 )
             }
 
-            ReportIntent.OnToggleDateSheet -> _state.update {
+            TransactionsIntent.OnToggleDateSheet -> _state.update {
                 it.copy(isDateSheetVisible = !it.isDateSheetVisible)
             }
 
-            ReportIntent.OnToggleCustomDateSheet -> _state.update {
+            TransactionsIntent.OnToggleCustomDateSheet -> _state.update {
                 it.copy(isCustomDateSheetVisible = !it.isCustomDateSheetVisible, isError = false)
             }
 
-            is ReportIntent.OnDateRange -> {
+            is TransactionsIntent.OnDateRange -> {
 //                val range = getRange(intent.dateFilterType)
                 val result = getRangeAsUiText(intent.dateFilterType)
                 val range = result.first
@@ -141,7 +141,7 @@ class TransactionsViewModel() : ViewModel() {
                 }
             }
 
-            is ReportIntent.OnDateSheetSubmit -> {
+            is TransactionsIntent.OnDateSheetSubmit -> {
                 if (intent.endTimeStamp != null && intent.startTimeStamp != null &&
                     intent.endDate != null && intent.startDate != null
                 ) {
@@ -173,7 +173,7 @@ class TransactionsViewModel() : ViewModel() {
 
             }
 
-            ReportIntent.OnNextClick -> {
+            TransactionsIntent.OnNextClick -> {
                 val result = DateFilterHelper.shiftDateRange(
                     start = state.value.startDateTimeStamp,
                     end = state.value.endDateTimeStamp,
@@ -210,7 +210,7 @@ class TransactionsViewModel() : ViewModel() {
 
             }
 
-            ReportIntent.OnPrevClick -> {
+            TransactionsIntent.OnPrevClick -> {
                 val result = DateFilterHelper.shiftDateRange(
                     start = state.value.startDateTimeStamp,
                     end = state.value.endDateTimeStamp,
@@ -247,7 +247,7 @@ class TransactionsViewModel() : ViewModel() {
 
             }
 
-            ReportIntent.OnToggleSearch -> _state.update { it.copy(isSearchActive = !it.isSearchActive) }
+            TransactionsIntent.OnToggleSearch -> _state.update { it.copy(isSearchActive = !it.isSearchActive) }
 
         }
     }
@@ -288,7 +288,7 @@ class TransactionsViewModel() : ViewModel() {
 
 }
 
-data class ReportState(
+data class TransactionsState(
     val selectedTransactionType: TransactionType = TransactionType.ALL,
 
     val dateFilterType: DateFilterType = DateFilterType.THIS_MONTH,
@@ -328,50 +328,50 @@ data class ReportState(
     val transactionWithRelations: TransactionWithRelations? = null,
 )
 
-sealed interface ReportIntent {
-    data class OnTransactionTypeSelected(val type: TransactionType) : ReportIntent
+sealed interface TransactionsIntent {
+    data class OnTransactionTypeSelected(val type: TransactionType) : TransactionsIntent
     data class ShowTransactionBottomSheet(val transactionWithRelations: TransactionWithRelations? = null) :
-        ReportIntent
+        TransactionsIntent
 
     data class DeleteTransactionBottomSheet(val transactionWithRelations: TransactionWithRelations? = null) :
-        ReportIntent
+        TransactionsIntent
 
-    data object OnToggleSourceSheet : ReportIntent
+    data object OnToggleSourceSheet : TransactionsIntent
     data class OnSourcesSelected(
         val sources: Set<Source>,
         val isAllSourceSelected: Boolean = true
-    ) : ReportIntent
+    ) : TransactionsIntent
 
-    data object OnToggleCategorySheet : ReportIntent
+    data object OnToggleCategorySheet : TransactionsIntent
     data class OnCategoriesSelected(
         val categories: Set<Category>,
         val isAllCategorySelected: Boolean = true
-    ) : ReportIntent
+    ) : TransactionsIntent
 
-    data object OnToggleTagSheet : ReportIntent
+    data object OnToggleTagSheet : TransactionsIntent
     data class OnTagSelected(
         val tag: Set<Tag>,
         val isAllTAgSelected: Boolean = true
-    ) : ReportIntent
+    ) : TransactionsIntent
 
-    data object OnTogglePersonSheet : ReportIntent
+    data object OnTogglePersonSheet : TransactionsIntent
     data class OnPersonSelected(
         val persons: Set<Person>,
         val isAllPersonSelected: Boolean = true
-    ) : ReportIntent
+    ) : TransactionsIntent
 
-    data object OnToggleDateSheet : ReportIntent
-    data object OnToggleCustomDateSheet : ReportIntent
-    data class OnDateRange(val dateFilterType: DateFilterType) : ReportIntent
-    data object OnPrevClick : ReportIntent
-    data object OnNextClick : ReportIntent
-    data object OnToggleSearch : ReportIntent
+    data object OnToggleDateSheet : TransactionsIntent
+    data object OnToggleCustomDateSheet : TransactionsIntent
+    data class OnDateRange(val dateFilterType: DateFilterType) : TransactionsIntent
+    data object OnPrevClick : TransactionsIntent
+    data object OnNextClick : TransactionsIntent
+    data object OnToggleSearch : TransactionsIntent
     data class OnDateSheetSubmit(
         val startDate: String?,
         val startTimeStamp: Long?,
         val endDate: String?,
         val endTimeStamp: Long?
-    ) : ReportIntent
+    ) : TransactionsIntent
 
 
 }

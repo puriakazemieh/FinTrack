@@ -96,7 +96,7 @@ fun TransactionsScreen(
             TxHeader(
                 isSearchActive = state.isSearchActive,
                 isFilterActive = activeFilters.isNotEmpty(),
-                onSearchClick = { viewModel.onIntent(ReportIntent.OnToggleSearch) },
+                onSearchClick = { viewModel.onIntent(TransactionsIntent.OnToggleSearch) },
                 onFilterClick = { /* Show general filter if needed, or toggle specific ones */ }
             )
 
@@ -106,9 +106,9 @@ fun TransactionsScreen(
                 periodSubLabel = if (state.startDate != null && state.endDate != null)
                     "${state.startDate} تا ${state.endDate}"
                 else "۱ — ۳۰ · ۳۰ روز", // Standardized placeholder
-                onPeriodSelected = { viewModel.onIntent(ReportIntent.OnDateRange(it)) },
-                onPrevClick = { viewModel.onIntent(ReportIntent.OnPrevClick) },
-                onNextClick = { viewModel.onIntent(ReportIntent.OnNextClick) }
+                onPeriodSelected = { viewModel.onIntent(TransactionsIntent.OnDateRange(it)) },
+                onPrevClick = { viewModel.onIntent(TransactionsIntent.OnPrevClick) },
+                onNextClick = { viewModel.onIntent(TransactionsIntent.OnNextClick) }
             )
 
             ActiveFilters(
@@ -119,33 +119,33 @@ fun TransactionsScreen(
                             val newSet =
                                 state.selectedCategories.filter { "cat_${it.id}" != filter.id }
                                     .toSet()
-                            viewModel.onIntent(ReportIntent.OnCategoriesSelected(newSet, false))
+                            viewModel.onIntent(TransactionsIntent.OnCategoriesSelected(newSet, false))
                         }
 
                         FilterType.Source -> {
                             val newSet =
                                 state.selectedSources.filter { "src_${it.id}" != filter.id }.toSet()
-                            viewModel.onIntent(ReportIntent.OnSourcesSelected(newSet, false))
+                            viewModel.onIntent(TransactionsIntent.OnSourcesSelected(newSet, false))
                         }
 
                         FilterType.Tag -> {
                             val newSet =
                                 state.selectedTag.filter { "tag_${it.id}" != filter.id }.toSet()
-                            viewModel.onIntent(ReportIntent.OnTagSelected(newSet, false))
+                            viewModel.onIntent(TransactionsIntent.OnTagSelected(newSet, false))
                         }
 
                         FilterType.Person -> {
                             val newSet =
                                 state.selectedPerson.filter { "pers_${it.id}" != filter.id }.toSet()
-                            viewModel.onIntent(ReportIntent.OnPersonSelected(newSet, false))
+                            viewModel.onIntent(TransactionsIntent.OnPersonSelected(newSet, false))
                         }
                     }
                 },
                 onClearAll = {
-                    viewModel.onIntent(ReportIntent.OnCategoriesSelected(emptySet(), false))
-                    viewModel.onIntent(ReportIntent.OnSourcesSelected(emptySet(), false))
-                    viewModel.onIntent(ReportIntent.OnTagSelected(emptySet(), false))
-                    viewModel.onIntent(ReportIntent.OnPersonSelected(emptySet(), false))
+                    viewModel.onIntent(TransactionsIntent.OnCategoriesSelected(emptySet(), false))
+                    viewModel.onIntent(TransactionsIntent.OnSourcesSelected(emptySet(), false))
+                    viewModel.onIntent(TransactionsIntent.OnTagSelected(emptySet(), false))
+                    viewModel.onIntent(TransactionsIntent.OnPersonSelected(emptySet(), false))
                 }
             )
 
@@ -164,12 +164,12 @@ fun TransactionsScreen(
                 enableAnimationChart = state.enableAnimationChart,
                 onEdit = { transactionWithRelations ->
                     viewModel.onIntent(
-                        ReportIntent.ShowTransactionBottomSheet(transactionWithRelations)
+                        TransactionsIntent.ShowTransactionBottomSheet(transactionWithRelations)
                     )
                 },
                 onDelete = { transactionWithRelations ->
                     viewModel.onIntent(
-                        ReportIntent.DeleteTransactionBottomSheet(transactionWithRelations)
+                        TransactionsIntent.DeleteTransactionBottomSheet(transactionWithRelations)
                     )
                 },
             )
@@ -181,9 +181,9 @@ fun TransactionsScreen(
                 isAllSelected = state.isAllCategorySelected,
                 selectedTransactionType = state.selectedTransactionType,
                 onConfirmPairs = { pairs, isAll ->
-                    viewModel.onIntent(ReportIntent.OnCategoriesSelected(pairs, isAll))
+                    viewModel.onIntent(TransactionsIntent.OnCategoriesSelected(pairs, isAll))
                 },
-                onDismiss = { viewModel.onIntent(ReportIntent.OnToggleCategorySheet) }
+                onDismiss = { viewModel.onIntent(TransactionsIntent.OnToggleCategorySheet) }
             )
         }
 
@@ -192,9 +192,9 @@ fun TransactionsScreen(
                 initialSelectionPairs = state.selectedTag,
                 isAllSelected = state.isAllTAgSelected,
                 onConfirmPairs = { pairs, isAll ->
-                    viewModel.onIntent(ReportIntent.OnTagSelected(pairs, isAll))
+                    viewModel.onIntent(TransactionsIntent.OnTagSelected(pairs, isAll))
                 },
-                onDismiss = { viewModel.onIntent(ReportIntent.OnToggleTagSheet) }
+                onDismiss = { viewModel.onIntent(TransactionsIntent.OnToggleTagSheet) }
             )
         }
 
@@ -203,9 +203,9 @@ fun TransactionsScreen(
                 initialSelectionPairs = state.selectedPerson,
                 isAllSelected = state.isAllPersonSelected,
                 onConfirmPairs = { pairs, isAll ->
-                    viewModel.onIntent(ReportIntent.OnPersonSelected(pairs, isAll))
+                    viewModel.onIntent(TransactionsIntent.OnPersonSelected(pairs, isAll))
                 },
-                onDismiss = { viewModel.onIntent(ReportIntent.OnTogglePersonSheet) }
+                onDismiss = { viewModel.onIntent(TransactionsIntent.OnTogglePersonSheet) }
             )
         }
 
@@ -214,17 +214,17 @@ fun TransactionsScreen(
                 initialSelectionPairs = state.selectedSources,
                 isAllSelected = state.isAllSourceSelected,
                 onConfirmPairs = { pairs, isAll ->
-                    viewModel.onIntent(ReportIntent.OnSourcesSelected(pairs, isAll))
+                    viewModel.onIntent(TransactionsIntent.OnSourcesSelected(pairs, isAll))
                 },
-                onDismiss = { viewModel.onIntent(ReportIntent.OnToggleSourceSheet) }
+                onDismiss = { viewModel.onIntent(TransactionsIntent.OnToggleSourceSheet) }
             )
         }
 
         if (state.isDateSheetVisible) {
             DateFilterBottomSheet(
-                onDismiss = { viewModel.onIntent(ReportIntent.OnToggleDateSheet) },
-                onToggleCustomDateSheet = { viewModel.onIntent(ReportIntent.OnToggleCustomDateSheet) },
-                onDateRange = { viewModel.onIntent(ReportIntent.OnDateRange(it)) },
+                onDismiss = { viewModel.onIntent(TransactionsIntent.OnToggleDateSheet) },
+                onToggleCustomDateSheet = { viewModel.onIntent(TransactionsIntent.OnToggleCustomDateSheet) },
+                onDateRange = { viewModel.onIntent(TransactionsIntent.OnDateRange(it)) },
                 startDate = state.startDate,
                 endDate = state.endDate,
             )
@@ -232,7 +232,7 @@ fun TransactionsScreen(
 
         if (state.isCustomDateSheetVisible) {
             CustomDateBottomSheet(
-                onDismiss = { viewModel.onIntent(ReportIntent.OnToggleCustomDateSheet) },
+                onDismiss = { viewModel.onIntent(TransactionsIntent.OnToggleCustomDateSheet) },
                 start = if (state.dateFilterType == DateFilterType.CUSTOM_RANGE)
                     state.startDate to state.startDateTimeStamp
                 else null,
@@ -242,7 +242,7 @@ fun TransactionsScreen(
                 isError = state.isError,
                 onSubmit = { startPair, endPair ->
                     viewModel.onIntent(
-                        ReportIntent.OnDateSheetSubmit(
+                        TransactionsIntent.OnDateSheetSubmit(
                             startDate = startPair?.first,
                             startTimeStamp = startPair?.second,
                             endDate = endPair?.first,
@@ -257,8 +257,8 @@ fun TransactionsScreen(
             AddTransactionBottomSheet(
                 snackbarHostState = snackbarHostState,
                 transactionWithRelations = state.transactionWithRelations,
-                onDismiss = { viewModel.onIntent(ReportIntent.ShowTransactionBottomSheet()) },
-                transactionAdded = { viewModel.onIntent(ReportIntent.ShowTransactionBottomSheet()) },
+                onDismiss = { viewModel.onIntent(TransactionsIntent.ShowTransactionBottomSheet()) },
+                transactionAdded = { viewModel.onIntent(TransactionsIntent.ShowTransactionBottomSheet()) },
             )
         }
 
@@ -266,8 +266,8 @@ fun TransactionsScreen(
             DeleteTransactionBottomSheet(
                 snackbarHostState = snackbarHostState,
                 transactionWithRelations = state.transactionWithRelations,
-                onDismiss = { viewModel.onIntent(ReportIntent.DeleteTransactionBottomSheet()) },
-                transactionDeleted = { viewModel.onIntent(ReportIntent.DeleteTransactionBottomSheet()) },
+                onDismiss = { viewModel.onIntent(TransactionsIntent.DeleteTransactionBottomSheet()) },
+                transactionDeleted = { viewModel.onIntent(TransactionsIntent.DeleteTransactionBottomSheet()) },
             )
         }
     }

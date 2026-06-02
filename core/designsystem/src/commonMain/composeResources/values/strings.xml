@@ -19,7 +19,7 @@
     <string name="add_source">افزودن منبع</string>
     <string name="balance">موجودی: %1$s</string>
     <string name="navigation_home">صفحه نخست</string>
-    <string name="navigation_report">گزارش</string>
+    <string name="navigation_report">تراکنش‌ها</string>
     <string name="navigation_setting">تنظیمات</string>
     <string name="outcoming">خرج</string>
     <string name="outcoming_category">دسته‌بندی خرج‌ها</string>
@@ -72,7 +72,7 @@
     <string name="save_person">ذخیره</string>
     <string name="confirm">تایید</string>
     <string name="cancell_">لغو</string>
-    <string name="report">گزارش</string>
+    <string name="report">تراکنش‌ها</string>
     <string name="source_name_label">نام منبع</string>
     <string name="initial_balance_label">مبلغ اولیه</string>
     <string name="card_number_label">شماره کارت</string>

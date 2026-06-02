@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.toFa
+import com.kazemieh.common.formatted
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.*
 import fintrack.core.designsystem.generated.resources.*
@@ -94,7 +95,7 @@ private fun SourceTile(source: Source) {
                 )
             }
             FintrackTitleSmallText(
-                text = source.balance.toLong().toFa(),
+                text = source.balance.formatted(),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 color = GlassText

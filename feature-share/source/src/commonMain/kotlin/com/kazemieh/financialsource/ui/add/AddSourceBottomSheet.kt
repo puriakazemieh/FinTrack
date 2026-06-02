@@ -17,7 +17,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -32,7 +31,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.GlassEdge
@@ -42,16 +40,14 @@ import com.kazemieh.designsystem.GlassText
 import com.kazemieh.designsystem.GlassText3
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.*
+import com.kazemieh.designsystem.component.model.asString
 import com.kazemieh.designsystem.model.Bank
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import com.kazemieh.designsystem.picker.FinTrackSourceIcons
-import com.kazemieh.designsystem.component.model.asString
+import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import fintrack.core.designsystem.generated.resources.*
-import org.jetbrains.compose.resources.stringResource
-import fintrack.core.designsystem.generated.resources.*
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -117,7 +113,9 @@ fun AddSourceContent(
     }
 
     AddFrame(
-        title = if (state.mode == AddSourceMode.Add) stringResource(Res.string.title_new_source) else stringResource(Res.string.title_edit_source),
+        title = if (state.mode == AddSourceMode.Add) stringResource(Res.string.title_new_source) else stringResource(
+            Res.string.title_edit_source
+        ),
         sub = stringResource(Res.string.title_source_management),
         primaryLabel = stringResource(Res.string.btn_save_source),
         onPrimaryClick = { onIntent(AddSourceIntent.Save) },
@@ -191,7 +189,13 @@ fun AddSourceContent(
                             val newValue = input.toIntOrNull() ?: 0
                             onIntent(AddSourceIntent.UpdateBalance(newValue))
                         },
-                        placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.label_zero), color = GlassText3) },
+                        visualTransformation = NumberCommaTransformation(),
+                        placeholder = {
+                            FintrackBodyMediumText(
+                                text = stringResource(Res.string.label_zero),
+                                color = GlassText3
+                            )
+                        },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
@@ -204,7 +208,12 @@ fun AddSourceContent(
                             fontWeight = FontWeight.Bold
                         ),
                         modifier = Modifier.fillMaxWidth(),
-                        suffix = { FintrackLabelSmallText(text = stringResource(Res.string.currency_toman), color = GlassText3) }
+                        suffix = {
+                            FintrackLabelSmallText(
+                                text = stringResource(Res.string.currency_toman),
+                                color = GlassText3
+                            )
+                        }
                     )
                 }
             }

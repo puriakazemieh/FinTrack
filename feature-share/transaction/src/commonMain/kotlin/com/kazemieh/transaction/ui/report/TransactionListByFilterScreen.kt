@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.*
 import com.kazemieh.common.toFa
+import com.kazemieh.common.toFormattedFa
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.*
 import org.jetbrains.compose.resources.stringResource
@@ -192,7 +193,7 @@ private fun DayHeader(date: String, count: Int, netAmount: Long) {
                 color = GlassText3
             )
             FintrackTitleSmallText(
-                text = stringResource(Res.string.label_amount_with_unit, netAmount.toFa(), stringResource(Res.string.unit_toman_short)),
+                text = stringResource(Res.string.label_amount_with_unit, netAmount.toFormattedFa(), stringResource(Res.string.unit_toman_short)),
                 fontWeight = FontWeight.Bold,
                 color = if (netAmount >= 0) GlassGreen else GlassRed
             )
@@ -253,7 +254,7 @@ private fun TxRow(item: TransactionWithRelations, onClick: () -> Unit) {
 
         Column(horizontalAlignment = Alignment.End) {
             FintrackTitleSmallText(
-                text = stringResource(Res.string.label_amount_with_unit, item.transaction.amount.toLong().toFa(), stringResource(Res.string.unit_toman_short)),
+                text = stringResource(Res.string.label_amount_with_unit, item.transaction.amount.toLong().toFormattedFa(), stringResource(Res.string.unit_toman_short)),
                 fontWeight = FontWeight.Bold,
                 color = color
             )

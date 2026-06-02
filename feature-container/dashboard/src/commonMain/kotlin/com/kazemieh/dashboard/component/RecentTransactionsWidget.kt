@@ -8,8 +8,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.common.formatNumberLong
+import com.kazemieh.common.formatted
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.toFa
+import com.kazemieh.common.toFormattedFa
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.GlassIcon
@@ -60,7 +63,7 @@ fun RecentTransactionsWidget(
                 ),
                 value = {
                     FintrackTitleSmallText(
-                        text = "${item.transaction.amount.toLong().toFa()} " + stringResource(Res.string.unit_toman_short),
+                        text = "${item.transaction.amount.toLong().formatNumberLong()} " + stringResource(Res.string.unit_toman_short),
                         fontWeight = FontWeight.W600,
                         color = color
                     )
