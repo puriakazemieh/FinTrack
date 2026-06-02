@@ -40,20 +40,18 @@ import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassGreenSoft
 import com.kazemieh.designsystem.GlassText
 import com.kazemieh.designsystem.GlassText3
-import com.kazemieh.designsystem.component.CardItem
-import com.kazemieh.designsystem.component.FinTrackLeadingIcon
-import com.kazemieh.designsystem.component.LeadingIconStyle
-import com.kazemieh.designsystem.component.glass.AddFrame
-import com.kazemieh.designsystem.component.glass.ColorSwatches
-import com.kazemieh.designsystem.component.glass.Field
-import com.kazemieh.designsystem.component.glass.GlassCard
-import com.kazemieh.designsystem.component.glass.IconGrid
-import com.kazemieh.designsystem.component.model.asString
+import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.model.Bank
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import com.kazemieh.designsystem.picker.FinTrackSourceIcons
+import com.kazemieh.designsystem.component.model.asString
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+import fintrack.core.designsystem.generated.resources.*
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -119,9 +117,9 @@ fun AddSourceContent(
     }
 
     AddFrame(
-        title = if (state.mode == AddSourceMode.Add) "منبع مالی جدید" else "ویرایش منبع مالی",
-        sub = "مدیریت موجودی و حساب‌ها",
-        primaryLabel = "ذخیره منبع",
+        title = if (state.mode == AddSourceMode.Add) stringResource(Res.string.title_new_source) else stringResource(Res.string.title_edit_source),
+        sub = stringResource(Res.string.title_source_management),
+        primaryLabel = stringResource(Res.string.btn_save_source),
         onPrimaryClick = { onIntent(AddSourceIntent.Save) },
         onClose = { onIntent(AddSourceIntent.OnDismiss) },
         hero = {
@@ -159,14 +157,13 @@ fun AddSourceContent(
             }
 
             item {
-                Field(label = "نام منبع", required = true) {
+                Field(label = stringResource(Res.string.source_name_label), required = true) {
                     TextField(
                         value = state.draft.name,
                         onValueChange = { onIntent(AddSourceIntent.UpdateName(it)) },
                         placeholder = {
-                            Text(
-                                "مثلاً کارت اصلی یا کیف پول",
-                                fontSize = 13.sp,
+                            FintrackBodyMediumText(
+                                text = stringResource(Res.string.hint_source_name_placeholder),
                                 color = GlassText3
                             )
                         },
@@ -187,14 +184,14 @@ fun AddSourceContent(
             }
 
             item {
-                Field(label = "موجودی اولیه") {
+                Field(label = stringResource(Res.string.initial_balance_label)) {
                     TextField(
                         value = if (state.draft.balance == 0) "" else state.draft.balance.toString(),
                         onValueChange = { input ->
                             val newValue = input.toIntOrNull() ?: 0
                             onIntent(AddSourceIntent.UpdateBalance(newValue))
                         },
-                        placeholder = { Text("0", fontSize = 13.sp, color = GlassText3) },
+                        placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.label_zero), color = GlassText3) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
@@ -207,7 +204,7 @@ fun AddSourceContent(
                             fontWeight = FontWeight.Bold
                         ),
                         modifier = Modifier.fillMaxWidth(),
-                        suffix = { Text("تومان", fontSize = 12.sp, color = GlassText3) }
+                        suffix = { FintrackLabelSmallText(text = stringResource(Res.string.currency_toman), color = GlassText3) }
                     )
                 }
             }
@@ -216,9 +213,8 @@ fun AddSourceContent(
                 item {
                     GlassCard(padding = 16.dp) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Text(
-                                text = "اطلاعات کارت",
-                                style = MaterialTheme.typography.labelSmall,
+                            FintrackLabelSmallText(
+                                text = stringResource(Res.string.label_card_info),
                                 color = GlassText3
                             )
 
@@ -226,9 +222,8 @@ fun AddSourceContent(
                                 value = state.draft.cardNumber.orEmpty(),
                                 onValueChange = { onIntent(AddSourceIntent.UpdateCardNumber(it)) },
                                 placeholder = {
-                                    Text(
-                                        "شماره ۱۶ رقمی کارت",
-                                        fontSize = 13.sp,
+                                    FintrackBodyMediumText(
+                                        text = stringResource(Res.string.label_card_16_digits),
                                         color = GlassText3
                                     )
                                 },
@@ -244,9 +239,8 @@ fun AddSourceContent(
                                     value = state.draft.cvv2.orEmpty(),
                                     onValueChange = { onIntent(AddSourceIntent.UpdateCvv2(it)) },
                                     placeholder = {
-                                        Text(
-                                            "CVV2",
-                                            fontSize = 13.sp,
+                                        FintrackBodyMediumText(
+                                            text = stringResource(Res.string.label_cvv2),
                                             color = GlassText3
                                         )
                                     },
@@ -266,9 +260,8 @@ fun AddSourceContent(
                                         )
                                     },
                                     placeholder = {
-                                        Text(
-                                            "ماه",
-                                            fontSize = 13.sp,
+                                        FintrackBodyMediumText(
+                                            text = stringResource(Res.string.label_exp_month),
                                             color = GlassText3
                                         )
                                     },
@@ -288,9 +281,8 @@ fun AddSourceContent(
                                         )
                                     },
                                     placeholder = {
-                                        Text(
-                                            "سال",
-                                            fontSize = 13.sp,
+                                        FintrackBodyMediumText(
+                                            text = stringResource(Res.string.label_exp_year),
                                             color = GlassText3
                                         )
                                     },
@@ -308,18 +300,16 @@ fun AddSourceContent(
                 item {
                     GlassCard(padding = 16.dp) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Text(
-                                text = "حساب و شبا",
-                                style = MaterialTheme.typography.labelSmall,
+                            FintrackLabelSmallText(
+                                text = stringResource(Res.string.label_account_shaba),
                                 color = GlassText3
                             )
                             TextField(
                                 value = state.draft.shabaNumber.orEmpty(),
                                 onValueChange = { onIntent(AddSourceIntent.UpdateShabaNumber(it)) },
                                 placeholder = {
-                                    Text(
-                                        "شماره شبا (بدون IR)",
-                                        fontSize = 13.sp,
+                                    FintrackBodyMediumText(
+                                        text = stringResource(Res.string.label_shaba_no_ir),
                                         color = GlassText3
                                     )
                                 },
@@ -333,9 +323,8 @@ fun AddSourceContent(
                                 value = state.draft.accountNumber.orEmpty(),
                                 onValueChange = { onIntent(AddSourceIntent.UpdateAccountNumber(it)) },
                                 placeholder = {
-                                    Text(
-                                        "شماره حساب",
-                                        fontSize = 13.sp,
+                                    FintrackBodyMediumText(
+                                        text = stringResource(Res.string.label_account_number),
                                         color = GlassText3
                                     )
                                 },
@@ -352,9 +341,8 @@ fun AddSourceContent(
                 item {
                     GlassCard(padding = 16.dp) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Text(
-                                text = "شعبه",
-                                style = MaterialTheme.typography.labelSmall,
+                            FintrackLabelSmallText(
+                                text = stringResource(Res.string.label_branch),
                                 color = GlassText3
                             )
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -362,9 +350,8 @@ fun AddSourceContent(
                                     value = state.draft.branchCode.orEmpty(),
                                     onValueChange = { onIntent(AddSourceIntent.UpdateBranchCode(it)) },
                                     placeholder = {
-                                        Text(
-                                            "کد شعبه",
-                                            fontSize = 13.sp,
+                                        FintrackBodyMediumText(
+                                            text = stringResource(Res.string.label_branch_code),
                                             color = GlassText3
                                         )
                                     },
@@ -378,9 +365,8 @@ fun AddSourceContent(
                                     value = state.draft.branchName.orEmpty(),
                                     onValueChange = { onIntent(AddSourceIntent.UpdateBranchName(it)) },
                                     placeholder = {
-                                        Text(
-                                            "نام شعبه",
-                                            fontSize = 13.sp,
+                                        FintrackBodyMediumText(
+                                            text = stringResource(Res.string.label_branch_name),
                                             color = GlassText3
                                         )
                                     },
@@ -399,9 +385,8 @@ fun AddSourceContent(
             item {
                 GlassCard(padding = 14.dp) {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text(
-                            text = "رنگ",
-                            style = MaterialTheme.typography.labelMedium,
+                        FintrackLabelMediumText(
+                            text = stringResource(Res.string.label_color),
                             color = GlassText3
                         )
                         ColorSwatches(
@@ -423,9 +408,8 @@ fun AddSourceContent(
             item {
                 GlassCard(padding = 14.dp) {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text(
-                            text = "آیکن",
-                            style = MaterialTheme.typography.labelMedium,
+                        FintrackLabelMediumText(
+                            text = stringResource(Res.string.label_icon),
                             color = GlassText3
                         )
                         IconGrid(
@@ -456,7 +440,7 @@ private fun SourceTypeSelector(
 ) {
     GlassCard(padding = 14.dp) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(text = "نوع منبع", style = MaterialTheme.typography.labelSmall, color = GlassText3)
+            FintrackLabelSmallText(text = stringResource(Res.string.label_type), color = GlassText3)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -480,10 +464,8 @@ private fun SourceTypeSelector(
                             .padding(vertical = 10.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
+                        FintrackBodyMediumText(
                             text = option.value.asString(),
-                            fontSize = 13.sp,
-                            fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
                             color = if (active) GlassGreen else GlassText3
                         )
                     }

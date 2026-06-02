@@ -49,6 +49,7 @@ import fintrack.core.designsystem.generated.resources.delete
 import fintrack.core.designsystem.generated.resources.description_with_value
 import fintrack.core.designsystem.generated.resources.edit
 import fintrack.core.designsystem.generated.resources.incoming
+import fintrack.core.designsystem.generated.resources.label_transfer_arrow
 import fintrack.core.designsystem.generated.resources.outcoming
 import fintrack.core.designsystem.generated.resources.person_label
 import fintrack.core.designsystem.generated.resources.source
@@ -194,7 +195,7 @@ fun TransactionItem(
                     if (isTransfer) {
                         Spacer(modifier = Modifier.width(space.small))
                         FintrackLabelSmallText(
-                            text = "←",
+                            text = stringResource(Res.string.label_transfer_arrow),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.width(space.small))

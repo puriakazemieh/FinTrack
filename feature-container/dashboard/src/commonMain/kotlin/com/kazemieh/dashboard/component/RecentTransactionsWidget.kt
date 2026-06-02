@@ -11,6 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.toFa
 import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.GlassIcon
 import com.kazemieh.designsystem.component.glass.Row
 import com.kazemieh.designsystem.component.glass.WidgetCard
@@ -18,7 +19,9 @@ import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.transaction.ui.main.TransactionIntent
 import com.kazemieh.transaction.ui.main.TransactionViewModel
 import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.label_source_date_summary
 import fintrack.core.designsystem.generated.resources.recent_transactions
+import fintrack.core.designsystem.generated.resources.unit_toman_short
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -49,16 +52,15 @@ fun RecentTransactionsWidget(
 
             Row(
                 label = item.category.name,
-                sub = "${item.source.name} · ${item.transaction.date}",
+                sub = stringResource(Res.string.label_source_date_summary, item.source.name, item.transaction.date),
                 icon = GlassIcon(
                     painter = painterResource(icon.resource),
                     bg = bgColor,
                     color = color
                 ),
                 value = {
-                    Text(
-                        text = "${item.transaction.amount.toLong().toFa()} ت",
-                        fontSize = 12.5.sp,
+                    FintrackTitleSmallText(
+                        text = "${item.transaction.amount.toLong().toFa()} " + stringResource(Res.string.unit_toman_short),
                         fontWeight = FontWeight.W600,
                         color = color
                     )

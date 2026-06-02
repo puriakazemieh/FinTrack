@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
+import com.kazemieh.designsystem.component.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,10 +63,8 @@ fun WidgetCard(
                     )
                 }
 
-                Text(
+                FintrackTitleSmallText(
                     text = title,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontSize = 15.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
@@ -77,9 +76,8 @@ fun WidgetCard(
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
-                        Text(
+                        FintrackLabelSmallText(
                             text = it.toLong().toFa(),
-                            fontSize = 10.sp,
                             fontWeight = FontWeight.W700,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -94,9 +92,8 @@ fun WidgetCard(
                             .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f))
                             .padding(horizontal = 8.dp, vertical = 2.dp)
                     ) {
-                        Text(
+                        FintrackLabelSmallText(
                             text = it,
-                            fontSize = 9.sp,
                             fontWeight = FontWeight.W600,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -144,9 +141,8 @@ fun WidgetCard(
                         modifier = Modifier.size(14.dp)
                     )
                     Spacer(modifier = Modifier.width(5.dp))
-                    Text(
+                    FintrackLabelSmallText(
                         text = more,
-                        fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
                     )
                 }

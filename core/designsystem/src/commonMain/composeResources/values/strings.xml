@@ -213,4 +213,132 @@
     <string name="navigation_tools">ابزارها</string>
     <string name="navigation_profile">پروفایل</string>
 
+    <string name="hint_enter_category_name">نام دسته‌بندی را وارد کنید...</string>
+    <string name="hint_enter_person_name">نام شخص را وارد کنید...</string>
+    <string name="hint_optional_note">یادداشت اختیاری...</string>
+    <string name="hint_source_name_placeholder">مثلاً کارت اصلی یا کیف پول</string>
+    <string name="hint_transaction_description">توضیحات تراکنش...</string>
+    <string name="hint_search_in">جستجو در %1$s</string>
+
+    <string name="label_color">رنگ</string>
+    <string name="label_icon">آیکن</string>
+    <string name="label_type">نوع</string>
+    <string name="label_person_name">نام شخص</string>
+    <string name="label_note">یادداشت</string>
+    <string name="label_source_info">اطلاعات منبع</string>
+    <string name="label_card_info">اطلاعات کارت</string>
+    <string name="label_account_shaba">حساب و شبا</string>
+    <string name="label_branch">شعبه</string>
+    <string name="label_branch_code">کد شعبه</string>
+    <string name="label_branch_name">نام شعبه</string>
+    <string name="label_card_16_digits">شماره ۱۶ رقمی کارت</string>
+    <string name="label_shaba_no_ir">شماره شبا (بدون IR)</string>
+    <string name="label_attachment">پیوست عکس</string>
+    <string name="label_optional">اختیاری</string>
+    <string name="label_camera">دوربین</string>
+    <string name="label_gallery">گالری</string>
+    <string name="label_related_persons">افراد مرتبط</string>
+    <string name="label_tag_count">تعداد برچسب‌ها</string>
+    <string name="label_person_count">تعداد اشخاص</string>
+    <string name="label_income">درآمد</string>
+    <string name="label_expense">خرج</string>
+    <string name="label_net">خالص</string>
+    <string name="label_category_split">تقسیم بر دسته‌بندی</string>
+    <string name="label_calculator">ماشین‌حساب</string>
+    <string name="label_new_source">منبع جدید</string>
+    <string name="label_summary_period">خلاصه‌ی این دوره</string>
+
+    <string name="btn_save_category">ذخیره دسته‌بندی</string>
+    <string name="btn_save_source">ذخیره منبع</string>
+    <string name="btn_save_tag">ذخیره برچسب</string>
+    <string name="btn_save_person">ذخیره شخص</string>
+    <string name="btn_save_transaction">ذخیره تراکنش</string>
+    <string name="btn_add_person">+ افزودن شخص</string>
+    <string name="btn_add_tag">+ افزودن تگ</string>
+    <string name="btn_retry">تلاش مجدد</string>
+
+    <string name="title_new_category">دسته‌بندی جدید</string>
+    <string name="title_edit_category">ویرایش دسته‌بندی</string>
+    <string name="title_new_source">منبع مالی جدید</string>
+    <string name="title_edit_source">ویرایش منبع مالی</string>
+    <string name="title_new_tag">برچسب جدید</string>
+    <string name="title_edit_tag">ویرایش برچسب</string>
+    <string name="title_new_person">شخص جدید</string>
+    <string name="title_edit_person">ویرایش شخص</string>
+    <string name="title_new_transaction">ثبت تراکنش جدید</string>
+    <string name="title_source_management">مدیریت موجودی و حساب‌ها</string>
+    <string name="title_person_management">مدیریت افراد مرتبط</string>
+    <string name="title_category_management">برای گروه‌بندی تراکنش‌ها</string>
+    <string name="title_tag_management">برای دسته‌بندی دقیق‌تر تراکنش‌ها</string>
+    <string name="title_transaction_management">مدیریت هزینه‌ها و درآمدها</string>
+
+    <string name="msg_hello">سلام،</string>
+    <string name="msg_no_transaction_found">تراکنشی یافت نشد</string>
+    <string name="msg_empty_list">هیچ موردی برای نمایش وجود ندارد</string>
+    <string name="msg_error_prefix">خطا: %1$s</string>
+
+    <string name="unit_transaction">تراکنش</string>
+    <string name="unit_toman_short">ت</string>
+
+    <string name="label_active">فعال</string>
+    <string name="label_inactive">غیرفعال</string>
+    <string name="label_transaction_notification">اعلان تراکنش</string>
+    <string name="hint_sms_on_register">دریافت پیامک هنگام ثبت</string>
+    <string name="label_home_purchase">خرید خانه</string>
+    <string name="label_monthly">ماهانه</string>
+    <string name="label_budgets">بودجه‌ها</string>
+    <string name="hint_remaining_amount">%1$s مانده</string>
+
+    <string name="label_management">مدیریت</string>
+    <string name="label_transactions_plural">تراکنش‌ها</string>
+    <string name="title_tools_management">ابزارهای مدیریت مالی شما</string>
+    <string name="btn_clear_all">پاک کردن همه</string>
+    <string name="msg_tools_coming_soon">صفحه ابزارها بزودی اضافه خواهد شد</string>
+    <string name="label_source_type">نوع منبع</string>
+    <string name="label_account_shaba_header">حساب و شبا</string>
+
+    <string name="label_camera_fa">دوربین</string>
+    <string name="label_gallery_fa">گالری</string>
+    <string name="label_optional_fa">اختیاری</string>
+    <string name="label_attachment_fa">پیوست عکس</string>
+
+    <string name="label_retry">تلاش مجدد</string>
+    <string name="label_error_with_msg">خطا: %1$s</string>
+    <string name="label_required_marker">*</string>
+    <string name="label_transfer_arrow">←</string>
+    <string name="label_tag_prefix">#%1$s</string>
+    <string name="label_transaction_net_summary">%1$s %2$s · %3$s</string>
+    <string name="label_amount_with_unit">%1$s %2$s</string>
+    <string name="label_source_date_summary">%1$s · %2$s</string>
+    <string name="label_percentage_suffix">%1$s %2$s%%</string>
+    <string name="label_zero">۰</string>
+    <string name="label_char_count_limit">%1$s / %2$s</string>
+
+    <string name="label_day">روز</string>
+    <string name="label_week">هفته</string>
+    <string name="label_month_short">ماه</string>
+    <string name="label_year_short">سال</string>
+    <string name="label_range">بازه</string>
+    <string name="action_select_date">انتخاب تاریخ</string>
+
+    <string name="dp_confirm">تایید</string>
+    <string name="dp_cancel">انصراف</string>
+    <string name="dp_today">امروز</string>
+    <string name="dp_select_month">انتخاب ماه</string>
+    <string name="dp_select_year">انتخاب سال</string>
+    <string name="dp_dow_sat">ش</string>
+    <string name="dp_dow_sun">ی</string>
+    <string name="dp_dow_mon">د</string>
+    <string name="dp_dow_tue">س</string>
+    <string name="dp_dow_wed">چ</string>
+    <string name="dp_dow_thu">پ</string>
+    <string name="dp_dow_fri">ج</string>
+
+    <string name="type_expense">خرج</string>
+    <string name="type_income">درآمد</string>
+    <string name="type_transfer">انتقال</string>
+
+    <string name="placeholder_user_initial">پ</string>
+    <string name="placeholder_user_name">کاربر</string>
+
 </resources>

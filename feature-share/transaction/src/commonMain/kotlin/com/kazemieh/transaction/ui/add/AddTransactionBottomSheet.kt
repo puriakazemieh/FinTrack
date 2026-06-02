@@ -28,7 +28,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.list.CategoryPickerBottomSheet
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.common.toFa
 import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
@@ -95,9 +97,9 @@ private fun BottomSheetContent(
         dragHandle = null
     ) {
         AddFrame(
-            title = "ثبت تراکنش",
-            sub = "مدیریت هزینه‌ها و درآمدها",
-            primaryLabel = "ذخیره تراکنش",
+            title = stringResource(Res.string.title_new_transaction),
+            sub = stringResource(Res.string.title_transaction_management),
+            primaryLabel = stringResource(Res.string.btn_save_transaction),
             onPrimaryClick = { onIntent(AddTransactionIntent.Submit) },
             onClose = { onIntent(AddTransactionIntent.OnDismiss) }
         ) {
@@ -234,10 +236,10 @@ fun AddTransactionContent(
 
         item {
             SectionContainer(
-                title = "افراد مرتبط",
-                sub = "برای تقسیم خرج یا طلب",
+                title = stringResource(Res.string.label_related_persons),
+                sub = stringResource(Res.string.title_person_management),
                 onAddClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.PersonPicker)) },
-                addLabel = "+ افزودن شخص"
+                addLabel = stringResource(Res.string.btn_add_person)
             ) {
                 state.persons?.forEach { person ->
                     RemovableChip(
@@ -255,7 +257,7 @@ fun AddTransactionContent(
                                     .background(GlassGreen),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(text = person.name.take(1), fontSize = 9.sp, fontWeight = FontWeight.Bold, color = GlassGreenDark)
+                                FintrackLabelSmallText(text = person.name.take(1), fontWeight = FontWeight.Bold, color = GlassGreenDark)
                             }
                         }
                     )
@@ -265,15 +267,15 @@ fun AddTransactionContent(
 
         item {
             SectionContainer(
-                title = "تگ‌ها",
-                sub = "برچسب برای فیلتر",
+                title = stringResource(Res.string.tags),
+                sub = stringResource(Res.string.title_tag_management),
                 onAddClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.TagPicker)) },
-                addLabel = "+ افزودن تگ"
+                addLabel = stringResource(Res.string.btn_add_tag)
             ) {
                 state.tags?.forEach { tag ->
                     val color = colors.firstOrNull { it.id == tag.colorId }?.color ?: GlassBlue
                     RemovableChip(
-                        label = "#${tag.name}",
+                        label = stringResource(Res.string.label_tag_prefix, tag.name),
                         color = color,
                         onRemove = {
                             val newSet = state.tags.filter { it.id != tag.id }.toSet()
@@ -288,8 +290,8 @@ fun AddTransactionContent(
             GlassCard(padding = 14.dp) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     ComposeRow(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(text = "یادداشت", style = MaterialTheme.typography.labelSmall, color = GlassText3)
-                        Text(text = "${state.description.length} / ۲۵۰", style = MaterialTheme.typography.labelSmall, color = GlassText3)
+                        FintrackLabelSmallText(text = stringResource(Res.string.label_note), color = GlassText3)
+                        FintrackLabelSmallText(text = stringResource(Res.string.label_char_count_limit, state.description.length.toLong().toFa(), 250.toLong().toFa()), color = GlassText3)
                     }
                     BasicTextField(
                         value = state.description,
@@ -299,7 +301,7 @@ fun AddTransactionContent(
                         decorationBox = @Composable { innerTextField ->
                             Box {
                                 if (state.description.isEmpty()) {
-                                    Text(text = "توضیحات تراکنش...", style = MaterialTheme.typography.bodyMedium, color = GlassText3)
+                                    FintrackBodyMediumText(text = stringResource(Res.string.hint_transaction_description), color = GlassText3)
                                 }
                                 innerTextField()
                             }
@@ -326,9 +328,8 @@ private fun PickerValue(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
+        FintrackBodyMediumText(
             text = label,
-            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
             color = GlassText
         )
@@ -349,12 +350,12 @@ private fun PhotoDropUI() {
                 modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "پیوست عکس", style = MaterialTheme.typography.labelSmall, color = GlassText3)
-                Text(text = "اختیاری", style = MaterialTheme.typography.labelSmall, color = GlassText3)
+                FintrackLabelSmallText(text = stringResource(Res.string.label_attachment), color = GlassText3)
+                FintrackLabelSmallText(text = stringResource(Res.string.label_optional), color = GlassText3)
             }
             ComposeRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                PhotoActionCard(icon = Icons.Default.CameraAlt, label = "دوربین")
-                PhotoActionCard(icon = Icons.Default.Image, label = "گالری")
+                PhotoActionCard(icon = Icons.Default.CameraAlt, label = stringResource(Res.string.label_camera))
+                PhotoActionCard(icon = Icons.Default.Image, label = stringResource(Res.string.label_gallery))
             }
         }
     }
@@ -372,7 +373,7 @@ private fun PhotoActionCard(icon: androidx.compose.ui.graphics.vector.ImageVecto
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Icon(imageVector = icon, contentDescription = null, tint = GlassText3, modifier = Modifier.size(18.dp))
-            Text(text = label, fontSize = 9.sp, color = GlassText3)
+            FintrackLabelSmallText(text = label, color = GlassText3)
         }
     }
 }

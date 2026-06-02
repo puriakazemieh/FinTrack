@@ -39,14 +39,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.dashboard.component.QuickActions
 import com.kazemieh.dashboard.component.RecentTransactionsWidget
 import com.kazemieh.designsystem.*
-import com.kazemieh.designsystem.component.FAB
-import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.BalanceHero
 import com.kazemieh.transaction.ui.main.rememberTransactionItemsProvider
 import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -202,26 +202,22 @@ private fun DashboardHeader(
                     .background(Brush.linearGradient(listOf(GlassGreen, GlassGreenDeep))),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "پ",
+                FintrackLabelMediumText(
+                    text = stringResource(Res.string.app_name).take(1),
                     color = GlassGreenDark,
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp
                 )
             }
             Column {
-                Text(
-                    text = "سلام،",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = GlassText3,
-                    lineHeight = 1.2.sp
+                FintrackLabelSmallText(
+                    text = stringResource(Res.string.msg_hello),
+                    color = GlassText3
                 )
-                Text(
-                    text = "پوریا", // Placeholder name
-                    style = MaterialTheme.typography.titleMedium,
+                FintrackTitleMediumText(
+                    text = stringResource(Res.string.app_name), // Placeholder for user name
                     fontWeight = FontWeight.SemiBold,
-                    color = GlassText,
-                    lineHeight = 1.2.sp
+                    color = GlassText
                 )
             }
         }

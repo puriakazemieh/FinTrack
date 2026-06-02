@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.*
+import com.kazemieh.designsystem.component.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,17 +53,15 @@ fun ScreenHeader(
             modifier = Modifier.weight(1f),
             horizontalAlignment = if (center) Alignment.CenterHorizontally else Alignment.Start
         ) {
-            Text(
+            FintrackHeadlineSmallText(
                 text = title,
-                style = MaterialTheme.typography.headlineMedium,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.W700,
                 color = MaterialTheme.colorScheme.onBackground
             )
             sub?.let {
-                Text(
+                FintrackLabelSmallText(
                     text = it,
-                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 11.sp
                 )

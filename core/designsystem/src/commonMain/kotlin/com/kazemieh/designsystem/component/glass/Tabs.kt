@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import com.kazemieh.designsystem.component.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -63,7 +64,7 @@ fun Tabs(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Text(
+                        FintrackBodyMediumText(
                             text = title,
                             fontSize = 12.sp,
                             fontWeight = if (isActive) FontWeight.W700 else FontWeight.W500,
@@ -77,9 +78,8 @@ fun Tabs(
                                     .background(if (isActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant)
                                     .padding(horizontal = 6.dp, vertical = 1.dp)
                             ) {
-                                Text(
+                                FintrackLabelSmallText(
                                     text = count.toLong().toFa(),
-                                    fontSize = 9.sp,
                                     fontWeight = FontWeight.W700,
                                     color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
                                 )

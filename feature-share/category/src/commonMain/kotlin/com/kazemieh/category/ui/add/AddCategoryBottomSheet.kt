@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.designsystem.picker.FinTrackIcons
@@ -104,11 +105,11 @@ fun AddCategoryContent(
     }
 
     AddFrame(
-        title = if (state.mode == AddCategoryMode.Add) "دسته‌بندی جدید" else "ویرایش دسته‌بندی",
-        sub = "برای گروه‌بندی تراکنش‌ها",
+        title = if (state.mode == AddCategoryMode.Add) stringResource(Res.string.title_new_category) else stringResource(Res.string.title_edit_category),
+        sub = stringResource(Res.string.title_category_management),
         iconId = state.draft.iconId,
         colorId = state.draft.colorId,
-        primaryLabel = "ذخیره دسته",
+        primaryLabel = stringResource(Res.string.btn_save_category),
         onPrimaryClick = { onIntent(AddCategoryIntent.Save) },
         onClose = { onIntent(AddCategoryIntent.OnDismiss) }
     ) {
@@ -117,11 +118,11 @@ fun AddCategoryContent(
             onTypeSelected = { onIntent(AddCategoryIntent.UpdateType(it)) }
         )
 
-        Field(label = "نام دسته", required = true) {
+        Field(label = stringResource(Res.string.category_name_label), required = true) {
             TextField(
                 value = state.draft.name,
                 onValueChange = { onIntent(AddCategoryIntent.UpdateName(it)) },
-                placeholder = { Text("نام دسته را وارد کنید...", fontSize = 13.sp, color = GlassText3) },
+                placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.hint_enter_category_name), color = GlassText3) },
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
@@ -136,7 +137,7 @@ fun AddCategoryContent(
 
         GlassCard(padding = 14.dp) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(text = "رنگ", style = MaterialTheme.typography.labelMedium, color = GlassText3)
+                FintrackLabelMediumText(text = stringResource(Res.string.label_color), color = GlassText3)
                 ColorSwatches(
                     colors = colors,
                     pickedIndex = selectedColorIndex,
@@ -147,7 +148,7 @@ fun AddCategoryContent(
 
         GlassCard(padding = 14.dp) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(text = "آیکن", style = MaterialTheme.typography.labelMedium, color = GlassText3)
+                FintrackLabelMediumText(text = stringResource(Res.string.label_icon), color = GlassText3)
                 IconGrid(
                     icons = FinTrackIcons.icons,
                     pickedIndex = selectedIconIndex,
@@ -166,14 +167,14 @@ private fun TypeSelector(
     onTypeSelected: (TransactionType) -> Unit
 ) {
     val types = listOf(
-        TransactionType.EXPENSE to "خرج",
-        TransactionType.INCOME to "درآمد",
-        TransactionType.TRANSFER to "انتقال"
+        TransactionType.EXPENSE to stringResource(Res.string.label_expense),
+        TransactionType.INCOME to stringResource(Res.string.label_income),
+        TransactionType.TRANSFER to stringResource(Res.string.transfer)
     )
 
     GlassCard(padding = 14.dp) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(text = "نوع", style = MaterialTheme.typography.labelSmall, color = GlassText3)
+            FintrackLabelSmallText(text = stringResource(Res.string.label_type), color = GlassText3)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -204,9 +205,8 @@ private fun TypeSelector(
                             .padding(vertical = 10.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
+                        FintrackBodyMediumText(
                             text = label,
-                            fontSize = 13.sp,
                             fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
                             color = if (active) color else GlassText3
                         )

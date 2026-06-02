@@ -46,7 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.*
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.cancell_
 import fintrack.core.designsystem.generated.resources.choose_color
@@ -138,9 +138,9 @@ fun ColorIconPickerBottomSheet(
             val isAnyIconTintable = remember(icons) { icons.any { it.isTintable } }
 
             if (isAnyIconTintable) {
-                Text(
+                FintrackTitleMediumText(
                     text = stringResource(Res.string.choose_color),
-                    style = MaterialTheme.typography.titleMedium
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 LazyRow(
@@ -158,9 +158,9 @@ fun ColorIconPickerBottomSheet(
                 }
             }
 
-            Text(
+            FintrackTitleMediumText(
                 text = stringResource(Res.string.choose_icon),
-                style = MaterialTheme.typography.titleMedium
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             LazyVerticalGrid(

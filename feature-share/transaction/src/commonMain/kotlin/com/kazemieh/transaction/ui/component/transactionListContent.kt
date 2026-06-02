@@ -11,7 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import com.kazemieh.designsystem.component.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import fintrack.core.designsystem.generated.resources.*
@@ -49,9 +49,9 @@ fun LazyListScope.transactionListContent(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "Error: ${state.refreshError}")
+                    FintrackBodyMediumText(text = stringResource(Res.string.label_error_with_msg, state.refreshError.orEmpty()))
                     Spacer(Modifier.height(12.dp))
-                    Button(onClick = onRetryRefresh) { Text("Retry") }
+                    Button(onClick = onRetryRefresh) { FintrackBodyMediumText(stringResource(Res.string.label_retry)) }
                 }
             }
         }
@@ -106,9 +106,9 @@ fun LazyListScope.transactionListContent(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Error: ${state.appendError}")
+                FintrackBodyMediumText(text = stringResource(Res.string.label_error_with_msg, state.appendError.orEmpty()))
                 Spacer(Modifier.height(8.dp))
-                Button(onClick = onRetryAppend) { Text("Retry") }
+                Button(onClick = onRetryAppend) { FintrackBodyMediumText(stringResource(Res.string.label_retry)) }
             }
         }
     }

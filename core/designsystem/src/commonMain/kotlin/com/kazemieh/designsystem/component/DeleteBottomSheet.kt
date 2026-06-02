@@ -18,6 +18,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import com.kazemieh.designsystem.LocalSpacing
 import fintrack.core.designsystem.generated.resources.Res
@@ -62,7 +63,8 @@ fun DeleteBottomSheet(
                     .fillMaxWidth()
                     .padding(vertical = space.large),
                 text = title,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.height(space.large))
@@ -83,7 +85,7 @@ fun DeleteBottomSheet(
                 ) {
                     FintrackTitleMediumText(
                         text = confirmButtonText,
-                        color = MaterialTheme.colorScheme.background
+                        color = Color.White
                     )
                 }
 
@@ -96,7 +98,7 @@ fun DeleteBottomSheet(
                 ) {
                     FintrackTitleMediumText(
                         text = dismissButtonText,
-                        color = MaterialTheme.colorScheme.background
+                        color = Color.White
                     )
                 }
             }

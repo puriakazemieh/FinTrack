@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.GlassCard
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -105,7 +106,7 @@ private fun QuickActionItem(
                     modifier = Modifier.size(16.dp)
                 )
             }
-            Text(
+            FintrackLabelSmallText(
                 text = label,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.W500,

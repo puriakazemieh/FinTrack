@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.toFa
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.GlassTone
 import com.kazemieh.financialsource.ui.list.SourceHorizontalList
@@ -78,15 +78,13 @@ fun BalanceHero(
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
+                FintrackDisplaySmallText(
                     text = if (isBalanceVisible) state.balance.toFa() else "****",
-                    style = MaterialTheme.typography.headlineLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(Modifier.width(space.mediumSmall))
-                Text(
+                FintrackBodyMediumText(
                     text = stringResource(Res.string.currency_toman),
-                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
 
@@ -99,9 +97,8 @@ fun BalanceHero(
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
-                    Text(
+                    FintrackLabelSmallText(
                         text = growthPercentage.toFa(),
-                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }

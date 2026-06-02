@@ -10,6 +10,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -23,9 +24,13 @@ class PersonViewModel(
     private val _effect = Channel<PersonEffect>()
     val effect = _effect.receiveAsFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+
     fun onIntent(intent: PersonIntent) {
         when (intent) {
             PersonIntent.GetAllPerson -> loadAllPersons()
+
+            is PersonIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
 
             is PersonIntent.SetSelectedPerson -> {
                 val current = _state.value.initialSelectionIds
@@ -88,15 +93,25 @@ class PersonViewModel(
     private fun loadAllPersons() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            observePersonsUseCase().collect { persons ->
-                _state.update {
-                    it.copy(
-                        persons = persons,
-                        items = persons.map { it.toItemUi() }.toSet(),
-                        isLoading = false
-                    )
+            observePersonsUseCase()
+                .combine(_searchQuery) { persons, query ->
+                    val filtered = persons.filter {
+                        it.name.contains(query, ignoreCase = true) ||
+                                it.description?.contains(query, ignoreCase = true) == true
+                    }
+                    persons to filtered
                 }
-            }
+                .collect { (all, filtered) ->
+                    _state.update {
+                        it.copy(
+                            persons = all,
+                            filteredPersons = filtered,
+                            items = filtered.map { it.toItemUi() }.toSet(),
+                            isLoading = false,
+                            searchQuery = _searchQuery.value
+                        )
+                    }
+                }
         }
     }
 
@@ -104,18 +119,21 @@ class PersonViewModel(
 
 data class PersonState(
     val persons: List<Person> = emptyList(),
+    val filteredPersons: List<Person> = emptyList(),
     val showAddPerson: Boolean = false,
     val isLoading: Boolean = false,
     val initialSelectionIds: Set<Person> = emptySet(),
     val items: Set<ItemUi> = emptySet(),
     val isDeleteShow: Boolean = false,
     val selectedPerson: Person? = null,
+    val searchQuery: String = ""
 )
 
 sealed interface PersonIntent {
     data class SetSelectedPerson(val person: Person) : PersonIntent
     data class SetAllSelectedPersons(val persons: Set<Person>? = null) : PersonIntent
     data object GetAllPerson : PersonIntent
+    data class UpdateSearchQuery(val query: String) : PersonIntent
     data object ShowAddPerson : PersonIntent
     data object OnDismiss : PersonIntent
     data class SelectedPerson(val person: Person? = null) : PersonIntent

@@ -12,8 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.designsystem.GlassEdgeStrong
-import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.component.*
 
 /**
  * 2.8 SheetFrame — bottom sheet shell
@@ -68,17 +67,15 @@ fun SheetFrame(
                 }
                 
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
+                    FintrackHeadlineLargeText(
                         text = title,
-                        style = MaterialTheme.typography.titleLarge,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.W700,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     sub?.let {
-                        Text(
+                        FintrackLabelSmallText(
                             text = it,
-                            style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 11.sp
                         )
@@ -112,7 +109,7 @@ fun SheetFrame(
                             contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
-                        Text(text = primaryButtonText, fontSize = 15.sp, fontWeight = FontWeight.W600)
+                        FintrackTitleMediumText(text = primaryButtonText, fontSize = 15.sp, fontWeight = FontWeight.W600)
                     }
                     
                     if (secondaryButtonText != null) {
@@ -127,9 +124,8 @@ fun SheetFrame(
                                     .padding(vertical = 12.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
+                                FintrackTitleSmallText(
                                     text = secondaryButtonText,
-                                    fontSize = 14.sp,
                                     fontWeight = FontWeight.W500,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )

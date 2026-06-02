@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.designsystem.picker.FinTrackIcons
@@ -96,9 +97,9 @@ fun AddTagContent(
     }
 
     AddFrame(
-        title = if (state.mode == AddTagMode.Add) "برچسب جدید" else "ویرایش برچسب",
-        sub = "برای دسته‌بندی دقیق‌تر تراکنش‌ها",
-        primaryLabel = "ذخیره برچسب",
+        title = if (state.mode == AddTagMode.Add) stringResource(Res.string.title_new_tag) else stringResource(Res.string.title_edit_tag),
+        sub = stringResource(Res.string.title_tag_management),
+        primaryLabel = stringResource(Res.string.btn_save_tag),
         onPrimaryClick = { onIntent(AddTagIntent.Save) },
         onClose = { onIntent(AddTagIntent.OnDismiss) },
         iconId = state.draft.iconId,
@@ -110,11 +111,11 @@ fun AddTagContent(
             contentPadding = PaddingValues(bottom = 24.dp)
         ) {
             item {
-                Field(label = "نام برچسب", required = true) {
+                Field(label = stringResource(Res.string.tag_name_label), required = true) {
                     TextField(
                         value = state.draft.name,
                         onValueChange = { onIntent(AddTagIntent.UpdateName(it)) },
-                        placeholder = { Text("مثلاً ناهار یا بنزین", fontSize = 13.sp, color = GlassText3) },
+                        placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.hint_search_in, stringResource(Res.string.tags)).replace(stringResource(Res.string.hint_search_in, ""), ""), color = GlassText3) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
@@ -129,11 +130,11 @@ fun AddTagContent(
             }
 
             item {
-                Field(label = "توضیحات") {
+                Field(label = stringResource(Res.string.description_label)) {
                     TextField(
                         value = state.draft.description.orEmpty(),
                         onValueChange = { onIntent(AddTagIntent.UpdateDescription(it)) },
-                        placeholder = { Text("یادداشت اختیاری...", fontSize = 13.sp, color = GlassText3) },
+                        placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.hint_optional_note), color = GlassText3) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
@@ -150,7 +151,7 @@ fun AddTagContent(
             item {
                 GlassCard(padding = 14.dp) {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text(text = "رنگ", style = MaterialTheme.typography.labelMedium, color = GlassText3)
+                        FintrackLabelMediumText(text = stringResource(Res.string.label_color), color = GlassText3)
                         ColorSwatches(
                             colors = colors,
                             pickedIndex = selectedColorIndex,
@@ -163,7 +164,7 @@ fun AddTagContent(
             item {
                 GlassCard(padding = 14.dp) {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text(text = "آیکن", style = MaterialTheme.typography.labelMedium, color = GlassText3)
+                        FintrackLabelMediumText(text = stringResource(Res.string.label_icon), color = GlassText3)
                         IconGrid(
                             icons = FinTrackIcons.icons,
                             pickedIndex = selectedIconIndex,

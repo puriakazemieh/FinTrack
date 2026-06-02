@@ -3,7 +3,7 @@ package com.kazemieh.designsystem.component.glass
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import com.kazemieh.designsystem.component.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,20 +32,19 @@ fun MoneyText(
         modifier = modifier,
         verticalAlignment = Alignment.Bottom
     ) {
-        Text(
+        FintrackTitleMediumText(
             text = amount.toFa(),
             fontSize = size.sp,
             fontWeight = weight,
-            color = color,
-            style = MaterialTheme.typography.bodyLarge // Base style
+            color = color
         )
         if (suffix.isNotEmpty()) {
-            Text(
+            FintrackLabelSmallText(
                 text = suffix,
                 fontSize = (size * 0.55).sp,
                 fontWeight = FontWeight.W400,
                 color = color.copy(alpha = 0.42f),
-                modifier = Modifier.padding(start = 5.dp)
+                modifier = Modifier.padding(start = 5.dp, bottom = 2.dp)
             )
         }
     }

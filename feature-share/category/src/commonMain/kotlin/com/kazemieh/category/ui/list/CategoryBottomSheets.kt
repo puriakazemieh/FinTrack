@@ -20,7 +20,7 @@ import com.kazemieh.category.ui.delete.DeleteCategoryBottomSheet
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.SheetFrame
@@ -74,9 +74,9 @@ fun CategoryPickerBottomSheet(
         }
 
         Column(modifier = Modifier.fillMaxWidth()) {
-            Text(
+            FintrackTitleLargeText(
                 text = stringResource(Res.string.category),
-                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(16.dp)
             )
             

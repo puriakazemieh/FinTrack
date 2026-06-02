@@ -10,9 +10,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Person
-import com.kazemieh.designsystem.component.bottomsheet.FormBottomSheetScaffold
-import com.kazemieh.designsystem.component.form.NameDescriptionFields
 import com.kazemieh.designsystem.component.model.resolveString
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.glass.*
+import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.GlassText
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
 import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -64,21 +76,73 @@ fun AddPersonBottomSheet(
         }
     }
 
-    FormBottomSheetScaffold(
-        sheetState = sheetState,
+    ModalBottomSheet(
         onDismissRequest = { viewModel.onIntent(AddPersonIntent.OnDismiss) },
-        primaryButtonText = stringResource(Res.string.save_person),
-        onPrimaryClick = { viewModel.onIntent(AddPersonIntent.Save) }
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = null
     ) {
-        NameDescriptionFields(
-            name = state.draft.name,
-            onNameChange = { viewModel.onIntent(AddPersonIntent.UpdateName(it)) },
-            nameLabel = stringResource(Res.string.person_name_label),
-            description = state.draft.description.orEmpty(),
-            onDescriptionChange = { viewModel.onIntent(AddPersonIntent.UpdateDescription(it)) },
-            descriptionLabel = stringResource(Res.string.description_label),
-
-            isIconShow = false
+        AddPersonContent(
+            state = state,
+            onIntent = viewModel::onIntent
         )
+    }
+}
+
+@Composable
+fun AddPersonContent(
+    state: AddPersonState,
+    onIntent: (AddPersonIntent) -> Unit
+) {
+    AddFrame(
+        title = if (state.mode == AddPersonMode.Add) stringResource(Res.string.title_new_person) else stringResource(Res.string.title_edit_person),
+        sub = stringResource(Res.string.title_person_management),
+        primaryLabel = stringResource(Res.string.btn_save_person),
+        onPrimaryClick = { onIntent(AddPersonIntent.Save) },
+        onClose = { onIntent(AddPersonIntent.OnDismiss) }
+    ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(bottom = 24.dp)
+        ) {
+            item {
+                Field(label = stringResource(Res.string.label_person_name), required = true) {
+                    TextField(
+                        value = state.draft.name,
+                        onValueChange = { onIntent(AddPersonIntent.UpdateName(it)) },
+                        placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.hint_enter_person_name), color = GlassText3) },
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            cursorColor = GlassGreen
+                        ),
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = GlassText, fontWeight = FontWeight.SemiBold),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            item {
+                Field(label = stringResource(Res.string.description_label)) {
+                    TextField(
+                        value = state.draft.description.orEmpty(),
+                        onValueChange = { onIntent(AddPersonIntent.UpdateDescription(it)) },
+                        placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.hint_optional_note), color = GlassText3) },
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            cursorColor = GlassGreen
+                        ),
+                        textStyle = MaterialTheme.typography.bodyMedium.copy(color = GlassText),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
     }
 }

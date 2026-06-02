@@ -56,6 +56,8 @@ import com.kazemieh.common.format
 import com.kazemieh.common.toDegrees
 import com.kazemieh.common.toFa
 import com.kazemieh.common.toRadians
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.vazirmatnFontFamily
 import com.kazemieh.designsystem.picker.FinTrackIcons
@@ -155,12 +157,19 @@ fun PieChart(
     val space = LocalSpacing.current
     val isDark = isSystemInDarkTheme()
 
+    val percentages = remember(data) { calculatePercentages(data) }
     val painters = data.map { item ->
         val res = item.iconId?.let { FinTrackIcons.findIcon(it).resource }
         res?.let { painterResource(it) } ?: item.icon?.let { rememberVectorPainter(it) }
     }
 
-    val percentages = remember(data) { calculatePercentages(data) }
+    // Pre-calculate localized labels
+    val labelTemplate = stringResource(Res.string.label_percentage_suffix)
+    val labelStrings = remember(data, percentages, labelTemplate) {
+        data.mapIndexed { index, item ->
+            labelTemplate.replace("%1\$s", item.label).replace("%2\$s", percentages[index].format(0).toFa())
+        }
+    }
     val total = data.sumOf { it.value.toDouble() }.takeIf { it != 0.0 } ?: 1.0
     val sliceAngles = remember(data) { data.map { 360f * (it.value.toFloat() / total.toFloat()) } }
 
@@ -247,6 +256,7 @@ fun PieChart(
                 data = data,
                 colors = colors,
                 percentages = percentages,
+                labelStrings = labelStrings,
                 textMeasurer = textMeasurer,
                 textStyle = labelTextStyle,
                 painters = painters,
@@ -274,6 +284,7 @@ private fun PieChartLabelsCanvas(
     data: List<PieChartItem>,
     colors: List<Color>,
     percentages: List<Float>,
+    labelStrings: List<String>,
     textMeasurer: androidx.compose.ui.text.TextMeasurer,
     textStyle: TextStyle,
     rotation: Float,
@@ -335,7 +346,7 @@ private fun PieChartLabelsCanvas(
             // جلوگیری از کرش کردن در صورتی که فضای محاسبه شده منفی یا خیلی کم شود
             val safeMaxWidth = maxOf(200f, maxAvailableTextWidth).toInt()
 
-            val labelText = "${data[index].label} ${percentages[index].format(0).toFa()}%"
+            val labelText = labelStrings[index]
 
             // تنظیمات جدید متن: تراز کردن + محدودیت سایز + دو خطی شدن
             val layout = textMeasurer.measure(
@@ -455,7 +466,8 @@ private fun PieChartLegend(
                 }
                 Spacer(modifier = Modifier.width(space.small))
                 FintrackLabelSmallText(
-                    text = "${item.label}: ${item.value.formatNumber()} تومان"
+                    text = stringResource(Res.string.amount_label, item.label, item.value.formatNumber().toFa()),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }

@@ -28,8 +28,9 @@ import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.toFa
 import com.kazemieh.designsystem.*
-import com.kazemieh.designsystem.component.FinTrackLeadingIcon
-import com.kazemieh.designsystem.component.LeadingIconStyle
+import com.kazemieh.designsystem.component.*
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -77,9 +78,8 @@ private fun SourceTile(source: Source) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Spacer(modifier = Modifier.weight(1f))
-                Text(
+                FintrackLabelSmallText(
                     text = source.name,
-                    style = MaterialTheme.typography.labelSmall,
                     fontSize = 10.5.sp,
                     maxLines = 1,
                     color = GlassText2
@@ -93,9 +93,8 @@ private fun SourceTile(source: Source) {
                     corner = 6.dp
                 )
             }
-            Text(
+            FintrackTitleSmallText(
                 text = source.balance.toLong().toFa(),
-                style = MaterialTheme.typography.titleSmall,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 color = GlassText
@@ -141,8 +140,8 @@ private fun NewSourceTile(onClick: () -> Unit) {
                     modifier = Modifier.size(14.dp)
                 )
             }
-            Text(
-                text = "منبع جدید",
+            FintrackLabelSmallText(
+                text = stringResource(Res.string.label_new_source),
                 fontSize = 9.5.sp,
                 fontWeight = FontWeight.Bold,
                 color = color

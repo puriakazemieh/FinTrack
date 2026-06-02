@@ -5,6 +5,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
+import com.kazemieh.designsystem.component.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,9 +47,8 @@ fun SearchBar(
             
             Box(modifier = Modifier.weight(1f)) {
                 if (query.isEmpty()) {
-                    Text(
+                    FintrackBodyMediumText(
                         text = placeholder,
-                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f),
                         fontSize = 13.sp
                     )

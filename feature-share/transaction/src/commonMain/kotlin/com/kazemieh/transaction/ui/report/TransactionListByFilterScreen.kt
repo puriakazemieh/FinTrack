@@ -26,8 +26,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.*
 import com.kazemieh.common.toFa
 import com.kazemieh.designsystem.*
-import com.kazemieh.designsystem.component.FinTrackLeadingIcon
-import com.kazemieh.designsystem.component.LeadingIconStyle
+import com.kazemieh.designsystem.component.*
+import org.jetbrains.compose.resources.stringResource
+import fintrack.core.designsystem.generated.resources.*
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -135,7 +136,7 @@ fun TransactionListByFilterContent(
         } else if (state.items.isEmpty()) {
             item {
                 Box(modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "تراکنشی یافت نشد", color = GlassText3)
+                    FintrackBodyMediumText(text = stringResource(Res.string.msg_no_transaction_found), color = GlassText3)
                 }
             }
         } else {
@@ -183,14 +184,15 @@ private fun DayHeader(date: String, count: Int, netAmount: Long) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
-            Text(text = date, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = GlassText)
-            // We don't have weekday in model yet, could add helper if needed
+            FintrackBodyLargeText(text = date, fontWeight = FontWeight.Bold, color = GlassText)
         }
         Column(horizontalAlignment = Alignment.End) {
-            Text(text = "${count.toLong().toFa()} تراکنش · خالص", style = MaterialTheme.typography.labelSmall, color = GlassText3)
-            Text(
-                text = "${netAmount.toFa()} ت",
-                fontSize = 12.5.sp,
+            FintrackLabelSmallText(
+                text = stringResource(Res.string.label_transaction_net_summary, count.toLong().toFa(), stringResource(Res.string.unit_transaction), stringResource(Res.string.label_net)),
+                color = GlassText3
+            )
+            FintrackTitleSmallText(
+                text = stringResource(Res.string.label_amount_with_unit, netAmount.toFa(), stringResource(Res.string.unit_toman_short)),
                 fontWeight = FontWeight.Bold,
                 color = if (netAmount >= 0) GlassGreen else GlassRed
             )
@@ -242,23 +244,21 @@ private fun TxRow(item: TransactionWithRelations, onClick: () -> Unit) {
         }
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = item.category.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = GlassText)
+            FintrackBodyMediumText(text = item.category.name, fontWeight = FontWeight.Bold, color = GlassText)
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(text = item.source.name, style = MaterialTheme.typography.labelSmall, color = GlassText3)
+                FintrackLabelSmallText(text = item.source.name, color = GlassText3)
                 Box(modifier = Modifier.size(3.dp).background(GlassText3, CircleShape))
-                // Text(text = item.transaction.time, ...) // time is not explicitly in model, only timestamp
             }
         }
 
         Column(horizontalAlignment = Alignment.End) {
-            Text(
-                text = "${item.transaction.amount.toLong().toFa()} ت",
-                fontSize = 13.sp,
+            FintrackTitleSmallText(
+                text = stringResource(Res.string.label_amount_with_unit, item.transaction.amount.toLong().toFa(), stringResource(Res.string.unit_toman_short)),
                 fontWeight = FontWeight.Bold,
                 color = color
             )
             item.transaction.description?.takeIf { it.isNotEmpty() }?.let {
-                Text(text = it, style = MaterialTheme.typography.labelSmall, color = GlassText3, maxLines = 1)
+                FintrackLabelSmallText(text = it, color = GlassText3, maxLines = 1)
             }
         }
     }

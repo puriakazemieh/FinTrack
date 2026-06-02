@@ -20,6 +20,8 @@ import com.kazemieh.tag.ui.delete.DeleteTagBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.tags
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.stringResource
+import fintrack.core.designsystem.generated.resources.*
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -122,7 +124,7 @@ fun TagManageBottomSheet(
             },
             summary = listOf(
                 EntitySummary(
-                    label = "تعداد برچسب‌ها",
+                    label = stringResource(Res.string.label_tag_count),
                     value = state.tags.size.toString(),
                     unit = stringResource(Res.string.tag_item, ""),
                     color = MaterialTheme.colorScheme.primary

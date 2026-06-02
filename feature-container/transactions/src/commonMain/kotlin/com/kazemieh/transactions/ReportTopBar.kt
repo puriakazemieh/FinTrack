@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
+import com.kazemieh.designsystem.component.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,17 +53,14 @@ fun TxHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
-            Text(
-                text = "مدیریت",
-                style = MaterialTheme.typography.labelSmall,
+            FintrackLabelSmallText(
+                text = stringResource(Res.string.label_management),
                 color = GlassText3
             )
-            Text(
-                text = "تراکنش‌ها",
-                style = MaterialTheme.typography.headlineSmall,
+            FintrackHeadlineSmallText(
+                text = stringResource(Res.string.label_transactions_plural),
                 fontWeight = FontWeight.Bold,
-                color = GlassText,
-                letterSpacing = (-0.5).sp
+                color = GlassText
             )
         }
 
@@ -129,11 +127,11 @@ fun PeriodSelector(
     modifier: Modifier = Modifier
 ) {
     val periods = listOf(
-        DateFilterType.TODAY to "روز",
-        DateFilterType.THIS_WEEK to "هفته",
-        DateFilterType.THIS_MONTH to "ماه",
-        DateFilterType.NEXT_MONTH to "سال", // Simplified mapping for now
-        DateFilterType.CUSTOM_RANGE to "بازه"
+        DateFilterType.TODAY to stringResource(Res.string.label_day),
+        DateFilterType.THIS_WEEK to stringResource(Res.string.label_week),
+        DateFilterType.THIS_MONTH to stringResource(Res.string.label_month_short),
+        DateFilterType.NEXT_MONTH to stringResource(Res.string.label_year_short), // Simplified mapping for now
+        DateFilterType.CUSTOM_RANGE to stringResource(Res.string.label_range)
     )
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -157,15 +155,13 @@ fun PeriodSelector(
                 }
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
+                    FintrackBodyLargeText(
                         text = periodLabel,
-                        style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
                         color = GlassText
                     )
-                    Text(
+                    FintrackLabelSmallText(
                         text = periodSubLabel,
-                        style = MaterialTheme.typography.labelSmall,
                         color = GlassText3
                     )
                 }
@@ -195,12 +191,11 @@ fun PeriodSelector(
                     color = GlassGreen,
                     onClick = { onPeriodSelected(type) }
                 ) {
-                    Text(
-                        text = label,
-                        fontSize = 12.sp,
-                        fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-                        color = if (active) GlassBg0 else GlassText2
-                    )
+                FintrackLabelMediumText(
+                    text = label,
+                    fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                    color = if (active) GlassBg0 else GlassText2
+                )
                 }
             }
         }
@@ -236,9 +231,8 @@ fun ActiveFilters(
             }
         }
         
-        Text(
-            text = "پاک کردن همه",
-            style = MaterialTheme.typography.labelSmall,
+        FintrackLabelSmallText(
+            text = stringResource(Res.string.btn_clear_all),
             color = GlassText3,
             modifier = Modifier
                 .clickable(onClick = onClearAll)
@@ -265,9 +259,8 @@ private fun FilterChip(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Text(
+        FintrackLabelSmallText(
             text = label,
-            fontSize = 11.sp,
             color = color ?: GlassText2
         )
         Icon(
@@ -320,23 +313,21 @@ fun DateFilterBottomSheet(
                 DateFilterType.LAST_MONTH -> Res.string.last_month
                 else -> Res.string.all
             }
-            Text(
+            FintrackBodyLargeText(
                 text = stringResource(label),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onDateRange(type) }
-                    .padding(vertical = 12.dp, horizontal = 16.dp),
-                style = MaterialTheme.typography.bodyLarge
+                    .padding(vertical = 12.dp, horizontal = 16.dp)
             )
         }
 
-        Text(
+        FintrackBodyLargeText(
             text = stringResource(Res.string.custom_range),
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onToggleCustomDateSheet() }
                 .padding(vertical = 12.dp, horizontal = 16.dp),
-            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.primary
         )
     }
@@ -394,7 +385,7 @@ fun CustomDateBottomSheet(
                 onClick = { onSubmit(startDate, endDate) },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(stringResource(Res.string.confirm))
+                FintrackTitleMediumText(text = stringResource(Res.string.confirm), color = Color.White)
             }
         }
     }
@@ -425,7 +416,7 @@ private fun DateInput(
     onClick: () -> Unit
 ) {
     Column(modifier = modifier) {
-        Text(text = label, style = MaterialTheme.typography.labelMedium, color = GlassText3)
+        FintrackLabelMediumText(text = label, color = GlassText3)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -436,9 +427,8 @@ private fun DateInput(
                 .padding(horizontal = 12.dp),
             contentAlignment = Alignment.CenterStart
         ) {
-            Text(
-                text = value.ifEmpty { "انتخاب تاریخ" },
-                style = MaterialTheme.typography.bodyMedium,
+            FintrackBodyMediumText(
+                text = value.ifEmpty { stringResource(Res.string.action_select_date) },
                 color = if (value.isEmpty()) GlassText3 else GlassText
             )
         }

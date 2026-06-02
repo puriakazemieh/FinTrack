@@ -9,13 +9,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material3.Text
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 
 @Composable
 fun FintrackDisplayLargeText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    style: TextStyle = MaterialTheme.typography.displayLarge.copy(color = color),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.displayLarge.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -34,7 +38,9 @@ fun FintrackDisplayMediumText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    style: TextStyle = MaterialTheme.typography.displayMedium.copy(color = color),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.displayMedium.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -53,7 +59,9 @@ fun FintrackDisplaySmallText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    style: TextStyle = MaterialTheme.typography.displaySmall.copy(color = color),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.displaySmall.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -72,7 +80,9 @@ fun FintrackHeadlineLargeText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    style: TextStyle = MaterialTheme.typography.headlineLarge.copy(color = color),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.headlineLarge.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -91,7 +101,9 @@ fun FintrackHeadlineMediumText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    style: TextStyle = MaterialTheme.typography.headlineMedium.copy(color = color),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.headlineMedium.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -110,7 +122,9 @@ fun FintrackHeadlineSmallText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    style: TextStyle = MaterialTheme.typography.headlineSmall.copy(color = color),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.headlineSmall.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -129,7 +143,9 @@ fun FintrackTitleLargeText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    style: TextStyle = MaterialTheme.typography.titleLarge.copy(color = color),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.titleLarge.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -148,7 +164,9 @@ fun FintrackTitleMediumText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    style: TextStyle = MaterialTheme.typography.titleMedium.copy(color = color),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.titleMedium.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -167,7 +185,9 @@ fun FintrackTitleSmallText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    style: TextStyle = MaterialTheme.typography.titleSmall.copy(color = color),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.titleSmall.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -186,7 +206,9 @@ fun FintrackBodyLargeText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    style: TextStyle = MaterialTheme.typography.bodyLarge.copy(color = color),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.bodyLarge.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -205,7 +227,9 @@ fun FintrackBodyMediumText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    style: TextStyle = MaterialTheme.typography.bodyMedium.copy(color = color),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.bodyMedium.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -224,7 +248,9 @@ fun FintrackBodySmallText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    style: TextStyle = MaterialTheme.typography.bodySmall.copy(color = color),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.bodySmall.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -243,7 +269,9 @@ fun FintrackLabelLargeText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    style: TextStyle = MaterialTheme.typography.labelLarge.copy(color = color),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.labelLarge.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -262,7 +290,9 @@ fun FintrackLabelMediumText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    style: TextStyle = MaterialTheme.typography.labelMedium.copy(color = color),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.labelMedium.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -281,7 +311,9 @@ fun FintrackLabelSmallText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    style: TextStyle = MaterialTheme.typography.labelSmall.copy(color = color),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.labelSmall.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {

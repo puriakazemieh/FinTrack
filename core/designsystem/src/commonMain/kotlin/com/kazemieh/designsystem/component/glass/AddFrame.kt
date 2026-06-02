@@ -16,8 +16,7 @@ import androidx.compose.ui.unit.sp
 import com.kazemieh.designsystem.GlassBg0
 import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.GlassText2
-import com.kazemieh.designsystem.component.FinTrackLeadingIcon
-import com.kazemieh.designsystem.component.LeadingIconStyle
+import com.kazemieh.designsystem.component.*
 
 /**
  * 2.8 AddFrame — full-screen add form
@@ -73,17 +72,14 @@ fun AddFrame(
                         )
                     }
                     
-                    Text(
+                    FintrackHeadlineLargeText(
                         text = title,
-                        style = MaterialTheme.typography.headlineLarge,
                         fontSize = 24.sp,
-                        fontWeight = FontWeight.W800,
-                        color = MaterialTheme.colorScheme.onBackground
+                        fontWeight = FontWeight.W800
                     )
                     sub?.let {
-                        Text(
+                        FintrackBodyMediumText(
                             text = it,
-                            style = MaterialTheme.typography.bodyMedium,
                             color = GlassText2,
                             modifier = Modifier.padding(top = 4.dp)
                         )
@@ -114,7 +110,7 @@ fun AddFrame(
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    Text(
+                    FintrackBodyLargeText(
                         text = primaryLabel,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.W700,

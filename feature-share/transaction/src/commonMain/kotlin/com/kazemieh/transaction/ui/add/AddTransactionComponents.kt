@@ -9,7 +9,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import com.kazemieh.designsystem.component.*
+import org.jetbrains.compose.resources.stringResource
+import fintrack.core.designsystem.generated.resources.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -40,9 +44,9 @@ fun GlassSegmentedSelector(
     modifier: Modifier = Modifier
 ) {
     val types = listOf(
-        TransactionType.EXPENSE to "خرج",
-        TransactionType.INCOME to "درآمد",
-        TransactionType.TRANSFER to "انتقال"
+        TransactionType.EXPENSE to stringResource(Res.string.type_expense),
+        TransactionType.INCOME to stringResource(Res.string.type_income),
+        TransactionType.TRANSFER to stringResource(Res.string.type_transfer)
     )
 
     Row(
@@ -75,13 +79,10 @@ fun GlassSegmentedSelector(
                     .padding(vertical = 9.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-                    color = if (active) color else GlassText3,
-                    fontSize = 13.sp
-                )
+        FintrackBodyMediumText(
+            text = label,
+            color = if (active) color else GlassText3
+        )
             }
         }
     }
@@ -105,16 +106,9 @@ fun LargeAmountCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = stringResource(Res.string.amount),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = GlassText3,
-                        fontSize = 11.sp
-                    )
-                    Text(
-                        text = " *",
-                        color = GlassRed,
-                        fontSize = 11.sp
+                    FintrackLabelSmallText(
+                        text = " " + stringResource(Res.string.label_required_marker),
+                        color = GlassRed
                     )
                 }
 
@@ -136,11 +130,9 @@ fun LargeAmountCard(
                             tint = GlassText3,
                             modifier = Modifier.size(11.dp)
                         )
-                        Text(
-                            text = "ماشین‌حساب",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = GlassText3,
-                            fontSize = 10.5.sp
+                        FintrackLabelSmallText(
+                            text = stringResource(Res.string.label_calculator),
+                            color = GlassText3
                         )
                     }
                 }
@@ -151,19 +143,9 @@ fun LargeAmountCard(
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                Text(
-                    text = if (amount.isEmpty()) "۰" else amount.toLongOrNull()?.toFa() ?: amount,
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = GlassText,
-                    letterSpacing = (-0.02).sp
-                )
-                Text(
-                    text = stringResource(Res.string.currency_toman),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = GlassText3,
-                    fontSize = 14.sp
+                FintrackDisplaySmallText(
+                    text = if (amount.isEmpty()) stringResource(Res.string.label_zero) else amount.toLongOrNull()?.toFa() ?: amount,
+                    color = GlassText
                 )
             }
         }
@@ -190,28 +172,22 @@ fun SectionContainer(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = GlassText,
-                        fontSize = 12.sp
-                    )
+                FintrackLabelMediumText(
+                    text = title,
+                    fontWeight = FontWeight.Bold,
+                    color = GlassText
+                )
                     sub?.let {
-                        Text(
+                        FintrackLabelSmallText(
                             text = it,
-                            style = MaterialTheme.typography.labelSmall,
                             color = GlassText3,
-                            fontSize = 10.sp,
                             modifier = Modifier.padding(top = 2.dp)
                         )
                     }
                 }
-                Text(
-                    text = "اختیاری",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = GlassText3,
-                    fontSize = 10.sp
+                FintrackLabelSmallText(
+                    text = stringResource(Res.string.label_optional_fa),
+                    color = GlassText3
                 )
             }
 
@@ -252,10 +228,8 @@ fun AddChip(
                 cornerRadius = androidx.compose.ui.geometry.CornerRadius(99.dp.toPx())
             )
         }
-        Text(
+        FintrackLabelSmallText(
             text = label,
-            fontSize = 11.5.sp,
-            fontWeight = FontWeight.Medium,
             color = GlassText2,
             modifier = Modifier.padding(horizontal = 11.dp, vertical = 4.dp)
         )
@@ -280,9 +254,8 @@ fun RemovableChip(
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         icon?.invoke()
-        Text(
+        FintrackLabelSmallText(
             text = label,
-            fontSize = 11.sp,
             fontWeight = FontWeight.SemiBold,
             color = color
         )

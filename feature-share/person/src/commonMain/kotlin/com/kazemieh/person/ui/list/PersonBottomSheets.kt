@@ -2,20 +2,28 @@ package com.kazemieh.person.ui.list
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.kazemieh.common.model.Person
-import com.kazemieh.designsystem.component.bottomsheet.ListBottomSheet
 import com.kazemieh.designsystem.component.bottomsheet.SelectableFlowRowBottomSheet
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
+import com.kazemieh.designsystem.component.glass.EntityItem
+import com.kazemieh.designsystem.component.glass.EntityList
+import com.kazemieh.designsystem.component.glass.EntitySummary
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.designsystem.component.model.toPerson
 import com.kazemieh.person.ui.add.AddPersonBottomSheet
 import com.kazemieh.person.ui.delete.DeletePersonBottomSheet
-import fintrack.core.designsystem.generated.resources.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.label_person_count
+import fintrack.core.designsystem.generated.resources.person_item
+import fintrack.core.designsystem.generated.resources.persons
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -85,18 +93,55 @@ fun PersonManageBottomSheet(
         }
     }
 
-    ListBottomSheet(
-        title = stringResource(Res.string.persons),
-        items = state.items,
-        onItemClicked = { viewModel.onIntent(PersonIntent.SelectedPerson(it.toPerson())) },
-        onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
-        onDismiss = { viewModel.onIntent(PersonIntent.OnDismiss) },
-        isDeleteShow = isDeleteShow,
-        isEditShow = isEditShow,
-        clickable = clickable,
-        onItemEditClicked = { viewModel.onIntent(PersonIntent.OnEditClick(it.toPerson())) },
-        onItemDeleteClicked = { viewModel.onIntent(PersonIntent.OnDeleteClick(it.toPerson())) },
-    )
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = { viewModel.onIntent(PersonIntent.OnDismiss) },
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = null
+    ) {
+        EntityList(
+            title = stringResource(Res.string.persons),
+            query = state.searchQuery,
+            onQueryChange = { viewModel.onIntent(PersonIntent.UpdateSearchQuery(it)) },
+            items = state.persons.map { person ->
+                EntityItem(
+                    id = person.id ?: 0L,
+                    name = person.name,
+                    sub = person.description,
+                    iconId = 1, // Default user icon? Or handle properly
+                    colorId = 1
+                )
+            },
+            onItemClick = { item ->
+                if (clickable) {
+                    state.persons.find { it.id == item.id }?.let {
+                        viewModel.onIntent(PersonIntent.SelectedPerson(it))
+                    }
+                }
+            },
+            onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
+            onEditClick = { item ->
+                state.persons.find { it.id == item.id }?.let {
+                    viewModel.onIntent(PersonIntent.OnEditClick(it))
+                }
+            },
+            onDeleteClick = { item ->
+                state.persons.find { it.id == item.id }?.let {
+                    viewModel.onIntent(PersonIntent.OnDeleteClick(it))
+                }
+            },
+            summary = listOf(
+                EntitySummary(
+                    label = stringResource(Res.string.label_person_count),
+                    value = state.persons.size.toString(),
+                    unit = stringResource(Res.string.person_item, ""),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            )
+        )
+    }
 
     if (state.showAddPerson) {
         AddPersonBottomSheet(
@@ -130,7 +175,8 @@ fun PersonSelectionBottomSheet(
 
     LaunchedEffect(Unit) { viewModel.onIntent(PersonIntent.GetAllPerson) }
 
-    val initialSelectionIds = if (isAllSelected) state.items else initialSelectionPairs.map { it.toItemUi() }.toSet()
+    val initialSelectionIds =
+        if (isAllSelected) state.items else initialSelectionPairs.map { it.toItemUi() }.toSet()
 
     SelectableListBottomSheet(
         title = stringResource(Res.string.persons),

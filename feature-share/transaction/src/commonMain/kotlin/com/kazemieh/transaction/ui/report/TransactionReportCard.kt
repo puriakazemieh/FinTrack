@@ -18,10 +18,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.toFa
 import com.kazemieh.designsystem.*
-import com.kazemieh.designsystem.component.FinTrackLeadingIcon
-import com.kazemieh.designsystem.component.LeadingIconStyle
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.GlassTone
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -42,9 +43,8 @@ fun SummaryCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "خلاصه‌ی این دوره",
-                    style = MaterialTheme.typography.labelMedium,
+                FintrackLabelMediumText(
+                    text = stringResource(Res.string.label_summary_period),
                     color = GlassText2
                 )
                 Box(
@@ -53,8 +53,8 @@ fun SummaryCard(
                         .background(GlassColor)
                         .padding(horizontal = 8.dp, vertical = 2.dp)
                 ) {
-                    Text(
-                        text = "${state.items.size.toLong().toFa()} تراکنش",
+                    FintrackLabelSmallText(
+                        text = stringResource(Res.string.label_amount_with_unit, state.items.size.toLong().toFa(), stringResource(Res.string.unit_transaction)),
                         fontSize = 10.sp,
                         color = GlassText3
                     )
@@ -71,10 +71,10 @@ fun SummaryCard(
                 )
 
                 Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SummaryRow(label = "درآمد", value = state.totalIncome, color = GlassGreen)
-                    SummaryRow(label = "خرج", value = state.totalExpense, color = GlassRed)
+                    SummaryRow(label = stringResource(Res.string.label_income), value = state.totalIncome, color = GlassGreen)
+                    SummaryRow(label = stringResource(Res.string.label_expense), value = state.totalExpense, color = GlassRed)
                     HorizontalDivider(modifier = Modifier.padding(top = 4.dp), color = GlassHairline)
-                    SummaryRow(label = "خالص", value = state.totalIncome - state.totalExpense, color = GlassText, isBold = true)
+                    SummaryRow(label = stringResource(Res.string.label_net), value = state.totalIncome - state.totalExpense, color = GlassText, isBold = true)
                 }
             }
         }
@@ -85,9 +85,9 @@ fun SummaryCard(
 private fun SummaryRow(label: String, value: Long, color: Color, isBold: Boolean = false) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(color))
-        Text(text = label, style = MaterialTheme.typography.labelSmall, color = GlassText2, modifier = Modifier.weight(1f))
-        Text(
-            text = "${value.toFa()} ت",
+        FintrackLabelSmallText(text = label, color = GlassText2, modifier = Modifier.weight(1f))
+        FintrackTitleSmallText(
+            text = stringResource(Res.string.label_amount_with_unit, value.toFa(), stringResource(Res.string.unit_toman_short)),
             fontSize = 13.sp,
             fontWeight = if (isBold) FontWeight.Bold else FontWeight.SemiBold,
             color = color
@@ -142,9 +142,8 @@ fun CategoryStrip(
 
     GlassCard(modifier = Modifier.fillMaxWidth(), padding = 14.dp) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(
-                text = "تقسیم بر دسته‌بندی",
-                style = MaterialTheme.typography.labelMedium,
+            FintrackLabelMediumText(
+                text = stringResource(Res.string.label_category_split),
                 fontWeight = FontWeight.Bold,
                 color = GlassText
             )
@@ -160,8 +159,8 @@ fun CategoryStrip(
                             iconSize = 12.dp,
                             corner = 7.dp
                         )
-                        Text(text = cat.name, style = MaterialTheme.typography.labelSmall, color = GlassText, modifier = Modifier.weight(1f))
-                        Text(text = "${cat.totalAmount.toFa()} ت", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = GlassText)
+                        FintrackLabelSmallText(text = cat.name, color = GlassText, modifier = Modifier.weight(1f))
+                        FintrackLabelSmallText(text = stringResource(Res.string.label_amount_with_unit, cat.totalAmount.toFa(), stringResource(Res.string.unit_toman_short)), fontWeight = FontWeight.Bold, color = GlassText)
                     }
                     
                     val progress = (cat.totalAmount.toFloat() / maxAmount).coerceIn(0f, 1f)

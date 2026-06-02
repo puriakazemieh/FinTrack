@@ -28,8 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.toFa
 import com.kazemieh.designsystem.*
-import com.kazemieh.designsystem.component.FinTrackLeadingIcon
-import com.kazemieh.designsystem.component.LeadingIconStyle
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+import com.kazemieh.designsystem.component.*
 
 /**
  * 2.9 EntityList — management list with summary header + search + edit/delete rows
@@ -73,18 +74,16 @@ fun EntityList(
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    Text(text = s.label, fontSize = 10.sp, color = GlassText3)
+                                    FintrackLabelSmallText(text = s.label, color = GlassText3)
                                     Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(
+                                        FintrackTitleMediumText(
                                             text = s.value.toFa(),
-                                            fontSize = 16.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = s.color ?: GlassText
                                         )
                                         s.unit?.let {
-                                            Text(
+                                            FintrackLabelSmallText(
                                                 text = it,
-                                                fontSize = 10.sp,
                                                 color = GlassText3,
                                                 modifier = Modifier.padding(start = 4.dp)
                                             )
@@ -107,7 +106,7 @@ fun EntityList(
                 SearchBar(
                     query = query,
                     onQueryChange = onQueryChange,
-                    placeholder = "جستجو در $title",
+                    placeholder = stringResource(Res.string.hint_search_in, title),
                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
                 )
             }
@@ -115,7 +114,7 @@ fun EntityList(
             if (items.isEmpty()) {
                 item {
                     Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp)) {
-                        EmptyListScreen(emptyHint ?: "هیچ موردی برای نمایش وجود ندارد")
+                        EmptyListScreen(emptyHint ?: stringResource(Res.string.msg_empty_list))
                     }
                 }
             } else {
@@ -163,43 +162,53 @@ private fun EntityRow(
         modifier = modifier.clickable(onClick = onClick),
         padding = 12.dp
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(11.dp)
-        ) {
-            FinTrackLeadingIcon(
-                colorId = item.colorId,
-                iconId = item.iconId,
-                style = LeadingIconStyle.Badge,
-                size = 38.dp,
-                iconSize = 16.dp,
-                corner = 12.dp
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(11.dp)
+            ) {
+                FinTrackLeadingIcon(
+                    colorId = item.colorId,
+                    iconId = item.iconId,
+                    style = LeadingIconStyle.Badge,
+                    size = 38.dp,
+                    iconSize = 16.dp,
+                    corner = 12.dp
+                )
 
-            Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text(
-                        text = item.name,
-                        fontSize = 13.5.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = GlassText
-                    )
-                    item.badge?.let {
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(6.dp))
-                                .background(color.copy(alpha = 0.12f))
-                                .padding(horizontal = 7.dp, vertical = 2.dp)
-                        ) {
-                            Text(text = it, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = color)
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        FintrackTitleSmallText(
+                            text = item.name,
+                            fontWeight = FontWeight.SemiBold,
+                            color = GlassText
+                        )
+                        item.badge?.let {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(color.copy(alpha = 0.12f))
+                                    .padding(horizontal = 7.dp, vertical = 2.dp)
+                            ) {
+                                FintrackLabelSmallText(
+                                    text = it,
+                                    fontWeight = FontWeight.Bold,
+                                    color = color
+                                )
+                            }
                         }
                     }
+                    item.sub?.let {
+                        FintrackBodySmallText(
+                            text = it,
+                            color = GlassText3,
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+                    }
                 }
-                item.sub?.let {
-                    Text(text = it, fontSize = 11.sp, color = GlassText3, modifier = Modifier.padding(top = 2.dp))
-                }
-            }
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ActionIcon(icon = Icons.Default.Edit, onClick = onEdit, color = GlassText2)

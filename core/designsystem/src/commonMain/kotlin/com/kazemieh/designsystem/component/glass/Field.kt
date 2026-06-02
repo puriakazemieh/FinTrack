@@ -2,7 +2,7 @@ package com.kazemieh.designsystem.component.glass
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import com.kazemieh.designsystem.component.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -11,6 +11,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.GlassText3
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * 2.8 Field — glass form row
@@ -35,19 +37,16 @@ fun Field(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
+                    FintrackLabelMediumText(
                         text = label,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (error) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 12.sp
+                        color = if (error) GlassRed else GlassText3
                     )
                     if (required) {
-                        Text(
-                            text = "*",
-                            color = MaterialTheme.colorScheme.error,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(start = 2.dp)
-                        )
+                        FintrackLabelSmallText(
+                        text = stringResource(Res.string.label_required_marker),
+                        color = GlassRed,
+                        modifier = Modifier.padding(start = 2.dp)
+                    )
                     }
                 }
                 
@@ -57,11 +56,9 @@ fun Field(
             }
             
             hint?.let {
-                Text(
+                FintrackLabelSmallText(
                     text = it,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f),
-                    fontSize = 10.sp
+                    color = GlassText3.copy(alpha = 0.65f)
                 )
             }
         }
