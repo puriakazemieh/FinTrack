@@ -227,7 +227,7 @@ fun AddTransactionContent(
         item {
             Field(label = stringResource(Res.string.date), required = true) {
                 PickerValue(
-                    label = state.date ?: "امروز",
+                    label = state.date ?: stringResource(Res.string.dp_today),
                     onClick = { /* Handle date picker toggle or direct integration */ },
                     color = GlassText2
                 )

@@ -466,7 +466,7 @@ private fun PieChartLegend(
                 }
                 Spacer(modifier = Modifier.width(space.small))
                 FintrackLabelSmallText(
-                    text = stringResource(Res.string.amount_label, item.label, item.value.formatNumber().toFa()),
+                    text = stringResource(Res.string.label_amount_with_unit, item.value.formatNumber().toFa(), stringResource(Res.string.currency_toman)),
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }

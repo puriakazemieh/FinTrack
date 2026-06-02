@@ -241,7 +241,7 @@ fun JalaliCalendarView(
                     onClick = {}, Modifier.size(iconSize).alpha(0f),
                     colors = IconButtonDefaults.filledIconButtonColors(Color.Transparent)
                 ) {
-                FintrackLabelSmallText("")
+                    FintrackLabelSmallText("")
                 }
             }
 
@@ -289,7 +289,7 @@ fun JalaliCalendarView(
                     onClick = {}, Modifier.size(iconSize).alpha(0f),
                     colors = IconButtonDefaults.filledIconButtonColors(Color.Transparent)
                 ) {
-                FintrackLabelSmallText("")
+                    FintrackLabelSmallText("")
                 }
             }
         }
@@ -381,9 +381,9 @@ fun JalaliCalendarView(
                 }
 
                 val monthRows = listOf(
-                    listOf(4 to "تیر", 3 to "خرداد", 2 to "اردیبهشت", 1 to "فروردین"),
-                    listOf(8 to "آبان", 7 to "مهر", 6 to "شهریور", 5 to "مرداد"),
-                    listOf(12 to "اسفند", 11 to "بهمن", 10 to "دی", 9 to "آذر")
+                    listOf(4 to stringResource(Res.string.month_tir), 3 to stringResource(Res.string.month_khordad), 2 to stringResource(Res.string.month_ordibehesht), 1 to stringResource(Res.string.month_farvardin)),
+                    listOf(8 to stringResource(Res.string.month_aban), 7 to stringResource(Res.string.month_mehr), 6 to stringResource(Res.string.month_shahrivar), 5 to stringResource(Res.string.month_mordad)),
+                    listOf(12 to stringResource(Res.string.month_esfand), 11 to stringResource(Res.string.month_bahman), 10 to stringResource(Res.string.month_dey), 9 to stringResource(Res.string.month_azar))
                 )
 
                 for (row in monthRows) {

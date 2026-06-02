@@ -203,7 +203,7 @@ private fun DashboardHeader(
                 contentAlignment = Alignment.Center
             ) {
                 FintrackLabelMediumText(
-                    text = stringResource(Res.string.app_name).take(1),
+                    text = stringResource(Res.string.placeholder_user_initial),
                     color = GlassGreenDark,
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp
@@ -215,7 +215,7 @@ private fun DashboardHeader(
                     color = GlassText3
                 )
                 FintrackTitleMediumText(
-                    text = stringResource(Res.string.app_name), // Placeholder for user name
+                    text = stringResource(Res.string.placeholder_user_name),
                     fontWeight = FontWeight.SemiBold,
                     color = GlassText
                 )
