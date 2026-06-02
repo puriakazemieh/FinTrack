@@ -58,6 +58,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AddTransactionBottomSheet(
     viewModel: AddTransactionViewModel = koinViewModel(),
     transactionWithRelations: TransactionWithRelations? = null,
+    initialType: TransactionType? = null,
     snackbarHostState: SnackbarHostState,
     onDismiss: () -> Unit,
     transactionAdded: () -> Unit
@@ -68,8 +69,9 @@ fun AddTransactionBottomSheet(
 
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(transactionWithRelations) {
+    LaunchedEffect(transactionWithRelations, initialType) {
         viewModel.onIntent(AddTransactionIntent.FetchDefaultData(transactionWithRelations))
+        initialType?.let { viewModel.onIntent(AddTransactionIntent.SelectedType(it)) }
     }
 
     LaunchedEffect(Unit) {

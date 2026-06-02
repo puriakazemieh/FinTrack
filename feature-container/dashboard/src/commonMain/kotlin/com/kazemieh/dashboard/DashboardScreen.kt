@@ -37,6 +37,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.dashboard.component.QuickActions
+import com.kazemieh.dashboard.component.RecentTransactionsWidget
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
@@ -122,6 +124,25 @@ fun DashboardScreen(
             item { Spacer(Modifier.height(space.large)) }
 
             item {
+                QuickActions(
+                    onActionClick = { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet(type = it)) },
+                    onSearchClick = { /* Handle search */ },
+                    modifier = Modifier.padding(horizontal = space.large)
+                )
+            }
+
+            item { Spacer(Modifier.height(space.large)) }
+
+            item {
+                RecentTransactionsWidget(
+                    onMoreClick = { /* Navigate to transactions */ },
+                    modifier = Modifier.padding(horizontal = space.large)
+                )
+            }
+
+            item { Spacer(Modifier.height(space.large)) }
+
+            item {
                 FintrackHeadlineSmallText(
                     text = stringResource(Res.string.recent_transactions),
                     modifier = Modifier.padding(horizontal = space.large, vertical = space.medium)
@@ -136,6 +157,7 @@ fun DashboardScreen(
         if (state.showAddTransaction) {
             AddTransactionBottomSheet(
                 transactionWithRelations = state.transactionWithRelations,
+                initialType = state.initialTransactionType,
                 snackbarHostState = snackbarHostState,
                 onDismiss = { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) },
                 transactionAdded = { viewModel.onIntent(DashboardIntent.AnimationEnabled) },

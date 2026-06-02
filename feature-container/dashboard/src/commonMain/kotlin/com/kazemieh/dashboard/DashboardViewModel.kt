@@ -1,6 +1,7 @@
 package com.kazemieh.dashboard
 
 import androidx.lifecycle.ViewModel
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +19,8 @@ class DashboardViewModel : ViewModel() {
             is DashboardIntent.ShowTransactionBottomSheet -> _state.update {
                 it.copy(
                     showAddTransaction = !_state.value.showAddTransaction,
-                    transactionWithRelations = intent.transactionWithRelations
+                    transactionWithRelations = intent.transactionWithRelations,
+                    initialTransactionType = intent.type
                 )
             }
 
@@ -54,14 +56,17 @@ data class DashboardState(
     val showAddSource: Boolean = false,
     val enableAnimationChart: Boolean = false,
     val transactionWithRelations: TransactionWithRelations? = null,
+    val initialTransactionType: TransactionType? = null,
     val isBalanceVisible: Boolean = true,
     val growthPercentage: String = "+2.5%" // Placeholder
 )
 
 
 sealed interface DashboardIntent {
-    data class ShowTransactionBottomSheet(val transactionWithRelations: TransactionWithRelations? = null) :
-        DashboardIntent
+    data class ShowTransactionBottomSheet(
+        val transactionWithRelations: TransactionWithRelations? = null,
+        val type: TransactionType? = null
+    ) : DashboardIntent
 
     data class DeleteTransactionBottomSheet(val transactionWithRelations: TransactionWithRelations? = null) :
         DashboardIntent

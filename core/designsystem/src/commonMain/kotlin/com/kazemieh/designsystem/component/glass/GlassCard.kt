@@ -26,15 +26,15 @@ fun GlassCard(
     content: @Composable () -> Unit
 ) {
     val backgroundColor = if (tone == GlassTone.Default) {
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f)
+        MaterialTheme.colorScheme.surfaceVariant // This is GlassColor (4.5% alpha)
     } else {
-        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.18f)
+        com.kazemieh.designsystem.GlassStrong // This is 8% alpha
     }
 
     val borderColor = if (tone == GlassTone.Default) {
-        MaterialTheme.colorScheme.outline.copy(alpha = 0.65f)
+        MaterialTheme.colorScheme.outline
     } else {
-        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
+        com.kazemieh.designsystem.GlassEdgeStrong
     }
 
     Box(
