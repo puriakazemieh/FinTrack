@@ -1,11 +1,14 @@
 package com.kazemieh.designsystem.component.glass
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,11 +41,20 @@ fun Tabs(
         ) {
             tabs.forEachIndexed { index, title ->
                 val isActive = index == active
+                val bgColor by animateColorAsState(
+                    targetValue = if (isActive) MaterialTheme.colorScheme.surfaceVariant else androidx.compose.ui.graphics.Color.Transparent,
+                    animationSpec = tween(200)
+                )
+                val textColor by animateColorAsState(
+                    targetValue = if (isActive) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                    animationSpec = tween(200)
+                )
+
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(if (isActive) MaterialTheme.colorScheme.surfaceVariant else androidx.compose.ui.graphics.Color.Transparent)
+                        .background(bgColor)
                         .clickable { onChange(index) }
                         .padding(vertical = 10.dp),
                     contentAlignment = Alignment.Center
@@ -55,7 +67,7 @@ fun Tabs(
                             text = title,
                             fontSize = 12.sp,
                             fontWeight = if (isActive) FontWeight.W700 else FontWeight.W500,
-                            color = if (isActive) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
+                            color = textColor
                         )
                         
                         counts?.getOrNull(index)?.let { count ->

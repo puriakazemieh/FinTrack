@@ -1,6 +1,8 @@
 package com.kazemieh.designsystem.component.glass
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -28,17 +30,15 @@ fun Switch(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
-    val thumbOffset by animateDpAsState(targetValue = if (on) 18.dp else 2.dp)
-    val trackColor = if (on) {
-        MaterialTheme.colorScheme.primary 
-    } else {
-        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
-    }
-    val thumbColor = if (on) {
-        MaterialTheme.colorScheme.onPrimary 
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    }
+    val thumbOffset by animateDpAsState(targetValue = if (on) 18.dp else 2.dp, animationSpec = tween(200))
+    val trackColor by animateColorAsState(
+        targetValue = if (on) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+        animationSpec = tween(200)
+    )
+    val thumbColor by animateColorAsState(
+        targetValue = if (on) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+        animationSpec = tween(200)
+    )
 
     Box(
         modifier = modifier

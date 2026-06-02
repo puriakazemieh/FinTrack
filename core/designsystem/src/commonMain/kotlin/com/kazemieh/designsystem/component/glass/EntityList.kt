@@ -1,6 +1,11 @@
 package com.kazemieh.designsystem.component.glass
 
 import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import com.kazemieh.designsystem.component.EmptyListScreen
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -42,7 +47,8 @@ fun EntityList(
     items: List<EntityItem>,
     onEditClick: (EntityItem) -> Unit,
     onDeleteClick: (EntityItem) -> Unit,
-    onItemClick: (EntityItem) -> Unit = {}
+    onItemClick: (EntityItem) -> Unit = {},
+    emptyHint: String? = null
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
@@ -106,15 +112,29 @@ fun EntityList(
                 )
             }
 
-            items(items) { it ->
-                EntityRow(
-                    item = it,
-                    mainColor = color,
-                    onEdit = { onEditClick(it) },
-                    onDelete = { onDeleteClick(it) },
-                    onClick = { onItemClick(it) },
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp)
-                )
+            if (items.isEmpty()) {
+                item {
+                    Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp)) {
+                        EmptyListScreen(emptyHint ?: "هیچ موردی برای نمایش وجود ندارد")
+                    }
+                }
+            } else {
+                items(items) { it ->
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = fadeIn(tween(200)),
+                        exit = fadeOut(tween(200))
+                    ) {
+                        EntityRow(
+                            item = it,
+                            mainColor = color,
+                            onEdit = { onEditClick(it) },
+                            onDelete = { onDeleteClick(it) },
+                            onClick = { onItemClick(it) },
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp)
+                        )
+                    }
+                }
             }
         }
 

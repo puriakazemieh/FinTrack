@@ -10,13 +10,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.*
+import com.kazemieh.common.toPrice
+import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.component.glass.*
+import com.kazemieh.designsystem.component.model.ItemUi
+import fintrack.core.designsystem.generated.resources.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -71,25 +70,56 @@ private fun SourceBottomSheetCore(
         }
     }
 
-    ListBottomSheet(
-        title = stringResource(Res.string.source),
-        items = state.items,
-        onItemClicked = { viewModel.onIntent(SourceIntent.SelectedSource(it.toSource())) },
-        onAddClick = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
-        onDismiss = { viewModel.onIntent(SourceIntent.OnDismiss) },
-        isDeleteShow = isDeleteShow,
-        isEditShow = isEditShow,
-        clickable = clickable,
-        onItemEditClicked = { viewModel.onIntent(SourceIntent.OnEditClick(it.toSource())) },
-        onItemDeleteClicked = { viewModel.onIntent(SourceIntent.OnDeleteClick(it.toSource())) },
-        itemContent = { item ->
-            val p = item.payload as ItemPayload.SourcePayload
-            FintrackBodySmallText(
-                text = stringResource(Res.string.balance, p.formattedBalance.toFa()),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = { viewModel.onIntent(SourceIntent.OnDismiss) },
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = null
+    ) {
+        EntityList(
+            title = stringResource(Res.string.source),
+            query = state.searchQuery,
+            onQueryChange = { viewModel.onIntent(SourceIntent.UpdateSearchQuery(it)) },
+            items = state.sources.map { source ->
+                EntityItem(
+                    id = source.id ?: 0L,
+                    name = source.name,
+                    sub = if (source.type == 1) source.cardNumber else source.description,
+                    badge = source.formattedBalance + " " + stringResource(Res.string.currency_toman),
+                    iconId = source.iconId,
+                    colorId = source.colorId
+                )
+            },
+            onItemClick = { item ->
+                if (clickable) {
+                    state.sources.find { it.id == item.id }?.let {
+                        viewModel.onIntent(SourceIntent.SelectedSource(it))
+                    }
+                }
+            },
+            onAddClick = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
+            onEditClick = { item ->
+                state.sources.find { it.id == item.id }?.let {
+                    viewModel.onIntent(SourceIntent.OnEditClick(it))
+                }
+            },
+            onDeleteClick = { item ->
+                state.sources.find { it.id == item.id }?.let {
+                    viewModel.onIntent(SourceIntent.OnDeleteClick(it))
+                }
+            },
+            summary = listOf(
+                EntitySummary(
+                    label = stringResource(Res.string.balance_total),
+                    value = state.totalBalance.toString(),
+                    unit = stringResource(Res.string.currency_toman),
+                    color = MaterialTheme.colorScheme.primary
+                )
             )
-        }
-    )
+        )
+    }
 
     if (state.isAddShow) {
         AddSourceBottomSheet(

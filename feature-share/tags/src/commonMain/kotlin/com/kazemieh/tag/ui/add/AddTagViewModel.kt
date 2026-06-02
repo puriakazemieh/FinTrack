@@ -2,8 +2,10 @@ package com.kazemieh.tag.ui.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.SnackbarController
 import com.kazemieh.common.model.Tag
 import com.kazemieh.designsystem.component.model.UiText
+import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.domain.usecase.AddTagUseCase
 import com.kazemieh.domain.usecase.UpdateTagUseCase
 import fintrack.core.designsystem.generated.resources.Res
@@ -83,7 +85,9 @@ class AddTagViewModel(
         viewModelScope.launch {
             val name = draft.name.trim()
             if (name.isBlank()) {
-                _effect.send(AddTagEffect.ShowMessage(UiText.StringResourceText(Res.string.check_name_tag_source)))
+                SnackbarController.showMessage(
+                    UiText.StringResourceText(Res.string.check_name_tag_source).resolveString()
+                )
                 return@launch
             }
 
@@ -159,7 +163,6 @@ sealed interface AddTagIntent {
 }
 
 sealed interface AddTagEffect {
-    data class ShowMessage(val message: UiText) : AddTagEffect
     data class SavedTag(val tag: Tag) : AddTagEffect
     data object OnDismiss : AddTagEffect
 }

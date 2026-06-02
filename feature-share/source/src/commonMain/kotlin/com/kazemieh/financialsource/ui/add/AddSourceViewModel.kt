@@ -3,7 +3,9 @@ package com.kazemieh.financialsource.ui.add
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Source
+import com.kazemieh.common.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
+import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.designsystem.model.Bank
 import com.kazemieh.designsystem.picker.FinTrackSourceIcons
 import fintrack.core.designsystem.generated.resources.*
@@ -148,7 +150,7 @@ class AddSourceViewModel(
     private fun save() = with(_state.value) {
         viewModelScope.launch {
             if (draft.name.isBlank()) {
-                _effect.send(AddSourceEffect.ShowMessage(UiText.StringResourceText(Res.string.check_name_financial_source)))
+                SnackbarController.showMessage(UiText.StringResourceText(Res.string.check_name_financial_source).resolveString())
                 return@launch
             }
 
@@ -271,7 +273,6 @@ enum class TypeSource(val count: Int, val value: UiText) {
 
 
 sealed interface AddSourceEffect {
-    data class ShowMessage(val message: UiText) : AddSourceEffect
     data class SavedSource(val source: Source) : AddSourceEffect
     data object OnDismiss : AddSourceEffect
 }

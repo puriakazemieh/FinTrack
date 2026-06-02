@@ -6,7 +6,11 @@ import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.domain.usecase.ObserveSourcesUseCase
-import com.kazemieh.financialsource.ui.list.SourceEffect.AddedSource
+import com.kazemieh.common.SnackbarController
+import com.kazemieh.designsystem.component.model.resolveString
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.check_name_financial_source
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,9 +28,13 @@ class SourceViewModel(
     private val _effect = Channel<SourceEffect>()
     val effect = _effect.receiveAsFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+
     fun onIntent(intent: SourceIntent) {
         when (intent) {
             SourceIntent.LoadAllSource -> loadAllFinancialSource()
+
+            is SourceIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
 
             SourceIntent.OnAddSourceClick -> _state.update {
                 it.copy(isAddShow = !_state.value.isAddShow, selectedSources = null)
@@ -35,7 +43,7 @@ class SourceViewModel(
             is SourceIntent.SelectedSource -> {
                 viewModelScope.launch {
 
-                    _effect.send(AddedSource(intent.selectedSources))
+                    _effect.send(SourceEffect.AddedSource(intent.selectedSources))
                     _state.update { SourceState() }
                 }
             }
@@ -65,14 +73,26 @@ class SourceViewModel(
 
     private fun loadAllFinancialSource() {
         viewModelScope.launch {
-            observeSourcesUseCase().collect { financialSource ->
-                _state.update {
-                    it.copy(
-                        sources = financialSource,
-                        items = financialSource.map { it.toItemUi() }.toSet()
-                    )
+            observeSourcesUseCase()
+                .combine(_searchQuery) { sources, query ->
+                    val filtered = sources.filter {
+                        it.name.contains(query, ignoreCase = true) ||
+                                it.description?.contains(query, ignoreCase = true) == true
+                    }
+                    val total = sources.sumOf { it.balance.toLong() }
+                    Triple(sources, filtered, total)
                 }
-            }
+                .collect { (all, filtered, total) ->
+                    _state.update {
+                        it.copy(
+                            sources = all,
+                            filteredSources = filtered,
+                            items = filtered.map { s -> s.toItemUi() }.toSet(),
+                            totalBalance = total,
+                            searchQuery = _searchQuery.value
+                        )
+                    }
+                }
         }
     }
 
@@ -81,15 +101,19 @@ class SourceViewModel(
 
 data class SourceState(
     val sources: List<Source> = emptyList(),
+    val filteredSources: List<Source> = emptyList(),
     val selectedSources: Source? = null,
     val items: Set<ItemUi> = emptySet(),
     val isDeleteShow: Boolean = false,
-    val isAddShow: Boolean = false
+    val isAddShow: Boolean = false,
+    val searchQuery: String = "",
+    val totalBalance: Long = 0
 )
 
 
 sealed interface SourceIntent {
     data object LoadAllSource : SourceIntent
+    data class UpdateSearchQuery(val query: String) : SourceIntent
     data object OnAddSourceClick : SourceIntent
     data object OnDismiss : SourceIntent
     data class SelectedSource(val selectedSources: Source) : SourceIntent

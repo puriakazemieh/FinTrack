@@ -1,8 +1,10 @@
 package com.kazemieh.tag.ui.list
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.*
+import com.kazemieh.designsystem.component.glass.*
+import fintrack.core.designsystem.generated.resources.tag_item
+import com.kazemieh.designsystem.component.model.toTag
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -79,25 +81,62 @@ fun TagManageBottomSheet(
         }
     }
 
-    ListBottomSheet(
-        title = stringResource(Res.string.tags),
-        items = state.items,
-        onItemClicked = { viewModel.onIntent(TagIntent.SelectedTag(it.toTag())) },
-        onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
-        onDismiss = { viewModel.onIntent(TagIntent.OnDismiss) },
-        isDeleteShow = isDeleteShow,
-        isEditShow = isEditShow,
-        clickable = clickable,
-        onItemEditClicked = { viewModel.onIntent(TagIntent.OnEditClick(it.toTag())) },
-        onItemDeleteClicked = { viewModel.onIntent(TagIntent.OnDeleteClick(it.toTag())) },
-    )
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = { viewModel.onIntent(TagIntent.OnDismiss) },
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = null
+    ) {
+        EntityList(
+            title = stringResource(Res.string.tags),
+            query = state.searchQuery,
+            onQueryChange = { viewModel.onIntent(TagIntent.UpdateSearchQuery(it)) },
+            items = state.tags.map { tag ->
+                EntityItem(
+                    id = tag.id ?: 0L,
+                    name = tag.name,
+                    sub = tag.description,
+                    iconId = tag.iconId,
+                    colorId = tag.colorId
+                )
+            },
+            onItemClick = { item ->
+                if (clickable) {
+                    state.tags.find { it.id == item.id }?.let {
+                        viewModel.onIntent(TagIntent.SelectedTag(it))
+                    }
+                }
+            },
+            onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
+            onEditClick = { item ->
+                state.tags.find { it.id == item.id }?.let {
+                    viewModel.onIntent(TagIntent.OnEditClick(it))
+                }
+            },
+            onDeleteClick = { item ->
+                state.tags.find { it.id == item.id }?.let {
+                    viewModel.onIntent(TagIntent.OnDeleteClick(it))
+                }
+            },
+            summary = listOf(
+                EntitySummary(
+                    label = "تعداد برچسب‌ها",
+                    value = state.tags.size.toString(),
+                    unit = stringResource(Res.string.tag_item, ""),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            )
+        )
+    }
 
     if (state.showAddTag) {
         AddTagBottomSheet(
             snackbarHostState = snackbarHostState,
             selectedTag = state.selectedTag,
             onDismiss = { viewModel.onIntent(TagIntent.ShowAddTag) },
-            setTag = { viewModel.onIntent(TagIntent.SetSelectedTag(it)) }
+            setTag = { viewModel.onIntent(TagIntent.SelectedTag(it)) }
         )
     }
 
