@@ -107,8 +107,9 @@ fun LargeAmountCard(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     FintrackLabelSmallText(
-                        text = " " + stringResource(Res.string.label_required_marker),
-                        color = GlassRed
+                        text = stringResource(Res.string.label_required_marker),
+                        color = GlassRed,
+                        modifier = Modifier.padding(start = 2.dp)
                     )
                 }
 

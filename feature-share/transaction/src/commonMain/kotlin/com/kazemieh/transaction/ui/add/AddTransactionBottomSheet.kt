@@ -350,12 +350,12 @@ private fun PhotoDropUI() {
                 modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                FintrackLabelSmallText(text = stringResource(Res.string.label_attachment), color = GlassText3)
-                FintrackLabelSmallText(text = stringResource(Res.string.label_optional), color = GlassText3)
+                FintrackLabelSmallText(text = stringResource(Res.string.label_attachment_fa), color = GlassText3)
+                FintrackLabelSmallText(text = stringResource(Res.string.label_optional_fa), color = GlassText3)
             }
             ComposeRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                PhotoActionCard(icon = Icons.Default.CameraAlt, label = stringResource(Res.string.label_camera))
-                PhotoActionCard(icon = Icons.Default.Image, label = stringResource(Res.string.label_gallery))
+                PhotoActionCard(icon = Icons.Default.CameraAlt, label = stringResource(Res.string.label_camera_fa))
+                PhotoActionCard(icon = Icons.Default.Image, label = stringResource(Res.string.label_gallery_fa))
             }
         }
     }
