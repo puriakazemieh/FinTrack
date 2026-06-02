@@ -253,12 +253,12 @@ class TransactionReportViewModel(
     }
 
     private fun updateCategorySums(categorySums: List<CategorySum>) {
-        var balance: Long = 0
+        var totalIncome: Long = 0
+        var totalExpense: Long = 0
         val pieChartItems = categorySums.map { c ->
             when (c.type) {
-                TransactionType.INCOME -> balance += c.totalAmount
-                TransactionType.EXPENSE -> balance -= c.totalAmount
-                TransactionType.TRANSFER -> Unit // Usually net balance doesn't change
+                TransactionType.INCOME -> totalIncome += c.totalAmount
+                TransactionType.EXPENSE -> totalExpense += c.totalAmount
                 else -> Unit
             }
             PieChartItem(
@@ -270,11 +270,16 @@ class TransactionReportViewModel(
             )
         }
 
+        val balance = totalIncome - totalExpense
+
         _state.update {
             it.copy(
                 balance = balance.toInt().formatted(),
+                totalIncome = totalIncome,
+                totalExpense = totalExpense,
                 isPositiveBalance = balance >= 0,
-                pieChartData = pieChartItems
+                pieChartData = pieChartItems,
+                categorySums = categorySums
             )
         }
     }
@@ -333,8 +338,11 @@ data class TransactionFilterParamsState(
 data class TransactionReportState(
     val filterParams: TransactionFilterParamsState = TransactionFilterParamsState(),
     val balance: String = "0",
+    val totalIncome: Long = 0,
+    val totalExpense: Long = 0,
     val isPositiveBalance: Boolean = true,
     val pieChartData: List<PieChartItem> = emptyList(),
+    val categorySums: List<CategorySum> = emptyList(),
 
     // list/reactive paging
     val items: List<TransactionWithRelations> = emptyList(),

@@ -1,25 +1,33 @@
 package com.kazemieh.transaction.ui.report
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.kazemieh.common.model.Category
-import com.kazemieh.common.model.Person
-import com.kazemieh.common.model.Source
-import com.kazemieh.common.model.Tag
-import com.kazemieh.common.model.TransactionType
-import com.kazemieh.common.model.TransactionWithRelations
-import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.transaction.ui.component.transactionListContent
+import com.kazemieh.common.model.*
+import com.kazemieh.common.toFa
+import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.component.FinTrackLeadingIcon
+import com.kazemieh.designsystem.component.LeadingIconStyle
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -78,6 +86,7 @@ fun TransactionListByFilterScreen(
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TransactionListByFilterContent(
     state: TransactionReportState,
@@ -101,21 +110,156 @@ fun TransactionListByFilterContent(
             }
     }
 
+    val groupedItems = remember(state.items) {
+        state.items.groupBy { it.transaction.date }
+    }
+
     LazyColumn(
         state = listState,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = space.large, vertical = space.mediumSmall)
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(horizontal = space.large, vertical = space.mediumSmall)
     ) {
-        item { ShowTransactionReportCard(enableAnimationChart = enableAnimationChart) }
-        item { Spacer(Modifier.height(space.mediumSmall)) }
+        item {
+            SummaryCard()
+            Spacer(Modifier.height(14.dp))
+            CategoryStrip()
+            Spacer(Modifier.height(24.dp))
+        }
 
-        transactionListContent(
-            state = state.toListState(),
-            onDelete = onDelete,
-            onEdit = onEdit,
-            onRetryRefresh = onRetryRefresh,
-            onRetryAppend = onRetryAppend
-        )
+        if (state.isRefreshing && state.items.isEmpty()) {
+            item {
+                Box(modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = GlassGreen)
+                }
+            }
+        } else if (state.items.isEmpty()) {
+            item {
+                Box(modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = "تراکنشی یافت نشد", color = GlassText3)
+                }
+            }
+        } else {
+            groupedItems.forEach { (date, items) ->
+                val totalNet = items.sumOf { 
+                    when(it.transaction.type) {
+                        TransactionType.INCOME -> it.transaction.amount.toLong()
+                        TransactionType.EXPENSE -> -it.transaction.amount.toLong()
+                        else -> 0L
+                    }
+                }
+
+                stickyHeader {
+                    DayHeader(date = date, count = items.size, netAmount = totalNet)
+                }
+
+                items(items, key = { it.transaction.id }) { item ->
+                    TxRow(
+                        item = item,
+                        onClick = { onEdit(item) }
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
+            }
+        }
+
+        if (state.isAppending) {
+            item {
+                Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = GlassGreen, modifier = Modifier.size(24.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DayHeader(date: String, count: Int, netAmount: Long) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(GlassBg0.copy(alpha = 0.9f))
+            .padding(vertical = 14.dp, horizontal = 6.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(text = date, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = GlassText)
+            // We don't have weekday in model yet, could add helper if needed
+        }
+        Column(horizontalAlignment = Alignment.End) {
+            Text(text = "${count.toLong().toFa()} تراکنش · خالص", style = MaterialTheme.typography.labelSmall, color = GlassText3)
+            Text(
+                text = "${netAmount.toFa()} ت",
+                fontSize = 12.5.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (netAmount >= 0) GlassGreen else GlassRed
+            )
+        }
+    }
+}
+
+@Composable
+private fun TxRow(item: TransactionWithRelations, onClick: () -> Unit) {
+    val isIncome = item.transaction.type == TransactionType.INCOME
+    val isTransfer = item.transaction.type == TransactionType.TRANSFER
+    val color = when {
+        isIncome -> GlassGreen
+        isTransfer -> GlassBlue
+        else -> GlassRed
+    }
+    val bgColor = when {
+        isIncome -> GlassGreenSoft
+        isTransfer -> GlassBlueSoft
+        else -> GlassRedSoft
+    }
+
+    val icon = com.kazemieh.designsystem.picker.FinTrackIcons.findIcon(item.category.iconId)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .background(GlassColor)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(38.dp)
+                .clip(MaterialTheme.shapes.small)
+                .background(bgColor)
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            androidx.compose.material3.Icon(
+                painter = org.jetbrains.compose.resources.painterResource(icon.resource),
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(17.dp)
+            )
+        }
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = item.category.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = GlassText)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(text = item.source.name, style = MaterialTheme.typography.labelSmall, color = GlassText3)
+                Box(modifier = Modifier.size(3.dp).background(GlassText3, CircleShape))
+                // Text(text = item.transaction.time, ...) // time is not explicitly in model, only timestamp
+            }
+        }
+
+        Column(horizontalAlignment = Alignment.End) {
+            Text(
+                text = "${item.transaction.amount.toLong().toFa()} ت",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                color = color
+            )
+            item.transaction.description?.takeIf { it.isNotEmpty() }?.let {
+                Text(text = it, style = MaterialTheme.typography.labelSmall, color = GlassText3, maxLines = 1)
+            }
+        }
     }
 }

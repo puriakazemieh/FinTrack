@@ -1,126 +1,199 @@
 package com.kazemieh.transaction.ui.report
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.kazemieh.common.model.TransactionType
-import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.FintrackTitleSmallText
-import com.kazemieh.designsystem.component.PieChart
-import fintrack.core.designsystem.generated.resources.*
-import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.common.toFa
+import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.component.FinTrackLeadingIcon
+import com.kazemieh.designsystem.component.LeadingIconStyle
+import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.GlassTone
 import org.koin.compose.viewmodel.koinViewModel
 
+@Composable
+fun SummaryCard(
+    viewModel: TransactionReportViewModel = koinViewModel()
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val space = LocalSpacing.current
+
+    GlassCard(
+        modifier = Modifier.fillMaxWidth(),
+        tone = GlassTone.Strong,
+        padding = 16.dp
+    ) {
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "خلاصه‌ی این دوره",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = GlassText2
+                )
+                Box(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(GlassColor)
+                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = "${state.items.size.toLong().toFa()} تراکنش",
+                        fontSize = 10.sp,
+                        color = GlassText3
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(14.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                MiniDonut(
+                    income = state.totalIncome,
+                    expense = state.totalExpense,
+                    modifier = Modifier.size(72.dp)
+                )
+
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SummaryRow(label = "درآمد", value = state.totalIncome, color = GlassGreen)
+                    SummaryRow(label = "خرج", value = state.totalExpense, color = GlassRed)
+                    HorizontalDivider(modifier = Modifier.padding(top = 4.dp), color = GlassHairline)
+                    SummaryRow(label = "خالص", value = state.totalIncome - state.totalExpense, color = GlassText, isBold = true)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SummaryRow(label: String, value: Long, color: Color, isBold: Boolean = false) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(color))
+        Text(text = label, style = MaterialTheme.typography.labelSmall, color = GlassText2, modifier = Modifier.weight(1f))
+        Text(
+            text = "${value.toFa()} ت",
+            fontSize = 13.sp,
+            fontWeight = if (isBold) FontWeight.Bold else FontWeight.SemiBold,
+            color = color
+        )
+    }
+}
+
+@Composable
+private fun MiniDonut(income: Long, expense: Long, modifier: Modifier = Modifier) {
+    val total = (income + expense).coerceAtLeast(1)
+    val incomePct = (income.toFloat() / total).coerceIn(0f, 1f)
+    
+    androidx.compose.foundation.Canvas(modifier = modifier) {
+        val strokeWidth = 12f
+        drawArc(
+            color = GlassHairline,
+            startAngle = 0f,
+            sweepAngle = 360f,
+            useCenter = false,
+            style = Stroke(width = strokeWidth)
+        )
+        
+        // Income arc
+        drawArc(
+            color = GlassGreen,
+            startAngle = -90f,
+            sweepAngle = incomePct * 360f * 0.95f,
+            useCenter = false,
+            style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+        )
+        
+        // Expense arc
+        drawArc(
+            color = GlassRed,
+            startAngle = -90f + (incomePct * 360f * 0.95f) + 5f,
+            sweepAngle = (1f - incomePct) * 360f * 0.95f,
+            useCenter = false,
+            style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+        )
+    }
+}
+
+@Composable
+fun CategoryStrip(
+    viewModel: TransactionReportViewModel = koinViewModel()
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val topCats = state.categorySums.sortedByDescending { it.totalAmount }.take(4)
+    if (topCats.isEmpty()) return
+    
+    val maxAmount = topCats.first().totalAmount.coerceAtLeast(1)
+
+    GlassCard(modifier = Modifier.fillMaxWidth(), padding = 14.dp) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(
+                text = "تقسیم بر دسته‌بندی",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = GlassText
+            )
+            
+            topCats.forEach { cat ->
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FinTrackLeadingIcon(
+                            colorId = cat.colorId,
+                            iconId = cat.iconId,
+                            style = LeadingIconStyle.Badge,
+                            size = 24.dp,
+                            iconSize = 12.dp,
+                            corner = 7.dp
+                        )
+                        Text(text = cat.name, style = MaterialTheme.typography.labelSmall, color = GlassText, modifier = Modifier.weight(1f))
+                        Text(text = "${cat.totalAmount.toFa()} ت", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = GlassText)
+                    }
+                    
+                    val progress = (cat.totalAmount.toFloat() / maxAmount).coerceIn(0f, 1f)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(4.dp)
+                            .clip(CircleShape)
+                            .background(GlassHairline)
+                    ) {
+                        val colors = com.kazemieh.designsystem.picker.FinTrackPickerColors.rainbow()
+                        val color = colors.firstOrNull { it.id == cat.colorId }?.color ?: GlassGreen
+                        
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(progress)
+                                .fillMaxHeight()
+                                .clip(CircleShape)
+                                .background(Brush.horizontalGradient(listOf(color, color.copy(alpha = 0.4f))))
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun ShowTransactionReportCard(
     viewModel: TransactionReportViewModel = koinViewModel(),
     enableAnimationChart: Boolean = true,
 ) {
-
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val space = LocalSpacing.current
-
-    val text = when (state.filterParams.type) {
-        TransactionType.INCOME.count -> {
-            stringResource(Res.string.incoming)
-        }
-
-        TransactionType.EXPENSE.count -> {
-            stringResource(Res.string.outcoming)
-        }
-
-        TransactionType.TRANSFER.count -> {
-            stringResource(Res.string.transfer)
-        }
-
-        else -> {
-            stringResource(Res.string.all)
-        }
-    }
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = space.one)
-    ) {
-
-        Column(
-            modifier = Modifier.padding(space.large),
-        ) {
-
-
-            Spacer(Modifier.height(space.mediumSmall))
-
-            Row(
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-
-                FintrackTitleSmallText(
-                    text = stringResource(Res.string.balance_with_label, text),
-                    style = MaterialTheme.typography.titleLarge
-                )
-
-                val balanceTotalLabel = stringResource(Res.string.balance_total_label, state.balance)
-
-                FintrackTitleSmallText(
-                    modifier = Modifier.weight(1f),
-                    text = balanceTotalLabel,
-                    textAlign = TextAlign.End,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = if (state.isPositiveBalance) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
-                )
-
-            }
-
-            Spacer(Modifier.height(space.mediumSmall))
-
-            if (state.pieChartData.isNotEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .padding(vertical = space.mediumSmall)
-                        .height(space.one)
-                        .fillMaxWidth()
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.secondary)
-                )
-
-
-                Box(
-                    modifier = Modifier
-                        .padding(top = space.large)
-                        .padding(horizontal = space.mediumSmall)
-                ) {
-                    PieChart(
-                        data = state.pieChartData,
-                        radiusOuter = 40.dp,
-                        chartBarWidth = 20.dp,
-                        textDistanceExtra = 30.dp,
-                        animDuration = 500,
-                        enableAnimation = enableAnimationChart
-                    )
-
-                }
-            }
-        }
-    }
+    // Keep this for compatibility if needed, but we prefer SummaryCard + CategoryStrip
+    SummaryCard(viewModel)
 }

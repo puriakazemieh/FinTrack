@@ -247,6 +247,7 @@ class TransactionsViewModel() : ViewModel() {
 
             }
 
+            ReportIntent.OnToggleSearch -> _state.update { it.copy(isSearchActive = !it.isSearchActive) }
 
         }
     }
@@ -319,6 +320,9 @@ data class ReportState(
     val isError: Boolean = false,
     val enableAnimationChart: Boolean = true,
 
+    val isSearchActive: Boolean = false,
+    val isFilterActive: Boolean = false,
+
     val showAddTransaction: Boolean = false,
     val showDeleteTransaction: Boolean = false,
     val transactionWithRelations: TransactionWithRelations? = null,
@@ -361,6 +365,7 @@ sealed interface ReportIntent {
     data class OnDateRange(val dateFilterType: DateFilterType) : ReportIntent
     data object OnPrevClick : ReportIntent
     data object OnNextClick : ReportIntent
+    data object OnToggleSearch : ReportIntent
     data class OnDateSheetSubmit(
         val startDate: String?,
         val startTimeStamp: Long?,

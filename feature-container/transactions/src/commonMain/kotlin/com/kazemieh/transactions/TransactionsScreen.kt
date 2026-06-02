@@ -3,19 +3,20 @@ package com.kazemieh.transactions
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.list.CategorySelectionBottomSheet
 import com.kazemieh.common.DateFilterType
+import com.kazemieh.designsystem.GlassBg0
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.model.asString
+import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import com.kazemieh.financialsource.ui.list.SourceSelectionBottomSheet
 import com.kazemieh.person.ui.list.PersonSelectionBottomSheet
 import com.kazemieh.tag.ui.list.TagSelectionBottomSheet
@@ -32,42 +33,118 @@ fun TransactionsScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
 
+    val colors = FinTrackPickerColors.rainbow()
+
+    val activeFilters = remember(
+        state.selectedCategories,
+        state.selectedSources,
+        state.selectedTag,
+        state.selectedPerson
+    ) {
+        buildList {
+            state.selectedCategories.forEach { category ->
+                add(
+                    FilterChipData(
+                        id = "cat_${category.id}",
+                        label = category.name,
+                        color = colors.firstOrNull { it.id == category.colorId }?.color,
+                        type = FilterType.Category
+                    )
+                )
+            }
+            state.selectedSources.forEach { source ->
+                add(
+                    FilterChipData(
+                        id = "src_${source.id}",
+                        label = source.name,
+                        type = FilterType.Source
+                    )
+                )
+            }
+            state.selectedTag.forEach { tag ->
+                add(
+                    FilterChipData(
+                        id = "tag_${tag.id}",
+                        label = tag.name,
+                        color = colors.firstOrNull { it.id == tag.colorId }?.color,
+                        type = FilterType.Tag
+                    )
+                )
+            }
+            state.selectedPerson.forEach { person ->
+                add(
+                    FilterChipData(
+                        id = "pers_${person.id}",
+                        label = person.name,
+                        type = FilterType.Person
+                    )
+                )
+            }
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(GlassBg0)
     ) {
-        Column {
-            Spacer(modifier = Modifier.height(space.mediumSmall))
-            val label = state.textDate.asString()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = space.large)
+        ) {
+            TxHeader(
+                isSearchActive = state.isSearchActive,
+                isFilterActive = activeFilters.isNotEmpty(),
+                onSearchClick = { viewModel.onIntent(ReportIntent.OnToggleSearch) },
+                onFilterClick = { /* Show general filter if needed, or toggle specific ones */ }
+            )
 
-            ReportTopBar(
-                onTransactionTypeSelected = state.selectedTransactionType,
-                onTransactionTypeClicked = {
-                    viewModel.onIntent(ReportIntent.OnTransactionTypeSelected(it))
-                },
-
-                selectedCategories = state.selectedCategories,
-                isAllCategorySelected = state.isAllCategorySelected,
-                onCategoryClicked = { viewModel.onIntent(ReportIntent.OnToggleCategorySheet) },
-
-                selectedSources = state.selectedSources,
-                isAllSourceSelected = state.isAllSourceSelected,
-                onSourceClicked = { viewModel.onIntent(ReportIntent.OnToggleSourceSheet) },
-
-                selectedTags = state.selectedTag,
-                isAllTAgSelected = state.isAllTAgSelected,
-                onTagClicked = { viewModel.onIntent(ReportIntent.OnToggleTagSheet) },
-
-                selectedPersons = state.selectedPerson,
-                isAllPersonSelected = state.isAllPersonSelected,
-                onPersonClicked = { viewModel.onIntent(ReportIntent.OnTogglePersonSheet) },
-
-                isShowArrowButton = state.isShowArrowButton,
-                onDateClick = { viewModel.onIntent(ReportIntent.OnToggleDateSheet) },
-                onNextClick = { viewModel.onIntent(ReportIntent.OnNextClick) },
+            PeriodSelector(
+                currentPeriod = state.dateFilterType,
+                periodLabel = state.textDate.asString(),
+                periodSubLabel = "نمایش بر اساس ${state.dateFilterType.name}", // Placeholder or helper
+                onPeriodSelected = { viewModel.onIntent(ReportIntent.OnDateRange(it)) },
                 onPrevClick = { viewModel.onIntent(ReportIntent.OnPrevClick) },
-                textDate = label
+                onNextClick = { viewModel.onIntent(ReportIntent.OnNextClick) }
+            )
+
+            ActiveFilters(
+                filters = activeFilters,
+                onRemove = { filter ->
+                    when (filter.type) {
+                        FilterType.Category -> {
+                            val newSet =
+                                state.selectedCategories.filter { "cat_${it.id}" != filter.id }
+                                    .toSet()
+                            viewModel.onIntent(ReportIntent.OnCategoriesSelected(newSet, false))
+                        }
+
+                        FilterType.Source -> {
+                            val newSet =
+                                state.selectedSources.filter { "src_${it.id}" != filter.id }.toSet()
+                            viewModel.onIntent(ReportIntent.OnSourcesSelected(newSet, false))
+                        }
+
+                        FilterType.Tag -> {
+                            val newSet =
+                                state.selectedTag.filter { "tag_${it.id}" != filter.id }.toSet()
+                            viewModel.onIntent(ReportIntent.OnTagSelected(newSet, false))
+                        }
+
+                        FilterType.Person -> {
+                            val newSet =
+                                state.selectedPerson.filter { "pers_${it.id}" != filter.id }.toSet()
+                            viewModel.onIntent(ReportIntent.OnPersonSelected(newSet, false))
+                        }
+                    }
+                },
+                onClearAll = {
+                    viewModel.onIntent(ReportIntent.OnCategoriesSelected(emptySet(), false))
+                    viewModel.onIntent(ReportIntent.OnSourcesSelected(emptySet(), false))
+                    viewModel.onIntent(ReportIntent.OnTagSelected(emptySet(), false))
+                    viewModel.onIntent(ReportIntent.OnPersonSelected(emptySet(), false))
+                }
             )
 
             TransactionListByFilterScreen(
@@ -161,13 +238,13 @@ fun TransactionsScreen(
                     state.endDate to state.endDateTimeStamp
                 else null,
                 isError = state.isError,
-                onSubmit = { startDate, endDate ->
+                onSubmit = { startPair, endPair ->
                     viewModel.onIntent(
                         ReportIntent.OnDateSheetSubmit(
-                            startDate = startDate?.first,
-                            startTimeStamp = startDate?.second,
-                            endDate = endDate?.first,
-                            endTimeStamp = endDate?.second
+                            startDate = startPair?.first,
+                            startTimeStamp = startPair?.second,
+                            endDate = endPair?.first,
+                            endTimeStamp = endPair?.second
                         )
                     )
                 }

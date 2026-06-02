@@ -1,295 +1,292 @@
 package com.kazemieh.transactions
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kazemieh.common.DateFilterType
-import com.kazemieh.common.model.Category
-import com.kazemieh.common.model.Person
-import com.kazemieh.common.model.Source
-import com.kazemieh.common.model.Tag
-import com.kazemieh.common.model.TransactionType
-import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.FilterButton
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackOutlinedTextField
-import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.designsystem.component.jalali.DatePickerField
-import com.kazemieh.designsystem.component.model.ItemUi
-import com.kazemieh.designsystem.component.model.UiText
-import com.kazemieh.designsystem.component.model.asString
-import com.kazemieh.designsystem.component.model.toItemUi
+import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.component.glass.Chip
+import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.GlassTone
+import com.kazemieh.designsystem.component.glass.SheetFrame
+import com.kazemieh.designsystem.component.jalali.JalaliCalendar
+import com.kazemieh.designsystem.component.jalali.JalaliDatePickerDialog
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 
-
 @Composable
-fun ReportTopBar(
-    onTransactionTypeSelected: TransactionType,
-    onTransactionTypeClicked: (TransactionType) -> Unit,
-
-    isAllSourceSelected: Boolean = true,
-    selectedSources: Set<Source> = emptySet(),
-    onSourceClicked: () -> Unit,
-
-    isAllCategorySelected: Boolean = true,
-    selectedCategories: Set<Category>,
-    onCategoryClicked: () -> Unit,
-
-    isAllTAgSelected: Boolean = true,
-    selectedTags: Set<Tag> = emptySet(),
-    onTagClicked: () -> Unit,
-
-    isAllPersonSelected: Boolean = true,
-    selectedPersons: Set<Person> = emptySet(),
-    onPersonClicked: () -> Unit,
-
-    isShowArrowButton: Boolean = true,
-    onDateClick: () -> Unit,
-    onPrevClick: () -> Unit,
-    onNextClick: () -> Unit,
-    textDate: String
+fun TxHeader(
+    isSearchActive: Boolean,
+    isFilterActive: Boolean,
+    onSearchClick: () -> Unit,
+    onFilterClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val space = LocalSpacing.current
-
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(space.large),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = space.small)
-    ) {
-        Column(
-            modifier = Modifier.padding(vertical = space.small, horizontal = space.large)
-        ) {
-
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                SingleChoiceSegmentedButtonRow(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    TransactionType.entries.forEachIndexed { index, option ->
-                        val text = when (option) {
-                            TransactionType.INCOME -> {
-                                stringResource(Res.string.incoming)
-                            }
-
-                            TransactionType.EXPENSE -> {
-                                stringResource(Res.string.outcoming)
-                            }
-
-                            TransactionType.TRANSFER -> {
-                                stringResource(Res.string.transfer)
-                            }
-
-                            else -> {
-                                stringResource(Res.string.all)
-                            }
-
-                        }
-                        SegmentedButton(
-                            selected = onTransactionTypeSelected == option,
-                            onClick = { onTransactionTypeClicked(option) },
-                            shape = SegmentedButtonDefaults.itemShape(
-                                index = index,
-                                count = TransactionType.entries.size
-                            ),
-                        ) {
-                            FintrackBodyMediumText(text = text)
-                        }
-                    }
-                }
-            }
-
-            Row(horizontalArrangement = Arrangement.spacedBy(space.mediumLarge)) {
-
-                val labelTextSource =
-                    if (isAllSourceSelected) stringResource(Res.string.all_source)
-                    else if (selectedSources.isEmpty()) stringResource(Res.string.empty_source)
-                    else stringResource(Res.string.sources, selectedSources.size)
-
-                Selector(
-                    selected = selectedSources.map { it.toItemUi() }.toSet(),
-                    isAllSelected = isAllSourceSelected,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    labelText = labelTextSource,
-                    onClick = onSourceClicked,
-                )
-
-                val labelTextCategory =
-                    if (isAllCategorySelected) stringResource(Res.string.all_category)
-                    else if (selectedCategories.isEmpty()) stringResource(Res.string.empty_category)
-                    else stringResource(Res.string.categories, selectedCategories.size)
-
-                Selector(
-                    selected = selectedCategories.map { it.toItemUi() }.toSet(),
-                    isAllSelected = isAllCategorySelected,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    labelText = labelTextCategory,
-                    onClick = onCategoryClicked
-                )
-
-            }
-
-            Row(horizontalArrangement = Arrangement.spacedBy(space.mediumLarge)) {
-
-                val labelTextSource =
-                    if (isAllTAgSelected) stringResource(Res.string.all_tags)
-                    else if (selectedTags.isEmpty()) stringResource(Res.string.empty_tag)
-                    else stringResource(Res.string.tags, selectedTags.size)
-
-                Selector(
-                    selected = selectedTags.map { it.toItemUi() }.toSet(),
-                    isAllSelected = isAllTAgSelected,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    labelText = labelTextSource,
-                    onClick = onTagClicked,
-                )
-
-                val labelTextCategory =
-                    if (isAllPersonSelected) stringResource(Res.string.all_person)
-                    else if (selectedPersons.isEmpty()) stringResource(Res.string.empty_person)
-                    else stringResource(Res.string.persons, selectedPersons.size)
-
-                Selector(
-                    selected = selectedPersons.map { it.toItemUi() }.toSet(),
-                    isAllSelected = isAllPersonSelected,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    labelText = labelTextCategory,
-                    onClick = onPersonClicked,
-                )
-
-            }
-
-            DatePeriodSelector(
-                dateText = textDate,
-                isShowArrowButton = isShowArrowButton,
-                onPrevClick = onPrevClick,
-                onNextClick = onNextClick,
-                onDateClick = onDateClick
-            )
-
-
-        }
-    }
-}
-
-@Composable
-private fun Selector(
-    selected: Set<ItemUi> = emptySet(),
-    modifier: Modifier = Modifier,
-    labelText: String,
-    isAllSelected: Boolean = false,
-    onClick: () -> Unit
-) {
-    val sourceTextStyle =
-        if (selected.isEmpty()) MaterialTheme.typography.bodyMedium
-        else MaterialTheme.typography.labelSmall
-
-    FintrackOutlinedTextField(
-        value = if (isAllSelected) "" else if (selected.size == 1) selected.first().title.asString()
-        else "${selected.size} انتخاب شده است ",
-        onClick = onClick,
-        readOnly = true,
-        enabled = false,
-        disabledContainerColor = MaterialTheme.colorScheme.surface,
-        singleLine = true,
-        textStyle = sourceTextStyle,
-        modifier = modifier,
-        label = {
-            FintrackBodyMediumText(text = labelText)
-        }
-
-    )
-}
-
-@Composable
-fun DatePeriodSelector(
-    dateText: String,
-    isShowArrowButton: Boolean = true,
-    onPrevClick: () -> Unit,
-    onNextClick: () -> Unit,
-    onDateClick: () -> Unit,
-) {
-    val space = LocalSpacing.current
     Row(
-        Modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (isShowArrowButton) {
-            IconButton(
-                modifier = Modifier.weight(0.1f),
-                onClick = onPrevClick
+        Column {
+            Text(
+                text = "مدیریت",
+                style = MaterialTheme.typography.labelSmall,
+                color = GlassText3
+            )
+            Text(
+                text = "تراکنش‌ها",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = GlassText,
+                letterSpacing = (-0.5).sp
+            )
+        }
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            HeaderButton(
+                icon = Icons.Default.Search,
+                onClick = onSearchClick,
+                isActive = isSearchActive
+            )
+            HeaderButton(
+                icon = Icons.Default.FilterList,
+                onClick = onFilterClick,
+                isActive = isFilterActive,
+                showDot = isFilterActive
+            )
+        }
+    }
+}
+
+@Composable
+private fun HeaderButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit,
+    isActive: Boolean = false,
+    showDot: Boolean = false
+) {
+    Box {
+        GlassCard(
+            modifier = Modifier.size(40.dp),
+            padding = 0.dp,
+            onClick = onClick,
+            tone = if (isActive) GlassTone.Strong else GlassTone.Default
+        ) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = if (isActive) GlassGreen else GlassText,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
+        if (showDot) {
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .align(Alignment.TopEnd)
+                    .offset(x = (-2).dp, y = 2.dp)
+                    .clip(CircleShape)
+                    .background(GlassGreen)
+            )
+        }
+    }
+}
+
+@Composable
+fun PeriodSelector(
+    currentPeriod: DateFilterType,
+    periodLabel: String,
+    periodSubLabel: String,
+    onPeriodSelected: (DateFilterType) -> Unit,
+    onPrevClick: () -> Unit,
+    onNextClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val periods = listOf(
+        DateFilterType.TODAY to "روز",
+        DateFilterType.THIS_WEEK to "هفته",
+        DateFilterType.THIS_MONTH to "ماه",
+        DateFilterType.NEXT_MONTH to "سال", // Simplified mapping for now
+        DateFilterType.CUSTOM_RANGE to "بازه"
+    )
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        GlassCard(
+            modifier = Modifier.fillMaxWidth(),
+            padding = 8.dp,
+            tone = GlassTone.Default
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                IconButton(onClick = onPrevClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward, // RTL Arrow
+                        contentDescription = null,
+                        tint = GlassText2,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = periodLabel,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = GlassText
+                    )
+                    Text(
+                        text = periodSubLabel,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = GlassText3
+                    )
+                }
+
+                IconButton(onClick = onNextClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack, // RTL Arrow
+                        contentDescription = null,
+                        tint = GlassText2,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
         }
 
-        FilterButton(
-            modifier = Modifier
-                .padding(
-                    top = space.mediumSmall,
-                    end = space.mediumSmall,
-                    start = space.mediumSmall,
-                    bottom = space.small
-                )
-                .weight(0.6f),
-            text = dateText,
-            onClick = onDateClick
-        )
+        Spacer(modifier = Modifier.height(8.dp))
 
-        if (isShowArrowButton) {
-            IconButton(
-                modifier = Modifier.weight(0.1f),
-                onClick = onNextClick
-            ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null)
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            contentPadding = PaddingValues(bottom = 12.dp)
+        ) {
+            items(periods) { (type, label) ->
+                val active = currentPeriod == type
+                Chip(
+                    active = active,
+                    color = GlassGreen,
+                    onClick = { onPeriodSelected(type) }
+                ) {
+                    Text(
+                        text = label,
+                        fontSize = 12.sp,
+                        fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                        color = if (active) GlassBg0 else GlassText2
+                    )
+                }
             }
         }
     }
 }
+
+@Composable
+fun ActiveFilters(
+    filters: List<FilterChipData>,
+    onRemove: (FilterChipData) -> Unit,
+    onClearAll: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    if (filters.isEmpty()) return
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        LazyRow(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            items(filters) { filter ->
+                FilterChip(
+                    label = filter.label,
+                    color = filter.color,
+                    onRemove = { onRemove(filter) }
+                )
+            }
+        }
+        
+        Text(
+            text = "پاک کردن همه",
+            style = MaterialTheme.typography.labelSmall,
+            color = GlassText3,
+            modifier = Modifier
+                .clickable(onClick = onClearAll)
+                .padding(4.dp)
+        )
+    }
+}
+
+@Composable
+private fun FilterChip(
+    label: String,
+    color: Color?,
+    onRemove: () -> Unit
+) {
+    val bgColor = color?.copy(alpha = 0.12f) ?: GlassColor
+    val borderColor = color?.copy(alpha = 0.33f) ?: GlassEdge
+    
+    Row(
+        modifier = Modifier
+            .clip(CircleShape)
+            .background(bgColor)
+            .clickable(onClick = onRemove)
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = label,
+            fontSize = 11.sp,
+            color = color ?: GlassText2
+        )
+        Icon(
+            imageVector = Icons.Default.Close,
+            contentDescription = null,
+            tint = color ?: GlassText2,
+            modifier = Modifier.size(10.dp)
+        )
+    }
+}
+
+data class FilterChipData(
+    val id: String,
+    val label: String,
+    val color: Color? = null,
+    val type: FilterType
+)
+
+enum class FilterType { Category, Source, Tag, Person }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -297,135 +294,51 @@ fun DateFilterBottomSheet(
     onDismiss: () -> Unit,
     onDateRange: (DateFilterType) -> Unit,
     onToggleCustomDateSheet: () -> Unit,
-    startDate: String? = null,
-    endDate: String? = null,
+    startDate: String?,
+    endDate: String?
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val space = LocalSpacing.current
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.background
+    SheetFrame(
+        title = stringResource(Res.string.date),
+        onDismiss = onDismiss
     ) {
-        val dayFilters = DateFilterType.entries.filter {
-            it in listOf(
-                DateFilterType.TODAY,
-                DateFilterType.YESTERDAY,
-                DateFilterType.TOMORROW
+        val filters = listOf(
+            DateFilterType.TODAY,
+            DateFilterType.YESTERDAY,
+            DateFilterType.THIS_WEEK,
+            DateFilterType.LAST_WEEK,
+            DateFilterType.THIS_MONTH,
+            DateFilterType.LAST_MONTH,
+        )
+
+        filters.forEach { type ->
+            val label = when (type) {
+                DateFilterType.TODAY -> Res.string.today
+                DateFilterType.YESTERDAY -> Res.string.yesterday
+                DateFilterType.THIS_WEEK -> Res.string.this_week
+                DateFilterType.LAST_WEEK -> Res.string.last_week
+                DateFilterType.THIS_MONTH -> Res.string.this_month
+                DateFilterType.LAST_MONTH -> Res.string.last_month
+                else -> Res.string.all
+            }
+            Text(
+                text = stringResource(label),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onDateRange(type) }
+                    .padding(vertical = 12.dp, horizontal = 16.dp),
+                style = MaterialTheme.typography.bodyLarge
             )
         }
 
-        val weekFilters = DateFilterType.entries.filter {
-            it in listOf(
-                DateFilterType.THIS_WEEK,
-                DateFilterType.LAST_WEEK,
-                DateFilterType.NEXT_WEEK
-            )
-        }
-
-        val monthFilters = DateFilterType.entries.filter {
-            it in listOf(
-                DateFilterType.THIS_MONTH,
-                DateFilterType.LAST_MONTH,
-                DateFilterType.NEXT_MONTH
-            )
-        }
-
-        Column(
+        Text(
+            text = stringResource(Res.string.custom_range),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(space.mediumLarge)
-        ) {
-
-            LazyColumn {
-                item {
-                    FilterRow(
-                        filters = dayFilters,
-                        onToggleCustomDateSheet = onToggleCustomDateSheet,
-                        onDateRange = onDateRange
-                    )
-                    Spacer(modifier = Modifier.height(space.mediumSmall))
-                    FilterRow(
-                        filters = weekFilters,
-                        onToggleCustomDateSheet = onToggleCustomDateSheet,
-                        onDateRange = onDateRange
-                    )
-                    Spacer(modifier = Modifier.height(space.mediumSmall))
-                    FilterRow(
-                        filters = monthFilters,
-                        onToggleCustomDateSheet = onToggleCustomDateSheet,
-                        onDateRange = onDateRange
-                    )
-                    Spacer(modifier = Modifier.height(space.mediumLarge))
-                    FilterRow(
-                        filters = listOf(DateFilterType.CUSTOM_RANGE),
-                        onToggleCustomDateSheet = onToggleCustomDateSheet,
-                        onDateRange = onDateRange,
-                        isCustomDate = true,
-                        startDate = startDate,
-                        endDate = endDate
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun FilterRow(
-    filters: List<DateFilterType>,
-    onToggleCustomDateSheet: () -> Unit,
-    onDateRange: (DateFilterType) -> Unit,
-    isCustomDate: Boolean = false,
-    startDate: String? = null,
-    endDate: String? = null
-) {
-    val space = LocalSpacing.current
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(space.mediumSmall)
-    ) {
-        filters.forEach { filter ->
-            Card(
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable {
-                        if (filter == DateFilterType.CUSTOM_RANGE) onToggleCustomDateSheet()
-                        else onDateRange(filter)
-
-                    },
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                shape = MaterialTheme.shapes.medium,
-                elevation = CardDefaults.cardElevation(defaultElevation = space.one)
-            ) {
-                //todo chane this
-                val text =
-                    if (isCustomDate && startDate != null && endDate != null) UiText.DynamicString("$startDate - $endDate")
-                    else {
-                        val resource = when (filter) {
-                            DateFilterType.TODAY -> Res.string.today
-                            DateFilterType.YESTERDAY -> Res.string.yesterday
-                            DateFilterType.TOMORROW -> Res.string.tomorrow
-                            DateFilterType.THIS_WEEK -> Res.string.this_week
-                            DateFilterType.LAST_WEEK -> Res.string.last_week
-                            DateFilterType.NEXT_WEEK -> Res.string.next_week
-                            DateFilterType.THIS_MONTH -> Res.string.this_month
-                            DateFilterType.LAST_MONTH -> Res.string.last_month
-                            DateFilterType.NEXT_MONTH -> Res.string.next_month
-                            DateFilterType.CUSTOM_RANGE -> Res.string.custom_range
-                        }
-                        UiText.StringResourceText(resource)
-                    }
-
-                FintrackBodyMediumText(
-                    modifier = Modifier.padding(space.large),
-                    text = text.asString()
-                )
-            }
-        }
+                .clickable { onToggleCustomDateSheet() }
+                .padding(vertical = 12.dp, horizontal = 16.dp),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary
+        )
     }
 }
 
@@ -433,76 +346,101 @@ private fun FilterRow(
 @Composable
 fun CustomDateBottomSheet(
     onDismiss: () -> Unit,
-    start: Pair<String?, Long?>? = null,
-    end: Pair<String?, Long?>? = null,
-    isError: Boolean = false,
-    onSubmit: (Pair<String?, Long?>?, Pair<String?, Long?>?) -> Unit,
+    start: Pair<String?, Long?>?,
+    end: Pair<String?, Long?>?,
+    isError: Boolean,
+    onSubmit: (Pair<String?, Long?>?, Pair<String?, Long?>?) -> Unit
 ) {
-
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val space = LocalSpacing.current
-
     var startDate by remember { mutableStateOf(start) }
     var endDate by remember { mutableStateOf(end) }
-    var startDateTimeStamp by remember { mutableStateOf(startDate?.second) }
 
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.background
+    val showDatePicker = remember { mutableStateOf(false) }
+    var isSelectingStart by remember { mutableStateOf(true) }
+
+    SheetFrame(
+        title = stringResource(Res.string.custom_range),
+        onDismiss = onDismiss
     ) {
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(space.mediumLarge)
-        ) {
-            Column(Modifier.padding(space.large)) {
-
-                FintrackTitleMediumText(stringResource(Res.string.custom_date))
-                Spacer(Modifier.height(space.mediumSmall))
-
-                DatePickerField(
-                    selectedDate = startDate?.first ?: stringResource(Res.string.not_choose),
-                    labelText = stringResource(Res.string.start),
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                DateInput(
+                    label = stringResource(Res.string.start),
+                    value = startDate?.first ?: "",
                     isError = isError && startDate == null,
-                    onDateSelected = { date, timeStamp ->
-                        startDate = date to timeStamp
-                        startDateTimeStamp = timeStamp
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        isSelectingStart = true
+                        showDatePicker.value = true
                     }
                 )
-
-                Spacer(Modifier.height(space.mediumSmall))
-
-                DatePickerField(
-                    selectedDate = endDate?.first ?: stringResource(Res.string.not_choose),
-                    labelText = stringResource(Res.string.end),
+                DateInput(
+                    label = stringResource(Res.string.end),
+                    value = endDate?.first ?: "",
                     isError = isError && endDate == null,
-                    disableBeforeDate = startDateTimeStamp,
-                    clickable = startDate != null,
-                    onDateSelected = { date, timeStamp ->
-                        endDate = date to timeStamp
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        isSelectingStart = false
+                        showDatePicker.value = true
                     }
                 )
+            }
 
-                Spacer(Modifier.height(space.mediumSmall))
+            Spacer(modifier = Modifier.height(24.dp))
 
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = { onSubmit(startDate, endDate) },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                ) {
-                    FintrackBodyMediumText(
-                        text = stringResource(Res.string.confirm),
-                        color = MaterialTheme.colorScheme.background
-                    )
-                }
+            Button(
+                onClick = { onSubmit(startDate, endDate) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(Res.string.confirm))
             }
         }
+    }
 
+    if (showDatePicker.value) {
+        val initial = if (isSelectingStart) startDate?.second else endDate?.second
+        val calendar = initial?.let { JalaliCalendar.fromEpochMilliseconds(it) } ?: JalaliCalendar()
+        
+        JalaliDatePickerDialog(
+            openDialog = showDatePicker,
+            initialDate = calendar,
+            onSelectDay = { jalali ->
+                val pair = jalali.toString() to jalali.toTimestamp()
+                if (isSelectingStart) startDate = pair else endDate = pair
+                showDatePicker.value = false
+            },
+            onConfirm = { showDatePicker.value = false }
+        )
     }
 }
 
+@Composable
+private fun DateInput(
+    label: String,
+    value: String,
+    isError: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Column(modifier = modifier) {
+        Text(text = label, style = MaterialTheme.typography.labelMedium, color = GlassText3)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .clip(MaterialTheme.shapes.small)
+                .background(if (isError) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f) else GlassColor)
+                .clickable(onClick = onClick)
+                .padding(horizontal = 12.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Text(
+                text = value.ifEmpty { "انتخاب تاریخ" },
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (value.isEmpty()) GlassText3 else GlassText
+            )
+        }
+    }
+}
