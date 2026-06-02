@@ -1,31 +1,33 @@
 package com.kazemieh.category.ui.list
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.add.AddCategoryBottomSheet
 import com.kazemieh.category.ui.delete.DeleteCategoryBottomSheet
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.glass.EntityItem
+import com.kazemieh.designsystem.component.glass.EntityList
+import com.kazemieh.designsystem.component.glass.SheetFrame
 import com.kazemieh.designsystem.component.model.toCategory
 import com.kazemieh.designsystem.component.model.toItemUi
-import com.kazemieh.designsystem.LocalSpacing
-import fintrack.core.designsystem.generated.resources.*
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.bottomsheet.ListBottomSheet
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
+import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -53,13 +55,46 @@ fun CategoryPickerBottomSheet(
         }
     }
 
-    ListBottomSheet(
-        title = stringResource(Res.string.category),
-        items = state.items,
-        onItemClicked = { viewModel.onIntent(CategoryIntent.SelectedCategory(it.toCategory())) },
-        onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
-        onDismiss = { viewModel.onIntent(CategoryIntent.OnDismiss) }
-    )
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    
+    ModalBottomSheet(
+        onDismissRequest = { viewModel.onIntent(CategoryIntent.OnDismiss) },
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background
+    ) {
+        val entityItems = remember(state.categories) {
+            state.categories.map {
+                EntityItem(
+                    id = it.id ?: 0,
+                    name = it.name,
+                    iconId = it.iconId,
+                    colorId = it.colorId
+                )
+            }
+        }
+
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = stringResource(Res.string.category),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(16.dp)
+            )
+            
+            EntityList(
+                title = stringResource(Res.string.category),
+                query = state.query,
+                onQueryChange = { viewModel.onIntent(CategoryIntent.SetQuery(it)) },
+                onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
+                summary = state.summaries,
+                items = entityItems,
+                onEditClick = { viewModel.onIntent(CategoryIntent.OnEditClick(state.categories.find { c -> c.id == it.id })) },
+                onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) },
+                onItemClick = { item ->
+                    state.categories.find { it.id == item.id }?.let { onCategoryClick(it) }
+                }
+            )
+        }
+    }
 
     if (state.isAddShow) {
         AddCategoryBottomSheet(
@@ -79,7 +114,7 @@ fun CategoryManageBottomSheet(
     onDismiss: () -> Unit
 ) {
     LaunchedEffect(Unit) {
-        viewModel.onIntent(CategoryIntent.LoadCategoryByType())
+        viewModel.onIntent(CategoryIntent.LoadCategoryByType(TransactionType.ALL))
     }
 
     val state by viewModel.state.collectAsState()
@@ -93,22 +128,36 @@ fun CategoryManageBottomSheet(
         }
     }
 
-    ListBottomSheet(
+    SheetFrame(
         title = stringResource(Res.string.category),
-        items = state.items,
-        isShowTopContent = true,
-        isDeleteShow = true,
-        isEditShow = true,
-        onItemEditClicked = { viewModel.onIntent(CategoryIntent.OnEditClick(it.toCategory())) },
-        onItemDeleteClicked = { viewModel.onIntent(CategoryIntent.OnDeleteClick(it.toCategory())) },
-        onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
-        topContent = {
-            TopCategoryContent(state.listTransactionType, state.type) {
-                viewModel.onIntent(CategoryIntent.LoadCategoryByType(it))
+        onDismiss = onDismiss
+    ) {
+        TopCategoryContent(state.listTransactionType, state.type) {
+            viewModel.onIntent(CategoryIntent.LoadCategoryByType(it))
+        }
+
+        val entityItems = remember(state.categories) {
+            state.categories.map {
+                EntityItem(
+                    id = it.id ?: 0,
+                    name = it.name,
+                    iconId = it.iconId,
+                    colorId = it.colorId
+                )
             }
-        },
-        onDismiss = { viewModel.onIntent(CategoryIntent.OnDismiss) }
-    )
+        }
+
+        EntityList(
+            title = stringResource(Res.string.category),
+            query = state.query,
+            onQueryChange = { viewModel.onIntent(CategoryIntent.SetQuery(it)) },
+            onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
+            summary = state.summaries,
+            items = entityItems,
+            onEditClick = { viewModel.onIntent(CategoryIntent.OnEditClick(state.categories.find { c -> c.id == it.id })) },
+            onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) }
+        )
+    }
 
     if (state.isAddShow) {
         AddCategoryBottomSheet(
