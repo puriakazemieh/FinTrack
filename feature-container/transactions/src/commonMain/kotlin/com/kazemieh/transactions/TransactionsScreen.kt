@@ -103,7 +103,9 @@ fun TransactionsScreen(
             PeriodSelector(
                 currentPeriod = state.dateFilterType,
                 periodLabel = state.textDate.asString(),
-                periodSubLabel = "نمایش بر اساس ${state.dateFilterType.name}", // Placeholder or helper
+                periodSubLabel = if (state.startDate != null && state.endDate != null)
+                    "${state.startDate} تا ${state.endDate}"
+                else "۱ — ۳۰ · ۳۰ روز", // Standardized placeholder
                 onPeriodSelected = { viewModel.onIntent(ReportIntent.OnDateRange(it)) },
                 onPrevClick = { viewModel.onIntent(ReportIntent.OnPrevClick) },
                 onNextClick = { viewModel.onIntent(ReportIntent.OnNextClick) }

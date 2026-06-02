@@ -1,14 +1,9 @@
 package com.kazemieh.financialsource.ui.list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,9 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.Source
-import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.common.toFa
+import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.LeadingIconStyle
 import org.koin.compose.viewmodel.koinViewModel
@@ -66,24 +64,41 @@ private fun SourceTile(source: Source) {
     val space = LocalSpacing.current
     Box(
         modifier = Modifier
-            .size(width = 110.dp, height = 70.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
-            .padding(space.medium)
+            .size(width = 90.dp, height = 56.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(GlassColor)
+            .border(1.dp, GlassEdge, RoundedCornerShape(14.dp))
+            .padding(8.dp)
     ) {
-        Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxSize()) {
-            FinTrackLeadingIcon(
-                colorId = source.colorId,
-                iconId = source.iconId,
-                style = LeadingIconStyle.Badge,
-                size = 28.dp,
-                iconSize = 16.dp
-            )
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxSize()) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = source.name,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontSize = 10.5.sp,
+                    maxLines = 1,
+                    color = GlassText2
+                )
+                FinTrackLeadingIcon(
+                    colorId = source.colorId,
+                    iconId = source.iconId,
+                    style = LeadingIconStyle.Badge,
+                    size = 18.dp,
+                    iconSize = 10.dp,
+                    corner = 6.dp
+                )
+            }
             Text(
-                text = source.name,
-                style = MaterialTheme.typography.labelSmall,
-                maxLines = 1,
-                color = MaterialTheme.colorScheme.onSurface
+                text = source.balance.toLong().toFa(),
+                style = MaterialTheme.typography.titleSmall,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                color = GlassText
             )
         }
     }
@@ -94,28 +109,44 @@ private fun NewSourceTile(onClick: () -> Unit) {
     val stroke = remember {
         Stroke(width = 2f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f))
     }
-    val color = MaterialTheme.colorScheme.primary
+    val color = GlassGreen
 
     Box(
         modifier = Modifier
-            .size(width = 110.dp, height = 70.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(2.dp), // Space for dashed border
+            .size(width = 90.dp, height = 56.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(GlassGreenSoft)
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
             drawRoundRect(
-                color = color,
+                color = color.copy(alpha = 0.45f),
                 style = stroke,
-                cornerRadius = androidx.compose.ui.geometry.CornerRadius(16.dp.toPx())
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(14.dp.toPx())
             )
         }
-        Icon(
-            imageVector = Icons.Default.Add,
-            contentDescription = null,
-            tint = color,
-            modifier = Modifier.size(24.dp)
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(GlassGreenSoft),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                    tint = color,
+                    modifier = Modifier.size(14.dp)
+                )
+            }
+            Text(
+                text = "منبع جدید",
+                fontSize = 9.5.sp,
+                fontWeight = FontWeight.Bold,
+                color = color
+            )
+        }
     }
 }

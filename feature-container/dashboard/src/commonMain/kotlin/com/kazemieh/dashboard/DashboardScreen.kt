@@ -4,6 +4,7 @@ package com.kazemieh.dashboard
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,11 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -35,11 +32,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.dashboard.component.QuickActions
 import com.kazemieh.dashboard.component.RecentTransactionsWidget
-import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
@@ -189,47 +188,69 @@ private fun DashboardHeader(
 ) {
     val space = LocalSpacing.current
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(Brush.linearGradient(listOf(GlassGreen, GlassGreenDeep))),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_source_default), // Fallback avatar
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
+                Text(
+                    text = "پ",
+                    color = GlassGreenDark,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp
                 )
             }
-            Spacer(Modifier.width(space.medium))
             Column {
                 Text(
-                    text = "Hello, User", // Hardcoded greeting for now
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onBackground
+                    text = "سلام،",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = GlassText3,
+                    lineHeight = 1.2.sp
                 )
                 Text(
-                    text = "Welcome back!",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = "پوریا", // Placeholder name
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = GlassText,
+                    lineHeight = 1.2.sp
                 )
             }
         }
 
-        Row {
-            IconButton(onClick = { /* Notification action */ }) {
-                Icon(Icons.Default.Notifications, contentDescription = null)
-            }
-            IconButton(onClick = { /* Search action */ }) {
-                Icon(Icons.Default.Search, contentDescription = null)
-            }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            HeaderIconButton(icon = Icons.Default.Notifications) { /* Notification action */ }
+            HeaderIconButton(icon = Icons.Default.Search) { /* Search action */ }
         }
+    }
+}
+
+@Composable
+private fun HeaderIconButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(40.dp)
+            .clip(MaterialTheme.shapes.medium)
+            .background(GlassColor)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = GlassText,
+            modifier = Modifier.size(18.dp)
+        )
     }
 }
