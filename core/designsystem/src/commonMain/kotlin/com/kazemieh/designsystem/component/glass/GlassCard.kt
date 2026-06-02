@@ -6,13 +6,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.kazemieh.designsystem.*
 
 /**
  * 2.3 GlassCard — base surface
@@ -25,8 +24,17 @@ fun GlassCard(
     onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
-    val backgroundColor = if (tone == GlassTone.Default) GlassColor else GlassStrong
-    val borderColor = if (tone == GlassTone.Default) GlassEdge else GlassEdgeStrong
+    val backgroundColor = if (tone == GlassTone.Default) {
+        MaterialTheme.colorScheme.surfaceVariant 
+    } else {
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f) // GlassStrong fallback
+    }
+    
+    val borderColor = if (tone == GlassTone.Default) {
+        MaterialTheme.colorScheme.outline
+    } else {
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.14f) // GlassEdgeStrong fallback
+    }
     
     Box(
         modifier = modifier

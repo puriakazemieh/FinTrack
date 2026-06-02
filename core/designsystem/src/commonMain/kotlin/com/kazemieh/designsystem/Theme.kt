@@ -6,6 +6,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -34,9 +35,9 @@ private val LightColors = lightColorScheme(
 
 private val DarkColors = darkColorScheme(
     primary = GlassGreen,
-    onPrimary = GlassBg0,
-    primaryContainer = GlassGreenSoft,
-    onPrimaryContainer = GlassGreen,
+    onPrimary = GlassGreenDark, // Standardized contrast color
+    primaryContainer = GlassGreenDeep, // For gradients
+    onPrimaryContainer = GlassGreenSoft, // For semantic backgrounds
     secondary = GlassBlue,
     onSecondary = GlassBg0,
     secondaryContainer = GlassBlueSoft,
@@ -45,14 +46,16 @@ private val DarkColors = darkColorScheme(
     onTertiary = GlassBg0,
     background = GlassBg0,
     onBackground = GlassText,
-    surface = GlassBg0,
+    surface = GlassBgAccent,
     onSurface = GlassText,
+    surfaceVariant = GlassColor, // Used for glass surfaces
+    onSurfaceVariant = GlassText2,
+    outline = GlassEdge,
+    outlineVariant = GlassHairline,
     error = GlassRed,
     onError = GlassBg0,
     errorContainer = GlassRedSoft,
     onErrorContainer = GlassRed,
-    outline = GlassEdge,
-    outlineVariant = GlassHairline,
 )
 
 

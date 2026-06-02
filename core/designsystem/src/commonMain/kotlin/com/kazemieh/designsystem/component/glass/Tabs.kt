@@ -42,7 +42,7 @@ fun Tabs(
                     modifier = Modifier
                         .weight(1f)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(if (isActive) GlassColor else androidx.compose.ui.graphics.Color.Transparent)
+                        .background(if (isActive) MaterialTheme.colorScheme.surfaceVariant else androidx.compose.ui.graphics.Color.Transparent)
                         .clickable { onChange(index) }
                         .padding(vertical = 10.dp),
                     contentAlignment = Alignment.Center
@@ -55,21 +55,21 @@ fun Tabs(
                             text = title,
                             fontSize = 12.sp,
                             fontWeight = if (isActive) FontWeight.W700 else FontWeight.W500,
-                            color = if (isActive) MaterialTheme.colorScheme.onSurface else GlassText2
+                            color = if (isActive) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         
                         counts?.getOrNull(index)?.let { count ->
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(99.dp))
-                                    .background(if (isActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else GlassColor)
+                                    .background(if (isActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant)
                                     .padding(horizontal = 6.dp, vertical = 1.dp)
                             ) {
                                 Text(
                                     text = count.toLong().toFa(),
                                     fontSize = 9.sp,
                                     fontWeight = FontWeight.W700,
-                                    color = if (isActive) MaterialTheme.colorScheme.primary else GlassText3
+                                    color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
                                 )
                             }
                         }

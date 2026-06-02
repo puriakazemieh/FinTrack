@@ -10,14 +10,14 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "com.kazemieh.setting"
+        namespace = "com.kazemieh.profile"
         compileSdk {
             version = release(36)
         }
         minSdk = 24
     }
 
-    val xcfName = "core:settingKit"
+    val xcfName = "core:profileKit"
 
     iosX64 {
         binaries.framework {

@@ -1,12 +1,6 @@
 package com.kazemieh.composeApp.navigation
 
-import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.ic_navigation_home
-import fintrack.core.designsystem.generated.resources.ic_navigation_report
-import fintrack.core.designsystem.generated.resources.ic_navigation_setting
-import fintrack.core.designsystem.generated.resources.navigation_home
-import fintrack.core.designsystem.generated.resources.navigation_report
-import fintrack.core.designsystem.generated.resources.navigation_setting
+import fintrack.core.designsystem.generated.resources.*
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
@@ -24,17 +18,22 @@ enum class Destinations(
         Screen.Dashboard
     ),
 
-    REPORT(
+    TRANSACTIONS(
         Res.drawable.ic_navigation_report,
-        Res.string.navigation_report,
-        Screen.Report
+        Res.string.navigation_transactions,
+        Screen.Transactions
     ),
 
-    SETTING(
-        Res.drawable.ic_navigation_setting,
-        Res.string.navigation_setting,
-        Screen.Setting
-    );
+    TOOLS(
+        Res.drawable.ic_navigation_setting, // Placeholder icon
+        Res.string.navigation_tools,
+        Screen.Tools
+    ),
 
+    PROFILE(
+        Res.drawable.ic_navigation_setting,
+        Res.string.navigation_profile,
+        Screen.Profile
+    );
 
 }

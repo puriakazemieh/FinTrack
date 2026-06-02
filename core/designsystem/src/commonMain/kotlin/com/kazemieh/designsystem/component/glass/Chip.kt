@@ -31,7 +31,7 @@ fun Chip(
     content: @Composable () -> Unit
 ) {
     val backgroundColor = if (active) color.copy(alpha = 0.16f) else Color.Transparent
-    val borderColor = if (active) color.copy(alpha = 0.33f) else GlassEdge
+    val borderColor = if (active) color.copy(alpha = 0.33f) else MaterialTheme.colorScheme.outline
     
     Box(
         modifier = modifier

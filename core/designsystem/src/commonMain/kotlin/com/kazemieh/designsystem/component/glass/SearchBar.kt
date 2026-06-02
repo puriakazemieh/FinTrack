@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.designsystem.GlassText2
 import com.kazemieh.designsystem.GlassText3
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.search_placeholder
@@ -50,7 +49,7 @@ fun SearchBar(
                     Text(
                         text = placeholder,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = GlassText3,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f),
                         fontSize = 13.sp
                     )
                 }

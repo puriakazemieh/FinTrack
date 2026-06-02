@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -28,8 +29,16 @@ fun Switch(
     enabled: Boolean = true
 ) {
     val thumbOffset by animateDpAsState(targetValue = if (on) 18.dp else 2.dp)
-    val trackColor = if (on) GlassGreen else Color.White.copy(alpha = 0.1f)
-    val thumbColor = if (on) Color.White else GlassText2
+    val trackColor = if (on) {
+        MaterialTheme.colorScheme.primary 
+    } else {
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+    }
+    val thumbColor = if (on) {
+        MaterialTheme.colorScheme.onPrimary 
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
 
     Box(
         modifier = modifier

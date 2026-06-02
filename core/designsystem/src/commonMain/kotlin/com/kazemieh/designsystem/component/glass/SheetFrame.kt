@@ -45,7 +45,7 @@ fun SheetFrame(
                     .padding(vertical = 12.dp)
                     .size(40.dp, 4.dp)
                     .clip(RoundedCornerShape(99.dp))
-                    .background(GlassEdgeStrong)
+                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.14f))
             )
         }
     ) {
@@ -79,7 +79,7 @@ fun SheetFrame(
                         Text(
                             text = it,
                             style = MaterialTheme.typography.bodySmall,
-                            color = GlassText2,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 11.sp
                         )
                     }

@@ -209,5 +209,8 @@
     <string name="currency_toman">تومان</string>
     <string name="more_details">مشاهده بیشتر</string>
     <string name="search_placeholder">جستجو...</string>
+    <string name="navigation_transactions">تراکنش‌ها</string>
+    <string name="navigation_tools">ابزارها</string>
+    <string name="navigation_profile">پروفایل</string>
 
 </resources>

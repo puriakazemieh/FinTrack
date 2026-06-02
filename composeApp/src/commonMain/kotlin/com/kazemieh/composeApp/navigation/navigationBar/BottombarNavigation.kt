@@ -6,9 +6,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.kazemieh.dashboard.DashboardScreen
-import com.kazemieh.filter.ReportScreen
+import com.kazemieh.transactions.TransactionsScreen
 import com.kazemieh.composeApp.navigation.Screen
-import com.kazemieh.setting.SettingScreen
+import com.kazemieh.profile.ProfileScreen
+import com.kazemieh.tools.ToolsScreen
 
 
 fun NavGraphBuilder.bottomBarNavGraph(
@@ -22,12 +23,16 @@ fun NavGraphBuilder.bottomBarNavGraph(
             DashboardScreen(snackbarHostState = snackbarHostState)
         }
 
-        composable<Screen.Report> { backStackEntry ->
-            ReportScreen(snackbarHostState = snackbarHostState)
+        composable<Screen.Transactions> { backStackEntry ->
+            TransactionsScreen(snackbarHostState = snackbarHostState)
         }
 
-        composable<Screen.Setting> { backStackEntry ->
-            SettingScreen(snackbarHostState = snackbarHostState)
+        composable<Screen.Tools> { backStackEntry ->
+            ToolsScreen(snackbarHostState = snackbarHostState)
+        }
+
+        composable<Screen.Profile> { backStackEntry ->
+            ProfileScreen(snackbarHostState = snackbarHostState)
         }
 
     }

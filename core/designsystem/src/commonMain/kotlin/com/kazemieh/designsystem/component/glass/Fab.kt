@@ -12,12 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassGreenDeep
 
 /**
@@ -28,13 +26,15 @@ fun Fab(
     label: String,
     icon: Painter,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    color: Color = GlassGreen
+    modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(99.dp))
-            .background(Brush.linearGradient(listOf(GlassGreen, GlassGreenDeep)))
+            .background(Brush.linearGradient(listOf(
+                MaterialTheme.colorScheme.primary, 
+                MaterialTheme.colorScheme.primaryContainer
+            )))
             .clickable(onClick = onClick)
             .padding(horizontal = 20.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center
@@ -46,14 +46,14 @@ fun Fab(
             Icon(
                 painter = icon,
                 contentDescription = null,
-                tint = Color(0xFF06281A), // Dark contrast from §2.7
+                tint = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.size(20.dp)
             )
             Text(
                 text = label,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.W700,
-                color = Color(0xFF06281A)
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }

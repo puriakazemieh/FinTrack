@@ -9,13 +9,15 @@ sealed class Screen {
     data object Dashboard: Screen()
 
     @Serializable
-    data object Report : Screen()
+    data object Transactions : Screen()
 
     @Serializable
-    data object Setting : Screen()
+    data object Tools : Screen()
+
+    @Serializable
+    data object Profile : Screen()
 
     @Serializable
     data object BottomBarGraph : Screen()
-
 
 }

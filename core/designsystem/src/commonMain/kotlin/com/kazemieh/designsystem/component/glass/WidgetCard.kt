@@ -74,14 +74,14 @@ fun WidgetCard(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(99.dp))
-                            .background(GlassColor)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
                         Text(
                             text = it.toLong().toFa(),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.W700,
-                            color = GlassText2
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -111,7 +111,7 @@ fun WidgetCard(
                         Icon(
                             imageVector = Icons.Default.MoreVert,
                             contentDescription = null,
-                            tint = GlassText3,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f),
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -140,14 +140,14 @@ fun WidgetCard(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack, // arrowL
                         contentDescription = null,
-                        tint = GlassText3,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f),
                         modifier = Modifier.size(14.dp)
                     )
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
                         text = more,
                         fontSize = 11.sp,
-                        color = GlassText3
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
                     )
                 }
             } else {

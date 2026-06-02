@@ -69,6 +69,8 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
 
+            implementation(libs.compose.material.icons.core)
+            implementation(libs.compose.material.icons.extended)
 
             implementation(libs.navigation.compose)
             implementation(project(":core:common"))
@@ -80,10 +82,11 @@ kotlin {
             implementation(project(":feature-share:category"))
             implementation(project(":feature-share:source"))
             implementation(project(":feature-share:tags"))
-            implementation(project(":feature-container:report"))
+            implementation(project(":feature-container:transactions"))
             implementation(project(":feature-share:person"))
             implementation(project(":feature-container:dashboard"))
-            implementation(project(":feature-container:setting"))
+            implementation(project(":feature-container:profile"))
+            implementation(project(":feature-container:tools"))
 
 
         }

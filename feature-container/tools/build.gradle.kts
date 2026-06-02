@@ -10,14 +10,14 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "com.kazemieh.filter"
+        namespace = "com.kazemieh.tools"
         compileSdk {
             version = release(36)
         }
         minSdk = 24
     }
 
-    val xcfName = "core:filterKit"
+    val xcfName = "core:toolsKit"
 
     iosX64 {
         binaries.framework {
@@ -49,15 +49,8 @@ kotlin {
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.kotlinx.datetime)
 
-                implementation(project(":core:domain"))
                 implementation(project(":core:common"))
                 implementation(project(":core:designsystem"))
-
-                implementation(project(":feature-share:source"))
-                implementation(project(":feature-share:category"))
-                implementation(project(":feature-share:tags"))
-                implementation(project(":feature-share:person"))
-                implementation(project(":feature-share:transaction"))
 
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)

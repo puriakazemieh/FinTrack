@@ -16,9 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.designsystem.GlassEdge
-import com.kazemieh.designsystem.GlassHairline
-import com.kazemieh.designsystem.GlassText2
 
 /**
  * 2.5 Row — list item inside widgets
@@ -34,7 +31,7 @@ fun Row(
     divider: Boolean = true
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        Row(
+        androidx.compose.foundation.layout.Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 12.dp),
@@ -48,7 +45,7 @@ fun Row(
                         .size(28.dp)
                         .clip(RoundedCornerShape(10.dp))
                         .background(it.bg)
-                        .border(1.dp, GlassEdge, RoundedCornerShape(10.dp)),
+                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(10.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -71,7 +68,7 @@ fun Row(
                     Text(
                         text = it,
                         style = MaterialTheme.typography.bodySmall,
-                        color = GlassText2,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 11.sp
                     )
                 }
@@ -87,7 +84,7 @@ fun Row(
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),
                 thickness = 1.dp,
-                color = GlassHairline
+                color = MaterialTheme.colorScheme.outlineVariant
             )
         }
     }

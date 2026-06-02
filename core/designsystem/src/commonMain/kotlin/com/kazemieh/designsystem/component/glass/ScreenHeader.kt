@@ -63,7 +63,7 @@ fun ScreenHeader(
                 Text(
                     text = it,
                     style = MaterialTheme.typography.bodySmall,
-                    color = GlassText2,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 11.sp
                 )
             }
@@ -86,7 +86,7 @@ fun ScreenHeader(
                                     .align(Alignment.TopEnd)
                                     .padding(4.dp)
                                     .size(8.dp)
-                                    .background(GlassRed, CircleShape)
+                                    .background(MaterialTheme.colorScheme.error, CircleShape)
                             )
                         }
                     }

@@ -15,17 +15,17 @@ import com.kazemieh.database.DatabaseInitializer
 import com.kazemieh.database.di.databaseModule
 import com.kazemieh.designsystem.FintrackTheme
 import com.kazemieh.domain.di.domainModule
-import com.kazemieh.filter.di.reportViewModel
 import com.kazemieh.financialsource.di.deleteSourceModule
 import com.kazemieh.financialsource.di.transactionAddFinancialSourceModule
 import com.kazemieh.financialsource.di.transactionFinancialSourceModule
 import com.kazemieh.person.di.transactionAddPersonModule
 import com.kazemieh.person.di.transactionDeletePersonModule
 import com.kazemieh.person.di.transactionPersonModule
-import com.kazemieh.setting.di.settingModule
+import com.kazemieh.profile.di.profileModule
 import com.kazemieh.tag.di.transactionAddTagModule
 import com.kazemieh.tag.di.transactionDeleteTagModule
 import com.kazemieh.tag.di.transactionTagModule
+import com.kazemieh.tools.di.toolsModule
 import com.kazemieh.transaction.di.addTransactionPresentationModule
 import com.kazemieh.transaction.di.transactionDeleteViewModelModule
 import com.kazemieh.transaction.di.transactionPresentationModule
@@ -69,12 +69,11 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         transactionAddTagModule,
         transactionDeleteTagModule,
         transactionTagModule,
-        settingModule,
-        reportViewModel,
+        profileModule,
         transactionPersonModule,
         transactionDeletePersonModule,
         transactionAddPersonModule,
-
+        toolsModule,
         dashboardModule,
 
         )

@@ -38,13 +38,13 @@ fun Field(
                     Text(
                         text = label,
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (error) GlassRed else GlassText3,
+                        color = if (error) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 12.sp
                     )
                     if (required) {
                         Text(
                             text = "*",
-                            color = GlassRed,
+                            color = MaterialTheme.colorScheme.error,
                             fontSize = 12.sp,
                             modifier = Modifier.padding(start = 2.dp)
                         )
@@ -60,7 +60,7 @@ fun Field(
                 Text(
                     text = it,
                     style = MaterialTheme.typography.labelSmall,
-                    color = GlassText3,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f),
                     fontSize = 10.sp
                 )
             }
