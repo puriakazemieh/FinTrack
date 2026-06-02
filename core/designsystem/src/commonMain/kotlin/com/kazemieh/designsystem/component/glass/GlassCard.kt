@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 
 /**
  * 2.3 GlassCard — base surface
+ * Frosted Glass effect with balanced blur and transparency.
  */
 @Composable
 fun GlassCard(
@@ -25,27 +26,35 @@ fun GlassCard(
     content: @Composable () -> Unit
 ) {
     val backgroundColor = if (tone == GlassTone.Default) {
-        MaterialTheme.colorScheme.surfaceVariant 
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f)
     } else {
-        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f) // GlassStrong fallback
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.18f)
     }
-    
+
     val borderColor = if (tone == GlassTone.Default) {
-        MaterialTheme.colorScheme.outline
+        MaterialTheme.colorScheme.outline.copy(alpha = 0.65f)
     } else {
-        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.14f) // GlassEdgeStrong fallback
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
     }
-    
+
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(22.dp))
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-            .background(backgroundColor)
-            .border(1.dp, borderColor, RoundedCornerShape(22.dp))
-            .glassBlur()
-            .padding(padding)
     ) {
-        content()
+        // Frosted Background Layer
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(backgroundColor)
+                .border(1.dp, borderColor, RoundedCornerShape(22.dp))
+                .glassBlur(50.dp) // Reverted to the preferred 50dp blur
+        )
+
+        // Sharp Content Layer
+        Box(modifier = Modifier.padding(padding)) {
+            content()
+        }
     }
 }
 

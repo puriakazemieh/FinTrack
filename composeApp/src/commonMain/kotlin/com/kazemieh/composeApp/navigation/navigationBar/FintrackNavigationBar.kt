@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
@@ -63,24 +61,32 @@ fun FintrackNavigationBar(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .height(84.dp),
-        contentAlignment = Alignment.BottomCenter
+            .padding(start = 24.dp, end = 24.dp, bottom = 12.dp)
+            .height(64.dp),
+        contentAlignment = Alignment.Center
     ) {
-        // The Glass Bar
+        // Frosted Pill Background Layer
+        val backgroundColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f)
+        val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f)
 
         Box(
-            modifier = modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .clip(MaterialTheme.shapes.extraLarge)
-                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.78f))
-                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(22.dp))
-                .glassBlur(5.dp)
-                .padding(horizontal = 14.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(CircleShape)
+                .background(backgroundColor)
+                .border(
+                    1.dp,
+                    borderColor,
+                    CircleShape
+                )
+                .glassBlur(60.dp) // Reverted to the preferred 60dp blur
         )
 
+        // Content Layer (Icons)
         Row(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
@@ -91,14 +97,17 @@ fun FintrackNavigationBar(
                 }
 
                 val isSelected = selectedDestination == destination
-                val color =
-                    if (isSelected) MaterialTheme.colorScheme.primary else
-                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.42f)
+                val color = if (isSelected) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                }
 
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
+                        .clip(CircleShape)
                         .clickable {
                             if (!isSelected) {
                                 navController.navigate(destination.route) {
@@ -112,22 +121,20 @@ fun FintrackNavigationBar(
                         },
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            painter = painterResource(destination.icon),
-                            contentDescription = stringResource(destination.label),
-                            tint = color,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+                    Icon(
+                        painter = painterResource(destination.icon),
+                        contentDescription = stringResource(destination.label),
+                        tint = color,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
             }
         }
 
-
+        // Floating Action Button
         Box(
             modifier = Modifier
-                .padding(bottom = 16.dp)
+                .padding(bottom = 32.dp)
                 .size(56.dp)
                 .clip(CircleShape)
                 .background(
