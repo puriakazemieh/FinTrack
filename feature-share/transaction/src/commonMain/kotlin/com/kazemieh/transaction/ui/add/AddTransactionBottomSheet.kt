@@ -1,56 +1,53 @@
 package com.kazemieh.transaction.ui.add
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.list.CategoryPickerBottomSheet
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
-import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackOutlinedTextField
-import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.designsystem.component.jalali.DatePickerField
+import com.kazemieh.common.toFa
+import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.component.FinTrackLeadingIcon
+import com.kazemieh.designsystem.component.LeadingIconStyle
+import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.component.model.resolveString
+import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import com.kazemieh.person.ui.list.PersonPickerBottomSheet
 import com.kazemieh.tag.ui.list.TagPickerBottomSheet
 import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import androidx.compose.foundation.layout.Row as ComposeRow
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -174,327 +171,264 @@ private fun BottomSheetContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionContent(
     state: AddTransactionState,
     onIntent: (AddTransactionIntent) -> Unit
 ) {
-    val focusRequester = remember { FocusRequester() }
     val space = LocalSpacing.current
+    val colors = FinTrackPickerColors.rainbow()
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(space.mediumLarge)
-    ) {
-
-        item {
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                SingleChoiceSegmentedButtonRow(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    state.listTransactionType.forEachIndexed { index, option ->
-                        SegmentedButton(
-                            selected = state.transactionType == option,
-                            onClick = { onIntent(AddTransactionIntent.SelectedType(option)) },
-                            shape = SegmentedButtonDefaults.itemShape(
-                                index = index,
-                                count = state.listTransactionType.size
-                            ),
-                        ) {
-                            val text = when (option.count) {
-                                1 -> {
-                                    stringResource(Res.string.incoming)
-                                }
-
-                                2 -> {
-                                    stringResource(Res.string.outcoming)
-                                }
-
-                                else -> {
-                                    stringResource(Res.string.transfer)
-                                }
-                            }
-
-                            FintrackBodyMediumText(text = text)
-                        }
-                    }
-                }
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(bottom = 100.dp)
+        ) {
+            item {
+                ScreenHeader(
+                    title = "ثبت تراکنش جدید",
+                    onBack = { onIntent(AddTransactionIntent.OnDismiss) }
+                )
             }
-        }
 
-        item { Spacer(modifier = Modifier.height(space.large)) }
+            item {
+                GlassSegmentedSelector(
+                    selectedType = state.transactionType,
+                    onTypeSelected = { onIntent(AddTransactionIntent.SelectedType(it)) }
+                )
+            }
 
-        item {
-            FintrackOutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                isPrice = true,
-                value = state.amount,
-                onValueChange = { onIntent(AddTransactionIntent.SetAmount(it)) },
-                label = {
-                    Row {
-                        FintrackBodyMediumText(text = stringResource(Res.string.amount))
-                        FintrackBodyMediumText(
-                            text = stringResource(Res.string.required_star),
-                            color = MaterialTheme.colorScheme.error
+            item {
+                LargeAmountCard(
+                    amount = state.amount,
+                    onCalcClick = { /* Part B */ }
+                )
+            }
+
+            if (state.transactionType == TransactionType.TRANSFER) {
+                item {
+                    Field(label = stringResource(Res.string.source_from), required = true, error = state.isSourceError) {
+                        PickerValue(
+                            label = state.source?.name ?: stringResource(Res.string.select_source),
+                            onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.SourcePicker)) },
+                            color = GlassBlue
                         )
                     }
-                },
-                textStyle = MaterialTheme.typography.titleLarge,
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                isError = state.isAmountError
-            )
-        }
+                }
+                item {
+                    Field(label = stringResource(Res.string.source_to), required = true, error = state.isSourceEndError) {
+                        PickerValue(
+                            label = state.sourceEnd?.name ?: stringResource(Res.string.select_source),
+                            onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.SourceEndPicker)) },
+                            color = GlassBlue
+                        )
+                    }
+                }
+            } else {
+                item {
+                    Field(label = stringResource(Res.string.category), required = true, error = state.isCategoryError) {
+                        val color = colors.firstOrNull { it.id == state.category?.colorId }?.color ?: GlassGreen
+                        PickerValue(
+                            label = state.category?.name ?: stringResource(Res.string.select_category),
+                            onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.CategoryPicker)) },
+                            color = color
+                        )
+                    }
+                }
+                item {
+                    Field(label = stringResource(Res.string.source), required = true, error = state.isSourceError) {
+                        PickerValue(
+                            label = state.source?.name ?: stringResource(Res.string.select_source),
+                            onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.SourcePicker)) },
+                            color = GlassBlue
+                        )
+                    }
+                }
+            }
 
-        item { Spacer(modifier = Modifier.height(space.large)) }
+            item {
+                Field(label = stringResource(Res.string.date), required = true) {
+                    PickerValue(
+                        label = state.date ?: "امروز",
+                        onClick = { /* Handle date picker toggle or direct integration */ },
+                        color = GlassText2
+                    )
+                }
+            }
 
-        item {
-            AnimatedVisibility(visible = state.transactionType == TransactionType.TRANSFER) {
-                TransferScreen(
-                    state = state,
-                    onSourceClicked = {
-                        onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.SourcePicker))
-                    },
-                    onSourceEndClicked = {
-                        onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.SourceEndPicker))
-                    },
-                    setTransferAmount = { onIntent(AddTransactionIntent.SetAmountTransfer(it)) }
-                )
+            item {
+                SectionContainer(
+                    title = "افراد مرتبط",
+                    sub = "برای تقسیم خرج یا طلب",
+                    onAddClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.PersonPicker)) },
+                    addLabel = "+ افزودن شخص"
+                ) {
+                    state.persons?.forEach { person ->
+                        RemovableChip(
+                            label = person.name,
+                            color = GlassGreen,
+                            onRemove = {
+                                val newSet = state.persons.filter { it.id != person.id }.toSet()
+                                onIntent(AddTransactionIntent.SetPerson(newSet))
+                            },
+                            icon = {
+                                Box(
+                                    modifier = Modifier
+                                        .size(18.dp)
+                                        .clip(CircleShape)
+                                        .background(GlassGreen),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(text = person.name.take(1), fontSize = 9.sp, fontWeight = FontWeight.Bold, color = GlassGreenDark)
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
+            item {
+                SectionContainer(
+                    title = "تگ‌ها",
+                    sub = "برچسب برای فیلتر",
+                    onAddClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.TagPicker)) },
+                    addLabel = "+ افزودن تگ"
+                ) {
+                    state.tags?.forEach { tag ->
+                        val color = colors.firstOrNull { it.id == tag.colorId }?.color ?: GlassBlue
+                        RemovableChip(
+                            label = "#${tag.name}",
+                            color = color,
+                            onRemove = {
+                                val newSet = state.tags.filter { it.id != tag.id }.toSet()
+                                onIntent(AddTransactionIntent.SetTags(newSet))
+                            }
+                        )
+                    }
+                }
+            }
+
+            item {
+                GlassCard(padding = 14.dp) {
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        ComposeRow(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text(text = "یادداشت", style = MaterialTheme.typography.labelSmall, color = GlassText3)
+                            Text(text = "${state.description.length} / ۲۵۰", style = MaterialTheme.typography.labelSmall, color = GlassText3)
+                        }
+                        BasicTextField(
+                            value = state.description,
+                            onValueChange = { desc -> if (desc.length <= 250) onIntent(AddTransactionIntent.SetDescription(desc)) },
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(color = GlassText),
+                            modifier = Modifier.fillMaxWidth(),
+                            decorationBox = @Composable { innerTextField ->
+                                Box {
+                                    if (state.description.isEmpty()) {
+                                        Text(text = "توضیحات تراکنش...", style = MaterialTheme.typography.bodyMedium, color = GlassText3)
+                                    }
+                                    innerTextField()
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
+            item {
+                PhotoDropUI()
             }
         }
 
-        item {
-            AnimatedVisibility(visible = state.transactionType != TransactionType.TRANSFER) {
-                TransactionDetail(
-                    state = state,
-                    onCategoryClicked = {
-                        onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.CategoryPicker))
-                    },
-                    onSourceClicked = {
-                        onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.SourcePicker))
-                    }
-                )
-            }
-        }
-
-        item { Spacer(modifier = Modifier.height(space.mediumSmall)) }
-
-        item {
-            FintrackOutlinedTextField(
-                value = state.tags?.joinToString("") { " #${it.name}" } ?: "",
-                onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.TagPicker)) },
-                readOnly = true,
-                enabled = false,
-                singleLine = false,
-                label = {
-                    if (!state.tags.isNullOrEmpty()) {
-                        FintrackBodyMediumText(text = stringResource(Res.string.tags))
-                    } else {
-                        FintrackBodyMediumText(text = stringResource(Res.string.select_tags))
-                    }
-                }
-
-            )
-        }
-
-        item { Spacer(modifier = Modifier.height(space.mediumSmall)) }
-
-        item {
-            FintrackOutlinedTextField(
-                value = state.persons?.joinToString("") { " #${it.name}" } ?: "",
-                onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.PersonPicker)) },
-                readOnly = true,
-                enabled = false,
-                singleLine = false,
-                label = {
-                    if (!state.persons.isNullOrEmpty()) {
-                        FintrackBodyMediumText(text = stringResource(Res.string.persons))
-                    } else {
-                        FintrackBodyMediumText(text = stringResource(Res.string.select_person))
-                    }
-                }
-
-            )
-        }
-
-        item { Spacer(modifier = Modifier.height(space.mediumSmall)) }
-
-        item {
-            DatePickerField(
-                selectedDate = state.date,
-                onDateSelected = { date, timeStamp ->
-                    onIntent(AddTransactionIntent.SetDate(date, timeStamp))
-                }
-            )
-        }
-
-        item { Spacer(modifier = Modifier.height(space.mediumSmall)) }
-
-        item {
-            FintrackOutlinedTextField(
-                value = state.description,
-                onValueChange = { onIntent(AddTransactionIntent.SetDescription(it)) },
-                label = { FintrackBodyMediumText(text = stringResource(Res.string.description)) },
-                singleLine = false,
-                maxLine = 5
-            )
-        }
-
-        item { Spacer(modifier = Modifier.height(space.large)) }
-
-        item {
+        // Fixed CTA at bottom
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .background(Brush.verticalGradient(listOf(Color.Transparent, GlassBg0.copy(alpha = 0.8f), GlassBg0)))
+                .padding(14.dp)
+        ) {
             Button(
                 onClick = { onIntent(AddTransactionIntent.Submit) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !state.isLoading,
-                shape = MaterialTheme.shapes.medium,
+                shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                    containerColor = GlassGreen,
+                    contentColor = GlassGreenDark
+                ),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
             ) {
-                FintrackTitleMediumText(
-                    text = stringResource(Res.string.save_transaction),
-                    color = MaterialTheme.colorScheme.background
+                Text(
+                    text = "ذخیره تراکنش",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
         }
-
-    }
-
-    LaunchedEffect(Unit) {
-        kotlinx.coroutines.delay(300)
-        focusRequester.requestFocus()
-    }
-
-}
-
-@Composable
-private fun TransferScreen(
-    state: AddTransactionState,
-    onSourceClicked: () -> Unit,
-    onSourceEndClicked: () -> Unit,
-    setTransferAmount: (String) -> Unit,
-) {
-    val space = LocalSpacing.current
-    Column {
-        FintrackOutlinedTextField(
-            value = state.source?.name ?: "",
-            onClick = onSourceClicked,
-            readOnly = true,
-            enabled = false,
-            label = {
-                Row {
-                    if (state.source?.name != null) {
-                        FintrackBodyMediumText(text = stringResource(Res.string.source_from))
-                    } else {
-                        FintrackBodyMediumText(text = stringResource(Res.string.select_source))
-                    }
-                    FintrackBodyMediumText(
-                        text = stringResource(Res.string.required_star),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            },
-            isError = state.isSourceError
-        )
-
-        Spacer(modifier = Modifier.height(space.mediumSmall))
-
-        FintrackOutlinedTextField(
-            value = state.sourceEnd?.name ?: "",
-            onClick = onSourceEndClicked,
-            readOnly = true,
-            enabled = false,
-            label = {
-                Row {
-                    if (state.sourceEnd?.name != null) {
-                        FintrackBodyMediumText(text = stringResource(Res.string.source_to))
-                    } else {
-                        FintrackBodyMediumText(text = stringResource(Res.string.select_source))
-                    }
-                    FintrackBodyMediumText(
-                        text = stringResource(Res.string.required_star),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            },
-            isError = state.isSourceEndError
-        )
-
-        Spacer(modifier = Modifier.height(space.mediumSmall))
-
-        FintrackOutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            isPrice = true,
-            value = state.amountTransfer ?: "0",
-            onValueChange = { setTransferAmount(it) },
-            label = {
-                Row {
-                    FintrackBodyMediumText(text = stringResource(Res.string.amount_transfer))
-                }
-            },
-            textStyle = MaterialTheme.typography.titleLarge,
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-        )
-
     }
 }
 
 @Composable
-private fun TransactionDetail(
-    state: AddTransactionState,
-    onSourceClicked: () -> Unit,
-    onCategoryClicked: () -> Unit,
+private fun PickerValue(
+    label: String,
+    onClick: () -> Unit,
+    color: Color
 ) {
-    val space = LocalSpacing.current
-    Column {
-        FintrackOutlinedTextField(
-            value = state.category?.name ?: "",
-            onClick = onCategoryClicked,
-            readOnly = true,
-            enabled = false,
-            label = {
-                Row {
-                    if (state.category?.name != null) {
-                        FintrackBodyMediumText(text = stringResource(Res.string.category))
-                    } else {
-                        FintrackBodyMediumText(text = stringResource(Res.string.select_category))
-                    }
-                    FintrackBodyMediumText(
-                        text = stringResource(Res.string.required_star),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            },
-            isError = state.isCategoryError
+    ComposeRow(
+        modifier = Modifier.clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = GlassText
         )
-        Spacer(modifier = Modifier.height(space.mediumSmall))
-
-
-        FintrackOutlinedTextField(
-            value = state.source?.name ?: "",
-            onClick = onSourceClicked,
-            readOnly = true,
-            enabled = false,
-            label = {
-                Row {
-                    if (state.source?.name != null) {
-                        FintrackBodyMediumText(text = stringResource(Res.string.source))
-                    } else {
-                        FintrackBodyMediumText(text = stringResource(Res.string.select_source))
-                    }
-                    FintrackBodyMediumText(
-                        text = stringResource(Res.string.required_star),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            },
-            isError = state.isSourceError
+        Icon(
+            painter = painterResource(Res.drawable.ic_1), // Placeholder arrow? 
+            contentDescription = null,
+            tint = GlassText3,
+            modifier = Modifier.size(13.dp)
         )
+    }
+}
 
+@Composable
+private fun PhotoDropUI() {
+    GlassCard(padding = 14.dp) {
+        Column {
+            ComposeRow(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(text = "پیوست عکس", style = MaterialTheme.typography.labelSmall, color = GlassText3)
+                Text(text = "اختیاری", style = MaterialTheme.typography.labelSmall, color = GlassText3)
+            }
+            ComposeRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                PhotoActionCard(icon = Icons.Default.CameraAlt, label = "دوربین")
+                PhotoActionCard(icon = Icons.Default.Image, label = "گالری")
+            }
+        }
+    }
+}
 
+@Composable
+private fun PhotoActionCard(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String) {
+    Box(
+        modifier = Modifier
+            .size(64.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(GlassColor)
+            .border(1.5.dp, GlassEdgeStrong, RoundedCornerShape(12.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Icon(imageVector = icon, contentDescription = null, tint = GlassText3, modifier = Modifier.size(18.dp))
+            Text(text = label, fontSize = 9.sp, color = GlassText3)
+        }
     }
 }
