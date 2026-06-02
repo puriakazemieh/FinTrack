@@ -30,6 +30,7 @@ import com.kazemieh.transaction.di.addTransactionPresentationModule
 import com.kazemieh.transaction.di.transactionDeleteViewModelModule
 import com.kazemieh.transaction.di.transactionPresentationModule
 import com.kazemieh.transaction.di.transactionReportViewModelModule
+import com.kazemieh.transactions.di.transactionsViewModelModule
 import org.koin.compose.koinInject
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
@@ -75,6 +76,7 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         transactionAddPersonModule,
         toolsModule,
         dashboardModule,
+        transactionsViewModelModule,
 
         )
     startKoin {
