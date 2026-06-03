@@ -99,7 +99,7 @@ private fun BottomSheetContent(
         dragHandle = null
     ) {
         AddFrame(
-            title = stringResource(Res.string.title_new_transaction),
+            title = if (state.oldTransaction == null) stringResource(Res.string.title_new_transaction) else stringResource(Res.string.edit) + " " + stringResource(Res.string.transaction),
             sub = stringResource(Res.string.title_transaction_management),
             primaryLabel = stringResource(Res.string.btn_save_transaction),
             onPrimaryClick = { onIntent(AddTransactionIntent.Submit) },

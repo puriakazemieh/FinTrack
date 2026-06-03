@@ -7,11 +7,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kazemieh.designsystem.GlassBg0
+import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.component.*
 
 /**
@@ -38,55 +40,23 @@ fun SheetFrame(
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        dragHandle = {
-            Box(
-                modifier = Modifier
-                    .padding(vertical = 12.dp)
-                    .size(40.dp, 4.dp)
-                    .clip(RoundedCornerShape(99.dp))
-                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.14f))
-            )
-        }
+        dragHandle = null
     ) {
         Column(
             modifier = modifier
-                .fillMaxWidth()
-                .navigationBarsPadding()
+                .fillMaxSize()
+                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
         ) {
-            // Header
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (hero != null) {
-                    Box(modifier = Modifier.padding(end = 16.dp)) {
-                        hero()
-                    }
-                }
-                
-                Column(modifier = Modifier.weight(1f)) {
-                    FintrackHeadlineLargeText(
-                        text = title,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.W700,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    sub?.let {
-                        FintrackLabelSmallText(
-                            text = it,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 11.sp
-                        )
-                    }
-                }
-            }
+            ScreenHeader(
+                title = title,
+                sub = sub,
+                onClose = onDismiss
+            )
 
             // Scrollable Content
             Column(
                 modifier = Modifier
-                    .weight(1f, fill = false)
+                    .weight(1f)
                     .padding(horizontal = 24.dp)
             ) {
                 content()

@@ -115,9 +115,7 @@ fun AddSourceContent(
     }
 
     AddFrame(
-        title = if (state.mode == AddSourceMode.Add) stringResource(Res.string.title_new_source) else stringResource(
-            Res.string.title_edit_source
-        ),
+        title = if (state.mode == AddSourceMode.Add) stringResource(Res.string.title_new_source) else stringResource(Res.string.title_edit_source),
         sub = stringResource(Res.string.title_source_management),
         primaryLabel = stringResource(Res.string.btn_save_source),
         onPrimaryClick = { onIntent(AddSourceIntent.Save) },

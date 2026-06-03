@@ -42,7 +42,7 @@ fun AddFrame(
         Column(modifier = Modifier.fillMaxSize()) {
             ScreenHeader(
                 title = "", // Title is handled in the hero section for AddFrame
-                onBack = onClose
+                onClose = onClose
             )
 
             Column(

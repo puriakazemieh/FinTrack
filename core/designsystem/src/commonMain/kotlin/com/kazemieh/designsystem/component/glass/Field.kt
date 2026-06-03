@@ -43,10 +43,17 @@ fun Field(
                     )
                     if (required) {
                         FintrackLabelSmallText(
-                        text = stringResource(Res.string.label_required_marker),
-                        color = GlassRed,
-                        modifier = Modifier.padding(start = 2.dp)
-                    )
+                            text = stringResource(Res.string.label_required_marker),
+                            color = GlassRed,
+                            modifier = Modifier.padding(start = 2.dp)
+                        )
+                    } else {
+                        FintrackLabelSmallText(
+                            text = " (${stringResource(Res.string.label_optional)})",
+                            color = GlassText3.copy(alpha = 0.6f),
+                            fontSize = 10.sp,
+                            modifier = Modifier.padding(start = 2.dp)
+                        )
                     }
                 }
                 

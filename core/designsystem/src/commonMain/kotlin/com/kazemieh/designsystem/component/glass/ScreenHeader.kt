@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import com.kazemieh.designsystem.component.*
 import androidx.compose.runtime.Composable
@@ -28,6 +29,7 @@ fun ScreenHeader(
     modifier: Modifier = Modifier,
     sub: String? = null,
     onBack: (() -> Unit)? = null,
+    onClose: (() -> Unit)? = null,
     actions: List<HeaderAction> = emptyList(),
     center: Boolean = false
 ) {
@@ -41,6 +43,14 @@ fun ScreenHeader(
             IconButton(onClick = onBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
+        } else if (onClose != null) {
+            IconButton(onClick = onClose) {
+                Icon(
+                    imageVector = Icons.Default.Close,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onBackground
                 )

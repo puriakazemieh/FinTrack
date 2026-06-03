@@ -1,6 +1,7 @@
 package com.kazemieh.person.ui.list
 
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -10,12 +11,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import com.kazemieh.common.model.Person
+import com.kazemieh.designsystem.GlassBg0
+import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.component.bottomsheet.SelectableFlowRowBottomSheet
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
-import com.kazemieh.designsystem.component.glass.EntitySummary
+import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.designsystem.component.model.toPerson
 import com.kazemieh.person.ui.add.AddPersonBottomSheet
@@ -101,38 +107,49 @@ fun PersonManageBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        EntityList(
-            title = stringResource(Res.string.persons),
-            query = state.searchQuery,
-            onQueryChange = { viewModel.onIntent(PersonIntent.UpdateSearchQuery(it)) },
-            items = state.persons.map { person ->
-                EntityItem(
-                    id = person.id ?: 0L,
-                    name = person.name,
-                    sub = person.description,
-                    iconId = 1, // Default user icon? Or handle properly
-                    colorId = 1
-                )
-            },
-            onItemClick = { item ->
-                if (clickable) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+        ) {
+            ScreenHeader(
+                title = stringResource(Res.string.persons),
+                onClose = { viewModel.onIntent(PersonIntent.OnDismiss) }
+            )
+
+            EntityList(
+                title = stringResource(Res.string.persons),
+                query = state.searchQuery,
+                onQueryChange = { viewModel.onIntent(PersonIntent.UpdateSearchQuery(it)) },
+                items = state.persons.map { person ->
+                    EntityItem(
+                        id = person.id ?: 0L,
+                        name = person.name,
+                        sub = person.description,
+                        iconId = 1, // Default user icon? Or handle properly
+                        colorId = 1
+                    )
+                },
+                onItemClick = { item ->
+                    if (clickable) {
+                        state.persons.find { it.id == item.id }?.let {
+                            viewModel.onIntent(PersonIntent.SelectedPerson(it))
+                        }
+                    }
+                },
+                onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
+                onEditClick = { item ->
                     state.persons.find { it.id == item.id }?.let {
-                        viewModel.onIntent(PersonIntent.SelectedPerson(it))
+                        viewModel.onIntent(PersonIntent.OnEditClick(it))
+                    }
+                },
+                onDeleteClick = { item ->
+                    state.persons.find { it.id == item.id }?.let {
+                        viewModel.onIntent(PersonIntent.OnDeleteClick(it))
                     }
                 }
-            },
-            onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
-            onEditClick = { item ->
-                state.persons.find { it.id == item.id }?.let {
-                    viewModel.onIntent(PersonIntent.OnEditClick(it))
-                }
-            },
-            onDeleteClick = { item ->
-                state.persons.find { it.id == item.id }?.let {
-                    viewModel.onIntent(PersonIntent.OnDeleteClick(it))
-                }
-            }
-        )
+            )
+        }
     }
 
     if (state.showAddPerson) {

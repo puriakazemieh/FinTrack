@@ -1,7 +1,10 @@
 package com.kazemieh.tag.ui.list
 
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import com.kazemieh.designsystem.GlassBg0
+import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.component.glass.*
 import fintrack.core.designsystem.generated.resources.tag_item
 import com.kazemieh.designsystem.component.model.toTag
@@ -9,6 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import com.kazemieh.common.model.Tag
 import com.kazemieh.designsystem.component.bottomsheet.ListBottomSheet
 import com.kazemieh.designsystem.component.bottomsheet.SelectableFlowRowBottomSheet
@@ -91,38 +97,49 @@ fun TagManageBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        EntityList(
-            title = stringResource(Res.string.tags),
-            query = state.searchQuery,
-            onQueryChange = { viewModel.onIntent(TagIntent.UpdateSearchQuery(it)) },
-            items = state.tags.map { tag ->
-                EntityItem(
-                    id = tag.id ?: 0L,
-                    name = tag.name,
-                    sub = tag.description,
-                    iconId = tag.iconId,
-                    colorId = tag.colorId
-                )
-            },
-            onItemClick = { item ->
-                if (clickable) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+        ) {
+            ScreenHeader(
+                title = stringResource(Res.string.tags),
+                onClose = { viewModel.onIntent(TagIntent.OnDismiss) }
+            )
+
+            EntityList(
+                title = stringResource(Res.string.tags),
+                query = state.searchQuery,
+                onQueryChange = { viewModel.onIntent(TagIntent.UpdateSearchQuery(it)) },
+                items = state.tags.map { tag ->
+                    EntityItem(
+                        id = tag.id ?: 0L,
+                        name = tag.name,
+                        sub = tag.description,
+                        iconId = tag.iconId,
+                        colorId = tag.colorId
+                    )
+                },
+                onItemClick = { item ->
+                    if (clickable) {
+                        state.tags.find { it.id == item.id }?.let {
+                            viewModel.onIntent(TagIntent.SelectedTag(it))
+                        }
+                    }
+                },
+                onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
+                onEditClick = { item ->
                     state.tags.find { it.id == item.id }?.let {
-                        viewModel.onIntent(TagIntent.SelectedTag(it))
+                        viewModel.onIntent(TagIntent.OnEditClick(it))
+                    }
+                },
+                onDeleteClick = { item ->
+                    state.tags.find { it.id == item.id }?.let {
+                        viewModel.onIntent(TagIntent.OnDeleteClick(it))
                     }
                 }
-            },
-            onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
-            onEditClick = { item ->
-                state.tags.find { it.id == item.id }?.let {
-                    viewModel.onIntent(TagIntent.OnEditClick(it))
-                }
-            },
-            onDeleteClick = { item ->
-                state.tags.find { it.id == item.id }?.let {
-                    viewModel.onIntent(TagIntent.OnDeleteClick(it))
-                }
-            }
-        )
+            )
+        }
     }
 
     if (state.showAddTag) {

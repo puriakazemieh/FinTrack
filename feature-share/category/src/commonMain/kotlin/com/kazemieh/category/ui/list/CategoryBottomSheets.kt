@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
@@ -23,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,16 +32,10 @@ import com.kazemieh.category.ui.add.AddCategoryBottomSheet
 import com.kazemieh.category.ui.delete.DeleteCategoryBottomSheet
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
-import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassRed
-import com.kazemieh.designsystem.GlassText3
-import com.kazemieh.designsystem.component.FintrackLabelMediumText
-import com.kazemieh.designsystem.component.FintrackTitleLargeText
+import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
-import com.kazemieh.designsystem.component.glass.EntityItem
-import com.kazemieh.designsystem.component.glass.EntityList
-import com.kazemieh.designsystem.component.glass.GlassCard
-import com.kazemieh.designsystem.component.glass.SheetFrame
+import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.component.model.toCategory
 import com.kazemieh.designsystem.component.model.toItemUi
 import fintrack.core.designsystem.generated.resources.Res
@@ -146,7 +142,16 @@ fun CategoryManageBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+        ) {
+            ScreenHeader(
+                title = stringResource(Res.string.category),
+                onClose = { viewModel.onIntent(CategoryIntent.OnDismiss) }
+            )
+
             TypeSwitcher(
                 selectedType = state.type,
                 onTypeSelected = { viewModel.onIntent(CategoryIntent.LoadCategoryByType(it)) }

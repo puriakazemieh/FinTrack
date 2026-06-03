@@ -1,17 +1,15 @@
 package com.kazemieh.financialsource.ui.list
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import com.kazemieh.common.toPrice
+import com.kazemieh.designsystem.GlassBg0
+import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.GlassText3
 import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.component.model.ItemUi
@@ -22,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.toFa
 import com.kazemieh.designsystem.LocalSpacing
@@ -78,47 +77,50 @@ private fun SourceBottomSheetCore(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        EntityList(
-            title = stringResource(Res.string.source),
-            query = state.searchQuery,
-            onQueryChange = { viewModel.onIntent(SourceIntent.UpdateSearchQuery(it)) },
-            items = state.sources.map { source ->
-                EntityItem(
-                    id = source.id ?: 0L,
-                    name = source.name,
-                    sub = if (source.type == 1) source.cardNumber else source.description,
-                    badge = source.formattedBalance + " " + stringResource(Res.string.currency_toman),
-                    iconId = source.iconId,
-                    colorId = source.colorId
-                )
-            },
-            onItemClick = { item ->
-                if (clickable) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+        ) {
+            ScreenHeader(
+                title = stringResource(Res.string.source),
+                onClose = { viewModel.onIntent(SourceIntent.OnDismiss) }
+            )
+
+            EntityList(
+                title = stringResource(Res.string.source),
+                query = state.searchQuery,
+                onQueryChange = { viewModel.onIntent(SourceIntent.UpdateSearchQuery(it)) },
+                items = state.sources.map { source ->
+                    EntityItem(
+                        id = source.id ?: 0L,
+                        name = source.name,
+                        sub = if (source.type == 1) source.cardNumber else source.description,
+                        badge = source.formattedBalance + " " + stringResource(Res.string.currency_toman),
+                        iconId = source.iconId,
+                        colorId = source.colorId
+                    )
+                },
+                onItemClick = { item ->
+                    if (clickable) {
+                        state.sources.find { it.id == item.id }?.let {
+                            viewModel.onIntent(SourceIntent.SelectedSource(it))
+                        }
+                    }
+                },
+                onAddClick = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
+                onEditClick = { item ->
                     state.sources.find { it.id == item.id }?.let {
-                        viewModel.onIntent(SourceIntent.SelectedSource(it))
+                        viewModel.onIntent(SourceIntent.OnEditClick(it))
+                    }
+                },
+                onDeleteClick = { item ->
+                    state.sources.find { it.id == item.id }?.let {
+                        viewModel.onIntent(SourceIntent.OnDeleteClick(it))
                     }
                 }
-            },
-            onAddClick = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
-            onEditClick = { item ->
-                state.sources.find { it.id == item.id }?.let {
-                    viewModel.onIntent(SourceIntent.OnEditClick(it))
-                }
-            },
-            onDeleteClick = { item ->
-                state.sources.find { it.id == item.id }?.let {
-                    viewModel.onIntent(SourceIntent.OnDeleteClick(it))
-                }
-            },
-            summary = listOf(
-                EntitySummary(
-                    label = stringResource(Res.string.balance_total),
-                    value = state.totalBalance.toString(),
-                    unit = stringResource(Res.string.currency_toman),
-                    color = MaterialTheme.colorScheme.primary
-                )
             )
-        )
+        }
     }
 
     if (state.isAddShow) {
