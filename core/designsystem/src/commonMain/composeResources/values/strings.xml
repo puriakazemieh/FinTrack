@@ -324,8 +324,13 @@
     <string name="label_day">روز</string>
     <string name="label_week">هفته</string>
     <string name="label_month_short">ماه</string>
-    <string name="label_year_short">سال</string>
+    <string name="label_year_short">امسال</string>
     <string name="label_range">بازه</string>
+    <string name="label_this_year">امسال</string>
+    <string name="msg_filters_combined">فیلترها ترکیبی اعمال می‌شوند</string>
+    <string name="label_custom_range_selected">بازه سفارشی: %1$s</string>
+    <string name="label_period_range_summary">%1$s · %2$s روز</string>
+    <string name="placeholder_period_range">۱ — ۳۰ · ۳۰ روز</string>
     <string name="action_select_date">انتخاب تاریخ</string>
 
     <string name="dp_confirm">تایید</string>

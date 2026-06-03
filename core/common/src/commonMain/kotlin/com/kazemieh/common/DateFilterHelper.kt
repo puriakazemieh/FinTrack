@@ -43,6 +43,7 @@ enum class DateFilterType {
     TODAY, YESTERDAY, TOMORROW,
     THIS_WEEK, LAST_WEEK, NEXT_WEEK,
     THIS_MONTH, LAST_MONTH, NEXT_MONTH,
+    THIS_YEAR, LAST_YEAR, NEXT_YEAR,
     CUSTOM_RANGE
 }
 
@@ -106,6 +107,24 @@ object DateFilterHelper {
                 val start2 = PersianDateTime(start.year, start.month, 1)
                 val end = PersianDateTime(start2.year, start2.month, start2.monthLength())
                 start2.toDateRange(end, type, timeZone)
+            }
+
+            DateFilterType.THIS_YEAR -> {
+                val start = PersianDateTime(today.year, 1, 1)
+                val end = PersianDateTime(today.year, 12, PersianDateTime(today.year, 12, 1).monthLength())
+                start.toDateRange(end, type, timeZone)
+            }
+
+            DateFilterType.LAST_YEAR -> {
+                val start = PersianDateTime(today.year - 1, 1, 1)
+                val end = PersianDateTime(today.year - 1, 12, PersianDateTime(today.year - 1, 12, 1).monthLength())
+                start.toDateRange(end, type, timeZone)
+            }
+
+            DateFilterType.NEXT_YEAR -> {
+                val start = PersianDateTime(today.year + 1, 1, 1)
+                val end = PersianDateTime(today.year + 1, 12, PersianDateTime(today.year + 1, 12, 1).monthLength())
+                start.toDateRange(end, type, timeZone)
             }
 
             DateFilterType.CUSTOM_RANGE -> {
@@ -179,11 +198,28 @@ object DateFilterHelper {
                 newEnd = PersianDateTime(monthBase.year, monthBase.month, newStart.monthLength())
 
                 val thisMonthStart = PersianDateTime(today.year, today.month, 1)
+                val lastMonthStart = thisMonthStart.minus(DatePeriod(months = 1))
+                val nextMonthStart = thisMonthStart.plus(DatePeriod(months = 1))
 
-                newFilter = when {
-                    newStart == thisMonthStart -> DateFilterType.THIS_MONTH
-                    newStart.plus(DatePeriod(months = 1)) == thisMonthStart -> DateFilterType.LAST_MONTH
-                    newStart.minus(DatePeriod(months = 1)) == thisMonthStart -> DateFilterType.NEXT_MONTH
+                newFilter = when (newStart) {
+                    thisMonthStart -> DateFilterType.THIS_MONTH
+                    lastMonthStart -> DateFilterType.LAST_MONTH
+                    nextMonthStart -> DateFilterType.NEXT_MONTH
+                    else -> DateFilterType.CUSTOM_RANGE
+                }
+            }
+
+            DateFilterType.THIS_YEAR,
+            DateFilterType.LAST_YEAR,
+            DateFilterType.NEXT_YEAR -> {
+                val newYear = startP.year + step
+                newStart = PersianDateTime(newYear, 1, 1)
+                newEnd = PersianDateTime(newYear, 12, PersianDateTime(newYear, 12, 1).monthLength())
+
+                newFilter = when (newYear) {
+                    today.year -> DateFilterType.THIS_YEAR
+                    today.year - 1 -> DateFilterType.LAST_YEAR
+                    today.year + 1 -> DateFilterType.NEXT_YEAR
                     else -> DateFilterType.CUSTOM_RANGE
                 }
             }
@@ -251,12 +287,15 @@ object DateFilterHelper {
         timeZone: TimeZone = TimeZone.currentSystemDefault()
     ): DateRangeLabel {
 
+        val startP = persianDateFromMillis(startMillis, timeZone)
+        val endP = persianDateFromMillis(endMillis, timeZone)
+
+        val daysBetween = (Instant.fromEpochMilliseconds(endMillis).toLocalDateTime(timeZone).date.toEpochDays() -
+                Instant.fromEpochMilliseconds(startMillis).toLocalDateTime(timeZone).date.toEpochDays()) + 1
+
         if (filterType != DateFilterType.CUSTOM_RANGE) {
             return DateRangeLabel.Filter(filterType)
         }
-
-        val startP = persianDateFromMillis(startMillis, timeZone)
-        val endP = persianDateFromMillis(endMillis, timeZone)
 
         val startMonthName = startP.persianMonth().displayName
         val endMonthName = endP.persianMonth().displayName
@@ -295,7 +334,7 @@ object DateFilterHelper {
         return nowLocalDate.toPersianDateTime()
     }
 
-    private fun persianDateFromMillis(millis: Long, timeZone: TimeZone): PersianDateTime {
+    fun persianDateFromMillis(millis: Long, timeZone: TimeZone): PersianDateTime {
         val localDate: LocalDate = Instant.fromEpochMilliseconds(millis)
             .toLocalDateTime(timeZone)
             .date

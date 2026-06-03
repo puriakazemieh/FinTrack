@@ -26,6 +26,7 @@ fun SheetFrame(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     sub: String? = null,
+    isFullScreen: Boolean = true,
     topOffset: Dp = 40.dp,
     hero: @Composable (() -> Unit)? = null,
     primaryButtonText: String? = null,
@@ -44,7 +45,7 @@ fun SheetFrame(
     ) {
         Column(
             modifier = modifier
-                .fillMaxSize()
+                .let { if (isFullScreen) it.fillMaxSize() else it.wrapContentHeight() }
                 .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
         ) {
             ScreenHeader(
@@ -56,7 +57,7 @@ fun SheetFrame(
             // Scrollable Content
             Column(
                 modifier = Modifier
-                    .weight(1f)
+                    .let { if (isFullScreen) it.weight(1f) else it.wrapContentHeight() }
                     .padding(horizontal = 24.dp)
             ) {
                 content()

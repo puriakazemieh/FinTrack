@@ -2,7 +2,18 @@ package com.kazemieh.transactions
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -12,8 +23,10 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import com.kazemieh.designsystem.component.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,17 +37,47 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kazemieh.common.DateFilterType
-import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.GlassBg0
+import com.kazemieh.designsystem.GlassColor
+import com.kazemieh.designsystem.GlassEdge
+import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.GlassRed
+import com.kazemieh.designsystem.GlassText
+import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.component.FintrackBodyLargeText
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.GlassTone
 import com.kazemieh.designsystem.component.glass.SheetFrame
 import com.kazemieh.designsystem.component.jalali.JalaliCalendar
-import com.kazemieh.designsystem.component.jalali.JalaliDatePickerDialog
-import fintrack.core.designsystem.generated.resources.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.action_select_date
+import fintrack.core.designsystem.generated.resources.all
+import fintrack.core.designsystem.generated.resources.btn_clear_all
+import fintrack.core.designsystem.generated.resources.confirm
+import fintrack.core.designsystem.generated.resources.custom_range
+import fintrack.core.designsystem.generated.resources.date
+import fintrack.core.designsystem.generated.resources.end
+import fintrack.core.designsystem.generated.resources.label_management
+import fintrack.core.designsystem.generated.resources.label_range
+import fintrack.core.designsystem.generated.resources.label_this_year
+import fintrack.core.designsystem.generated.resources.label_transactions_plural
+import fintrack.core.designsystem.generated.resources.last_month
+import fintrack.core.designsystem.generated.resources.last_week
+import fintrack.core.designsystem.generated.resources.start
+import fintrack.core.designsystem.generated.resources.this_month
+import fintrack.core.designsystem.generated.resources.this_week
+import fintrack.core.designsystem.generated.resources.today
+import fintrack.core.designsystem.generated.resources.yesterday
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -127,10 +170,10 @@ fun PeriodSelector(
     modifier: Modifier = Modifier
 ) {
     val periods = listOf(
-        DateFilterType.TODAY to stringResource(Res.string.label_day),
-        DateFilterType.THIS_WEEK to stringResource(Res.string.label_week),
-        DateFilterType.THIS_MONTH to stringResource(Res.string.label_month_short),
-        DateFilterType.NEXT_MONTH to stringResource(Res.string.label_year_short), // Simplified mapping for now
+        DateFilterType.TODAY to stringResource(Res.string.today),
+        DateFilterType.THIS_WEEK to stringResource(Res.string.this_week),
+        DateFilterType.THIS_MONTH to stringResource(Res.string.this_month),
+        DateFilterType.THIS_YEAR to stringResource(Res.string.label_this_year),
         DateFilterType.CUSTOM_RANGE to stringResource(Res.string.label_range)
     )
 
@@ -147,28 +190,36 @@ fun PeriodSelector(
             ) {
                 IconButton(onClick = onPrevClick) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward, // RTL Arrow
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack, // RTL Prev is ArrowBack
                         contentDescription = null,
                         tint = GlassText2,
                         modifier = Modifier.size(20.dp)
                     )
                 }
 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     FintrackBodyLargeText(
                         text = periodLabel,
                         fontWeight = FontWeight.Bold,
-                        color = GlassText
+                        color = GlassText,
+                        textAlign = TextAlign.Center
                     )
-                    FintrackLabelSmallText(
-                        text = periodSubLabel,
-                        color = GlassText3
-                    )
+                    if (periodSubLabel.isNotEmpty()) {
+                        FintrackLabelSmallText(
+                            text = periodSubLabel,
+                            color = GlassText3,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2
+                        )
+                    }
                 }
 
                 IconButton(onClick = onNextClick) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack, // RTL Arrow
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward, // RTL Next is ArrowForward
                         contentDescription = null,
                         tint = GlassText2,
                         modifier = Modifier.size(20.dp)
@@ -191,11 +242,11 @@ fun PeriodSelector(
                     color = GlassGreen,
                     onClick = { onPeriodSelected(type) }
                 ) {
-                FintrackLabelMediumText(
-                    text = label,
-                    fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-                    color = if (active) GlassBg0 else GlassText2
-                )
+                    FintrackLabelMediumText(
+                        text = label,
+                        fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                        color = if (active) GlassBg0 else GlassText2
+                    )
                 }
             }
         }
@@ -230,7 +281,7 @@ fun ActiveFilters(
                 )
             }
         }
-        
+
         FintrackLabelSmallText(
             text = stringResource(Res.string.btn_clear_all),
             color = GlassText3,
@@ -249,7 +300,7 @@ private fun FilterChip(
 ) {
     val bgColor = color?.copy(alpha = 0.12f) ?: GlassColor
     val borderColor = color?.copy(alpha = 0.33f) ?: GlassEdge
-    
+
     Row(
         modifier = Modifier
             .clip(CircleShape)
@@ -292,7 +343,8 @@ fun DateFilterBottomSheet(
 ) {
     SheetFrame(
         title = stringResource(Res.string.date),
-        onDismiss = onDismiss
+        onDismiss = onDismiss,
+        isFullScreen = false
     ) {
         val filters = listOf(
             DateFilterType.TODAY,
@@ -350,9 +402,10 @@ fun CustomDateBottomSheet(
 
     SheetFrame(
         title = stringResource(Res.string.custom_range),
-        onDismiss = onDismiss
+        onDismiss = onDismiss,
+        isFullScreen = false
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(bottom = 24.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -381,11 +434,24 @@ fun CustomDateBottomSheet(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Button(
+            GlassCard(
+                modifier = Modifier.fillMaxWidth(),
+                padding = 0.dp,
                 onClick = { onSubmit(startDate, endDate) },
-                modifier = Modifier.fillMaxWidth()
+                tone = GlassTone.Strong
             ) {
-                FintrackTitleMediumText(text = stringResource(Res.string.confirm), color = Color.White)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    FintrackTitleMediumText(
+                        text = stringResource(Res.string.confirm),
+                        color = GlassGreen,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }
@@ -393,16 +459,15 @@ fun CustomDateBottomSheet(
     if (showDatePicker.value) {
         val initial = if (isSelectingStart) startDate?.second else endDate?.second
         val calendar = initial?.let { JalaliCalendar.fromEpochMilliseconds(it) } ?: JalaliCalendar()
-        
-        JalaliDatePickerDialog(
-            openDialog = showDatePicker,
+
+        com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet(
+            openSheet = showDatePicker,
             initialDate = calendar,
-            onSelectDay = { jalali ->
+            onConfirm = { jalali ->
                 val pair = jalali.toString() to jalali.toTimestamp()
                 if (isSelectingStart) startDate = pair else endDate = pair
                 showDatePicker.value = false
-            },
-            onConfirm = { showDatePicker.value = false }
+            }
         )
     }
 }

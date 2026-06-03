@@ -24,6 +24,7 @@ import androidx.compose.material.icons.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.glass.SheetFrame
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 
@@ -160,6 +162,47 @@ fun JalaliDatePickerDialog(
 
         }
 
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun JalaliDatePickerBottomSheet(
+    openSheet: MutableState<Boolean>,
+    initialDate: JalaliCalendar? = null,
+    disableBeforeDate: JalaliCalendar? = null,
+    disableAfterDate: JalaliCalendar? = null,
+    onConfirm: (JalaliCalendar) -> Unit,
+) {
+    if (openSheet.value) {
+        SheetFrame(
+            title = stringResource(Res.string.action_select_date),
+            onDismiss = { openSheet.value = false },
+            isFullScreen = false
+        ) {
+            JalaliCalendarView(
+                openDialog = openSheet,
+                initialDate = initialDate,
+                disableBeforeDate = disableBeforeDate,
+                disableAfterDate = disableAfterDate,
+                onSelectDay = { },
+                onConfirm = onConfirm,
+                backgroundColor = Color.Transparent,
+                dayOfWeekLabelColor = com.kazemieh.designsystem.GlassText3,
+                dropDownColor = com.kazemieh.designsystem.GlassText,
+                selectedIconColor = com.kazemieh.designsystem.GlassGreen,
+                textColorHighlight = com.kazemieh.designsystem.GlassGreen,
+                textColor = com.kazemieh.designsystem.GlassText,
+                textDisabledColor = com.kazemieh.designsystem.GlassText3.copy(alpha = 0.38f),
+                cancelBtnColor = com.kazemieh.designsystem.GlassRed,
+                confirmBtnColor = com.kazemieh.designsystem.GlassGreen,
+                todayBtnColor = com.kazemieh.designsystem.GlassGreen,
+                nextPreviousBtnColor = com.kazemieh.designsystem.GlassText,
+                fontFamily = FontFamily.Default,
+                fontSize = 14.sp
+            )
+        }
     }
 }
 

@@ -14,9 +14,14 @@ import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.common.persiandatetime.extensions.persianMonth
+import com.kazemieh.common.toFa
 import com.kazemieh.designsystem.component.model.UiText
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.custom_range
+import fintrack.core.designsystem.generated.resources.label_period_range_summary
+import fintrack.core.designsystem.generated.resources.label_this_year
+import fintrack.core.designsystem.generated.resources.label_year_short
 import fintrack.core.designsystem.generated.resources.last_month
 import fintrack.core.designsystem.generated.resources.last_week
 import fintrack.core.designsystem.generated.resources.next_month
@@ -29,7 +34,9 @@ import fintrack.core.designsystem.generated.resources.yesterday
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 
 class TransactionsViewModel() : ViewModel() {
@@ -122,10 +129,11 @@ class TransactionsViewModel() : ViewModel() {
             }
 
             is TransactionsIntent.OnDateRange -> {
-//                val range = getRange(intent.dateFilterType)
                 val result = getRangeAsUiText(intent.dateFilterType)
                 val range = result.first
                 val uiText = result.second
+                val subLabel = getPeriodSubLabel(range)
+
                 _state.update {
                     it.copy(
                         dateFilterType = range?.filterType ?: DateFilterType.THIS_MONTH,
@@ -134,6 +142,7 @@ class TransactionsViewModel() : ViewModel() {
                         endDateTimeStamp = range?.end,
                         isShowArrowButton = true,
                         textDate = uiText,
+                        textPeriodRange = subLabel,
                         startDate = null,
                         endDate = null,
                         enableAnimationChart = !_state.value.enableAnimationChart
@@ -152,6 +161,7 @@ class TransactionsViewModel() : ViewModel() {
                     )
                     val range = result.first
                     val uiText = result.second
+                    val subLabel = getPeriodSubLabel(range)
 
                     _state.update {
                         it.copy(
@@ -160,6 +170,7 @@ class TransactionsViewModel() : ViewModel() {
                             startDateTimeStamp = range?.start,
                             endDateTimeStamp = range?.end,
                             textDate = uiText,
+                            textPeriodRange = subLabel,
                             startDate = intent.startDate,
                             endDate = intent.endDate,
                             isShowArrowButton = false,
@@ -180,27 +191,13 @@ class TransactionsViewModel() : ViewModel() {
                     filterType = state.value.dateFilterType,
                     direction = Direction.NEXT
                 )
-                val uiText = when (result.label) {
-                    is DateRangeLabel.Text -> UiText.DynamicString((result.label as DateRangeLabel.Text).value)
-                    is DateRangeLabel.Filter -> {
-                        val resource = when ((result.label as DateRangeLabel.Filter).type) {
-                            DateFilterType.TODAY -> Res.string.today
-                            DateFilterType.YESTERDAY -> Res.string.yesterday
-                            DateFilterType.TOMORROW -> Res.string.tomorrow
-                            DateFilterType.THIS_WEEK -> Res.string.this_week
-                            DateFilterType.LAST_WEEK -> Res.string.last_week
-                            DateFilterType.NEXT_WEEK -> Res.string.next_week
-                            DateFilterType.THIS_MONTH -> Res.string.this_month
-                            DateFilterType.LAST_MONTH -> Res.string.last_month
-                            DateFilterType.NEXT_MONTH -> Res.string.next_month
-                            DateFilterType.CUSTOM_RANGE -> Res.string.custom_range
-                        }
-                        UiText.StringResourceText(resource)
-                    }
-                }
+                val uiText = result.label.toUiText()
+                val subLabel = getPeriodSubLabel(result)
+
                 _state.update {
                     it.copy(
                         textDate = uiText,
+                        textPeriodRange = subLabel,
                         dateFilterType = result.filterType,
                         startDateTimeStamp = result.start,
                         endDateTimeStamp = result.end,
@@ -217,27 +214,13 @@ class TransactionsViewModel() : ViewModel() {
                     filterType = state.value.dateFilterType,
                     direction = Direction.PREVIOUS
                 )
-                val uiText = when (result.label) {
-                    is DateRangeLabel.Text -> UiText.DynamicString((result.label as DateRangeLabel.Text).value)
-                    is DateRangeLabel.Filter -> {
-                        val resource = when ((result.label as DateRangeLabel.Filter).type) {
-                            DateFilterType.TODAY -> Res.string.today
-                            DateFilterType.YESTERDAY -> Res.string.yesterday
-                            DateFilterType.TOMORROW -> Res.string.tomorrow
-                            DateFilterType.THIS_WEEK -> Res.string.this_week
-                            DateFilterType.LAST_WEEK -> Res.string.last_week
-                            DateFilterType.NEXT_WEEK -> Res.string.next_week
-                            DateFilterType.THIS_MONTH -> Res.string.this_month
-                            DateFilterType.LAST_MONTH -> Res.string.last_month
-                            DateFilterType.NEXT_MONTH -> Res.string.next_month
-                            DateFilterType.CUSTOM_RANGE -> Res.string.custom_range
-                        }
-                        UiText.StringResourceText(resource)
-                    }
-                }
+                val uiText = result.label.toUiText()
+                val subLabel = getPeriodSubLabel(result)
+
                 _state.update {
                     it.copy(
                         textDate = uiText,
+                        textPeriodRange = subLabel,
                         dateFilterType = result.filterType,
                         startDateTimeStamp = result.start,
                         endDateTimeStamp = result.end,
@@ -249,6 +232,8 @@ class TransactionsViewModel() : ViewModel() {
 
             TransactionsIntent.OnToggleSearch -> _state.update { it.copy(isSearchActive = !it.isSearchActive) }
 
+            TransactionsIntent.OnToggleFilterSheet -> _state.update { it.copy(isFilterSheetVisible = !it.isFilterSheetVisible) }
+
         }
     }
 
@@ -259,11 +244,13 @@ class TransactionsViewModel() : ViewModel() {
         timeZone: TimeZone = TimeZone.currentSystemDefault()
     ): Pair<DateRange?, UiText> {
         val range = getRange(type, customFrom, customTo, timeZone)
+        return Pair(range, range?.label?.toUiText() ?: UiText.DynamicString(""))
+    }
 
-        val uiText = when (val label = range?.label) {
+    private fun DateRangeLabel?.toUiText(): UiText {
+        return when (val label = this) {
             is DateRangeLabel.Text -> UiText.DynamicString(label.value)
             is DateRangeLabel.Filter -> {
-
                 val resource = when (label.type) {
                     DateFilterType.TODAY -> Res.string.today
                     DateFilterType.YESTERDAY -> Res.string.yesterday
@@ -274,6 +261,9 @@ class TransactionsViewModel() : ViewModel() {
                     DateFilterType.THIS_MONTH -> Res.string.this_month
                     DateFilterType.LAST_MONTH -> Res.string.last_month
                     DateFilterType.NEXT_MONTH -> Res.string.next_month
+                    DateFilterType.THIS_YEAR -> Res.string.label_this_year
+                    DateFilterType.LAST_YEAR -> Res.string.label_this_year // Simplified
+                    DateFilterType.NEXT_YEAR -> Res.string.label_this_year // Simplified
                     DateFilterType.CUSTOM_RANGE -> Res.string.custom_range
                 }
                 UiText.StringResourceText(resource)
@@ -281,8 +271,31 @@ class TransactionsViewModel() : ViewModel() {
 
             null -> UiText.DynamicString("")
         }
+    }
 
-        return Pair(range, uiText)
+    private fun getPeriodSubLabel(range: DateRange?, timeZone: TimeZone = TimeZone.currentSystemDefault()): UiText {
+        if (range == null) return UiText.DynamicString("")
+        if (range.filterType == DateFilterType.TODAY) return UiText.DynamicString("")
+
+        val startP = DateFilterHelper.getDateText(range.start, timeZone)
+        val endP = DateFilterHelper.getDateText(range.end, timeZone)
+        
+        val startPersian = DateFilterHelper.persianDateFromMillis(range.start, timeZone)
+        val endPersian = DateFilterHelper.persianDateFromMillis(range.end, timeZone)
+        
+        val rangeStr = if (startPersian.year == endPersian.year && startPersian.month == endPersian.month) {
+            "${startPersian.day} — ${endPersian.day} ${startPersian.persianMonth().displayName}"
+        } else {
+            "$startP تا $endP"
+        }
+
+        val daysBetween = (Instant.fromEpochMilliseconds(range.end).toLocalDateTime(timeZone).date.toEpochDays() -
+                Instant.fromEpochMilliseconds(range.start).toLocalDateTime(timeZone).date.toEpochDays()) + 1
+
+        return UiText.StringResourceText(
+            Res.string.label_period_range_summary,
+            listOf(rangeStr, daysBetween.toFa())
+        )
     }
 
 
@@ -300,6 +313,7 @@ data class TransactionsState(
     val startDateTimeStamp: Long? = null,
     val endDateTimeStamp: Long? = null,
     val textDate: UiText = UiText.StringResourceText(Res.string.this_month),
+    val textPeriodRange: UiText = UiText.DynamicString(""),
 
     val isSourceSheetVisible: Boolean = false,
     val selectedSources: Set<Source> = emptySet(),
@@ -322,6 +336,7 @@ data class TransactionsState(
 
     val isSearchActive: Boolean = false,
     val isFilterActive: Boolean = false,
+    val isFilterSheetVisible: Boolean = false,
 
     val showAddTransaction: Boolean = false,
     val showDeleteTransaction: Boolean = false,
@@ -366,6 +381,7 @@ sealed interface TransactionsIntent {
     data object OnPrevClick : TransactionsIntent
     data object OnNextClick : TransactionsIntent
     data object OnToggleSearch : TransactionsIntent
+    data object OnToggleFilterSheet : TransactionsIntent
     data class OnDateSheetSubmit(
         val startDate: String?,
         val startTimeStamp: Long?,

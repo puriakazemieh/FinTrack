@@ -23,6 +23,9 @@ import com.kazemieh.tag.ui.list.TagSelectionBottomSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.report.TransactionListByFilterScreen
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.placeholder_period_range
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -97,16 +100,22 @@ fun TransactionsScreen(
                 isSearchActive = state.isSearchActive,
                 isFilterActive = activeFilters.isNotEmpty(),
                 onSearchClick = { viewModel.onIntent(TransactionsIntent.OnToggleSearch) },
-                onFilterClick = { /* Show general filter if needed, or toggle specific ones */ }
+                onFilterClick = { viewModel.onIntent(TransactionsIntent.OnToggleFilterSheet) }
             )
 
             PeriodSelector(
                 currentPeriod = state.dateFilterType,
                 periodLabel = state.textDate.asString(),
-                periodSubLabel = if (state.startDate != null && state.endDate != null)
-                    "${state.startDate} تا ${state.endDate}"
-                else "۱ — ۳۰ · ۳۰ روز", // Standardized placeholder
-                onPeriodSelected = { viewModel.onIntent(TransactionsIntent.OnDateRange(it)) },
+                periodSubLabel = state.textPeriodRange.asString().ifEmpty { 
+                    if (state.dateFilterType == DateFilterType.TODAY) "" else stringResource(Res.string.placeholder_period_range) 
+                },
+                onPeriodSelected = { type ->
+                    if (type == DateFilterType.CUSTOM_RANGE) {
+                        viewModel.onIntent(TransactionsIntent.OnToggleCustomDateSheet)
+                    } else {
+                        viewModel.onIntent(TransactionsIntent.OnDateRange(type))
+                    }
+                },
                 onPrevClick = { viewModel.onIntent(TransactionsIntent.OnPrevClick) },
                 onNextClick = { viewModel.onIntent(TransactionsIntent.OnNextClick) }
             )
@@ -268,6 +277,14 @@ fun TransactionsScreen(
                 transactionWithRelations = state.transactionWithRelations,
                 onDismiss = { viewModel.onIntent(TransactionsIntent.DeleteTransactionBottomSheet()) },
                 transactionDeleted = { viewModel.onIntent(TransactionsIntent.DeleteTransactionBottomSheet()) },
+            )
+        }
+
+        if (state.isFilterSheetVisible) {
+            TransactionFilterBottomSheet(
+                state = state,
+                onIntent = viewModel::onIntent,
+                onDismiss = { viewModel.onIntent(TransactionsIntent.OnToggleFilterSheet) }
             )
         }
     }
