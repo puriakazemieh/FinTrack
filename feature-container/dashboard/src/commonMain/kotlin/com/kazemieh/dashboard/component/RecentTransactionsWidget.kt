@@ -25,6 +25,7 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.label_source_date_summary
 import fintrack.core.designsystem.generated.resources.recent_transactions
 import fintrack.core.designsystem.generated.resources.unit_toman_short
+import fintrack.core.designsystem.generated.resources.transfer
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -47,14 +48,26 @@ fun RecentTransactionsWidget(
         modifier = modifier
     ) {
         state.items.take(5).forEachIndexed { index, item ->
-            val isPositive = item.transaction.type == TransactionType.INCOME
-            val color = if (isPositive) GlassGreen else GlassRed
-            val bgColor = if (isPositive) GlassGreenSoft else GlassRedSoft
+            val isIncome = item.transaction.type == TransactionType.INCOME
+            val isTransfer = item.transaction.type == TransactionType.TRANSFER
+            
+            val color = when {
+                isIncome -> GlassGreen
+                isTransfer -> GlassBlue
+                else -> GlassRed
+            }
+            val bgColor = when {
+                isIncome -> GlassGreenSoft
+                isTransfer -> GlassBlueSoft
+                else -> GlassRedSoft
+            }
 
-            val icon = FinTrackIcons.findIcon(item.category.iconId)
+            val iconId = if (isTransfer) 19 else item.category.iconId
+            val icon = FinTrackIcons.findIcon(iconId)
+            val label = if (isTransfer) stringResource(Res.string.transfer) else item.category.name
 
             Row(
-                label = item.category.name,
+                label = label,
                 sub = stringResource(Res.string.label_source_date_summary, item.source.name, item.transaction.date),
                 icon = GlassIcon(
                     painter = painterResource(icon.resource),
@@ -62,8 +75,13 @@ fun RecentTransactionsWidget(
                     color = color
                 ),
                 value = {
+                    val amountText = if (isTransfer) {
+                        item.transaction.amount.toLong().formatNumberLong()
+                    } else {
+                        item.transaction.amount.toLong().formatNumberLong()
+                    }
                     FintrackTitleSmallText(
-                        text = "${item.transaction.amount.toLong().formatNumberLong()} " + stringResource(Res.string.unit_toman_short),
+                        text = "$amountText " + stringResource(Res.string.unit_toman_short),
                         fontWeight = FontWeight.W600,
                         color = color
                     )

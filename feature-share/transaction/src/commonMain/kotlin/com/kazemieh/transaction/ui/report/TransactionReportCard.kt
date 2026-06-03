@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.toFa
 import com.kazemieh.common.toFormattedFa
 import com.kazemieh.designsystem.*
@@ -64,18 +65,53 @@ fun SummaryCard(
 
             Spacer(Modifier.height(14.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                MiniDonut(
-                    income = state.totalIncome,
-                    expense = state.totalExpense,
-                    modifier = Modifier.size(72.dp)
-                )
+            val filterType = state.filterParams.type
+            if (filterType == null || filterType == TransactionType.ALL.count) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    MiniDonut(
+                        income = state.totalIncome,
+                        expense = state.totalExpense,
+                        transfer = state.totalTransfer,
+                        modifier = Modifier.size(72.dp)
+                    )
 
-                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SummaryRow(label = stringResource(Res.string.label_income), value = state.totalIncome, color = GlassGreen)
-                    SummaryRow(label = stringResource(Res.string.label_expense), value = state.totalExpense, color = GlassRed)
-                    HorizontalDivider(modifier = Modifier.padding(top = 4.dp), color = GlassHairline)
-                    SummaryRow(label = stringResource(Res.string.label_net), value = state.totalIncome - state.totalExpense, color = GlassText, isBold = true)
+                    Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        SummaryRow(label = stringResource(Res.string.label_income), value = state.totalIncome, color = GlassGreen)
+                        SummaryRow(label = stringResource(Res.string.label_expense), value = state.totalExpense, color = GlassRed)
+                        if (state.totalTransfer > 0) {
+                            SummaryRow(label = stringResource(Res.string.type_transfer), value = state.totalTransfer, color = GlassBlue)
+                        }
+                        HorizontalDivider(modifier = Modifier.padding(top = 4.dp), color = GlassHairline)
+                        SummaryRow(
+                            label = stringResource(Res.string.label_net),
+                            valueStr = state.balance + " " + stringResource(Res.string.unit_toman_short),
+                            color = if (state.isPositiveBalance) GlassGreen else GlassRed,
+                            isBold = true
+                        )
+                    }
+                }
+            } else {
+                val (label, value, color) = when (filterType) {
+                    TransactionType.INCOME.count -> Triple(stringResource(Res.string.label_income), state.totalIncome, GlassGreen)
+                    TransactionType.EXPENSE.count -> Triple(stringResource(Res.string.label_expense), state.totalExpense, GlassRed)
+                    TransactionType.TRANSFER.count -> Triple(stringResource(Res.string.type_transfer), state.totalTransfer, GlassBlue)
+                    else -> Triple("", 0L, GlassText)
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Box(modifier = Modifier.size(10.dp).clip(CircleShape).background(color))
+                        FintrackTitleSmallText(text = label, color = GlassText)
+                    }
+                    FintrackTitleLargeText(
+                        text = stringResource(Res.string.label_amount_with_unit, value.toFormattedFa(), stringResource(Res.string.unit_toman_short)),
+                        color = color,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
@@ -83,12 +119,23 @@ fun SummaryCard(
 }
 
 @Composable
-private fun SummaryRow(label: String, value: Long, color: Color, isBold: Boolean = false) {
+private fun SummaryRow(
+    label: String,
+    value: Long = 0,
+    valueStr: String? = null,
+    color: Color,
+    isBold: Boolean = false
+) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(color))
         FintrackLabelSmallText(text = label, color = GlassText2, modifier = Modifier.weight(1f))
+        val text = valueStr ?: stringResource(
+            Res.string.label_amount_with_unit,
+            value.toFormattedFa(),
+            stringResource(Res.string.unit_toman_short)
+        )
         FintrackTitleSmallText(
-            text = stringResource(Res.string.label_amount_with_unit, value.toFormattedFa(), stringResource(Res.string.unit_toman_short)),
+            text = text,
             fontSize = 13.sp,
             fontWeight = if (isBold) FontWeight.Bold else FontWeight.SemiBold,
             color = color
@@ -97,10 +144,12 @@ private fun SummaryRow(label: String, value: Long, color: Color, isBold: Boolean
 }
 
 @Composable
-private fun MiniDonut(income: Long, expense: Long, modifier: Modifier = Modifier) {
-    val total = (income + expense).coerceAtLeast(1)
+private fun MiniDonut(income: Long, expense: Long, transfer: Long, modifier: Modifier = Modifier) {
+    val total = (income + expense + transfer).coerceAtLeast(1)
     val incomePct = (income.toFloat() / total).coerceIn(0f, 1f)
-    
+    val expensePct = (expense.toFloat() / total).coerceIn(0f, 1f)
+    val transferPct = (transfer.toFloat() / total).coerceIn(0f, 1f)
+
     androidx.compose.foundation.Canvas(modifier = modifier) {
         val strokeWidth = 12f
         drawArc(
@@ -110,24 +159,43 @@ private fun MiniDonut(income: Long, expense: Long, modifier: Modifier = Modifier
             useCenter = false,
             style = Stroke(width = strokeWidth)
         )
-        
+
+        var currentAngle = -90f
+
         // Income arc
-        drawArc(
-            color = GlassGreen,
-            startAngle = -90f,
-            sweepAngle = incomePct * 360f * 0.95f,
-            useCenter = false,
-            style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-        )
-        
+        if (incomePct > 0) {
+            drawArc(
+                color = GlassGreen,
+                startAngle = currentAngle,
+                sweepAngle = incomePct * 360f * 0.95f,
+                useCenter = false,
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+            )
+            currentAngle += (incomePct * 360f * 0.95f) + (if (expensePct > 0 || transferPct > 0) 5f else 0f)
+        }
+
         // Expense arc
-        drawArc(
-            color = GlassRed,
-            startAngle = -90f + (incomePct * 360f * 0.95f) + 5f,
-            sweepAngle = (1f - incomePct) * 360f * 0.95f,
-            useCenter = false,
-            style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-        )
+        if (expensePct > 0) {
+            drawArc(
+                color = GlassRed,
+                startAngle = currentAngle,
+                sweepAngle = expensePct * 360f * 0.95f,
+                useCenter = false,
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+            )
+            currentAngle += (expensePct * 360f * 0.95f) + (if (transferPct > 0) 5f else 0f)
+        }
+
+        // Transfer arc
+        if (transferPct > 0) {
+            drawArc(
+                color = GlassBlue,
+                startAngle = currentAngle,
+                sweepAngle = transferPct * 360f * 0.95f,
+                useCenter = false,
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+            )
+        }
     }
 }
 

@@ -48,10 +48,12 @@ class TransactionReportViewModel(
 
     private val filterParamsFlow: Flow<TransactionFilterParams> = state
         .map { s ->
+            val type = if (s.filterParams.type == 0) null else s.filterParams.type
             TransactionFilterParams(
-                type = if (s.filterParams.type == 0) null else s.filterParams.type,
+                type = type,
                 categories = s.filterParams.categories,
-                isAllCategories = s.filterParams.isAllCategories,
+                // If type is TRANSFER, we ignore category filtering because transfers don't have user categories
+                isAllCategories = s.filterParams.isAllCategories || type == TransactionType.TRANSFER.count,
                 sources = s.filterParams.sources,
                 isAllSources = s.filterParams.isAllSources,
                 tags = s.filterParams.tags,
@@ -255,10 +257,12 @@ class TransactionReportViewModel(
     private fun updateCategorySums(categorySums: List<CategorySum>) {
         var totalIncome: Long = 0
         var totalExpense: Long = 0
+        var totalTransfer: Long = 0
         val pieChartItems = categorySums.map { c ->
             when (c.type) {
                 TransactionType.INCOME -> totalIncome += c.totalAmount
                 TransactionType.EXPENSE -> totalExpense += c.totalAmount
+                TransactionType.TRANSFER -> totalTransfer += c.totalAmount
                 else -> Unit
             }
             PieChartItem(
@@ -270,14 +274,15 @@ class TransactionReportViewModel(
             )
         }
 
-        val balance = totalIncome - totalExpense
+        val balanceValue = totalIncome - totalExpense
 
         _state.update {
             it.copy(
-                balance = balance.toInt().formatted(),
+                balance = balanceValue.formatted(),
                 totalIncome = totalIncome,
                 totalExpense = totalExpense,
-                isPositiveBalance = balance >= 0,
+                totalTransfer = totalTransfer,
+                isPositiveBalance = balanceValue >= 0,
                 pieChartData = pieChartItems,
                 categorySums = categorySums
             )
@@ -337,9 +342,10 @@ data class TransactionFilterParamsState(
 
 data class TransactionReportState(
     val filterParams: TransactionFilterParamsState = TransactionFilterParamsState(),
-    val balance: String = "0",
+    val balance: String = "۰",
     val totalIncome: Long = 0,
     val totalExpense: Long = 0,
+    val totalTransfer: Long = 0,
     val isPositiveBalance: Boolean = true,
     val pieChartData: List<PieChartItem> = emptyList(),
     val categorySums: List<CategorySum> = emptyList(),

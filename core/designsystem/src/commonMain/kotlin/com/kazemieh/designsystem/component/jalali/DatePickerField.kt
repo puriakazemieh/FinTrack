@@ -126,9 +126,7 @@ fun JalaliDatePickerDialog(
                         cancelBtnColor = MaterialTheme.colorScheme.primary,
                         confirmBtnColor = MaterialTheme.colorScheme.primary,
                         todayBtnColor = MaterialTheme.colorScheme.primary,
-                        nextPreviousBtnColor = MaterialTheme.colorScheme.primary,
-                        fontFamily = vazirmatnFontFamily(),
-                        fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                        nextPreviousBtnColor = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -187,9 +185,7 @@ fun JalaliDatePickerBottomSheet(
                     cancelBtnColor = MaterialTheme.colorScheme.primary,
                     confirmBtnColor = MaterialTheme.colorScheme.primary,
                     todayBtnColor = MaterialTheme.colorScheme.primary,
-                    nextPreviousBtnColor = MaterialTheme.colorScheme.primary,
-                        fontFamily = vazirmatnFontFamily(),
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                    nextPreviousBtnColor = MaterialTheme.colorScheme.primary
                 )
             }
         }

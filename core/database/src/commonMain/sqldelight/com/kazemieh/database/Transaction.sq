@@ -98,7 +98,7 @@ SELECT
     GROUP_CONCAT(DISTINCT person.name) AS person_names,
     GROUP_CONCAT(DISTINCT person.description) AS person_descriptions
 FROM transactions t
-INNER JOIN category c ON t.categoryId = c.id
+LEFT JOIN category c ON t.categoryId = c.id
 INNER JOIN source s ON t.sourceId = s.id
 LEFT JOIN source se ON t.sourceEndId = se.id
 LEFT JOIN transaction_tag tt ON t.id = tt.transactionId
@@ -138,7 +138,7 @@ SELECT
     c.colorId AS colorId,
     c.iconId AS iconId
 FROM transactions t
-INNER JOIN category c ON t.categoryId = c.id
+LEFT JOIN category c ON t.categoryId = c.id
 WHERE (:type IS NULL OR t.type = :type)
   AND (:categoryIdsSize = 0 OR t.categoryId IN :categoryIds)
   AND (:sourceIdsSize = 0 OR t.sourceId IN :sourceIds)

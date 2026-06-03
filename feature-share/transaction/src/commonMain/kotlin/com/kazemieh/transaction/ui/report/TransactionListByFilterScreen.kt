@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.common.formatted
 import com.kazemieh.common.model.*
 import com.kazemieh.common.toFa
 import com.kazemieh.common.toFormattedFa
@@ -146,6 +147,7 @@ fun TransactionListByFilterContent(
                     when(it.transaction.type) {
                         TransactionType.INCOME -> it.transaction.amount.toLong()
                         TransactionType.EXPENSE -> -it.transaction.amount.toLong()
+                        TransactionType.TRANSFER -> -(it.transaction.amountTransfer.toLong())
                         else -> 0L
                     }
                 }
@@ -193,7 +195,7 @@ private fun DayHeader(date: String, count: Int, netAmount: Long) {
                 color = GlassText3
             )
             FintrackTitleSmallText(
-                text = stringResource(Res.string.label_amount_with_unit, netAmount.toFormattedFa(), stringResource(Res.string.unit_toman_short)),
+                text = stringResource(Res.string.label_amount_with_unit, netAmount.formatted(), stringResource(Res.string.unit_toman_short)),
                 fontWeight = FontWeight.Bold,
                 color = if (netAmount >= 0) GlassGreen else GlassRed
             )

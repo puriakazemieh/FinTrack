@@ -68,12 +68,12 @@ fun GetAllTransactionsFiltered.toTransactionWithRelations(): TransactionWithRela
             type = TransactionType.fromInt(type.toInt())
         ),
         category = Category(
-            id = category_id,
-            name = category_name,
+            id = category_id ?: 0L,
+            name = category_name ?: "انتقال",
             description = category_description,
-            type = TransactionType.fromInt(category_type.toInt()),
-            colorId = category_colorId.toInt(),
-            iconId = category_iconId.toInt()
+            type = TransactionType.fromInt(category_type?.toInt() ?: TransactionType.TRANSFER.count),
+            colorId = category_colorId?.toInt() ?: 1,
+            iconId = category_iconId?.toInt() ?: 19
         ),
         source = Source(
             id = source_id,
@@ -128,12 +128,12 @@ fun CategoryDb.toCategory() = Category(
 
 fun ObserveCategorySumsByFilter.toCategorySum(): CategorySum {
     return CategorySum(
-        categoryId = categoryId,
-        name = name,
+        categoryId = categoryId ?: 0L,
+        name = name ?: "انتقال",
         totalAmount = totalAmount ?: 0,
-        type = TransactionType.fromInt(type.toInt()),
-        colorId = colorId.toInt(),
-        iconId = iconId.toInt()
+        type = TransactionType.fromInt(type?.toInt() ?: TransactionType.TRANSFER.count),
+        colorId = colorId?.toInt() ?: 1,
+        iconId = iconId?.toInt() ?: 19
     )
 }
 
