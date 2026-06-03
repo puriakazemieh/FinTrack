@@ -77,29 +77,40 @@ fun CategoryPickerBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        val entityItems = remember(state.categories) {
-            state.categories.map {
-                EntityItem(
-                    id = it.id ?: 0,
-                    name = it.name,
-                    iconId = it.iconId,
-                    colorId = it.colorId
-                )
-            }
-        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+        ) {
+            ScreenHeader(
+                title = stringResource(Res.string.category),
+                onClose = { viewModel.onIntent(CategoryIntent.OnDismiss) }
+            )
 
-        EntityList(
-            title = stringResource(Res.string.category),
-            query = state.query,
-            onQueryChange = { viewModel.onIntent(CategoryIntent.SetQuery(it)) },
-            onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
-            items = entityItems,
-            onEditClick = { viewModel.onIntent(CategoryIntent.OnEditClick(state.categories.find { c -> c.id == it.id })) },
-            onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) },
-            onItemClick = { item ->
-                state.categories.find { it.id == item.id }?.let { onCategoryClick(it) }
+            val entityItems = remember(state.categories) {
+                state.categories.map {
+                    EntityItem(
+                        id = it.id ?: 0,
+                        name = it.name,
+                        iconId = it.iconId,
+                        colorId = it.colorId
+                    )
+                }
             }
-        )
+
+            EntityList(
+                title = stringResource(Res.string.category),
+                query = state.query,
+                onQueryChange = { viewModel.onIntent(CategoryIntent.SetQuery(it)) },
+                onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
+                items = entityItems,
+                onEditClick = { viewModel.onIntent(CategoryIntent.OnEditClick(state.categories.find { c -> c.id == it.id })) },
+                onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) },
+                onItemClick = { item ->
+                    state.categories.find { it.id == item.id }?.let { onCategoryClick(it) }
+                }
+            )
+        }
     }
 
     if (state.isAddShow) {

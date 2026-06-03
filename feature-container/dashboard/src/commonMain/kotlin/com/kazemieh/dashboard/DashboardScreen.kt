@@ -74,7 +74,7 @@ fun DashboardScreen(
         // Decorative background blobs for glass effect
         val primaryColor = MaterialTheme.colorScheme.primary
         val secondaryColor = MaterialTheme.colorScheme.secondary
-        
+
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawCircle(
                 brush = Brush.radialGradient(
@@ -124,7 +124,13 @@ fun DashboardScreen(
 
             item {
                 QuickActions(
-                    onActionClick = { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet(type = it)) },
+                    onActionClick = {
+                        viewModel.onIntent(
+                            DashboardIntent.ShowTransactionBottomSheet(
+                                type = it
+                            )
+                        )
+                    },
                     onSearchClick = { /* Handle search */ },
                     modifier = Modifier.padding(horizontal = space.large)
                 )
@@ -151,7 +157,7 @@ fun DashboardScreen(
             transactionItems()
         }
 
-        FAB { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) }
+        FAB(modifier = Modifier.padding(bottom = 60.dp)) { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) }
 
         if (state.showAddTransaction) {
             AddTransactionBottomSheet(
@@ -194,7 +200,10 @@ private fun DashboardHeader(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
             Box(
                 modifier = Modifier
                     .size(40.dp)

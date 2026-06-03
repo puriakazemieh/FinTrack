@@ -2,7 +2,9 @@ package com.kazemieh.designsystem.component.glass
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -41,7 +43,8 @@ fun AddFrame(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             ScreenHeader(
-                title = "", // Title is handled in the hero section for AddFrame
+                title = title,
+                sub = sub,
                 onClose = onClose
             )
 
@@ -50,39 +53,28 @@ fun AddFrame(
                     .weight(1f)
                     .padding(horizontal = 24.dp)
             ) {
-                // Hero Section
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    if (hero != null) {
-                        Box(modifier = Modifier.padding(bottom = 16.dp)) {
-                            hero()
+                // Hero Section (Only icon/hero now)
+                if (hero != null || (iconId != null && colorId != null)) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        if (hero != null) {
+                            Box(modifier = Modifier.padding(bottom = 16.dp)) {
+                                hero()
+                            }
+                        } else if (iconId != null && colorId != null) {
+                            FinTrackLeadingIcon(
+                                colorId = colorId,
+                                iconId = iconId,
+                                style = LeadingIconStyle.Badge,
+                                size = 64.dp,
+                                iconSize = 32.dp,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
                         }
-                    } else if (iconId != null && colorId != null) {
-                         FinTrackLeadingIcon(
-                            colorId = colorId,
-                            iconId = iconId,
-                            style = LeadingIconStyle.Badge,
-                            size = 64.dp,
-                            iconSize = 32.dp,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-                    }
-                    
-                    FintrackHeadlineLargeText(
-                        text = title,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.W800
-                    )
-                    sub?.let {
-                        FintrackBodyMediumText(
-                            text = it,
-                            color = GlassText2,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
                     }
                 }
 
@@ -93,6 +85,8 @@ fun AddFrame(
                 ) {
                     content()
                 }
+                
+                Spacer(Modifier.height(24.dp))
             }
 
             // Fixed CTA at bottom
