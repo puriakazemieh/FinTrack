@@ -160,12 +160,12 @@ private fun EntityRow(
     val color = item.color ?: mainColor
     GlassCard(
         modifier = modifier.clickable(onClick = onClick),
-        padding = 12.dp
+        padding = 10.dp
     ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(11.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 FinTrackLeadingIcon(
                     colorId = item.colorId,

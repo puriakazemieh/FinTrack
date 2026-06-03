@@ -113,49 +113,62 @@ fun AddCategoryContent(
         onPrimaryClick = { onIntent(AddCategoryIntent.Save) },
         onClose = { onIntent(AddCategoryIntent.OnDismiss) }
     ) {
-        TypeSelector(
-            selectedType = state.draft.type,
-            onTypeSelected = { onIntent(AddCategoryIntent.UpdateType(it)) }
-        )
-
-        Field(label = stringResource(Res.string.category_name_label), required = true) {
-            TextField(
-                value = state.draft.name,
-                onValueChange = { onIntent(AddCategoryIntent.UpdateName(it)) },
-                placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.hint_enter_category_name), color = GlassText3) },
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = GlassGreen
-                ),
-                textStyle = MaterialTheme.typography.bodyLarge.copy(color = GlassText, fontWeight = FontWeight.SemiBold),
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-
-        GlassCard(padding = 14.dp) {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                FintrackLabelMediumText(text = stringResource(Res.string.label_color), color = GlassText3)
-                ColorSwatches(
-                    colors = colors,
-                    pickedIndex = selectedColorIndex,
-                    onColorPick = { onIntent(AddCategoryIntent.SetColorIcon(rainbowColors[it].id, state.draft.iconId)) }
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(bottom = 24.dp)
+        ) {
+            item {
+                TypeSelector(
+                    selectedType = state.draft.type,
+                    onTypeSelected = { onIntent(AddCategoryIntent.UpdateType(it)) }
                 )
             }
-        }
 
-        GlassCard(padding = 14.dp) {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                FintrackLabelMediumText(text = stringResource(Res.string.label_icon), color = GlassText3)
-                IconGrid(
-                    icons = FinTrackIcons.icons,
-                    pickedIndex = selectedIconIndex,
-                    color = rainbowColors[selectedColorIndex].color,
-                    onIconPick = { onIntent(AddCategoryIntent.SetColorIcon(state.draft.colorId, FinTrackIcons.icons[it].id)) },
-                    modifier = Modifier.height(200.dp)
-                )
+            item {
+                Field(label = stringResource(Res.string.category_name_label), required = true) {
+                    TextField(
+                        value = state.draft.name,
+                        onValueChange = { onIntent(AddCategoryIntent.UpdateName(it)) },
+                        placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.hint_enter_category_name), color = GlassText3) },
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            cursorColor = GlassGreen
+                        ),
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = GlassText, fontWeight = FontWeight.SemiBold),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            item {
+                GlassCard(padding = 14.dp) {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        FintrackLabelMediumText(text = stringResource(Res.string.label_color), color = GlassText3)
+                        ColorSwatches(
+                            colors = colors,
+                            pickedIndex = selectedColorIndex,
+                            onColorPick = { onIntent(AddCategoryIntent.SetColorIcon(rainbowColors[it].id, state.draft.iconId)) }
+                        )
+                    }
+                }
+            }
+
+            item {
+                GlassCard(padding = 14.dp) {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        FintrackLabelMediumText(text = stringResource(Res.string.label_icon), color = GlassText3)
+                        IconGrid(
+                            icons = FinTrackIcons.icons,
+                            pickedIndex = selectedIconIndex,
+                            color = rainbowColors[selectedColorIndex].color,
+                            onIconPick = { onIntent(AddCategoryIntent.SetColorIcon(state.draft.colorId, FinTrackIcons.icons[it].id)) }
+                        )
+                    }
+                }
             }
         }
     }
@@ -168,8 +181,7 @@ private fun TypeSelector(
 ) {
     val types = listOf(
         TransactionType.EXPENSE to stringResource(Res.string.label_expense),
-        TransactionType.INCOME to stringResource(Res.string.label_income),
-        TransactionType.TRANSFER to stringResource(Res.string.transfer)
+        TransactionType.INCOME to stringResource(Res.string.label_income)
     )
 
     GlassCard(padding = 14.dp) {
@@ -181,16 +193,8 @@ private fun TypeSelector(
             ) {
                 types.forEach { (type, label) ->
                     val active = type == selectedType
-                    val color = when (type) {
-                        TransactionType.INCOME -> GlassGreen
-                        TransactionType.TRANSFER -> GlassBlue
-                        else -> GlassRed
-                    }
-                    val bgColor = when (type) {
-                        TransactionType.INCOME -> GlassGreenSoft
-                        TransactionType.TRANSFER -> GlassBlueSoft
-                        else -> GlassRedSoft
-                    }
+                    val color = if (type == TransactionType.INCOME) GlassGreen else GlassRed
+                    val bgColor = if (type == TransactionType.INCOME) GlassGreenSoft else GlassRedSoft
 
                     Box(
                         modifier = Modifier
@@ -198,7 +202,11 @@ private fun TypeSelector(
                             .clip(RoundedCornerShape(10.dp))
                             .background(if (active) bgColor else Color.Transparent)
                             .then(
-                                if (active) Modifier.border(1.dp, color.copy(alpha = 0.33f), RoundedCornerShape(10.dp))
+                                if (active) Modifier.border(
+                                    1.dp,
+                                    color.copy(alpha = 0.33f),
+                                    RoundedCornerShape(10.dp)
+                                )
                                 else Modifier.border(1.dp, GlassEdge, RoundedCornerShape(10.dp))
                             )
                             .clickable { onTypeSelected(type) }
@@ -216,3 +224,4 @@ private fun TypeSelector(
         }
     }
 }
+

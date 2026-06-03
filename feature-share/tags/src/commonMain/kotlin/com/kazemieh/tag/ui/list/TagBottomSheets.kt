@@ -121,15 +121,7 @@ fun TagManageBottomSheet(
                 state.tags.find { it.id == item.id }?.let {
                     viewModel.onIntent(TagIntent.OnDeleteClick(it))
                 }
-            },
-            summary = listOf(
-                EntitySummary(
-                    label = stringResource(Res.string.label_tag_count),
-                    value = state.tags.size.toString(),
-                    unit = stringResource(Res.string.tag_item, ""),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            )
+            }
         )
     }
 

@@ -131,15 +131,7 @@ fun PersonManageBottomSheet(
                 state.persons.find { it.id == item.id }?.let {
                     viewModel.onIntent(PersonIntent.OnDeleteClick(it))
                 }
-            },
-            summary = listOf(
-                EntitySummary(
-                    label = stringResource(Res.string.label_person_count),
-                    value = state.persons.size.toString(),
-                    unit = stringResource(Res.string.person_item, ""),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            )
+            }
         )
     }
 

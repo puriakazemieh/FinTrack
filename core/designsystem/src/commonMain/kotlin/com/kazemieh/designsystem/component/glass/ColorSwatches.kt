@@ -19,6 +19,9 @@ import com.kazemieh.designsystem.GlassBg0
 import com.kazemieh.designsystem.GlassText
 import com.kazemieh.designsystem.picker.bestOnColor
 
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+
 @Composable
 fun ColorSwatches(
     colors: List<Color>,
@@ -26,32 +29,38 @@ fun ColorSwatches(
     onColorPick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    FlowRow(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        colors.forEachIndexed { index, color ->
-            val isSelected = index == pickedIndex
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(color)
-                    .then(
-                        if (isSelected) Modifier.border(2.dp, GlassText, CircleShape)
-                        else Modifier
-                    )
-                    .clickable { onColorPick(index) },
-                contentAlignment = Alignment.Center
-            ) {
-                if (isSelected) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        tint = bestOnColor(color),
-                        modifier = Modifier.size(16.dp)
-                    )
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        // Show ~3.5 items to hint scrolling
+        val itemWidth = maxWidth / 3.5f
+        
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp)
+        ) {
+            itemsIndexed(colors) { index, color ->
+                val isSelected = index == pickedIndex
+                Box(
+                    modifier = Modifier
+                        .width(itemWidth)
+                        .aspectRatio(1f)
+                        .clip(CircleShape)
+                        .background(color)
+                        .then(
+                            if (isSelected) Modifier.border(2.dp, GlassText, CircleShape)
+                            else Modifier
+                        )
+                        .clickable { onColorPick(index) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isSelected) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            tint = bestOnColor(color),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
         }

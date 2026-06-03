@@ -445,8 +445,7 @@ fun AddSourceContent(
                                         if (state.draft.type == TypeSource.CREDIT) FinTrackSourceIcons.icons[it].id else FinTrackIcons.icons[it].id
                                     )
                                 )
-                            },
-                            modifier = Modifier.height(200.dp)
+                            }
                         )
                     }
                 }

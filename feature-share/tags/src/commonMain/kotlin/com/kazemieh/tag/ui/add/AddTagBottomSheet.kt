@@ -169,8 +169,7 @@ fun AddTagContent(
                             icons = FinTrackIcons.icons,
                             pickedIndex = selectedIconIndex,
                             color = rainbowColors[selectedColorIndex].color,
-                            onIconPick = { onIntent(AddTagIntent.SetColorIcon(state.draft.colorId, FinTrackIcons.icons[it].id)) },
-                            modifier = Modifier.height(200.dp)
+                            onIconPick = { onIntent(AddTagIntent.SetColorIcon(state.draft.colorId, FinTrackIcons.icons[it].id)) }
                         )
                     }
                 }
