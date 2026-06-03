@@ -160,7 +160,14 @@ class TransactionsViewModel() : ViewModel() {
                         intent.endTimeStamp
                     )
                     val range = result.first
-                    val uiText = result.second
+                    
+                    // Force the label to show the actual range text instead of "Custom Range"
+                    val actualRangeText = if (intent.startDate == intent.endDate) {
+                        intent.startDate
+                    } else {
+                        "${intent.startDate} تا ${intent.endDate}"
+                    }
+                    val uiText = UiText.DynamicString(actualRangeText)
                     val subLabel = getPeriodSubLabel(range)
 
                     _state.update {

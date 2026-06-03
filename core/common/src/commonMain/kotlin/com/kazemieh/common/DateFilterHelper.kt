@@ -150,63 +150,32 @@ object DateFilterHelper {
         val endP = end?.let { persianDateFromMillis(it, timeZone) } ?: nowPersianDate(timeZone)
         val today = nowPersianDate(timeZone)
 
-        val newStart: PersianDateTime
-        val newEnd: PersianDateTime
-        var newFilter = filterType
+        var newStart: PersianDateTime
+        var newEnd: PersianDateTime
+        var newFilter: DateFilterType
 
         when (filterType) {
 
             DateFilterType.TODAY,
             DateFilterType.YESTERDAY,
             DateFilterType.TOMORROW -> {
-
                 newStart = startP.plus(step, DateTimeUnit.DAY)
                 newEnd = newStart
-
-                newFilter = when (newStart) {
-                    today -> DateFilterType.TODAY
-                    today.minus(1, DateTimeUnit.DAY) -> DateFilterType.YESTERDAY
-                    today.plus(1, DateTimeUnit.DAY) -> DateFilterType.TOMORROW
-                    else -> DateFilterType.CUSTOM_RANGE
-                }
             }
 
             DateFilterType.THIS_WEEK,
             DateFilterType.LAST_WEEK,
             DateFilterType.NEXT_WEEK -> {
-
                 newStart = startP.plus(step * 7, DateTimeUnit.DAY)
                 newEnd = endP.plus(step * 7, DateTimeUnit.DAY)
-
-                val thisWeekStart = startOfWeek(today, timeZone)
-
-                newFilter = when {
-                    newStart == thisWeekStart -> DateFilterType.THIS_WEEK
-                    newStart.plus(7, DateTimeUnit.DAY) == thisWeekStart -> DateFilterType.LAST_WEEK
-                    newStart.minus(7, DateTimeUnit.DAY) == thisWeekStart -> DateFilterType.NEXT_WEEK
-                    else -> DateFilterType.CUSTOM_RANGE
-                }
             }
 
             DateFilterType.THIS_MONTH,
             DateFilterType.LAST_MONTH,
             DateFilterType.NEXT_MONTH -> {
-
-                val monthBase =
-                    PersianDateTime(startP.year, startP.month, 1).plus(DatePeriod(months = step))
+                val monthBase = PersianDateTime(startP.year, startP.month, 1).plus(DatePeriod(months = step))
                 newStart = PersianDateTime(monthBase.year, monthBase.month, 1)
                 newEnd = PersianDateTime(monthBase.year, monthBase.month, newStart.monthLength())
-
-                val thisMonthStart = PersianDateTime(today.year, today.month, 1)
-                val lastMonthStart = thisMonthStart.minus(DatePeriod(months = 1))
-                val nextMonthStart = thisMonthStart.plus(DatePeriod(months = 1))
-
-                newFilter = when (newStart) {
-                    thisMonthStart -> DateFilterType.THIS_MONTH
-                    lastMonthStart -> DateFilterType.LAST_MONTH
-                    nextMonthStart -> DateFilterType.NEXT_MONTH
-                    else -> DateFilterType.CUSTOM_RANGE
-                }
             }
 
             DateFilterType.THIS_YEAR,
@@ -215,48 +184,57 @@ object DateFilterHelper {
                 val newYear = startP.year + step
                 newStart = PersianDateTime(newYear, 1, 1)
                 newEnd = PersianDateTime(newYear, 12, PersianDateTime(newYear, 12, 1).monthLength())
-
-                newFilter = when (newYear) {
-                    today.year -> DateFilterType.THIS_YEAR
-                    today.year - 1 -> DateFilterType.LAST_YEAR
-                    today.year + 1 -> DateFilterType.NEXT_YEAR
-                    else -> DateFilterType.CUSTOM_RANGE
-                }
             }
 
             else -> {
-                // اگر بازه دقیقاً کل ماهه، با ماه حرکت بده
                 val isFullMonth = startP.day == 1 && endP.day == startP.monthLength()
-
                 if (isFullMonth) {
-                    val monthBase = PersianDateTime(
-                        startP.year,
-                        startP.month,
-                        1
-                    ).plus(DatePeriod(months = step))
+                    val monthBase = PersianDateTime(startP.year, startP.month, 1).plus(DatePeriod(months = step))
                     newStart = PersianDateTime(monthBase.year, monthBase.month, 1)
-                    newEnd =
-                        PersianDateTime(monthBase.year, monthBase.month, newStart.monthLength())
-
-                    val thisMonthStart = PersianDateTime(today.year, today.month, 1)
-                    newFilter = when {
-                        newStart == thisMonthStart -> DateFilterType.THIS_MONTH
-                        newStart.plus(DatePeriod(months = 1)) == thisMonthStart -> DateFilterType.LAST_MONTH
-                        newStart.minus(DatePeriod(months = 1)) == thisMonthStart -> DateFilterType.NEXT_MONTH
-                        else -> DateFilterType.CUSTOM_RANGE
-                    }
+                    newEnd = PersianDateTime(monthBase.year, monthBase.month, newStart.monthLength())
                 } else {
-                    // حرکت با طول بازه (inclusive)
                     val startG = startP.toLocalDate()
                     val endG = endP.toLocalDate()
-                    val daysBetween = endG.toEpochDays() - startG.toEpochDays() // inclusive-1
+                    val daysBetween = endG.toEpochDays() - startG.toEpochDays()
                     val shift = (daysBetween + 1).toInt() * step
 
                     newStart = startP.plus(shift, DateTimeUnit.DAY)
                     newEnd = endP.plus(shift, DateTimeUnit.DAY)
-                    newFilter = DateFilterType.CUSTOM_RANGE
                 }
             }
+        }
+
+        // Unified identification of the new filter type relative to today
+        val thisMonthStart = PersianDateTime(today.year, today.month, 1)
+        val lastMonthStart = thisMonthStart.minus(DatePeriod(months = 1))
+        val nextMonthStart = thisMonthStart.plus(DatePeriod(months = 1))
+
+        val thisYearStart = PersianDateTime(today.year, 1, 1)
+        val lastYearStart = PersianDateTime(today.year - 1, 1, 1)
+        val nextYearStart = PersianDateTime(today.year + 1, 1, 1)
+
+        val thisWeekStart = startOfWeek(today, timeZone)
+        val lastWeekStart = thisWeekStart.minus(7, DateTimeUnit.DAY)
+        val nextWeekStart = thisWeekStart.plus(7, DateTimeUnit.DAY)
+
+        newFilter = when {
+            newStart.isSameDay(today) && newEnd.isSameDay(today) -> DateFilterType.TODAY
+            newStart.isSameDay(today.minus(1, DateTimeUnit.DAY)) && newEnd.isSameDay(today.minus(1, DateTimeUnit.DAY)) -> DateFilterType.YESTERDAY
+            newStart.isSameDay(today.plus(1, DateTimeUnit.DAY)) && newEnd.isSameDay(today.plus(1, DateTimeUnit.DAY)) -> DateFilterType.TOMORROW
+
+            newStart.isSameDay(thisWeekStart) && newEnd.isSameDay(thisWeekStart.plus(6, DateTimeUnit.DAY)) -> DateFilterType.THIS_WEEK
+            newStart.isSameDay(lastWeekStart) && newEnd.isSameDay(lastWeekStart.plus(6, DateTimeUnit.DAY)) -> DateFilterType.LAST_WEEK
+            newStart.isSameDay(nextWeekStart) && newEnd.isSameDay(nextWeekStart.plus(6, DateTimeUnit.DAY)) -> DateFilterType.NEXT_WEEK
+
+            newStart.isSameMonth(thisMonthStart) && newEnd.day == newStart.monthLength() -> DateFilterType.THIS_MONTH
+            newStart.isSameMonth(lastMonthStart) && newEnd.day == newStart.monthLength() -> DateFilterType.LAST_MONTH
+            newStart.isSameMonth(nextMonthStart) && newEnd.day == newStart.monthLength() -> DateFilterType.NEXT_MONTH
+
+            newStart.isSameYear(thisYearStart) && newStart.day == 1 && newStart.month == 1 && newEnd.month == 12 && newEnd.day == newEnd.monthLength() -> DateFilterType.THIS_YEAR
+            newStart.isSameYear(lastYearStart) && newStart.day == 1 && newStart.month == 1 && newEnd.month == 12 && newEnd.day == newEnd.monthLength() -> DateFilterType.LAST_YEAR
+            newStart.isSameYear(nextYearStart) && newStart.day == 1 && newStart.month == 1 && newEnd.month == 12 && newEnd.day == newEnd.monthLength() -> DateFilterType.NEXT_YEAR
+
+            else -> DateFilterType.CUSTOM_RANGE
         }
 
         val newStartMillis = startOfDayMillis(newStart, timeZone)
@@ -270,6 +248,16 @@ object DateFilterHelper {
             label = label
         )
     }
+
+    private fun PersianDateTime.isSameDay(other: PersianDateTime): Boolean =
+        this.year == other.year && this.month == other.month && this.day == other.day
+
+    private fun PersianDateTime.isSameMonth(other: PersianDateTime): Boolean =
+        this.year == other.year && this.month == other.month
+
+    private fun PersianDateTime.isSameYear(other: PersianDateTime): Boolean =
+        this.year == other.year
+
 
     fun getDateText(
         dateMillis: Long,

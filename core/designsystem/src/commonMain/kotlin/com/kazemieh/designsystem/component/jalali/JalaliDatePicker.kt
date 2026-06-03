@@ -4,34 +4,26 @@ package com.kazemieh.designsystem.component.jalali
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.outlined.KeyboardArrowRight
-import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -45,125 +37,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.component.FintrackTitleLargeText
+import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.SheetFrame
-import fintrack.core.designsystem.generated.resources.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.action_select_date
+import fintrack.core.designsystem.generated.resources.dp_cancel
+import fintrack.core.designsystem.generated.resources.dp_confirm
+import fintrack.core.designsystem.generated.resources.dp_dow_fri
+import fintrack.core.designsystem.generated.resources.dp_dow_mon
+import fintrack.core.designsystem.generated.resources.dp_dow_sat
+import fintrack.core.designsystem.generated.resources.dp_dow_sun
+import fintrack.core.designsystem.generated.resources.dp_dow_thu
+import fintrack.core.designsystem.generated.resources.dp_dow_tue
+import fintrack.core.designsystem.generated.resources.dp_dow_wed
+import fintrack.core.designsystem.generated.resources.dp_select_month
+import fintrack.core.designsystem.generated.resources.dp_select_year
+import fintrack.core.designsystem.generated.resources.dp_today
+import fintrack.core.designsystem.generated.resources.month_aban
+import fintrack.core.designsystem.generated.resources.month_azar
+import fintrack.core.designsystem.generated.resources.month_bahman
+import fintrack.core.designsystem.generated.resources.month_dey
+import fintrack.core.designsystem.generated.resources.month_esfand
+import fintrack.core.designsystem.generated.resources.month_farvardin
+import fintrack.core.designsystem.generated.resources.month_khordad
+import fintrack.core.designsystem.generated.resources.month_mehr
+import fintrack.core.designsystem.generated.resources.month_mordad
+import fintrack.core.designsystem.generated.resources.month_ordibehesht
+import fintrack.core.designsystem.generated.resources.month_shahrivar
+import fintrack.core.designsystem.generated.resources.month_tir
 import org.jetbrains.compose.resources.stringResource
-
-/**
- * Opens a Jalali DatePicker dialog with the given content.
- *
- * Example usage:
- *
- * @param openDialog Dialog will be visible as long as openDialog value is true.
- * @param disableBeforeDate Days before this date are disabled and can't be selected.
- * @param disableAfterDate Days after this date are disabled and can't be selected.
- * @param initialDate Specify a date to be shown when dialog opens.
- * @param onSelectDay Called when a day is selected.
- * @param onConfirm Called when confirm button is clicked.
- * @param backgroundColor Background color of the dialog.
- * @param textColor Color of the text.
- * @param selectedIconColor Color of selected day (month, year) circular icon.
- * @param textColorHighlight Color of current day (month, year) text.
- * @param dropDownColor Color of the year and month drop-down text.
- * @param dayOfWeekLabelColor Color for the day of the week label text.
- * @param confirmBtnColor Color of confirm button.
- * @param cancelBtnColor Color of cancel button.
- * @param todayBtnColor Color of today button.
- * @param nextPreviousBtnColor Color of next and previous month button.
- * @param fontFamily changing font for all the text.
- * @param fontSize changing font size for all the text.
- *
- */
-
-@Composable
-fun JalaliDatePickerDialog(
-    openDialog: MutableState<Boolean>,
-    initialDate: JalaliCalendar? = null,
-    disableBeforeDate: JalaliCalendar? = null,
-    disableAfterDate: JalaliCalendar? = null,
-    onSelectDay: (JalaliCalendar) -> Unit,
-    onConfirm: (JalaliCalendar) -> Unit,
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
-    textColor: Color = MaterialTheme.colorScheme.onSurface,
-    textDisabledColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-    selectedIconColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    textColorHighlight: Color = MaterialTheme.colorScheme.primary,
-    dropDownColor: Color = MaterialTheme.colorScheme.onSurface,
-    dayOfWeekLabelColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-    confirmBtnColor: Color = MaterialTheme.colorScheme.primary,
-    cancelBtnColor: Color = MaterialTheme.colorScheme.error,
-    todayBtnColor: Color = MaterialTheme.colorScheme.primary,
-    nextPreviousBtnColor: Color = MaterialTheme.colorScheme.onSurface,
-    fontFamily: FontFamily = FontFamily.Default,
-    fontSize: TextUnit = 14.sp
-) {
-    if (openDialog.value) {
-        Dialog(
-            onDismissRequest = { openDialog.value = false },
-//            properties = DialogProperties(usePlatformDefaultWidth = false)
-        ) {
-
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                    ) {
-                        // same action as in onDismissRequest
-                        openDialog.value = false
-                    }
-            ) {
-                // content
-                Surface(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .wrapContentHeight(),
-                    shape = MaterialTheme.shapes.large,
-                    tonalElevation = AlertDialogDefaults.TonalElevation,
-
-                    ) {
-                    JalaliCalendarView(
-                        openDialog = openDialog,
-                        initialDate = initialDate,
-                        disableBeforeDate = disableBeforeDate,
-                        disableAfterDate = disableAfterDate,
-                        onSelectDay = {
-                            onSelectDay(it)
-//                            Log.d("DAGDAG", "onSelect: ${it.day} ${it.monthString} ${it.year}")
-                        },
-                        onConfirm = {
-                            onConfirm(it)
-//                            Log.d("DAGDAG", "onConfirm: ${it.day} ${it.monthString} ${it.year}")
-                        },
-                        backgroundColor = backgroundColor,
-                        dayOfWeekLabelColor = dayOfWeekLabelColor,
-                        dropDownColor = dropDownColor,
-                        selectedIconColor = selectedIconColor,
-                        textColorHighlight = textColorHighlight,
-                        textColor = textColor,
-                        textDisabledColor = textDisabledColor,
-                        cancelBtnColor = cancelBtnColor,
-                        confirmBtnColor = confirmBtnColor,
-                        todayBtnColor = todayBtnColor,
-                        nextPreviousBtnColor = nextPreviousBtnColor,
-                        fontFamily = fontFamily,
-                        fontSize = fontSize
-                    )
-                }
-            }
-
-        }
-
-    }
-}
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -176,6 +83,9 @@ fun JalaliDatePickerBottomSheet(
     onConfirm: (JalaliCalendar) -> Unit,
 ) {
     if (openSheet.value) {
+        val initial = remember(initialDate) { initialDate ?: JalaliCalendar() }
+        var tempSelectedDate by remember { mutableStateOf(initial) }
+
         SheetFrame(
             title = stringResource(Res.string.action_select_date),
             onDismiss = { openSheet.value = false },
@@ -183,11 +93,11 @@ fun JalaliDatePickerBottomSheet(
         ) {
             JalaliCalendarView(
                 openDialog = openSheet,
-                initialDate = initialDate,
+                initialDate = initial,
                 disableBeforeDate = disableBeforeDate,
                 disableAfterDate = disableAfterDate,
-                onSelectDay = { },
-                onConfirm = onConfirm,
+                onSelectDay = { tempSelectedDate = it },
+                onConfirm = { onConfirm(tempSelectedDate) },
                 backgroundColor = Color.Transparent,
                 dayOfWeekLabelColor = com.kazemieh.designsystem.GlassText3,
                 dropDownColor = com.kazemieh.designsystem.GlassText,
@@ -198,9 +108,8 @@ fun JalaliDatePickerBottomSheet(
                 cancelBtnColor = com.kazemieh.designsystem.GlassRed,
                 confirmBtnColor = com.kazemieh.designsystem.GlassGreen,
                 todayBtnColor = com.kazemieh.designsystem.GlassGreen,
-                nextPreviousBtnColor = com.kazemieh.designsystem.GlassText,
-                fontFamily = FontFamily.Default,
-                fontSize = 14.sp
+                todayBtnVisible = true,
+                nextPreviousBtnColor = com.kazemieh.designsystem.GlassText
             )
         }
     }
@@ -226,8 +135,7 @@ fun JalaliCalendarView(
     cancelBtnColor: Color,
     todayBtnColor: Color,
     nextPreviousBtnColor: Color,
-    fontFamily: FontFamily,
-    fontSize: TextUnit
+    todayBtnVisible: Boolean = false
 ) {
     var iconSize by remember { mutableStateOf(43.dp) }
     var weekDaysLabelPadding by remember { mutableStateOf(18.dp) }
@@ -345,9 +253,9 @@ fun JalaliCalendarView(
                     Arrangement.SpaceAround
                 ) {
                     listOf(
-                        Res.string.dp_dow_fri, Res.string.dp_dow_thu, Res.string.dp_dow_wed,
-                        Res.string.dp_dow_tue, Res.string.dp_dow_mon, Res.string.dp_dow_sun,
-                        Res.string.dp_dow_sat
+                        Res.string.dp_dow_sat, Res.string.dp_dow_sun, Res.string.dp_dow_mon,
+                        Res.string.dp_dow_tue, Res.string.dp_dow_wed, Res.string.dp_dow_thu,
+                        Res.string.dp_dow_fri
                     ).forEach { labelRes ->
                         FintrackLabelSmallText(
                             text = stringResource(labelRes),
@@ -362,8 +270,8 @@ fun JalaliCalendarView(
                         Modifier.fillMaxWidth().padding(horizontal = 4.dp),
                         Arrangement.SpaceAround
                     ) {
-                        var day = jomeh
                         repeat(7) {
+                            val day = jomeh - (6 - it)
                             if (day in 1..jalali.monthLength) {
                                 val current = JalaliCalendar(jalali.year, jalali.month, day)
                                 val disabled =
@@ -407,7 +315,6 @@ fun JalaliCalendarView(
                                     FintrackBodyMediumText("")
                                 }
                             }
-                            day--
                         }
                     }
                     if (jomeh >= jalali.monthLength) break
@@ -424,9 +331,24 @@ fun JalaliCalendarView(
                 }
 
                 val monthRows = listOf(
-                    listOf(4 to stringResource(Res.string.month_tir), 3 to stringResource(Res.string.month_khordad), 2 to stringResource(Res.string.month_ordibehesht), 1 to stringResource(Res.string.month_farvardin)),
-                    listOf(8 to stringResource(Res.string.month_aban), 7 to stringResource(Res.string.month_mehr), 6 to stringResource(Res.string.month_shahrivar), 5 to stringResource(Res.string.month_mordad)),
-                    listOf(12 to stringResource(Res.string.month_esfand), 11 to stringResource(Res.string.month_bahman), 10 to stringResource(Res.string.month_dey), 9 to stringResource(Res.string.month_azar))
+                    listOf(
+                        4 to stringResource(Res.string.month_tir),
+                        3 to stringResource(Res.string.month_khordad),
+                        2 to stringResource(Res.string.month_ordibehesht),
+                        1 to stringResource(Res.string.month_farvardin)
+                    ),
+                    listOf(
+                        8 to stringResource(Res.string.month_aban),
+                        7 to stringResource(Res.string.month_mehr),
+                        6 to stringResource(Res.string.month_shahrivar),
+                        5 to stringResource(Res.string.month_mordad)
+                    ),
+                    listOf(
+                        12 to stringResource(Res.string.month_esfand),
+                        11 to stringResource(Res.string.month_bahman),
+                        10 to stringResource(Res.string.month_dey),
+                        9 to stringResource(Res.string.month_azar)
+                    )
                 )
 
                 for (row in monthRows) {
@@ -521,10 +443,16 @@ fun JalaliCalendarView(
         }
 
         if (pickerType == PickerType.Day) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Row {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     TextButton(
-                        modifier = Modifier.padding(horizontal = 8.dp),
+                        modifier = Modifier.padding(horizontal = 4.dp),
                         enabled = selectedDate != null,
                         onClick = {
                             onConfirm(selectedDate!!)
@@ -533,11 +461,12 @@ fun JalaliCalendarView(
                     ) {
                         FintrackBodyMediumText(
                             text = stringResource(Res.string.dp_confirm),
-                            color = if (selectedDate != null) confirmBtnColor else textDisabledColor
+                            color = if (selectedDate != null) confirmBtnColor else textDisabledColor,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                     TextButton(
-                        modifier = Modifier.padding(horizontal = 8.dp),
+                        modifier = Modifier.padding(horizontal = 4.dp),
                         onClick = { openDialog.value = false }) {
                         FintrackBodyMediumText(
                             text = stringResource(Res.string.dp_cancel),
@@ -545,61 +474,24 @@ fun JalaliCalendarView(
                         )
                     }
                 }
-                TextButton(
-                    modifier = Modifier.padding(horizontal = 8.dp).alpha(
-                        if (selectedDate != today || jalali.year != today.year || jalali.month != today.month) 1f else 0f
-                    ),
-                    onClick = {
-                        val tempToday = JalaliCalendar()
-                        jalali = JalaliCalendar(tempToday.year, tempToday.month, 1)
-                        selectedDate = JalaliCalendar()
-                        onSelectDay(selectedDate!!)
+
+                if (todayBtnVisible || (selectedDate != today || jalali.year != today.year || jalali.month != today.month)) {
+                    TextButton(
+                        modifier = Modifier.padding(horizontal = 4.dp),
+                        onClick = {
+                            val tempToday = JalaliCalendar()
+                            jalali = JalaliCalendar(tempToday.year, tempToday.month, 1)
+                            selectedDate = JalaliCalendar()
+                            onSelectDay(selectedDate!!)
+                        }
+                    ) {
+                        FintrackBodyMediumText(
+                            text = stringResource(Res.string.dp_today),
+                            color = todayBtnColor
+                        )
                     }
-                ) {
-                    FintrackBodyMediumText(
-                        text = stringResource(Res.string.dp_today),
-                        color = todayBtnColor
-                    )
                 }
             }
         }
-    }
-}
-
-
-@Composable
-fun monthTextColorFun(
-    currentMonth: Int,
-    jalali: JalaliCalendar,
-    isDisabled: Boolean,
-    textColorHighlight: Color,
-    textColor: Color,
-    textDisabledColor: Color
-): Color {
-    return if (isDisabled)
-        textDisabledColor
-    else if (jalali.month == currentMonth) {
-        textColorHighlight
-    } else {
-        textColor
-    }
-}
-
-@Composable
-fun yearTextColorFun(
-    currentYear: Int,
-    yearIndex: Int,
-    isDisabled: Boolean,
-    textColorHighlight: Color,
-    textColor: Color,
-    textDisabledColor: Color
-
-): Color {
-    return if (isDisabled)
-        textDisabledColor
-    else if (currentYear == yearIndex) {
-        textColorHighlight
-    } else {
-        textColor
     }
 }
