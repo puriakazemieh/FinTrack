@@ -1,39 +1,30 @@
 package com.kazemieh.designsystem.component.bottomsheet
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import com.kazemieh.designsystem.component.model.UiText
-import com.kazemieh.designsystem.component.model.ItemUi
-import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.EmptyListScreen
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackTitleLargeText
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Checkbox
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import com.kazemieh.designsystem.component.FinTrackLeadingIcon
-import com.kazemieh.designsystem.component.LeadingIconStyle
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.GlassBg0
+import com.kazemieh.designsystem.GlassBg1
+import com.kazemieh.designsystem.GlassText
+import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.glass.GlassTone
+import com.kazemieh.designsystem.component.glass.ItemSelected
+import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.model.ItemUi
+import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.designsystem.component.model.asString
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.confirm
@@ -68,104 +59,74 @@ fun SelectableListBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = null
     ) {
-        Box(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(space.mediumLarge)
+                .fillMaxSize()
+                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                FintrackTitleLargeText(
-                    text = title,
-                    modifier = Modifier.padding(space.small)
-                )
-                Spacer(Modifier.height(space.mediumSmall))
+            ScreenHeader(
+                title = title,
+                onClose = onDismiss
+            )
 
-                if (showSelectAll && itemsList.size > 1) {
-                    val text = stringResource(Res.string.select_All)
-                    val allItem = ItemUi(id = 0, title = UiText.DynamicString(text))
+            if (showSelectAll && itemsList.size > 1) {
+                val text = stringResource(Res.string.select_All)
+                val allItem = ItemUi(id = 0, title = UiText.DynamicString(text))
 
-                    ItemSelected(
-                        modifier = Modifier.padding(
-                            vertical = space.mediumSmall,
-                            horizontal = space.small
-                        ),
-                        isSelected = isAllSelected,
-                        item = allItem,
-                        onToggle = {
-                            selected = if (isAllSelected) emptySet() else items
-                        }
-                    )
-                }
-
-                HorizontalDivider()
-
-                if (itemsList.isNotEmpty()) {
-                    LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
-                        items(itemsList, key = { it.id }) { item ->
-                            val isSelected = selected.contains(item)
-                            ItemSelected(
-                                modifier = Modifier.padding(space.mediumLarge),
-                                isSelected = isSelected,
-                                item = item,
-                                onToggle = {
-                                    selected = if (isSelected) selected - item else selected + item
-                                }
-                            )
-                        }
+                ItemSelected(
+                    modifier = Modifier.padding(
+                        vertical = space.mediumSmall,
+                        horizontal = 24.dp
+                    ),
+                    isSelected = isAllSelected,
+                    item = allItem,
+                    onToggle = {
+                        selected = if (isAllSelected) emptySet() else items
                     }
-                } else {
+                )
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 24.dp))
+            }
+
+            if (itemsList.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(bottom = 100.dp)
+                ) {
+                    items(itemsList, key = { it.id }) { item ->
+                        val isSelected = selected.contains(item)
+                        ItemSelected(
+                            modifier = Modifier.padding(vertical = space.mediumSmall, horizontal = 24.dp),
+                            isSelected = isSelected,
+                            item = item,
+                            onToggle = {
+                                selected = if (isSelected) selected - item else selected + item
+                            }
+                        )
+                    }
+                }
+            } else {
+                Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp)) {
                     EmptyListScreen(title)
                 }
+            }
 
-                Spacer(Modifier.height(space.mediumLarge))
-
+            // Fixed CTA at bottom
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp)
+            ) {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
                     onClick = { onConfirm(selected, isAllSelected) }
                 ) {
                     FintrackBodyMediumText(text = stringResource(Res.string.confirm))
                 }
-
-                Spacer(Modifier.height(space.mediumSmall))
             }
         }
     }
-}
-
-
-@Composable
-fun ItemSelected(
-    modifier: Modifier = Modifier,
-    isSelected: Boolean,
-    item: ItemUi,
-    onToggle: () -> Unit
-) {
-    val space = LocalSpacing.current
-
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onToggle() }
-            .then(modifier),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Checkbox(checked = isSelected, onCheckedChange = { onToggle() })
-        Spacer(modifier = Modifier.width(space.mediumLarge))
-        if (item.iconId != null || item.colorId != null) {
-            FinTrackLeadingIcon(
-                colorId = item.colorId,
-                iconId = item.iconId,
-                style = LeadingIconStyle.Badge,
-                size = space.extraLarge,
-                iconSize = space.large,
-                corner = space.mediumLarge
-            )
-            Spacer(modifier = Modifier.width(space.mediumSmall))
-        }
-        FintrackBodyMediumText(text = item.title.asString())
-    }
-
 }

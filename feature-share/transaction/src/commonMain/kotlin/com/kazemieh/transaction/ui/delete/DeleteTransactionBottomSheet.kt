@@ -59,6 +59,7 @@ fun DeleteTransactionBottomSheet(
         dismissClicked = { viewModel.onIntent(DeleteTransactionIntent.OnDismiss) },
         confirmClicked = { viewModel.onIntent(DeleteTransactionIntent.Submit) },
         sheetState = sheetState,
+        itemName = transactionWithRelations?.transaction?.description,
         confirmEnabled = !state.isLoading,
         dismissEnabled = !state.isLoading,
         isLoading = state.isLoading

@@ -13,6 +13,7 @@ import com.kazemieh.common.model.Person
 import com.kazemieh.designsystem.component.bottomsheet.DeleteWithMoveBottomSheetContent
 import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.person.ui.list.PersonManageBottomSheet
+import com.kazemieh.person.ui.list.PersonPickerSingleBottomSheet
 import kotlinx.coroutines.launch
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -58,10 +59,10 @@ fun DeletePersonBottomSheet(
 
     DeleteWithMoveBottomSheetContent(
         sheetState = sheetState,
-        title = stringResource(Res.string.transaction_delete),
+        itemName = person.name,
+        itemType = stringResource(Res.string.person_name),
         deleteAllText = stringResource(Res.string.delete_all_transaction),
         moveToAnotherText = stringResource(Res.string.move_to_another_person),
-        targetTitleText = stringResource(Res.string.person_name_label),
         targetPlaceholderText = stringResource(Res.string.select_person),
         targetValue = state.movePerson?.name,
         isDeleteAll = state.isDeleteAllData,
@@ -76,12 +77,9 @@ fun DeletePersonBottomSheet(
     )
 
     if (state.isPersonListShow) {
-        PersonManageBottomSheet(
+        PersonPickerSingleBottomSheet(
             snackbarHostState = snackbarHostState,
-            isEditShow = false,
-            isDeleteShow = false,
-            clickable = true,
-            onPersonClick = { viewModel.onIntent(DeletePersonIntent.SetMovePerson(it)) }, // TODO
+            onPersonClick = { viewModel.onIntent(DeletePersonIntent.SetMovePerson(it)) },
             onDismiss = { viewModel.onIntent(DeletePersonIntent.ShowAllPersonList) }
         )
     }

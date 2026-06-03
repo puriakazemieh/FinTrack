@@ -12,7 +12,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import com.kazemieh.common.model.Tag
 import com.kazemieh.designsystem.component.bottomsheet.DeleteWithMoveBottomSheetContent
 import com.kazemieh.designsystem.component.model.resolveString
-import com.kazemieh.tag.ui.list.TagManageBottomSheet
+import com.kazemieh.tag.ui.list.TagPickerSingleBottomSheet
 import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -69,17 +69,14 @@ fun DeleteTagBottomSheet(
 
     DeleteWithMoveBottomSheetContent(
         sheetState = sheetState,
-        title = stringResource(Res.string.transaction_delete),
+        itemName = tag.name,
+        itemType = stringResource(Res.string.tag_name),
         deleteAllText = stringResource(Res.string.delete_all_transaction),
-
         moveToAnotherText = stringResource(Res.string.move_to_another_tag),
-        targetTitleText = stringResource(Res.string.tags),
         targetPlaceholderText = stringResource(Res.string.select_tag),
-
         targetValue = state.moveTag?.name,
         isDeleteAll = state.isDeleteAllData,
         isTargetError = state.isTagError,
-
         onSelectDeleteAll = { viewModel.onIntent(DeleteTagIntent.DeleteAllTransaction) },
         onSelectMove = { viewModel.onIntent(DeleteTagIntent.MoveAllTransaction) },
         onPickTarget = { viewModel.onIntent(DeleteTagIntent.ShowAllTagList) },
@@ -91,11 +88,8 @@ fun DeleteTagBottomSheet(
     )
 
     if (state.isTagListShow) {
-        TagManageBottomSheet(
+        TagPickerSingleBottomSheet(
             snackbarHostState = snackbarHostState,
-            isEditShow = false,
-            isDeleteShow = false,
-            clickable = true,
             onTagClick = { viewModel.onIntent(DeleteTagIntent.SetMoveTag(it)) },
             onDismiss = { viewModel.onIntent(DeleteTagIntent.ShowAllTagList) }
         )

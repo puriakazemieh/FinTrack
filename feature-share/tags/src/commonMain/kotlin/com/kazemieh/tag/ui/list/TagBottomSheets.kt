@@ -66,6 +66,88 @@ fun TagPickerBottomSheet(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun TagPickerSingleBottomSheet(
+    viewModel: TagViewModel = koinViewModel(key = "TagPickerSingleBottomSheet"),
+    snackbarHostState: SnackbarHostState,
+    onTagClick: (Tag) -> Unit,
+    onDismiss: () -> Unit
+) {
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(TagIntent.GetAllTag)
+    }
+
+    val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is TagEffect.OnTagSelected -> onTagClick(effect.tag)
+                TagEffect.OnDismiss -> onDismiss()
+            }
+        }
+    }
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = { viewModel.onIntent(TagIntent.OnDismiss) },
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = null
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+        ) {
+            ScreenHeader(
+                title = stringResource(Res.string.tags),
+                onClose = { viewModel.onIntent(TagIntent.OnDismiss) }
+            )
+
+            EntityList(
+                title = stringResource(Res.string.tags),
+                query = state.searchQuery,
+                onQueryChange = { viewModel.onIntent(TagIntent.UpdateSearchQuery(it)) },
+                onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
+                items = state.tags.map {
+                    EntityItem(
+                        id = it.id ?: 0,
+                        name = it.name,
+                        sub = it.description,
+                        iconId = it.iconId,
+                        colorId = it.colorId
+                    )
+                },
+                onEditClick = { item ->
+                    state.tags.find { it.id == item.id }?.let {
+                        viewModel.onIntent(TagIntent.OnEditClick(it))
+                    }
+                },
+                onDeleteClick = { item ->
+                    state.tags.find { it.id == item.id }?.let {
+                        viewModel.onIntent(TagIntent.OnDeleteClick(it))
+                    }
+                },
+                onItemClick = { item ->
+                    state.tags.find { it.id == item.id }?.let { onTagClick(it) }
+                }
+            )
+        }
+    }
+
+    if (state.showAddTag) {
+        AddTagBottomSheet(
+            snackbarHostState = snackbarHostState,
+            selectedTag = state.selectedTag,
+            onDismiss = { viewModel.onIntent(TagIntent.ShowAddTag) },
+            setTag = { viewModel.onIntent(TagIntent.SetSelectedTag(it)) }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun TagManageBottomSheet(
     keyViewmodel: String = "TagManageBottomSheet",
     viewModel: TagViewModel = koinViewModel(key = keyViewmodel),

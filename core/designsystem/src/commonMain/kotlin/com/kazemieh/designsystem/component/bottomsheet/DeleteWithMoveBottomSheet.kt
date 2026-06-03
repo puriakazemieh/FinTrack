@@ -1,43 +1,44 @@
 package com.kazemieh.designsystem.component.bottomsheet
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.SheetState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.kazemieh.designsystem.GlassBg0
+import com.kazemieh.designsystem.GlassBg1
+import com.kazemieh.designsystem.GlassText
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackBodySmallText
-import com.kazemieh.designsystem.component.FintrackOutlinedTextField
-import com.kazemieh.designsystem.component.FintrackTitleLargeText
-import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.GlassTone
+import com.kazemieh.designsystem.component.glass.ScreenHeader
 import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.categories
+import fintrack.core.designsystem.generated.resources.delete_confirm_question
+import fintrack.core.designsystem.generated.resources.move
 import fintrack.core.designsystem.generated.resources.required_star
+import fintrack.core.designsystem.generated.resources.transaction_delete
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeleteWithMoveBottomSheetContent(
-    sheetState: SheetState,
-    title: String,
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
+    title: String? = null,
+    itemName: String? = null,
+    itemType: String? = null,
     deleteAllText: String,
     moveToAnotherText: String,
-    targetTitleText: String,
     targetPlaceholderText: String,
     targetValue: String?,
     isDeleteAll: Boolean,
@@ -52,75 +53,117 @@ fun DeleteWithMoveBottomSheetContent(
 ) {
     val space = LocalSpacing.current
 
+    val finalTitle = title ?: if (itemName != null) {
+        stringResource(Res.string.delete_confirm_question, itemType ?: "", itemName)
+    } else {
+        stringResource(Res.string.transaction_delete)
+    }
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = null
     ) {
-        Column {
-            FintrackTitleLargeText(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = space.large),
-                text = title,
-                textAlign = TextAlign.Center
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+        ) {
+            ScreenHeader(
+                title = finalTitle,
+                onClose = onDismiss
             )
 
-            Spacer(Modifier.height(space.large))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable { onSelectDeleteAll() }
-            ) {
-                RadioButton(selected = isDeleteAll, onClick = onSelectDeleteAll)
-                FintrackBodySmallText(text = deleteAllText)
-            }
-
-            Spacer(Modifier.height(space.mediumSmall))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable { onSelectMove() }
-            ) {
-                RadioButton(selected = !isDeleteAll, onClick = onSelectMove)
-                FintrackBodySmallText(text = moveToAnotherText)
-            }
-
-            AnimatedVisibility(
-                visible = !isDeleteAll,
-                modifier = Modifier.padding(horizontal = space.mediumSmall)
-            ) {
-                FintrackOutlinedTextField(
-                    value = targetValue.orEmpty(),
-                    onClick = onPickTarget,
-                    readOnly = true,
-                    enabled = false,
-                    label = {
-                        Row {
-                            FintrackBodyMediumText(
-                                text = if (targetValue.isNullOrBlank()) targetPlaceholderText else targetTitleText
-                            )
-                            FintrackBodyMediumText(
-                                text = stringResource(Res.string.required_star),
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    },
-                    isError = isTargetError
-                )
-            }
-
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(space.large),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(space.mediumSmall)
+                    .padding(horizontal = 24.dp)
+            ) {
+                Spacer(Modifier.height(space.medium))
+
+                GlassCard(
+                    onClick = onSelectDeleteAll,
+                    padding = 8.dp,
+                    tone = if (isDeleteAll) GlassTone.Strong else GlassTone.Default,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        RadioButton(selected = isDeleteAll, onClick = onSelectDeleteAll)
+                        Spacer(Modifier.width(space.small))
+                        FintrackBodyMediumText(
+                            text = deleteAllText,
+                            fontWeight = if (isDeleteAll) FontWeight.Bold else FontWeight.Medium,
+                            color = GlassText
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(space.mediumSmall))
+
+                GlassCard(
+                    onClick = onSelectMove,
+                    padding = 8.dp,
+                    tone = if (!isDeleteAll) GlassTone.Strong else GlassTone.Default,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        RadioButton(selected = !isDeleteAll, onClick = onSelectMove)
+                        Spacer(Modifier.width(space.small))
+                        FintrackBodyMediumText(
+                            text = moveToAnotherText,
+                            fontWeight = if (!isDeleteAll) FontWeight.Bold else FontWeight.Medium,
+                            color = GlassText
+                        )
+                    }
+                }
+
+                AnimatedVisibility(
+                    visible = !isDeleteAll,
+                    modifier = Modifier.padding(top = space.medium)
+                ) {
+                    FintrackOutlinedTextField(
+                        value = targetValue.orEmpty(),
+                        onClick = onPickTarget,
+                        readOnly = true,
+                        enabled = false,
+                        label = {
+                            Row {
+                                FintrackBodyMediumText(
+                                    text = if (targetValue.isNullOrBlank()) targetPlaceholderText else stringResource(
+                                        Res.string.move
+                                    )
+                                )
+                                FintrackBodyMediumText(
+                                    text = stringResource(Res.string.required_star),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        },
+                        isError = isTargetError
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(space.large))
+
+            // Footer / CTAs
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Button(
                     onClick = onConfirm,
-                    modifier = Modifier.weight(1f),
-                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error,
                         contentColor = MaterialTheme.colorScheme.onError
@@ -128,25 +171,32 @@ fun DeleteWithMoveBottomSheetContent(
                 ) {
                     FintrackTitleMediumText(
                         text = confirmButtonText,
-                        color = MaterialTheme.colorScheme.background
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.W600
                     )
                 }
 
-                Button(
+                GlassCard(
                     onClick = onDismiss,
-                    modifier = Modifier.weight(1f),
-                    shape = MaterialTheme.shapes.medium,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
+                    padding = 0.dp,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    FintrackTitleMediumText(
-                        text = dismissButtonText,
-                        color = MaterialTheme.colorScheme.background
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        FintrackTitleSmallText(
+                            text = dismissButtonText,
+                            fontWeight = FontWeight.W500,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

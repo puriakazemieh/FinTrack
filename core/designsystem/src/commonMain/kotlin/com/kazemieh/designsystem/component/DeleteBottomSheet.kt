@@ -1,29 +1,28 @@
 package com.kazemieh.designsystem.component
 
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.kazemieh.designsystem.GlassBg0
+import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.ScreenHeader
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.cancell_
 import fintrack.core.designsystem.generated.resources.confirm
+import fintrack.core.designsystem.generated.resources.delete_confirm_question
 import fintrack.core.designsystem.generated.resources.transaction_delete
 import org.jetbrains.compose.resources.stringResource
 
@@ -31,20 +30,18 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeleteBottomSheet(
-    title: String = stringResource(Res.string.transaction_delete),
+    title: String? = null,
+    itemName: String? = null,
+    itemType: String? = null,
     confirmButtonText: String = stringResource(Res.string.confirm),
     dismissButtonText: String = stringResource(Res.string.cancell_),
     confirmButtonColors: ButtonColors = ButtonDefaults.buttonColors(
         containerColor = MaterialTheme.colorScheme.error,
         contentColor = MaterialTheme.colorScheme.onError
     ),
-    dismissButtonColors: ButtonColors = ButtonDefaults.buttonColors(
-        containerColor = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary
-    ),
     dismissClicked: () -> Unit,
     confirmClicked: () -> Unit,
-    sheetState: SheetState,
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
 
     confirmEnabled: Boolean = true,
     dismissEnabled: Boolean = true,
@@ -52,56 +49,80 @@ fun DeleteBottomSheet(
 ) {
     val space = LocalSpacing.current
 
+    val finalTitle = title ?: if (itemName != null) {
+        stringResource(Res.string.delete_confirm_question, itemType ?: "", itemName)
+    } else {
+        stringResource(Res.string.transaction_delete)
+    }
+
     ModalBottomSheet(
         onDismissRequest = { if (dismissEnabled && !isLoading) dismissClicked() },
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = null
     ) {
-        Column {
-            FintrackTitleLargeText(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = space.large),
-                text = title,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurface
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+        ) {
+            ScreenHeader(
+                title = finalTitle,
+                onClose = dismissClicked
             )
 
             Spacer(modifier = Modifier.height(space.large))
 
-            Row(
+            // Footer / CTAs
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(space.large),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(space.mediumSmall)
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Button(
                     onClick = confirmClicked,
                     enabled = confirmEnabled && !isLoading,
-                    modifier = Modifier.weight(1f),
-                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
                     colors = confirmButtonColors
                 ) {
-                    FintrackTitleMediumText(
-                        text = confirmButtonText,
-                        color = Color.White
-                    )
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = MaterialTheme.colorScheme.onError,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        FintrackTitleMediumText(
+                            text = confirmButtonText,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.W600
+                        )
+                    }
                 }
 
-                Button(
-                    onClick = dismissClicked,
-                    enabled = dismissEnabled && !isLoading,
-                    modifier = Modifier.weight(1f),
-                    shape = MaterialTheme.shapes.medium,
-                    colors = dismissButtonColors
+                GlassCard(
+                    onClick = { if (dismissEnabled && !isLoading) dismissClicked() },
+                    padding = 0.dp,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    FintrackTitleMediumText(
-                        text = dismissButtonText,
-                        color = Color.White
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        FintrackTitleSmallText(
+                            text = dismissButtonText,
+                            fontWeight = FontWeight.W500,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

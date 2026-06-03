@@ -63,10 +63,10 @@ fun DeleteCategoryBottomSheet(
 
     DeleteWithMoveBottomSheetContent(
         sheetState = sheetState,
-        title = stringResource(Res.string.transaction_delete),
+        itemName = category.name,
+        itemType = stringResource(Res.string.category_name),
         deleteAllText = stringResource(Res.string.delete_all_transaction),
         moveToAnotherText = stringResource(Res.string.move_to_another_category),
-        targetTitleText = stringResource(Res.string.categories),
         targetPlaceholderText = stringResource(Res.string.select_category),
         targetValue = state.moveCategory?.name,
         isDeleteAll = state.isDeleteAllData,

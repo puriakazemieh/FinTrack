@@ -60,10 +60,10 @@ fun DeleteSourceBottomSheet(
 
     DeleteWithMoveBottomSheetContent(
         sheetState = sheetState,
-        title = stringResource(Res.string.transaction_delete),
+        itemName = source.name,
+        itemType = stringResource(Res.string.source_name),
         deleteAllText = stringResource(Res.string.delete_all_transaction),
         moveToAnotherText = stringResource(Res.string.move_to_another_source),
-        targetTitleText = stringResource(Res.string.source_name_label),
         targetPlaceholderText = stringResource(Res.string.select_source),
         targetValue = state.moveSource?.name,
         isDeleteAll = state.isDeleteAllData,

@@ -76,6 +76,88 @@ fun PersonPickerBottomSheet(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun PersonPickerSingleBottomSheet(
+    viewModel: PersonViewModel = koinViewModel(key = "PersonPickerSingleBottomSheet"),
+    snackbarHostState: SnackbarHostState,
+    onPersonClick: (Person) -> Unit,
+    onDismiss: () -> Unit
+) {
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(PersonIntent.GetAllPerson)
+    }
+
+    val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is PersonEffect.OnPersonSelected -> onPersonClick(effect.person)
+                PersonEffect.OnDismiss -> onDismiss()
+            }
+        }
+    }
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = { viewModel.onIntent(PersonIntent.OnDismiss) },
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = null
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+        ) {
+            ScreenHeader(
+                title = stringResource(Res.string.persons),
+                onClose = { viewModel.onIntent(PersonIntent.OnDismiss) }
+            )
+
+            EntityList(
+                title = stringResource(Res.string.persons),
+                query = state.searchQuery,
+                onQueryChange = { viewModel.onIntent(PersonIntent.UpdateSearchQuery(it)) },
+                onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
+                items = state.persons.map {
+                    EntityItem(
+                        id = it.id ?: 0,
+                        name = it.name,
+                        sub = it.description,
+                        iconId = 1,
+                        colorId = 1
+                    )
+                },
+                onEditClick = { item ->
+                    state.persons.find { it.id == item.id }?.let {
+                        viewModel.onIntent(PersonIntent.OnEditClick(it))
+                    }
+                },
+                onDeleteClick = { item ->
+                    state.persons.find { it.id == item.id }?.let {
+                        viewModel.onIntent(PersonIntent.OnDeleteClick(it))
+                    }
+                },
+                onItemClick = { item ->
+                    state.persons.find { it.id == item.id }?.let { onPersonClick(it) }
+                }
+            )
+        }
+    }
+
+    if (state.showAddPerson) {
+        AddPersonBottomSheet(
+            snackbarHostState = snackbarHostState,
+            selectedPerson = state.selectedPerson,
+            onDismiss = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
+            setPerson = { viewModel.onIntent(PersonIntent.SetSelectedPerson(it)) }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun PersonManageBottomSheet(
     keyViewmodel: String = "PersonManageBottomSheet",
     viewModel: PersonViewModel = koinViewModel(key = keyViewmodel),

@@ -46,6 +46,12 @@ fun fintrackTypography(): Typography {
             fontSize = 20.sp,
             letterSpacing = (-0.2).sp // 20 * -0.01
         ),
+        headlineSmall = TextStyle(
+            fontFamily = family,
+            fontWeight = FontWeight.W700,
+            fontSize = 18.sp,
+            letterSpacing = (-0.18).sp
+        ),
         // Card/section title: 13-15 / 600-700
         titleLarge = TextStyle(
             fontFamily = family,
