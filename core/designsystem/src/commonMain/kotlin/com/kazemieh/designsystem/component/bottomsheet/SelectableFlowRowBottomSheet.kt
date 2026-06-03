@@ -1,45 +1,38 @@
 package com.kazemieh.designsystem.component.bottomsheet
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.EmptyListScreen
-import com.kazemieh.designsystem.component.FAB
-import com.kazemieh.designsystem.component.FinTrackLeadingIcon
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackTitleLargeText
-import com.kazemieh.designsystem.component.LeadingIconStyle
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.kazemieh.common.toFa
+import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.component.model.asString
 import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.add_new_item
 import fintrack.core.designsystem.generated.resources.confirm
+import fintrack.core.designsystem.generated.resources.search_placeholder
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SelectableFlowRowBottomSheet(
     title: String,
@@ -53,11 +46,20 @@ fun SelectableFlowRowBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val space = LocalSpacing.current
 
-
     val itemsList = remember(items) { items.toList().sortedBy { it.id } }
 
     var selected by remember(items, initialSelection) {
         mutableStateOf(initialSelection.intersect(items))
+    }
+
+    var searchQuery by remember { mutableStateOf("") }
+
+    // Resolve titles in a composable way
+    val resolvedItems = itemsList.map { it to it.title.asString() }
+
+    val filteredItems = remember(resolvedItems, searchQuery) {
+        if (searchQuery.isEmpty()) resolvedItems
+        else resolvedItems.filter { it.second.contains(searchQuery, ignoreCase = true) }
     }
 
     LaunchedEffect(initialSelection, items) {
@@ -67,92 +69,173 @@ fun SelectableFlowRowBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = null
     ) {
-        Box(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(space.medium)
+                .fillMaxSize()
+                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                FintrackTitleLargeText(
-                    text = title,
-                    modifier = Modifier.padding(space.extraSmall)
-                )
-                Spacer(Modifier.height(space.small))
+            ScreenHeader(
+                title = title,
+                onClose = onDismiss
+            )
 
-                FlowRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f, fill = false),
-                    horizontalArrangement = Arrangement.spacedBy(space.mediumSmall)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 24.dp)
+            ) {
+                SearchBar(
+                    query = searchQuery,
+                    onQueryChange = { searchQuery = it },
+                    placeholder = stringResource(Res.string.search_placeholder),
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(space.mediumSmall),
+                    contentPadding = PaddingValues(bottom = 16.dp)
                 ) {
-                    if (itemsList.isEmpty()) {
-                        EmptyListScreen(title)
+                    if (filteredItems.isEmpty()) {
+                        item {
+                            EmptyListScreen(title)
+                        }
                     } else {
-                        itemsList.forEach { item ->
+                        items(filteredItems) { (item, resolvedTitle) ->
                             val isSelected = selected.contains(item)
-                            FilterChip(
-                                selected = isSelected,
+                            
+                            GlassCard(
                                 onClick = {
                                     selected = if (isSelected) selected - item else selected + item
                                 },
-                                label = {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        if (item.iconId != null || item.colorId != null) {
-                                            FinTrackLeadingIcon(
-                                                colorId = item.colorId,
-                                                iconId = item.iconId,
-                                                style = LeadingIconStyle.TintOnly,
-                                                iconSize = space.large
-                                            )
-                                            Spacer(Modifier.width(space.extraSmall))
-                                        }
-
-                                        FintrackBodyMediumText(
-                                            text = item.title.asString(),
-                                            color = if (isSelected) MaterialTheme.colorScheme.surface
-                                            else MaterialTheme.colorScheme.onBackground
+                                padding = 10.dp,
+                                tone = if (isSelected) GlassTone.Strong else GlassTone.Default,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    if (item.iconId != null || item.colorId != null) {
+                                        FinTrackLeadingIcon(
+                                            colorId = item.colorId ?: 1,
+                                            iconId = item.iconId ?: 1,
+                                            style = LeadingIconStyle.Badge,
+                                            size = 32.dp,
+                                            iconSize = 14.dp,
+                                            corner = 10.dp
                                         )
+                                        Spacer(Modifier.width(10.dp))
                                     }
-                                },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                                    containerColor = MaterialTheme.colorScheme.surface,
-                                    labelColor = MaterialTheme.colorScheme.onSurface
-                                )
-                            )
+
+                                    FintrackBodyMediumText(
+                                        text = resolvedTitle,
+                                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                                        color = if (isSelected) GlassText else GlassText2,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    
+                                    Box(
+                                        modifier = Modifier
+                                            .size(22.dp)
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .border(
+                                                width = 1.5.dp,
+                                                color = if (isSelected) GlassGreen else GlassEdgeStrong,
+                                                shape = RoundedCornerShape(6.dp)
+                                            )
+                                            .background(if (isSelected) GlassGreen else Color.Transparent),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        if (isSelected) {
+                                            Icon(
+                                                imageVector = Icons.Default.Check,
+                                                contentDescription = null,
+                                                tint = GlassGreenDark,
+                                                modifier = Modifier.size(12.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
 
-                Spacer(Modifier.height(space.mediumLarge))
+                Spacer(Modifier.height(12.dp))
 
-                FAB(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(space.small),
-                    onClick = onAddClick
-                )
+                // Add new at the bottom
+                AddButton(
+                    onClick = onAddClick,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        tint = GlassGreen,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    FintrackBodyMediumText(
+                        text = stringResource(Res.string.add_new_item),
+                        fontWeight = FontWeight.Bold,
+                        color = GlassGreen
+                    )
+                }
+            }
 
+            // Footer / CTAs
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 Button(
-                    modifier = Modifier.fillMaxWidth(),
                     onClick = { onConfirm(selected) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    FintrackBodyMediumText(
-                        text = stringResource(Res.string.confirm),
-                        color = MaterialTheme.colorScheme.background
+                    FintrackTitleMediumText(
+                        text = "${stringResource(Res.string.confirm)} (${selected.size.toLong().toFa()})",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.W600
                     )
                 }
-
-                Spacer(Modifier.height(space.mediumSmall))
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            content()
+        }
+    }
+}
+
+@Composable
+private fun AddButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .border(1.5.dp, GlassEdgeStrong, RoundedCornerShape(12.dp))
+            .padding(12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
             content()
         }
     }

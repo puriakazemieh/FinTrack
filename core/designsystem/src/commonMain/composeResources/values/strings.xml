@@ -96,6 +96,7 @@
     <string name="all_category">همه دسته‌بندی‌ها</string>
     <string name="empty_category">هیچ دسته‌بندی انتخاب نشده</string>
 
+    <string name="add_new_item">افزودن مورد جدید</string>
     <string name="categories">%1$s دسته‌بندی</string>
     <string name="move">اتقال به</string>
     <string name="sources">%1$s منبع</string>
