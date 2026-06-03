@@ -2,6 +2,7 @@ package com.kazemieh.transactions
 
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.DateFilterHelper
 import com.kazemieh.common.DateFilterHelper.getRange
 import com.kazemieh.common.DateFilterType
@@ -248,10 +249,41 @@ class TransactionsViewModel() : ViewModel() {
 
             }
 
-            TransactionsIntent.OnToggleSearch -> _state.update { it.copy(isSearchActive = !it.isSearchActive) }
+            is TransactionsIntent.OnToggleSearch -> _state.update { it.copy(isSearchActive = !it.isSearchActive) }
 
-            TransactionsIntent.OnToggleFilterSheet -> _state.update { it.copy(isFilterSheetVisible = !it.isFilterSheetVisible) }
+            is TransactionsIntent.OnToggleFilterSheet -> _state.update { it.copy(isFilterSheetVisible = !it.isFilterSheetVisible) }
 
+            is TransactionsIntent.OnSourcesSelected -> _state.update {
+                it.copy(
+                    selectedSources = intent.sources,
+                    isAllSourceSelected = intent.isAllSourceSelected,
+                    enableAnimationChart = !_state.value.enableAnimationChart
+                )
+            }
+
+            is TransactionsIntent.OnTagSelected -> _state.update {
+                it.copy(
+                    selectedTag = intent.tag,
+                    isAllTAgSelected = intent.isAllTAgSelected,
+                    enableAnimationChart = !_state.value.enableAnimationChart
+                )
+            }
+
+            is TransactionsIntent.OnPersonSelected -> _state.update {
+                it.copy(
+                    selectedPerson = intent.persons,
+                    isAllPersonSelected = intent.isAllPersonSelected,
+                    enableAnimationChart = !_state.value.enableAnimationChart
+                )
+            }
+
+            is TransactionsIntent.OnCategoriesSelected -> _state.update {
+                it.copy(
+                    selectedCategories = intent.categories,
+                    isAllCategorySelected = intent.isAllCategorySelected,
+                    enableAnimationChart = !_state.value.enableAnimationChart
+                )
+            }
         }
     }
 

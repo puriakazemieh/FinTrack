@@ -1,19 +1,24 @@
 package com.kazemieh.transactions
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.list.CategorySelectionBottomSheet
 import com.kazemieh.common.DateFilterType
-import com.kazemieh.designsystem.GlassBg0
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.model.asString
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
@@ -89,8 +94,33 @@ fun TransactionsScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(GlassBg0)
+            .background(MaterialTheme.colorScheme.background)
     ) {
+        // Decorative background blobs for glass effect
+        val primaryColor = MaterialTheme.colorScheme.primary
+        val secondaryColor = MaterialTheme.colorScheme.secondary
+
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(primaryColor.copy(alpha = 0.15f), Color.Transparent),
+                    center = Offset(size.width * 0.8f, size.height * 0.2f),
+                    radius = 400.dp.toPx()
+                ),
+                center = Offset(size.width * 0.8f, size.height * 0.2f),
+                radius = 400.dp.toPx()
+            )
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(secondaryColor.copy(alpha = 0.1f), Color.Transparent),
+                    center = Offset(size.width * 0.2f, size.height * 0.8f),
+                    radius = 500.dp.toPx()
+                ),
+                center = Offset(size.width * 0.2f, size.height * 0.8f),
+                radius = 500.dp.toPx()
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -283,6 +313,7 @@ fun TransactionsScreen(
         if (state.isFilterSheetVisible) {
             TransactionFilterBottomSheet(
                 state = state,
+                snackbarHostState = snackbarHostState,
                 onIntent = viewModel::onIntent,
                 onDismiss = { viewModel.onIntent(TransactionsIntent.OnToggleFilterSheet) }
             )

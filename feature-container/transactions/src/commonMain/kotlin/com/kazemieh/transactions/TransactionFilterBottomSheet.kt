@@ -1,37 +1,61 @@
 package com.kazemieh.transactions
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.kazemieh.category.ui.list.CategoryFilterSelectionContent
 import com.kazemieh.common.DateFilterType
 import com.kazemieh.common.model.TransactionType
-import com.kazemieh.common.toFa
-import com.kazemieh.designsystem.*
-import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.GlassBg0
+import com.kazemieh.designsystem.GlassBlue
+import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.GlassRed
+import com.kazemieh.designsystem.GlassText
+import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.SheetFrame
 import com.kazemieh.designsystem.component.model.asString
-import fintrack.core.designsystem.generated.resources.*
+import com.kazemieh.financialsource.ui.list.SourceFilterSelectionContent
+import com.kazemieh.person.ui.list.PersonFilterSelectionContent
+import com.kazemieh.tag.ui.list.TagFilterSelectionContent
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.all
+import fintrack.core.designsystem.generated.resources.custom_range
+import fintrack.core.designsystem.generated.resources.date
+import fintrack.core.designsystem.generated.resources.label_custom_range_selected
+import fintrack.core.designsystem.generated.resources.label_this_year
+import fintrack.core.designsystem.generated.resources.label_type
+import fintrack.core.designsystem.generated.resources.msg_filters_combined
+import fintrack.core.designsystem.generated.resources.report
+import fintrack.core.designsystem.generated.resources.this_month
+import fintrack.core.designsystem.generated.resources.this_week
+import fintrack.core.designsystem.generated.resources.today
+import fintrack.core.designsystem.generated.resources.type_expense
+import fintrack.core.designsystem.generated.resources.type_income
+import fintrack.core.designsystem.generated.resources.type_transfer
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionFilterBottomSheet(
     state: TransactionsState,
+    snackbarHostState: SnackbarHostState,
     onIntent: (TransactionsIntent) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -40,9 +64,11 @@ fun TransactionFilterBottomSheet(
         sub = stringResource(Res.string.msg_filters_combined),
         onDismiss = onDismiss
     ) {
+        val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .verticalScroll(scrollState)
                 .padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -84,13 +110,18 @@ fun TransactionFilterBottomSheet(
                         }
                     }
 
-                    if (state.textPeriodRange.asString().isNotEmpty() || state.dateFilterType == DateFilterType.CUSTOM_RANGE) {
+                    if (state.textPeriodRange.asString()
+                            .isNotEmpty() || state.dateFilterType == DateFilterType.CUSTOM_RANGE
+                    ) {
                         val label = if (state.dateFilterType == DateFilterType.CUSTOM_RANGE) {
-                            stringResource(Res.string.label_custom_range_selected, state.textDate.asString())
+                            stringResource(
+                                Res.string.label_custom_range_selected,
+                                state.textDate.asString()
+                            )
                         } else {
                             state.textPeriodRange.asString()
                         }
-                        
+
                         GlassCard(
                             modifier = Modifier.fillMaxWidth(),
                             padding = 10.dp
@@ -144,47 +175,44 @@ fun TransactionFilterBottomSheet(
             }
 
             // Sources Section
-            MultiSelectSection(
-                title = stringResource(Res.string.financial_sources),
-                items = state.selectedSources.toList(),
+            SourceFilterSelectionContent(
+                selectedSources = state.selectedSources,
                 isAllSelected = state.isAllSourceSelected,
-                onAllClick = { onIntent(TransactionsIntent.OnSourcesSelected(emptySet(), isAllSourceSelected = true)) },
-                onAddClick = { onIntent(TransactionsIntent.OnToggleSourceSheet) },
-                chipLabel = { it.name },
-                chipColor = { GlassBlue }
+                snackbarHostState = snackbarHostState,
+                onSelectionChanged = { sources, isAll ->
+                    onIntent(TransactionsIntent.OnSourcesSelected(sources, isAll))
+                }
             )
 
             // Categories Section
-            MultiSelectSection(
-                title = stringResource(Res.string.category),
-                items = state.selectedCategories.toList(),
+            CategoryFilterSelectionContent(
+                selectedCategories = state.selectedCategories,
+                selectedTransactionType = state.selectedTransactionType,
                 isAllSelected = state.isAllCategorySelected,
-                onAllClick = { onIntent(TransactionsIntent.OnCategoriesSelected(emptySet(), isAllCategorySelected = true)) },
-                onAddClick = { onIntent(TransactionsIntent.OnToggleCategorySheet) },
-                chipLabel = { it.name },
-                chipColor = { GlassGreen }
+                snackbarHostState = snackbarHostState,
+                onSelectionChanged = { categories, isAll ->
+                    onIntent(TransactionsIntent.OnCategoriesSelected(categories, isAll))
+                }
             )
 
             // Persons Section
-            MultiSelectSection(
-                title = stringResource(Res.string.persons),
-                items = state.selectedPerson.toList(),
+            PersonFilterSelectionContent(
+                selectedPersons = state.selectedPerson,
                 isAllSelected = state.isAllPersonSelected,
-                onAllClick = { onIntent(TransactionsIntent.OnPersonSelected(emptySet(), isAllPersonSelected = true)) },
-                onAddClick = { onIntent(TransactionsIntent.OnTogglePersonSheet) },
-                chipLabel = { it.name },
-                chipColor = { GlassPurple }
+                snackbarHostState = snackbarHostState,
+                onSelectionChanged = { persons, isAll ->
+                    onIntent(TransactionsIntent.OnPersonSelected(persons, isAll))
+                }
             )
 
             // Tags Section
-            MultiSelectSection(
-                title = stringResource(Res.string.tags),
-                items = state.selectedTag.toList(),
+            TagFilterSelectionContent(
+                selectedTags = state.selectedTag,
                 isAllSelected = state.isAllTAgSelected,
-                onAllClick = { onIntent(TransactionsIntent.OnTagSelected(emptySet(), isAllTAgSelected = true)) },
-                onAddClick = { onIntent(TransactionsIntent.OnToggleTagSheet) },
-                chipLabel = { it.name },
-                chipColor = { GlassAmber }
+                snackbarHostState = snackbarHostState,
+                onSelectionChanged = { tags, isAll ->
+                    onIntent(TransactionsIntent.OnTagSelected(tags, isAll))
+                }
             )
         }
     }
@@ -205,80 +233,3 @@ private fun FilterSection(
     }
 }
 
-@Composable
-private fun <T> MultiSelectSection(
-    title: String,
-    items: List<T>,
-    isAllSelected: Boolean,
-    onAllClick: () -> Unit,
-    onAddClick: () -> Unit,
-    chipLabel: (T) -> String,
-    chipColor: (T) -> Color
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            FintrackLabelSmallText(
-                text = title,
-                color = GlassText2,
-                fontWeight = FontWeight.Bold
-            )
-            FintrackLabelSmallText(
-                text = stringResource(Res.string.all),
-                color = if (isAllSelected) GlassGreen else GlassText3,
-                modifier = Modifier.clickable(onClick = onAllClick)
-            )
-        }
-
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            items.forEach { item ->
-                Chip(
-                    active = true,
-                    color = chipColor(item),
-                    onClick = onAddClick // Re-open selection sheet to modify
-                ) {
-                    FintrackLabelSmallText(
-                        text = "${chipLabel(item)} ✓",
-                        color = GlassBg0
-                    )
-                }
-            }
-            
-            Chip(
-                active = false,
-                dashed = true,
-                onClick = onAddClick
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    tint = GlassText3,
-                    modifier = Modifier.size(14.dp)
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun FlowRow(
-    modifier: Modifier = Modifier,
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    content: @Composable () -> Unit
-) {
-    androidx.compose.foundation.layout.FlowRow(
-        modifier = modifier,
-        horizontalArrangement = horizontalArrangement,
-        verticalArrangement = verticalArrangement,
-        content = { content() }
-    )
-}

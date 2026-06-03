@@ -120,7 +120,7 @@ fun TransactionListByFilterContent(
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(horizontal = space.large, vertical = space.mediumSmall)
+        contentPadding = PaddingValues(bottom = space.mediumSmall)
     ) {
         item {
             SummaryCard()
@@ -181,25 +181,38 @@ private fun DayHeader(date: String, count: Int, netAmount: Long) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(GlassBg0.copy(alpha = 0.9f))
-            .padding(vertical = 14.dp, horizontal = 6.dp),
+            .padding(vertical = 12.dp, horizontal = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             FintrackBodyLargeText(text = date, fontWeight = FontWeight.Bold, color = GlassText)
+            Box(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(GlassColor)
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
+            ) {
+                FintrackLabelSmallText(
+                    text = count.toLong().toFa() + " " + stringResource(Res.string.unit_transaction),
+                    fontSize = 10.sp,
+                    color = GlassText3
+                )
+            }
         }
-        Column(horizontalAlignment = Alignment.End) {
-            FintrackLabelSmallText(
-                text = stringResource(Res.string.label_transaction_net_summary, count.toLong().toFa(), stringResource(Res.string.unit_transaction), stringResource(Res.string.label_net)),
-                color = GlassText3
-            )
-            FintrackTitleSmallText(
-                text = stringResource(Res.string.label_amount_with_unit, netAmount.formatted(), stringResource(Res.string.unit_toman_short)),
-                fontWeight = FontWeight.Bold,
-                color = if (netAmount >= 0) GlassGreen else GlassRed
-            )
-        }
+
+        FintrackTitleSmallText(
+            text = stringResource(
+                Res.string.label_amount_with_unit,
+                (if (netAmount >= 0) "+" else "") + netAmount.formatted(),
+                stringResource(Res.string.unit_toman_short)
+            ),
+            fontWeight = FontWeight.Bold,
+            color = if (netAmount >= 0) GlassGreen else GlassRed
+        )
     }
 }
 
@@ -264,7 +277,11 @@ private fun TxRow(item: TransactionWithRelations, onClick: () -> Unit) {
             val displayAmount = if (isTransfer) item.transaction.amountTransfer else item.transaction.amount
 
             FintrackTitleSmallText(
-                text = stringResource(Res.string.label_amount_with_unit, item.transaction.amount.toLong().toFormattedFa(), stringResource(Res.string.unit_toman_short)),
+                text = stringResource(
+                    Res.string.label_amount_with_unit,
+                    "$sign${displayAmount.toLong().toFormattedFa()}",
+                    stringResource(Res.string.unit_toman_short)
+                ),
                 fontWeight = FontWeight.Bold,
                 color = color
             )

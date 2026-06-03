@@ -78,9 +78,7 @@ fun SummaryCard(
                     Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         SummaryRow(label = stringResource(Res.string.label_income), value = state.totalIncome, color = GlassGreen)
                         SummaryRow(label = stringResource(Res.string.label_expense), value = state.totalExpense, color = GlassRed)
-                        if (state.totalTransfer > 0) {
-                            SummaryRow(label = stringResource(Res.string.type_transfer), value = state.totalTransfer, color = GlassBlue)
-                        }
+                        SummaryRow(label = stringResource(Res.string.type_transfer), value = state.totalTransfer, color = GlassBlue)
                         HorizontalDivider(modifier = Modifier.padding(top = 4.dp), color = GlassHairline)
                         SummaryRow(
                             label = stringResource(Res.string.label_net),
@@ -267,11 +265,3 @@ fun CategoryStrip(
     }
 }
 
-@Composable
-fun ShowTransactionReportCard(
-    viewModel: TransactionReportViewModel = koinViewModel(),
-    enableAnimationChart: Boolean = true,
-) {
-    // Keep this for compatibility if needed, but we prefer SummaryCard + CategoryStrip
-    SummaryCard(viewModel)
-}

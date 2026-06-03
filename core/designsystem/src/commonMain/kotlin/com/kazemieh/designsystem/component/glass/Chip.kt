@@ -1,8 +1,9 @@
 package com.kazemieh.designsystem.component.glass
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +22,7 @@ import com.kazemieh.designsystem.GlassEdge
 /**
  * 2.8 Chip — selectable pill
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Chip(
     modifier: Modifier = Modifier,
@@ -28,6 +30,7 @@ fun Chip(
     active: Boolean = false,
     dashed: Boolean = false,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     val backgroundColor = if (active) color.copy(alpha = 0.16f) else Color.Transparent
@@ -36,7 +39,10 @@ fun Chip(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(99.dp))
-            .clickable(onClick = onClick)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
             .background(backgroundColor)
             .border(
                 width = 1.dp,
