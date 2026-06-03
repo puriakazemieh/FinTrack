@@ -284,16 +284,28 @@ class TransactionsViewModel() : ViewModel() {
         if (range == null) return UiText.DynamicString("")
         if (range.filterType == DateFilterType.TODAY) return UiText.DynamicString("")
 
-        val startP = DateFilterHelper.getDateText(range.start, timeZone)
-        val endP = DateFilterHelper.getDateText(range.end, timeZone)
-        
         val startPersian = DateFilterHelper.persianDateFromMillis(range.start, timeZone)
         val endPersian = DateFilterHelper.persianDateFromMillis(range.end, timeZone)
         
-        val rangeStr = if (startPersian.year == endPersian.year && startPersian.month == endPersian.month) {
-            "${startPersian.day} — ${endPersian.day} ${startPersian.persianMonth().displayName}"
-        } else {
-            "$startP تا $endP"
+        val isSameDay = startPersian.year == endPersian.year && 
+                        startPersian.month == endPersian.month && 
+                        startPersian.day == endPersian.day
+        
+        val rangeStr = when {
+            isSameDay -> DateFilterHelper.getDateText(range.start, timeZone)
+            startPersian.year == endPersian.year && startPersian.month == endPersian.month -> {
+                "${startPersian.day.toFa()} — ${endPersian.day.toFa()} ${startPersian.persianMonth().displayName}"
+            }
+            startPersian.year == endPersian.year -> {
+                val startP = "${startPersian.day.toFa()} ${startPersian.persianMonth().displayName}"
+                val endP = "${endPersian.day.toFa()} ${endPersian.persianMonth().displayName} ${endPersian.year.toFa()}"
+                "$startP تا $endP"
+            }
+            else -> {
+                val startP = DateFilterHelper.getDateText(range.start, timeZone)
+                val endP = DateFilterHelper.getDateText(range.end, timeZone)
+                "$startP تا $endP"
+            }
         }
 
         val daysBetween = (Instant.fromEpochMilliseconds(range.end).toLocalDateTime(timeZone).date.toEpochDays() -

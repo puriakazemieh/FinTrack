@@ -1,6 +1,12 @@
 package com.kazemieh.designsystem.component.jalali
 
+import com.kazemieh.common.persiandatetime.extensions.isLeapYear
+import com.kazemieh.common.persiandatetime.extensions.toLocalDate
+import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
+import com.kazemieh.common.persiandatetime.domain.PersianDateTime
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
@@ -65,8 +71,8 @@ class JalaliCalendar(val year: Int, val month: Int, val day: Int) {
     fun isLeapYear(): Boolean = getLeapFactor(year) == 0
 
     fun toGregorian(): Triple<Int, Int, Int> {
-        val julianDay = toJulianDay()
-        return julianDayToGregorian(julianDay)
+        val ld = PersianDateTime(year, month, day).toLocalDate()
+        return Triple(ld.year, ld.monthNumber, ld.dayOfMonth)
     }
 
     fun getYesterday(): JalaliCalendar = getDateByDiff(-1)
@@ -114,9 +120,9 @@ class JalaliCalendar(val year: Int, val month: Int, val day: Int) {
         return this.toJulianDay() >= other.toJulianDay()
     }
 
-    fun toTimestamp(): Long {
+    fun toTimestamp(timeZone: TimeZone = TimeZone.currentSystemDefault()): Long {
         val (year, month, day) = toGregorian()
-        return gregorianToTimestamp(year, month, day)
+        return LocalDate(year, month, day).atStartOfDayIn(timeZone).toEpochMilliseconds()
     }
 
     // ---------- همراه شیء (companion object) ----------
@@ -134,8 +140,8 @@ class JalaliCalendar(val year: Int, val month: Int, val day: Int) {
          * ساخت شیء از تاریخ میلادی
          */
         fun fromGregorian(year: Int, month: Int, day: Int): JalaliCalendar {
-            val jd = gregorianToJulianDay(year, month, day)
-            return fromJulianDay(jd)
+            val pdt = LocalDate(year, month, day).toPersianDateTime()
+            return JalaliCalendar(pdt.year, pdt.month, pdt.day)
         }
 
         // ---------- توابع خصوصی محاسباتی ----------
@@ -193,57 +199,6 @@ class JalaliCalendar(val year: Int, val month: Int, val day: Int) {
             }
         }
 
-        private fun getLeapFactor(jalaliYear: Int): Int {
-            val breaks = intArrayOf(
-                -61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181, 1210,
-                1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178
-            )
-            var jp = breaks[0]
-            for (j in 1..19) {
-                val jm = breaks[j]
-                val jump = jm - jp
-                if (jalaliYear < jm) {
-                    var N = jalaliYear - jp
-                    if (jump - N < 6)
-                        N = N - jump + (jump + 4) / 33 * 33
-                    val leap = ((((N + 1) % 33) - 1) % 4)
-                    return if (leap == -1) 4 else leap
-                }
-                jp = jm
-            }
-            return 0
-        }
-
-        private fun fromJulianDay(julianDay: Int): JalaliCalendar {
-            val (gy, gm, gd) = julianDayToGregorian(julianDay)
-            var jalaliYear = gy - 621
-            val gregorianFirstFarvardin = getGregorianFirstFarvardin(jalaliYear)
-            val jdFirstFarvardin = gregorianToJulianDay(
-                gregorianFirstFarvardin.first,
-                gregorianFirstFarvardin.second,
-                gregorianFirstFarvardin.third
-            )
-            var diff = julianDay - jdFirstFarvardin
-            var jalaliMonth: Int
-            var jalaliDay: Int
-            if (diff >= 0) {
-                if (diff <= 185) {
-                    jalaliMonth = 1 + diff / 31
-                    jalaliDay = (diff % 31) + 1
-                    return JalaliCalendar(jalaliYear, jalaliMonth, jalaliDay)
-                } else {
-                    diff -= 186
-                }
-            } else {
-                diff += 179
-                if (getLeapFactor(jalaliYear) == 1) diff++
-                jalaliYear--
-            }
-            jalaliMonth = 7 + diff / 30
-            jalaliDay = (diff % 30) + 1
-            return JalaliCalendar(jalaliYear, jalaliMonth, jalaliDay)
-        }
-
         private fun getGregorianFirstFarvardin(jalaliYear: Int): Triple<Int, Int, Int> {
             val breaks = intArrayOf(
                 -61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181, 1210,
@@ -282,39 +237,14 @@ class JalaliCalendar(val year: Int, val month: Int, val day: Int) {
             return jdFirst + daysBefore + (day - 1)
         }
 
-        private fun gregorianToTimestamp(year: Int, month: Int, day: Int): Long {
-            // محاسبه روز ژولین
-            var y = year
-            var m = month
-            if (m < 3) {
-                y -= 1
-                m += 12
-            }
-            val a = y / 100
-            val b = 2 - a + a / 4
-            val julianDay = ((1461 * (y + 4800)) / 4
-                    + (367 * (m - 2)) / 12
-                    - (3 * ((y + 4900) / 100)) / 4
-                    + day - 32075) + b
-
-            // تبدیل روز ژولین به میلی‌ثانیه (از سال 1970)
-            // JULIAN_DAY_EPOCH = 2440588 (روز ژولین برای 1970-01-01)
-            val JULIAN_DAY_EPOCH = 2440588L
-            val millisPerDay = 86400000L
-            return (julianDay - JULIAN_DAY_EPOCH) * millisPerDay
+        fun fromTimestamp(timestamp: Long, timeZone: TimeZone = TimeZone.currentSystemDefault()): JalaliCalendar {
+            val localDate = Instant.fromEpochMilliseconds(timestamp).toLocalDateTime(timeZone).date
+            return fromGregorian(localDate.year, localDate.monthNumber, localDate.dayOfMonth)
         }
 
-        fun fromTimestamp(timestamp: Long): JalaliCalendar {
-            val millisPerDay = 86400000L
-            val julianDay = (timestamp / millisPerDay) + 2440588L
-            return fromJulianDay(julianDay.toInt())
-        }
-
-        fun fromEpochMilliseconds(epochMillis: Long): JalaliCalendar {
-            val JULIAN_DAY_EPOCH = 2440588L
-            val MILLIS_PER_DAY = 86400000L
-            val julianDay = (epochMillis / MILLIS_PER_DAY) + JULIAN_DAY_EPOCH
-            return fromJulianDay(julianDay.toInt())
+        fun fromEpochMilliseconds(epochMillis: Long, timeZone: TimeZone = TimeZone.currentSystemDefault()): JalaliCalendar {
+            val localDate = Instant.fromEpochMilliseconds(epochMillis).toLocalDateTime(timeZone).date
+            return fromGregorian(localDate.year, localDate.monthNumber, localDate.dayOfMonth)
         }
     }
 
@@ -323,5 +253,5 @@ class JalaliCalendar(val year: Int, val month: Int, val day: Int) {
     private fun getGregorianFirstFarvardin(): Triple<Int, Int, Int> =
         getGregorianFirstFarvardin(year)
 
-    private fun getLeapFactor(year: Int): Int = Companion.getLeapFactor(year)
+    private fun getLeapFactor(year: Int): Int = if (PersianDateTime(year, 1, 1).isLeapYear()) 0 else 1
 }
