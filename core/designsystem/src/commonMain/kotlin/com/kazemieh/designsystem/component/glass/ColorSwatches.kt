@@ -31,7 +31,7 @@ fun ColorSwatches(
     modifier: Modifier = Modifier
 ) {
     LazyHorizontalGrid(
-        rows = GridCells.Fixed(3),
+        rows = GridCells.Fixed(4),
         modifier = modifier
             .fillMaxWidth()
             .height(180.dp)
@@ -61,7 +61,7 @@ fun ColorSwatches(
                         imageVector = Icons.Default.Check,
                         contentDescription = null,
                         tint = bestOnColor(color),
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(12.dp)
                     )
                 }
             }

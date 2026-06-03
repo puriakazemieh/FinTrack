@@ -3,15 +3,22 @@ package com.kazemieh.financialsource.ui.list
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,12 +32,21 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.common.model.Source
-import com.kazemieh.common.toFa
 import com.kazemieh.common.formatted
-import com.kazemieh.designsystem.*
-import com.kazemieh.designsystem.component.*
-import fintrack.core.designsystem.generated.resources.*
+import com.kazemieh.common.model.Source
+import com.kazemieh.designsystem.GlassColor
+import com.kazemieh.designsystem.GlassEdge
+import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.GlassGreenSoft
+import com.kazemieh.designsystem.GlassText
+import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.FinTrackLeadingIcon
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.component.FintrackTitleSmallText
+import com.kazemieh.designsystem.component.LeadingIconStyle
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.label_new_source
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -72,19 +88,15 @@ private fun SourceTile(source: Source) {
             .border(1.dp, GlassEdge, RoundedCornerShape(14.dp))
             .padding(8.dp)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxSize()) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.fillMaxSize()
+        ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Spacer(modifier = Modifier.weight(1f))
-                FintrackLabelSmallText(
-                    text = source.name,
-                    fontSize = 10.5.sp,
-                    maxLines = 1,
-                    color = GlassText2
-                )
                 FinTrackLeadingIcon(
                     colorId = source.colorId,
                     iconId = source.iconId,
@@ -93,6 +105,14 @@ private fun SourceTile(source: Source) {
                     iconSize = 10.dp,
                     corner = 6.dp
                 )
+                Spacer(modifier = Modifier.weight(1f))
+                FintrackLabelSmallText(
+                    text = source.name,
+                    fontSize = 10.5.sp,
+                    maxLines = 1,
+                    color = GlassText2
+                )
+
             }
             FintrackTitleSmallText(
                 text = source.balance.formatted(),
@@ -126,7 +146,10 @@ private fun NewSourceTile(onClick: () -> Unit) {
                 cornerRadius = androidx.compose.ui.geometry.CornerRadius(14.dp.toPx())
             )
         }
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
             Box(
                 modifier = Modifier
                     .size(24.dp)

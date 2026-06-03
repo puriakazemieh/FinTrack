@@ -36,12 +36,50 @@ class AddTransactionViewModel(
         when (intent) {
             is AddTransactionIntent.SetAmount -> _state.update { it.copy(amount = intent.amount, isAmountError = false) }
             is AddTransactionIntent.SetAmountTransfer -> _state.update { it.copy(amountTransfer = intent.amount) }
-            is AddTransactionIntent.SetCategory -> _state.update { it.copy(category = intent.category, isCategoryError = false) }
-            is AddTransactionIntent.SetSource -> _state.update { it.copy(source = intent.source, isSourceError = false) }
-            is AddTransactionIntent.SetSourceEnd -> _state.update { it.copy(sourceEnd = intent.source, isSourceEndError = false) }
-            is AddTransactionIntent.SetTags -> _state.update { it.copy(tags = intent.tags) }
-            is AddTransactionIntent.SetPerson -> _state.update { it.copy(persons = intent.persons) }
-            is AddTransactionIntent.SetDate -> _state.update { it.copy(date = intent.date, timeStamp = intent.timeStamp) }
+            is AddTransactionIntent.SetCategory -> _state.update {
+                it.copy(
+                    category = intent.category,
+                    isCategoryError = false,
+                    sheetStack = it.sheetStack.dropLast(1)
+                )
+            }
+
+            is AddTransactionIntent.SetSource -> _state.update {
+                it.copy(
+                    source = intent.source,
+                    isSourceError = false,
+                    sheetStack = it.sheetStack.dropLast(1)
+                )
+            }
+
+            is AddTransactionIntent.SetSourceEnd -> _state.update {
+                it.copy(
+                    sourceEnd = intent.source,
+                    isSourceEndError = false,
+                    sheetStack = it.sheetStack.dropLast(1)
+                )
+            }
+
+            is AddTransactionIntent.SetTags -> _state.update {
+                it.copy(
+                    tags = intent.tags,
+                    sheetStack = it.sheetStack.dropLast(1)
+                )
+            }
+
+            is AddTransactionIntent.SetPerson -> _state.update {
+                it.copy(
+                    persons = intent.persons,
+                    sheetStack = it.sheetStack.dropLast(1)
+                )
+            }
+            is AddTransactionIntent.SetDate -> _state.update {
+                it.copy(
+                    date = intent.date,
+                    timeStamp = intent.timeStamp,
+                    sheetStack = it.sheetStack.dropLast(1)
+                )
+            }
             is AddTransactionIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
             AddTransactionIntent.Submit -> submitTransaction()
             is AddTransactionIntent.FetchDefaultData -> fetchDefaultData(intent.transactionWithRelations)
@@ -55,7 +93,17 @@ class AddTransactionViewModel(
 
     private fun fetchDefaultData(transactionWithRelations: TransactionWithRelations?) {
         if (transactionWithRelations == null) {
-            _state.update { AddTransactionState() }
+            _state.value = AddTransactionState() // Full reset first
+            viewModelScope.launch {
+                val defaultSource = transactionUseCaseGroup.getDefaultFinancialSourceUseCase()
+                val defaultCategory = transactionUseCaseGroup.getDefaultCategoryUseCase(_state.value.transactionType)
+                _state.update {
+                    it.copy(
+                        source = defaultSource,
+                        category = defaultCategory
+                    )
+                }
+            }
             return
         }
         _state.update {
@@ -158,12 +206,15 @@ class AddTransactionViewModel(
     }
 
     private fun onTypeChanged(type: TransactionType) {
-        _state.update {
-            it.copy(
-                transactionType = type,
-                category = if (type == TransactionType.TRANSFER) null else it.category,
-                isCategoryError = false
-            )
+        viewModelScope.launch {
+            val defaultCategory = if (type == TransactionType.TRANSFER) null else transactionUseCaseGroup.getDefaultCategoryUseCase(type)
+            _state.update {
+                it.copy(
+                    transactionType = type,
+                    category = defaultCategory,
+                    isCategoryError = false
+                )
+            }
         }
     }
 }
@@ -218,6 +269,7 @@ sealed interface AddTransactionSheet {
     data object CategoryPicker : AddTransactionSheet
     data object TagPicker : AddTransactionSheet
     data object PersonPicker : AddTransactionSheet
+    data object DatePicker : AddTransactionSheet
 }
 
 sealed interface AddTransactionEffect {

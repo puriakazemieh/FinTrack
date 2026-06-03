@@ -3,25 +3,28 @@ package com.kazemieh.transaction.ui.add
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import com.kazemieh.designsystem.component.*
-import org.jetbrains.compose.resources.stringResource
-import fintrack.core.designsystem.generated.resources.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -29,16 +32,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.TransactionType
-import com.kazemieh.common.toFa
-import androidx.compose.ui.text.input.KeyboardType
-import com.kazemieh.common.toFormattedFa
-import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.GlassBlue
+import com.kazemieh.designsystem.GlassColor
+import com.kazemieh.designsystem.GlassEdge
+import com.kazemieh.designsystem.GlassEdgeStrong
+import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.GlassRed
+import com.kazemieh.designsystem.GlassText
+import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.GlassTone
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.amount
 import fintrack.core.designsystem.generated.resources.currency_toman
-import fintrack.core.designsystem.generated.resources.required_star
+import fintrack.core.designsystem.generated.resources.label_calculator
+import fintrack.core.designsystem.generated.resources.label_optional_fa
+import fintrack.core.designsystem.generated.resources.label_required_marker
+import fintrack.core.designsystem.generated.resources.type_expense
+import fintrack.core.designsystem.generated.resources.type_income
+import fintrack.core.designsystem.generated.resources.type_transfer
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -83,10 +100,10 @@ fun GlassSegmentedSelector(
                     .padding(vertical = 9.dp),
                 contentAlignment = Alignment.Center
             ) {
-        FintrackBodyMediumText(
-            text = label,
-            color = if (active) color else GlassText3
-        )
+                FintrackBodyMediumText(
+                    text = label,
+                    color = if (active) color else GlassText3
+                )
             }
         }
     }
@@ -95,9 +112,16 @@ fun GlassSegmentedSelector(
 @Composable
 fun LargeAmountCard(
     amount: String,
+    onAmountChange: (String) -> Unit,
     onCalcClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     GlassCard(
         modifier = modifier,
         tone = GlassTone.Strong,
@@ -150,7 +174,7 @@ fun LargeAmountCard(
             ) {
                 FintrackOutlinedTextField(
                     value = amount,
-                    onValueChange = { if (it.length <= 12) onCalcClick() /* Part B will handle direct updates */ },
+                    onValueChange = { if (it.length <= 12) onAmountChange(it) },
                     isPrice = true,
                     label = { FintrackBodyMediumText(text = stringResource(Res.string.amount)) },
                     textColor = GlassText,
@@ -163,7 +187,9 @@ fun LargeAmountCard(
                             color = GlassText3
                         )
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
                 )
             }
         }
@@ -190,11 +216,11 @@ fun SectionContainer(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                FintrackLabelMediumText(
-                    text = title,
-                    fontWeight = FontWeight.Bold,
-                    color = GlassText
-                )
+                    FintrackLabelMediumText(
+                        text = title,
+                        fontWeight = FontWeight.Bold,
+                        color = GlassText
+                    )
                     sub?.let {
                         FintrackLabelSmallText(
                             text = it,
@@ -205,7 +231,8 @@ fun SectionContainer(
                 }
                 FintrackLabelSmallText(
                     text = stringResource(Res.string.label_optional_fa),
-                    color = GlassText3
+                    color = GlassText3,
+                    fontSize = 9.sp
                 )
             }
 

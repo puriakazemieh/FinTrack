@@ -2,8 +2,13 @@ package com.kazemieh.transaction.ui.add
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,10 +17,18 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,15 +44,54 @@ import com.kazemieh.category.ui.list.CategoryPickerBottomSheet
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toFa
-import androidx.compose.ui.text.input.KeyboardType
-import com.kazemieh.designsystem.*
-import com.kazemieh.designsystem.component.*
-import com.kazemieh.designsystem.component.glass.*
+import com.kazemieh.designsystem.GlassBlue
+import com.kazemieh.designsystem.GlassColor
+import com.kazemieh.designsystem.GlassEdgeStrong
+import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.GlassGreenDark
+import com.kazemieh.designsystem.GlassText
+import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.component.glass.AddFrame
+import com.kazemieh.designsystem.component.glass.Field
+import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import com.kazemieh.person.ui.list.PersonPickerBottomSheet
 import com.kazemieh.tag.ui.list.TagPickerBottomSheet
-import fintrack.core.designsystem.generated.resources.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.btn_add_person
+import fintrack.core.designsystem.generated.resources.btn_add_tag
+import fintrack.core.designsystem.generated.resources.btn_save_transaction
+import fintrack.core.designsystem.generated.resources.category
+import fintrack.core.designsystem.generated.resources.date
+import fintrack.core.designsystem.generated.resources.dp_today
+import fintrack.core.designsystem.generated.resources.edit
+import fintrack.core.designsystem.generated.resources.hint_transaction_description
+import fintrack.core.designsystem.generated.resources.ic_1
+import fintrack.core.designsystem.generated.resources.label_attachment_fa
+import fintrack.core.designsystem.generated.resources.label_camera_fa
+import fintrack.core.designsystem.generated.resources.label_char_count_limit
+import fintrack.core.designsystem.generated.resources.label_gallery_fa
+import fintrack.core.designsystem.generated.resources.label_note
+import fintrack.core.designsystem.generated.resources.label_optional_fa
+import fintrack.core.designsystem.generated.resources.label_related_persons
+import fintrack.core.designsystem.generated.resources.label_tag_prefix
+import fintrack.core.designsystem.generated.resources.select_category
+import fintrack.core.designsystem.generated.resources.select_source
+import fintrack.core.designsystem.generated.resources.source
+import fintrack.core.designsystem.generated.resources.source_from
+import fintrack.core.designsystem.generated.resources.source_to
+import fintrack.core.designsystem.generated.resources.tags
+import fintrack.core.designsystem.generated.resources.title_new_transaction
+import fintrack.core.designsystem.generated.resources.title_person_management
+import fintrack.core.designsystem.generated.resources.title_tag_management
+import fintrack.core.designsystem.generated.resources.title_transaction_management
+import fintrack.core.designsystem.generated.resources.transaction
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -76,6 +129,7 @@ fun AddTransactionBottomSheet(
                         }
                     }
                 }
+
                 AddTransactionEffect.OnDismiss -> onDismiss()
             }
         }
@@ -99,11 +153,14 @@ private fun BottomSheetContent(
         dragHandle = null
     ) {
         AddFrame(
-            title = if (state.oldTransaction == null) stringResource(Res.string.title_new_transaction) else stringResource(Res.string.edit) + " " + stringResource(Res.string.transaction),
+            title = if (state.oldTransaction == null) stringResource(Res.string.title_new_transaction) else stringResource(
+                Res.string.edit
+            ) + " " + stringResource(Res.string.transaction),
             sub = stringResource(Res.string.title_transaction_management),
             primaryLabel = stringResource(Res.string.btn_save_transaction),
             onPrimaryClick = { onIntent(AddTransactionIntent.Submit) },
-            onClose = { onIntent(AddTransactionIntent.OnDismiss) }
+            onClose = { onIntent(AddTransactionIntent.OnDismiss) },
+            showHero = false
         ) {
             AddTransactionContent(state = state, onIntent = onIntent)
         }
@@ -153,6 +210,26 @@ private fun BottomSheetContent(
             )
         }
 
+        AddTransactionSheet.DatePicker -> {
+            val openSheet = remember { mutableStateOf(true) }
+            LaunchedEffect(openSheet.value) {
+                if (!openSheet.value) {
+                    onIntent(AddTransactionIntent.PopSheet)
+                }
+            }
+            JalaliDatePickerBottomSheet(
+                openSheet = openSheet,
+                onConfirm = { jalaliCalendar ->
+                    onIntent(
+                        AddTransactionIntent.SetDate(
+                            date = "${jalaliCalendar.day.toFa()} / ${jalaliCalendar.monthString} / ${jalaliCalendar.year.toFa()}",
+                            timeStamp = jalaliCalendar.toTimestamp()
+                        )
+                    )
+                }
+            )
+        }
+
         null -> Unit
     }
 }
@@ -181,45 +258,63 @@ fun AddTransactionContent(
         item {
             LargeAmountCard(
                 amount = state.amount,
+                onAmountChange = { onIntent(AddTransactionIntent.SetAmount(it)) },
                 onCalcClick = { /* Part B */ }
             )
         }
 
         if (state.transactionType == TransactionType.TRANSFER) {
             item {
-                Field(label = stringResource(Res.string.source_from), required = true, error = state.isSourceError) {
+                Field(
+                    label = stringResource(Res.string.source_from),
+                    required = true,
+                    error = state.isSourceError,
+                    onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.SourcePicker)) }
+                ) {
                     PickerValue(
                         label = state.source?.name ?: stringResource(Res.string.select_source),
-                        onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.SourcePicker)) },
                         color = GlassBlue
                     )
                 }
             }
             item {
-                Field(label = stringResource(Res.string.source_to), required = true, error = state.isSourceEndError) {
+                Field(
+                    label = stringResource(Res.string.source_to),
+                    required = true,
+                    error = state.isSourceEndError,
+                    onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.SourceEndPicker)) }
+                ) {
                     PickerValue(
                         label = state.sourceEnd?.name ?: stringResource(Res.string.select_source),
-                        onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.SourceEndPicker)) },
                         color = GlassBlue
                     )
                 }
             }
         } else {
             item {
-                Field(label = stringResource(Res.string.category), required = true, error = state.isCategoryError) {
-                    val color = colors.firstOrNull { it.id == state.category?.colorId }?.color ?: GlassGreen
+                Field(
+                    label = stringResource(Res.string.category),
+                    required = true,
+                    error = state.isCategoryError,
+                    onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.CategoryPicker)) }
+                ) {
+                    val color =
+                        colors.firstOrNull { it.id == state.category?.colorId }?.color ?: GlassGreen
                     PickerValue(
                         label = state.category?.name ?: stringResource(Res.string.select_category),
-                        onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.CategoryPicker)) },
                         color = color
                     )
                 }
             }
             item {
-                Field(label = stringResource(Res.string.source), required = true, error = state.isSourceError) {
+                Field(
+                    label = stringResource(Res.string.source),
+                    required = true,
+                    error = state.isSourceError,
+                    onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.SourcePicker)) }
+                ) {
                     PickerValue(
                         label = state.source?.name ?: stringResource(Res.string.select_source),
-                        onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.SourcePicker)) },
                         color = GlassBlue
                     )
                 }
@@ -227,10 +322,13 @@ fun AddTransactionContent(
         }
 
         item {
-            Field(label = stringResource(Res.string.date), required = true) {
+            Field(
+                label = stringResource(Res.string.date),
+                required = true,
+                onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.DatePicker)) }
+            ) {
                 PickerValue(
                     label = state.date ?: stringResource(Res.string.dp_today),
-                    onClick = { /* Handle date picker toggle or direct integration */ },
                     color = GlassText2
                 )
             }
@@ -259,7 +357,11 @@ fun AddTransactionContent(
                                     .background(GlassGreen),
                                 contentAlignment = Alignment.Center
                             ) {
-                                FintrackLabelSmallText(text = person.name.take(1), fontWeight = FontWeight.Bold, color = GlassGreenDark)
+                                FintrackLabelSmallText(
+                                    text = person.name.take(1),
+                                    fontWeight = FontWeight.Bold,
+                                    color = GlassGreenDark
+                                )
                             }
                         }
                     )
@@ -291,20 +393,40 @@ fun AddTransactionContent(
         item {
             GlassCard(padding = 14.dp) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    ComposeRow(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        FintrackLabelSmallText(text = stringResource(Res.string.label_note), color = GlassText3)
-                        FintrackLabelSmallText(text = stringResource(Res.string.label_char_count_limit, state.description.length.toLong().toFa(), 250.toLong().toFa()), color = GlassText3)
+                    ComposeRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        FintrackLabelSmallText(
+                            text = stringResource(Res.string.label_note),
+                            color = GlassText3
+                        )
+                        FintrackLabelSmallText(
+                            text = stringResource(
+                                Res.string.label_char_count_limit,
+                                state.description.length.toLong().toFa(),
+                                250.toLong().toFa()
+                            ), color = GlassText3
+                        )
                     }
                     BasicTextField(
                         value = state.description,
-                        onValueChange = { desc -> if (desc.length <= 250) onIntent(AddTransactionIntent.SetDescription(desc)) },
+                        onValueChange = { desc ->
+                            if (desc.length <= 250) onIntent(
+                                AddTransactionIntent.SetDescription(desc)
+                            )
+                        },
                         textStyle = MaterialTheme.typography.bodyMedium.copy(color = GlassText),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        cursorBrush = Brush.verticalGradient(listOf(GlassGreen, GlassGreen)),
                         modifier = Modifier.fillMaxWidth(),
                         decorationBox = @Composable { innerTextField ->
                             Box {
                                 if (state.description.isEmpty()) {
-                                    FintrackBodyMediumText(text = stringResource(Res.string.hint_transaction_description), color = GlassText3)
+                                    FintrackBodyMediumText(
+                                        text = stringResource(Res.string.hint_transaction_description),
+                                        color = GlassText3
+                                    )
                                 }
                                 innerTextField()
                             }
@@ -323,11 +445,9 @@ fun AddTransactionContent(
 @Composable
 private fun PickerValue(
     label: String,
-    onClick: () -> Unit,
     color: Color
 ) {
     ComposeRow(
-        modifier = Modifier.clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -353,12 +473,25 @@ private fun PhotoDropUI() {
                 modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                FintrackLabelSmallText(text = stringResource(Res.string.label_attachment_fa), color = GlassText3)
-                FintrackLabelSmallText(text = stringResource(Res.string.label_optional_fa), color = GlassText3)
+                FintrackLabelSmallText(
+                    text = stringResource(Res.string.label_attachment_fa),
+                    color = GlassText3
+                )
+                FintrackLabelSmallText(
+                    text = stringResource(Res.string.label_optional_fa),
+                    color = GlassText3,
+                    fontSize = 9.sp
+                )
             }
             ComposeRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                PhotoActionCard(icon = Icons.Default.CameraAlt, label = stringResource(Res.string.label_camera_fa))
-                PhotoActionCard(icon = Icons.Default.Image, label = stringResource(Res.string.label_gallery_fa))
+                PhotoActionCard(
+                    icon = Icons.Default.CameraAlt,
+                    label = stringResource(Res.string.label_camera_fa)
+                )
+                PhotoActionCard(
+                    icon = Icons.Default.Image,
+                    label = stringResource(Res.string.label_gallery_fa)
+                )
             }
         }
     }
@@ -374,8 +507,16 @@ private fun PhotoActionCard(icon: androidx.compose.ui.graphics.vector.ImageVecto
             .border(1.5.dp, GlassEdgeStrong, RoundedCornerShape(12.dp)),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Icon(imageVector = icon, contentDescription = null, tint = GlassText3, modifier = Modifier.size(18.dp))
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = GlassText3,
+                modifier = Modifier.size(18.dp)
+            )
             FintrackLabelSmallText(text = label, color = GlassText3)
         }
     }

@@ -24,11 +24,13 @@ fun Field(
     required: Boolean = false,
     hint: String? = null,
     error: Boolean = false,
+    onClick: (() -> Unit)? = null,
     children: @Composable () -> Unit
 ) {
     GlassCard(
         modifier = modifier.fillMaxWidth(),
-        padding = 14.dp
+        padding = 14.dp,
+        onClick = onClick
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(
