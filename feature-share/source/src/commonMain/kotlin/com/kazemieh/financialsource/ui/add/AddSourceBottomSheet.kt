@@ -110,8 +110,9 @@ fun AddSourceContent(
     val selectedColorIndex = remember(state.draft.colorId, rainbowColors) {
         rainbowColors.indexOfFirst { it.id == state.draft.colorId }.coerceAtLeast(0)
     }
-    val selectedIconIndex = remember(state.draft.iconId) {
-        FinTrackSourceIcons.icons.indexOfFirst { it.id == state.draft.iconId }.coerceAtLeast(0)
+    val selectedIconIndex = remember(state.draft.iconId, state.draft.type) {
+        val icons = if (state.draft.type == TypeSource.CREDIT) FinTrackSourceIcons.icons else FinTrackIcons.icons
+        icons.indexOfFirst { it.id == state.draft.iconId }.coerceAtLeast(0)
     }
 
     AddFrame(
@@ -132,13 +133,25 @@ fun AddSourceContent(
                     iconId = state.draft.iconId
                 )
             } else {
-                FinTrackLeadingIcon(
-                    colorId = state.draft.colorId ?: 1,
-                    iconId = state.draft.iconId ?: 1,
-                    style = LeadingIconStyle.Badge,
-                    size = 64.dp,
-                    iconSize = 32.dp
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    FinTrackLeadingIcon(
+                        colorId = state.draft.colorId ?: 1,
+                        iconId = state.draft.iconId ?: 1,
+                        style = LeadingIconStyle.Badge,
+                        size = 64.dp,
+                        iconSize = 32.dp
+                    )
+                    if (state.draft.name.isNotEmpty()) {
+                        FintrackHeadlineLargeText(
+                            text = state.draft.name,
+                            fontWeight = FontWeight.Bold,
+                            color = GlassText
+                        )
+                    }
+                }
             }
         }
     ) {
@@ -224,7 +237,7 @@ fun AddSourceContent(
                     GlassCard(padding = 16.dp) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             FintrackLabelSmallText(
-                                text = stringResource(Res.string.label_card_info),
+                                text = stringResource(Res.string.label_card_info) + " (" + stringResource(Res.string.label_optional) + ")",
                                 color = GlassText3
                             )
 
@@ -316,7 +329,7 @@ fun AddSourceContent(
                     GlassCard(padding = 16.dp) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             FintrackLabelSmallText(
-                                text = stringResource(Res.string.label_account_shaba),
+                                text = stringResource(Res.string.label_account_shaba) + " (" + stringResource(Res.string.label_optional) + ")",
                                 color = GlassText3
                             )
                             TextField(
@@ -361,7 +374,7 @@ fun AddSourceContent(
                     GlassCard(padding = 16.dp) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             FintrackLabelSmallText(
-                                text = stringResource(Res.string.label_branch),
+                                text = stringResource(Res.string.label_branch) + " (" + stringResource(Res.string.label_optional) + ")",
                                 color = GlassText3
                             )
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -402,25 +415,27 @@ fun AddSourceContent(
                 }
             }
 
-            item {
-                GlassCard(padding = 14.dp) {
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        FintrackLabelMediumText(
-                            text = stringResource(Res.string.label_color),
-                            color = GlassText3
-                        )
-                        ColorSwatches(
-                            colors = colors,
-                            pickedIndex = selectedColorIndex,
-                            onColorPick = {
-                                onIntent(
-                                    AddSourceIntent.SetColorIcon(
-                                        rainbowColors[it].id,
-                                        state.draft.iconId
+            if (state.draft.type != TypeSource.CREDIT) {
+                item {
+                    GlassCard(padding = 14.dp) {
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            FintrackLabelMediumText(
+                                text = stringResource(Res.string.label_color),
+                                color = GlassText3
+                            )
+                            ColorSwatches(
+                                colors = colors,
+                                pickedIndex = selectedColorIndex,
+                                onColorPick = {
+                                    onIntent(
+                                        AddSourceIntent.SetColorIcon(
+                                            rainbowColors[it].id,
+                                            state.draft.iconId
+                                        )
                                     )
-                                )
-                            }
-                        )
+                                }
+                            )
+                        }
                     }
                 }
             }
