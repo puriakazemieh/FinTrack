@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Source
@@ -207,6 +209,7 @@ fun AddSourceContent(
                             color = GlassGreen,
                             fontWeight = FontWeight.Bold
                         ),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                         suffix = {
                             FintrackLabelSmallText(
@@ -236,6 +239,8 @@ fun AddSourceContent(
                                         color = GlassText3
                                     )
                                 },
+                                visualTransformation = FourDigitGroupingTransformation(),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = TextFieldDefaults.colors(
                                     focusedContainerColor = Color.Transparent,
@@ -253,6 +258,7 @@ fun AddSourceContent(
                                             color = GlassText3
                                         )
                                     },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     modifier = Modifier.weight(1f),
                                     colors = TextFieldDefaults.colors(
                                         focusedContainerColor = Color.Transparent,
@@ -274,6 +280,7 @@ fun AddSourceContent(
                                             color = GlassText3
                                         )
                                     },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     modifier = Modifier.weight(0.5f),
                                     colors = TextFieldDefaults.colors(
                                         focusedContainerColor = Color.Transparent,
@@ -295,6 +302,7 @@ fun AddSourceContent(
                                             color = GlassText3
                                         )
                                     },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     modifier = Modifier.weight(0.5f),
                                     colors = TextFieldDefaults.colors(
                                         focusedContainerColor = Color.Transparent,
@@ -322,6 +330,8 @@ fun AddSourceContent(
                                         color = GlassText3
                                     )
                                 },
+                                visualTransformation = FourDigitGroupingTransformation(),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = TextFieldDefaults.colors(
                                     focusedContainerColor = Color.Transparent,
@@ -337,6 +347,8 @@ fun AddSourceContent(
                                         color = GlassText3
                                     )
                                 },
+                                visualTransformation = FourDigitGroupingTransformation(),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = TextFieldDefaults.colors(
                                     focusedContainerColor = Color.Transparent,
@@ -364,6 +376,7 @@ fun AddSourceContent(
                                             color = GlassText3
                                         )
                                     },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     modifier = Modifier.weight(1f),
                                     colors = TextFieldDefaults.colors(
                                         focusedContainerColor = Color.Transparent,

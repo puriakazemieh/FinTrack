@@ -6,6 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Close
@@ -28,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.toFa
+import androidx.compose.ui.text.input.KeyboardType
 import com.kazemieh.common.toFormattedFa
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.glass.GlassCard
@@ -145,9 +148,22 @@ fun LargeAmountCard(
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                FintrackDisplaySmallText(
-                    text = if (amount.isEmpty()) stringResource(Res.string.label_zero) else amount.toLongOrNull()?.toFormattedFa() ?: amount.toFa(),
-                    color = GlassText
+                FintrackOutlinedTextField(
+                    value = amount,
+                    onValueChange = { if (it.length <= 12) onCalcClick() /* Part B will handle direct updates */ },
+                    isPrice = true,
+                    label = { FintrackBodyMediumText(text = stringResource(Res.string.amount)) },
+                    textColor = GlassText,
+                    containerColor = Color.Transparent,
+                    unfocusedBorderColor = GlassEdge,
+                    focusedBorderColor = GlassGreen,
+                    suffix = {
+                        FintrackBodyMediumText(
+                            text = stringResource(Res.string.currency_toman),
+                            color = GlassText3
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }

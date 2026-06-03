@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.kazemieh.common.toFa
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.model.Bank
 import com.kazemieh.designsystem.picker.FinTrackIcons
@@ -93,7 +94,7 @@ fun CardItem(
                     verticalArrangement = Arrangement.Center
                 ) {
                     FintrackTitleMediumText(
-                        text = cardNumber,
+                        text = cardNumber.chunked(4).joinToString("-").toFa(),
                         color = Color.White
                     )
                 }

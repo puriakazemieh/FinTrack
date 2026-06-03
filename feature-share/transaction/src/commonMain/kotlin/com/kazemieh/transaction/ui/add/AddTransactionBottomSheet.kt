@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Image
@@ -29,6 +30,7 @@ import com.kazemieh.category.ui.list.CategoryPickerBottomSheet
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toFa
+import androidx.compose.ui.text.input.KeyboardType
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.*
@@ -297,6 +299,7 @@ fun AddTransactionContent(
                         value = state.description,
                         onValueChange = { desc -> if (desc.length <= 250) onIntent(AddTransactionIntent.SetDescription(desc)) },
                         textStyle = MaterialTheme.typography.bodyMedium.copy(color = GlassText),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         modifier = Modifier.fillMaxWidth(),
                         decorationBox = @Composable { innerTextField ->
                             Box {

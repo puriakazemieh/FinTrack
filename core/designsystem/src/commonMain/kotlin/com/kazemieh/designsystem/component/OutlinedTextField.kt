@@ -19,6 +19,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.KeyboardType
 import com.kazemieh.common.toFa
 import com.kazemieh.common.toPrice
 import com.kazemieh.designsystem.LocalSpacing
@@ -46,15 +47,25 @@ fun FintrackOutlinedTextField(
     isError: Boolean = false,
     isPrice: Boolean = false,
     isPersianNumber: Boolean = false,
+    isFourDigitGroup: Boolean = false,
     minLine : Int = 1,
     maxLine : Int = if (singleLine) 1 else Int.MAX_VALUE,
+    prefix: @Composable (() -> Unit)? = null,
+    suffix: @Composable (() -> Unit)? = null,
     onClick: () -> Unit = {},
 ) {
 
     val visualTransformation = when {
         isPrice -> NumberCommaTransformation()
         isPersianNumber -> PersianNumberTransformation()
+        isFourDigitGroup -> FourDigitGroupingTransformation()
         else -> VisualTransformation.None
+    }
+
+    val finalKeyboardOptions = if (isPrice || isPersianNumber || isFourDigitGroup) {
+        keyboardOptions.copy(keyboardType = KeyboardType.Number)
+    } else {
+        keyboardOptions
     }
 
     OutlinedTextField(
@@ -79,7 +90,9 @@ fun FintrackOutlinedTextField(
         singleLine = singleLine,
         readOnly = readOnly,
         isError = isError,
-        keyboardOptions = keyboardOptions,
+        keyboardOptions = finalKeyboardOptions,
+        prefix = prefix,
+        suffix = suffix,
         colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = textColor,
             unfocusedTextColor = textColor,
@@ -141,6 +154,29 @@ class PersianNumberTransformation : VisualTransformation {
             text = AnnotatedString(transformedText),
             offsetMapping = OffsetMapping.Identity
         )
+    }
+}
+
+class FourDigitGroupingTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val originalText = text.text
+        val transformedText = originalText.chunked(4).joinToString("-").toFa()
+
+        val offsetMapping = object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int {
+                if (offset <= 0) return 0
+                val dashes = (offset - 1) / 4
+                return (offset + dashes).coerceAtMost(transformedText.length)
+            }
+
+            override fun transformedToOriginal(offset: Int): Int {
+                if (offset <= 0) return 0
+                val dashes = offset / 5
+                return (offset - dashes).coerceAtMost(originalText.length)
+            }
+        }
+
+        return TransformedText(AnnotatedString(transformedText), offsetMapping)
     }
 }
 
