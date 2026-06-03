@@ -204,20 +204,22 @@ fun CategoryStrip(
     viewModel: TransactionReportViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val topCats = state.categorySums.sortedByDescending { it.totalAmount }.take(4)
+    val topCats = state.categorySums.sortedByDescending { it.totalAmount }
     if (topCats.isEmpty()) return
     
     val maxAmount = topCats.first().totalAmount.coerceAtLeast(1)
 
     GlassCard(modifier = Modifier.fillMaxWidth(), padding = 14.dp) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            FintrackLabelMediumText(
-                text = stringResource(Res.string.label_category_split),
-                fontWeight = FontWeight.Bold,
-                color = GlassText
-            )
-            
             topCats.forEach { cat ->
+                val sign = if (cat.type == TransactionType.INCOME) "+" else "-"
+                val isIncome = cat.type == TransactionType.INCOME
+                val isTransfer = cat.type == TransactionType.TRANSFER
+                val amountColor = when {
+                    isIncome -> GlassGreen
+                    isTransfer -> GlassBlue
+                    else -> GlassRed
+                }
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FinTrackLeadingIcon(
@@ -229,7 +231,15 @@ fun CategoryStrip(
                             corner = 7.dp
                         )
                         FintrackLabelSmallText(text = cat.name, color = GlassText, modifier = Modifier.weight(1f))
-                        FintrackLabelSmallText(text = stringResource(Res.string.label_amount_with_unit, cat.totalAmount.toFormattedFa(), stringResource(Res.string.unit_toman_short)), fontWeight = FontWeight.Bold, color = GlassText)
+                        FintrackLabelSmallText(
+                            text = stringResource(
+                                Res.string.label_amount_with_unit,
+                                cat.totalAmount.toFormattedFa(),
+                                stringResource(Res.string.unit_toman_short)
+                            ),
+                            fontWeight = FontWeight.Bold,
+                            color = amountColor
+                        )
                     }
                     
                     val progress = (cat.totalAmount.toFloat() / maxAmount).coerceIn(0f, 1f)

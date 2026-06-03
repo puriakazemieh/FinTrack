@@ -255,6 +255,14 @@ private fun TxRow(item: TransactionWithRelations, onClick: () -> Unit) {
         }
 
         Column(horizontalAlignment = Alignment.End) {
+            val sign = when (item.transaction.type) {
+                TransactionType.INCOME -> "+"
+                TransactionType.EXPENSE -> "-"
+                TransactionType.TRANSFER -> "-"
+                else -> ""
+            }
+            val displayAmount = if (isTransfer) item.transaction.amountTransfer else item.transaction.amount
+
             FintrackTitleSmallText(
                 text = stringResource(Res.string.label_amount_with_unit, item.transaction.amount.toLong().toFormattedFa(), stringResource(Res.string.unit_toman_short)),
                 fontWeight = FontWeight.Bold,
