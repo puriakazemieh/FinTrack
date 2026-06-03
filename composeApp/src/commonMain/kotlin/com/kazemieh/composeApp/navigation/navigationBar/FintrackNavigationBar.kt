@@ -39,7 +39,8 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun FintrackNavigationBar(
     modifier: Modifier = Modifier,
-    navController: NavHostController
+    navController: NavHostController,
+    onFabClick: () -> Unit = {}
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -60,18 +61,18 @@ fun FintrackNavigationBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .navigationBarsPadding()
-            .padding(start = 24.dp, end = 24.dp, bottom = 12.dp)
-            .height(64.dp),
-        contentAlignment = Alignment.Center
+            .padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
+            .height(84.dp), // Height allows FAB to protrude
+        contentAlignment = Alignment.BottomCenter
     ) {
-        // Frosted Pill Background Layer
-        val backgroundColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f)
-        val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f)
+        // 1. Frosted Pill Background Layer
+        val backgroundColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.65f)
+        val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .height(64.dp) // The actual pill height
                 .clip(CircleShape)
                 .background(backgroundColor)
                 .border(
@@ -79,13 +80,14 @@ fun FintrackNavigationBar(
                     borderColor,
                     CircleShape
                 )
-                .glassBlur(60.dp) // Reverted to the preferred 60dp blur
+                .glassBlur(30.dp) 
         )
 
-        // Content Layer (Icons)
+        // 2. Content Layer (Icons Row)
         Row(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .height(64.dp) // Matches the pill height
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -93,7 +95,7 @@ fun FintrackNavigationBar(
             Destinations.entries.forEachIndexed { index, destination ->
                 // Center slot for FAB
                 if (index == 2) {
-                    Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.weight(1.5f)) // Reserved space for the protruding FAB
                 }
 
                 val isSelected = selectedDestination == destination
@@ -131,28 +133,28 @@ fun FintrackNavigationBar(
             }
         }
 
-        // Floating Action Button
+        // 3. Central Floating Action Button (Protruding)
         Box(
             modifier = Modifier
-                .padding(bottom = 32.dp)
-                .size(56.dp)
+                .align(Alignment.TopCenter) // Align to top of the 84dp container
+                .size(60.dp)
                 .clip(CircleShape)
                 .background(
                     Brush.linearGradient(
                         listOf(
                             MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.primaryContainer
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                         )
                     )
                 )
-                .clickable { /* Action for FAB */ },
+                .clickable(onClick = onFabClick),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(28.dp)
+                modifier = Modifier.size(32.dp)
             )
         }
     }

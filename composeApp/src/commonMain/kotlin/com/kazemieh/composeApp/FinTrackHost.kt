@@ -10,15 +10,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import com.kazemieh.common.SnackbarController
-import kotlinx.coroutines.flow.collectLatest
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.kazemieh.common.SnackbarController
 import com.kazemieh.composeApp.navigation.AppNavHost
 import com.kazemieh.composeApp.navigation.navigationBar.FintrackNavigationBar
+import kotlinx.coroutines.flow.collectLatest
 
 
 @Composable
@@ -41,27 +43,35 @@ fun FinTrackHost() {
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            bottomBar = {
-                FintrackNavigationBar(navController = navController)
-            }
+            modifier = Modifier.fillMaxSize()
         ) { innerPadding ->
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier.fillMaxSize().padding(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding()
+                )
+            ) {
+                // Main content fills the whole screen
                 AppNavHost(
                     navController = navController,
-                    modifier = Modifier.fillMaxSize(), // Don't apply innerPadding here
+                    modifier = Modifier.fillMaxSize(),
                     snackbarHostState = snackbarHostState
                 )
-                Box(
-                    modifier = Modifier.padding(innerPadding)
-                ) {
-                    SnackbarHost(
-                        hostState = snackbarHostState,
-                    )
-                }
+
+                FintrackNavigationBar(
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    navController = navController,
+                    onFabClick = { /* TODO: Global Add Transaction */ }
+                )
+
+                // Snackbar above the navigation bar
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 100.dp)
+                )
             }
         }
     }
-
 }
-

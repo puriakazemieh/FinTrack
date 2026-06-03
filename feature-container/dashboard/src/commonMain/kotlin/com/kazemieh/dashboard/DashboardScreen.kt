@@ -151,8 +151,6 @@ fun DashboardScreen(
             transactionItems()
         }
 
-        FAB { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) }
-
         if (state.showAddTransaction) {
             AddTransactionBottomSheet(
                 transactionWithRelations = state.transactionWithRelations,
