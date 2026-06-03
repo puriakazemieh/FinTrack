@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -104,6 +105,16 @@ fun AddCategoryContent(
         FinTrackIcons.icons.indexOfFirst { it.id == state.draft.iconId }.coerceAtLeast(0)
     }
 
+    val backgroundBrush = remember(state.draft.type) {
+        val topColor: Color = when (state.draft.type) {
+            TransactionType.EXPENSE -> GlassRedSoft
+            TransactionType.INCOME -> GlassGreenSoft
+            TransactionType.TRANSFER -> GlassBlueSoft
+            else -> GlassBg1
+        }
+        Brush.verticalGradient(listOf(topColor, GlassBg1, GlassBg0))
+    }
+
     AddFrame(
         title = if (state.mode == AddCategoryMode.Add) stringResource(Res.string.title_new_category) else stringResource(Res.string.title_edit_category),
         sub = stringResource(Res.string.title_category_management),
@@ -112,7 +123,8 @@ fun AddCategoryContent(
         heroName = state.draft.name,
         primaryLabel = stringResource(Res.string.btn_save_category),
         onPrimaryClick = { onIntent(AddCategoryIntent.Save) },
-        onClose = { onIntent(AddCategoryIntent.OnDismiss) }
+        onClose = { onIntent(AddCategoryIntent.OnDismiss) },
+        backgroundBrush = backgroundBrush
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),

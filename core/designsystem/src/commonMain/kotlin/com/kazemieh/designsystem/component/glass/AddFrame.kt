@@ -35,13 +35,15 @@ fun AddFrame(
     colorId: Int? = null,
     heroName: String? = null,
     showHero: Boolean = true,
+    backgroundBrush: Brush? = null,
     hero: @Composable (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val defaultBrush = Brush.verticalGradient(listOf(GlassBg1, GlassBg0))
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+            .background(backgroundBrush ?: defaultBrush)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             ScreenHeader(

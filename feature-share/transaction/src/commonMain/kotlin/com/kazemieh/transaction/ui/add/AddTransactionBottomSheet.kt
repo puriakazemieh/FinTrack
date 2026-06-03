@@ -45,10 +45,15 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toFa
 import com.kazemieh.designsystem.GlassBlue
+import com.kazemieh.designsystem.GlassBlueSoft
+import com.kazemieh.designsystem.GlassBg0
+import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.GlassColor
 import com.kazemieh.designsystem.GlassEdgeStrong
 import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.GlassGreenSoft
 import com.kazemieh.designsystem.GlassGreenDark
+import com.kazemieh.designsystem.GlassRedSoft
 import com.kazemieh.designsystem.GlassText
 import com.kazemieh.designsystem.GlassText2
 import com.kazemieh.designsystem.GlassText3
@@ -146,6 +151,16 @@ private fun BottomSheetContent(
     sheetState: SheetState,
     snackbarHostState: SnackbarHostState,
 ) {
+    val backgroundBrush = remember(state.transactionType) {
+        val topColor: Color = when (state.transactionType) {
+            TransactionType.EXPENSE -> GlassRedSoft
+            TransactionType.INCOME -> GlassGreenSoft
+            TransactionType.TRANSFER -> GlassBlueSoft
+            else -> GlassBg1
+        }
+        Brush.verticalGradient(listOf(topColor, GlassBg1, GlassBg0))
+    }
+
     ModalBottomSheet(
         onDismissRequest = { onIntent(AddTransactionIntent.OnDismiss) },
         sheetState = sheetState,
@@ -160,7 +175,8 @@ private fun BottomSheetContent(
             primaryLabel = stringResource(Res.string.btn_save_transaction),
             onPrimaryClick = { onIntent(AddTransactionIntent.Submit) },
             onClose = { onIntent(AddTransactionIntent.OnDismiss) },
-            showHero = false
+            showHero = false,
+            backgroundBrush = backgroundBrush
         ) {
             AddTransactionContent(state = state, onIntent = onIntent)
         }
