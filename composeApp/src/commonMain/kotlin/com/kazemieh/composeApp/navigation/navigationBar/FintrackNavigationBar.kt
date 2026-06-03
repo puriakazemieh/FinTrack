@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -61,8 +59,8 @@ fun FintrackNavigationBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
-            .height(84.dp), // Height allows FAB to protrude
+            .padding(start = 16.dp, end = 16.dp, bottom = 20.dp)
+            .height(80.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
         // 1. Frosted Pill Background Layer
@@ -72,30 +70,30 @@ fun FintrackNavigationBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp) // The actual pill height
+                .height(58.dp) // Slightly slimmer pill
                 .clip(CircleShape)
                 .background(backgroundColor)
                 .border(
-                    1.dp,
+                    0.5.dp, // Thinner, more subtle border
                     borderColor,
                     CircleShape
                 )
-                .glassBlur(30.dp) 
+                .glassBlur(20.dp) // Optimized blur for clarity
         )
 
         // 2. Content Layer (Icons Row)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp) // Matches the pill height
-                .padding(horizontal = 16.dp),
+                .height(58.dp) // Matches the new slimmer pill height
+                .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Destinations.entries.forEachIndexed { index, destination ->
                 // Center slot for FAB
                 if (index == 2) {
-                    Spacer(modifier = Modifier.weight(1.5f)) // Reserved space for the protruding FAB
+                    Spacer(modifier = Modifier.weight(1.3f))
                 }
 
                 val isSelected = selectedDestination == destination
@@ -127,7 +125,7 @@ fun FintrackNavigationBar(
                         painter = painterResource(destination.icon),
                         contentDescription = stringResource(destination.label),
                         tint = color,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(22.dp) // Slightly smaller icons
                     )
                 }
             }
@@ -136,14 +134,14 @@ fun FintrackNavigationBar(
         // 3. Central Floating Action Button (Protruding)
         Box(
             modifier = Modifier
-                .align(Alignment.TopCenter) // Align to top of the 84dp container
-                .size(60.dp)
+                .align(Alignment.TopCenter)
+                .size(56.dp) // Slightly adjusted size
                 .clip(CircleShape)
                 .background(
                     Brush.linearGradient(
                         listOf(
                             MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
                         )
                     )
                 )
@@ -154,7 +152,7 @@ fun FintrackNavigationBar(
                 imageVector = Icons.Default.Add,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(28.dp)
             )
         }
     }
