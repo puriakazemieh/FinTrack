@@ -44,6 +44,10 @@ class TransactionsViewModel() : ViewModel() {
     private val _state = MutableStateFlow(TransactionsState())
     val state = _state.asStateFlow()
 
+    init {
+        onIntent(TransactionsIntent.OnDateRange(DateFilterType.THIS_MONTH))
+    }
+
     fun onIntent(intent: TransactionsIntent) {
         when (intent) {
             is TransactionsIntent.ShowTransactionBottomSheet -> _state.update {
@@ -161,11 +165,16 @@ class TransactionsViewModel() : ViewModel() {
                     )
                     val range = result.first
                     
-                    // Force the label to show the actual range text instead of "Custom Range"
-                    val actualRangeText = if (intent.startDate == intent.endDate) {
-                        intent.startDate
+                    // Display range with month names instead of raw numeric strings
+                    val startP = DateFilterHelper.persianDateFromMillis(intent.startTimeStamp, TimeZone.currentSystemDefault())
+                    val endP = DateFilterHelper.persianDateFromMillis(intent.endTimeStamp, TimeZone.currentSystemDefault())
+                    
+                    val actualRangeText = if (startP.year == endP.year && startP.month == endP.month && startP.day == endP.day) {
+                        "${startP.day.toFa()} ${startP.persianMonth().displayName} ${startP.year.toFa()}"
+                    } else if (startP.year == endP.year) {
+                        "${startP.day.toFa()} ${startP.persianMonth().displayName} تا ${endP.day.toFa()} ${endP.persianMonth().displayName} ${endP.year.toFa()}"
                     } else {
-                        "${intent.startDate} تا ${intent.endDate}"
+                        "${startP.day.toFa()} ${startP.persianMonth().displayName} ${startP.year.toFa()} تا ${endP.day.toFa()} ${endP.persianMonth().displayName} ${endP.year.toFa()}"
                     }
                     val uiText = UiText.DynamicString(actualRangeText)
                     val subLabel = getPeriodSubLabel(range)
@@ -282,6 +291,14 @@ class TransactionsViewModel() : ViewModel() {
 
     private fun getPeriodSubLabel(range: DateRange?, timeZone: TimeZone = TimeZone.currentSystemDefault()): UiText {
         if (range == null) return UiText.DynamicString("")
+        
+        val daysBetween = (Instant.fromEpochMilliseconds(range.end).toLocalDateTime(timeZone).date.toEpochDays() -
+                Instant.fromEpochMilliseconds(range.start).toLocalDateTime(timeZone).date.toEpochDays()) + 1
+
+        if (range.filterType == DateFilterType.CUSTOM_RANGE) {
+            return UiText.DynamicString("${daysBetween.toFa()} روز")
+        }
+
         if (range.filterType == DateFilterType.TODAY) return UiText.DynamicString("")
 
         val startPersian = DateFilterHelper.persianDateFromMillis(range.start, timeZone)
@@ -307,9 +324,6 @@ class TransactionsViewModel() : ViewModel() {
                 "$startP تا $endP"
             }
         }
-
-        val daysBetween = (Instant.fromEpochMilliseconds(range.end).toLocalDateTime(timeZone).date.toEpochDays() -
-                Instant.fromEpochMilliseconds(range.start).toLocalDateTime(timeZone).date.toEpochDays()) + 1
 
         return UiText.StringResourceText(
             Res.string.label_period_range_summary,

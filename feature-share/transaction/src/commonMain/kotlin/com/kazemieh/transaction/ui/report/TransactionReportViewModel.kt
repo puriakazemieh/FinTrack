@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.hours
 
 class TransactionReportViewModel(
     private val transactionUseCaseGroup: TransactionUseCaseGroup
@@ -61,7 +60,9 @@ class TransactionReportViewModel(
                 persons = s.filterParams.persons,
                 isAllPersons = s.filterParams.isAllPersons,
                 fromTimestamp = s.filterParams.fromTimestamp,
-                toTimestamp = s.filterParams.toTimestamp?.plus(24.hours.inWholeMilliseconds)
+                toTimestamp = s.filterParams.toTimestamp?.let { 
+                    it + 24 * 60 * 60 * 1000L
+                }
             )
         }
         .distinctUntilChanged()

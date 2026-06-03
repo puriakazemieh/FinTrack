@@ -10,6 +10,7 @@ import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.SnackbarController
+import com.kazemieh.common.toFa
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.designsystem.component.model.resolveString
 import fintrack.core.designsystem.generated.resources.*
@@ -93,7 +94,11 @@ class AddTransactionViewModel(
 
     private fun fetchDefaultData(transactionWithRelations: TransactionWithRelations?) {
         if (transactionWithRelations == null) {
-            _state.value = AddTransactionState() // Full reset first
+            val today = com.kazemieh.designsystem.component.jalali.JalaliCalendar()
+            _state.value = AddTransactionState(
+                date = "${today.day.toFa()} / ${today.monthString} / ${today.year.toFa()}",
+                timeStamp = today.toTimestamp()
+            ) // Full reset first with today's date
             viewModelScope.launch {
                 val defaultSource = transactionUseCaseGroup.getDefaultFinancialSourceUseCase()
                 val defaultCategory = transactionUseCaseGroup.getDefaultCategoryUseCase(_state.value.transactionType)

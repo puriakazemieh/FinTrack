@@ -17,7 +17,7 @@ fun NavGraphBuilder.bottomBarNavGraph(
     snackbarHostState: SnackbarHostState,
     onBackPressed: () -> Unit
 ) {
-    navigation<Screen.BottomBarGraph>(startDestination = Screen.Dashboard) {
+    navigation<Screen.BottomBarGraph>(startDestination = Screen.Transactions) {
 
         composable<Screen.Dashboard> { backStackEntry ->
             DashboardScreen(snackbarHostState = snackbarHostState)

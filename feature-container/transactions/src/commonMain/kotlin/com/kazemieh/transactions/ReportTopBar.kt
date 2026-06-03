@@ -39,6 +39,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.kazemieh.common.persiandatetime.extensions.persianMonth
+import com.kazemieh.common.toFa
 import com.kazemieh.common.DateFilterType
 import com.kazemieh.designsystem.GlassBg0
 import com.kazemieh.designsystem.GlassColor
@@ -366,7 +368,7 @@ fun DateFilterBottomSheet(
                 else -> Res.string.all
             }
             FintrackBodyLargeText(
-                text = stringResource(label),
+                text = stringResource(label).toFa(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onDateRange(type) }
@@ -412,7 +414,7 @@ fun CustomDateBottomSheet(
             ) {
                 DateInput(
                     label = stringResource(Res.string.start),
-                    value = startDate?.first ?: "",
+                    value = (startDate?.first ?: "").toFa(),
                     isError = isError && startDate == null,
                     modifier = Modifier.weight(1f),
                     onClick = {
@@ -422,7 +424,7 @@ fun CustomDateBottomSheet(
                 )
                 DateInput(
                     label = stringResource(Res.string.end),
-                    value = endDate?.first ?: "",
+                    value = (endDate?.first ?: "").toFa(),
                     isError = isError && endDate == null,
                     modifier = Modifier.weight(1f),
                     onClick = {
@@ -480,6 +482,20 @@ private fun DateInput(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
+    val displayValue = remember(value) {
+        if (value.isEmpty()) ""
+        else {
+            val parts = value.split("-")
+            if (parts.size == 3) {
+                val year = parts[0]
+                val month = parts[1].toIntOrNull() ?: 0
+                val day = parts[2]
+                val pdt = com.kazemieh.common.persiandatetime.domain.PersianDateTime(year.toInt(), month, day.toInt())
+                "${day.toFa()} ${pdt.persianMonth().displayName} ${year.toFa()}"
+            } else value
+        }
+    }
+
     Column(modifier = modifier) {
         FintrackLabelMediumText(text = label, color = GlassText3)
         Box(
@@ -493,8 +509,8 @@ private fun DateInput(
             contentAlignment = Alignment.CenterStart
         ) {
             FintrackBodyMediumText(
-                text = value.ifEmpty { stringResource(Res.string.action_select_date) },
-                color = if (value.isEmpty()) GlassText3 else GlassText
+                text = displayValue.ifEmpty { stringResource(Res.string.action_select_date) },
+                color = if (displayValue.isEmpty()) GlassText3 else GlassText
             )
         }
     }

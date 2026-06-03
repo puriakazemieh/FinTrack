@@ -254,8 +254,13 @@ fun PersianDateTime.persianMonth(): PersianMonth = PersianMonth.entries.toTypedA
  * ```
  */
 fun PersianDateTime.persianDayOfWeek(): PersianWeekday =
-    PersianWeekday.entries.toTypedArray()
-        .getOrElse(this.toLocalDate().dayOfWeek.isoDayNumber) { PersianWeekday.UNKNOWN }
+    PersianWeekday.fromNumber(this.dayOfWeekIndex + 1)
+
+/**
+ * Returns the 0-indexed day of week starting from Saturday (0 = Saturday, 6 = Friday).
+ */
+val PersianDateTime.dayOfWeekIndex: Int
+    get() = (this.toLocalDate().dayOfWeek.isoDayNumber + 1) % 7
 
 /**
  * Formats this PersianDateTime using the DSL builder.

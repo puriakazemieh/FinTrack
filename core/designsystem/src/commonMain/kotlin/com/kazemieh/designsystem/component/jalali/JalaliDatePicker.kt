@@ -43,6 +43,7 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.common.toFa
 import com.kazemieh.designsystem.component.glass.SheetFrame
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.action_select_date
@@ -158,10 +159,7 @@ fun JalaliCalendarView(
     Column(
         Modifier.background(backgroundColor).animateContentSize()
     ) {
-        val firstJomeh = run {
-            val dow = JalaliCalendar(jalali.year, jalali.month, 1).dayOfWeek
-            if (dow == 7) 7 else 7 - dow
-        }
+        val startOffset = JalaliCalendar(jalali.year, jalali.month, 1).dayOfWeek
 
         // header
         Row(
@@ -200,7 +198,7 @@ fun JalaliCalendarView(
                 pickerType = if (pickerType != PickerType.Year) PickerType.Year else PickerType.Day
             }) {
                 FintrackTitleMediumText(
-                    text = FormatHelper.toPersianNumber(jalali.year.toString()),
+                    text = jalali.year.toFa(),
                     color = dropDownColor
                 )
                 Icon(Icons.Outlined.ArrowDropDown, null, tint = dropDownColor)
@@ -264,14 +262,14 @@ fun JalaliCalendarView(
                     }
                 }
 
-                var jomeh = firstJomeh
-                while (true) {
+                var currentDay = 1 - startOffset
+                while (currentDay <= jalali.monthLength) {
                     Row(
                         Modifier.fillMaxWidth().padding(horizontal = 4.dp),
                         Arrangement.SpaceAround
                     ) {
-                        repeat(7) {
-                            val day = jomeh - (6 - it)
+                        repeat(7) { index ->
+                            val day = currentDay + index
                             if (day in 1..jalali.monthLength) {
                                 val current = JalaliCalendar(jalali.year, jalali.month, day)
                                 val disabled =
@@ -298,7 +296,7 @@ fun JalaliCalendarView(
                                     enabled = !disabled
                                 ) {
                                     FintrackBodyMediumText(
-                                        text = FormatHelper.toPersianNumber(day.toString()),
+                                        text = day.toFa(),
                                         color = when {
                                             isToday -> textColorHighlight
                                             disabled -> textDisabledColor
@@ -317,8 +315,7 @@ fun JalaliCalendarView(
                             }
                         }
                     }
-                    if (jomeh >= jalali.monthLength) break
-                    jomeh += 7
+                    currentDay += 7
                 }
             }
 
@@ -429,7 +426,7 @@ fun JalaliCalendarView(
                             contentAlignment = Alignment.Center
                         ) {
                             FintrackTitleLargeText(
-                                text = FormatHelper.toPersianNumber(index.toString()),
+                                text = index.toFa(),
                                 color = when {
                                     disabled -> textDisabledColor
                                     jalali.year == index -> textColorHighlight
