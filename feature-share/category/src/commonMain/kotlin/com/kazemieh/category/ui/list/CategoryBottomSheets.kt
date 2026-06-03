@@ -107,7 +107,9 @@ fun CategoryPickerBottomSheet(
                 onEditClick = { viewModel.onIntent(CategoryIntent.OnEditClick(state.categories.find { c -> c.id == it.id })) },
                 onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) },
                 onItemClick = { item ->
-                    state.categories.find { it.id == item.id }?.let { onCategoryClick(it) }
+                    state.categories.find { it.id == item.id }?.let {
+                        viewModel.onIntent(CategoryIntent.SelectedCategory(it))
+                    }
                 }
             )
         }
@@ -286,9 +288,14 @@ fun CategorySelectionBottomSheet(
         title = stringResource(Res.string.category),
         items = state.items,
         initialSelection = initialSelectionIds,
+        query = state.query,
+        onQueryChange = { viewModel.onIntent(CategoryIntent.SetQuery(it)) },
         onConfirm = { selectedItems, isAll ->
             onConfirmPairs(selectedItems.map { it.toCategory() }.toSet(), isAll)
+            viewModel.onIntent(CategoryIntent.OnDismiss)
         },
-        onDismiss = onDismiss
+        onDismiss = {
+            viewModel.onIntent(CategoryIntent.OnDismiss)
+        }
     )
 }

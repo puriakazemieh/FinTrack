@@ -16,12 +16,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.EmptyListScreen
 import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
 import com.kazemieh.designsystem.component.ItemScreen
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.search_placeholder
+import org.jetbrains.compose.resources.stringResource
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,6 +33,8 @@ import com.kazemieh.designsystem.component.ItemScreen
 fun ListBottomSheet(
     title: String,
     items: Set<ItemUi>,
+    query: String = "",
+    onQueryChange: (String) -> Unit = {},
     onItemClicked: (ItemUi) -> Unit = {},
     onItemEditClicked: (ItemUi) -> Unit = {},
     onItemDeleteClicked: (ItemUi) -> Unit = {},
@@ -60,6 +66,13 @@ fun ListBottomSheet(
                         modifier = Modifier.padding(space.small)
                     )
                 } else topContent()
+
+                SearchBar(
+                    query = query,
+                    onQueryChange = onQueryChange,
+                    placeholder = stringResource(Res.string.search_placeholder),
+                    modifier = Modifier.padding(space.small)
+                )
 
                 val list = remember(items) { items.toList().sortedBy { it.id } }
                 LazyColumn(modifier = Modifier.weight(1f, fill = false)) {

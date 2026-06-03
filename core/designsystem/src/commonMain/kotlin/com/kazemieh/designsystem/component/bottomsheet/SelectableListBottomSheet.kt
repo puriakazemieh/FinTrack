@@ -19,7 +19,9 @@ import com.kazemieh.designsystem.GlassText
 import com.kazemieh.designsystem.GlassText2
 import com.kazemieh.designsystem.GlassText3
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.EmptyListScreen
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.designsystem.component.glass.GlassTone
 import com.kazemieh.designsystem.component.glass.ItemSelected
 import com.kazemieh.designsystem.component.glass.ScreenHeader
@@ -28,6 +30,7 @@ import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.designsystem.component.model.asString
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.confirm
+import fintrack.core.designsystem.generated.resources.search_placeholder
 import fintrack.core.designsystem.generated.resources.select_All
 import org.jetbrains.compose.resources.stringResource
 
@@ -38,6 +41,8 @@ fun SelectableListBottomSheet(
     items: Set<ItemUi>,
     initialSelection: Set<ItemUi> = emptySet(),
     showSelectAll: Boolean = true,
+    query: String = "",
+    onQueryChange: (String) -> Unit = {},
     onConfirm: (selectedIds: Set<ItemUi>, isAllSelected: Boolean) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -70,6 +75,13 @@ fun SelectableListBottomSheet(
             ScreenHeader(
                 title = title,
                 onClose = onDismiss
+            )
+
+            SearchBar(
+                query = query,
+                onQueryChange = onQueryChange,
+                placeholder = stringResource(Res.string.search_placeholder),
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
             )
 
             if (showSelectAll && itemsList.size > 1) {

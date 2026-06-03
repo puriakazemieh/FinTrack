@@ -80,7 +80,7 @@ class CategoryViewModel(
 
 
     private fun loadAllCategory(type: TransactionType) {
-        _state.update { it.copy(type = type) }
+        _state.update { it.copy(type = type, query = "") }
         viewModelScope.launch {
             val baseFlow = if (type == TransactionType.ALL) {
                 combine(

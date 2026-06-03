@@ -110,7 +110,7 @@ fun TagPickerSingleBottomSheet(
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(TagIntent.UpdateSearchQuery(it)) },
                 onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
-                items = state.tags.map {
+                items = state.filteredTags.map {
                     EntityItem(
                         id = it.id ?: 0,
                         name = it.name,
@@ -193,7 +193,7 @@ fun TagManageBottomSheet(
                 title = stringResource(Res.string.tags),
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(TagIntent.UpdateSearchQuery(it)) },
-                items = state.tags.map { tag ->
+                items = state.filteredTags.map { tag ->
                     EntityItem(
                         id = tag.id ?: 0L,
                         name = tag.name,
@@ -262,9 +262,14 @@ fun TagSelectionBottomSheet(
         title = stringResource(Res.string.tags),
         items = state.items,
         initialSelection = initialSelectionIds,
+        query = state.searchQuery,
+        onQueryChange = { viewModel.onIntent(TagIntent.UpdateSearchQuery(it)) },
         onConfirm = { selectedItems, isAll ->
             onConfirmPairs(selectedItems.map { it.toTag() }.toSet(), isAll)
+            viewModel.onIntent(TagIntent.OnDismiss)
         },
-        onDismiss = onDismiss
+        onDismiss = {
+            viewModel.onIntent(TagIntent.OnDismiss)
+        }
     )
 }

@@ -71,6 +71,7 @@ class TagViewModel(
             TagIntent.OnDismiss -> {
                 viewModelScope.launch {
                     _effect.send(TagEffect.OnDismiss)
+                    _searchQuery.value = ""
                     _state.update { TagState() }
                 }
             }
@@ -79,6 +80,7 @@ class TagViewModel(
                 viewModelScope.launch {
                     if (intent.tag != null) {
                         _effect.send(TagEffect.OnTagSelected(intent.tag))
+                        _searchQuery.value = ""
                         _state.update { TagState() }
                     }
                 }

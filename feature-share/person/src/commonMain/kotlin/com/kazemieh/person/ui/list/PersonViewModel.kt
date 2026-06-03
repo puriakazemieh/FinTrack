@@ -74,6 +74,7 @@ class PersonViewModel(
             PersonIntent.OnDismiss -> {
                 viewModelScope.launch {
                     _effect.send(PersonEffect.OnDismiss)
+                    _searchQuery.value = ""
                     _state.update { PersonState() }
                 }
             }
@@ -82,6 +83,7 @@ class PersonViewModel(
                 viewModelScope.launch {
                     if (intent.person != null) {
                         _effect.send(PersonEffect.OnPersonSelected(intent.person))
+                        _searchQuery.value = ""
                         _state.update { PersonState() }
                     }
                 }

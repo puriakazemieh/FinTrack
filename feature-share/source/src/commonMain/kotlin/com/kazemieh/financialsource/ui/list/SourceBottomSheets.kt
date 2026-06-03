@@ -91,7 +91,7 @@ private fun SourceBottomSheetCore(
                 title = stringResource(Res.string.source),
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(SourceIntent.UpdateSearchQuery(it)) },
-                items = state.sources.map { source ->
+                items = state.filteredSources.map { source ->
                     EntityItem(
                         id = source.id ?: 0L,
                         name = source.name,
@@ -193,10 +193,15 @@ fun SourceSelectionBottomSheet(
         title = stringResource(Res.string.source),
         items = state.items,
         initialSelection = initialSelectionIds,
+        query = state.searchQuery,
+        onQueryChange = { viewModel.onIntent(SourceIntent.UpdateSearchQuery(it)) },
         onConfirm = { selectedItems, isAll ->
             onConfirmPairs(selectedItems.map { it.toSource() }.toSet(), isAll)
+            viewModel.onIntent(SourceIntent.OnDismiss)
         },
-        onDismiss = onDismiss
+        onDismiss = {
+            viewModel.onIntent(SourceIntent.OnDismiss)
+        }
     )
 }
 

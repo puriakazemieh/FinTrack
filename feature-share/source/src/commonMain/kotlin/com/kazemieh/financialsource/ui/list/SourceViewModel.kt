@@ -42,8 +42,8 @@ class SourceViewModel(
 
             is SourceIntent.SelectedSource -> {
                 viewModelScope.launch {
-
                     _effect.send(SourceEffect.AddedSource(intent.selectedSources))
+                    _searchQuery.value = ""
                     _state.update { SourceState() }
                 }
             }
@@ -51,6 +51,7 @@ class SourceViewModel(
             SourceIntent.OnDismiss -> {
                 viewModelScope.launch {
                     _effect.send(SourceEffect.OnDismiss)
+                    _searchQuery.value = ""
                     _state.update { SourceState() }
                 }
             }

@@ -120,7 +120,7 @@ fun PersonPickerSingleBottomSheet(
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(PersonIntent.UpdateSearchQuery(it)) },
                 onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
-                items = state.persons.map {
+                items = state.filteredPersons.map {
                     EntityItem(
                         id = it.id ?: 0,
                         name = it.name,
@@ -203,7 +203,7 @@ fun PersonManageBottomSheet(
                 title = stringResource(Res.string.persons),
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(PersonIntent.UpdateSearchQuery(it)) },
-                items = state.persons.map { person ->
+                items = state.filteredPersons.map { person ->
                     EntityItem(
                         id = person.id ?: 0L,
                         name = person.name,
@@ -273,9 +273,14 @@ fun PersonSelectionBottomSheet(
         title = stringResource(Res.string.persons),
         items = state.items,
         initialSelection = initialSelectionIds,
+        query = state.searchQuery,
+        onQueryChange = { viewModel.onIntent(PersonIntent.UpdateSearchQuery(it)) },
         onConfirm = { selectedItems, isAll ->
             onConfirmPairs(selectedItems.map { it.toPerson() }.toSet(), isAll)
+            viewModel.onIntent(PersonIntent.OnDismiss)
         },
-        onDismiss = onDismiss
+        onDismiss = {
+            viewModel.onIntent(PersonIntent.OnDismiss)
+        }
     )
 }
