@@ -173,9 +173,17 @@ object DateFilterHelper {
             DateFilterType.THIS_MONTH,
             DateFilterType.LAST_MONTH,
             DateFilterType.NEXT_MONTH -> {
-                val monthBase = PersianDateTime(startP.year, startP.month, 1).plus(DatePeriod(months = step))
-                newStart = PersianDateTime(monthBase.year, monthBase.month, 1)
-                newEnd = PersianDateTime(monthBase.year, monthBase.month, newStart.monthLength())
+                var month = startP.month + step
+                var year = startP.year
+                if (month > 12) {
+                    month = 1
+                    year++
+                } else if (month < 1) {
+                    month = 12
+                    year--
+                }
+                newStart = PersianDateTime(year, month, 1)
+                newEnd = PersianDateTime(year, month, newStart.monthLength())
             }
 
             DateFilterType.THIS_YEAR,
@@ -188,10 +196,24 @@ object DateFilterHelper {
 
             else -> {
                 val isFullMonth = startP.day == 1 && endP.day == startP.monthLength()
-                if (isFullMonth) {
-                    val monthBase = PersianDateTime(startP.year, startP.month, 1).plus(DatePeriod(months = step))
-                    newStart = PersianDateTime(monthBase.year, monthBase.month, 1)
-                    newEnd = PersianDateTime(monthBase.year, monthBase.month, newStart.monthLength())
+                val isFullYear = startP.day == 1 && startP.month == 1 && endP.month == 12 && endP.day == endP.monthLength()
+
+                if (isFullYear) {
+                    val newYear = startP.year + step
+                    newStart = PersianDateTime(newYear, 1, 1)
+                    newEnd = PersianDateTime(newYear, 12, PersianDateTime(newYear, 12, 1).monthLength())
+                } else if (isFullMonth) {
+                    var month = startP.month + step
+                    var year = startP.year
+                    if (month > 12) {
+                        month = 1
+                        year++
+                    } else if (month < 1) {
+                        month = 12
+                        year--
+                    }
+                    newStart = PersianDateTime(year, month, 1)
+                    newEnd = PersianDateTime(year, month, newStart.monthLength())
                 } else {
                     val startG = startP.toLocalDate()
                     val endG = endP.toLocalDate()
@@ -226,13 +248,18 @@ object DateFilterHelper {
             newStart.isSameDay(lastWeekStart) && newEnd.isSameDay(lastWeekStart.plus(6, DateTimeUnit.DAY)) -> DateFilterType.LAST_WEEK
             newStart.isSameDay(nextWeekStart) && newEnd.isSameDay(nextWeekStart.plus(6, DateTimeUnit.DAY)) -> DateFilterType.NEXT_WEEK
 
-            newStart.isSameMonth(thisMonthStart) && newEnd.day == newStart.monthLength() -> DateFilterType.THIS_MONTH
-            newStart.isSameMonth(lastMonthStart) && newEnd.day == newStart.monthLength() -> DateFilterType.LAST_MONTH
-            newStart.isSameMonth(nextMonthStart) && newEnd.day == newStart.monthLength() -> DateFilterType.NEXT_MONTH
+            newStart.isSameMonth(thisMonthStart) && newStart.day == 1 && newEnd.day == newStart.monthLength() -> DateFilterType.THIS_MONTH
+            newStart.isSameMonth(lastMonthStart) && newStart.day == 1 && newEnd.day == newStart.monthLength() -> DateFilterType.LAST_MONTH
+            newStart.isSameMonth(nextMonthStart) && newStart.day == 1 && newEnd.day == newStart.monthLength() -> DateFilterType.NEXT_MONTH
 
             newStart.isSameYear(thisYearStart) && newStart.day == 1 && newStart.month == 1 && newEnd.month == 12 && newEnd.day == newEnd.monthLength() -> DateFilterType.THIS_YEAR
             newStart.isSameYear(lastYearStart) && newStart.day == 1 && newStart.month == 1 && newEnd.month == 12 && newEnd.day == newEnd.monthLength() -> DateFilterType.LAST_YEAR
             newStart.isSameYear(nextYearStart) && newStart.day == 1 && newStart.month == 1 && newEnd.month == 12 && newEnd.day == newEnd.monthLength() -> DateFilterType.NEXT_YEAR
+
+            // Fallback for any full year range to be treated as a year filter for labeling
+            newStart.day == 1 && newStart.month == 1 && newEnd.month == 12 && newEnd.day == newEnd.monthLength() -> {
+                if (newStart.year < today.year) DateFilterType.LAST_YEAR else DateFilterType.NEXT_YEAR
+            }
 
             else -> DateFilterType.CUSTOM_RANGE
         }

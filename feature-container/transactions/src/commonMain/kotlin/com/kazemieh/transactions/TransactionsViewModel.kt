@@ -207,7 +207,7 @@ class TransactionsViewModel() : ViewModel() {
                     filterType = state.value.dateFilterType,
                     direction = Direction.NEXT
                 )
-                val uiText = result.label.toUiText()
+                val uiText = result.label.toUiText(result.start)
                 val subLabel = getPeriodSubLabel(result)
 
                 _state.update {
@@ -217,6 +217,7 @@ class TransactionsViewModel() : ViewModel() {
                         dateFilterType = result.filterType,
                         startDateTimeStamp = result.start,
                         endDateTimeStamp = result.end,
+                        isShowArrowButton = true,
                         enableAnimationChart = !_state.value.enableAnimationChart
                     )
                 }
@@ -230,7 +231,7 @@ class TransactionsViewModel() : ViewModel() {
                     filterType = state.value.dateFilterType,
                     direction = Direction.PREVIOUS
                 )
-                val uiText = result.label.toUiText()
+                val uiText = result.label.toUiText(result.start)
                 val subLabel = getPeriodSubLabel(result)
 
                 _state.update {
@@ -240,6 +241,7 @@ class TransactionsViewModel() : ViewModel() {
                         dateFilterType = result.filterType,
                         startDateTimeStamp = result.start,
                         endDateTimeStamp = result.end,
+                        isShowArrowButton = true,
                         enableAnimationChart = !_state.value.enableAnimationChart
                     )
                 }
@@ -260,31 +262,32 @@ class TransactionsViewModel() : ViewModel() {
         timeZone: TimeZone = TimeZone.currentSystemDefault()
     ): Pair<DateRange?, UiText> {
         val range = getRange(type, customFrom, customTo, timeZone)
-        return Pair(range, range?.label?.toUiText() ?: UiText.DynamicString(""))
+        return Pair(range, range?.label?.toUiText(range.start) ?: UiText.DynamicString(""))
     }
 
-    private fun DateRangeLabel?.toUiText(): UiText {
+    private fun DateRangeLabel?.toUiText(currentStart: Long? = null): UiText {
         return when (val label = this) {
             is DateRangeLabel.Text -> UiText.DynamicString(label.value)
             is DateRangeLabel.Filter -> {
-                val resource = when (label.type) {
-                    DateFilterType.TODAY -> Res.string.today
-                    DateFilterType.YESTERDAY -> Res.string.yesterday
-                    DateFilterType.TOMORROW -> Res.string.tomorrow
-                    DateFilterType.THIS_WEEK -> Res.string.this_week
-                    DateFilterType.LAST_WEEK -> Res.string.last_week
-                    DateFilterType.NEXT_WEEK -> Res.string.next_week
-                    DateFilterType.THIS_MONTH -> Res.string.this_month
-                    DateFilterType.LAST_MONTH -> Res.string.last_month
-                    DateFilterType.NEXT_MONTH -> Res.string.next_month
-                    DateFilterType.THIS_YEAR -> Res.string.label_this_year
-                    DateFilterType.LAST_YEAR -> Res.string.label_this_year // Simplified
-                    DateFilterType.NEXT_YEAR -> Res.string.label_this_year // Simplified
-                    DateFilterType.CUSTOM_RANGE -> Res.string.custom_range
+                when (label.type) {
+                    DateFilterType.TODAY -> UiText.StringResourceText(Res.string.today)
+                    DateFilterType.YESTERDAY -> UiText.StringResourceText(Res.string.yesterday)
+                    DateFilterType.TOMORROW -> UiText.StringResourceText(Res.string.tomorrow)
+                    DateFilterType.THIS_WEEK -> UiText.StringResourceText(Res.string.this_week)
+                    DateFilterType.LAST_WEEK -> UiText.StringResourceText(Res.string.last_week)
+                    DateFilterType.NEXT_WEEK -> UiText.StringResourceText(Res.string.next_week)
+                    DateFilterType.THIS_MONTH -> UiText.StringResourceText(Res.string.this_month)
+                    DateFilterType.LAST_MONTH -> UiText.StringResourceText(Res.string.last_month)
+                    DateFilterType.NEXT_MONTH -> UiText.StringResourceText(Res.string.next_month)
+                    DateFilterType.THIS_YEAR -> UiText.StringResourceText(Res.string.label_this_year)
+                    DateFilterType.LAST_YEAR,
+                    DateFilterType.NEXT_YEAR -> {
+                        val year = DateFilterHelper.persianDateFromMillis(currentStart ?: 0, TimeZone.currentSystemDefault()).year
+                        UiText.DynamicString(year.toLong().toFa())
+                    }
+                    DateFilterType.CUSTOM_RANGE -> UiText.StringResourceText(Res.string.custom_range)
                 }
-                UiText.StringResourceText(resource)
             }
-
             null -> UiText.DynamicString("")
         }
     }
