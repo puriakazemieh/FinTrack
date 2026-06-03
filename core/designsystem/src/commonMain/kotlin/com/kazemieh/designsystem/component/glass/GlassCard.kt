@@ -13,6 +13,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+import androidx.compose.ui.draw.alpha
+
 /**
  * 2.3 GlassCard — base surface
  * Frosted Glass effect with balanced blur and transparency.
@@ -22,25 +24,32 @@ fun GlassCard(
     modifier: Modifier = Modifier,
     tone: GlassTone = GlassTone.Default,
     padding: Dp = 16.dp,
+    enabled: Boolean = true,
     onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
-    val backgroundColor = if (tone == GlassTone.Default) {
-        MaterialTheme.colorScheme.surfaceVariant // This is GlassColor (4.5% alpha)
-    } else {
-        com.kazemieh.designsystem.GlassStrong // This is 8% alpha
+    val backgroundColor = when (tone) {
+        GlassTone.Default -> MaterialTheme.colorScheme.surfaceVariant // This is GlassColor (4.5% alpha)
+        GlassTone.Strong -> com.kazemieh.designsystem.GlassStrong // This is 8% alpha
+        GlassTone.Error -> MaterialTheme.colorScheme.errorContainer
     }
 
-    val borderColor = if (tone == GlassTone.Default) {
-        MaterialTheme.colorScheme.outline
-    } else {
-        com.kazemieh.designsystem.GlassEdgeStrong
+    val borderColor = when (tone) {
+        GlassTone.Default -> MaterialTheme.colorScheme.outline
+        GlassTone.Strong -> com.kazemieh.designsystem.GlassEdgeStrong
+        GlassTone.Error -> MaterialTheme.colorScheme.error
     }
 
     Box(
         modifier = modifier
+            .alpha(if (enabled) 1f else 0.5f)
             .clip(RoundedCornerShape(22.dp))
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .then(
+                if (onClick != null) Modifier.clickable(
+                    enabled = enabled,
+                    onClick = onClick
+                ) else Modifier
+            )
     ) {
         // Frosted Background Layer
         Box(
@@ -59,5 +68,5 @@ fun GlassCard(
 }
 
 enum class GlassTone {
-    Default, Strong
+    Default, Strong, Error
 }

@@ -1,4 +1,4 @@
-package com.kazemieh.designsystem.component
+package com.kazemieh.designsystem.component.bottomsheet
 
 
 import androidx.compose.foundation.background
@@ -9,14 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.designsystem.GlassBg0
 import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.ScreenHeader
 import fintrack.core.designsystem.generated.resources.Res
@@ -26,6 +26,8 @@ import fintrack.core.designsystem.generated.resources.delete_confirm_question
 import fintrack.core.designsystem.generated.resources.transaction_delete
 import org.jetbrains.compose.resources.stringResource
 
+
+import com.kazemieh.designsystem.component.glass.GlassTone
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,30 +82,40 @@ fun DeleteBottomSheet(
                     .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Button(
+              
+                GlassCard(
                     onClick = confirmClicked,
                     enabled = confirmEnabled && !isLoading,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = confirmButtonColors
+                    tone = GlassTone.Error,
+                    padding = 0.dp,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            color = MaterialTheme.colorScheme.onError,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        FintrackTitleMediumText(
-                            text = confirmButtonText,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.W600
-                        )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp)
+                        ,
+                        contentAlignment = Alignment.Center,
+
+                        ) {
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = MaterialTheme.colorScheme.onError,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            FintrackTitleMediumText(
+                                text = confirmButtonText,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.W600
+                            )
+                        }
                     }
                 }
-
                 GlassCard(
                     onClick = { if (dismissEnabled && !isLoading) dismissClicked() },
+                    enabled = dismissEnabled && !isLoading,
                     padding = 0.dp,
                     modifier = Modifier.fillMaxWidth()
                 ) {

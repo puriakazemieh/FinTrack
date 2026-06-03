@@ -109,6 +109,7 @@ fun AddCategoryContent(
         sub = stringResource(Res.string.title_category_management),
         iconId = state.draft.iconId,
         colorId = state.draft.colorId,
+        heroName = state.draft.name,
         primaryLabel = stringResource(Res.string.btn_save_category),
         onPrimaryClick = { onIntent(AddCategoryIntent.Save) },
         onClose = { onIntent(AddCategoryIntent.OnDismiss) }

@@ -97,6 +97,9 @@ fun AddPersonContent(
     AddFrame(
         title = if (state.mode == AddPersonMode.Add) stringResource(Res.string.title_new_person) else stringResource(Res.string.title_edit_person),
         sub = stringResource(Res.string.title_person_management),
+        heroName = state.draft.name,
+        iconId = 1, // Default icon for person
+        colorId = 1,
         primaryLabel = stringResource(Res.string.btn_save_person),
         onPrimaryClick = { onIntent(AddPersonIntent.Save) },
         onClose = { onIntent(AddPersonIntent.OnDismiss) }

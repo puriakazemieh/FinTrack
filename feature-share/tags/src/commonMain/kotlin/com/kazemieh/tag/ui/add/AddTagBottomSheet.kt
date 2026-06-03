@@ -103,7 +103,8 @@ fun AddTagContent(
         onPrimaryClick = { onIntent(AddTagIntent.Save) },
         onClose = { onIntent(AddTagIntent.OnDismiss) },
         iconId = state.draft.iconId,
-        colorId = state.draft.colorId
+        colorId = state.draft.colorId,
+        heroName = state.draft.name
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),

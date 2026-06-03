@@ -10,10 +10,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -65,6 +64,7 @@ fun DeleteWithMoveBottomSheetContent(
     onDismiss: () -> Unit,
     confirmButtonText: String,
     dismissButtonText: String,
+    isLoading: Boolean = false,
 ) {
     val space = LocalSpacing.current
 
@@ -75,7 +75,7 @@ fun DeleteWithMoveBottomSheetContent(
     }
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (!isLoading) onDismiss() },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
@@ -99,6 +99,7 @@ fun DeleteWithMoveBottomSheetContent(
 
                 GlassCard(
                     onClick = onSelectDeleteAll,
+                    enabled = !isLoading,
                     padding = 8.dp,
                     tone = if (isDeleteAll) GlassTone.Strong else GlassTone.Default,
                     modifier = Modifier.fillMaxWidth()
@@ -107,7 +108,11 @@ fun DeleteWithMoveBottomSheetContent(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        RadioButton(selected = isDeleteAll, onClick = onSelectDeleteAll)
+                        RadioButton(
+                            selected = isDeleteAll,
+                            onClick = onSelectDeleteAll,
+                            enabled = !isLoading
+                        )
                         Spacer(Modifier.width(space.small))
                         FintrackBodyMediumText(
                             text = deleteAllText,
@@ -121,6 +126,7 @@ fun DeleteWithMoveBottomSheetContent(
 
                 GlassCard(
                     onClick = onSelectMove,
+                    enabled = !isLoading,
                     padding = 8.dp,
                     tone = if (!isDeleteAll) GlassTone.Strong else GlassTone.Default,
                     modifier = Modifier.fillMaxWidth()
@@ -129,7 +135,11 @@ fun DeleteWithMoveBottomSheetContent(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        RadioButton(selected = !isDeleteAll, onClick = onSelectMove)
+                        RadioButton(
+                            selected = !isDeleteAll,
+                            onClick = onSelectMove,
+                            enabled = !isLoading
+                        )
                         Spacer(Modifier.width(space.small))
                         FintrackBodyMediumText(
                             text = moveToAnotherText,
@@ -178,27 +188,37 @@ fun DeleteWithMoveBottomSheetContent(
 
                 GlassCard(
                     onClick = onConfirm,
+                    enabled = !isLoading && (isDeleteAll || !targetValue.isNullOrEmpty()),
+                    tone = GlassTone.Error,
                     padding = 0.dp,
-                    modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.error)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 12.dp)
-                            ,
+                            .padding(vertical = 12.dp),
                         contentAlignment = Alignment.Center,
 
                         ) {
-                        FintrackTitleMediumText(
-                            text = confirmButtonText,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.W600
-                        )
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = MaterialTheme.colorScheme.onError,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            FintrackTitleMediumText(
+                                text = confirmButtonText,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.W600
+                            )
+                        }
                     }
                 }
 
                 GlassCard(
                     onClick = onDismiss,
+                    enabled = !isLoading,
                     padding = 0.dp,
                     modifier = Modifier.fillMaxWidth()
                 ) {

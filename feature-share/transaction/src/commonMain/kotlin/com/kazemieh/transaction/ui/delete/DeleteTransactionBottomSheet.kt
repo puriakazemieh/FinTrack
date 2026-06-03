@@ -9,7 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.TransactionWithRelations
-import com.kazemieh.designsystem.component.DeleteBottomSheet
+import com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet
 import com.kazemieh.designsystem.component.model.resolveString
 import org.koin.compose.viewmodel.koinViewModel
 

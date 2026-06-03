@@ -33,6 +33,7 @@ fun AddFrame(
     sub: String? = null,
     iconId: Int? = null,
     colorId: Int? = null,
+    heroName: String? = null,
     hero: @Composable (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -53,27 +54,38 @@ fun AddFrame(
                     .weight(1f)
                     .padding(horizontal = 24.dp)
             ) {
-                // Hero Section (Only icon/hero now)
-                if (hero != null || (iconId != null && colorId != null)) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        if (hero != null) {
-                            Box(modifier = Modifier.padding(bottom = 16.dp)) {
-                                hero()
-                            }
-                        } else if (iconId != null && colorId != null) {
+                // Hero Section
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (hero != null) {
+                        Box(modifier = Modifier.padding(bottom = 16.dp)) {
+                            hero()
+                        }
+                    } else {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        ) {
                             FinTrackLeadingIcon(
-                                colorId = colorId,
-                                iconId = iconId,
+                                colorId = colorId ?: 1,
+                                iconId = iconId ?: 1,
                                 style = LeadingIconStyle.Badge,
                                 size = 64.dp,
                                 iconSize = 32.dp,
-                                modifier = Modifier.padding(bottom = 16.dp)
                             )
+                            if (!heroName.isNullOrBlank()) {
+                                Spacer(modifier = Modifier.width(16.dp))
+                                FintrackHeadlineSmallText(
+                                    text = heroName,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
                         }
                     }
                 }
