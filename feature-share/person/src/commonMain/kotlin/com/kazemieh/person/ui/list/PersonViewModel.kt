@@ -74,9 +74,11 @@ class PersonViewModel(
             PersonIntent.OnDismiss -> {
                 viewModelScope.launch {
                     _effect.send(PersonEffect.OnDismiss)
-                    _searchQuery.value = ""
-                    _state.update { PersonState() }
                 }
+            }
+
+            PersonIntent.ResetFlags -> {
+                _state.update { it.copy(showAddPerson = false, isDeleteShow = false, selectedPerson = null) }
             }
 
             is PersonIntent.SelectedPerson -> {
@@ -141,6 +143,7 @@ sealed interface PersonIntent {
     data class SelectedPerson(val person: Person? = null) : PersonIntent
     data class OnEditClick(val person: Person? = null) : PersonIntent
     data class OnDeleteClick(val person: Person? = null) : PersonIntent
+    data object ResetFlags : PersonIntent
 }
 
 sealed interface PersonEffect {

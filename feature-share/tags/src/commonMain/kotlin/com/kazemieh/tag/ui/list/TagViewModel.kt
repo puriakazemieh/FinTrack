@@ -71,9 +71,11 @@ class TagViewModel(
             TagIntent.OnDismiss -> {
                 viewModelScope.launch {
                     _effect.send(TagEffect.OnDismiss)
-                    _searchQuery.value = ""
-                    _state.update { TagState() }
                 }
+            }
+
+            TagIntent.ResetFlags -> {
+                _state.update { it.copy(showAddTag = false, isDeleteShow = false, selectedTag = null) }
             }
 
             is TagIntent.SelectedTag -> {
@@ -138,6 +140,7 @@ sealed interface TagIntent {
     data class SelectedTag(val tag: Tag? = null) : TagIntent
     data class OnEditClick(val tag: Tag? = null) : TagIntent
     data class OnDeleteClick(val tag: Tag? = null) : TagIntent
+    data object ResetFlags : TagIntent
 }
 
 

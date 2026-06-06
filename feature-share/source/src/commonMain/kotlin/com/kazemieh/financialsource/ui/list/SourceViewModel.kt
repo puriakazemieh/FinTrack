@@ -47,9 +47,11 @@ class SourceViewModel(
             SourceIntent.OnDismiss -> {
                 viewModelScope.launch {
                     _effect.send(SourceEffect.OnDismiss)
-                    _searchQuery.value = ""
-                    _state.update { SourceState() }
                 }
+            }
+
+            SourceIntent.ResetFlags -> {
+                _state.update { it.copy(isAddShow = false, isDeleteShow = false, selectedSources = null) }
             }
 
             is SourceIntent.OnDeleteClick -> _state.update {
@@ -116,6 +118,7 @@ sealed interface SourceIntent {
     data class SelectedSource(val selectedSources: Source) : SourceIntent
     data class OnEditClick(val source: Source) : SourceIntent
     data class OnDeleteClick(val source: Source? = null) : SourceIntent
+    data object ResetFlags : SourceIntent
 }
 
 sealed interface SourceEffect {

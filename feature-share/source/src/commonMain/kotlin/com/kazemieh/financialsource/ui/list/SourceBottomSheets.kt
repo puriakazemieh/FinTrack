@@ -72,7 +72,10 @@ private fun SourceBottomSheetCore(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = { viewModel.onIntent(SourceIntent.OnDismiss) },
+        onDismissRequest = {
+            viewModel.onIntent(SourceIntent.ResetFlags)
+            onDismiss()
+        },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
@@ -84,7 +87,10 @@ private fun SourceBottomSheetCore(
         ) {
             ScreenHeader(
                 title = stringResource(Res.string.source),
-                onClose = { viewModel.onIntent(SourceIntent.OnDismiss) }
+                onClose = {
+                    viewModel.onIntent(SourceIntent.ResetFlags)
+                    onDismiss()
+                }
             )
 
             EntityList(
@@ -127,7 +133,7 @@ private fun SourceBottomSheetCore(
         AddSourceBottomSheet(
             snackbarHostState = snackbarHostState,
             selectedSource = state.selectedSources,
-            onDismiss = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
+            onDismiss = { viewModel.onIntent(SourceIntent.ResetFlags) },
             setSource = { viewModel.onIntent(SourceIntent.SelectedSource(it)) }
         )
     }
@@ -136,8 +142,8 @@ private fun SourceBottomSheetCore(
         DeleteSourceBottomSheet(
             snackbarHostState = snackbarHostState,
             source = state.selectedSources!!,
-            onDismiss = { viewModel.onIntent(SourceIntent.OnDeleteClick()) },
-            deleted = { viewModel.onIntent(SourceIntent.OnDeleteClick()) }
+            onDismiss = { viewModel.onIntent(SourceIntent.ResetFlags) },
+            deleted = { viewModel.onIntent(SourceIntent.ResetFlags) }
         )
     }
 }

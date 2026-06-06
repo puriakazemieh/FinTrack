@@ -68,7 +68,7 @@ fun PersonPickerBottomSheet(
     if (state.showAddPerson) {
         AddPersonBottomSheet(
             snackbarHostState = snackbarHostState,
-            onDismiss = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
+            onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
             setPerson = { viewModel.onIntent(PersonIntent.SetSelectedPerson(it)) }
         )
     }
@@ -100,7 +100,10 @@ fun PersonPickerSingleBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = { viewModel.onIntent(PersonIntent.OnDismiss) },
+        onDismissRequest = {
+            viewModel.onIntent(PersonIntent.ResetFlags)
+            onDismiss()
+        },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
@@ -112,7 +115,10 @@ fun PersonPickerSingleBottomSheet(
         ) {
             ScreenHeader(
                 title = stringResource(Res.string.persons),
-                onClose = { viewModel.onIntent(PersonIntent.OnDismiss) }
+                onClose = {
+                    viewModel.onIntent(PersonIntent.ResetFlags)
+                    onDismiss()
+                }
             )
 
             EntityList(
@@ -150,7 +156,7 @@ fun PersonPickerSingleBottomSheet(
         AddPersonBottomSheet(
             snackbarHostState = snackbarHostState,
             selectedPerson = state.selectedPerson,
-            onDismiss = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
+            onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
             setPerson = { viewModel.onIntent(PersonIntent.SetSelectedPerson(it)) }
         )
     }
@@ -184,7 +190,10 @@ fun PersonManageBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = { viewModel.onIntent(PersonIntent.OnDismiss) },
+        onDismissRequest = {
+            viewModel.onIntent(PersonIntent.ResetFlags)
+            onDismiss()
+        },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
@@ -196,7 +205,10 @@ fun PersonManageBottomSheet(
         ) {
             ScreenHeader(
                 title = stringResource(Res.string.persons),
-                onClose = { viewModel.onIntent(PersonIntent.OnDismiss) }
+                onClose = {
+                    viewModel.onIntent(PersonIntent.ResetFlags)
+                    onDismiss()
+                }
             )
 
             EntityList(
@@ -238,8 +250,8 @@ fun PersonManageBottomSheet(
         AddPersonBottomSheet(
             snackbarHostState = snackbarHostState,
             selectedPerson = state.selectedPerson,
-            onDismiss = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
-            setPerson = { viewModel.onIntent(PersonIntent.SetSelectedPerson(it)) }
+            onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
+            setPerson = { viewModel.onIntent(PersonIntent.SelectedPerson(it)) }
         )
     }
 
@@ -247,8 +259,8 @@ fun PersonManageBottomSheet(
         DeletePersonBottomSheet(
             snackbarHostState = snackbarHostState,
             person = state.selectedPerson!!,
-            onDismiss = { viewModel.onIntent(PersonIntent.OnDeleteClick()) },
-            deleted = { viewModel.onIntent(PersonIntent.OnDeleteClick()) }
+            onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
+            deleted = { viewModel.onIntent(PersonIntent.ResetFlags) }
         )
     }
 }

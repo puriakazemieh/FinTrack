@@ -58,7 +58,7 @@ fun TagPickerBottomSheet(
     if (state.showAddTag) {
         AddTagBottomSheet(
             snackbarHostState = snackbarHostState,
-            onDismiss = { viewModel.onIntent(TagIntent.ShowAddTag) },
+            onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
             setTag = { viewModel.onIntent(TagIntent.SetSelectedTag(it)) }
         )
     }
@@ -90,7 +90,10 @@ fun TagPickerSingleBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = { viewModel.onIntent(TagIntent.OnDismiss) },
+        onDismissRequest = {
+            viewModel.onIntent(TagIntent.ResetFlags)
+            onDismiss()
+        },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
@@ -102,7 +105,10 @@ fun TagPickerSingleBottomSheet(
         ) {
             ScreenHeader(
                 title = stringResource(Res.string.tags),
-                onClose = { viewModel.onIntent(TagIntent.OnDismiss) }
+                onClose = {
+                    viewModel.onIntent(TagIntent.ResetFlags)
+                    onDismiss()
+                }
             )
 
             EntityList(
@@ -140,7 +146,7 @@ fun TagPickerSingleBottomSheet(
         AddTagBottomSheet(
             snackbarHostState = snackbarHostState,
             selectedTag = state.selectedTag,
-            onDismiss = { viewModel.onIntent(TagIntent.ShowAddTag) },
+            onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
             setTag = { viewModel.onIntent(TagIntent.SetSelectedTag(it)) }
         )
     }
@@ -174,7 +180,10 @@ fun TagManageBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = { viewModel.onIntent(TagIntent.OnDismiss) },
+        onDismissRequest = {
+            viewModel.onIntent(TagIntent.ResetFlags)
+            onDismiss()
+        },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
@@ -186,7 +195,10 @@ fun TagManageBottomSheet(
         ) {
             ScreenHeader(
                 title = stringResource(Res.string.tags),
-                onClose = { viewModel.onIntent(TagIntent.OnDismiss) }
+                onClose = {
+                    viewModel.onIntent(TagIntent.ResetFlags)
+                    onDismiss()
+                }
             )
 
             EntityList(
@@ -228,7 +240,7 @@ fun TagManageBottomSheet(
         AddTagBottomSheet(
             snackbarHostState = snackbarHostState,
             selectedTag = state.selectedTag,
-            onDismiss = { viewModel.onIntent(TagIntent.ShowAddTag) },
+            onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
             setTag = { viewModel.onIntent(TagIntent.SelectedTag(it)) }
         )
     }
@@ -237,8 +249,8 @@ fun TagManageBottomSheet(
         DeleteTagBottomSheet(
             snackbarHostState = snackbarHostState,
             tag = state.selectedTag!!,
-            onDismiss = { viewModel.onIntent(TagIntent.OnDeleteClick()) },
-            deleted = { viewModel.onIntent(TagIntent.OnDeleteClick()) }
+            onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
+            deleted = { viewModel.onIntent(TagIntent.ResetFlags) }
         )
     }
 }
