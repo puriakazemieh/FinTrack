@@ -1,6 +1,6 @@
 package com.kazemieh.common.model
 
-import com.kazemieh.common.formatNumber
+import com.kazemieh.common.chunked3
 import com.kazemieh.common.toFa
 import kotlinx.serialization.Serializable
 import kotlin.time.Clock
@@ -18,15 +18,10 @@ data class Transaction(
     val date: String = "",
     val type: TransactionType
 ) {
-    val formatedAmount: String
-        get() = when (type) {
-            TransactionType.INCOME -> "\u200E+ ${amount.formatNumber().toFa()}"
-            TransactionType.EXPENSE -> "\u200E- ${amount.formatNumber().toFa()}"
-            else -> amount.formatNumber().toFa()
-        }
 
     val amountTransferFormated: String?
-        get() = if (type == TransactionType.TRANSFER) amountTransfer.formatNumber().toFa() else null
+        get() = if (type == TransactionType.TRANSFER) amountTransfer.toString().chunked3()
+            .toFa() else null
 }
 
 @Serializable

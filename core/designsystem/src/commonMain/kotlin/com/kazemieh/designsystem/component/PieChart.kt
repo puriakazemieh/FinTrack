@@ -52,18 +52,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.kazemieh.common.format
 import com.kazemieh.common.formatNumberLong
-import com.kazemieh.common.toDegrees
 import com.kazemieh.common.toFa
-import com.kazemieh.common.toRadians
-import fintrack.core.designsystem.generated.resources.*
-import org.jetbrains.compose.resources.stringResource
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.vazirmatnFontFamily
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
+import com.kazemieh.designsystem.vazirmatnFontFamily
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.currency_toman
+import fintrack.core.designsystem.generated.resources.label_amount_with_unit
+import fintrack.core.designsystem.generated.resources.label_percentage_suffix
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import kotlin.math.PI
+import kotlin.math.pow
 
 // ---------- Data class ----------
 data class PieChartItem(
@@ -165,7 +167,8 @@ fun PieChart(
     val labelTemplate = stringResource(Res.string.label_percentage_suffix)
     val labelStrings = remember(data, percentages, labelTemplate) {
         data.mapIndexed { index, item ->
-            labelTemplate.replace("%1\$s", item.label).replace("%2\$s", percentages[index].format(0).toFa())
+            labelTemplate.replace("%1\$s", item.label)
+                .replace("%2\$s", percentages[index].format(0).toFa())
         }
     }
     val total = data.sumOf { it.value.toDouble() }.takeIf { it != 0.0 } ?: 1.0
@@ -464,7 +467,11 @@ private fun PieChartLegend(
                 }
                 Spacer(modifier = Modifier.width(space.small))
                 FintrackLabelSmallText(
-                    text = stringResource(Res.string.label_amount_with_unit, item.value.formatNumberLong(), stringResource(Res.string.currency_toman)),
+                    text = stringResource(
+                        Res.string.label_amount_with_unit,
+                        item.value.formatNumberLong(),
+                        stringResource(Res.string.currency_toman)
+                    ),
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -472,3 +479,25 @@ private fun PieChartLegend(
     }
 }
 
+
+private fun Float.toDegrees(): Float = this * 180f / PI.toFloat()
+
+// تبدیل درجه به رادیان
+private fun Double.toRadians(): Double = this * PI / 180.0
+
+
+// commonMain
+private fun Double.format(digits: Int = 0): String {
+    val multiplier = 10.0.pow(digits)
+    val rounded = kotlin.math.round(this * multiplier) / multiplier
+    return if (digits == 0) {
+        rounded.toLong().toString()
+    } else {
+        val parts = rounded.toString().split('.')
+        val integerPart = parts[0]
+        val fractionalPart = parts.getOrElse(1) { "0" }.padEnd(digits, '0').take(digits)
+        "$integerPart.$fractionalPart"
+    }
+}
+
+private fun Float.format(digits: Int = 0): String = this.toDouble().format(digits)
