@@ -30,9 +30,9 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
-import com.kazemieh.common.toFormattedFa
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.common.toPersianPrice
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
@@ -235,7 +235,7 @@ fun TransactionItem(
                     text = stringResource(
                         Res.string.amount_label,
                         typeLabel,
-                        trx.amount.toLong().toFormattedFa()
+                        trx.amount.toLong().toPersianPrice()
                     ),
                     fontWeight = FontWeight.W700,
                     color = amountColor

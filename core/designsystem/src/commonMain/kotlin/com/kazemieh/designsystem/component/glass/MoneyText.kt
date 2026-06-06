@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.common.toFa
+import com.kazemieh.common.toPersianDigits
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.currency_toman
 import org.jetbrains.compose.resources.stringResource
@@ -33,7 +33,7 @@ fun MoneyText(
         verticalAlignment = Alignment.Bottom
     ) {
         FintrackTitleMediumText(
-            text = amount.toFa(),
+            text = amount.toPersianDigits(),
             fontSize = size.sp,
             fontWeight = weight,
             color = color

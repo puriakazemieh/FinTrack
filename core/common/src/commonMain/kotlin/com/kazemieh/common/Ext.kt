@@ -1,43 +1,48 @@
 package com.kazemieh.common
 
-
-
-fun String.chunked3(): String {
-    return this.reversed().chunked(3).joinToString(",").reversed()
-}
-
+/**
+ * Extension for Left-to-Right Mark to fix layout issues with RTL languages and symbols.
+ */
 fun String.withLRM(): String = "\u200E$this"
 
-fun Int.formatted(): String = toLong().formatted()
+/**
+ * Converts English digits to Persian digits.
+ */
+fun String.toPersianDigits(): String = this.map { if (it in '0'..'9') '۰' + (it - '0') else it }.joinToString("")
+fun Long.toPersianDigits(): String = toString().toPersianDigits()
+fun Int.toPersianDigits(): String = toLong().toPersianDigits()
 
-fun Long.formatNumberLong(): String {
-    return toString().reversed().chunked(3).joinToString(",").reversed().toFa()
-}
+/**
+ * Formats a number with comma separators every 3 digits.
+ * Example: 1250000 -> 1,250,000
+ */
+fun String.separateWithCommas(): String = this.reversed().chunked(3).joinToString(",").reversed()
+fun Long.separateWithCommas(): String = toString().separateWithCommas()
+fun Int.separateWithCommas(): String = toString().separateWithCommas()
 
-fun Long.formatted(): String =
+/**
+ * Formats a value as a currency/price with Persian digits and comma separators.
+ * Example: 1250000 -> ۱,۲۵۰,۰۰۰
+ */
+fun Long.toPersianPrice(): String = separateWithCommas().toPersianDigits()
+fun Int.toPersianPrice(): String = toLong().toPersianPrice()
+fun String.toPersianPrice(): String = separateWithCommas().toPersianDigits()
+
+/**
+ * Formats a value with a sign (+/-), Persian digits, and comma separators.
+ * Useful for displaying transaction amounts or balance changes.
+ */
+fun Long.toSignedPersianPrice(): String =
     when {
-        this < 0 -> "- ${(-this).formatNumber()}".withLRM().toFa()
-        this > 0 -> "+ ${this.formatNumber()}".withLRM().toFa()
-        else -> "0".toFa()
+        this < 0 -> "- ${(-this).toPersianPrice()}".withLRM().toPersianDigits()
+        this > 0 -> "+ ${this.toPersianPrice()}".withLRM().toPersianDigits()
+        else -> "0".toPersianDigits()
     }
+fun Int.toSignedPersianPrice(): String = toLong().toSignedPersianPrice()
 
-
-fun String.toPrice(): String {
-    return this.chunked3()
-}
-
-fun Long.toFa(): String = toString().map { if (it in '0'..'9') '۰' + (it - '0') else it }.joinToString("")
-fun Int.toFa(): String = this.toLong().toFa()
-fun String.toFa(): String = this.map { if (it in '0'..'9') '۰' + (it - '0') else it }.joinToString("")
-
-fun Long.toFormattedFa(): String = formatNumber().toFa()
-fun Long.formatNumber(): String = toString().chunked3()
-
-
-
-
-
-
+/**
+ * Helper to safely unwrap two nullable objects.
+ */
 inline fun <T1 : Any, T2 : Any, R : Any> safeLet(p1: T1?, p2: T2?, block: (T1, T2) -> R?): R? {
     return if (p1 != null && p2 != null) block(p1, p2) else null
 }

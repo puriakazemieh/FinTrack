@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.TransactionType
-import com.kazemieh.common.toFa
-import com.kazemieh.common.toFormattedFa
+import com.kazemieh.common.toPersianDigits
+import com.kazemieh.common.toPersianPrice
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.GlassCard
@@ -56,7 +56,7 @@ fun SummaryCard(
                         .padding(horizontal = 8.dp, vertical = 2.dp)
                 ) {
                     FintrackLabelSmallText(
-                        text = stringResource(Res.string.label_amount_with_unit, state.items.size.toLong().toFa(), stringResource(Res.string.unit_transaction)),
+                        text = stringResource(Res.string.label_amount_with_unit, state.items.size.toLong().toPersianDigits(), stringResource(Res.string.unit_transaction)),
                         fontSize = 10.sp,
                         color = GlassText3
                     )
@@ -106,7 +106,7 @@ fun SummaryCard(
                         FintrackTitleSmallText(text = label, color = GlassText)
                     }
                     FintrackTitleLargeText(
-                        text = stringResource(Res.string.label_amount_with_unit, value.toFormattedFa(), stringResource(Res.string.unit_toman_short)),
+                        text = stringResource(Res.string.label_amount_with_unit, value.toPersianPrice(), stringResource(Res.string.unit_toman_short)),
                         color = color,
                         fontWeight = FontWeight.W700
                     )
@@ -129,7 +129,7 @@ private fun SummaryRow(
         FintrackLabelSmallText(text = label, color = GlassText2, modifier = Modifier.weight(1f))
         val text = valueStr ?: stringResource(
             Res.string.label_amount_with_unit,
-            value.toFormattedFa(),
+            value.toPersianPrice(),
             stringResource(Res.string.unit_toman_short)
         )
         FintrackTitleSmallText(
@@ -231,10 +231,10 @@ fun CategoryStrip(
                         FintrackLabelSmallText(text = cat.name, color = GlassText, modifier = Modifier.weight(1f))
                         FintrackLabelSmallText(
                             text = stringResource(
-                                Res.string.label_amount_with_unit,
-                                cat.totalAmount.toFormattedFa(),
-                                stringResource(Res.string.unit_toman_short)
-                            ),
+                            Res.string.label_amount_with_unit,
+                            cat.totalAmount.toPersianPrice(),
+                            stringResource(Res.string.unit_toman_short)
+                        ),
                             fontWeight = FontWeight.Bold,
                             color = amountColor
                         )

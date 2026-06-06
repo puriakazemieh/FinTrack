@@ -2,11 +2,11 @@ package com.kazemieh.transaction.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.common.formatted
 import com.kazemieh.common.model.PageRequest
 import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -210,13 +210,13 @@ class TransactionViewModel(
 
                 _state.update {
                     it.copy(
-                        formatedTotalIncome = totalIncome.toInt().formatted(),
+                        formatedTotalIncome = totalIncome.toInt().toSignedPersianPrice(),
                         totalIncome = totalIncome,
-                        formatedTotalExpense = totalExpense.toInt().formatted(),
+                        formatedTotalExpense = totalExpense.toInt().toSignedPersianPrice(),
                         totalExpense = totalExpense,
-                        formatedTotalTransfer = totalTransfer.toInt().formatted(),
+                        formatedTotalTransfer = totalTransfer.toInt().toSignedPersianPrice(),
                         totalTransfer = totalTransfer,
-                        balance = balance.toInt().formatted(),
+                        balance = balance.toInt().toSignedPersianPrice(),
                         isPositiveBalance = balance >= 0L
                     )
                 }

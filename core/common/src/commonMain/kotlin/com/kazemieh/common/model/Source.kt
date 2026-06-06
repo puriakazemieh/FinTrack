@@ -1,6 +1,6 @@
 package com.kazemieh.common.model
 
-import com.kazemieh.common.formatted
+import com.kazemieh.common.toSignedPersianPrice
 import kotlinx.serialization.Serializable
 
 @OptIn(kotlinx.serialization.InternalSerializationApi::class)
@@ -12,7 +12,7 @@ data class Source(
     val cardNumber: String? = null,
     val description: String? = null,
     val type: Int = 0,
-    val formattedBalance: String = balance.formatted(),
+    val formattedBalance: String = balance.toSignedPersianPrice(),
     val colorId: Int,
     val iconId: Int,
     val shabaNumber: String? = null,

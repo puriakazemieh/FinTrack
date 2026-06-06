@@ -16,7 +16,7 @@ import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.persiandatetime.extensions.persianMonth
-import com.kazemieh.common.toFa
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.component.model.UiText
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.custom_range
@@ -171,11 +171,11 @@ class TransactionsViewModel() : ViewModel() {
                     val endP = DateFilterHelper.persianDateFromMillis(intent.endTimeStamp, TimeZone.currentSystemDefault())
                     
                     val actualRangeText = if (startP.year == endP.year && startP.month == endP.month && startP.day == endP.day) {
-                        "${startP.day.toFa()} ${startP.persianMonth().displayName} ${startP.year.toFa()}"
+                        "${startP.day.toPersianDigits()} ${startP.persianMonth().displayName} ${startP.year.toPersianDigits()}"
                     } else if (startP.year == endP.year) {
-                        "${startP.day.toFa()} ${startP.persianMonth().displayName} تا ${endP.day.toFa()} ${endP.persianMonth().displayName} ${endP.year.toFa()}"
+                        "${startP.day.toPersianDigits()} ${startP.persianMonth().displayName} تا ${endP.day.toPersianDigits()} ${endP.persianMonth().displayName} ${endP.year.toPersianDigits()}"
                     } else {
-                        "${startP.day.toFa()} ${startP.persianMonth().displayName} ${startP.year.toFa()} تا ${endP.day.toFa()} ${endP.persianMonth().displayName} ${endP.year.toFa()}"
+                        "${startP.day.toPersianDigits()} ${startP.persianMonth().displayName} ${startP.year.toPersianDigits()} تا ${endP.day.toPersianDigits()} ${endP.persianMonth().displayName} ${endP.year.toPersianDigits()}"
                     }
                     val uiText = UiText.DynamicString(actualRangeText)
                     val subLabel = getPeriodSubLabel(range)
@@ -315,7 +315,7 @@ class TransactionsViewModel() : ViewModel() {
                     DateFilterType.LAST_YEAR,
                     DateFilterType.NEXT_YEAR -> {
                         val year = DateFilterHelper.persianDateFromMillis(currentStart ?: 0, TimeZone.currentSystemDefault()).year
-                        UiText.DynamicString(year.toLong().toFa())
+                        UiText.DynamicString(year.toLong().toPersianDigits())
                     }
                     DateFilterType.CUSTOM_RANGE -> UiText.StringResourceText(Res.string.custom_range)
                 }
@@ -331,7 +331,7 @@ class TransactionsViewModel() : ViewModel() {
                 Instant.fromEpochMilliseconds(range.start).toLocalDateTime(timeZone).date.toEpochDays()) + 1
 
         if (range.filterType == DateFilterType.CUSTOM_RANGE) {
-            return UiText.DynamicString("${daysBetween.toFa()} روز")
+            return UiText.DynamicString("${daysBetween.toPersianDigits()} روز")
         }
 
         if (range.filterType == DateFilterType.TODAY) return UiText.DynamicString("")
@@ -346,11 +346,11 @@ class TransactionsViewModel() : ViewModel() {
         val rangeStr = when {
             isSameDay -> DateFilterHelper.getDateText(range.start, timeZone)
             startPersian.year == endPersian.year && startPersian.month == endPersian.month -> {
-                "${startPersian.day.toFa()} — ${endPersian.day.toFa()} ${startPersian.persianMonth().displayName}"
+                "${startPersian.day.toPersianDigits()} — ${endPersian.day.toPersianDigits()} ${startPersian.persianMonth().displayName}"
             }
             startPersian.year == endPersian.year -> {
-                val startP = "${startPersian.day.toFa()} ${startPersian.persianMonth().displayName}"
-                val endP = "${endPersian.day.toFa()} ${endPersian.persianMonth().displayName} ${endPersian.year.toFa()}"
+                val startP = "${startPersian.day.toPersianDigits()} ${startPersian.persianMonth().displayName}"
+                val endP = "${endPersian.day.toPersianDigits()} ${endPersian.persianMonth().displayName} ${endPersian.year.toPersianDigits()}"
                 "$startP تا $endP"
             }
             else -> {
@@ -362,7 +362,7 @@ class TransactionsViewModel() : ViewModel() {
 
         return UiText.StringResourceText(
             Res.string.label_period_range_summary,
-            listOf(rangeStr, daysBetween.toFa())
+            listOf(rangeStr, daysBetween.toPersianDigits())
         )
     }
 

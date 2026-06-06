@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.common.toFa
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.*
@@ -204,7 +204,7 @@ fun SelectableFlowRowBottomSheet(
                     )
                 ) {
                     FintrackTitleMediumText(
-                        text = "${stringResource(Res.string.confirm)} (${selected.size.toLong().toFa()})",
+                        text = "${stringResource(Res.string.confirm)} (${selected.size.toLong().toPersianDigits()})",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.W600
                     )

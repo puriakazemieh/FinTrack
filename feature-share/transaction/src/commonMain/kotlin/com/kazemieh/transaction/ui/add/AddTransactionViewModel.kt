@@ -7,9 +7,10 @@ import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
-import com.kazemieh.common.toFa
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
@@ -155,7 +156,7 @@ class AddTransactionViewModel(
         if (transactionWithRelations == null) {
             val today = com.kazemieh.designsystem.component.jalali.JalaliCalendar()
             _state.value = AddTransactionState(
-                date = "${today.day.toFa()} / ${today.monthString} / ${today.year.toFa()}",
+                date = "${today.day.toPersianDigits()} / ${today.monthString} / ${today.year.toPersianDigits()}",
                 timeStamp = today.toTimestamp(),
                 mostUsedCategories = _state.value.mostUsedCategories,
                 mostUsedSources = _state.value.mostUsedSources,

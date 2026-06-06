@@ -52,8 +52,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.kazemieh.common.formatNumberLong
-import com.kazemieh.common.toFa
+import com.kazemieh.common.toPersianDigits
+import com.kazemieh.common.toPersianPrice
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
@@ -168,7 +168,7 @@ fun PieChart(
     val labelStrings = remember(data, percentages, labelTemplate) {
         data.mapIndexed { index, item ->
             labelTemplate.replace("%1\$s", item.label)
-                .replace("%2\$s", percentages[index].format(0).toFa())
+                .replace("%2\$s", percentages[index].format(0).toPersianDigits())
         }
     }
     val total = data.sumOf { it.value.toDouble() }.takeIf { it != 0.0 } ?: 1.0
@@ -469,7 +469,7 @@ private fun PieChartLegend(
                 FintrackLabelSmallText(
                     text = stringResource(
                         Res.string.label_amount_with_unit,
-                        item.value.formatNumberLong(),
+                        item.value.toPersianPrice(),
                         stringResource(Res.string.currency_toman)
                     ),
                     color = MaterialTheme.colorScheme.onSurface

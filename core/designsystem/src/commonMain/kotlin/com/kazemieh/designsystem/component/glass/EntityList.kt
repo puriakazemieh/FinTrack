@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.common.toFa
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.*
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -78,7 +78,7 @@ fun EntityList(
                                     FintrackLabelSmallText(text = s.label, color = GlassText3)
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         FintrackTitleMediumText(
-                                            text = s.value.toFa(),
+                                            text = s.value.toPersianDigits(),
                                             fontWeight = FontWeight.Bold,
                                             color = s.color ?: GlassText
                                         )

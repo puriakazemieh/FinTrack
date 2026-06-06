@@ -40,8 +40,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.persiandatetime.extensions.persianMonth
-import com.kazemieh.common.toFa
 import com.kazemieh.common.DateFilterType
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.GlassBg0
 import com.kazemieh.designsystem.GlassColor
 import com.kazemieh.designsystem.GlassEdge
@@ -368,7 +368,7 @@ fun DateFilterBottomSheet(
                 else -> Res.string.all
             }
             FintrackBodyLargeText(
-                text = stringResource(label).toFa(),
+                text = stringResource(label).toPersianDigits(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onDateRange(type) }
@@ -414,7 +414,7 @@ fun CustomDateBottomSheet(
             ) {
                 DateInput(
                     label = stringResource(Res.string.start),
-                    value = (startDate?.first ?: "").toFa(),
+                    value = (startDate?.first ?: "").toPersianDigits(),
                     isError = isError && startDate == null,
                     modifier = Modifier.weight(1f),
                     onClick = {
@@ -424,7 +424,7 @@ fun CustomDateBottomSheet(
                 )
                 DateInput(
                     label = stringResource(Res.string.end),
-                    value = (endDate?.first ?: "").toFa(),
+                    value = (endDate?.first ?: "").toPersianDigits(),
                     isError = isError && endDate == null,
                     modifier = Modifier.weight(1f),
                     onClick = {
@@ -491,7 +491,7 @@ private fun DateInput(
                 val month = parts[1].toIntOrNull() ?: 0
                 val day = parts[2]
                 val pdt = com.kazemieh.common.persiandatetime.domain.PersianDateTime(year.toInt(), month, day.toInt())
-                "${day.toFa()} ${pdt.persianMonth().displayName} ${year.toFa()}"
+                "${day.toPersianDigits()} ${pdt.persianMonth().displayName} ${year.toPersianDigits()}"
             } else value
         }
     }

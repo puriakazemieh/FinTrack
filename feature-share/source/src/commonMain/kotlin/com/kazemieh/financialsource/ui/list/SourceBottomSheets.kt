@@ -1,19 +1,26 @@
 package com.kazemieh.financialsource.ui.list
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
-import com.kazemieh.common.toPrice
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
-import com.kazemieh.designsystem.GlassText3
-import com.kazemieh.designsystem.component.glass.*
-import com.kazemieh.designsystem.component.model.ItemUi
-import fintrack.core.designsystem.generated.resources.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -22,16 +29,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import com.kazemieh.common.model.Source
-import com.kazemieh.common.toFa
+import com.kazemieh.common.toPersianDigits
+import com.kazemieh.designsystem.GlassBg0
+import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.LeadingIconStyle
-import com.kazemieh.designsystem.component.bottomsheet.ListBottomSheet
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
-import com.kazemieh.designsystem.component.model.ItemPayload
+import com.kazemieh.designsystem.component.glass.EntityItem
+import com.kazemieh.designsystem.component.glass.EntityList
+import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.designsystem.component.model.toSource
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
@@ -39,6 +49,7 @@ import com.kazemieh.financialsource.ui.delete.DeleteSourceBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.add_source
 import fintrack.core.designsystem.generated.resources.balance
+import fintrack.core.designsystem.generated.resources.currency_toman
 import fintrack.core.designsystem.generated.resources.financial_sources
 import fintrack.core.designsystem.generated.resources.source
 import org.jetbrains.compose.resources.stringResource
@@ -193,7 +204,8 @@ fun SourceSelectionBottomSheet(
         viewModel.onIntent(SourceIntent.LoadAllSource)
     }
 
-    val initialSelectionIds = if (isAllSelected) state.items else initialSelectionPairs.map { it.toItemUi() }.toSet()
+    val initialSelectionIds =
+        if (isAllSelected) state.items else initialSelectionPairs.map { it.toItemUi() }.toSet()
 
     SelectableListBottomSheet(
         title = stringResource(Res.string.source),
@@ -271,7 +283,10 @@ fun SourceList(
                             FintrackBodyMediumText(text = source.name)
                         }
                         FintrackBodySmallText(
-                            text = stringResource(Res.string.balance, source.formattedBalance.toFa()),
+                            text = stringResource(
+                                Res.string.balance,
+                                source.formattedBalance.toPersianDigits()
+                            ),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }

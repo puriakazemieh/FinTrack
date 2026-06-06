@@ -21,8 +21,8 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.KeyboardType
-import com.kazemieh.common.toFa
-import com.kazemieh.common.toPrice
+import com.kazemieh.common.toPersianDigits
+import com.kazemieh.common.toPersianPrice
 import com.kazemieh.designsystem.LocalSpacing
 
 @Composable
@@ -115,7 +115,7 @@ fun FintrackOutlinedTextField(
 class NumberCommaTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         val originalText = text.text
-        val transformedText = originalText.toPrice().toFa()
+        val transformedText = originalText.toPersianPrice()
         
         return TransformedText(
             text = AnnotatedString(transformedText),
@@ -152,7 +152,7 @@ class NumberCommaTransformation : VisualTransformation {
 
 class PersianNumberTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
-        val transformedText = text.text.toFa()
+        val transformedText = text.text.toPersianDigits()
         return TransformedText(
             text = AnnotatedString(transformedText),
             offsetMapping = OffsetMapping.Identity
@@ -163,7 +163,7 @@ class PersianNumberTransformation : VisualTransformation {
 class FourDigitGroupingTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         val originalText = text.text
-        val transformedText = originalText.chunked(4).joinToString("-").toFa()
+        val transformedText = originalText.chunked(4).joinToString("-").toPersianDigits()
 
         val offsetMapping = object : OffsetMapping {
             override fun originalToTransformed(offset: Int): Int {

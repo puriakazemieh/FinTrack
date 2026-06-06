@@ -292,7 +292,7 @@ object DateFilterHelper {
     ): String {
         val d = persianDateFromMillis(dateMillis, timeZone)
         val monthName = d.persianMonth().displayName
-        return "${d.day.toFa()} $monthName ${d.year.toFa()}"
+        return "${d.day.toPersianDigits()} $monthName ${d.year.toPersianDigits()}"
     }
 
     fun getDateRangeLabel(

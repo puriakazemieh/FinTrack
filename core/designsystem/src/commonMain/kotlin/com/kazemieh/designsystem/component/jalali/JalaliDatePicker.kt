@@ -43,7 +43,7 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.common.toFa
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.component.glass.SheetFrame
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.action_select_date
@@ -198,7 +198,7 @@ fun JalaliCalendarView(
                 pickerType = if (pickerType != PickerType.Year) PickerType.Year else PickerType.Day
             }) {
                 FintrackTitleMediumText(
-                    text = jalali.year.toFa(),
+                    text = jalali.year.toPersianDigits(),
                     color = dropDownColor
                 )
                 Icon(Icons.Outlined.ArrowDropDown, null, tint = dropDownColor)
@@ -296,7 +296,7 @@ fun JalaliCalendarView(
                                     enabled = !disabled
                                 ) {
                                     FintrackBodyMediumText(
-                                        text = day.toFa(),
+                                        text = day.toPersianDigits(),
                                         color = when {
                                             isToday -> textColorHighlight
                                             disabled -> textDisabledColor
@@ -426,7 +426,7 @@ fun JalaliCalendarView(
                             contentAlignment = Alignment.Center
                         ) {
                             FintrackTitleLargeText(
-                                text = index.toFa(),
+                                text = index.toPersianDigits(),
                                 color = when {
                                     disabled -> textDisabledColor
                                     jalali.year == index -> textColorHighlight

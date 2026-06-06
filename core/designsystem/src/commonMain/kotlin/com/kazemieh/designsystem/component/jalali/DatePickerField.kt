@@ -29,7 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.window.Dialog
-import com.kazemieh.common.toFa
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
@@ -42,7 +42,7 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerField(
-    selectedDate: String? = "${JalaliCalendar().day.toFa()} / ${JalaliCalendar().monthString} / ${JalaliCalendar().year.toFa()}",
+    selectedDate: String? = "${JalaliCalendar().day.toPersianDigits()} / ${JalaliCalendar().monthString} / ${JalaliCalendar().year.toPersianDigits()}",
     labelText: String = stringResource(Res.string.date),
     isError: Boolean = false,
     clickable: Boolean = true,
@@ -57,14 +57,14 @@ fun DatePickerField(
             disableBeforeDate = disableBeforeDate,
             onConfirm = {
                 val timestamp = it.toTimestamp()
-                val date = "${it.day.toFa()} / ${it.monthString} / ${it.year.toFa()}"
+                val date = "${it.day.toPersianDigits()} / ${it.monthString} / ${it.year.toPersianDigits()}"
                 onDateSelected(date, timestamp)
             },
         )
     }
     FintrackOutlinedTextField(
         value = selectedDate
-            ?: "${JalaliCalendar().day.toFa()} / ${JalaliCalendar().monthString} / ${JalaliCalendar().year.toFa()}",
+            ?: "${JalaliCalendar().day.toPersianDigits()} / ${JalaliCalendar().monthString} / ${JalaliCalendar().year.toPersianDigits()}",
         onClick = { if (clickable) openSheet.value = true },
         readOnly = true,
         enabled = false,

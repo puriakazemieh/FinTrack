@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kazemieh.common.toFa
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.*
 
 @Preview
@@ -69,7 +69,7 @@ fun GlassComponentsPreview() {
             WidgetCard(title = stringResource(Res.string.label_budgets), count = 6, badge = stringResource(Res.string.label_monthly), accent = GlassGreen, onMore = {}) {
                 Row(
                     label = stringResource(Res.string.label_home_purchase),
-                    sub = stringResource(Res.string.hint_remaining_amount, "2,000,000".toFa()),
+                    sub = stringResource(Res.string.hint_remaining_amount, "2,000,000".toPersianDigits()),
                     icon = GlassIcon(rememberVectorPainter(Icons.Default.Notifications), GlassGreenSoft, GlassGreen),
                     value = { MoneyText(amount = 1250000) }
                 )

@@ -4,10 +4,13 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import com.kazemieh.designsystem.component.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -16,10 +19,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.common.toFa
-import com.kazemieh.designsystem.GlassColor
-import com.kazemieh.designsystem.GlassText2
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.common.toPersianDigits
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
 
 /**
  * 2.8 Tabs — segmented tab control
@@ -70,18 +72,24 @@ fun Tabs(
                             fontWeight = if (isActive) FontWeight.W700 else FontWeight.W500,
                             color = textColor
                         )
-                        
+
                         counts?.getOrNull(index)?.let { count ->
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(99.dp))
-                                    .background(if (isActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant)
+                                    .background(
+                                        if (isActive) MaterialTheme.colorScheme.primary.copy(
+                                            alpha = 0.1f
+                                        ) else MaterialTheme.colorScheme.surfaceVariant
+                                    )
                                     .padding(horizontal = 6.dp, vertical = 1.dp)
                             ) {
                                 FintrackLabelSmallText(
-                                    text = count.toLong().toFa(),
+                                    text = count.toLong().toPersianDigits(),
                                     fontWeight = FontWeight.W700,
-                                    color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
+                                    color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                        alpha = 0.65f
+                                    )
                                 )
                             }
                         }

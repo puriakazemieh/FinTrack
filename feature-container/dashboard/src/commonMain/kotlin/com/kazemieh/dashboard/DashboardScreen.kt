@@ -16,14 +16,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -38,16 +38,28 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.dashboard.component.QuickActions
 import com.kazemieh.dashboard.component.RecentTransactionsWidget
-import com.kazemieh.designsystem.*
-import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.GlassColor
+import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.GlassGreenDark
+import com.kazemieh.designsystem.GlassGreenDeep
+import com.kazemieh.designsystem.GlassText
+import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.FAB
+import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.BalanceHero
 import com.kazemieh.transaction.ui.main.rememberTransactionItemsProvider
-import fintrack.core.designsystem.generated.resources.*
-import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.resources.painterResource
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.msg_hello
+import fintrack.core.designsystem.generated.resources.placeholder_user_initial
+import fintrack.core.designsystem.generated.resources.placeholder_user_name
+import fintrack.core.designsystem.generated.resources.recent_transactions
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -115,7 +127,6 @@ fun DashboardScreen(
                     isBalanceVisible = state.isBalanceVisible,
                     onToggleVisibility = { viewModel.onIntent(DashboardIntent.ToggleBalanceVisibility) },
                     onAddSourceClick = { viewModel.onIntent(DashboardIntent.ShowAddSource) },
-                    growthPercentage = state.growthPercentage,
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }
@@ -126,9 +137,7 @@ fun DashboardScreen(
                 QuickActions(
                     onActionClick = {
                         viewModel.onIntent(
-                            DashboardIntent.ShowTransactionBottomSheet(
-                                type = it
-                            )
+                            DashboardIntent.ShowTransactionBottomSheet(type = it)
                         )
                     },
                     onSearchClick = { /* Handle search */ },
@@ -141,6 +150,11 @@ fun DashboardScreen(
             item {
                 RecentTransactionsWidget(
                     onMoreClick = { /* Navigate to transactions */ },
+                    onEdit = { transactionWithRelations ->
+                        viewModel.onIntent(
+                            DashboardIntent.ShowTransactionBottomSheet(transactionWithRelations)
+                        )
+                    },
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }

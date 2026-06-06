@@ -1,7 +1,6 @@
 package com.kazemieh.common.model
 
-import com.kazemieh.common.chunked3
-import com.kazemieh.common.toFa
+import com.kazemieh.common.toPersianPrice
 import kotlinx.serialization.Serializable
 import kotlin.time.Clock
 
@@ -20,8 +19,7 @@ data class Transaction(
 ) {
 
     val amountTransferFormated: String?
-        get() = if (type == TransactionType.TRANSFER) amountTransfer.toString().chunked3()
-            .toFa() else null
+        get() = if (type == TransactionType.TRANSFER) amountTransfer.toPersianPrice() else null
 }
 
 @Serializable

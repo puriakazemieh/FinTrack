@@ -5,22 +5,24 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,44 +43,47 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.list.CategoryPickerBottomSheet
-import com.kazemieh.common.model.TransactionType
-import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
-import com.kazemieh.common.model.Person
-import com.kazemieh.common.toFa
-import com.kazemieh.designsystem.GlassBlue
-import com.kazemieh.designsystem.GlassBlueSoft
+import com.kazemieh.common.model.TransactionType
+import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.GlassBg0
 import com.kazemieh.designsystem.GlassBg1
+import com.kazemieh.designsystem.GlassBlue
+import com.kazemieh.designsystem.GlassBlueSoft
 import com.kazemieh.designsystem.GlassColor
 import com.kazemieh.designsystem.GlassEdgeStrong
 import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassGreenSoft
 import com.kazemieh.designsystem.GlassGreenDark
+import com.kazemieh.designsystem.GlassGreenSoft
 import com.kazemieh.designsystem.GlassRedSoft
 import com.kazemieh.designsystem.GlassText
 import com.kazemieh.designsystem.GlassText2
 import com.kazemieh.designsystem.GlassText3
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.glass.AddFrame
+import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.Field
 import com.kazemieh.designsystem.component.glass.GlassCard
-import com.kazemieh.designsystem.component.glass.Chip
-import com.kazemieh.designsystem.component.SnackbarController
-import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
+import com.kazemieh.designsystem.component.model.resolveString
+import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import com.kazemieh.designsystem.picker.PickableColor
-import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import com.kazemieh.person.ui.list.PersonPickerBottomSheet
 import com.kazemieh.tag.ui.list.TagPickerBottomSheet
@@ -92,10 +97,12 @@ import fintrack.core.designsystem.generated.resources.dp_today
 import fintrack.core.designsystem.generated.resources.edit
 import fintrack.core.designsystem.generated.resources.hint_transaction_description
 import fintrack.core.designsystem.generated.resources.ic_1
+import fintrack.core.designsystem.generated.resources.ic_cat_transfer
 import fintrack.core.designsystem.generated.resources.label_attachment_fa
 import fintrack.core.designsystem.generated.resources.label_camera_fa
 import fintrack.core.designsystem.generated.resources.label_char_count_limit
 import fintrack.core.designsystem.generated.resources.label_gallery_fa
+import fintrack.core.designsystem.generated.resources.label_most_used
 import fintrack.core.designsystem.generated.resources.label_note
 import fintrack.core.designsystem.generated.resources.label_optional_fa
 import fintrack.core.designsystem.generated.resources.label_related_persons
@@ -111,18 +118,12 @@ import fintrack.core.designsystem.generated.resources.title_person_management
 import fintrack.core.designsystem.generated.resources.title_tag_management
 import fintrack.core.designsystem.generated.resources.title_transaction_management
 import fintrack.core.designsystem.generated.resources.transaction
-import fintrack.core.designsystem.generated.resources.label_most_used
-import fintrack.core.designsystem.generated.resources.ic_cat_transfer
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.compose.foundation.layout.Row as ComposeRow
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -319,7 +320,7 @@ private fun BottomSheetContent(
                 onConfirm = { jalaliCalendar ->
                     onIntent(
                         AddTransactionIntent.SetDate(
-                            date = "${jalaliCalendar.day.toFa()} / ${jalaliCalendar.monthString} / ${jalaliCalendar.year.toFa()}",
+                            date = "${jalaliCalendar.day.toPersianDigits()} / ${jalaliCalendar.monthString} / ${jalaliCalendar.year.toPersianDigits()}",
                             timeStamp = jalaliCalendar.toTimestamp()
                         )
                     )
@@ -432,7 +433,9 @@ fun AddTransactionContent(
                     PickerValue(
                         label = state.category?.name ?: stringResource(Res.string.select_category),
                         color = color,
-                        icon = if (state.transactionType == TransactionType.TRANSFER) Res.drawable.ic_cat_transfer else FinTrackIcons.findIcon(state.category?.iconId).resource
+                        icon = if (state.transactionType == TransactionType.TRANSFER) Res.drawable.ic_cat_transfer else FinTrackIcons.findIcon(
+                            state.category?.iconId
+                        ).resource
                     )
                 }
                 if (state.mostUsedCategories.isNotEmpty()) {
@@ -584,8 +587,8 @@ fun AddTransactionContent(
                         FintrackLabelSmallText(
                             text = stringResource(
                                 Res.string.label_char_count_limit,
-                                state.description.length.toLong().toFa(),
-                                250.toLong().toFa()
+                                state.description.length.toLong().toPersianDigits(),
+                                250.toLong().toPersianDigits()
                             ), color = GlassText3
                         )
                     }
@@ -647,6 +650,7 @@ private fun PickerValue(
                     modifier = Modifier.size(16.dp)
                 )
             }
+
             is androidx.compose.ui.graphics.vector.ImageVector -> {
                 Icon(
                     imageVector = icon,
@@ -655,6 +659,7 @@ private fun PickerValue(
                     modifier = Modifier.size(16.dp)
                 )
             }
+
             else -> {
                 Icon(
                     painter = painterResource(Res.drawable.ic_1), // Placeholder arrow? 
@@ -700,7 +705,7 @@ private fun PhotoDropUI() {
 }
 
 @Composable
-private fun PhotoActionCard(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String) {
+private fun PhotoActionCard(icon: ImageVector, label: String) {
     Box(
         modifier = Modifier
             .size(64.dp)
@@ -733,7 +738,7 @@ private fun MostUsedCategoryChips(
 ) {
     if (items.isEmpty()) return
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -772,7 +777,7 @@ private fun MostUsedSourceChips(
 ) {
     if (items.isEmpty()) return
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -812,7 +817,7 @@ private fun MostUsedTagChips(
 ) {
     if (items.isEmpty()) return
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -854,7 +859,7 @@ private fun MostUsedPersonChips(
 ) {
     if (items.isEmpty()) return
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {

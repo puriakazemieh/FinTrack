@@ -33,13 +33,13 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.common.toFa
 import com.kazemieh.common.model.Source
+import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.GlassColor
 import com.kazemieh.designsystem.GlassEdge
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassGreenSoft
-import com.kazemieh.designsystem.GlassText
+import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.GlassText2
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
@@ -80,7 +80,13 @@ fun SourceHorizontalList(
 
 @Composable
 private fun SourceTile(source: Source) {
-    val space = LocalSpacing.current
+
+    val color = when {
+        source.balance < 0 -> GlassRed
+        source.balance > 0 -> GlassGreen
+        else -> GlassGreen
+    }
+
     Box(
         modifier = Modifier
             .size(width = 90.dp, height = 56.dp)
@@ -116,10 +122,10 @@ private fun SourceTile(source: Source) {
 
             }
             FintrackTitleSmallText(
-                text = source.balance.toLong().toFa(),
+                text = source.balance.toSignedPersianPrice(),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.W700,
-                color = GlassText
+                color = color
             )
         }
     }

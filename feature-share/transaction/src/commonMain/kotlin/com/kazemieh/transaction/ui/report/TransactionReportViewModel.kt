@@ -2,7 +2,7 @@ package com.kazemieh.transaction.ui.report
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.common.formatted
+import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
 import com.kazemieh.common.model.PageRequest
@@ -279,7 +279,7 @@ class TransactionReportViewModel(
 
         _state.update {
             it.copy(
-                balance = balanceValue.formatted(),
+                balance = balanceValue.toSignedPersianPrice(),
                 totalIncome = totalIncome,
                 totalExpense = totalExpense,
                 totalTransfer = totalTransfer,
