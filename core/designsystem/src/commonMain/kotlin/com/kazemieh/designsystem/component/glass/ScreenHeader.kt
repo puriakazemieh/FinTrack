@@ -31,7 +31,8 @@ fun ScreenHeader(
     onBack: (() -> Unit)? = null,
     onClose: (() -> Unit)? = null,
     actions: List<HeaderAction> = emptyList(),
-    center: Boolean = false
+    center: Boolean = false,
+    trailingContent: @Composable RowScope.() -> Unit = {}
 ) {
     Row(
         modifier = modifier
@@ -77,6 +78,8 @@ fun ScreenHeader(
                 )
             }
         }
+
+        trailingContent()
 
         if (actions.isNotEmpty()) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

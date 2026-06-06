@@ -49,7 +49,8 @@ fun EntityList(
     onEditClick: (EntityItem) -> Unit,
     onDeleteClick: (EntityItem) -> Unit,
     onItemClick: (EntityItem) -> Unit = {},
-    emptyHint: String? = null
+    emptyHint: String? = null,
+    showActions: Boolean = true
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
@@ -127,6 +128,7 @@ fun EntityList(
                         EntityRow(
                             item = it,
                             mainColor = color,
+                            showActions = showActions,
                             onEdit = { onEditClick(it) },
                             onDelete = { onDeleteClick(it) },
                             onClick = { onItemClick(it) },
@@ -152,6 +154,7 @@ fun EntityList(
 private fun EntityRow(
     item: EntityItem,
     mainColor: Color,
+    showActions: Boolean,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onClick: () -> Unit,
@@ -210,9 +213,11 @@ private fun EntityRow(
                     }
                 }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ActionIcon(icon = Icons.Default.Edit, onClick = onEdit, color = GlassText2)
-                ActionIcon(icon = Icons.Default.Delete, onClick = onDelete, color = GlassRed)
+            if (showActions) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ActionIcon(icon = Icons.Default.Edit, onClick = onEdit, color = GlassText2)
+                    ActionIcon(icon = Icons.Default.Delete, onClick = onDelete, color = GlassRed)
+                }
             }
         }
     }

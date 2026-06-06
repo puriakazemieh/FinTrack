@@ -42,7 +42,7 @@ class CategoryViewModel(
             is CategoryIntent.SelectedCategory -> {
                 viewModelScope.launch {
                     _effect.send(CategoryEffect.AddedCategory(intent.selectedCategory))
-                    _state.update { CategoryState() }
+                    _state.update { it.copy(isAddShow = false, selectedCategory = null, isDeleteShow = false) }
                 }
             }
 
@@ -71,8 +71,11 @@ class CategoryViewModel(
             CategoryIntent.OnDismiss -> {
                 viewModelScope.launch {
                     _effect.send(CategoryEffect.OnDismiss)
-                    _state.update { CategoryState() }
                 }
+            }
+
+            CategoryIntent.ResetFlags -> {
+                _state.update { it.copy(isAddShow = false, isDeleteShow = false, selectedCategory = null) }
             }
         }
 
@@ -157,6 +160,7 @@ sealed interface CategoryIntent {
     data class OnDeleteClick(val category: Category? = null) : CategoryIntent
     data class OnEditClick(val category: Category? = null) : CategoryIntent
     data object OnDismiss : CategoryIntent
+    data object ResetFlags : CategoryIntent
 
 }
 

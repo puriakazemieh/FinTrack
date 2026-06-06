@@ -282,7 +282,10 @@ private fun BottomSheetContent(
             CategoryPickerBottomSheet(
                 transactionType = state.transactionType,
                 snackbarHostState = snackbarHostState,
-                onCategoryClick = { onIntent(AddTransactionIntent.SetCategory(it)) },
+                onCategoryClick = {
+                    onIntent(AddTransactionIntent.SetCategory(it))
+                    onIntent(AddTransactionIntent.PopSheet)
+                },
                 onDismiss = { onIntent(AddTransactionIntent.PopSheet) }
             )
         }

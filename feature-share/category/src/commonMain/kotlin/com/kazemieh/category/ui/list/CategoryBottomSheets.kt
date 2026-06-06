@@ -15,12 +15,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,7 +42,9 @@ import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.component.model.toCategory
 import com.kazemieh.designsystem.component.model.toItemUi
 import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.cancell_
 import fintrack.core.designsystem.generated.resources.category
+import fintrack.core.designsystem.generated.resources.edit
 import fintrack.core.designsystem.generated.resources.label_expense
 import fintrack.core.designsystem.generated.resources.label_income
 import org.jetbrains.compose.resources.stringResource
@@ -59,11 +64,14 @@ fun CategoryPickerBottomSheet(
     }
 
     val state by viewModel.state.collectAsState()
+    var isEditMode by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is CategoryEffect.AddedCategory -> onCategoryClick(effect.category)
+                is CategoryEffect.AddedCategory -> {
+                    onCategoryClick(effect.category)
+                }
                 CategoryEffect.OnDismiss -> onDismiss()
             }
         }
@@ -72,7 +80,10 @@ fun CategoryPickerBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = { viewModel.onIntent(CategoryIntent.OnDismiss) },
+        onDismissRequest = { 
+            viewModel.onIntent(CategoryIntent.ResetFlags)
+            onDismiss() 
+        },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
@@ -84,7 +95,18 @@ fun CategoryPickerBottomSheet(
         ) {
             ScreenHeader(
                 title = stringResource(Res.string.category),
-                onClose = { viewModel.onIntent(CategoryIntent.OnDismiss) }
+                onClose = { 
+                    viewModel.onIntent(CategoryIntent.ResetFlags)
+                    onDismiss() 
+                },
+                trailingContent = {
+                    TextButton(onClick = { isEditMode = !isEditMode }) {
+                        FintrackLabelMediumText(
+                            text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
+                            color = GlassText2
+                        )
+                    }
+                }
             )
 
             val entityItems = remember(state.categories) {
@@ -104,6 +126,7 @@ fun CategoryPickerBottomSheet(
                 onQueryChange = { viewModel.onIntent(CategoryIntent.SetQuery(it)) },
                 onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
                 items = entityItems,
+                showActions = isEditMode,
                 onEditClick = { viewModel.onIntent(CategoryIntent.OnEditClick(state.categories.find { c -> c.id == it.id })) },
                 onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) },
                 onItemClick = { item ->
@@ -119,8 +142,20 @@ fun CategoryPickerBottomSheet(
         AddCategoryBottomSheet(
             snackbarHostState = snackbarHostState,
             transactionType = transactionType,
-            onDismiss = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
-            setCategory = { viewModel.onIntent(CategoryIntent.SelectedCategory(it)) }
+            selectedCategory = state.selectedCategory,
+            onDismiss = { viewModel.onIntent(CategoryIntent.ResetFlags) },
+            setCategory = {
+                viewModel.onIntent(CategoryIntent.SelectedCategory(it))
+            }
+        )
+    }
+
+    if (state.isDeleteShow && state.selectedCategory != null) {
+        DeleteCategoryBottomSheet(
+            snackbarHostState = snackbarHostState,
+            category = state.selectedCategory!!,
+            onDismiss = { viewModel.onIntent(CategoryIntent.ResetFlags) },
+            deleted = { viewModel.onIntent(CategoryIntent.ResetFlags) },
         )
     }
 }
@@ -137,6 +172,7 @@ fun CategoryManageBottomSheet(
     }
 
     val state by viewModel.state.collectAsState()
+    var isEditMode by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
