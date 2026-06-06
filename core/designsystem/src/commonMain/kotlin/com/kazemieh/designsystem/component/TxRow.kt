@@ -7,23 +7,25 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
-import com.kazemieh.common.separateWithCommas
 import com.kazemieh.common.toPersianPrice
-import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassBlueSoft
 import com.kazemieh.designsystem.GlassColor
@@ -39,6 +41,35 @@ import fintrack.core.designsystem.generated.resources.label_amount_with_unit
 import fintrack.core.designsystem.generated.resources.unit_toman_short
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+
+@Composable
+fun SwipeableTxRow(
+    item: TransactionWithRelations,
+    onClick: () -> Unit,
+    onDelete: (TransactionWithRelations) -> Unit,
+) {
+    FintrackSwipeableRow(
+        onDelete = { onDelete(item) },
+        backgroundContent = { progress ->
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .graphicsLayer { this.alpha = progress }
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(GlassRedSoft.copy(progress))
+                    .padding(horizontal = 20.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = null,
+                    tint = GlassRed.copy(progress)
+                )
+            }
+        },
+        content = { TxRow(item = item, onClick = onClick) }
+    )
+}
 
 @Composable
 fun TxRow(item: TransactionWithRelations, onClick: () -> Unit) {
@@ -65,7 +96,7 @@ fun TxRow(item: TransactionWithRelations, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Box(
             modifier = Modifier

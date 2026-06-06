@@ -155,6 +155,11 @@ fun DashboardScreen(
                             DashboardIntent.ShowTransactionBottomSheet(transactionWithRelations)
                         )
                     },
+                    onDelete = { transactionWithRelations ->
+                        viewModel.onIntent(
+                            DashboardIntent.DeleteTransactionBottomSheet(transactionWithRelations)
+                        )
+                    },
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }

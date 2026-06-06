@@ -266,6 +266,8 @@
 
     <string name="title_new_category">دسته‌بندی جدید</string>
     <string name="title_edit_category">ویرایش دسته‌بندی</string>
+    <string name="title_edit_transaction">ویرایش تراکنش</string>
+    <string name="btn_edit_transaction">ویرایش تراکنش</string>
     <string name="title_new_source">منبع مالی جدید</string>
     <string name="title_edit_source">ویرایش منبع مالی</string>
     <string name="title_new_tag">برچسب جدید</string>

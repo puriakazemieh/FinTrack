@@ -55,6 +55,7 @@ import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
+import com.kazemieh.designsystem.component.SwipeableTxRow
 import com.kazemieh.designsystem.component.TxRow
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import fintrack.core.designsystem.generated.resources.Res
@@ -193,9 +194,10 @@ fun TransactionListByFilterContent(
                 }
 
                 items(items, key = { it.transaction.id }) { item ->
-                    TxRow(
+                    SwipeableTxRow(
                         item = item,
-                        onClick = { onEdit(item) }
+                        onClick = { onEdit(item) },
+                        onDelete = { onDelete(item) }
                     )
                     Spacer(Modifier.height(8.dp))
                 }

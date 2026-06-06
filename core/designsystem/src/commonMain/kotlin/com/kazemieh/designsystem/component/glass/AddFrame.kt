@@ -2,9 +2,7 @@ package com.kazemieh.designsystem.component.glass
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,8 +34,10 @@ fun AddFrame(
     heroName: String? = null,
     showHero: Boolean = true,
     backgroundBrush: Brush? = null,
+    secondaryLabel: String? = null,
+    onSecondaryClick: (() -> Unit)? = null,
     hero: @Composable (() -> Unit)? = null,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     val defaultBrush = Brush.verticalGradient(listOf(GlassBg1, GlassBg0))
     Box(
@@ -107,14 +107,17 @@ fun AddFrame(
             }
 
             // Fixed CTA at bottom
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp)
+                    .padding(24.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Button(
                     onClick = onPrimaryClick,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .weight(if (secondaryLabel != null) 0.6f else 1f)
+                        .height(48.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -124,9 +127,31 @@ fun AddFrame(
                     FintrackBodyLargeText(
                         text = primaryLabel,
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.W700,
-                        modifier = Modifier.padding(vertical = 4.dp)
+                        fontWeight = FontWeight.W700
                     )
+                }
+
+                if ((secondaryLabel != null) && (onSecondaryClick != null)) {
+                    OutlinedButton(
+                        onClick = onSecondaryClick,
+                        modifier = Modifier
+                            .weight(0.4f)
+                            .height(48.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.error
+                        ),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        FintrackBodyLargeText(
+                            text = secondaryLabel,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.W700
+                        )
+                    }
                 }
             }
         }

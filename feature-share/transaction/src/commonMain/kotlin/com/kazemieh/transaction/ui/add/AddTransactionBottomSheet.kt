@@ -79,6 +79,7 @@ import com.kazemieh.designsystem.component.glass.AddFrame
 import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.Field
 import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet
 import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
 import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.designsystem.picker.FinTrackIcons
@@ -90,9 +91,11 @@ import com.kazemieh.tag.ui.list.TagPickerBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.btn_add_person
 import fintrack.core.designsystem.generated.resources.btn_add_tag
+import fintrack.core.designsystem.generated.resources.btn_edit_transaction
 import fintrack.core.designsystem.generated.resources.btn_save_transaction
 import fintrack.core.designsystem.generated.resources.category
 import fintrack.core.designsystem.generated.resources.date
+import fintrack.core.designsystem.generated.resources.delete
 import fintrack.core.designsystem.generated.resources.dp_today
 import fintrack.core.designsystem.generated.resources.edit
 import fintrack.core.designsystem.generated.resources.hint_transaction_description
@@ -228,11 +231,17 @@ private fun BottomSheetContent(
                 Res.string.edit
             ) + " " + stringResource(Res.string.transaction),
             sub = stringResource(Res.string.title_transaction_management),
-            primaryLabel = stringResource(Res.string.btn_save_transaction),
+            primaryLabel = if (state.oldTransaction == null) stringResource(Res.string.btn_save_transaction) else stringResource(
+                Res.string.btn_edit_transaction
+            ),
             onPrimaryClick = {
                 focusManager.clearFocus()
                 keyboardController?.hide()
                 onIntent(AddTransactionIntent.Submit)
+            },
+            secondaryLabel = if (state.oldTransaction != null) stringResource(Res.string.delete) else null,
+            onSecondaryClick = {
+                onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.DeleteConfirmation))
             },
             onClose = {
                 focusManager.clearFocus()
@@ -325,6 +334,18 @@ private fun BottomSheetContent(
                         )
                     )
                 }
+            )
+        }
+
+        AddTransactionSheet.DeleteConfirmation -> {
+            DeleteBottomSheet(
+                itemName = state.description.ifEmpty { state.category?.name },
+                dismissClicked = { onIntent(AddTransactionIntent.PopSheet) },
+                confirmClicked = {
+                    onIntent(AddTransactionIntent.Delete)
+                    onIntent(AddTransactionIntent.PopSheet)
+                },
+                isLoading = state.isLoading
             )
         }
 
@@ -651,7 +672,7 @@ private fun PickerValue(
                 )
             }
 
-            is androidx.compose.ui.graphics.vector.ImageVector -> {
+            is ImageVector -> {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,

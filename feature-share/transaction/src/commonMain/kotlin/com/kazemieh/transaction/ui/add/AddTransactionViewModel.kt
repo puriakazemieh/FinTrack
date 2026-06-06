@@ -7,7 +7,6 @@ import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
-import com.kazemieh.common.toPersianDigits
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toPersianDigits
@@ -31,7 +30,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AddTransactionViewModel(
-    private val transactionUseCaseGroup: TransactionUseCaseGroup
+    private val transactionUseCaseGroup: TransactionUseCaseGroup,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddTransactionState())
@@ -149,6 +148,17 @@ class AddTransactionViewModel(
             is AddTransactionIntent.ToggleSheet -> toggleSheet(intent.sheet)
             AddTransactionIntent.PopSheet -> popSheet()
             AddTransactionIntent.ClearSheets -> clearSheets()
+            AddTransactionIntent.Delete -> deleteTransaction()
+        }
+    }
+
+    private fun deleteTransaction() {
+        val transaction = _state.value.oldTransaction ?: return
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            transactionUseCaseGroup.deleteTransactionUseCase(transaction)
+            _state.update { it.copy(isLoading = false) }
+            _effect.send(AddTransactionEffect.AddedTransaction)
         }
     }
 
@@ -330,6 +340,7 @@ sealed interface AddTransactionIntent {
     data class ToggleSheet(val sheet: AddTransactionSheet) : AddTransactionIntent
     data object PopSheet : AddTransactionIntent
     data object ClearSheets : AddTransactionIntent
+    data object Delete : AddTransactionIntent
 }
 
 sealed interface AddTransactionSheet {
@@ -339,6 +350,7 @@ sealed interface AddTransactionSheet {
     data object TagPicker : AddTransactionSheet
     data object PersonPicker : AddTransactionSheet
     data object DatePicker : AddTransactionSheet
+    data object DeleteConfirmation : AddTransactionSheet
 }
 
 sealed interface AddTransactionEffect {
