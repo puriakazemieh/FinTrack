@@ -161,7 +161,6 @@ fun AddTransactionBottomSheet(
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
                             transactionAdded()
-                            onDismiss()
                         }
                     }
                 }

@@ -35,7 +35,6 @@ fun DeleteTransactionBottomSheet(
                 DeleteTransactionEffect.DeletedTransaction -> {
                     sheetState.hide()
                     transactionDeleted()
-                    onDismiss()
                 }
 
                 is DeleteTransactionEffect.ShowMessage -> {

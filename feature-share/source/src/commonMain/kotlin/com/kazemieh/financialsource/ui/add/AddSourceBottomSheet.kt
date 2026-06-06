@@ -77,7 +77,6 @@ fun AddSourceBottomSheet(
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
                             setSource(effect.source)
-                            onDismiss()
                         }
                     }
                 }

@@ -67,7 +67,6 @@ fun AddPersonBottomSheet(
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
                             setPerson(effect.person)
-                            onDismiss()
                         }
                     }
                 }

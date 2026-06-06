@@ -68,7 +68,6 @@ fun AddCategoryBottomSheet(
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
                             setCategory(effect.category)
-                            onDismiss()
                         }
                     }
                 }

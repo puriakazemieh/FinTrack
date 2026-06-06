@@ -59,7 +59,6 @@ fun AddTagBottomSheet(
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
                             setTag(effect.tag)
-                            onDismiss()
                         }
                     }
                 }
