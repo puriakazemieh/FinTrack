@@ -17,9 +17,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.kazemieh.common.SnackbarController
+import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.composeApp.navigation.AppNavHost
 import com.kazemieh.composeApp.navigation.navigationBar.FintrackNavigationBar
+import com.kazemieh.designsystem.component.model.resolveString
 import kotlinx.coroutines.flow.collectLatest
 
 
@@ -37,7 +38,7 @@ fun FinTrackHost() {
 
     LaunchedEffect(Unit) {
         SnackbarController.events.collectLatest { event ->
-            snackbarHostState.showSnackbar(event.message)
+            snackbarHostState.showSnackbar(event.message.resolveString())
         }
     }
 

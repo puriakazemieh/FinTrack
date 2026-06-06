@@ -20,9 +20,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -114,17 +122,25 @@ fun LargeAmountCard(
     amount: String,
     onAmountChange: (String) -> Unit,
     onCalcClick: () -> Unit,
+    autoFocus: Boolean = true,
+    enabled: Boolean = true,
+    isError: Boolean = false,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     modifier: Modifier = Modifier
 ) {
     val focusRequester = remember { FocusRequester() }
+    var focusRequested by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
+        if (autoFocus && !focusRequested) {
+            focusRequester.requestFocus()
+            focusRequested = true
+        }
     }
 
     GlassCard(
         modifier = modifier,
-        tone = GlassTone.Strong,
+        tone = if (isError) GlassTone.Error else GlassTone.Strong,
         padding = 16.dp
     ) {
         Column {
@@ -176,11 +192,18 @@ fun LargeAmountCard(
                     value = amount,
                     onValueChange = { if (it.length <= 12) onAmountChange(it) },
                     isPrice = true,
+                    isError = isError,
+                    enabled = enabled,
                     label = { FintrackBodyMediumText(text = stringResource(Res.string.amount)) },
                     textColor = GlassText,
                     containerColor = Color.Transparent,
                     unfocusedBorderColor = GlassEdge,
                     focusedBorderColor = GlassGreen,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = keyboardActions,
                     suffix = {
                         FintrackBodyMediumText(
                             text = stringResource(Res.string.currency_toman),

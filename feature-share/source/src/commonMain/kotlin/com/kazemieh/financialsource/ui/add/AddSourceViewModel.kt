@@ -3,7 +3,7 @@ package com.kazemieh.financialsource.ui.add
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Source
-import com.kazemieh.common.SnackbarController
+import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.designsystem.model.Bank
@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.Resource
 
 
 class AddSourceViewModel(
@@ -150,7 +149,7 @@ class AddSourceViewModel(
     private fun save() = with(_state.value) {
         viewModelScope.launch {
             if (draft.name.isBlank()) {
-                SnackbarController.showMessage(UiText.StringResourceText(Res.string.check_name_financial_source).resolveString())
+                SnackbarController.showMessage(UiText.StringResourceText(Res.string.check_name_financial_source))
                 return@launch
             }
 

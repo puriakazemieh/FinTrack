@@ -6,10 +6,6 @@ import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.domain.usecase.ObserveSourcesUseCase
-import com.kazemieh.common.SnackbarController
-import com.kazemieh.designsystem.component.model.resolveString
-import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.check_name_financial_source
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

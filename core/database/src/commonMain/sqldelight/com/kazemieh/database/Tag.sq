@@ -35,3 +35,11 @@ insertFullTag:
 INSERT OR REPLACE INTO tag(id, name, description, colorId, iconId)
 VALUES (?, ?, ?, ?, ?);
 
+getMostUsedTags:
+SELECT tag.* FROM tag
+JOIN transaction_tag tt ON tag.id = tt.tagId
+GROUP BY tag.id
+ORDER BY COUNT(tt.transactionId) DESC
+LIMIT :limit;
+
+

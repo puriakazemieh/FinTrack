@@ -9,20 +9,26 @@ import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
-import com.kazemieh.common.SnackbarController
 import com.kazemieh.common.toFa
+import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
-import com.kazemieh.designsystem.component.model.resolveString
-import fintrack.core.designsystem.generated.resources.*
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.msg_mandatory_fields_error
+import fintrack.core.designsystem.generated.resources.transaction_failed
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AddTransactionViewModel(
     private val transactionUseCaseGroup: TransactionUseCaseGroup
 ) : ViewModel() {
@@ -33,9 +39,46 @@ class AddTransactionViewModel(
     private val _effect = Channel<AddTransactionEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
+    private val _typeFlow = MutableStateFlow<TransactionType?>(TransactionType.EXPENSE)
+
+    init {
+        _typeFlow
+            .flatMapLatest { type ->
+                transactionUseCaseGroup.observeMostUsedCategoriesUseCase(type)
+            }
+            .onEach { categories ->
+                _state.update { it.copy(mostUsedCategories = categories) }
+            }
+            .launchIn(viewModelScope)
+
+        transactionUseCaseGroup.observeMostUsedSourcesUseCase()
+            .onEach { sources ->
+                _state.update { it.copy(mostUsedSources = sources) }
+            }
+            .launchIn(viewModelScope)
+
+        transactionUseCaseGroup.observeMostUsedTagsUseCase()
+            .onEach { tags ->
+                _state.update { it.copy(mostUsedTags = tags) }
+            }
+            .launchIn(viewModelScope)
+
+        transactionUseCaseGroup.observeMostUsedPersonsUseCase()
+            .onEach { persons ->
+                _state.update { it.copy(mostUsedPersons = persons) }
+            }
+            .launchIn(viewModelScope)
+    }
+
     fun onIntent(intent: AddTransactionIntent) {
         when (intent) {
-            is AddTransactionIntent.SetAmount -> _state.update { it.copy(amount = intent.amount, isAmountError = false) }
+            is AddTransactionIntent.SetAmount -> _state.update {
+                it.copy(
+                    amount = intent.amount,
+                    isAmountError = false
+                )
+            }
+
             is AddTransactionIntent.SetAmountTransfer -> _state.update { it.copy(amountTransfer = intent.amount) }
             is AddTransactionIntent.SetCategory -> _state.update {
                 it.copy(
@@ -74,6 +117,7 @@ class AddTransactionViewModel(
                     sheetStack = it.sheetStack.dropLast(1)
                 )
             }
+
             is AddTransactionIntent.SetDate -> _state.update {
                 it.copy(
                     date = intent.date,
@@ -81,10 +125,25 @@ class AddTransactionViewModel(
                     sheetStack = it.sheetStack.dropLast(1)
                 )
             }
+
             is AddTransactionIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
-            AddTransactionIntent.Submit -> submitTransaction()
+            AddTransactionIntent.Submit -> {
+                if (validateAndUpdateErrors()) {
+                    submitTransaction()
+                } else {
+                    viewModelScope.launch {
+                        SnackbarController.showMessage(UiText.StringResourceText(Res.string.msg_mandatory_fields_error))
+                    }
+                }
+            }
+
             is AddTransactionIntent.FetchDefaultData -> fetchDefaultData(intent.transactionWithRelations)
-            AddTransactionIntent.OnDismiss -> viewModelScope.launch { _effect.send(AddTransactionEffect.OnDismiss) }
+            AddTransactionIntent.OnDismiss -> viewModelScope.launch {
+                _effect.send(
+                    AddTransactionEffect.OnDismiss
+                )
+            }
+
             is AddTransactionIntent.SelectedType -> onTypeChanged(intent.selectedTransactionType)
             is AddTransactionIntent.ToggleSheet -> toggleSheet(intent.sheet)
             AddTransactionIntent.PopSheet -> popSheet()
@@ -97,11 +156,16 @@ class AddTransactionViewModel(
             val today = com.kazemieh.designsystem.component.jalali.JalaliCalendar()
             _state.value = AddTransactionState(
                 date = "${today.day.toFa()} / ${today.monthString} / ${today.year.toFa()}",
-                timeStamp = today.toTimestamp()
+                timeStamp = today.toTimestamp(),
+                mostUsedCategories = _state.value.mostUsedCategories,
+                mostUsedSources = _state.value.mostUsedSources,
+                mostUsedTags = _state.value.mostUsedTags,
+                mostUsedPersons = _state.value.mostUsedPersons
             ) // Full reset first with today's date
             viewModelScope.launch {
                 val defaultSource = transactionUseCaseGroup.getDefaultFinancialSourceUseCase()
-                val defaultCategory = transactionUseCaseGroup.getDefaultCategoryUseCase(_state.value.transactionType)
+                val defaultCategory =
+                    transactionUseCaseGroup.getDefaultCategoryUseCase(_state.value.transactionType)
                 _state.update {
                     it.copy(
                         source = defaultSource,
@@ -127,26 +191,22 @@ class AddTransactionViewModel(
                 persons = transactionWithRelations.persons.toSet()
             )
         }
+        _typeFlow.value = transactionWithRelations.transaction.type
     }
 
     private fun submitTransaction() {
-        if (!validateAndUpdateErrors()) return
-
         val current = _state.value
-        val amount = current.amount.toIntOrNull() ?: 0
-        val amountTransfer = current.amountTransfer?.toIntOrNull() ?: 0
-
         val transaction = Transaction(
-            id = current.oldTransaction?.id ?: 0L,
-            amount = amount,
-            amountTransfer = amountTransfer,
-            description = current.description,
-            date = current.date ?: "",
-            timeStamp = current.timeStamp,
-            type = current.transactionType,
+            id = current.oldTransaction?.id ?: 0,
+            amount = current.amount.toIntOrNull() ?: 0,
+            amountTransfer = current.amountTransfer?.toIntOrNull() ?: 0,
             categoryId = current.category?.id ?: 0,
             sourceId = current.source?.id ?: 0,
-            sourceEndId = current.sourceEnd?.id
+            sourceEndId = current.sourceEnd?.id,
+            description = current.description,
+            timeStamp = current.timeStamp,
+            type = current.transactionType,
+            date = current.date ?: ""
         )
 
         val tagIds = current.tags?.mapNotNull { it.id } ?: emptyList()
@@ -157,14 +217,18 @@ class AddTransactionViewModel(
             val id = if (current.oldTransaction == null) {
                 transactionUseCaseGroup.addTransactionUseCase(transaction, tagIds, personIds)
             } else {
-                transactionUseCaseGroup.updateTransactionUseCase(current.oldTransaction, transaction, tagIds, personIds)
+                transactionUseCaseGroup.updateTransactionUseCase(
+                    current.oldTransaction,
+                    transaction,
+                    tagIds,
+                    personIds
+                )
             }
-
+            _state.update { it.copy(isLoading = false) }
             if (id > 0) {
                 _effect.send(AddTransactionEffect.AddedTransaction)
             } else {
-                _state.update { it.copy(isLoading = false) }
-                SnackbarController.showMessage(UiText.StringResourceText(Res.string.transaction_failed).resolveString())
+                SnackbarController.showMessage(UiText.StringResourceText(Res.string.transaction_failed))
             }
         }
     }
@@ -183,36 +247,29 @@ class AddTransactionViewModel(
 
     private fun validateAndUpdateErrors(): Boolean {
         val current = _state.value
-        val amount = current.amount.toLongOrNull() ?: 0L
-        val sourceOk = current.source?.id != null
-        val sourceEndOk = current.transactionType != TransactionType.TRANSFER || current.sourceEnd?.id != null
-        val categoryOk = current.transactionType == TransactionType.TRANSFER || current.category?.id != null
-        val amountOk = amount > 0
+        val isAmountError = current.amount.toLongOrNull() == null || current.amount.toLong() <= 0
+        val isCategoryError =
+            current.transactionType != TransactionType.TRANSFER && current.category == null
+        val isSourceError = current.source == null
+        val isSourceEndError =
+            current.transactionType == TransactionType.TRANSFER && current.sourceEnd == null
 
         _state.update {
             it.copy(
-                isAmountError = !amountOk,
-                isSourceError = !sourceOk,
-                isSourceEndError = !sourceEndOk,
-                isCategoryError = !categoryOk
+                isAmountError = isAmountError,
+                isCategoryError = isCategoryError,
+                isSourceError = isSourceError,
+                isSourceEndError = isSourceEndError
             )
         }
 
-        if (!amountOk || !sourceOk || !sourceEndOk || !categoryOk) {
-            viewModelScope.launch {
-                val msg = if (!amountOk) Res.string.fill_all_field
-                else if (!categoryOk) Res.string.category_choose
-                else Res.string.source_choose
-                SnackbarController.showMessage(UiText.StringResourceText(msg).resolveString())
-            }
-            return false
-        }
-        return true
+        return !isAmountError && !isCategoryError && !isSourceError && !isSourceEndError
     }
 
     private fun onTypeChanged(type: TransactionType) {
+        _typeFlow.value = type
         viewModelScope.launch {
-            val defaultCategory = if (type == TransactionType.TRANSFER) null else transactionUseCaseGroup.getDefaultCategoryUseCase(type)
+            val defaultCategory = transactionUseCaseGroup.getDefaultCategoryUseCase(type)
             _state.update {
                 it.copy(
                     transactionType = type,
@@ -243,7 +300,11 @@ data class AddTransactionState(
     val isLoading: Boolean = false,
     val sheetStack: List<AddTransactionSheet> = emptyList(),
     val oldTransaction: Transaction? = null,
-    val listTransactionType: List<TransactionType> = TransactionType.entries
+    val listTransactionType: List<TransactionType> = TransactionType.entries,
+    val mostUsedCategories: List<Category> = emptyList(),
+    val mostUsedSources: List<Source> = emptyList(),
+    val mostUsedTags: List<Tag> = emptyList(),
+    val mostUsedPersons: List<Person> = emptyList()
 )
 
 val AddTransactionState.topSheet: AddTransactionSheet?
@@ -260,7 +321,9 @@ sealed interface AddTransactionIntent {
     data class SetDate(val date: String, val timeStamp: Long) : AddTransactionIntent
     data class SetDescription(val description: String) : AddTransactionIntent
     data object Submit : AddTransactionIntent
-    data class FetchDefaultData(val transactionWithRelations: TransactionWithRelations?) : AddTransactionIntent
+    data class FetchDefaultData(val transactionWithRelations: TransactionWithRelations?) :
+        AddTransactionIntent
+
     data object OnDismiss : AddTransactionIntent
     data class SelectedType(val selectedTransactionType: TransactionType) : AddTransactionIntent
     data class ToggleSheet(val sheet: AddTransactionSheet) : AddTransactionIntent

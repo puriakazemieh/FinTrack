@@ -2,10 +2,9 @@ package com.kazemieh.tag.ui.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.common.SnackbarController
 import com.kazemieh.common.model.Tag
+import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
-import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.domain.usecase.AddTagUseCase
 import com.kazemieh.domain.usecase.UpdateTagUseCase
 import fintrack.core.designsystem.generated.resources.Res
@@ -85,9 +84,7 @@ class AddTagViewModel(
         viewModelScope.launch {
             val name = draft.name.trim()
             if (name.isBlank()) {
-                SnackbarController.showMessage(
-                    UiText.StringResourceText(Res.string.check_name_tag_source).resolveString()
-                )
+                SnackbarController.showMessage(UiText.StringResourceText(Res.string.check_name_tag_source))
                 return@launch
             }
 

@@ -27,6 +27,10 @@ import com.kazemieh.domain.usecase.ObserveSourceUseCase
 import com.kazemieh.domain.usecase.GetTransferCategoryUseCase
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import com.kazemieh.domain.usecase.UpdateTransactionUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedCategoriesUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedSourcesUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedTagsUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedPersonsUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -55,6 +59,10 @@ val domainModule = module {
     factory { UpdateSourceUseCase(get()) }
     factory { ObserveSourceUseCase(get()) }
     factory { UpdatePersonUseCase(get()) }
+    factory { ObserveMostUsedCategoriesUseCase(get()) }
+    factory { ObserveMostUsedSourcesUseCase(get()) }
+    factory { ObserveMostUsedTagsUseCase(get()) }
+    factory { ObserveMostUsedPersonsUseCase(get()) }
 
 
     single {
@@ -74,7 +82,11 @@ val domainModule = module {
             observeTransactionsUseCase = get(),
             updateTransactionUseCase = get(),
             observeCategorySumsUseCase = get(),
-            observeSourcesUseCase = get()
+            observeSourcesUseCase = get(),
+            observeMostUsedCategoriesUseCase = get(),
+            observeMostUsedSourcesUseCase = get(),
+            observeMostUsedTagsUseCase = get(),
+            observeMostUsedPersonsUseCase = get()
         )
     }
 

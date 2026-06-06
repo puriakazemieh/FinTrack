@@ -131,4 +131,19 @@ class TransactionRepositoryImpl(
         return localDataSource.getDefaultSource()
     }
 
+    override fun observeMostUsedCategories(type: TransactionType?, limit: Long): Flow<List<Category>> {
+        return localDataSource.observeMostUsedCategories(type, limit)
+    }
+
+    override fun observeMostUsedSources(limit: Long): Flow<List<Source>> {
+        return localDataSource.observeMostUsedSources(limit)
+    }
+
+    override fun observeMostUsedTags(limit: Long): Flow<List<Tag>> {
+        return localDataSource.observeMostUsedTags(limit)
+    }
+
+    override fun observeMostUsedPersons(limit: Long): Flow<List<Person>> {
+        return localDataSource.observeMostUsedPersons(limit)
+    }
 }

@@ -369,6 +369,34 @@ class TransactionLocalDataSourceImpl(
             .map { it.map { p -> p.toPerson() } }
     }
 
+    override fun observeMostUsedCategories(type: TransactionType?, limit: Long): Flow<List<Category>> {
+        return categoryQueries.getMostUsedCategories(type?.count?.toLong(), limit)
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+            .map { it.map { c -> c.toCategory() } }
+    }
+
+    override fun observeMostUsedSources(limit: Long): Flow<List<Source>> {
+        return sourceQueries.getMostUsedSources(limit)
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+            .map { it.map { s -> s.toSource() } }
+    }
+
+    override fun observeMostUsedTags(limit: Long): Flow<List<Tag>> {
+        return tagQueries.getMostUsedTags(limit)
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+            .map { it.map { t -> t.toTag() } }
+    }
+
+    override fun observeMostUsedPersons(limit: Long): Flow<List<Person>> {
+        return personQueries.getMostUsedPersons(limit)
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+            .map { it.map { p -> p.toPerson() } }
+    }
+
     override suspend fun addTransactionWithBalance(
         transaction: Transaction,
         tagIds: List<Long>,

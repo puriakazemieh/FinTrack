@@ -68,5 +68,8 @@ interface TransactionRepository {
     fun observeSource(sourceId: Long): Flow<Source?>
     suspend fun getDefaultSource(): Source?
 
-
+    fun observeMostUsedCategories(type: TransactionType?, limit: Long): Flow<List<Category>>
+    fun observeMostUsedSources(limit: Long): Flow<List<Source>>
+    fun observeMostUsedTags(limit: Long): Flow<List<Tag>>
+    fun observeMostUsedPersons(limit: Long): Flow<List<Person>>
 }

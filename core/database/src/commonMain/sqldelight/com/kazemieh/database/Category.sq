@@ -76,3 +76,11 @@ DELETE FROM category WHERE id = ?;
 insertFullCategory:
 INSERT OR REPLACE INTO category(id, name, description, type, colorId, iconId)
 VALUES (?, ?, ?, ?, ?, ?);
+
+getMostUsedCategories:
+SELECT c.* FROM category c
+JOIN transactions t ON c.id = t.categoryId
+WHERE (:type IS NULL OR c.type = :type)
+GROUP BY c.id
+ORDER BY COUNT(t.id) DESC
+LIMIT :limit;

@@ -9,5 +9,9 @@ data class TransactionUseCaseGroup(
     val updateTransactionUseCase: UpdateTransactionUseCase,
     val observeTransactionsUseCase: ObserveTransactionsUseCase,
     val observeCategorySumsUseCase: ObserveCategorySumsUseCase,
-    val observeSourcesUseCase: ObserveSourcesUseCase
+    val observeSourcesUseCase: ObserveSourcesUseCase,
+    val observeMostUsedCategoriesUseCase: ObserveMostUsedCategoriesUseCase,
+    val observeMostUsedSourcesUseCase: ObserveMostUsedSourcesUseCase,
+    val observeMostUsedTagsUseCase: ObserveMostUsedTagsUseCase,
+    val observeMostUsedPersonsUseCase: ObserveMostUsedPersonsUseCase
 )

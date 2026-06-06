@@ -8,16 +8,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.kazemieh.designsystem.GlassEdge
 
 /**
  * 2.8 Chip — selectable pill
@@ -35,7 +31,7 @@ fun Chip(
 ) {
     val backgroundColor = if (active) color.copy(alpha = 0.16f) else Color.Transparent
     val borderColor = if (active) color.copy(alpha = 0.33f) else MaterialTheme.colorScheme.outline
-    
+
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(99.dp))

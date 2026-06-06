@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -30,6 +31,7 @@ fun FintrackOutlinedTextField(
     onValueChange: (String) -> Unit = {},
     modifier: Modifier = Modifier.fillMaxWidth(),
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     label: @Composable (() -> Unit),
     textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     textColor: Color = MaterialTheme.colorScheme.onBackground,
@@ -91,6 +93,7 @@ fun FintrackOutlinedTextField(
         readOnly = readOnly,
         isError = isError,
         keyboardOptions = finalKeyboardOptions,
+        keyboardActions = keyboardActions,
         prefix = prefix,
         suffix = suffix,
         colors = OutlinedTextFieldDefaults.colors(

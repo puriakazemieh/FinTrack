@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,17 +16,21 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +49,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.list.CategoryPickerBottomSheet
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.Tag
+import com.kazemieh.common.model.Person
 import com.kazemieh.common.toFa
 import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassBlueSoft
@@ -57,14 +67,18 @@ import com.kazemieh.designsystem.GlassRedSoft
 import com.kazemieh.designsystem.GlassText
 import com.kazemieh.designsystem.GlassText2
 import com.kazemieh.designsystem.GlassText3
-import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.AddFrame
 import com.kazemieh.designsystem.component.glass.Field
 import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.Chip
+import com.kazemieh.designsystem.component.SnackbarController
+import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
+import com.kazemieh.designsystem.picker.PickableColor
+import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import com.kazemieh.person.ui.list.PersonPickerBottomSheet
 import com.kazemieh.tag.ui.list.TagPickerBottomSheet
@@ -97,12 +111,18 @@ import fintrack.core.designsystem.generated.resources.title_person_management
 import fintrack.core.designsystem.generated.resources.title_tag_management
 import fintrack.core.designsystem.generated.resources.title_transaction_management
 import fintrack.core.designsystem.generated.resources.transaction
+import fintrack.core.designsystem.generated.resources.label_most_used
+import fintrack.core.designsystem.generated.resources.ic_cat_transfer
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.compose.foundation.layout.Row as ComposeRow
-
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -117,6 +137,15 @@ fun AddTransactionBottomSheet(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
+    DisposableEffect(Unit) {
+        onDispose {
+            focusManager.clearFocus()
+            keyboardController?.hide()
+        }
+    }
 
     LaunchedEffect(transactionWithRelations, initialType) {
         viewModel.onIntent(AddTransactionIntent.FetchDefaultData(transactionWithRelations))
@@ -127,6 +156,8 @@ fun AddTransactionBottomSheet(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is AddTransactionEffect.AddedTransaction -> {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
                             transactionAdded()
@@ -135,12 +166,16 @@ fun AddTransactionBottomSheet(
                     }
                 }
 
-                AddTransactionEffect.OnDismiss -> onDismiss()
+                AddTransactionEffect.OnDismiss -> {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                    onDismiss()
+                }
             }
         }
     }
 
-    BottomSheetContent(state, viewModel::onIntent, sheetState, snackbarHostState)
+    BottomSheetContent(state, viewModel::onIntent, sheetState)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -149,8 +184,15 @@ private fun BottomSheetContent(
     state: AddTransactionState,
     onIntent: (intent: AddTransactionIntent) -> Unit,
     sheetState: SheetState,
-    snackbarHostState: SnackbarHostState,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        SnackbarController.events.collectLatest { event ->
+            snackbarHostState.showSnackbar(event.message.resolveString())
+        }
+    }
+
     val backgroundBrush = remember(state.transactionType) {
         val topColor: Color = when (state.transactionType) {
             TransactionType.EXPENSE -> GlassRedSoft
@@ -161,8 +203,22 @@ private fun BottomSheetContent(
         Brush.verticalGradient(listOf(topColor, GlassBg1, GlassBg0))
     }
 
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(state.isLoading) {
+        if (state.isLoading) {
+            focusManager.clearFocus()
+            keyboardController?.hide()
+        }
+    }
+
     ModalBottomSheet(
-        onDismissRequest = { onIntent(AddTransactionIntent.OnDismiss) },
+        onDismissRequest = {
+            focusManager.clearFocus()
+            keyboardController?.hide()
+            onIntent(AddTransactionIntent.OnDismiss)
+        },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
@@ -173,12 +229,35 @@ private fun BottomSheetContent(
             ) + " " + stringResource(Res.string.transaction),
             sub = stringResource(Res.string.title_transaction_management),
             primaryLabel = stringResource(Res.string.btn_save_transaction),
-            onPrimaryClick = { onIntent(AddTransactionIntent.Submit) },
-            onClose = { onIntent(AddTransactionIntent.OnDismiss) },
+            onPrimaryClick = {
+                focusManager.clearFocus()
+                keyboardController?.hide()
+                onIntent(AddTransactionIntent.Submit)
+            },
+            onClose = {
+                focusManager.clearFocus()
+                keyboardController?.hide()
+                onIntent(AddTransactionIntent.OnDismiss)
+            },
             showHero = false,
             backgroundBrush = backgroundBrush
         ) {
-            AddTransactionContent(state = state, onIntent = onIntent)
+            Box(modifier = Modifier.fillMaxSize()) {
+                AddTransactionContent(
+                    state = state,
+                    onIntent = onIntent,
+                    keyboardActions = KeyboardActions(onDone = {
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
+                        onIntent(AddTransactionIntent.Submit)
+                    })
+                )
+
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
+            }
         }
     }
 
@@ -253,9 +332,11 @@ private fun BottomSheetContent(
 @Composable
 fun AddTransactionContent(
     state: AddTransactionState,
-    onIntent: (AddTransactionIntent) -> Unit
+    onIntent: (AddTransactionIntent) -> Unit,
+    keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
-    val space = LocalSpacing.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
     val colors = FinTrackPickerColors.rainbow()
 
     LazyColumn(
@@ -267,15 +348,23 @@ fun AddTransactionContent(
         item {
             GlassSegmentedSelector(
                 selectedType = state.transactionType,
-                onTypeSelected = { onIntent(AddTransactionIntent.SelectedType(it)) }
+                onTypeSelected = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                    onIntent(AddTransactionIntent.SelectedType(it))
+                }
             )
         }
 
-        item {
+        item(key = "amount") {
             LargeAmountCard(
                 amount = state.amount,
                 onAmountChange = { onIntent(AddTransactionIntent.SetAmount(it)) },
-                onCalcClick = { /* Part B */ }
+                onCalcClick = { /* Part B */ },
+                autoFocus = state.oldTransaction == null,
+                isError = state.isAmountError,
+                enabled = !state.isLoading,
+                keyboardActions = keyboardActions
             )
         }
 
@@ -289,7 +378,18 @@ fun AddTransactionContent(
                 ) {
                     PickerValue(
                         label = state.source?.name ?: stringResource(Res.string.select_source),
-                        color = GlassBlue
+                        color = GlassBlue,
+                        icon = FinTrackIcons.findIcon(state.source?.iconId).resource
+                    )
+                }
+                if (state.mostUsedSources.isNotEmpty()) {
+                    MostUsedSourceChips(
+                        items = state.mostUsedSources,
+                        onItemClick = {
+                            focusManager.clearFocus()
+                            keyboardController?.hide()
+                            onIntent(AddTransactionIntent.SetSource(it))
+                        }
                     )
                 }
             }
@@ -302,7 +402,18 @@ fun AddTransactionContent(
                 ) {
                     PickerValue(
                         label = state.sourceEnd?.name ?: stringResource(Res.string.select_source),
-                        color = GlassBlue
+                        color = GlassBlue,
+                        icon = FinTrackIcons.findIcon(state.sourceEnd?.iconId).resource
+                    )
+                }
+                if (state.mostUsedSources.isNotEmpty()) {
+                    MostUsedSourceChips(
+                        items = state.mostUsedSources,
+                        onItemClick = {
+                            focusManager.clearFocus()
+                            keyboardController?.hide()
+                            onIntent(AddTransactionIntent.SetSourceEnd(it))
+                        }
                     )
                 }
             }
@@ -318,7 +429,19 @@ fun AddTransactionContent(
                         colors.firstOrNull { it.id == state.category?.colorId }?.color ?: GlassGreen
                     PickerValue(
                         label = state.category?.name ?: stringResource(Res.string.select_category),
-                        color = color
+                        color = color,
+                        icon = if (state.transactionType == TransactionType.TRANSFER) Res.drawable.ic_cat_transfer else FinTrackIcons.findIcon(state.category?.iconId).resource
+                    )
+                }
+                if (state.mostUsedCategories.isNotEmpty()) {
+                    MostUsedCategoryChips(
+                        items = state.mostUsedCategories,
+                        colors = colors,
+                        onItemClick = {
+                            focusManager.clearFocus()
+                            keyboardController?.hide()
+                            onIntent(AddTransactionIntent.SetCategory(it))
+                        }
                     )
                 }
             }
@@ -331,7 +454,18 @@ fun AddTransactionContent(
                 ) {
                     PickerValue(
                         label = state.source?.name ?: stringResource(Res.string.select_source),
-                        color = GlassBlue
+                        color = GlassBlue,
+                        icon = FinTrackIcons.findIcon(state.source?.iconId).resource
+                    )
+                }
+                if (state.mostUsedSources.isNotEmpty()) {
+                    MostUsedSourceChips(
+                        items = state.mostUsedSources,
+                        onItemClick = {
+                            focusManager.clearFocus()
+                            keyboardController?.hide()
+                            onIntent(AddTransactionIntent.SetSource(it))
+                        }
                     )
                 }
             }
@@ -345,7 +479,8 @@ fun AddTransactionContent(
             ) {
                 PickerValue(
                     label = state.date ?: stringResource(Res.string.dp_today),
-                    color = GlassText2
+                    color = GlassText2,
+                    icon = Icons.Default.CalendarToday
                 )
             }
         }
@@ -383,6 +518,19 @@ fun AddTransactionContent(
                     )
                 }
             }
+            if (state.mostUsedPersons.isNotEmpty()) {
+                MostUsedPersonChips(
+                    items = state.mostUsedPersons,
+                    selectedItems = state.persons ?: emptySet(),
+                    onItemClick = { person ->
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
+                        val newSet = state.persons?.toMutableSet() ?: mutableSetOf()
+                        if (newSet.contains(person)) newSet.remove(person) else newSet.add(person)
+                        onIntent(AddTransactionIntent.SetPerson(newSet))
+                    }
+                )
+            }
         }
 
         item {
@@ -403,6 +551,20 @@ fun AddTransactionContent(
                         }
                     )
                 }
+            }
+            if (state.mostUsedTags.isNotEmpty()) {
+                MostUsedTagChips(
+                    items = state.mostUsedTags,
+                    selectedItems = state.tags ?: emptySet(),
+                    colors = colors,
+                    onItemClick = { tag ->
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
+                        val newSet = state.tags?.toMutableSet() ?: mutableSetOf()
+                        if (newSet.contains(tag)) newSet.remove(tag) else newSet.add(tag)
+                        onIntent(AddTransactionIntent.SetTags(newSet))
+                    }
+                )
             }
         }
 
@@ -432,6 +594,7 @@ fun AddTransactionContent(
                                 AddTransactionIntent.SetDescription(desc)
                             )
                         },
+                        enabled = !state.isLoading,
                         textStyle = MaterialTheme.typography.bodyMedium.copy(color = GlassText),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         cursorBrush = Brush.verticalGradient(listOf(GlassGreen, GlassGreen)),
@@ -461,7 +624,8 @@ fun AddTransactionContent(
 @Composable
 private fun PickerValue(
     label: String,
-    color: Color
+    color: Color,
+    icon: Any? = null
 ) {
     ComposeRow(
         verticalAlignment = Alignment.CenterVertically,
@@ -472,12 +636,32 @@ private fun PickerValue(
             fontWeight = FontWeight.SemiBold,
             color = GlassText
         )
-        Icon(
-            painter = painterResource(Res.drawable.ic_1), // Placeholder arrow? 
-            contentDescription = null,
-            tint = GlassText3,
-            modifier = Modifier.size(13.dp)
-        )
+        when (icon) {
+            is org.jetbrains.compose.resources.DrawableResource -> {
+                Icon(
+                    painter = painterResource(icon),
+                    contentDescription = null,
+                    tint = GlassText3,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+            is androidx.compose.ui.graphics.vector.ImageVector -> {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = GlassText3,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+            else -> {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_1), // Placeholder arrow? 
+                    contentDescription = null,
+                    tint = GlassText3,
+                    modifier = Modifier.size(13.dp)
+                )
+            }
+        }
     }
 }
 
@@ -534,6 +718,168 @@ private fun PhotoActionCard(icon: androidx.compose.ui.graphics.vector.ImageVecto
                 modifier = Modifier.size(18.dp)
             )
             FintrackLabelSmallText(text = label, color = GlassText3)
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MostUsedCategoryChips(
+    items: List<Category>,
+    colors: List<PickableColor>,
+    onItemClick: (Category) -> Unit
+) {
+    if (items.isEmpty()) return
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        FintrackLabelSmallText(
+            text = stringResource(Res.string.label_most_used),
+            color = GlassText3,
+            fontSize = 9.sp
+        )
+        FlowRow(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            items.take(3).forEach { category ->
+                val color = colors.firstOrNull { it.id == category.colorId }?.color ?: GlassGreen
+                Chip(
+                    color = color,
+                    onClick = { onItemClick(category) }
+                ) {
+                    FintrackLabelSmallText(
+                        text = category.name,
+                        color = color,
+                        fontSize = 10.sp
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MostUsedSourceChips(
+    items: List<Source>,
+    onItemClick: (Source) -> Unit
+) {
+    if (items.isEmpty()) return
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        FintrackLabelSmallText(
+            text = stringResource(Res.string.label_most_used),
+            color = GlassText3,
+            fontSize = 9.sp
+        )
+        FlowRow(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            items.take(3).forEach { source ->
+                Chip(
+                    color = GlassBlue,
+                    onClick = { onItemClick(source) }
+                ) {
+                    FintrackLabelSmallText(
+                        text = source.name,
+                        color = GlassBlue,
+                        fontSize = 10.sp
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MostUsedTagChips(
+    items: List<Tag>,
+    selectedItems: Set<Tag>,
+    colors: List<PickableColor>,
+    onItemClick: (Tag) -> Unit
+) {
+    if (items.isEmpty()) return
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        FintrackLabelSmallText(
+            text = stringResource(Res.string.label_most_used),
+            color = GlassText3,
+            fontSize = 9.sp
+        )
+        FlowRow(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            items.take(3).forEach { tag ->
+                val active = selectedItems.contains(tag)
+                val color = colors.firstOrNull { it.id == tag.colorId }?.color ?: GlassBlue
+                Chip(
+                    color = color,
+                    active = active,
+                    onClick = { onItemClick(tag) }
+                ) {
+                    FintrackLabelSmallText(
+                        text = stringResource(Res.string.label_tag_prefix, tag.name),
+                        color = if (active) Color.White else color,
+                        fontSize = 10.sp
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MostUsedPersonChips(
+    items: List<Person>,
+    selectedItems: Set<Person>,
+    onItemClick: (Person) -> Unit
+) {
+    if (items.isEmpty()) return
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        FintrackLabelSmallText(
+            text = stringResource(Res.string.label_most_used),
+            color = GlassText3,
+            fontSize = 9.sp
+        )
+        FlowRow(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            items.take(3).forEach { person ->
+                val active = selectedItems.contains(person)
+                Chip(
+                    color = GlassGreen,
+                    active = active,
+                    onClick = { onItemClick(person) }
+                ) {
+                    FintrackLabelSmallText(
+                        text = person.name,
+                        color = if (active) Color.White else GlassGreen,
+                        fontSize = 10.sp
+                    )
+                }
+            }
         }
     }
 }

@@ -346,6 +346,9 @@
     <string name="dp_dow_thu">پ</string>
     <string name="dp_dow_fri">ج</string>
 
+    <string name="msg_mandatory_fields_error">موارد اجباری باید پر بشه</string>
+    <string name="label_most_used">پراستفاده‌ها</string>
+
     <string name="type_expense">خرج</string>
     <string name="type_income">درآمد</string>
     <string name="type_transfer">انتقال</string>

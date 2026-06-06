@@ -33,3 +33,11 @@ insertFullPerson:
 INSERT OR REPLACE INTO person(id, name, description)
 VALUES (?, ?, ?);
 
+getMostUsedPersons:
+SELECT person.* FROM person
+JOIN transaction_person tp ON person.id = tp.personId
+GROUP BY person.id
+ORDER BY COUNT(tp.transactionId) DESC
+LIMIT :limit;
+
+

@@ -65,5 +65,8 @@ interface TransactionLocalDataSource {
     suspend fun addPerson(person: Person): Long
     fun observePersons(): Flow<List<Person>>
 
-
+    fun observeMostUsedCategories(type: TransactionType?, limit: Long): Flow<List<Category>>
+    fun observeMostUsedSources(limit: Long): Flow<List<Source>>
+    fun observeMostUsedTags(limit: Long): Flow<List<Tag>>
+    fun observeMostUsedPersons(limit: Long): Flow<List<Person>>
 }
