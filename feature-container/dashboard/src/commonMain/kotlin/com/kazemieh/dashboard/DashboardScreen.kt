@@ -150,6 +150,7 @@ fun DashboardScreen(
             item {
                 FintrackHeadlineSmallText(
                     text = stringResource(Res.string.recent_transactions),
+                    fontWeight = FontWeight.W700,
                     modifier = Modifier.padding(horizontal = space.large, vertical = space.medium)
                 )
             }

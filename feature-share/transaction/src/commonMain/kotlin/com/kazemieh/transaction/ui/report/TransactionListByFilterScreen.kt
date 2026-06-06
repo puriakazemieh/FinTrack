@@ -207,10 +207,10 @@ private fun DayHeader(date: String, count: Int, netAmount: Long) {
         FintrackTitleSmallText(
             text = stringResource(
                 Res.string.label_amount_with_unit,
-                (if (netAmount >= 0) "+" else "") + netAmount.formatted(),
+                (if (netAmount >= 0) "+" else "") + netAmount.toLong().toFa(),
                 stringResource(Res.string.unit_toman_short)
             ),
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.W700,
             color = if (netAmount >= 0) GlassGreen else GlassRed
         )
     }
@@ -282,7 +282,7 @@ private fun TxRow(item: TransactionWithRelations, onClick: () -> Unit) {
                     "$sign${displayAmount.toLong().toFormattedFa()}",
                     stringResource(Res.string.unit_toman_short)
                 ),
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.W700,
                 color = color
             )
             item.transaction.description?.takeIf { it.isNotEmpty() }?.let {

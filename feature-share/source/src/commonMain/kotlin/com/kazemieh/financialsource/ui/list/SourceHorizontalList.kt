@@ -33,7 +33,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.common.formatted
+import com.kazemieh.common.toFa
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.GlassColor
 import com.kazemieh.designsystem.GlassEdge
@@ -116,9 +116,9 @@ private fun SourceTile(source: Source) {
 
             }
             FintrackTitleSmallText(
-                text = source.balance.formatted(),
+                text = source.balance.toLong().toFa(),
                 fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.W700,
                 color = GlassText
             )
         }

@@ -3,6 +3,7 @@ package com.kazemieh.designsystem.component
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import com.kazemieh.designsystem.vazirmatnFontFamily
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -19,7 +20,12 @@ fun FintrackDisplayLargeText(
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
-    style: TextStyle = MaterialTheme.typography.displayLarge.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
+    style: TextStyle = MaterialTheme.typography.displayLarge.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -40,7 +46,12 @@ fun FintrackDisplayMediumText(
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
-    style: TextStyle = MaterialTheme.typography.displayMedium.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
+    style: TextStyle = MaterialTheme.typography.displayMedium.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -61,7 +72,12 @@ fun FintrackDisplaySmallText(
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
-    style: TextStyle = MaterialTheme.typography.displaySmall.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
+    style: TextStyle = MaterialTheme.typography.displaySmall.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -82,7 +98,12 @@ fun FintrackHeadlineLargeText(
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
-    style: TextStyle = MaterialTheme.typography.headlineLarge.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
+    style: TextStyle = MaterialTheme.typography.headlineLarge.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -103,7 +124,12 @@ fun FintrackHeadlineMediumText(
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
-    style: TextStyle = MaterialTheme.typography.headlineMedium.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
+    style: TextStyle = MaterialTheme.typography.headlineMedium.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -124,7 +150,12 @@ fun FintrackHeadlineSmallText(
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
-    style: TextStyle = MaterialTheme.typography.headlineSmall.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
+    style: TextStyle = MaterialTheme.typography.headlineSmall.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -145,7 +176,12 @@ fun FintrackTitleLargeText(
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
-    style: TextStyle = MaterialTheme.typography.titleLarge.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
+    style: TextStyle = MaterialTheme.typography.titleLarge.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -166,7 +202,12 @@ fun FintrackTitleMediumText(
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
-    style: TextStyle = MaterialTheme.typography.titleMedium.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
+    style: TextStyle = MaterialTheme.typography.titleMedium.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -187,7 +228,12 @@ fun FintrackTitleSmallText(
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
-    style: TextStyle = MaterialTheme.typography.titleSmall.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
+    style: TextStyle = MaterialTheme.typography.titleSmall.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -208,7 +254,12 @@ fun FintrackBodyLargeText(
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
-    style: TextStyle = MaterialTheme.typography.bodyLarge.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
+    style: TextStyle = MaterialTheme.typography.bodyLarge.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -229,7 +280,12 @@ fun FintrackBodyMediumText(
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
-    style: TextStyle = MaterialTheme.typography.bodyMedium.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
+    style: TextStyle = MaterialTheme.typography.bodyMedium.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -250,7 +306,12 @@ fun FintrackBodySmallText(
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
-    style: TextStyle = MaterialTheme.typography.bodySmall.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
+    style: TextStyle = MaterialTheme.typography.bodySmall.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -271,7 +332,12 @@ fun FintrackLabelLargeText(
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
-    style: TextStyle = MaterialTheme.typography.labelLarge.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
+    style: TextStyle = MaterialTheme.typography.labelLarge.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -292,7 +358,12 @@ fun FintrackLabelMediumText(
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
-    style: TextStyle = MaterialTheme.typography.labelMedium.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
+    style: TextStyle = MaterialTheme.typography.labelMedium.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -313,7 +384,12 @@ fun FintrackLabelSmallText(
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
-    style: TextStyle = MaterialTheme.typography.labelSmall.copy(color = color, fontSize = fontSize, fontWeight = fontWeight),
+    style: TextStyle = MaterialTheme.typography.labelSmall.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
 ) {

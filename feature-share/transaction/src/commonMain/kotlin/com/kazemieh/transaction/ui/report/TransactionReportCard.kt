@@ -108,7 +108,7 @@ fun SummaryCard(
                     FintrackTitleLargeText(
                         text = stringResource(Res.string.label_amount_with_unit, value.toFormattedFa(), stringResource(Res.string.unit_toman_short)),
                         color = color,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.W700
                     )
                 }
             }
@@ -135,7 +135,7 @@ private fun SummaryRow(
         FintrackTitleSmallText(
             text = text,
             fontSize = 13.sp,
-            fontWeight = if (isBold) FontWeight.Bold else FontWeight.SemiBold,
+            fontWeight = if (isBold) FontWeight.W700 else FontWeight.W600,
             color = color
         )
     }

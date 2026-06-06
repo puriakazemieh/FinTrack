@@ -29,6 +29,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
+import com.kazemieh.common.toFormattedFa
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.LocalSpacing
@@ -233,8 +235,9 @@ fun TransactionItem(
                     text = stringResource(
                         Res.string.amount_label,
                         typeLabel,
-                        trx.formatedAmount
+                        trx.amount.toLong().toFormattedFa()
                     ),
+                    fontWeight = FontWeight.W700,
                     color = amountColor
                 )
 
