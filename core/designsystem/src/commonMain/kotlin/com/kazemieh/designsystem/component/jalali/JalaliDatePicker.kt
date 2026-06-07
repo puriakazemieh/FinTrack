@@ -168,19 +168,19 @@ fun JalaliCalendarView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (pickerType == PickerType.Day) {
-                val nextMonth =
-                    if (jalali.month != 12) JalaliCalendar(jalali.year, jalali.month + 1, 1)
-                    else JalaliCalendar(jalali.year + 1, 1, 1)
-                val lastCurrent = JalaliCalendar(jalali.year, jalali.month, jalali.monthLength)
+                val prevMonth =
+                    if (jalali.month != 1) JalaliCalendar(jalali.year, jalali.month - 1, 1)
+                    else JalaliCalendar(jalali.year - 1, 12, 1)
+                val firstCurrent = JalaliCalendar(jalali.year, jalali.month, 1)
                 val disabled =
-                    disableAfterDate != null && lastCurrent.isAfterOrEqual(disableAfterDate)
+                    disableBeforeDate != null && firstCurrent.isBeforeOrEqual(disableBeforeDate)
                 IconButton(
-                    onClick = { jalali = nextMonth },
+                    onClick = { jalali = prevMonth },
                     enabled = !disabled,
                     modifier = Modifier.size(iconSize)
                 ) {
                     Icon(
-                        Icons.Outlined.KeyboardArrowLeft,
+                        Icons.Outlined.KeyboardArrowRight,
                         null,
                         tint = if (disabled) textDisabledColor else nextPreviousBtnColor
                     )
@@ -216,19 +216,19 @@ fun JalaliCalendarView(
             }
 
             if (pickerType == PickerType.Day) {
-                val prevMonth =
-                    if (jalali.month != 1) JalaliCalendar(jalali.year, jalali.month - 1, 1)
-                    else JalaliCalendar(jalali.year - 1, 12, 1)
-                val firstCurrent = JalaliCalendar(jalali.year, jalali.month, 1)
+                val nextMonth =
+                    if (jalali.month != 12) JalaliCalendar(jalali.year, jalali.month + 1, 1)
+                    else JalaliCalendar(jalali.year + 1, 1, 1)
+                val lastCurrent = JalaliCalendar(jalali.year, jalali.month, jalali.monthLength)
                 val disabled =
-                    disableBeforeDate != null && firstCurrent.isBeforeOrEqual(disableBeforeDate)
+                    disableAfterDate != null && lastCurrent.isAfterOrEqual(disableAfterDate)
                 IconButton(
-                    onClick = { jalali = prevMonth },
+                    onClick = { jalali = nextMonth },
                     enabled = !disabled,
                     modifier = Modifier.size(iconSize)
                 ) {
                     Icon(
-                        Icons.Outlined.KeyboardArrowRight,
+                        Icons.Outlined.KeyboardArrowLeft,
                         null,
                         tint = if (disabled) textDisabledColor else nextPreviousBtnColor
                     )
