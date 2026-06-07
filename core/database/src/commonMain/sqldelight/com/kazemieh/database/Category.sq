@@ -22,7 +22,7 @@ SET name = ?, description = ?, type = ?, colorId = ?, iconId = ?
 WHERE id = ?;
 
 observeCategories:
-SELECT * FROM category WHERE type = ?;
+SELECT * FROM category WHERE (:type IS NULL OR type = :type);
 
 getFirstByType:
 SELECT * FROM category WHERE type = ? ORDER BY id LIMIT 1;

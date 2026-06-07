@@ -16,6 +16,7 @@ import com.kazemieh.domain.usecase.UpdatePersonUseCase
 import com.kazemieh.domain.usecase.UpdateSourceUseCase
 import com.kazemieh.domain.usecase.UpdateTagUseCase
 import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
+import com.kazemieh.domain.usecase.GetCategoryUseCase
 import com.kazemieh.domain.usecase.ObservePersonsUseCase
 import com.kazemieh.domain.usecase.ObserveSourcesUseCase
 import com.kazemieh.domain.usecase.ObserveTagsUseCase
@@ -42,6 +43,7 @@ val domainModule = module {
     factory { ObserveTagsUseCase(get()) }
     factory { ObserveSourcesUseCase(get()) }
     factory { ObserveCategoriesUseCase(get()) }
+    factory { GetCategoryUseCase(get()) }
     factory { AddCategoryUseCase(get()) }
     factory { UpdateCategoryUseCase(get()) }
     factory { UpdateTagUseCase(get()) }

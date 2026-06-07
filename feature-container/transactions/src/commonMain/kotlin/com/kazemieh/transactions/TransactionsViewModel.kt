@@ -18,6 +18,11 @@ import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.persiandatetime.extensions.persianMonth
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.component.model.UiText
+import com.kazemieh.domain.usecase.GetCategoryUseCase
+import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
+import com.kazemieh.domain.usecase.ObservePersonsUseCase
+import com.kazemieh.domain.usecase.ObserveSourcesUseCase
+import com.kazemieh.domain.usecase.ObserveTagsUseCase
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.custom_range
 import fintrack.core.designsystem.generated.resources.label_period_range_summary
@@ -34,13 +39,20 @@ import fintrack.core.designsystem.generated.resources.tomorrow
 import fintrack.core.designsystem.generated.resources.yesterday
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 
-class TransactionsViewModel() : ViewModel() {
+class TransactionsViewModel(
+    private val getCategoryUseCase: GetCategoryUseCase,
+    private val observeSourcesUseCase: ObserveSourcesUseCase,
+    private val observeTagsUseCase: ObserveTagsUseCase,
+    private val observePersonsUseCase: ObservePersonsUseCase
+) : ViewModel() {
 
     private val _state = MutableStateFlow(TransactionsState())
     val state = _state.asStateFlow()
@@ -69,6 +81,7 @@ class TransactionsViewModel() : ViewModel() {
                 it.copy(
                     selectedTransactionType = intent.type,
                     selectedCategories = emptySet(),
+                    isAllCategorySelected = true,
                     enableAnimationChart = !_state.value.enableAnimationChart
                 )
             }
@@ -121,6 +134,7 @@ class TransactionsViewModel() : ViewModel() {
                     selectedCategories = intent.categories,
                     isCategorySheetVisible = false,
                     isAllCategorySelected = intent.isAllCategorySelected,
+                    selectedTransactionType = if (intent.isAllCategorySelected) TransactionType.ALL else it.selectedTransactionType,
                     enableAnimationChart = !_state.value.enableAnimationChart
                 )
             }
@@ -263,36 +277,39 @@ class TransactionsViewModel() : ViewModel() {
                 onIntent(TransactionsIntent.OnDateRange(DateFilterType.THIS_MONTH))
             }
 
-            is TransactionsIntent.OnSourcesSelected -> _state.update {
-                it.copy(
-                    selectedSources = intent.sources,
-                    isAllSourceSelected = intent.isAllSourceSelected,
-                    enableAnimationChart = !_state.value.enableAnimationChart
-                )
-            }
+            is TransactionsIntent.ApplyFilter -> {
+                viewModelScope.launch {
+                    val categories = intent.categoryId?.let { id ->
+                        getCategoryUseCase(id)
+                    }?.let { setOf(it) } ?: emptySet()
 
-            is TransactionsIntent.OnTagSelected -> _state.update {
-                it.copy(
-                    selectedTag = intent.tag,
-                    isAllTAgSelected = intent.isAllTAgSelected,
-                    enableAnimationChart = !_state.value.enableAnimationChart
-                )
-            }
+                    val sources = intent.sourceId?.let { id ->
+                        observeSourcesUseCase().first().find { it.id == id }
+                    }?.let { setOf(it) } ?: emptySet()
 
-            is TransactionsIntent.OnPersonSelected -> _state.update {
-                it.copy(
-                    selectedPerson = intent.persons,
-                    isAllPersonSelected = intent.isAllPersonSelected,
-                    enableAnimationChart = !_state.value.enableAnimationChart
-                )
-            }
+                    val tags = intent.tagId?.let { id ->
+                        observeTagsUseCase().first().find { it.id == id }
+                    }?.let { setOf(it) } ?: emptySet()
 
-            is TransactionsIntent.OnCategoriesSelected -> _state.update {
-                it.copy(
-                    selectedCategories = intent.categories,
-                    isAllCategorySelected = intent.isAllCategorySelected,
-                    enableAnimationChart = !_state.value.enableAnimationChart
-                )
+                    val persons = intent.personId?.let { id ->
+                        observePersonsUseCase().first().find { it.id == id }
+                    }?.let { setOf(it) } ?: emptySet()
+
+                    _state.update {
+                        it.copy(
+                            selectedCategories = categories,
+                            isAllCategorySelected = categories.isEmpty(),
+                            selectedSources = sources,
+                            isAllSourceSelected = sources.isEmpty(),
+                            selectedTag = tags,
+                            isAllTAgSelected = tags.isEmpty(),
+                            selectedPerson = persons,
+                            isAllPersonSelected = persons.isEmpty(),
+                            selectedTransactionType = if (categories.isNotEmpty()) categories.first().type else it.selectedTransactionType,
+                            enableAnimationChart = !it.enableAnimationChart
+                        )
+                    }
+                }
             }
         }
     }
@@ -462,6 +479,13 @@ sealed interface TransactionsIntent {
     data object OnToggleSearch : TransactionsIntent
     data object OnToggleFilterSheet : TransactionsIntent
     data object ResetFilters : TransactionsIntent
+    data class ApplyFilter(
+        val categoryId: Long? = null,
+        val sourceId: Long? = null,
+        val tagId: Long? = null,
+        val personId: Long? = null
+    ) : TransactionsIntent
+
     data class OnDateSheetSubmit(
         val startDate: String?,
         val startTimeStamp: Long?,

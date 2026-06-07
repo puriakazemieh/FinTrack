@@ -70,7 +70,8 @@ fun TagPickerSingleBottomSheet(
     viewModel: TagViewModel = koinViewModel(key = "TagPickerSingleBottomSheet"),
     snackbarHostState: SnackbarHostState,
     onTagClick: (Tag) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onNavigateToTransactions: ((Tag) -> Unit)? = null
 ) {
     LaunchedEffect(Unit) {
         viewModel.onIntent(TagIntent.GetAllTag)
@@ -116,6 +117,12 @@ fun TagPickerSingleBottomSheet(
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(TagIntent.UpdateSearchQuery(it)) },
                 onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
+                onFilterClick = onNavigateToTransactions?.let { callback ->
+                    { item ->
+                        state.tags.find { it.id == item.id }?.let { callback(it) }
+                        onDismiss()
+                    }
+                },
                 items = state.filteredTags.map {
                     EntityItem(
                         id = it.id ?: 0,
@@ -162,7 +169,8 @@ fun TagManageBottomSheet(
     isEditShow: Boolean = true,
     clickable: Boolean = false,
     onTagClick: (Tag) -> Unit = {},
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onNavigateToTransactions: ((Tag) -> Unit)? = null
 ) {
     LaunchedEffect(Unit) { viewModel.onIntent(TagIntent.GetAllTag) }
 
@@ -222,6 +230,12 @@ fun TagManageBottomSheet(
                     }
                 },
                 onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
+                onFilterClick = onNavigateToTransactions?.let { callback ->
+                    { item ->
+                        state.tags.find { it.id == item.id }?.let { callback(it) }
+                        onDismiss()
+                    }
+                },
                 onEditClick = { item ->
                     state.tags.find { it.id == item.id }?.let {
                         viewModel.onIntent(TagIntent.OnEditClick(it))

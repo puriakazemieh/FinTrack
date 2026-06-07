@@ -80,7 +80,8 @@ fun PersonPickerSingleBottomSheet(
     viewModel: PersonViewModel = koinViewModel(key = "PersonPickerSingleBottomSheet"),
     snackbarHostState: SnackbarHostState,
     onPersonClick: (Person) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onNavigateToTransactions: ((Person) -> Unit)? = null
 ) {
     LaunchedEffect(Unit) {
         viewModel.onIntent(PersonIntent.GetAllPerson)
@@ -126,6 +127,12 @@ fun PersonPickerSingleBottomSheet(
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(PersonIntent.UpdateSearchQuery(it)) },
                 onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
+                onFilterClick = onNavigateToTransactions?.let { callback ->
+                    { item ->
+                        state.persons.find { it.id == item.id }?.let { callback(it) }
+                        onDismiss()
+                    }
+                },
                 items = state.filteredPersons.map {
                     EntityItem(
                         id = it.id ?: 0,
@@ -172,7 +179,8 @@ fun PersonManageBottomSheet(
     isEditShow: Boolean = true,
     clickable: Boolean = false,
     onPersonClick: (Person) -> Unit = {},
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onNavigateToTransactions: ((Person) -> Unit)? = null
 ) {
     LaunchedEffect(Unit) { viewModel.onIntent(PersonIntent.GetAllPerson) }
 
@@ -232,6 +240,12 @@ fun PersonManageBottomSheet(
                     }
                 },
                 onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
+                onFilterClick = onNavigateToTransactions?.let { callback ->
+                    { item ->
+                        state.persons.find { it.id == item.id }?.let { callback(it) }
+                        onDismiss()
+                    }
+                },
                 onEditClick = { item ->
                     state.persons.find { it.id == item.id }?.let {
                         viewModel.onIntent(PersonIntent.OnEditClick(it))

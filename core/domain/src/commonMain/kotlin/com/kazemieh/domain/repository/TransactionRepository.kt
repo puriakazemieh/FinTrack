@@ -44,7 +44,8 @@ interface TransactionRepository {
     suspend fun updateCategory(category: Category): Int
     suspend fun deleteCategory(category: Category, moveCategory: Category?)
     fun observeCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>>
-    fun observeCategories(type: TransactionType): Flow<List<Category>>
+    fun observeCategories(type: TransactionType?): Flow<List<Category>>
+    suspend fun getCategoryById(id: Long): Category?
     suspend fun getDefaultCategory(type: TransactionType): Category
     suspend fun getTransferCategory(): Category
 

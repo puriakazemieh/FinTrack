@@ -7,6 +7,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.toRoute
+import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.Tag
 import com.kazemieh.dashboard.DashboardScreen
 import com.kazemieh.transactions.TransactionsScreen
 import com.kazemieh.composeApp.navigation.Screen
@@ -39,7 +43,11 @@ fun NavGraphBuilder.bottomBarNavGraph(
             val args = backStackEntry.toRoute<Screen.Transactions>()
             TransactionsScreen(
                 snackbarHostState = snackbarHostState,
-                resetFilters = args.resetFilters
+                resetFilters = args.resetFilters,
+                categoryId = args.categoryId,
+                sourceId = args.sourceId,
+                tagId = args.tagId,
+                personId = args.personId
             )
         }
 
@@ -48,7 +56,24 @@ fun NavGraphBuilder.bottomBarNavGraph(
         }
 
         composable<Screen.Profile> { backStackEntry ->
-            ProfileScreen(snackbarHostState = snackbarHostState)
+            ProfileScreen(
+                snackbarHostState = snackbarHostState,
+                onNavigateToTransactions = { data ->
+                    val route = when (data) {
+                        is Category -> Screen.Transactions(categoryId = data.id)
+                        is Source -> Screen.Transactions(sourceId = data.id)
+                        is Tag -> Screen.Transactions(tagId = data.id)
+                        is Person -> Screen.Transactions(personId = data.id)
+                        else -> Screen.Transactions()
+                    }
+                    navController.navigate(route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
 
     }

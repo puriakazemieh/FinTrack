@@ -52,7 +52,8 @@ interface TransactionLocalDataSource {
     suspend fun deleteSource(deleteSource: Source, moveSource: Source?)
     suspend fun addSource(source: Source): Long
     suspend fun addTag(tag: Tag): Long
-    fun observeCategories(type: TransactionType): Flow<List<Category>>
+    fun observeCategories(type: TransactionType?): Flow<List<Category>>
+    suspend fun getCategoryById(id: Long): Category?
     fun observeSources(): Flow<List<Source>>
     fun observeSource(sourceId: Long): Flow<Source?>
     fun observeTags(): Flow<List<Tag>>

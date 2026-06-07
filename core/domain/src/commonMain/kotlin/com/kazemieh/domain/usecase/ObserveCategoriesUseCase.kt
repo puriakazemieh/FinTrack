@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 class ObserveCategoriesUseCase(
     private val repository: TransactionRepository
 ) {
-    suspend operator fun invoke(type: TransactionType): Flow<List<Category>> {
+    suspend operator fun invoke(type: TransactionType? = null): Flow<List<Category>> {
         return repository.observeCategories(type)
     }
 }

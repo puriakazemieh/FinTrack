@@ -107,7 +107,7 @@ fun DashboardScreen(
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 120.dp) // Space for NavigationBar
+            contentPadding = PaddingValues(bottom = 110.dp) // Space for NavigationBar
         ) {
             item {
                 DashboardHeader(

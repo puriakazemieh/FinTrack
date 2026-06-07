@@ -65,6 +65,7 @@ private fun SourceBottomSheetCore(
     clickable: Boolean,
     onSourceClick: (Source) -> Unit,
     onDismiss: () -> Unit,
+    onNavigateToTransactions: ((Source) -> Unit)? = null,
 ) {
     val viewModel: SourceViewModel = koinViewModel(key = keyViewmodel)
 
@@ -126,6 +127,12 @@ private fun SourceBottomSheetCore(
                     }
                 },
                 onAddClick = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
+                onFilterClick = onNavigateToTransactions?.let { callback ->
+                    { item ->
+                        state.sources.find { it.id == item.id }?.let { callback(it) }
+                        onDismiss()
+                    }
+                },
                 onEditClick = { item ->
                     state.sources.find { it.id == item.id }?.let {
                         viewModel.onIntent(SourceIntent.OnEditClick(it))
@@ -164,6 +171,7 @@ fun SourceManageBottomSheet(
     snackbarHostState: SnackbarHostState,
     onDismiss: () -> Unit,
     onSourceClick: (Source) -> Unit = {},
+    onNavigateToTransactions: ((Source) -> Unit)? = null,
 ) = SourceBottomSheetCore(
     keyViewmodel = "SourceManageBottomSheet",
     snackbarHostState = snackbarHostState,
@@ -172,6 +180,7 @@ fun SourceManageBottomSheet(
     clickable = false,
     onSourceClick = onSourceClick,
     onDismiss = onDismiss,
+    onNavigateToTransactions = onNavigateToTransactions
 )
 
 @Composable
@@ -179,6 +188,7 @@ fun SourcePickerBottomSheet(
     snackbarHostState: SnackbarHostState,
     onDismiss: () -> Unit,
     onSourceClick: (Source) -> Unit = {},
+    onNavigateToTransactions: ((Source) -> Unit)? = null,
 ) = SourceBottomSheetCore(
     keyViewmodel = "SourcePickerBottomSheet",
     snackbarHostState = snackbarHostState,
@@ -187,6 +197,7 @@ fun SourcePickerBottomSheet(
     clickable = true,
     onSourceClick = onSourceClick,
     onDismiss = onDismiss,
+    onNavigateToTransactions = onNavigateToTransactions
 )
 
 

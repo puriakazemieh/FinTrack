@@ -57,7 +57,8 @@ fun CategoryPickerBottomSheet(
     snackbarHostState: SnackbarHostState,
     transactionType: TransactionType,
     onCategoryClick: (Category) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onNavigateToTransactions: ((Category) -> Unit)? = null
 ) {
     LaunchedEffect(transactionType) {
         viewModel.onIntent(CategoryIntent.LoadCategoryByType(transactionType))
@@ -127,6 +128,12 @@ fun CategoryPickerBottomSheet(
                 onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
                 items = entityItems,
                 showActions = isEditMode,
+                onFilterClick = onNavigateToTransactions?.let { callback ->
+                    { item ->
+                        state.categories.find { it.id == item.id }?.let { callback(it) }
+                        onDismiss()
+                    }
+                },
                 onEditClick = { viewModel.onIntent(CategoryIntent.OnEditClick(state.categories.find { c -> c.id == it.id })) },
                 onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) },
                 onItemClick = { item ->
@@ -165,7 +172,8 @@ fun CategoryPickerBottomSheet(
 fun CategoryManageBottomSheet(
     viewModel: CategoryViewModel = koinViewModel(key = "CategoryManageBottomSheet"),
     snackbarHostState: SnackbarHostState,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onNavigateToTransactions: ((Category) -> Unit)? = null
 ) {
     LaunchedEffect(Unit) {
         viewModel.onIntent(CategoryIntent.LoadCategoryByType(TransactionType.INCOME))
@@ -223,6 +231,12 @@ fun CategoryManageBottomSheet(
                 onQueryChange = { viewModel.onIntent(CategoryIntent.SetQuery(it)) },
                 onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
                 items = entityItems,
+                onFilterClick = onNavigateToTransactions?.let { callback ->
+                    { item ->
+                        state.categories.find { it.id == item.id }?.let { callback(it) }
+                        onDismiss()
+                    }
+                },
                 onEditClick = { viewModel.onIntent(CategoryIntent.OnEditClick(state.categories.find { c -> c.id == it.id })) },
                 onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) }
             )

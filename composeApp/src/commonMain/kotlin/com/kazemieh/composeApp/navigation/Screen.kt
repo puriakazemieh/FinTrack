@@ -6,10 +6,16 @@ import kotlinx.serialization.Serializable
 sealed class Screen {
 
     @Serializable
-    data object Dashboard: Screen()
+    data object Dashboard : Screen()
 
     @Serializable
-    data class Transactions(val resetFilters: Boolean = false) : Screen()
+    data class Transactions(
+        val resetFilters: Boolean = false,
+        val categoryId: Long? = null,
+        val sourceId: Long? = null,
+        val tagId: Long? = null,
+        val personId: Long? = null,
+    ) : Screen()
 
     @Serializable
     data object Tools : Screen()

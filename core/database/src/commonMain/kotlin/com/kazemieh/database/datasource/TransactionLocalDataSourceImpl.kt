@@ -288,11 +288,18 @@ class TransactionLocalDataSourceImpl(
         tagQueries.lastInsertRowId().awaitAsOne()
     }
 
-    override fun observeCategories(type: TransactionType): Flow<List<Category>> {
-        return categoryQueries.observeCategories(type.count.toLong())
+    override fun observeCategories(type: TransactionType?): Flow<List<Category>> {
+        val count = if (type == TransactionType.ALL) null else type?.count?.toLong()
+        return categoryQueries.observeCategories(count)
             .asFlow()
             .mapToList(Dispatchers.Default)
             .map { list -> list.map { it.toCategory() } }
+    }
+
+    override suspend fun getCategoryById(id: Long): Category? = withContext(Dispatchers.Default) {
+        categoryQueries.getCategoryById(id)
+            .awaitAsOneOrNull()
+            ?.toCategory()
     }
 
     override fun observeSources(): Flow<List<Source>> {

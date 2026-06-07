@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.list.CategorySelectionBottomSheet
 import com.kazemieh.common.DateFilterType
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.model.asString
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
@@ -38,13 +39,28 @@ import org.koin.compose.viewmodel.koinViewModel
 fun TransactionsScreen(
     snackbarHostState: SnackbarHostState,
     resetFilters: Boolean = false,
+    categoryId: Long? = null,
+    sourceId: Long? = null,
+    tagId: Long? = null,
+    personId: Long? = null,
     viewModel: TransactionsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(resetFilters, state.resetFiltersHandled) {
+    LaunchedEffect(resetFilters, state.resetFiltersHandled, categoryId, sourceId, tagId, personId) {
         if (resetFilters && !state.resetFiltersHandled) {
             viewModel.onIntent(TransactionsIntent.ResetFilters)
+        }
+
+        if (categoryId != null || sourceId != null || tagId != null || personId != null) {
+            viewModel.onIntent(
+                TransactionsIntent.ApplyFilter(
+                    categoryId = categoryId,
+                    sourceId = sourceId,
+                    tagId = tagId,
+                    personId = personId
+                )
+            )
         }
     }
 
@@ -145,8 +161,8 @@ fun TransactionsScreen(
             PeriodSelector(
                 currentPeriod = state.dateFilterType,
                 periodLabel = state.textDate.asString(),
-                periodSubLabel = state.textPeriodRange.asString().ifEmpty { 
-                    if (state.dateFilterType == DateFilterType.TODAY) "" else stringResource(Res.string.placeholder_period_range) 
+                periodSubLabel = state.textPeriodRange.asString().ifEmpty {
+                    if (state.dateFilterType == DateFilterType.TODAY) "" else stringResource(Res.string.placeholder_period_range)
                 },
                 onPeriodSelected = { type ->
                     if (type == DateFilterType.CUSTOM_RANGE) {
@@ -167,33 +183,54 @@ fun TransactionsScreen(
                             val newSet =
                                 state.selectedCategories.filter { "cat_${it.id}" != filter.id }
                                     .toSet()
-                            viewModel.onIntent(TransactionsIntent.OnCategoriesSelected(newSet, false))
+                            viewModel.onIntent(
+                                TransactionsIntent.OnCategoriesSelected(
+                                    newSet,
+                                    newSet.isEmpty()
+                                )
+                            )
                         }
 
                         FilterType.Source -> {
                             val newSet =
                                 state.selectedSources.filter { "src_${it.id}" != filter.id }.toSet()
-                            viewModel.onIntent(TransactionsIntent.OnSourcesSelected(newSet, false))
+                            viewModel.onIntent(
+                                TransactionsIntent.OnSourcesSelected(
+                                    newSet,
+                                    newSet.isEmpty()
+                                )
+                            )
                         }
 
                         FilterType.Tag -> {
                             val newSet =
                                 state.selectedTag.filter { "tag_${it.id}" != filter.id }.toSet()
-                            viewModel.onIntent(TransactionsIntent.OnTagSelected(newSet, false))
+                            viewModel.onIntent(
+                                TransactionsIntent.OnTagSelected(
+                                    newSet,
+                                    newSet.isEmpty()
+                                )
+                            )
                         }
 
                         FilterType.Person -> {
                             val newSet =
                                 state.selectedPerson.filter { "pers_${it.id}" != filter.id }.toSet()
-                            viewModel.onIntent(TransactionsIntent.OnPersonSelected(newSet, false))
+                            viewModel.onIntent(
+                                TransactionsIntent.OnPersonSelected(
+                                    newSet,
+                                    newSet.isEmpty()
+                                )
+                            )
                         }
                     }
                 },
                 onClearAll = {
-                    viewModel.onIntent(TransactionsIntent.OnCategoriesSelected(emptySet(), false))
-                    viewModel.onIntent(TransactionsIntent.OnSourcesSelected(emptySet(), false))
-                    viewModel.onIntent(TransactionsIntent.OnTagSelected(emptySet(), false))
-                    viewModel.onIntent(TransactionsIntent.OnPersonSelected(emptySet(), false))
+                    viewModel.onIntent(TransactionsIntent.OnTransactionTypeSelected(TransactionType.ALL))
+                    viewModel.onIntent(TransactionsIntent.OnCategoriesSelected(emptySet(), true))
+                    viewModel.onIntent(TransactionsIntent.OnSourcesSelected(emptySet(), true))
+                    viewModel.onIntent(TransactionsIntent.OnTagSelected(emptySet(), true))
+                    viewModel.onIntent(TransactionsIntent.OnPersonSelected(emptySet(), true))
                 }
             )
 
@@ -329,4 +366,3 @@ fun TransactionsScreen(
         }
     }
 }
-
