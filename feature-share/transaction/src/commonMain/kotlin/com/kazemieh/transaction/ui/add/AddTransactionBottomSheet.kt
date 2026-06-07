@@ -80,6 +80,7 @@ import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.Field
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet
+import com.kazemieh.designsystem.component.calculator.CalculatorBottomSheet
 import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
 import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.designsystem.picker.FinTrackIcons
@@ -349,6 +350,17 @@ private fun BottomSheetContent(
             )
         }
 
+        AddTransactionSheet.Calculator -> {
+            CalculatorBottomSheet(
+                initialAmount = state.amount,
+                onConfirm = {
+                    onIntent(AddTransactionIntent.SetAmount(it))
+                    onIntent(AddTransactionIntent.PopSheet)
+                },
+                onDismiss = { onIntent(AddTransactionIntent.PopSheet) }
+            )
+        }
+
         null -> Unit
     }
 }
@@ -384,7 +396,7 @@ fun AddTransactionContent(
             LargeAmountCard(
                 amount = state.amount,
                 onAmountChange = { onIntent(AddTransactionIntent.SetAmount(it)) },
-                onCalcClick = { /* Part B */ },
+                onCalcClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.Calculator)) },
                 autoFocus = state.oldTransaction == null,
                 isError = state.isAmountError,
                 enabled = !state.isLoading,

@@ -352,6 +352,7 @@ sealed interface AddTransactionSheet {
     data object PersonPicker : AddTransactionSheet
     data object DatePicker : AddTransactionSheet
     data object DeleteConfirmation : AddTransactionSheet
+    data object Calculator : AddTransactionSheet
 }
 
 sealed interface AddTransactionEffect {
