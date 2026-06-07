@@ -53,6 +53,8 @@ kotlin {
 //                implementation(libs.jalali.datepicker.compose)
 //                implementation(libs.jalalicalendar)
                 implementation(project(":core:common"))
+                implementation(project(":core:jalali"))
+                implementation(project(":core:money"))
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)

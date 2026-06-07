@@ -65,7 +65,7 @@ fun FintrackNavigationBar(
     ) {
 
         val backgroundColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
-        val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.80f)
+        val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
 
         Box(
             modifier = Modifier

@@ -1,4 +1,4 @@
-package com.kazemieh.designsystem.component.jalali
+package com.kazemieh.jalali
 
 import com.kazemieh.common.persiandatetime.domain.PersianDateTime
 import com.kazemieh.common.persiandatetime.extensions.dayOfWeekIndex
@@ -17,9 +17,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
-/**
- * مدل تاریخ شمسی (Jalali) – پوسته روی PersianDateTime برای استفاده در UI
- */
+
 class JalaliCalendar(val year: Int, val month: Int, val day: Int) {
 
     constructor() : this(

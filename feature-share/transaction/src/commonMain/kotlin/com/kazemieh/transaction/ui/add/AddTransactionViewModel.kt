@@ -13,6 +13,7 @@ import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
+import com.kazemieh.jalali.JalaliCalendar
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.msg_mandatory_fields_error
 import fintrack.core.designsystem.generated.resources.transaction_failed
@@ -164,7 +165,7 @@ class AddTransactionViewModel(
 
     private fun fetchDefaultData(transactionWithRelations: TransactionWithRelations?) {
         if (transactionWithRelations == null) {
-            val today = com.kazemieh.designsystem.component.jalali.JalaliCalendar()
+            val today = JalaliCalendar()
             _state.value = AddTransactionState(
                 date = "${today.day.toPersianDigits()} / ${today.monthString} / ${today.year.toPersianDigits()}",
                 timeStamp = today.toTimestamp(),

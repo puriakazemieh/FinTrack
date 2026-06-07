@@ -60,7 +60,7 @@ import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.GlassTone
 import com.kazemieh.designsystem.component.glass.SheetFrame
-import com.kazemieh.designsystem.component.jalali.JalaliCalendar
+import com.kazemieh.jalali.JalaliCalendar
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.action_select_date
 import fintrack.core.designsystem.generated.resources.all
