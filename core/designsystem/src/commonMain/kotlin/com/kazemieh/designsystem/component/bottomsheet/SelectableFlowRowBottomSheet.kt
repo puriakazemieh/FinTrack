@@ -154,7 +154,7 @@ fun SelectableFlowRowBottomSheet(
                                     FintrackBodyMediumText(
                                         text = resolvedTitle,
                                         fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                                        color = if (isSelected) GlassText else GlassText2,
+                                        color = if (isSelected) Color.White else GlassText2,
                                         modifier = Modifier.weight(1f)
                                     )
 

@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.model.Source
@@ -100,7 +101,7 @@ fun SourceFilterSelectionContent(
                 ) {
                     FintrackLabelSmallText(
                         text = source.name + if (active) " ✓" else "",
-                        color = if (active) GlassBg0 else GlassText2
+                        color = if (active) Color.White else GlassText2
                     )
                 }
             }

@@ -14,6 +14,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.list.CategoryFilterSelectionContent
@@ -92,7 +93,7 @@ fun TransactionFilterBottomSheet(
                             ) {
                                 FintrackLabelMediumText(
                                     text = label,
-                                    color = if (active) GlassBg0 else GlassText2
+                                    color = if (active) Color.White else GlassText2
                                 )
                             }
                         }
@@ -104,7 +105,7 @@ fun TransactionFilterBottomSheet(
                             ) {
                                 FintrackLabelMediumText(
                                     text = stringResource(Res.string.custom_range),
-                                    color = if (state.dateFilterType == DateFilterType.CUSTOM_RANGE) GlassBg0 else GlassText2
+                                    color = if (state.dateFilterType == DateFilterType.CUSTOM_RANGE) Color.White else GlassText2
                                 )
                             }
                         }
@@ -167,7 +168,7 @@ fun TransactionFilterBottomSheet(
                         ) {
                             FintrackLabelMediumText(
                                 text = label,
-                                color = if (active) GlassBg0 else GlassText2
+                                color = if (active) Color.White else GlassText2
                             )
                         }
                     }
