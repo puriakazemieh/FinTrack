@@ -21,10 +21,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -32,10 +36,12 @@ import com.kazemieh.common.model.Source
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.GlassBg0
 import com.kazemieh.designsystem.GlassBg1
+import com.kazemieh.designsystem.GlassText2
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.LeadingIconStyle
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
@@ -49,7 +55,9 @@ import com.kazemieh.financialsource.ui.delete.DeleteSourceBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.add_source
 import fintrack.core.designsystem.generated.resources.balance
+import fintrack.core.designsystem.generated.resources.cancell_
 import fintrack.core.designsystem.generated.resources.currency_toman
+import fintrack.core.designsystem.generated.resources.edit
 import fintrack.core.designsystem.generated.resources.financial_sources
 import fintrack.core.designsystem.generated.resources.source
 import org.jetbrains.compose.resources.stringResource
@@ -66,11 +74,13 @@ private fun SourceBottomSheetCore(
     onSourceClick: (Source) -> Unit,
     onDismiss: () -> Unit,
     onNavigateToTransactions: ((Source) -> Unit)? = null,
+    showEditButton: Boolean = true
 ) {
     val viewModel: SourceViewModel = koinViewModel(key = keyViewmodel)
 
     LaunchedEffect(Unit) { viewModel.onIntent(SourceIntent.LoadAllSource) }
     val state by viewModel.state.collectAsState()
+    var isEditMode by remember { mutableStateOf(isEditShow) }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -102,6 +112,16 @@ private fun SourceBottomSheetCore(
                 onClose = {
                     viewModel.onIntent(SourceIntent.ResetFlags)
                     onDismiss()
+                },
+                trailingContent = {
+                    if (showEditButton) {
+                        TextButton(onClick = { isEditMode = !isEditMode }) {
+                            FintrackLabelMediumText(
+                                text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
+                                color = GlassText2
+                            )
+                        }
+                    }
                 }
             )
 
@@ -109,6 +129,7 @@ private fun SourceBottomSheetCore(
                 title = stringResource(Res.string.source),
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(SourceIntent.UpdateSearchQuery(it)) },
+                showActions = isEditMode,
                 items = state.filteredSources.map { source ->
                     EntityItem(
                         id = source.id ?: 0L,
@@ -186,7 +207,8 @@ fun SourceManageBottomSheet(
     clickable = false,
     onSourceClick = onSourceClick,
     onDismiss = onDismiss,
-    onNavigateToTransactions = onNavigateToTransactions
+    onNavigateToTransactions = onNavigateToTransactions,
+    showEditButton = false
 )
 
 @Composable
@@ -203,7 +225,8 @@ fun SourcePickerBottomSheet(
     clickable = true,
     onSourceClick = onSourceClick,
     onDismiss = onDismiss,
-    onNavigateToTransactions = onNavigateToTransactions
+    onNavigateToTransactions = onNavigateToTransactions,
+    showEditButton = true
 )
 
 

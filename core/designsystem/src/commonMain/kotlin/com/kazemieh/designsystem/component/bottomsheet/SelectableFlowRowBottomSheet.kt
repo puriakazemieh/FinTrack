@@ -10,6 +10,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,7 +31,9 @@ import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.component.model.asString
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.add_new_item
+import fintrack.core.designsystem.generated.resources.cancell_
 import fintrack.core.designsystem.generated.resources.confirm
+import fintrack.core.designsystem.generated.resources.edit
 import fintrack.core.designsystem.generated.resources.search_placeholder
 import org.jetbrains.compose.resources.stringResource
 
@@ -41,6 +46,10 @@ fun SelectableFlowRowBottomSheet(
     onConfirm: (selectedItem: Set<ItemUi>) -> Unit,
     onAddClick: () -> Unit,
     onDismiss: () -> Unit,
+    isEditShow: Boolean = false,
+    showEditButton: Boolean = true,
+    onEditClick: ((ItemUi) -> Unit)? = null,
+    onDeleteClick: ((ItemUi) -> Unit)? = null,
     content: @Composable () -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -52,6 +61,7 @@ fun SelectableFlowRowBottomSheet(
         mutableStateOf(initialSelection.intersect(items))
     }
 
+    var isEditMode by remember { mutableStateOf(isEditShow) }
     var searchQuery by remember { mutableStateOf("") }
 
     // Resolve titles in a composable way
@@ -79,7 +89,17 @@ fun SelectableFlowRowBottomSheet(
         ) {
             ScreenHeader(
                 title = title,
-                onClose = onDismiss
+                onClose = onDismiss,
+                trailingContent = {
+                    if (showEditButton) {
+                        TextButton(onClick = { isEditMode = !isEditMode }) {
+                            FintrackLabelMediumText(
+                                text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
+                                color = GlassText2
+                            )
+                        }
+                    }
+                }
             )
 
             Column(
@@ -137,26 +157,44 @@ fun SelectableFlowRowBottomSheet(
                                         color = if (isSelected) GlassText else GlassText2,
                                         modifier = Modifier.weight(1f)
                                     )
-                                    
-                                    Box(
-                                        modifier = Modifier
-                                            .size(22.dp)
-                                            .clip(RoundedCornerShape(6.dp))
-                                            .border(
-                                                width = 1.5.dp,
-                                                color = if (isSelected) GlassGreen else GlassEdgeStrong,
-                                                shape = RoundedCornerShape(6.dp)
-                                            )
-                                            .background(if (isSelected) GlassGreen else Color.Transparent),
-                                        contentAlignment = Alignment.Center
+
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
-                                        if (isSelected) {
-                                            Icon(
-                                                imageVector = Icons.Default.Check,
-                                                contentDescription = null,
-                                                tint = GlassGreenDark,
-                                                modifier = Modifier.size(12.dp)
+                                        if (isEditMode) {
+                                            ActionIcon(
+                                                icon = Icons.Default.Edit,
+                                                onClick = { onEditClick?.invoke(item) },
+                                                color = GlassText2
                                             )
+                                            ActionIcon(
+                                                icon = Icons.Default.Delete,
+                                                onClick = { onDeleteClick?.invoke(item) },
+                                                color = GlassRed
+                                            )
+                                        }
+
+                                        Box(
+                                            modifier = Modifier
+                                                .size(22.dp)
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .border(
+                                                    width = 1.5.dp,
+                                                    color = if (isSelected) GlassGreen else GlassEdgeStrong,
+                                                    shape = RoundedCornerShape(6.dp)
+                                                )
+                                                .background(if (isSelected) GlassGreen else Color.Transparent),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            if (isSelected) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Check,
+                                                    contentDescription = null,
+                                                    tint = GlassGreenDark,
+                                                    modifier = Modifier.size(12.dp)
+                                                )
+                                            }
                                         }
                                     }
                                 }
@@ -215,6 +253,30 @@ fun SelectableFlowRowBottomSheet(
 
             content()
         }
+    }
+}
+
+@Composable
+private fun ActionIcon(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit,
+    color: Color
+) {
+    Box(
+        modifier = Modifier
+            .size(32.dp)
+            .clip(RoundedCornerShape(9.dp))
+            .background(GlassColor)
+            .border(1.dp, GlassEdge, RoundedCornerShape(9.dp))
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = color,
+            modifier = Modifier.size(13.dp)
+        )
     }
 }
 

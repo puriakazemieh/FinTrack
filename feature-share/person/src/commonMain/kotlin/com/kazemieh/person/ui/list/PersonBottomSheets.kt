@@ -9,15 +9,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import com.kazemieh.common.model.Person
 import com.kazemieh.designsystem.GlassBg0
 import com.kazemieh.designsystem.GlassBg1
+import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.bottomsheet.SelectableFlowRowBottomSheet
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
 import com.kazemieh.designsystem.component.glass.EntityItem
@@ -28,6 +34,8 @@ import com.kazemieh.designsystem.component.model.toPerson
 import com.kazemieh.person.ui.add.AddPersonBottomSheet
 import com.kazemieh.person.ui.delete.DeletePersonBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.cancell_
+import fintrack.core.designsystem.generated.resources.edit
 import fintrack.core.designsystem.generated.resources.persons
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -39,7 +47,9 @@ fun PersonPickerBottomSheet(
     snackbarHostState: SnackbarHostState,
     selectedPersons: Set<Person>?,
     onSubmitClick: (Set<Person>?) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    isEditShow: Boolean = false,
+    showEditButton: Boolean = true
 ) {
     LaunchedEffect(Unit) { viewModel.onIntent(PersonIntent.GetAllPerson) }
     LaunchedEffect(selectedPersons) {
@@ -62,14 +72,36 @@ fun PersonPickerBottomSheet(
         },
         onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
         onDismiss = onDismiss,
+        isEditShow = isEditShow,
+        showEditButton = showEditButton,
+        onEditClick = { item ->
+            state.persons.find { it.id == item.id }?.let {
+                viewModel.onIntent(PersonIntent.OnEditClick(it))
+            }
+        },
+        onDeleteClick = { item ->
+            state.persons.find { it.id == item.id }?.let {
+                viewModel.onIntent(PersonIntent.OnDeleteClick(it))
+            }
+        }
     )
 
     if (state.showAddPerson) {
         AddPersonBottomSheet(
             snackbarHostState = snackbarHostState,
+            selectedPerson = state.selectedPerson,
             onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
             onNavigateToTransactions = null, // Picker usually doesn't need filter navigation
             setPerson = { viewModel.onIntent(PersonIntent.SetSelectedPerson(it)) }
+        )
+    }
+
+    if (state.isDeleteShow && state.selectedPerson != null) {
+        DeletePersonBottomSheet(
+            snackbarHostState = snackbarHostState,
+            person = state.selectedPerson!!,
+            onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
+            deleted = { viewModel.onIntent(PersonIntent.ResetFlags) }
         )
     }
 }
@@ -81,13 +113,16 @@ fun PersonPickerSingleBottomSheet(
     snackbarHostState: SnackbarHostState,
     onPersonClick: (Person) -> Unit,
     onDismiss: () -> Unit,
-    onNavigateToTransactions: ((Person) -> Unit)? = null
+    onNavigateToTransactions: ((Person) -> Unit)? = null,
+    isEditShow: Boolean = false,
+    showEditButton: Boolean = true
 ) {
     LaunchedEffect(Unit) {
         viewModel.onIntent(PersonIntent.GetAllPerson)
     }
 
     val state by viewModel.state.collectAsState()
+    var isEditMode by remember { mutableStateOf(isEditShow) }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -119,6 +154,16 @@ fun PersonPickerSingleBottomSheet(
                 onClose = {
                     viewModel.onIntent(PersonIntent.ResetFlags)
                     onDismiss()
+                },
+                trailingContent = {
+                    if (showEditButton) {
+                        TextButton(onClick = { isEditMode = !isEditMode }) {
+                            FintrackLabelMediumText(
+                                text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
+                                color = GlassText2
+                            )
+                        }
+                    }
                 }
             )
 
@@ -127,6 +172,7 @@ fun PersonPickerSingleBottomSheet(
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(PersonIntent.UpdateSearchQuery(it)) },
                 onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
+                showActions = isEditMode,
                 onFilterClick = onNavigateToTransactions?.let { callback ->
                     { item ->
                         state.persons.find { it.id == item.id }?.let { callback(it) }
@@ -170,7 +216,16 @@ fun PersonPickerSingleBottomSheet(
                     onDismiss()
                 }
             },
-            setPerson = { viewModel.onIntent(PersonIntent.SetSelectedPerson(it)) }
+            setPerson = { viewModel.onIntent(PersonIntent.SelectedPerson(it)) }
+        )
+    }
+
+    if (state.isDeleteShow && state.selectedPerson != null) {
+        DeletePersonBottomSheet(
+            snackbarHostState = snackbarHostState,
+            person = state.selectedPerson!!,
+            onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
+            deleted = { viewModel.onIntent(PersonIntent.ResetFlags) }
         )
     }
 }
@@ -187,109 +242,15 @@ fun PersonManageBottomSheet(
     onPersonClick: (Person) -> Unit = {},
     onDismiss: () -> Unit,
     onNavigateToTransactions: ((Person) -> Unit)? = null
-) {
-    LaunchedEffect(Unit) { viewModel.onIntent(PersonIntent.GetAllPerson) }
-
-    val state by viewModel.state.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
-            when (effect) {
-                PersonEffect.OnDismiss -> onDismiss()
-                is PersonEffect.OnPersonSelected -> onPersonClick(effect.person)
-            }
-        }
-    }
-
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    ModalBottomSheet(
-        onDismissRequest = {
-            viewModel.onIntent(PersonIntent.ResetFlags)
-            onDismiss()
-        },
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.background,
-        dragHandle = null
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
-        ) {
-            ScreenHeader(
-                title = stringResource(Res.string.persons),
-                onClose = {
-                    viewModel.onIntent(PersonIntent.ResetFlags)
-                    onDismiss()
-                }
-            )
-
-            EntityList(
-                title = stringResource(Res.string.persons),
-                query = state.searchQuery,
-                onQueryChange = { viewModel.onIntent(PersonIntent.UpdateSearchQuery(it)) },
-                items = state.filteredPersons.map { person ->
-                    EntityItem(
-                        id = person.id ?: 0L,
-                        name = person.name,
-                        sub = person.description,
-                        iconId = 1, // Default user icon? Or handle properly
-                        colorId = 1
-                    )
-                },
-                onItemClick = { item ->
-                    if (clickable) {
-                        state.persons.find { it.id == item.id }?.let {
-                            viewModel.onIntent(PersonIntent.SelectedPerson(it))
-                        }
-                    }
-                },
-                onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
-                onFilterClick = onNavigateToTransactions?.let { callback ->
-                    { item ->
-                        state.persons.find { it.id == item.id }?.let { callback(it) }
-                        onDismiss()
-                    }
-                },
-                onEditClick = { item ->
-                    state.persons.find { it.id == item.id }?.let {
-                        viewModel.onIntent(PersonIntent.OnEditClick(it))
-                    }
-                },
-                onDeleteClick = { item ->
-                    state.persons.find { it.id == item.id }?.let {
-                        viewModel.onIntent(PersonIntent.OnDeleteClick(it))
-                    }
-                }
-            )
-        }
-    }
-
-    if (state.showAddPerson) {
-        AddPersonBottomSheet(
-            snackbarHostState = snackbarHostState,
-            selectedPerson = state.selectedPerson,
-            onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
-            onNavigateToTransactions = onNavigateToTransactions?.let { navCallback ->
-                { person ->
-                    navCallback(person)
-                    onDismiss()
-                }
-            },
-            setPerson = { viewModel.onIntent(PersonIntent.SelectedPerson(it)) }
-        )
-    }
-
-    if (state.isDeleteShow && state.selectedPerson != null) {
-        DeletePersonBottomSheet(
-            snackbarHostState = snackbarHostState,
-            person = state.selectedPerson!!,
-            onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
-            deleted = { viewModel.onIntent(PersonIntent.ResetFlags) }
-        )
-    }
-}
+) = PersonPickerSingleBottomSheet(
+    viewModel = viewModel,
+    snackbarHostState = snackbarHostState,
+    onPersonClick = onPersonClick,
+    onDismiss = onDismiss,
+    onNavigateToTransactions = onNavigateToTransactions,
+    isEditShow = isEditShow,
+    showEditButton = false
+)
 
 @Composable
 fun PersonSelectionBottomSheet(

@@ -9,15 +9,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import com.kazemieh.common.model.Tag
 import com.kazemieh.designsystem.GlassBg0
 import com.kazemieh.designsystem.GlassBg1
+import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.bottomsheet.SelectableFlowRowBottomSheet
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
 import com.kazemieh.designsystem.component.glass.EntityItem
@@ -28,6 +34,8 @@ import com.kazemieh.designsystem.component.model.toTag
 import com.kazemieh.tag.ui.add.AddTagBottomSheet
 import com.kazemieh.tag.ui.delete.DeleteTagBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.cancell_
+import fintrack.core.designsystem.generated.resources.edit
 import fintrack.core.designsystem.generated.resources.tags
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -39,7 +47,9 @@ fun TagPickerBottomSheet(
     snackbarHostState: SnackbarHostState,
     selectedTags: Set<Tag>?,
     onSubmitClick: (Set<Tag>?) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    isEditShow: Boolean = false,
+    showEditButton: Boolean = true
 ) {
     LaunchedEffect(Unit) { viewModel.onIntent(TagIntent.GetAllTag) }
 
@@ -55,14 +65,36 @@ fun TagPickerBottomSheet(
         onConfirm = { onSubmitClick(it.map { item -> item.toTag() }.toSet()) },
         onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
         onDismiss = onDismiss,
+        isEditShow = isEditShow,
+        showEditButton = showEditButton,
+        onEditClick = { item ->
+            state.tags.find { it.id == item.id }?.let {
+                viewModel.onIntent(TagIntent.OnEditClick(it))
+            }
+        },
+        onDeleteClick = { item ->
+            state.tags.find { it.id == item.id }?.let {
+                viewModel.onIntent(TagIntent.OnDeleteClick(it))
+            }
+        }
     )
 
     if (state.showAddTag) {
         AddTagBottomSheet(
             snackbarHostState = snackbarHostState,
+            selectedTag = state.selectedTag,
             onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
             onNavigateToTransactions = null,
             setTag = { viewModel.onIntent(TagIntent.SetSelectedTag(it)) }
+        )
+    }
+
+    if (state.isDeleteShow && state.selectedTag != null) {
+        DeleteTagBottomSheet(
+            snackbarHostState = snackbarHostState,
+            tag = state.selectedTag!!,
+            onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
+            deleted = { viewModel.onIntent(TagIntent.ResetFlags) }
         )
     }
 }
@@ -74,13 +106,16 @@ fun TagPickerSingleBottomSheet(
     snackbarHostState: SnackbarHostState,
     onTagClick: (Tag) -> Unit,
     onDismiss: () -> Unit,
-    onNavigateToTransactions: ((Tag) -> Unit)? = null
+    onNavigateToTransactions: ((Tag) -> Unit)? = null,
+    isEditShow: Boolean = false,
+    showEditButton: Boolean = true
 ) {
     LaunchedEffect(Unit) {
         viewModel.onIntent(TagIntent.GetAllTag)
     }
 
     val state by viewModel.state.collectAsState()
+    var isEditMode by remember { mutableStateOf(isEditShow) }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -112,6 +147,16 @@ fun TagPickerSingleBottomSheet(
                 onClose = {
                     viewModel.onIntent(TagIntent.ResetFlags)
                     onDismiss()
+                },
+                trailingContent = {
+                    if (showEditButton) {
+                        TextButton(onClick = { isEditMode = !isEditMode }) {
+                            FintrackLabelMediumText(
+                                text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
+                                color = GlassText2
+                            )
+                        }
+                    }
                 }
             )
 
@@ -120,6 +165,7 @@ fun TagPickerSingleBottomSheet(
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(TagIntent.UpdateSearchQuery(it)) },
                 onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
+                showActions = isEditMode,
                 onFilterClick = onNavigateToTransactions?.let { callback ->
                     { item ->
                         state.tags.find { it.id == item.id }?.let { callback(it) }
@@ -166,6 +212,15 @@ fun TagPickerSingleBottomSheet(
             setTag = { viewModel.onIntent(TagIntent.SetSelectedTag(it)) }
         )
     }
+
+    if (state.isDeleteShow && state.selectedTag != null) {
+        DeleteTagBottomSheet(
+            snackbarHostState = snackbarHostState,
+            tag = state.selectedTag!!,
+            onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
+            deleted = { viewModel.onIntent(TagIntent.ResetFlags) }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -180,109 +235,15 @@ fun TagManageBottomSheet(
     onTagClick: (Tag) -> Unit = {},
     onDismiss: () -> Unit,
     onNavigateToTransactions: ((Tag) -> Unit)? = null
-) {
-    LaunchedEffect(Unit) { viewModel.onIntent(TagIntent.GetAllTag) }
-
-    val state by viewModel.state.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
-            when (effect) {
-                TagEffect.OnDismiss -> onDismiss()
-                is TagEffect.OnTagSelected -> onTagClick(effect.tag)
-            }
-        }
-    }
-
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    ModalBottomSheet(
-        onDismissRequest = {
-            viewModel.onIntent(TagIntent.ResetFlags)
-            onDismiss()
-        },
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.background,
-        dragHandle = null
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
-        ) {
-            ScreenHeader(
-                title = stringResource(Res.string.tags),
-                onClose = {
-                    viewModel.onIntent(TagIntent.ResetFlags)
-                    onDismiss()
-                }
-            )
-
-            EntityList(
-                title = stringResource(Res.string.tags),
-                query = state.searchQuery,
-                onQueryChange = { viewModel.onIntent(TagIntent.UpdateSearchQuery(it)) },
-                items = state.filteredTags.map { tag ->
-                    EntityItem(
-                        id = tag.id ?: 0L,
-                        name = tag.name,
-                        sub = tag.description,
-                        iconId = tag.iconId,
-                        colorId = tag.colorId
-                    )
-                },
-                onItemClick = { item ->
-                    if (clickable) {
-                        state.tags.find { it.id == item.id }?.let {
-                            viewModel.onIntent(TagIntent.SelectedTag(it))
-                        }
-                    }
-                },
-                onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
-                onFilterClick = onNavigateToTransactions?.let { callback ->
-                    { item ->
-                        state.tags.find { it.id == item.id }?.let { callback(it) }
-                        onDismiss()
-                    }
-                },
-                onEditClick = { item ->
-                    state.tags.find { it.id == item.id }?.let {
-                        viewModel.onIntent(TagIntent.OnEditClick(it))
-                    }
-                },
-                onDeleteClick = { item ->
-                    state.tags.find { it.id == item.id }?.let {
-                        viewModel.onIntent(TagIntent.OnDeleteClick(it))
-                    }
-                }
-            )
-        }
-    }
-
-    if (state.showAddTag) {
-        AddTagBottomSheet(
-            snackbarHostState = snackbarHostState,
-            selectedTag = state.selectedTag,
-            onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
-            onNavigateToTransactions = onNavigateToTransactions?.let { navCallback ->
-                { tag ->
-                    navCallback(tag)
-                    onDismiss()
-                }
-            },
-            setTag = { viewModel.onIntent(TagIntent.SelectedTag(it)) }
-        )
-    }
-
-    if (state.isDeleteShow && state.selectedTag != null) {
-        DeleteTagBottomSheet(
-            snackbarHostState = snackbarHostState,
-            tag = state.selectedTag!!,
-            onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
-            deleted = { viewModel.onIntent(TagIntent.ResetFlags) }
-        )
-    }
-}
+) = TagPickerSingleBottomSheet(
+    viewModel = viewModel,
+    snackbarHostState = snackbarHostState,
+    onTagClick = onTagClick,
+    onDismiss = onDismiss,
+    onNavigateToTransactions = onNavigateToTransactions,
+    isEditShow = isEditShow,
+    showEditButton = false
+)
 
 @Composable
 fun TagSelectionBottomSheet(
