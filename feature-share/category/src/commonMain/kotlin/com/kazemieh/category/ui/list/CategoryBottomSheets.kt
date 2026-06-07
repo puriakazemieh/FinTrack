@@ -151,6 +151,7 @@ fun CategoryPickerBottomSheet(
             transactionType = transactionType,
             selectedCategory = state.selectedCategory,
             onDismiss = { viewModel.onIntent(CategoryIntent.ResetFlags) },
+            onNavigateToTransactions = onNavigateToTransactions,
             setCategory = {
                 viewModel.onIntent(CategoryIntent.SelectedCategory(it))
             }
@@ -249,6 +250,12 @@ fun CategoryManageBottomSheet(
             transactionType = if (state.type == TransactionType.ALL) TransactionType.EXPENSE else state.type,
             selectedCategory = state.selectedCategory,
             onDismiss = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
+            onNavigateToTransactions = onNavigateToTransactions?.let { navCallback ->
+                { category ->
+                    navCallback(category)
+                    onDismiss()
+                }
+            },
             setCategory = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) }
         )
     }

@@ -38,6 +38,7 @@ fun AddCategoryBottomSheet(
     transactionType: TransactionType,
     selectedCategory: Category? = null,
     onDismiss: () -> Unit,
+    onNavigateToTransactions: ((Category) -> Unit)? = null,
     setCategory: (Category) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -84,7 +85,8 @@ fun AddCategoryBottomSheet(
     ) {
         AddCategoryContent(
             state = state,
-            onIntent = viewModel::onIntent
+            onIntent = viewModel::onIntent,
+            onNavigateToTransactions = onNavigateToTransactions
         )
     }
 }
@@ -92,7 +94,8 @@ fun AddCategoryBottomSheet(
 @Composable
 fun AddCategoryContent(
     state: AddCategoryState,
-    onIntent: (AddCategoryIntent) -> Unit
+    onIntent: (AddCategoryIntent) -> Unit,
+    onNavigateToTransactions: ((Category) -> Unit)? = null
 ) {
     val space = LocalSpacing.current
     val rainbowColors = FinTrackPickerColors.rainbow()
@@ -123,6 +126,22 @@ fun AddCategoryContent(
         primaryLabel = stringResource(Res.string.btn_save_category),
         onPrimaryClick = { onIntent(AddCategoryIntent.Save) },
         onClose = { onIntent(AddCategoryIntent.OnDismiss) },
+        onFilterClick = if (state.mode is AddCategoryMode.Edit && onNavigateToTransactions != null) {
+            {
+                state.mode.categoryId.let { id ->
+                    onNavigateToTransactions(
+                        Category(
+                            id = id,
+                            name = state.draft.name,
+                            type = state.draft.type,
+                            colorId = state.draft.colorId ?: 1,
+                            iconId = state.draft.iconId ?: 1
+                        )
+                    )
+                    onIntent(AddCategoryIntent.OnDismiss)
+                }
+            }
+        } else null,
         backgroundBrush = backgroundBrush
     ) {
         LazyColumn(

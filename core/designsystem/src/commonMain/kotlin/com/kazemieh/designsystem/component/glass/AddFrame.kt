@@ -1,22 +1,38 @@
 package com.kazemieh.designsystem.component.glass
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.designsystem.GlassBg0
 import com.kazemieh.designsystem.GlassBg1
-import com.kazemieh.designsystem.GlassText2
-import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.FinTrackLeadingIcon
+import com.kazemieh.designsystem.component.FintrackBodyLargeText
+import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
+import com.kazemieh.designsystem.component.LeadingIconStyle
 
 /**
  * 2.8 AddFrame — full-screen add form
@@ -36,6 +52,7 @@ fun AddFrame(
     backgroundBrush: Brush? = null,
     secondaryLabel: String? = null,
     onSecondaryClick: (() -> Unit)? = null,
+    onFilterClick: (() -> Unit)? = null,
     hero: @Composable (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -49,7 +66,16 @@ fun AddFrame(
             ScreenHeader(
                 title = title,
                 sub = sub,
-                onClose = onClose
+                onClose = onClose,
+                actions = if (onFilterClick != null) {
+                    listOf(
+                        HeaderAction(
+                            icon = rememberVectorPainter(Icons.Default.FilterList),
+                            label = "Filter",
+                            onClick = onFilterClick
+                        )
+                    )
+                } else emptyList()
             )
 
             Column(
@@ -102,7 +128,7 @@ fun AddFrame(
                 ) {
                     content()
                 }
-                
+
                 Spacer(Modifier.height(24.dp))
             }
 

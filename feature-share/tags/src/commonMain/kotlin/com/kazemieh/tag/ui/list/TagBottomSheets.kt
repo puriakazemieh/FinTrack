@@ -1,24 +1,28 @@
 package com.kazemieh.tag.ui.list
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
-import com.kazemieh.designsystem.component.glass.*
-import fintrack.core.designsystem.generated.resources.tag_item
-import com.kazemieh.designsystem.component.model.toTag
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import com.kazemieh.common.model.Tag
-import com.kazemieh.designsystem.component.bottomsheet.ListBottomSheet
+import com.kazemieh.designsystem.GlassBg0
+import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.component.bottomsheet.SelectableFlowRowBottomSheet
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
+import com.kazemieh.designsystem.component.glass.EntityItem
+import com.kazemieh.designsystem.component.glass.EntityList
+import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.designsystem.component.model.toTag
 import com.kazemieh.tag.ui.add.AddTagBottomSheet
@@ -26,8 +30,6 @@ import com.kazemieh.tag.ui.delete.DeleteTagBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.tags
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.resources.stringResource
-import fintrack.core.designsystem.generated.resources.*
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -59,6 +61,7 @@ fun TagPickerBottomSheet(
         AddTagBottomSheet(
             snackbarHostState = snackbarHostState,
             onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
+            onNavigateToTransactions = null,
             setTag = { viewModel.onIntent(TagIntent.SetSelectedTag(it)) }
         )
     }
@@ -154,6 +157,12 @@ fun TagPickerSingleBottomSheet(
             snackbarHostState = snackbarHostState,
             selectedTag = state.selectedTag,
             onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
+            onNavigateToTransactions = onNavigateToTransactions?.let { navCallback ->
+                { tag ->
+                    navCallback(tag)
+                    onDismiss()
+                }
+            },
             setTag = { viewModel.onIntent(TagIntent.SetSelectedTag(it)) }
         )
     }
@@ -255,6 +264,12 @@ fun TagManageBottomSheet(
             snackbarHostState = snackbarHostState,
             selectedTag = state.selectedTag,
             onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
+            onNavigateToTransactions = onNavigateToTransactions?.let { navCallback ->
+                { tag ->
+                    navCallback(tag)
+                    onDismiss()
+                }
+            },
             setTag = { viewModel.onIntent(TagIntent.SelectedTag(it)) }
         )
     }
@@ -282,7 +297,8 @@ fun TagSelectionBottomSheet(
 
     LaunchedEffect(Unit) { viewModel.onIntent(TagIntent.GetAllTag) }
 
-    val initialSelectionIds = if (isAllSelected) state.items else initialSelectionPairs.map { it.toItemUi() }.toSet()
+    val initialSelectionIds =
+        if (isAllSelected) state.items else initialSelectionPairs.map { it.toItemUi() }.toSet()
 
     SelectableListBottomSheet(
         title = stringResource(Res.string.tags),

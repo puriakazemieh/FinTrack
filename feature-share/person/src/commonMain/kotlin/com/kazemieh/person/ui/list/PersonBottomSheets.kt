@@ -1,7 +1,9 @@
 package com.kazemieh.person.ui.list
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -11,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import com.kazemieh.common.model.Person
@@ -27,8 +28,6 @@ import com.kazemieh.designsystem.component.model.toPerson
 import com.kazemieh.person.ui.add.AddPersonBottomSheet
 import com.kazemieh.person.ui.delete.DeletePersonBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.label_person_count
-import fintrack.core.designsystem.generated.resources.person_item
 import fintrack.core.designsystem.generated.resources.persons
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -69,6 +68,7 @@ fun PersonPickerBottomSheet(
         AddPersonBottomSheet(
             snackbarHostState = snackbarHostState,
             onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
+            onNavigateToTransactions = null, // Picker usually doesn't need filter navigation
             setPerson = { viewModel.onIntent(PersonIntent.SetSelectedPerson(it)) }
         )
     }
@@ -164,6 +164,12 @@ fun PersonPickerSingleBottomSheet(
             snackbarHostState = snackbarHostState,
             selectedPerson = state.selectedPerson,
             onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
+            onNavigateToTransactions = onNavigateToTransactions?.let { navCallback ->
+                { person ->
+                    navCallback(person)
+                    onDismiss()
+                }
+            },
             setPerson = { viewModel.onIntent(PersonIntent.SetSelectedPerson(it)) }
         )
     }
@@ -265,6 +271,12 @@ fun PersonManageBottomSheet(
             snackbarHostState = snackbarHostState,
             selectedPerson = state.selectedPerson,
             onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
+            onNavigateToTransactions = onNavigateToTransactions?.let { navCallback ->
+                { person ->
+                    navCallback(person)
+                    onDismiss()
+                }
+            },
             setPerson = { viewModel.onIntent(PersonIntent.SelectedPerson(it)) }
         )
     }

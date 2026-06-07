@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,14 +39,50 @@ import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassGreenSoft
 import com.kazemieh.designsystem.GlassText
 import com.kazemieh.designsystem.GlassText3
-import com.kazemieh.designsystem.component.*
-import com.kazemieh.designsystem.component.glass.*
+import com.kazemieh.designsystem.component.CardItem
+import com.kazemieh.designsystem.component.FinTrackLeadingIcon
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackHeadlineLargeText
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.component.FourDigitGroupingTransformation
+import com.kazemieh.designsystem.component.LeadingIconStyle
+import com.kazemieh.designsystem.component.NumberCommaTransformation
+import com.kazemieh.designsystem.component.glass.AddFrame
+import com.kazemieh.designsystem.component.glass.ColorSwatches
+import com.kazemieh.designsystem.component.glass.Field
+import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.IconGrid
 import com.kazemieh.designsystem.component.model.asString
 import com.kazemieh.designsystem.model.Bank
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import com.kazemieh.designsystem.picker.FinTrackSourceIcons
-import fintrack.core.designsystem.generated.resources.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.btn_save_source
+import fintrack.core.designsystem.generated.resources.currency_toman
+import fintrack.core.designsystem.generated.resources.hint_source_name_placeholder
+import fintrack.core.designsystem.generated.resources.initial_balance_label
+import fintrack.core.designsystem.generated.resources.label_account_number
+import fintrack.core.designsystem.generated.resources.label_account_shaba
+import fintrack.core.designsystem.generated.resources.label_branch
+import fintrack.core.designsystem.generated.resources.label_branch_code
+import fintrack.core.designsystem.generated.resources.label_branch_name
+import fintrack.core.designsystem.generated.resources.label_card_16_digits
+import fintrack.core.designsystem.generated.resources.label_card_info
+import fintrack.core.designsystem.generated.resources.label_color
+import fintrack.core.designsystem.generated.resources.label_cvv2
+import fintrack.core.designsystem.generated.resources.label_exp_month
+import fintrack.core.designsystem.generated.resources.label_exp_year
+import fintrack.core.designsystem.generated.resources.label_icon
+import fintrack.core.designsystem.generated.resources.label_optional
+import fintrack.core.designsystem.generated.resources.label_shaba_no_ir
+import fintrack.core.designsystem.generated.resources.label_type
+import fintrack.core.designsystem.generated.resources.label_zero
+import fintrack.core.designsystem.generated.resources.source_name_label
+import fintrack.core.designsystem.generated.resources.title_edit_source
+import fintrack.core.designsystem.generated.resources.title_new_source
+import fintrack.core.designsystem.generated.resources.title_source_management
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -59,6 +94,7 @@ fun AddSourceBottomSheet(
     snackbarHostState: SnackbarHostState,
     selectedSource: Source? = null,
     onDismiss: () -> Unit,
+    onNavigateToTransactions: ((Source) -> Unit)? = null,
     setSource: (Source) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -94,7 +130,8 @@ fun AddSourceBottomSheet(
     ) {
         AddSourceContent(
             state = state,
-            onIntent = viewModel::onIntent
+            onIntent = viewModel::onIntent,
+            onNavigateToTransactions = onNavigateToTransactions
         )
     }
 }
@@ -102,7 +139,8 @@ fun AddSourceBottomSheet(
 @Composable
 fun AddSourceContent(
     state: AddSourceState,
-    onIntent: (AddSourceIntent) -> Unit
+    onIntent: (AddSourceIntent) -> Unit,
+    onNavigateToTransactions: ((Source) -> Unit)? = null
 ) {
     val rainbowColors = FinTrackPickerColors.rainbow()
     val colors = rainbowColors.map { it.color }
@@ -110,16 +148,38 @@ fun AddSourceContent(
         rainbowColors.indexOfFirst { it.id == state.draft.colorId }.coerceAtLeast(0)
     }
     val selectedIconIndex = remember(state.draft.iconId, state.draft.type) {
-        val icons = if (state.draft.type == TypeSource.CREDIT) FinTrackSourceIcons.icons else FinTrackIcons.icons
+        val icons =
+            if (state.draft.type == TypeSource.CREDIT) FinTrackSourceIcons.icons else FinTrackIcons.icons
         icons.indexOfFirst { it.id == state.draft.iconId }.coerceAtLeast(0)
     }
 
     AddFrame(
-        title = if (state.mode == AddSourceMode.Add) stringResource(Res.string.title_new_source) else stringResource(Res.string.title_edit_source),
+        title = if (state.mode == AddSourceMode.Add) stringResource(Res.string.title_new_source) else stringResource(
+            Res.string.title_edit_source
+        ),
         sub = stringResource(Res.string.title_source_management),
         primaryLabel = stringResource(Res.string.btn_save_source),
         onPrimaryClick = { onIntent(AddSourceIntent.Save) },
         onClose = { onIntent(AddSourceIntent.OnDismiss) },
+        onFilterClick = if (state.mode is AddSourceMode.Edit && onNavigateToTransactions != null) {
+            {
+                (state.mode as? AddSourceMode.Edit)?.sourceId?.let { id ->
+                    onNavigateToTransactions(
+                        Source(
+                            id = id,
+                            name = state.draft.name,
+                            description = state.draft.description,
+                            balance = state.draft.balance,
+                            type = state.draft.type.ordinal + 1, // TypeSource mapping might need verification
+                            cardNumber = state.draft.cardNumber,
+                            colorId = state.draft.colorId ?: 1,
+                            iconId = state.draft.iconId ?: 1
+                        )
+                    )
+                    onIntent(AddSourceIntent.OnDismiss)
+                }
+            }
+        } else null,
         hero = {
             if (state.draft.type == TypeSource.CREDIT) {
                 val bank = remember(state.draft.cardNumber) {
@@ -236,7 +296,9 @@ fun AddSourceContent(
                     GlassCard(padding = 16.dp) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             FintrackLabelSmallText(
-                                text = stringResource(Res.string.label_card_info) + " (" + stringResource(Res.string.label_optional) + ")",
+                                text = stringResource(Res.string.label_card_info) + " (" + stringResource(
+                                    Res.string.label_optional
+                                ) + ")",
                                 color = GlassText3
                             )
 
@@ -328,7 +390,9 @@ fun AddSourceContent(
                     GlassCard(padding = 16.dp) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             FintrackLabelSmallText(
-                                text = stringResource(Res.string.label_account_shaba) + " (" + stringResource(Res.string.label_optional) + ")",
+                                text = stringResource(Res.string.label_account_shaba) + " (" + stringResource(
+                                    Res.string.label_optional
+                                ) + ")",
                                 color = GlassText3
                             )
                             TextField(
@@ -373,7 +437,9 @@ fun AddSourceContent(
                     GlassCard(padding = 16.dp) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             FintrackLabelSmallText(
-                                text = stringResource(Res.string.label_branch) + " (" + stringResource(Res.string.label_optional) + ")",
+                                text = stringResource(Res.string.label_branch) + " (" + stringResource(
+                                    Res.string.label_optional
+                                ) + ")",
                                 color = GlassText3
                             )
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

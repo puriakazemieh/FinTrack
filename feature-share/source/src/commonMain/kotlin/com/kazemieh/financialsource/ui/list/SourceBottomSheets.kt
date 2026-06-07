@@ -152,6 +152,12 @@ private fun SourceBottomSheetCore(
             snackbarHostState = snackbarHostState,
             selectedSource = state.selectedSources,
             onDismiss = { viewModel.onIntent(SourceIntent.ResetFlags) },
+            onNavigateToTransactions = onNavigateToTransactions?.let { navCallback ->
+                { source ->
+                    navCallback(source)
+                    onDismiss()
+                }
+            },
             setSource = { viewModel.onIntent(SourceIntent.SelectedSource(it)) }
         )
     }
