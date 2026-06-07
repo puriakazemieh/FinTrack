@@ -8,6 +8,9 @@ import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.common.persiandatetime.domain.PersianDateTime
+import com.kazemieh.common.persiandatetime.extensions.persianMonth
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.database.GetAllTransactionsFiltered
 import com.kazemieh.database.transaction.ObserveCategorySumsByFilter
 import com.kazemieh.database.Category as CategoryDb
@@ -65,6 +68,7 @@ fun GetAllTransactionsFiltered.toTransactionWithRelations(): TransactionWithRela
             sourceEndId = sourceEndId,
             description = description,
             timeStamp = timeStamp,
+            date = PersianDateTime.parse(timeStamp).let { "${it.day} ${it.persianMonth().displayName} ${it.year}" }.toPersianDigits(),
             type = TransactionType.fromInt(type.toInt())
         ),
         category = Category(
@@ -182,5 +186,6 @@ fun TransactionDb.toTransaction() = Transaction(
     sourceEndId = sourceEndId,
     description = description,
     timeStamp = timeStamp,
+    date = PersianDateTime.parse(timeStamp).let { "${it.day} ${it.persianMonth().displayName} ${it.year}" }.toPersianDigits(),
     type = TransactionType.fromInt(type.toInt())
 )

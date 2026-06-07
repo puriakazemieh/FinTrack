@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toPersianPrice
@@ -256,6 +257,7 @@ private fun TransactionAmountAndDate(amount: Long, date: String, color: Color) {
         FintrackLabelSmallText(
             text = date,
             color = GlassText3,
+            fontSize = 10.sp,
             modifier = Modifier.padding(top = 2.dp)
         )
     }
