@@ -17,7 +17,6 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import kotlinx.coroutines.launch
-import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @Composable
@@ -25,6 +24,7 @@ fun FintrackSwipeableRow(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onDelete: () -> Unit,
+    onEdit: () -> Unit,
     backgroundContent: @Composable (progress: Float) -> Unit,
     content: @Composable () -> Unit
 ) {
@@ -46,17 +46,21 @@ fun FintrackSwipeableRow(
                             dragAmount
                         }
 
-                        val newOffset = (offset.value + logicalDragAmount).coerceIn(-width, 0f)
+                        val newOffset = (offset.value + logicalDragAmount).coerceIn(-width, width)
 
                         scope.launch {
                             offset.snapTo(newOffset)
                         }
                     },
                     onDragEnd = {
-                        val progress = if (width > 0) abs(offset.value) / width else 0f
-                        if (progress > 0.4f) {
+                        val progress = if (width > 0) offset.value / width else 0f
+
+                        if (progress < -0.4f) {
                             onDelete()
+                        } else if (progress > 0.4f) {
+                            onEdit()
                         }
+
                         scope.launch {
                             offset.animateTo(0f)
                         }
@@ -69,7 +73,7 @@ fun FintrackSwipeableRow(
                 )
             }
     ) {
-        val progress = if (width > 0) abs(offset.value) / width else 0f
+        val progress = if (width > 0) offset.value / width else 0f
 
         // Background layer
         Box(modifier = Modifier.matchParentSize()) {

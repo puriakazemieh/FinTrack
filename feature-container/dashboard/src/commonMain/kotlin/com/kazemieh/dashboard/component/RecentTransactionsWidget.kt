@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.TransactionWithRelations
-import com.kazemieh.designsystem.component.SwipeableTxRow
+import com.kazemieh.designsystem.component.SwipeableTxRowMinimal
 import com.kazemieh.designsystem.component.glass.WidgetCard
 import com.kazemieh.transaction.ui.main.TransactionIntent
 import com.kazemieh.transaction.ui.main.TransactionViewModel
@@ -38,9 +38,10 @@ fun RecentTransactionsWidget(
         modifier = modifier
     ) {
         state.items.take(5).forEach { item ->
-            SwipeableTxRow(
+            SwipeableTxRowMinimal(
                 item = item,
                 onClick = { onEdit(item) },
+                onEdit = { onEdit(item) },
                 onDelete = { onDelete(item) }
             )
             Spacer(Modifier.height(8.dp))

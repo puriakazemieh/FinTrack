@@ -124,6 +124,8 @@
     <string name="transfer_from_to_label">از %1$s به %2$s</string>
     <string name="amount_transfer_label">مبلغ انتقال: %1$s</string>
     <string name="edit">ویرایش</string>
+    <string name="label_to">به</string>
+    <string name="btn_delete_transaction">حذف تراکنش</string>
 
 
     <string name="save_">ذخیره</string>

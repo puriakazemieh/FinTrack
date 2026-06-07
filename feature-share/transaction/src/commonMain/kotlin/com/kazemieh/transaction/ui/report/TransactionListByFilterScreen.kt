@@ -2,10 +2,8 @@ package com.kazemieh.transaction.ui.report
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,8 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -41,13 +37,9 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.common.toSignedPersianPrice
-import com.kazemieh.designsystem.GlassBlue
-import com.kazemieh.designsystem.GlassBlueSoft
 import com.kazemieh.designsystem.GlassColor
 import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassGreenSoft
 import com.kazemieh.designsystem.GlassRed
-import com.kazemieh.designsystem.GlassRedSoft
 import com.kazemieh.designsystem.GlassText
 import com.kazemieh.designsystem.GlassText3
 import com.kazemieh.designsystem.LocalSpacing
@@ -56,14 +48,11 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.SwipeableTxRow
-import com.kazemieh.designsystem.component.TxRow
-import com.kazemieh.designsystem.picker.FinTrackIcons
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.label_amount_with_unit
 import fintrack.core.designsystem.generated.resources.msg_no_transaction_found
 import fintrack.core.designsystem.generated.resources.unit_toman_short
 import fintrack.core.designsystem.generated.resources.unit_transaction
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -197,6 +186,7 @@ fun TransactionListByFilterContent(
                     SwipeableTxRow(
                         item = item,
                         onClick = { onEdit(item) },
+                        onEdit = { onEdit(item) },
                         onDelete = { onDelete(item) }
                     )
                     Spacer(Modifier.height(8.dp))
