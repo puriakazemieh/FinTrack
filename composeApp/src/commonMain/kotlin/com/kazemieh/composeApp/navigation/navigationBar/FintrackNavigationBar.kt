@@ -63,22 +63,22 @@ fun FintrackNavigationBar(
             .height(80.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
-        // 1. Frosted Pill Background Layer
-        val backgroundColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.65f)
-        val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+
+        val backgroundColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+        val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.80f)
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(58.dp) // Slightly slimmer pill
+                .height(58.dp)
                 .clip(CircleShape)
                 .background(backgroundColor)
                 .border(
-                    0.5.dp, // Thinner, more subtle border
+                    0.5.dp,
                     borderColor,
                     CircleShape
                 )
-                .glassBlur(20.dp) // Optimized blur for clarity
+                .glassBlur(20.dp)
         )
 
         // 2. Content Layer (Icons Row)
