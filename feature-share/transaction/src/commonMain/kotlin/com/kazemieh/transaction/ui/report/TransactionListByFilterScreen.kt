@@ -143,7 +143,7 @@ fun TransactionListByFilterContent(
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = space.mediumSmall)
+        contentPadding = PaddingValues(bottom = 120.dp)
     ) {
         item {
             SummaryCard()

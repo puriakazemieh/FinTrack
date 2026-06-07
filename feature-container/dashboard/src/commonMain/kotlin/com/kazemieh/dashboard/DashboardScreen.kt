@@ -73,11 +73,6 @@ fun DashboardScreen(
     val space = LocalSpacing.current
     val listState = rememberLazyListState()
 
-    val transactionItems = rememberTransactionItemsProvider(
-        listState = listState,
-        onEdit = { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet(it)) },
-        onDelete = { viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet(it)) }
-    )
 
     Box(
         modifier = Modifier
@@ -112,7 +107,7 @@ fun DashboardScreen(
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 100.dp) // Space for NavigationBar
+            contentPadding = PaddingValues(bottom = 120.dp) // Space for NavigationBar
         ) {
             item {
                 DashboardHeader(
@@ -167,18 +162,6 @@ fun DashboardScreen(
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }
-
-            item { Spacer(Modifier.height(space.large)) }
-
-            item {
-                FintrackHeadlineSmallText(
-                    text = stringResource(Res.string.recent_transactions),
-                    fontWeight = FontWeight.W700,
-                    modifier = Modifier.padding(horizontal = space.large, vertical = space.medium)
-                )
-            }
-
-            transactionItems()
         }
 
         FAB(modifier = Modifier.padding(bottom = 60.dp)) { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) }
