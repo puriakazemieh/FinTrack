@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalSpacing
@@ -41,6 +42,7 @@ fun BalanceHero(
     isBalanceVisible: Boolean,
     onToggleVisibility: () -> Unit,
     onAddSourceClick: () -> Unit,
+    onSourceClick: (Source) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val space = LocalSpacing.current
@@ -98,7 +100,10 @@ fun BalanceHero(
 
             Spacer(Modifier.height(space.large))
 
-            SourceHorizontalList(onAddSourceClick = onAddSourceClick)
+            SourceHorizontalList(
+                onAddSourceClick = onAddSourceClick,
+                onSourceClick = onSourceClick
+            )
         }
     }
 }

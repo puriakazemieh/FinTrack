@@ -1,6 +1,7 @@
 package com.kazemieh.dashboard
 
 import androidx.lifecycle.ViewModel
+import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,8 +32,11 @@ class DashboardViewModel : ViewModel() {
                 )
             }
 
-            is DashboardIntent.ShowAddSource -> _state.update {
-                it.copy(showAddSource = !_state.value.showAddSource)
+             is DashboardIntent.ShowAddSource -> _state.update {
+                it.copy(
+                    showAddSource = !it.showAddSource,
+                    selectedSource = intent.source
+                )
             }
 
             is DashboardIntent.AnimationEnabled -> _state.update {
@@ -54,6 +58,7 @@ data class DashboardState(
     val showAddTransaction: Boolean = false,
     val showDeleteTransaction: Boolean = false,
     val showAddSource: Boolean = false,
+    val selectedSource: Source? = null,
     val enableAnimationChart: Boolean = false,
     val transactionWithRelations: TransactionWithRelations? = null,
     val initialTransactionType: TransactionType? = null,
@@ -72,6 +77,6 @@ sealed interface DashboardIntent {
         DashboardIntent
 
     data object AnimationEnabled : DashboardIntent
-    data object ShowAddSource : DashboardIntent
+    data class ShowAddSource(val source: Source? = null) : DashboardIntent
     data object ToggleBalanceVisibility : DashboardIntent
 }

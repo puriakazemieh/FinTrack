@@ -53,6 +53,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun SourceHorizontalList(
     viewModel: SourceViewModel = koinViewModel(),
     onAddSourceClick: () -> Unit,
+    onSourceClick: (Source) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val space = LocalSpacing.current
@@ -68,7 +69,10 @@ fun SourceHorizontalList(
         contentPadding = PaddingValues(vertical = 4.dp)
     ) {
         items(state.sources) { source ->
-            SourceTile(source = source)
+            SourceTile(
+                source = source,
+                onClick = { onSourceClick(source) }
+            )
         }
         item {
             NewSourceTile(onClick = onAddSourceClick)
@@ -77,7 +81,10 @@ fun SourceHorizontalList(
 }
 
 @Composable
-private fun SourceTile(source: Source) {
+private fun SourceTile(
+    source: Source,
+    onClick: () -> Unit
+) {
 
     val color = when {
         source.balance < 0 -> GlassRed
@@ -91,6 +98,7 @@ private fun SourceTile(source: Source) {
             .clip(RoundedCornerShape(14.dp))
             .background(GlassColor)
             .border(1.dp, GlassEdge, RoundedCornerShape(14.dp))
+            .clickable(onClick = onClick)
             .padding(8.dp)
     ) {
         Column(

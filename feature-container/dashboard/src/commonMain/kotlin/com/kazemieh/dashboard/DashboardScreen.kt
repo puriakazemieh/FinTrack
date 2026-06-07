@@ -127,7 +127,10 @@ fun DashboardScreen(
                 BalanceHero(
                     isBalanceVisible = state.isBalanceVisible,
                     onToggleVisibility = { viewModel.onIntent(DashboardIntent.ToggleBalanceVisibility) },
-                    onAddSourceClick = { viewModel.onIntent(DashboardIntent.ShowAddSource) },
+                    onAddSourceClick = { viewModel.onIntent(DashboardIntent.ShowAddSource()) },
+                    onSourceClick = { source ->
+                        viewModel.onIntent(DashboardIntent.ShowAddSource(source))
+                    },
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }
@@ -201,9 +204,10 @@ fun DashboardScreen(
 
         if (state.showAddSource) {
             AddSourceBottomSheet(
+                selectedSource = state.selectedSource,
                 snackbarHostState = snackbarHostState,
-                onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddSource) },
-                setSource = { viewModel.onIntent(DashboardIntent.ShowAddSource) }
+                onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddSource()) },
+                setSource = { viewModel.onIntent(DashboardIntent.ShowAddSource()) }
             )
         }
     }
