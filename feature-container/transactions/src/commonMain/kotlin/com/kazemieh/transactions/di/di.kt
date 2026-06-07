@@ -8,10 +8,7 @@ import org.koin.dsl.module
 val transactionsViewModelModule = module {
     viewModel {
         TransactionsViewModel(
-            getCategoryUseCase = get(),
-            observeSourcesUseCase = get(),
-            observeTagsUseCase = get(),
-            observePersonsUseCase = get()
+            transactionUseCaseGroup = get()
         )
     }
 }

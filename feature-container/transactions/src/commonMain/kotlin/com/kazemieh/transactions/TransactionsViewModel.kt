@@ -23,6 +23,7 @@ import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
 import com.kazemieh.domain.usecase.ObservePersonsUseCase
 import com.kazemieh.domain.usecase.ObserveSourcesUseCase
 import com.kazemieh.domain.usecase.ObserveTagsUseCase
+import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.custom_range
 import fintrack.core.designsystem.generated.resources.label_period_range_summary
@@ -48,10 +49,7 @@ import kotlinx.datetime.toLocalDateTime
 
 
 class TransactionsViewModel(
-    private val getCategoryUseCase: GetCategoryUseCase,
-    private val observeSourcesUseCase: ObserveSourcesUseCase,
-    private val observeTagsUseCase: ObserveTagsUseCase,
-    private val observePersonsUseCase: ObservePersonsUseCase
+    private val transactionUseCaseGroup: TransactionUseCaseGroup
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TransactionsState())
@@ -280,19 +278,19 @@ class TransactionsViewModel(
             is TransactionsIntent.ApplyFilter -> {
                 viewModelScope.launch {
                     val categories = intent.categoryId?.let { id ->
-                        getCategoryUseCase(id)
+                        transactionUseCaseGroup.getCategoryUseCase(id)
                     }?.let { setOf(it) } ?: emptySet()
 
                     val sources = intent.sourceId?.let { id ->
-                        observeSourcesUseCase().first().find { it.id == id }
+                        transactionUseCaseGroup.observeSourcesUseCase().first().find { it.id == id }
                     }?.let { setOf(it) } ?: emptySet()
 
                     val tags = intent.tagId?.let { id ->
-                        observeTagsUseCase().first().find { it.id == id }
+                        transactionUseCaseGroup.observeTagsUseCase().first().find { it.id == id }
                     }?.let { setOf(it) } ?: emptySet()
 
                     val persons = intent.personId?.let { id ->
-                        observePersonsUseCase().first().find { it.id == id }
+                        transactionUseCaseGroup.observePersonsUseCase().first().find { it.id == id }
                     }?.let { setOf(it) } ?: emptySet()
 
                     _state.update {

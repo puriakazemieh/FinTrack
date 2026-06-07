@@ -88,7 +88,11 @@ val domainModule = module {
             observeMostUsedCategoriesUseCase = get(),
             observeMostUsedSourcesUseCase = get(),
             observeMostUsedTagsUseCase = get(),
-            observeMostUsedPersonsUseCase = get()
+            observeMostUsedPersonsUseCase = get(),
+            getCategoryUseCase = get(),
+            observeTagsUseCase = get(),
+            observePersonsUseCase = get(),
+            observeCategoriesUseCase = get()
         )
     }
 
