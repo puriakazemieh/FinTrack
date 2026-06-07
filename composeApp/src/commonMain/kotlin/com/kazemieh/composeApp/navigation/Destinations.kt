@@ -21,7 +21,7 @@ enum class Destinations(
     TRANSACTIONS(
         Res.drawable.ic_navigation_report,
         Res.string.navigation_transactions,
-        Screen.Transactions
+        Screen.Transactions()
     ),
 
     TOOLS(

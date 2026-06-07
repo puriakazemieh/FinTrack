@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -36,9 +37,17 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun TransactionsScreen(
     snackbarHostState: SnackbarHostState,
+    resetFilters: Boolean = false,
     viewModel: TransactionsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(resetFilters, state.resetFiltersHandled) {
+        if (resetFilters && !state.resetFiltersHandled) {
+            viewModel.onIntent(TransactionsIntent.ResetFilters)
+        }
+    }
+
     val space = LocalSpacing.current
 
     val colors = FinTrackPickerColors.rainbow()

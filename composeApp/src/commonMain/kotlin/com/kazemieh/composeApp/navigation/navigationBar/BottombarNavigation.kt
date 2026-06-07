@@ -5,6 +5,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.toRoute
 import com.kazemieh.dashboard.DashboardScreen
 import com.kazemieh.transactions.TransactionsScreen
 import com.kazemieh.composeApp.navigation.Screen
@@ -17,14 +19,28 @@ fun NavGraphBuilder.bottomBarNavGraph(
     snackbarHostState: SnackbarHostState,
     onBackPressed: () -> Unit
 ) {
-    navigation<Screen.BottomBarGraph>(startDestination = Screen.Transactions) {
+    navigation<Screen.BottomBarGraph>(startDestination = Screen.Dashboard) {
 
         composable<Screen.Dashboard> { backStackEntry ->
-            DashboardScreen(snackbarHostState = snackbarHostState)
+            DashboardScreen(
+                snackbarHostState = snackbarHostState,
+                onNavigateToTransactions = { reset ->
+                    navController.navigate(Screen.Transactions(resetFilters = reset)) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
 
         composable<Screen.Transactions> { backStackEntry ->
-            TransactionsScreen(snackbarHostState = snackbarHostState)
+            val args = backStackEntry.toRoute<Screen.Transactions>()
+            TransactionsScreen(
+                snackbarHostState = snackbarHostState,
+                resetFilters = args.resetFilters
+            )
         }
 
         composable<Screen.Tools> { backStackEntry ->

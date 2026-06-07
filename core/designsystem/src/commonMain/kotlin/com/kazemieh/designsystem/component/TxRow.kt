@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Forward
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -193,14 +194,14 @@ fun TxRow(
                     SourceIconAndName(item.source.iconId, item.source.name)
 
                     if (isTransfer && item.sourceEnd != null) {
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(2.dp))
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Forward,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                             contentDescription = stringResource(Res.string.label_to),
                             tint = GlassText3,
                             modifier = Modifier.size(12.dp)
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(2.dp))
                         SourceIconAndName(item.sourceEnd!!.iconId, item.sourceEnd!!.name)
                     }
                 }

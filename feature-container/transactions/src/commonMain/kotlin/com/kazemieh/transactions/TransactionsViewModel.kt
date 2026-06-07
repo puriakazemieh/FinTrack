@@ -253,6 +253,16 @@ class TransactionsViewModel() : ViewModel() {
 
             is TransactionsIntent.OnToggleFilterSheet -> _state.update { it.copy(isFilterSheetVisible = !it.isFilterSheetVisible) }
 
+            TransactionsIntent.ResetFilters -> {
+                _state.update {
+                    TransactionsState().copy(
+                        resetFiltersHandled = true,
+                        enableAnimationChart = !it.enableAnimationChart
+                    )
+                }
+                onIntent(TransactionsIntent.OnDateRange(DateFilterType.THIS_MONTH))
+            }
+
             is TransactionsIntent.OnSourcesSelected -> _state.update {
                 it.copy(
                     selectedSources = intent.sources,
@@ -409,6 +419,7 @@ data class TransactionsState(
     val showAddTransaction: Boolean = false,
     val showDeleteTransaction: Boolean = false,
     val transactionWithRelations: TransactionWithRelations? = null,
+    val resetFiltersHandled: Boolean = false
 )
 
 sealed interface TransactionsIntent {
@@ -450,6 +461,7 @@ sealed interface TransactionsIntent {
     data object OnNextClick : TransactionsIntent
     data object OnToggleSearch : TransactionsIntent
     data object OnToggleFilterSheet : TransactionsIntent
+    data object ResetFilters : TransactionsIntent
     data class OnDateSheetSubmit(
         val startDate: String?,
         val startTimeStamp: Long?,

@@ -9,7 +9,7 @@ sealed class Screen {
     data object Dashboard: Screen()
 
     @Serializable
-    data object Transactions : Screen()
+    data class Transactions(val resetFilters: Boolean = false) : Screen()
 
     @Serializable
     data object Tools : Screen()
