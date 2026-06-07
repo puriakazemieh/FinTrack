@@ -13,6 +13,10 @@ import com.kazemieh.domain.usecase.DeleteTagUseCase
 import com.kazemieh.domain.usecase.DeleteTransactionUseCase
 import com.kazemieh.domain.usecase.UpdateCategoryUseCase
 import com.kazemieh.domain.usecase.UpdatePersonUseCase
+import com.kazemieh.domain.usecase.UpdateCategoryPositionsUseCase
+import com.kazemieh.domain.usecase.UpdateSourcePositionsUseCase
+import com.kazemieh.domain.usecase.UpdateTagPositionsUseCase
+import com.kazemieh.domain.usecase.UpdatePersonPositionsUseCase
 import com.kazemieh.domain.usecase.UpdateSourceUseCase
 import com.kazemieh.domain.usecase.UpdateTagUseCase
 import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
@@ -65,6 +69,10 @@ val domainModule = module {
     factory { ObserveMostUsedSourcesUseCase(get()) }
     factory { ObserveMostUsedTagsUseCase(get()) }
     factory { ObserveMostUsedPersonsUseCase(get()) }
+    factory { UpdateCategoryPositionsUseCase(get()) }
+    factory { UpdateSourcePositionsUseCase(get()) }
+    factory { UpdateTagPositionsUseCase(get()) }
+    factory { UpdatePersonPositionsUseCase(get()) }
 
 
     single {

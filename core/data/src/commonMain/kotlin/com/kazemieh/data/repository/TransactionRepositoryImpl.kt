@@ -150,4 +150,28 @@ class TransactionRepositoryImpl(
     override fun observeMostUsedPersons(limit: Long): Flow<List<Person>> {
         return localDataSource.observeMostUsedPersons(limit)
     }
+
+    override suspend fun updateCategoryPositions(positions: Map<Long, Int>) {
+        positions.forEach { (id, position) ->
+            localDataSource.updateCategoryPosition(id, position)
+        }
+    }
+
+    override suspend fun updateSourcePositions(positions: Map<Long, Int>) {
+        positions.forEach { (id, position) ->
+            localDataSource.updateSourcePosition(id, position)
+        }
+    }
+
+    override suspend fun updateTagPositions(positions: Map<Long, Int>) {
+        positions.forEach { (id, position) ->
+            localDataSource.updateTagPosition(id, position)
+        }
+    }
+
+    override suspend fun updatePersonPositions(positions: Map<Long, Int>) {
+        positions.forEach { (id, position) ->
+            localDataSource.updatePersonPosition(id, position)
+        }
+    }
 }

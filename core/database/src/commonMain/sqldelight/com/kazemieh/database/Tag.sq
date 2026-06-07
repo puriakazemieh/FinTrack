@@ -3,19 +3,20 @@ CREATE TABLE IF NOT EXISTS tag (
     name TEXT NOT NULL,
     description TEXT,
     colorId INTEGER NOT NULL DEFAULT 1,
-    iconId INTEGER NOT NULL DEFAULT 1
+    iconId INTEGER NOT NULL DEFAULT 1,
+    position INTEGER NOT NULL DEFAULT 0
 );
 
 addTag:
-INSERT INTO tag(name, description, colorId, iconId)
-VALUES (?, ?, ?, ?);
+INSERT INTO tag(name, description, colorId, iconId, position)
+VALUES (?, ?, ?, ?, ?);
 
 insertAllTag:
-INSERT INTO tag(name, description, colorId, iconId)
+INSERT INTO tag(name, description, colorId, iconId, position)
 VALUES ?;
 
 observeTags:
-SELECT * FROM tag;
+SELECT * FROM tag ORDER BY position ASC;
 
 getTagById:
 SELECT * FROM tag WHERE id = ?;
@@ -25,15 +26,18 @@ DELETE FROM tag WHERE id = ?;
 
 updateTag:
 UPDATE tag
-SET name = ?, description = ?, colorId = ?, iconId = ?
+SET name = ?, description = ?, colorId = ?, iconId = ?, position = ?
 WHERE id = ?;
+
+updateTagPosition:
+UPDATE tag SET position = ? WHERE id = ?;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertFullTag:
-INSERT OR REPLACE INTO tag(id, name, description, colorId, iconId)
-VALUES (?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO tag(id, name, description, colorId, iconId, position)
+VALUES (?, ?, ?, ?, ?, ?);
 
 getMostUsedTags:
 SELECT tag.* FROM tag

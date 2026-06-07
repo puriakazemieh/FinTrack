@@ -11,17 +11,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.TextButton
+import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,6 +29,7 @@ import com.kazemieh.common.model.Source
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.GlassBg0
 import com.kazemieh.designsystem.GlassBg1
+import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassText2
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
@@ -114,12 +108,21 @@ private fun SourceBottomSheetCore(
                     onDismiss()
                 },
                 trailingContent = {
-                    if (showEditButton) {
-                        TextButton(onClick = { isEditMode = !isEditMode }) {
-                            FintrackLabelMediumText(
-                                text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
-                                color = GlassText2
+                    Row {
+                        IconButton(onClick = { viewModel.onIntent(SourceIntent.OnToggleReorder) }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Sort,
+                                contentDescription = null,
+                                tint = if (state.isReorderShow) GlassGreen else GlassText2
                             )
+                        }
+                        if (showEditButton) {
+                            TextButton(onClick = { isEditMode = !isEditMode }) {
+                                FintrackLabelMediumText(
+                                    text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
+                                    color = GlassText2
+                                )
+                            }
                         }
                     }
                 }
@@ -129,7 +132,16 @@ private fun SourceBottomSheetCore(
                 title = stringResource(Res.string.source),
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(SourceIntent.UpdateSearchQuery(it)) },
-                showActions = isEditMode,
+                showActions = isEditMode && !state.isReorderShow,
+                isReorderMode = state.isReorderShow,
+                onMove = { from, to ->
+                    val list = state.sources.toMutableList()
+                    list.add(to, list.removeAt(from))
+                    val positions = list.mapIndexed { index, source ->
+                        source.id!! to index
+                    }.toMap()
+                    viewModel.onIntent(SourceIntent.UpdatePositions(positions))
+                },
                 items = state.filteredSources.map { source ->
                     EntityItem(
                         id = source.id ?: 0L,

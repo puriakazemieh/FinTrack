@@ -6,6 +6,7 @@ import com.kazemieh.common.model.Person
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.domain.usecase.ObservePersonsUseCase
+import com.kazemieh.domain.usecase.UpdatePersonPositionsUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +16,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PersonViewModel(
-    private val observePersonsUseCase: ObservePersonsUseCase
+    private val observePersonsUseCase: ObservePersonsUseCase,
+    private val updatePersonPositionsUseCase: UpdatePersonPositionsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PersonState())
@@ -78,7 +80,24 @@ class PersonViewModel(
             }
 
             PersonIntent.ResetFlags -> {
-                _state.update { it.copy(showAddPerson = false, isDeleteShow = false, selectedPerson = null) }
+                _state.update {
+                    it.copy(
+                        showAddPerson = false,
+                        isDeleteShow = false,
+                        selectedPerson = null,
+                        isReorderShow = false
+                    )
+                }
+            }
+
+            PersonIntent.OnToggleReorder -> {
+                _state.update { it.copy(isReorderShow = !it.isReorderShow) }
+            }
+
+            is PersonIntent.UpdatePositions -> {
+                viewModelScope.launch {
+                    updatePersonPositionsUseCase(intent.positions)
+                }
             }
 
             is PersonIntent.SelectedPerson -> {
@@ -130,7 +149,8 @@ data class PersonState(
     val items: Set<ItemUi> = emptySet(),
     val isDeleteShow: Boolean = false,
     val selectedPerson: Person? = null,
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val isReorderShow: Boolean = false
 )
 
 sealed interface PersonIntent {
@@ -144,6 +164,8 @@ sealed interface PersonIntent {
     data class OnEditClick(val person: Person? = null) : PersonIntent
     data class OnDeleteClick(val person: Person? = null) : PersonIntent
     data object ResetFlags : PersonIntent
+    data object OnToggleReorder : PersonIntent
+    data class UpdatePositions(val positions: Map<Long, Int>) : PersonIntent
 }
 
 sealed interface PersonEffect {

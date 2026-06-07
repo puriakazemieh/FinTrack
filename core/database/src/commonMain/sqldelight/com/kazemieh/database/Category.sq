@@ -4,25 +4,29 @@ CREATE TABLE IF NOT EXISTS category (
     description TEXT,
     type INTEGER NOT NULL,
     colorId INTEGER NOT NULL DEFAULT 1,
-    iconId INTEGER NOT NULL DEFAULT 1
+    iconId INTEGER NOT NULL DEFAULT 1,
+    position INTEGER NOT NULL DEFAULT 0
 );
 
 -- Queries
 addCategory:
-INSERT INTO category(name, description, type, colorId, iconId)
-VALUES (?, ?, ?, ?, ?);
+INSERT INTO category(name, description, type, colorId, iconId, position)
+VALUES (?, ?, ?, ?, ?, ?);
 
 insertAllCategory:
-INSERT INTO category(name, description, type, colorId, iconId)
+INSERT INTO category(name, description, type, colorId, iconId, position)
 VALUES ?;
 
 updateCategory:
 UPDATE category
-SET name = ?, description = ?, type = ?, colorId = ?, iconId = ?
+SET name = ?, description = ?, type = ?, colorId = ?, iconId = ?, position = ?
 WHERE id = ?;
 
+updateCategoryPosition:
+UPDATE category SET position = ? WHERE id = ?;
+
 observeCategories:
-SELECT * FROM category WHERE (:type IS NULL OR type = :type);
+SELECT * FROM category WHERE (:type IS NULL OR type = :type) ORDER BY position ASC;
 
 getFirstByType:
 SELECT * FROM category WHERE type = ? ORDER BY id LIMIT 1;
@@ -74,8 +78,8 @@ deleteCategory:
 DELETE FROM category WHERE id = ?;
 
 insertFullCategory:
-INSERT OR REPLACE INTO category(id, name, description, type, colorId, iconId)
-VALUES (?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO category(id, name, description, type, colorId, iconId, position)
+VALUES (?, ?, ?, ?, ?, ?, ?);
 
 getMostUsedCategories:
 SELECT c.* FROM category c

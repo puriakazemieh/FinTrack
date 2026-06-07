@@ -39,7 +39,8 @@ class DatabaseInitializer(
             expirationMonth = null,
             expirationYear = null,
             branchCode = null,
-            branchName = null
+            branchName = null,
+            position = 0
         )
 
         // دسته‌بندی‌های پیش‌فرض
@@ -77,7 +78,8 @@ class DatabaseInitializer(
                 description = description,
                 type = type.toLong(),
                 colorId = colorId.toLong(),
-                iconId = iconId.toLong()
+                iconId = iconId.toLong(),
+                position = 0
             )
         }
 
@@ -101,7 +103,8 @@ class DatabaseInitializer(
                 name = name,
                 description = description,
                 colorId = colorId.toLong(),
-                iconId = iconId.toLong()
+                iconId = iconId.toLong(),
+                position = 0
             )
         }
     }

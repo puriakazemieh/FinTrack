@@ -7,6 +7,7 @@ import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
+import com.kazemieh.domain.usecase.UpdateCategoryPositionsUseCase
 import kotlinx.coroutines.channels.Channel
 import com.kazemieh.designsystem.component.glass.EntitySummary
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,8 @@ import kotlinx.coroutines.launch
 
 
 class CategoryViewModel(
-    private val observeCategoriesUseCase: ObserveCategoriesUseCase
+    private val observeCategoriesUseCase: ObserveCategoriesUseCase,
+    private val updateCategoryPositionsUseCase: UpdateCategoryPositionsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CategoryState())
@@ -75,7 +77,17 @@ class CategoryViewModel(
             }
 
             CategoryIntent.ResetFlags -> {
-                _state.update { it.copy(isAddShow = false, isDeleteShow = false, selectedCategory = null) }
+                _state.update { it.copy(isAddShow = false, isDeleteShow = false, selectedCategory = null, isReorderShow = false) }
+            }
+
+            CategoryIntent.OnToggleReorder -> {
+                _state.update { it.copy(isReorderShow = !it.isReorderShow) }
+            }
+
+            is CategoryIntent.UpdatePositions -> {
+                viewModelScope.launch {
+                    updateCategoryPositionsUseCase(intent.positions)
+                }
             }
         }
 
@@ -145,7 +157,8 @@ data class CategoryState(
         TransactionType.TRANSFER
     ),
     val isAddShow: Boolean = false,
-    val isDeleteShow: Boolean = false
+    val isDeleteShow: Boolean = false,
+    val isReorderShow: Boolean = false
 )
 
 sealed interface CategoryIntent {
@@ -161,6 +174,8 @@ sealed interface CategoryIntent {
     data class OnEditClick(val category: Category? = null) : CategoryIntent
     data object OnDismiss : CategoryIntent
     data object ResetFlags : CategoryIntent
+    data object OnToggleReorder : CategoryIntent
+    data class UpdatePositions(val positions: Map<Long, Int>) : CategoryIntent
 
 }
 

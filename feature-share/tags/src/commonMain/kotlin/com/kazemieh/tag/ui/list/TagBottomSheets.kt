@@ -5,7 +5,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
+import com.kazemieh.designsystem.GlassGreen
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -21,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import com.kazemieh.common.model.Tag
 import com.kazemieh.designsystem.GlassBg0
+import androidx.compose.foundation.layout.Row
 import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.GlassText2
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
@@ -149,12 +155,21 @@ fun TagPickerSingleBottomSheet(
                     onDismiss()
                 },
                 trailingContent = {
-                    if (showEditButton) {
-                        TextButton(onClick = { isEditMode = !isEditMode }) {
-                            FintrackLabelMediumText(
-                                text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
-                                color = GlassText2
+                    Row {
+                        IconButton(onClick = { viewModel.onIntent(TagIntent.OnToggleReorder) }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Sort,
+                                contentDescription = null,
+                                tint = if (state.isReorderShow) GlassGreen else GlassText2
                             )
+                        }
+                        if (showEditButton) {
+                            TextButton(onClick = { isEditMode = !isEditMode }) {
+                                FintrackLabelMediumText(
+                                    text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
+                                    color = GlassText2
+                                )
+                            }
                         }
                     }
                 }
@@ -165,7 +180,16 @@ fun TagPickerSingleBottomSheet(
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(TagIntent.UpdateSearchQuery(it)) },
                 onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
-                showActions = isEditMode,
+                showActions = isEditMode && !state.isReorderShow,
+                isReorderMode = state.isReorderShow,
+                onMove = { from, to ->
+                    val list = state.tags.toMutableList()
+                    list.add(to, list.removeAt(from))
+                    val positions = list.mapIndexed { index, tag ->
+                        tag.id!! to index
+                    }.toMap()
+                    viewModel.onIntent(TagIntent.UpdatePositions(positions))
+                },
                 onFilterClick = onNavigateToTransactions?.let { callback ->
                     { item ->
                         state.tags.find { it.id == item.id }?.let { callback(it) }

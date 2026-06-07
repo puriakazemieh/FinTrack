@@ -4,8 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
+import com.kazemieh.designsystem.GlassGreen
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -156,12 +162,21 @@ fun PersonPickerSingleBottomSheet(
                     onDismiss()
                 },
                 trailingContent = {
-                    if (showEditButton) {
-                        TextButton(onClick = { isEditMode = !isEditMode }) {
-                            FintrackLabelMediumText(
-                                text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
-                                color = GlassText2
+                    Row {
+                        IconButton(onClick = { viewModel.onIntent(PersonIntent.OnToggleReorder) }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Sort,
+                                contentDescription = null,
+                                tint = if (state.isReorderShow) GlassGreen else GlassText2
                             )
+                        }
+                        if (showEditButton) {
+                            TextButton(onClick = { isEditMode = !isEditMode }) {
+                                FintrackLabelMediumText(
+                                    text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
+                                    color = GlassText2
+                                )
+                            }
                         }
                     }
                 }
@@ -172,7 +187,16 @@ fun PersonPickerSingleBottomSheet(
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(PersonIntent.UpdateSearchQuery(it)) },
                 onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
-                showActions = isEditMode,
+                showActions = isEditMode && !state.isReorderShow,
+                isReorderMode = state.isReorderShow,
+                onMove = { from, to ->
+                    val list = state.persons.toMutableList()
+                    list.add(to, list.removeAt(from))
+                    val positions = list.mapIndexed { index, person ->
+                        person.id!! to index
+                    }.toMap()
+                    viewModel.onIntent(PersonIntent.UpdatePositions(positions))
+                },
                 onFilterClick = onNavigateToTransactions?.let { callback ->
                     { item ->
                         state.persons.find { it.id == item.id }?.let { callback(it) }

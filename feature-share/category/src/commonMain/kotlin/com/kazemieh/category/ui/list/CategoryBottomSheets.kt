@@ -12,7 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TextButton
@@ -101,11 +105,20 @@ fun CategoryPickerBottomSheet(
                     onDismiss() 
                 },
                 trailingContent = {
-                    TextButton(onClick = { isEditMode = !isEditMode }) {
-                        FintrackLabelMediumText(
-                            text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
-                            color = GlassText2
-                        )
+                    Row {
+                        IconButton(onClick = { viewModel.onIntent(CategoryIntent.OnToggleReorder) }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Sort,
+                                contentDescription = null,
+                                tint = if (state.isReorderShow) GlassGreen else GlassText2
+                            )
+                        }
+                        TextButton(onClick = { isEditMode = !isEditMode }) {
+                            FintrackLabelMediumText(
+                                text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
+                                color = GlassText2
+                            )
+                        }
                     }
                 }
             )
@@ -127,7 +140,13 @@ fun CategoryPickerBottomSheet(
                 onQueryChange = { viewModel.onIntent(CategoryIntent.SetQuery(it)) },
                 onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
                 items = entityItems,
-                showActions = isEditMode,
+                showActions = isEditMode && !state.isReorderShow,
+                isReorderMode = state.isReorderShow,
+                onMove = { _, _ ->
+                    // UI handles immediate move, we need to collect final state or update on every move
+                    // For simplicity, let's collect final state when reorder mode is turned off
+                    // or just update on every move.
+                },
                 onFilterClick = onNavigateToTransactions?.let { callback ->
                     { item ->
                         state.categories.find { it.id == item.id }?.let { callback(it) }
@@ -207,7 +226,16 @@ fun CategoryManageBottomSheet(
         ) {
             ScreenHeader(
                 title = stringResource(Res.string.category),
-                onClose = { viewModel.onIntent(CategoryIntent.OnDismiss) }
+                onClose = { viewModel.onIntent(CategoryIntent.OnDismiss) },
+                trailingContent = {
+                    IconButton(onClick = { viewModel.onIntent(CategoryIntent.OnToggleReorder) }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Sort,
+                            contentDescription = null,
+                            tint = if (state.isReorderShow) GlassGreen else GlassText2
+                        )
+                    }
+                }
             )
 
             TypeSwitcher(
@@ -232,6 +260,16 @@ fun CategoryManageBottomSheet(
                 onQueryChange = { viewModel.onIntent(CategoryIntent.SetQuery(it)) },
                 onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
                 items = entityItems,
+                showActions = !state.isReorderShow,
+                isReorderMode = state.isReorderShow,
+                onMove = { from, to ->
+                    val list = state.categories.toMutableList()
+                    list.add(to, list.removeAt(from))
+                    val positions = list.mapIndexed { index, category ->
+                        category.id!! to index
+                    }.toMap()
+                    viewModel.onIntent(CategoryIntent.UpdatePositions(positions))
+                },
                 onFilterClick = onNavigateToTransactions?.let { callback ->
                     { item ->
                         state.categories.find { it.id == item.id }?.let { callback(it) }

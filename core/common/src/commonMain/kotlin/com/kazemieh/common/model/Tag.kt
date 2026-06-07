@@ -9,5 +9,6 @@ data class Tag(
     val name: String,
     val description: String? = null,
     val colorId: Int,
-    val iconId: Int
+    val iconId: Int,
+    val position: Int = 0
 )

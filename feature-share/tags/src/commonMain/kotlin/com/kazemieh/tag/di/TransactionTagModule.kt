@@ -9,7 +9,8 @@ import org.koin.dsl.module
 val transactionTagModule = module {
     viewModel {
         TagViewModel(
-            observeTagsUseCase = get()
+            observeTagsUseCase = get(),
+            updateTagPositionsUseCase = get()
         )
     }
 }

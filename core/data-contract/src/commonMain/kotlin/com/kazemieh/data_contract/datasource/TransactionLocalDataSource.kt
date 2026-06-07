@@ -70,4 +70,9 @@ interface TransactionLocalDataSource {
     fun observeMostUsedSources(limit: Long): Flow<List<Source>>
     fun observeMostUsedTags(limit: Long): Flow<List<Tag>>
     fun observeMostUsedPersons(limit: Long): Flow<List<Person>>
+
+    suspend fun updateCategoryPosition(id: Long, position: Int)
+    suspend fun updateSourcePosition(id: Long, position: Int)
+    suspend fun updateTagPosition(id: Long, position: Int)
+    suspend fun updatePersonPosition(id: Long, position: Int)
 }

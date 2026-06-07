@@ -9,7 +9,8 @@ import org.koin.dsl.module
 val transactionFinancialSourceModule = module {
     viewModel {
         SourceViewModel(
-            observeSourcesUseCase = get()
+            observeSourcesUseCase = get(),
+            updateSourcePositionsUseCase = get()
         )
     }
 }

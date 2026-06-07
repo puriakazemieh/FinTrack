@@ -1,19 +1,20 @@
 CREATE TABLE IF NOT EXISTS person (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     name TEXT NOT NULL,
-    description TEXT
+    description TEXT,
+    position INTEGER NOT NULL DEFAULT 0
 );
 
 addPerson:
-INSERT INTO person(name, description)
-VALUES (?, ?);
+INSERT INTO person(name, description, position)
+VALUES (?, ?, ?);
 
 insertAllPerson:
-INSERT INTO person(name, description)
+INSERT INTO person(name, description, position)
 VALUES ?;
 
 observePersons:
-SELECT * FROM person;
+SELECT * FROM person ORDER BY position ASC;
 
 getPersonById:
 SELECT * FROM person WHERE id = ?;
@@ -23,15 +24,18 @@ DELETE FROM person WHERE id = ?;
 
 updatePerson:
 UPDATE person
-SET name = ?, description = ?
+SET name = ?, description = ?, position = ?
 WHERE id = ?;
+
+updatePersonPosition:
+UPDATE person SET position = ? WHERE id = ?;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertFullPerson:
-INSERT OR REPLACE INTO person(id, name, description)
-VALUES (?, ?, ?);
+INSERT OR REPLACE INTO person(id, name, description, position)
+VALUES (?, ?, ?, ?);
 
 getMostUsedPersons:
 SELECT person.* FROM person

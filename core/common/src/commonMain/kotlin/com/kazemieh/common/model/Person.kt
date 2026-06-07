@@ -8,4 +8,5 @@ data class Person(
     val id: Long? = null,
     val name: String,
     val description: String? = null,
+    val position: Int = 0
 )

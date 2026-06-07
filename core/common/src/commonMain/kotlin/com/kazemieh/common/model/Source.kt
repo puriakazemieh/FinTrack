@@ -21,5 +21,6 @@ data class Source(
     val expirationMonth: String? = null,
     val expirationYear: String? = null,
     val branchCode: String? = null,
-    val branchName: String? = null
+    val branchName: String? = null,
+    val position: Int = 0
 )

@@ -6,6 +6,7 @@ import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.common.model.Tag
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.domain.usecase.ObserveTagsUseCase
+import com.kazemieh.domain.usecase.UpdateTagPositionsUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +16,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class TagViewModel(
-    private val observeTagsUseCase: ObserveTagsUseCase
+    private val observeTagsUseCase: ObserveTagsUseCase,
+    private val updateTagPositionsUseCase: UpdateTagPositionsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TagState())
@@ -75,7 +77,24 @@ class TagViewModel(
             }
 
             TagIntent.ResetFlags -> {
-                _state.update { it.copy(showAddTag = false, isDeleteShow = false, selectedTag = null) }
+                _state.update {
+                    it.copy(
+                        showAddTag = false,
+                        isDeleteShow = false,
+                        selectedTag = null,
+                        isReorderShow = false
+                    )
+                }
+            }
+
+            TagIntent.OnToggleReorder -> {
+                _state.update { it.copy(isReorderShow = !it.isReorderShow) }
+            }
+
+            is TagIntent.UpdatePositions -> {
+                viewModelScope.launch {
+                    updateTagPositionsUseCase(intent.positions)
+                }
             }
 
             is TagIntent.SelectedTag -> {
@@ -127,7 +146,8 @@ data class TagState(
     val initialSelectionItem: Set<Tag> = emptySet(),
     val items: Set<ItemUi> = emptySet(),
     val isDeleteShow: Boolean = false,
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val isReorderShow: Boolean = false
 )
 
 sealed interface TagIntent {
@@ -141,6 +161,8 @@ sealed interface TagIntent {
     data class OnEditClick(val tag: Tag? = null) : TagIntent
     data class OnDeleteClick(val tag: Tag? = null) : TagIntent
     data object ResetFlags : TagIntent
+    data object OnToggleReorder : TagIntent
+    data class UpdatePositions(val positions: Map<Long, Int>) : TagIntent
 }
 
 

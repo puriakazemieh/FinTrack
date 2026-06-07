@@ -107,7 +107,8 @@ class TransactionLocalDataSourceImpl(
             description = category.description,
             type = category.type.count.toLong(),
             colorId = category.colorId.toLong(),
-            iconId = category.iconId.toLong()
+            iconId = category.iconId.toLong(),
+            position = category.position.toLong()
         )
         categoryQueries.lastInsertRowId().awaitAsOne()
     }
@@ -120,6 +121,7 @@ class TransactionLocalDataSourceImpl(
                 type = category.type.count.toLong(),
                 colorId = category.colorId.toLong(),
                 iconId = category.iconId.toLong(),
+                position = category.position.toLong(),
                 id = category.id ?: 0
             )
 
@@ -152,6 +154,7 @@ class TransactionLocalDataSourceImpl(
             expirationYear = source.expirationYear,
             branchCode = source.branchCode,
             branchName = source.branchName,
+            position = source.position.toLong(),
             id = id
         )
 
@@ -170,6 +173,7 @@ class TransactionLocalDataSourceImpl(
             description = tag.description,
             colorId = tag.colorId.toLong(),
             iconId = tag.iconId.toLong(),
+            position = tag.position.toLong(),
             id = tag.id ?: 0
         )
         1
@@ -179,6 +183,7 @@ class TransactionLocalDataSourceImpl(
         personQueries.updatePerson(
             name = person.name,
             description = person.description,
+            position = person.position.toLong(),
             id = person.id ?: 0
         )
         1
@@ -273,7 +278,8 @@ class TransactionLocalDataSourceImpl(
             expirationMonth = source.expirationMonth,
             expirationYear = source.expirationYear,
             branchCode = source.branchCode,
-            branchName = source.branchName
+            branchName = source.branchName,
+            position = source.position.toLong()
         )
         sourceQueries.lastInsertRowId().awaitAsOne()
     }
@@ -283,7 +289,8 @@ class TransactionLocalDataSourceImpl(
             name = tag.name,
             description = tag.description,
             colorId = tag.colorId.toLong(),
-            iconId = tag.iconId.toLong()
+            iconId = tag.iconId.toLong(),
+            position = tag.position.toLong()
         )
         tagQueries.lastInsertRowId().awaitAsOne()
     }
@@ -364,7 +371,8 @@ class TransactionLocalDataSourceImpl(
         withContext(Dispatchers.Default) {
             personQueries.addPerson(
                 name = person.name,
-                description = person.description
+                description = person.description,
+                position = person.position.toLong()
             )
             personQueries.lastInsertRowId().awaitAsOne()
         }
@@ -402,6 +410,22 @@ class TransactionLocalDataSourceImpl(
             .asFlow()
             .mapToList(Dispatchers.Default)
             .map { it.map { p -> p.toPerson() } }
+    }
+
+    override suspend fun updateCategoryPosition(id: Long, position: Int) {
+        categoryQueries.updateCategoryPosition(position.toLong(), id)
+    }
+
+    override suspend fun updateSourcePosition(id: Long, position: Int) {
+        sourceQueries.updateSourcePosition(position.toLong(), id)
+    }
+
+    override suspend fun updateTagPosition(id: Long, position: Int) {
+        tagQueries.updateTagPosition(position.toLong(), id)
+    }
+
+    override suspend fun updatePersonPosition(id: Long, position: Int) {
+        personQueries.updatePersonPosition(position.toLong(), id)
     }
 
     override suspend fun addTransactionWithBalance(

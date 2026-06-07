@@ -1,6 +1,7 @@
 package com.kazemieh.designsystem.component.glass
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -25,12 +26,20 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
@@ -55,6 +64,8 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.hint_search_in
 import fintrack.core.designsystem.generated.resources.msg_empty_list
 import org.jetbrains.compose.resources.stringResource
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 /**
  * 2.9 EntityList — management list with summary header + search + edit/delete rows
@@ -75,105 +86,187 @@ fun EntityList(
     onFilterClick: ((EntityItem) -> Unit)? = null,
     onItemClick: (EntityItem) -> Unit = {},
     emptyHint: String? = null,
-    showActions: Boolean = true
+    showActions: Boolean = true,
+    isReorderMode: Boolean = false,
+    onMove: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> }
 ) {
+    var internalItems by remember(items) { mutableStateOf(items) }
+
     Box(modifier = modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 100.dp)
-        ) {
-            item {
-                if (summary != null) {
-                    GlassCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 14.dp, vertical = 8.dp),
-                        tone = GlassTone.Strong,
-                        padding = 14.dp
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceAround
-                        ) {
-                            summary.forEachIndexed { index, s ->
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    FintrackLabelSmallText(text = s.label, color = GlassText3)
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        FintrackTitleMediumText(
-                                            text = s.value.toPersianDigits(),
-                                            fontWeight = FontWeight.Bold,
-                                            color = s.color ?: GlassText
-                                        )
-                                        s.unit?.let {
-                                            FintrackLabelSmallText(
-                                                text = it,
-                                                color = GlassText3,
-                                                modifier = Modifier.padding(start = 4.dp)
-                                            )
-                                        }
+        if (isReorderMode) {
+            val lazyListState = androidx.compose.foundation.lazy.rememberLazyListState()
+            val state = rememberReorderableLazyListState(
+                lazyListState = lazyListState,
+                onMove = { from, to ->
+                    val fromIdx = from.index - 2 // Adjust for summary and search bar
+                    val toIdx = to.index - 2
+                    if (fromIdx >= 0 && toIdx >= 0 && fromIdx < internalItems.size && toIdx < internalItems.size) {
+                        internalItems = internalItems.toMutableList().apply {
+                            add(toIdx, removeAt(fromIdx))
+                        }
+                        onMove(fromIdx, toIdx)
+                    }
+                }
+            )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                state = lazyListState,
+                contentPadding = PaddingValues(bottom = 100.dp)
+            ) {
+                item {
+                    SummaryHeader(summary)
+                }
+                item {
+                    SearchHeader(query, onQueryChange, title)
+                }
+                items(internalItems, key = { it.id }) { item ->
+                    ReorderableItem(state, key = item.id) { isDragging ->
+                        val elevation by animateDpAsState(if (isDragging) 8.dp else 0.dp)
+                        EntityRow(
+                            item = item,
+                            mainColor = color,
+                            showActions = false,
+                            onEdit = {},
+                            onDelete = {},
+                            onClick = {},
+                            isReorderMode = true,
+                            onMoveUp = {
+                                val idx = internalItems.indexOf(item)
+                                if (idx > 0) {
+                                    internalItems = internalItems.toMutableList().apply {
+                                        add(idx - 1, removeAt(idx))
                                     }
+                                    onMove(idx, idx - 1)
                                 }
-                                if (index < summary.lastIndex) {
-                                    VerticalDivider(
-                                        modifier = Modifier.height(30.dp),
-                                        color = GlassHairline
-                                    )
+                            },
+                            onMoveDown = {
+                                val idx = internalItems.indexOf(item)
+                                if (idx < internalItems.size - 1) {
+                                    internalItems = internalItems.toMutableList().apply {
+                                        add(idx + 1, removeAt(idx))
+                                    }
+                                    onMove(idx, idx + 1)
                                 }
-                            }
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 14.dp, vertical = 4.dp)
+                                .shadow(elevation)
+                                .draggableHandle()
+                        )
+                    }
+                }
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 100.dp)
+            ) {
+                item {
+                    SummaryHeader(summary)
+                }
+
+                item {
+                    SearchHeader(query, onQueryChange, title)
+                }
+
+                if (items.isEmpty()) {
+                    item {
+                        Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp)) {
+                            EmptyListScreen(emptyHint ?: stringResource(Res.string.msg_empty_list))
                         }
                     }
-                }
-            }
-
-            item {
-                SearchBar(
-                    query = query,
-                    onQueryChange = onQueryChange,
-                    placeholder = stringResource(Res.string.hint_search_in, title),
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
-                )
-            }
-
-            if (items.isEmpty()) {
-                item {
-                    Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp)) {
-                        EmptyListScreen(emptyHint ?: stringResource(Res.string.msg_empty_list))
-                    }
-                }
-            } else {
-                items(items) {
-                    AnimatedVisibility(
-                        visible = true,
-                        enter = fadeIn(tween(200)),
-                        exit = fadeOut(tween(200))
-                    ) {
-                        EntityRow(
-                            item = it,
-                            mainColor = color,
-                            showActions = showActions,
-                            onEdit = { onEditClick(it) },
-                            onDelete = { onDeleteClick(it) },
-                            onFilter = onFilterClick?.let { callback -> { callback(it) } },
-                            onClick = { onItemClick(it) },
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp)
-                        )
+                } else {
+                    items(items) {
+                        AnimatedVisibility(
+                            visible = true,
+                            enter = fadeIn(tween(200)),
+                            exit = fadeOut(tween(200))
+                        ) {
+                            EntityRow(
+                                item = it,
+                                mainColor = color,
+                                showActions = showActions,
+                                onEdit = { onEditClick(it) },
+                                onDelete = { onDeleteClick(it) },
+                                onFilter = onFilterClick?.let { callback -> { callback(it) } },
+                                onClick = { onItemClick(it) },
+                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp)
+                            )
+                        }
                     }
                 }
             }
         }
 
-        Fab(
-            label = addLabel ?: "افزودن ${title.split(" ").first()} جدید",
-            icon = rememberVectorPainter(Icons.Default.Add),
-            onClick = onAddClick,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(14.dp)
-        )
+        if (!isReorderMode) {
+            Fab(
+                label = addLabel ?: "افزودن ${title.split(" ").first()} جدید",
+                icon = rememberVectorPainter(Icons.Default.Add),
+                onClick = onAddClick,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(14.dp)
+            )
+        }
     }
+}
+
+@Composable
+private fun SummaryHeader(summary: List<EntitySummary>?) {
+    if (summary != null) {
+        GlassCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 8.dp),
+            tone = GlassTone.Strong,
+            padding = 14.dp
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                summary.forEachIndexed { index, s ->
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        FintrackLabelSmallText(text = s.label, color = GlassText3)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            FintrackTitleMediumText(
+                                text = s.value.toPersianDigits(),
+                                fontWeight = FontWeight.Bold,
+                                color = s.color ?: GlassText
+                            )
+                            s.unit?.let {
+                                FintrackLabelSmallText(
+                                    text = it,
+                                    color = GlassText3,
+                                    modifier = Modifier.padding(start = 4.dp)
+                                )
+                            }
+                        }
+                    }
+                    if (index < summary.lastIndex) {
+                        VerticalDivider(
+                            modifier = Modifier.height(30.dp),
+                            color = GlassHairline
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SearchHeader(query: String, onQueryChange: (String) -> Unit, title: String) {
+    SearchBar(
+        query = query,
+        onQueryChange = onQueryChange,
+        placeholder = stringResource(Res.string.hint_search_in, title),
+        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
+    )
 }
 
 @Composable
@@ -185,11 +278,14 @@ private fun EntityRow(
     onDelete: () -> Unit,
     onFilter: (() -> Unit)? = null,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isReorderMode: Boolean = false,
+    onMoveUp: () -> Unit = {},
+    onMoveDown: () -> Unit = {}
 ) {
     val color = item.color ?: mainColor
     GlassCard(
-        modifier = modifier.clickable(onClick = onClick),
+        modifier = modifier.clickable(enabled = !isReorderMode, onClick = onClick),
         padding = 10.dp
     ) {
         Row(
@@ -197,6 +293,15 @@ private fun EntityRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            if (isReorderMode) {
+                Icon(
+                    imageVector = Icons.Default.Reorder,
+                    contentDescription = null,
+                    tint = GlassText3,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
             FinTrackLeadingIcon(
                 colorId = item.colorId,
                 iconId = item.iconId,
@@ -239,7 +344,20 @@ private fun EntityRow(
                 }
             }
 
-            if (showActions) {
+            if (isReorderMode) {
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    ActionIcon(
+                        icon = Icons.Default.KeyboardArrowUp,
+                        onClick = onMoveUp,
+                        color = GlassText2
+                    )
+                    ActionIcon(
+                        icon = Icons.Default.KeyboardArrowDown,
+                        onClick = onMoveDown,
+                        color = GlassText2
+                    )
+                }
+            } else if (showActions) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     onFilter?.let {
                         ActionIcon(

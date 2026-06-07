@@ -9,7 +9,8 @@ import org.koin.dsl.module
 val transactionPersonModule = module {
     viewModel {
         PersonViewModel(
-            observePersonsUseCase = get()
+            observePersonsUseCase = get(),
+            updatePersonPositionsUseCase = get()
         )
     }
 }

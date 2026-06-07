@@ -1,0 +1,11 @@
+ALTER TABLE category ADD COLUMN position INTEGER NOT NULL DEFAULT 0;
+UPDATE category SET position = id;
+
+ALTER TABLE source ADD COLUMN position INTEGER NOT NULL DEFAULT 0;
+UPDATE source SET position = id;
+
+ALTER TABLE tag ADD COLUMN position INTEGER NOT NULL DEFAULT 0;
+UPDATE tag SET position = id;
+
+ALTER TABLE person ADD COLUMN position INTEGER NOT NULL DEFAULT 0;
+UPDATE person SET position = id;

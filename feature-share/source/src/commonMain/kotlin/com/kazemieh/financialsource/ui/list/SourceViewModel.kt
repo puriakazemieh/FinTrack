@@ -6,6 +6,7 @@ import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.domain.usecase.ObserveSourcesUseCase
+import com.kazemieh.domain.usecase.UpdateSourcePositionsUseCase
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +16,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SourceViewModel(
-    private val observeSourcesUseCase: ObserveSourcesUseCase
+    private val observeSourcesUseCase: ObserveSourcesUseCase,
+    private val updateSourcePositionsUseCase: UpdateSourcePositionsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SourceState())
@@ -51,7 +53,24 @@ class SourceViewModel(
             }
 
             SourceIntent.ResetFlags -> {
-                _state.update { it.copy(isAddShow = false, isDeleteShow = false, selectedSources = null) }
+                _state.update {
+                    it.copy(
+                        isAddShow = false,
+                        isDeleteShow = false,
+                        selectedSources = null,
+                        isReorderShow = false
+                    )
+                }
+            }
+
+            SourceIntent.OnToggleReorder -> {
+                _state.update { it.copy(isReorderShow = !it.isReorderShow) }
+            }
+
+            is SourceIntent.UpdatePositions -> {
+                viewModelScope.launch {
+                    updateSourcePositionsUseCase(intent.positions)
+                }
             }
 
             is SourceIntent.OnDeleteClick -> _state.update {
@@ -106,7 +125,8 @@ data class SourceState(
     val isDeleteShow: Boolean = false,
     val isAddShow: Boolean = false,
     val searchQuery: String = "",
-    val totalBalance: Long = 0
+    val totalBalance: Long = 0,
+    val isReorderShow: Boolean = false
 )
 
 
@@ -119,6 +139,8 @@ sealed interface SourceIntent {
     data class OnEditClick(val source: Source) : SourceIntent
     data class OnDeleteClick(val source: Source? = null) : SourceIntent
     data object ResetFlags : SourceIntent
+    data object OnToggleReorder : SourceIntent
+    data class UpdatePositions(val positions: Map<Long, Int>) : SourceIntent
 }
 
 sealed interface SourceEffect {

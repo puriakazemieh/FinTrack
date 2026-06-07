@@ -13,15 +13,16 @@ CREATE TABLE IF NOT EXISTS source (
     expirationMonth TEXT,
     expirationYear TEXT,
     branchCode TEXT,
-    branchName TEXT
+    branchName TEXT,
+    position INTEGER NOT NULL DEFAULT 0
 );
 
 addSource:
-INSERT INTO source(name, balance, cardNumber, description, type, colorId, iconId, shabaNumber, accountNumber, cvv2, expirationMonth, expirationYear, branchCode, branchName)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO source(name, balance, cardNumber, description, type, colorId, iconId, shabaNumber, accountNumber, cvv2, expirationMonth, expirationYear, branchCode, branchName, position)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 observeSources:
-SELECT * FROM source;
+SELECT * FROM source ORDER BY position ASC;
 
 observeSourceById:
 SELECT * FROM source WHERE id = ?;
@@ -36,8 +37,11 @@ DELETE FROM source WHERE id = ?;
 
 updateSource:
 UPDATE source
-SET name = ?, balance = ?, cardNumber = ?, description = ?, type = ?, colorId = ?, iconId = ?, shabaNumber = ?, accountNumber = ?, cvv2 = ?, expirationMonth = ?, expirationYear = ?, branchCode = ?, branchName = ?
+SET name = ?, balance = ?, cardNumber = ?, description = ?, type = ?, colorId = ?, iconId = ?, shabaNumber = ?, accountNumber = ?, cvv2 = ?, expirationMonth = ?, expirationYear = ?, branchCode = ?, branchName = ?, position = ?
 WHERE id = ?;
+
+updateSourcePosition:
+UPDATE source SET position = ? WHERE id = ?;
 
 getDefaultSource:
 SELECT * FROM source ORDER BY id LIMIT 1;
@@ -49,8 +53,8 @@ getSourceById:
 SELECT * FROM source WHERE id = ?;
 
 insertFullSource:
-INSERT OR REPLACE INTO source(id, name, balance, cardNumber, description, type, colorId, iconId, shabaNumber, accountNumber, cvv2, expirationMonth, expirationYear, branchCode, branchName)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO source(id, name, balance, cardNumber, description, type, colorId, iconId, shabaNumber, accountNumber, cvv2, expirationMonth, expirationYear, branchCode, branchName, position)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getMostUsedSources:
 SELECT * FROM source

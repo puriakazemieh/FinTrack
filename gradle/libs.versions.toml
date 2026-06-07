@@ -11,6 +11,7 @@ composeHotReload = "1.0.0"
 material3 = "1.10.0-alpha05"
 compose-multiplatform = "1.10.0"
 androidx-lifecycle = "2.9.6"
+reorderable = "3.1.0"
 
 # --- AndroidX (Stable channel) ---
 coreKtx = "1.17.0" # :contentReference[oaicite:13]{index=13}
@@ -189,6 +190,7 @@ compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-mu
 compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-multiplatform" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-multiplatform" }
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
