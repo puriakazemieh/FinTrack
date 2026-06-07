@@ -206,36 +206,35 @@ private fun EntityRow(
                 corner = 12.dp
             )
 
-            Column(modifier = Modifier.weight(1f)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    FintrackTitleSmallText(
-                        text = item.name,
-                        fontWeight = FontWeight.SemiBold,
-                        color = GlassText
-                    )
-                    item.badge?.let {
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(6.dp))
-                                .background(color.copy(alpha = 0.12f))
-                                .padding(horizontal = 7.dp, vertical = 2.dp)
-                        ) {
-                            FintrackLabelSmallText(
-                                text = it,
-                                fontWeight = FontWeight.Bold,
-                                color = color
-                            )
-                        }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                FintrackTitleSmallText(
+                    text = item.name,
+                    fontWeight = FontWeight.SemiBold,
+                    color = GlassText,
+                    maxLines = 1
+                )
+                item.badge?.let {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(color.copy(alpha = 0.12f))
+                            .padding(horizontal = 7.dp, vertical = 2.dp)
+                    ) {
+                        FintrackLabelSmallText(
+                            text = it,
+                            fontWeight = FontWeight.Bold,
+                            color = color
+                        )
                     }
                 }
                 item.sub?.let {
                     FintrackBodySmallText(
                         text = it,
                         color = GlassText3,
-                        modifier = Modifier.padding(top = 2.dp)
+                        maxLines = 1
                     )
                 }
             }

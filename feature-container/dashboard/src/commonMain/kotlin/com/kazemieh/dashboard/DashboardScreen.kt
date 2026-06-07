@@ -67,7 +67,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun DashboardScreen(
     viewModel: DashboardViewModel = koinViewModel(),
     snackbarHostState: SnackbarHostState,
-    onNavigateToTransactions: (Boolean) -> Unit = {}
+    onNavigateToTransactions: (Any?) -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
@@ -190,6 +190,10 @@ fun DashboardScreen(
                 selectedSource = state.selectedSource,
                 snackbarHostState = snackbarHostState,
                 onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddSource()) },
+                onNavigateToTransactions = { source ->
+                    onNavigateToTransactions(source)
+                    viewModel.onIntent(DashboardIntent.ShowAddSource())
+                },
                 setSource = { viewModel.onIntent(DashboardIntent.ShowAddSource()) }
             )
         }

@@ -23,19 +23,29 @@ fun NavGraphBuilder.bottomBarNavGraph(
     snackbarHostState: SnackbarHostState,
     onBackPressed: () -> Unit
 ) {
+    val navigateToTransactions: (Any?) -> Unit = { data ->
+        val route = when (data) {
+            is Category -> Screen.Transactions(categoryId = data.id)
+            is Source -> Screen.Transactions(sourceId = data.id)
+            is Tag -> Screen.Transactions(tagId = data.id)
+            is Person -> Screen.Transactions(personId = data.id)
+            is Boolean -> Screen.Transactions(resetFilters = data)
+            else -> Screen.Transactions()
+        }
+        navController.navigate(route) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                saveState = true
+            }
+            launchSingleTop = true
+        }
+    }
+
     navigation<Screen.BottomBarGraph>(startDestination = Screen.Dashboard) {
 
         composable<Screen.Dashboard> { backStackEntry ->
             DashboardScreen(
                 snackbarHostState = snackbarHostState,
-                onNavigateToTransactions = { reset ->
-                    navController.navigate(Screen.Transactions(resetFilters = reset)) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                    }
-                }
+                onNavigateToTransactions = navigateToTransactions
             )
         }
 
@@ -58,21 +68,7 @@ fun NavGraphBuilder.bottomBarNavGraph(
         composable<Screen.Profile> { backStackEntry ->
             ProfileScreen(
                 snackbarHostState = snackbarHostState,
-                onNavigateToTransactions = { data ->
-                    val route = when (data) {
-                        is Category -> Screen.Transactions(categoryId = data.id)
-                        is Source -> Screen.Transactions(sourceId = data.id)
-                        is Tag -> Screen.Transactions(tagId = data.id)
-                        is Person -> Screen.Transactions(personId = data.id)
-                        else -> Screen.Transactions()
-                    }
-                    navController.navigate(route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                    }
-                }
+                onNavigateToTransactions = navigateToTransactions
             )
         }
 
