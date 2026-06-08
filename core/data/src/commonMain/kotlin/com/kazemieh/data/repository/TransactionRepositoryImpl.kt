@@ -227,4 +227,8 @@ class TransactionRepositoryImpl(
             localDataSource.updatePersonPosition(id, position)
         }
     }
+
+    override suspend fun getTransactionAmountRange(): Pair<Long, Long> {
+        return localDataSource.getTransactionAmountRange()
+    }
 }

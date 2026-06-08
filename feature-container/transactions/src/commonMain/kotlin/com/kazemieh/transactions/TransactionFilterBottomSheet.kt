@@ -26,10 +26,12 @@ import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.GlassText
 import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.GlassText3
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.GlassRangeSlider
 import com.kazemieh.designsystem.component.glass.SheetFrame
 import com.kazemieh.designsystem.component.model.asString
 import com.kazemieh.financialsource.ui.list.SourceFilterSelectionContent
@@ -39,6 +41,7 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.all
 import fintrack.core.designsystem.generated.resources.custom_range
 import fintrack.core.designsystem.generated.resources.date
+import fintrack.core.designsystem.generated.resources.label_amount_with_unit
 import fintrack.core.designsystem.generated.resources.label_custom_range_selected
 import fintrack.core.designsystem.generated.resources.label_this_year
 import fintrack.core.designsystem.generated.resources.label_type
@@ -52,6 +55,9 @@ import fintrack.core.designsystem.generated.resources.type_income
 import fintrack.core.designsystem.generated.resources.type_transfer
 import org.jetbrains.compose.resources.stringResource
 
+import androidx.compose.material3.TextButton
+import fintrack.core.designsystem.generated.resources.btn_clear_all
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionFilterBottomSheet(
@@ -63,7 +69,15 @@ fun TransactionFilterBottomSheet(
     SheetFrame(
         title = stringResource(Res.string.report),
         sub = stringResource(Res.string.msg_filters_combined),
-        onDismiss = onDismiss
+        onDismiss = onDismiss,
+        trailingContent = {
+            TextButton(onClick = { onIntent(TransactionsIntent.ResetFilters) }) {
+                FintrackLabelMediumText(
+                    text = stringResource(Res.string.btn_clear_all),
+                    color = GlassRed
+                )
+            }
+        }
     ) {
         val scrollState = rememberScrollState()
         Column(
@@ -174,6 +188,16 @@ fun TransactionFilterBottomSheet(
                     }
                 }
             }
+
+            // Amount Range Section
+            GlassRangeSlider(
+                title = "مبلغ",
+                value = state.selectedMinAmount..state.selectedMaxAmount,
+                onValueChange = { range ->
+                    onIntent(TransactionsIntent.OnAmountRangeChanged(range.start, range.endInclusive))
+                },
+                valueRange = state.minAmountLimit..state.maxAmountLimit
+            )
 
             // Sources Section
             SourceFilterSelectionContent(

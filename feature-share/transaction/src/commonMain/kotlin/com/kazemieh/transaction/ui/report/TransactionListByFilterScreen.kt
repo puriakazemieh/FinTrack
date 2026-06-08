@@ -69,6 +69,8 @@ fun TransactionListByFilterScreen(
     selectedTransactionType: TransactionType,
     fromTimestamp: Long? = null,
     toTimestamp: Long? = null,
+    minAmount: Long? = null,
+    maxAmount: Long? = null,
     enableAnimationChart: Boolean = true,
     onDelete: (TransactionWithRelations) -> Unit = {},
     onEdit: (TransactionWithRelations) -> Unit = {},
@@ -91,7 +93,9 @@ fun TransactionListByFilterScreen(
                 isAllPersons = isAllPersons,
                 type = selectedTransactionType,
                 fromTimestamp = fromTimestamp,
-                toTimestamp = toTimestamp
+                toTimestamp = toTimestamp,
+                minAmount = minAmount,
+                maxAmount = maxAmount
             )
         )
     }

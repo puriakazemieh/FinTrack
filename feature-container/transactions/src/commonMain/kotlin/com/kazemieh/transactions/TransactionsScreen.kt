@@ -21,6 +21,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.list.CategorySelectionBottomSheet
 import com.kazemieh.common.DateFilterType
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.common.toSignedPersianPrice
+import com.kazemieh.designsystem.GlassAmber
+import com.kazemieh.designsystem.GlassBlue
+import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.GlassPurple
+import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.model.asString
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
@@ -31,7 +37,9 @@ import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.report.TransactionListByFilterScreen
 import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.label_amount_with_unit
 import fintrack.core.designsystem.generated.resources.placeholder_period_range
+import fintrack.core.designsystem.generated.resources.unit_toman_short
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -68,14 +76,33 @@ fun TransactionsScreen(
     val space = LocalSpacing.current
 
     val colors = FinTrackPickerColors.rainbow()
+    val tomanUnit = stringResource(Res.string.unit_toman_short)
 
     val activeFilters = remember(
         state.selectedCategories,
         state.selectedSources,
         state.selectedTag,
-        state.selectedPerson
+        state.selectedPerson,
+        state.selectedMinAmount,
+        state.selectedMaxAmount,
+        state.minAmountLimit,
+        state.maxAmountLimit,
+        tomanUnit
     ) {
         buildList {
+            if (state.selectedMinAmount > state.minAmountLimit || state.selectedMaxAmount < state.maxAmountLimit) {
+                val label = "${
+                    state.selectedMinAmount.toLong().toSignedPersianPrice()
+                } تا ${state.selectedMaxAmount.toLong().toSignedPersianPrice()} $tomanUnit"
+                add(
+                    FilterChipData(
+                        id = "amount_range",
+                        label = label,
+                        color = GlassGreen,
+                        type = FilterType.Amount
+                    )
+                )
+            }
             state.selectedCategories.forEach { category ->
                 add(
                     FilterChipData(
@@ -224,6 +251,15 @@ fun TransactionsScreen(
                                 )
                             )
                         }
+
+                        FilterType.Amount -> {
+                            viewModel.onIntent(
+                                TransactionsIntent.OnAmountRangeChanged(
+                                    state.minAmountLimit,
+                                    state.maxAmountLimit
+                                )
+                            )
+                        }
                     }
                 },
                 onClearAll = {
@@ -232,6 +268,12 @@ fun TransactionsScreen(
                     viewModel.onIntent(TransactionsIntent.OnSourcesSelected(emptySet(), true))
                     viewModel.onIntent(TransactionsIntent.OnTagSelected(emptySet(), true))
                     viewModel.onIntent(TransactionsIntent.OnPersonSelected(emptySet(), true))
+                    viewModel.onIntent(
+                        TransactionsIntent.OnAmountRangeChanged(
+                            state.minAmountLimit,
+                            state.maxAmountLimit
+                        )
+                    )
                 }
             )
 
@@ -247,6 +289,8 @@ fun TransactionsScreen(
                 selectedTransactionType = state.selectedTransactionType,
                 fromTimestamp = state.startDateTimeStamp,
                 toTimestamp = state.endDateTimeStamp,
+                minAmount = state.selectedMinAmount.toLong(),
+                maxAmount = state.selectedMaxAmount.toLong(),
                 enableAnimationChart = state.enableAnimationChart,
                 onEdit = { transactionWithRelations ->
                     viewModel.onIntent(

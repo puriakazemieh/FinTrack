@@ -88,4 +88,6 @@ interface TransactionRepository {
     suspend fun updateSourcePositions(positions: Map<Long, Int>)
     suspend fun updateTagPositions(positions: Map<Long, Int>)
     suspend fun updatePersonPositions(positions: Map<Long, Int>)
+
+    suspend fun getTransactionAmountRange(): Pair<Long, Long>
 }

@@ -64,6 +64,8 @@ class TransactionLocalDataSourceImpl(
             personIdsSize = if (transactionFilterParams.isAllPersons) 0 else personIds.size.toLong().coerceAtLeast(1),
             fromTimestamp = transactionFilterParams.fromTimestamp,
             toTimestamp = transactionFilterParams.toTimestamp,
+            minAmount = transactionFilterParams.minAmount,
+            maxAmount = transactionFilterParams.maxAmount,
             query = transactionFilterParams.query,
             limit = request.limit.toLong(),
             offset = request.offset.toLong()
@@ -96,6 +98,8 @@ class TransactionLocalDataSourceImpl(
             personIdsSize = if (transactionFilterParams.isAllPersons) 0 else personIds.size.toLong().coerceAtLeast(1),
             fromTimestamp = transactionFilterParams.fromTimestamp,
             toTimestamp = transactionFilterParams.toTimestamp,
+            minAmount = transactionFilterParams.minAmount,
+            maxAmount = transactionFilterParams.maxAmount,
             query = transactionFilterParams.query
         )
             .asFlow()
@@ -466,6 +470,11 @@ class TransactionLocalDataSourceImpl(
 
     override suspend fun updatePersonPosition(id: Long, position: Int) {
         personQueries.updatePersonPosition(position.toLong(), id)
+    }
+
+    override suspend fun getTransactionAmountRange(): Pair<Long, Long> = withContext(Dispatchers.Default) {
+        val row = transactionQueries.getTransactionAmountRange().awaitAsOne()
+        Pair(row.MIN ?: 0L, row.MAX ?: 1_000_000L)
     }
 
     override suspend fun addTransactionWithBalance(

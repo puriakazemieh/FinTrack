@@ -112,92 +112,88 @@ fun EntityList(
                 }
             )
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                state = lazyListState,
-                contentPadding = PaddingValues(bottom = 100.dp)
-            ) {
-                item {
-                    SummaryHeader(summary)
-                }
-                item {
-                    SearchHeader(query, onQueryChange, title)
-                }
-                items(internalItems, key = { it.id }) { item ->
-                    ReorderableItem(state, key = item.id) { isDragging ->
-                        val elevation by animateDpAsState(if (isDragging) 8.dp else 0.dp)
-                        EntityRow(
-                            item = item,
-                            mainColor = color,
-                            showActions = false,
-                            onEdit = {},
-                            onDelete = {},
-                            onClick = {},
-                            isReorderMode = true,
-                            onMoveUp = {
-                                val idx = internalItems.indexOf(item)
-                                if (idx > 0) {
-                                    internalItems = internalItems.toMutableList().apply {
-                                        add(idx - 1, removeAt(idx))
+            Column(modifier = Modifier.fillMaxSize()) {
+                SummaryHeader(summary)
+                SearchHeader(query, onQueryChange, title)
+
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    state = lazyListState,
+                    contentPadding = PaddingValues(bottom = 100.dp)
+                ) {
+                    items(internalItems, key = { it.id }) { item ->
+                        ReorderableItem(state, key = item.id) { isDragging ->
+                            val elevation by animateDpAsState(if (isDragging) 8.dp else 0.dp)
+                            EntityRow(
+                                item = item,
+                                mainColor = color,
+                                showActions = false,
+                                onEdit = {},
+                                onDelete = {},
+                                onClick = {},
+                                isReorderMode = true,
+                                onMoveUp = {
+                                    val idx = internalItems.indexOf(item)
+                                    if (idx > 0) {
+                                        internalItems = internalItems.toMutableList().apply {
+                                            add(idx - 1, removeAt(idx))
+                                        }
+                                        onMove(idx, idx - 1)
                                     }
-                                    onMove(idx, idx - 1)
-                                }
-                            },
-                            onMoveDown = {
-                                val idx = internalItems.indexOf(item)
-                                if (idx < internalItems.size - 1) {
-                                    internalItems = internalItems.toMutableList().apply {
-                                        add(idx + 1, removeAt(idx))
+                                },
+                                onMoveDown = {
+                                    val idx = internalItems.indexOf(item)
+                                    if (idx < internalItems.size - 1) {
+                                        internalItems = internalItems.toMutableList().apply {
+                                            add(idx + 1, removeAt(idx))
+                                        }
+                                        onMove(idx, idx + 1)
                                     }
-                                    onMove(idx, idx + 1)
-                                }
-                            },
-                            modifier = Modifier
-                                .padding(horizontal = 14.dp, vertical = 4.dp)
-                                .shadow(elevation)
-                                .draggableHandle()
-                        )
+                                },
+                                modifier = Modifier
+                                    .padding(horizontal = 14.dp, vertical = 4.dp)
+                                    .shadow(elevation)
+                                    .draggableHandle()
+                            )
+                        }
                     }
                 }
             }
         } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 100.dp)
-            ) {
-                item {
-                    SummaryHeader(summary)
-                }
+            Column(modifier = Modifier.fillMaxSize()) {
+                SummaryHeader(summary)
+                SearchHeader(query, onQueryChange, title)
 
-                item {
-                    SearchHeader(query, onQueryChange, title)
-                }
-
-                if (items.isEmpty()) {
-                    item {
-                        Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp)) {
-                            EmptyListScreen(emptyHint ?: stringResource(Res.string.msg_empty_list))
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(bottom = 100.dp)
+                ) {
+                    if (items.isEmpty()) {
+                        item {
+                            Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp)) {
+                                EmptyListScreen(emptyHint ?: stringResource(Res.string.msg_empty_list))
+                            }
                         }
-                    }
-                } else {
-                    items(items) {
-                        AnimatedVisibility(
-                            visible = true,
-                            enter = fadeIn(tween(200)),
-                            exit = fadeOut(tween(200))
-                        ) {
-                            EntityRow(
-                                item = it,
-                                mainColor = color,
-                                showActions = showActions,
-                                onEdit = { onEditClick(it) },
-                                onDelete = { onDeleteClick(it) },
-                                onFilter = onFilterClick?.let { callback -> { callback(it) } },
-                                onClick = { onItemClick(it) },
-                                onExpand = onExpandClick?.let { callback -> { callback(it) } },
-                                isSubCategory = indentSubCategories && it.parentId != null,
-                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp)
-                            )
+                    } else {
+                        items(items) {
+                            AnimatedVisibility(
+                                visible = true,
+                                enter = fadeIn(tween(200)),
+                                exit = fadeOut(tween(200))
+                            ) {
+                                EntityRow(
+                                    item = it,
+                                    mainColor = color,
+                                    showActions = showActions,
+                                    onEdit = { onEditClick(it) },
+                                    onDelete = { onDeleteClick(it) },
+                                    onFilter = onFilterClick?.let { callback -> { callback(it) } },
+                                    onClick = { onItemClick(it) },
+                                    onExpand = onExpandClick?.let { callback -> { callback(it) } },
+                                    isSubCategory = indentSubCategories && it.parentId != null,
+                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp)
+                                )
+                            }
                         }
                     }
                 }

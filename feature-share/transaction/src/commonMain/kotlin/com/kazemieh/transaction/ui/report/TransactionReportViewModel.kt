@@ -62,7 +62,9 @@ class TransactionReportViewModel(
                 fromTimestamp = s.filterParams.fromTimestamp,
                 toTimestamp = s.filterParams.toTimestamp?.let { 
                     it + 24 * 60 * 60 * 1000L
-                }
+                },
+                minAmount = s.filterParams.minAmount,
+                maxAmount = s.filterParams.maxAmount
             )
         }
         .distinctUntilChanged()
@@ -141,7 +143,9 @@ class TransactionReportViewModel(
                             isAllPersons = intent.isAllPersons,
                             type = intent.type.count,
                             fromTimestamp = intent.fromTimestamp,
-                            toTimestamp = intent.toTimestamp
+                            toTimestamp = intent.toTimestamp,
+                            minAmount = intent.minAmount,
+                            maxAmount = intent.maxAmount
                         )
                     )
                 }
@@ -320,6 +324,8 @@ sealed interface TransactionReportIntent {
         val type: TransactionType,
         val fromTimestamp: Long?,
         val toTimestamp: Long?,
+        val minAmount: Long? = null,
+        val maxAmount: Long? = null
     ) : TransactionReportIntent
 
     data object LoadNextPage : TransactionReportIntent
@@ -338,7 +344,9 @@ data class TransactionFilterParamsState(
     val persons: Set<Person> = emptySet(),
     val isAllPersons: Boolean = true,
     val fromTimestamp: Long? = null,
-    val toTimestamp: Long? = null
+    val toTimestamp: Long? = null,
+    val minAmount: Long? = null,
+    val maxAmount: Long? = null
 )
 
 data class TransactionReportState(

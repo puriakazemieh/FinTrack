@@ -34,6 +34,7 @@ fun SheetFrame(
     secondaryButtonText: String? = null,
     onSecondaryClick: (() -> Unit)? = null,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    trailingContent: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
 ) {
     ModalBottomSheet(
@@ -51,7 +52,8 @@ fun SheetFrame(
             ScreenHeader(
                 title = title,
                 sub = sub,
-                onClose = onDismiss
+                onClose = onDismiss,
+                trailingContent = trailingContent
             )
 
             // Scrollable Content

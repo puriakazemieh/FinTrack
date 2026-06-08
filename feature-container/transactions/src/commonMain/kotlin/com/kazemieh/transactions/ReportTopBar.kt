@@ -332,7 +332,7 @@ data class FilterChipData(
     val type: FilterType
 )
 
-enum class FilterType { Category, Source, Tag, Person }
+enum class FilterType { Category, Source, Tag, Person, Amount }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

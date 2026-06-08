@@ -48,8 +48,8 @@ fun BalanceHero(
     val space = LocalSpacing.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val color = when {
-        state.balance < 0.toString() -> GlassGreen
-        state.balance > 0.toString() -> GlassRed
+        state.balance < 0.toString() -> GlassRed
+        state.balance > 0.toString() -> GlassGreen
         else -> GlassGreen
     }
     LaunchedEffect(Unit) {

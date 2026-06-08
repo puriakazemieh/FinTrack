@@ -13,5 +13,7 @@ data class TransactionFilterParams(
     val persons: Set<Person> = emptySet(),
     val isAllPersons: Boolean = true,
     val fromTimestamp: Long? = null,
-    val toTimestamp: Long? = null
+    val toTimestamp: Long? = null,
+    val minAmount: Long? = null,
+    val maxAmount: Long? = null
 )

@@ -57,6 +57,21 @@ class TransactionsViewModel(
 
     init {
         onIntent(TransactionsIntent.OnDateRange(DateFilterType.THIS_MONTH))
+        loadAmountRange()
+    }
+
+    private fun loadAmountRange() {
+        viewModelScope.launch {
+            val range = transactionUseCaseGroup.getTransactionAmountRangeUseCase()
+            _state.update {
+                it.copy(
+                    minAmountLimit = range.first.toFloat(),
+                    maxAmountLimit = range.second.toFloat(),
+                    selectedMinAmount = range.first.toFloat(),
+                    selectedMaxAmount = range.second.toFloat()
+                )
+            }
+        }
     }
 
     fun onIntent(intent: TransactionsIntent) {
@@ -81,6 +96,14 @@ class TransactionsViewModel(
                     selectedCategories = emptySet(),
                     isAllCategorySelected = true,
                     enableAnimationChart = !_state.value.enableAnimationChart
+                )
+            }
+
+            is TransactionsIntent.OnAmountRangeChanged -> _state.update {
+                it.copy(
+                    selectedMinAmount = intent.min,
+                    selectedMaxAmount = intent.max,
+                    enableAnimationChart = !it.enableAnimationChart
                 )
             }
 
@@ -427,6 +450,11 @@ data class TransactionsState(
     val isError: Boolean = false,
     val enableAnimationChart: Boolean = true,
 
+    val minAmountLimit: Float = 0f,
+    val maxAmountLimit: Float = 1_000_000f,
+    val selectedMinAmount: Float = 0f,
+    val selectedMaxAmount: Float = 1_000_000f,
+
     val isSearchActive: Boolean = false,
     val isFilterActive: Boolean = false,
     val isFilterSheetVisible: Boolean = false,
@@ -476,6 +504,7 @@ sealed interface TransactionsIntent {
     data object OnNextClick : TransactionsIntent
     data object OnToggleSearch : TransactionsIntent
     data object OnToggleFilterSheet : TransactionsIntent
+    data class OnAmountRangeChanged(val min: Float, val max: Float) : TransactionsIntent
     data object ResetFilters : TransactionsIntent
     data class ApplyFilter(
         val categoryId: Long? = null,

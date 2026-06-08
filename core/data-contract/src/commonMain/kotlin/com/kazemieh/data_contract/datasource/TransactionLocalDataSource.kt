@@ -81,4 +81,6 @@ interface TransactionLocalDataSource {
     suspend fun updateSourcePosition(id: Long, position: Int)
     suspend fun updateTagPosition(id: Long, position: Int)
     suspend fun updatePersonPosition(id: Long, position: Int)
+
+    suspend fun getTransactionAmountRange(): Pair<Long, Long>
 }
