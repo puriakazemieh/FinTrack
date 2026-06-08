@@ -47,6 +47,7 @@ kotlin {
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.kermit)
+                implementation(libs.koin.core)
             }
         }
 

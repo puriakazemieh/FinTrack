@@ -10,6 +10,7 @@ import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toPersianDigits
+import com.kazemieh.common.ImageStorage
 import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
@@ -32,6 +33,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalCoroutinesApi::class)
 class AddTransactionViewModel(
     private val transactionUseCaseGroup: TransactionUseCaseGroup,
+    private val imageStorage: ImageStorage,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddTransactionState())
@@ -128,6 +130,7 @@ class AddTransactionViewModel(
             }
 
             is AddTransactionIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
+            is AddTransactionIntent.SetPhoto -> _state.update { it.copy(photoBytes = intent.bytes) }
             AddTransactionIntent.Submit -> {
                 if (validateAndUpdateErrors()) {
                     submitTransaction()
@@ -157,6 +160,7 @@ class AddTransactionViewModel(
         val transaction = _state.value.oldTransaction ?: return
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
+            transaction.photoPath?.let { imageStorage.deleteImage(it) }
             transactionUseCaseGroup.deleteTransactionUseCase(transaction)
             _state.update { it.copy(isLoading = false) }
             _effect.send(AddTransactionEffect.AddedTransaction)
@@ -200,32 +204,60 @@ class AddTransactionViewModel(
                 source = transactionWithRelations.source,
                 sourceEnd = transactionWithRelations.sourceEnd,
                 tags = transactionWithRelations.tags.toSet(),
-                persons = transactionWithRelations.persons.toSet()
+                persons = transactionWithRelations.persons.toSet(),
+                photoBytes = null // We will load it below
             )
         }
         _typeFlow.value = transactionWithRelations.transaction.type
+
+        transactionWithRelations.transaction.photoPath?.let { path ->
+            viewModelScope.launch {
+                val bytes = imageStorage.loadImage(path)
+                _state.update { it.copy(photoBytes = bytes) }
+            }
+        }
     }
 
     private fun submitTransaction() {
         val current = _state.value
-        val transaction = Transaction(
-            id = current.oldTransaction?.id ?: 0,
-            amount = current.amount.toIntOrNull() ?: 0,
-            amountTransfer = current.amountTransfer?.toIntOrNull() ?: 0,
-            categoryId = current.category?.id ?: 0,
-            sourceId = current.source?.id ?: 0,
-            sourceEndId = current.sourceEnd?.id,
-            description = current.description,
-            timeStamp = current.timeStamp,
-            type = current.transactionType,
-            date = current.date ?: ""
-        )
-
-        val tagIds = current.tags?.mapNotNull { it.id } ?: emptyList()
-        val personIds = current.persons?.mapNotNull { it.id } ?: emptyList()
 
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
+
+            val photoPath = current.photoBytes?.let { bytes ->
+                // Simplified: always save if present. 
+                // In a real app, you'd check if it changed.
+                val path = imageStorage.saveImage(bytes)
+                // Delete old photo if it exists and we are saving a new one
+                current.oldTransaction?.photoPath?.let { oldPath ->
+                    imageStorage.deleteImage(oldPath)
+                }
+                path
+            } ?: run {
+                // If photoBytes is null, and we had an old photo, it means it was removed
+                current.oldTransaction?.photoPath?.let { oldPath ->
+                    imageStorage.deleteImage(oldPath)
+                }
+                null
+            }
+
+            val transaction = Transaction(
+                id = current.oldTransaction?.id ?: 0,
+                amount = current.amount.toIntOrNull() ?: 0,
+                amountTransfer = current.amountTransfer?.toIntOrNull() ?: 0,
+                categoryId = current.category?.id ?: 0,
+                sourceId = current.source?.id ?: 0,
+                sourceEndId = current.sourceEnd?.id,
+                description = current.description,
+                photoPath = photoPath,
+                timeStamp = current.timeStamp,
+                type = current.transactionType,
+                date = current.date ?: ""
+            )
+
+            val tagIds = current.tags?.mapNotNull { it.id } ?: emptyList()
+            val personIds = current.persons?.mapNotNull { it.id } ?: emptyList()
+
             val id = if (current.oldTransaction == null) {
                 transactionUseCaseGroup.addTransactionUseCase(transaction, tagIds, personIds)
             } else {
@@ -305,6 +337,7 @@ data class AddTransactionState(
     val sourceEnd: Source? = null,
     val tags: Set<Tag>? = emptySet(),
     val persons: Set<Person>? = emptySet(),
+    val photoBytes: ByteArray? = null,
     val isAmountError: Boolean = false,
     val isCategoryError: Boolean = false,
     val isSourceError: Boolean = false,
@@ -332,6 +365,7 @@ sealed interface AddTransactionIntent {
     data class SetPerson(val persons: Set<Person>?) : AddTransactionIntent
     data class SetDate(val date: String, val timeStamp: Long) : AddTransactionIntent
     data class SetDescription(val description: String) : AddTransactionIntent
+    data class SetPhoto(val bytes: ByteArray?) : AddTransactionIntent
     data object Submit : AddTransactionIntent
     data class FetchDefaultData(val transactionWithRelations: TransactionWithRelations?) :
         AddTransactionIntent

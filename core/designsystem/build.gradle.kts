@@ -53,6 +53,7 @@ kotlin {
 //                implementation(libs.jalali.datepicker.compose)
 //                implementation(libs.jalalicalendar)
                 implementation(project(":core:common"))
+                implementation(project(":core:storage"))
                 implementation(project(":core:jalali"))
                 implementation(project(":core:money"))
                 implementation(libs.compose.runtime)
@@ -65,16 +66,20 @@ kotlin {
                 implementation(libs.compose.uiToolingPreview)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
                 implementation(libs.kotlinx.serialization)
+                implementation(libs.koin.compose)
 
 
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.reorderable)
+                implementation(libs.image.loader)
             }
         }
 
 
         androidMain {
             dependencies {
+                implementation(libs.androidx.activity.compose)
+                implementation(libs.androidx.core)
             }
         }
 

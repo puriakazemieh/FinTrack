@@ -13,6 +13,7 @@ data class Transaction(
     val sourceId: Long,
     val sourceEndId: Long? = null,
     val description: String? = null,
+    val photoPath: String? = null,
     val timeStamp: Long = Clock.System.now().toEpochMilliseconds(),
     val date: String = "",
     val type: TransactionType

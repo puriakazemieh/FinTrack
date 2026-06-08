@@ -1,6 +1,7 @@
 package com.kazemieh.designsystem.component
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,18 +11,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.automirrored.filled.Forward
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,13 +32,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toPersianPrice
+import com.kazemieh.common.ImageStorage
 import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassBlueSoft
 import com.kazemieh.designsystem.GlassColor
@@ -54,8 +59,10 @@ import fintrack.core.designsystem.generated.resources.label_to
 import fintrack.core.designsystem.generated.resources.title_edit_transaction
 import fintrack.core.designsystem.generated.resources.unit_toman_short
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.decodeToImageBitmap
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import kotlin.math.abs
 
 @Composable
@@ -326,6 +333,28 @@ private fun ExpandedContent(
         item.transaction.description?.let {
             if (it.isNotEmpty()) {
                 FintrackLabelSmallText(text = it, color = GlassText3)
+            }
+        }
+
+        item.transaction.photoPath?.let { path ->
+            var bitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+            val imageStorage = koinInject<ImageStorage>()
+            LaunchedEffect(path) {
+                imageStorage.loadImage(path)?.let {
+                    bitmap = it.decodeToImageBitmap()
+                }
+            }
+            bitmap?.let {
+                Image(
+                    bitmap = it,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .padding(vertical = 8.dp)
+                        .clip(MaterialTheme.shapes.small),
+                    contentScale = ContentScale.Crop
+                )
             }
         }
 

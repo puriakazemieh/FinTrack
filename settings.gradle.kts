@@ -42,6 +42,7 @@ rootProject.name = "FinTrack"
 include(":app")
 include(":composeApp")
 include(":core:common")
+include(":core:storage")
 include(":core:data")
 include(":core:data-contract")
 include(":core:database")

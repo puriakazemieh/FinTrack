@@ -1,7 +1,10 @@
 [versions]
 # --- Tooling ---
 agp = "9.0.0-rc03"
+coreVersion = "0.12.0"
 kotlin = "2.3.0" # :contentReference[oaicite:10]{index=10}
+kotlinBrowser = "2026.6.3"
+kotlinxBrowser = "0.5.0"
 kotlinxDatetime = "0.7.1"
 ksp = "2.3.2" # :contentReference[oaicite:11]{index=11}
 
@@ -75,10 +78,13 @@ kotlinx-serialization = "1.9.0"
 [libraries]
 # --- Build logic compileOnly ---
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
+indexeddb-core = { module = "com.juul.indexeddb:core", version.ref = "coreVersion" }
+kotlin-browser = { module = "org.jetbrains.kotlin-wrappers:kotlin-browser", version.ref = "kotlinBrowser" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 android-gradleApi = { group = "com.android.tools.build", name = "gradle-api", version.ref = "agp" }
 
 # --- Libs ---
+kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinxBrowser" }
 russhwolf-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatformSettingsVersion" }
 russhwolf-settings-noarg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatformSettingsVersion" }
 russhwolf-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatformSettingsVersion" }

@@ -49,6 +49,7 @@ kotlin {
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.kotlinx.datetime)
                 implementation(project(":core:common"))
+                implementation(project(":core:storage"))
                 implementation(project(":core:domain"))
                 implementation(project(":core:jalali"))
 

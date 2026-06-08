@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     sourceId INTEGER NOT NULL,
     sourceEndId INTEGER,
     description TEXT,
+    photoPath TEXT,
     timeStamp INTEGER NOT NULL,
     type INTEGER NOT NULL,
     FOREIGN KEY (categoryId) REFERENCES category(id) ON DELETE CASCADE,
@@ -19,12 +20,12 @@ CREATE INDEX IF NOT EXISTS  idx_transaction_sourceEnd ON transactions(sourceEndI
 CREATE INDEX IF NOT EXISTS  idx_transaction_timestamp ON transactions(timeStamp);
 
 insertTransaction:
-INSERT INTO transactions(amount, amountTransfer, categoryId, sourceId, sourceEndId, description, timeStamp, type)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO transactions(amount, amountTransfer, categoryId, sourceId, sourceEndId, description, photoPath, timeStamp, type)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateTransaction:
 UPDATE transactions
-SET amount = ?, amountTransfer = ?, categoryId = ?, sourceId = ?, sourceEndId = ?, description = ?, timeStamp = ?, type = ?
+SET amount = ?, amountTransfer = ?, categoryId = ?, sourceId = ?, sourceEndId = ?, description = ?, photoPath = ?, timeStamp = ?, type = ?
 WHERE id = ?;
 
 deleteTransaction:
@@ -51,6 +52,7 @@ SELECT
     t.sourceId,
     t.sourceEndId,
     t.description,
+    t.photoPath,
     t.timeStamp,
     t.type,
     c.id AS category_id,
@@ -156,5 +158,5 @@ getTransactionById:
 SELECT * FROM transactions WHERE id = ?;
 
 insertFullTransaction:
-INSERT OR REPLACE INTO transactions(id, amount, amountTransfer, categoryId, sourceId, sourceEndId, description, timeStamp, type)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO transactions(id, amount, amountTransfer, categoryId, sourceId, sourceEndId, description, photoPath, timeStamp, type)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);

@@ -443,6 +443,7 @@ class TransactionLocalDataSourceImpl(
                 sourceId = transaction.sourceId,
                 sourceEndId = transaction.sourceEndId,
                 description = transaction.description,
+                photoPath = transaction.photoPath,
                 timeStamp = transaction.timeStamp,
                 type = transaction.type.count.toLong()
             )
@@ -481,6 +482,7 @@ class TransactionLocalDataSourceImpl(
                 sourceId = transaction.sourceId,
                 sourceEndId = transaction.sourceEndId,
                 description = transaction.description,
+                photoPath = transaction.photoPath,
                 timeStamp = transaction.timeStamp,
                 type = transaction.type.count.toLong(),
                 id = transaction.id

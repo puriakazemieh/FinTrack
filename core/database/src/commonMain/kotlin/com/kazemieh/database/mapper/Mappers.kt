@@ -67,6 +67,7 @@ fun GetAllTransactionsFiltered.toTransactionWithRelations(): TransactionWithRela
             sourceId = sourceId,
             sourceEndId = sourceEndId,
             description = description,
+            photoPath = photoPath,
             timeStamp = timeStamp,
             date = PersianDateTime.parse(timeStamp).let { "${it.day} ${it.persianMonth().displayName} ${it.year}" }.toPersianDigits(),
             type = TransactionType.fromInt(type.toInt())
@@ -185,6 +186,7 @@ fun TransactionDb.toTransaction() = Transaction(
     sourceId = sourceId,
     sourceEndId = sourceEndId,
     description = description,
+    photoPath = photoPath,
     timeStamp = timeStamp,
     date = PersianDateTime.parse(timeStamp).let { "${it.day} ${it.persianMonth().displayName} ${it.year}" }.toPersianDigits(),
     type = TransactionType.fromInt(type.toInt())

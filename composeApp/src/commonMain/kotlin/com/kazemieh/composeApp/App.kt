@@ -9,6 +9,8 @@ import androidx.compose.runtime.setValue
 import com.kazemieh.category.di.transactionAddCategoryModule
 import com.kazemieh.category.di.transactionCategoryModule
 import com.kazemieh.category.di.transactionDeleteCategoryModule
+import com.kazemieh.common.di.commonModule
+import com.kazemieh.storage.storageModule
 import com.kazemieh.dashboard.di.dashboardModule
 import com.kazemieh.data.di.dataModule
 import com.kazemieh.database.DatabaseInitializer
@@ -54,6 +56,8 @@ fun App() {
 
 fun initKoin(config: KoinAppDeclaration? = null) {
     val appModule = listOf(
+        commonModule,
+        storageModule,
         dataModule,
         domainModule,
         databaseModule,

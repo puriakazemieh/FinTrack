@@ -79,6 +79,7 @@ import com.kazemieh.designsystem.component.glass.AddFrame
 import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.Field
 import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.PhotoDrop
 import com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet
 import com.kazemieh.designsystem.component.calculator.CalculatorBottomSheet
 import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
@@ -124,6 +125,7 @@ import fintrack.core.designsystem.generated.resources.title_transaction_manageme
 import fintrack.core.designsystem.generated.resources.transaction
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.decodeToImageBitmap
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -654,7 +656,14 @@ fun AddTransactionContent(
         }
 
         item {
-            PhotoDropUI()
+            val photoBitmap = remember(state.photoBytes) {
+                state.photoBytes?.decodeToImageBitmap()
+            }
+            PhotoDrop(
+                photoBitmap = photoBitmap,
+                onImagePicked = { onIntent(AddTransactionIntent.SetPhoto(it)) },
+                onRemove = { onIntent(AddTransactionIntent.SetPhoto(null)) }
+            )
         }
     }
 }
@@ -701,63 +710,6 @@ private fun PickerValue(
                     modifier = Modifier.size(13.dp)
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun PhotoDropUI() {
-    GlassCard(padding = 14.dp) {
-        Column {
-            ComposeRow(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                FintrackLabelSmallText(
-                    text = stringResource(Res.string.label_attachment_fa),
-                    color = GlassText3
-                )
-                FintrackLabelSmallText(
-                    text = stringResource(Res.string.label_optional_fa),
-                    color = GlassText3,
-                    fontSize = 9.sp
-                )
-            }
-            ComposeRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                PhotoActionCard(
-                    icon = Icons.Default.CameraAlt,
-                    label = stringResource(Res.string.label_camera_fa)
-                )
-                PhotoActionCard(
-                    icon = Icons.Default.Image,
-                    label = stringResource(Res.string.label_gallery_fa)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun PhotoActionCard(icon: ImageVector, label: String) {
-    Box(
-        modifier = Modifier
-            .size(64.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(GlassColor)
-            .border(1.5.dp, GlassEdgeStrong, RoundedCornerShape(12.dp)),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = GlassText3,
-                modifier = Modifier.size(18.dp)
-            )
-            FintrackLabelSmallText(text = label, color = GlassText3)
         }
     }
 }
