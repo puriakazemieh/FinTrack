@@ -38,7 +38,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun TransactionsScreen(
     snackbarHostState: SnackbarHostState,
-    resetFilters: Boolean = false,
+    resetFilters: Boolean = true,
     categoryId: Long? = null,
     sourceId: Long? = null,
     tagId: Long? = null,

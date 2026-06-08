@@ -105,7 +105,7 @@ fun DashboardScreen(
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 110.dp) // Space for NavigationBar
+            contentPadding = PaddingValues(bottom = 100.dp) // Space for NavigationBar
         ) {
             item {
                 DashboardHeader(
@@ -190,8 +190,8 @@ fun DashboardScreen(
                 snackbarHostState = snackbarHostState,
                 onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddSource()) },
                 onNavigateToTransactions = { source ->
-                    onNavigateToTransactions(source)
                     viewModel.onIntent(DashboardIntent.ShowAddSource())
+                    onNavigateToTransactions(source)
                 },
                 setSource = { viewModel.onIntent(DashboardIntent.ShowAddSource()) }
             )

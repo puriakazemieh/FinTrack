@@ -41,16 +41,23 @@ fun FintrackNavigationBar(
     onFabClick: () -> Unit = {}
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
 
-    val selectedDestination by remember(currentDestination) {
+    val selectedDestination by remember(navBackStackEntry) {
         derivedStateOf {
-            val route = currentDestination?.route.toString()
+            val currentRoute = navBackStackEntry?.destination?.route.toString()
+            val isSearchOpen = currentRoute.contains("Search", ignoreCase = true)
+
+            val routeToAnalyze = if (isSearchOpen) {
+                navController.previousBackStackEntry?.destination?.route.toString()
+            } else {
+                currentRoute
+            }
+
             when {
-                route.contains("Dashboard") -> Destinations.DASHBOARD
-                route.contains("Transactions") -> Destinations.TRANSACTIONS
-                route.contains("Tools") -> Destinations.TOOLS
-                route.contains("Profile") -> Destinations.PROFILE
+                routeToAnalyze.contains("Dashboard", ignoreCase = true) -> Destinations.DASHBOARD
+                routeToAnalyze.contains("Transactions", ignoreCase = true) -> Destinations.TRANSACTIONS
+                routeToAnalyze.contains("Tools", ignoreCase = true) -> Destinations.TOOLS
+                routeToAnalyze.contains("Profile", ignoreCase = true) -> Destinations.PROFILE
                 else -> Destinations.DASHBOARD
             }
         }
@@ -109,7 +116,13 @@ fun FintrackNavigationBar(
                         .fillMaxHeight()
                         .clip(CircleShape)
                         .clickable {
+                            val currentRoute = navController.currentBackStackEntry?.destination?.route.toString()
+                            val isSearchOpen = currentRoute.contains("Search", ignoreCase = true)
+
                             if (!isSelected) {
+                                if (isSearchOpen) {
+                                    navController.popBackStack()
+                                }
                                 navController.navigate(destination.route) {
                                     popUpTo(navController.graph.findStartDestination().id) {
                                         saveState = true
@@ -117,6 +130,9 @@ fun FintrackNavigationBar(
                                     launchSingleTop = true
                                     restoreState = true
                                 }
+                            } else if (isSearchOpen) {
+                                // If the same tab is clicked while Search is open, close Search
+                                navController.popBackStack()
                             }
                         },
                     contentAlignment = Alignment.Center

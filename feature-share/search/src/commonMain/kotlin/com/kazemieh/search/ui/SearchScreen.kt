@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.CircularProgressIndicator
@@ -88,7 +88,7 @@ fun SearchScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = null)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                 }
                 SearchBar(
                     query = state.query,
@@ -107,8 +107,10 @@ fun SearchScreen(
             if (state.query.isEmpty()) {
                 SearchEmptyState(
                     recentSearches = state.recentSearches,
+                    quickFilters = state.quickFilters,
                     onRecentClick = { viewModel.onIntent(SearchIntent.SelectRecentSearch(it)) },
-                    onDeleteRecent = { viewModel.onIntent(SearchIntent.DeleteRecentSearch(it)) }
+                    onDeleteRecent = { viewModel.onIntent(SearchIntent.DeleteRecentSearch(it)) },
+                    onQuickFilterClick = { viewModel.onIntent(SearchIntent.SelectQuickFilter(it)) }
                 )
             } else {
                 SearchResultList(
@@ -156,8 +158,10 @@ fun SearchScreen(
 @Composable
 private fun SearchEmptyState(
     recentSearches: List<String>,
+    quickFilters: List<QuickFilter>,
     onRecentClick: (String) -> Unit,
-    onDeleteRecent: (String) -> Unit
+    onDeleteRecent: (String) -> Unit,
+    onQuickFilterClick: (QuickFilter) -> Unit
 ) {
     val space = LocalSpacing.current
     Column(modifier = Modifier.fillMaxSize().padding(space.large)) {
@@ -202,10 +206,17 @@ private fun SearchEmptyState(
             horizontalArrangement = Arrangement.spacedBy(space.small),
             verticalArrangement = Arrangement.spacedBy(space.small)
         ) {
-            Chip(onClick = { /* TODO */ }) { FintrackLabelMediumText(text = "درآمدها") }
-            Chip(onClick = { /* TODO */ }) { FintrackLabelMediumText(text = "هزینه‌ها") }
-            Chip(onClick = { /* TODO */ }) { FintrackLabelMediumText(text = "انتقال‌ها") }
-            Chip(onClick = { /* TODO */ }) { FintrackLabelMediumText(text = "تراکنش‌های اخیر") }
+            quickFilters.forEach { filter ->
+                val label = when (filter) {
+                    QuickFilter.INCOME -> "درآمدها"
+                    QuickFilter.EXPENSE -> "هزینه‌ها"
+                    QuickFilter.TRANSFER -> "انتقال‌ها"
+                    QuickFilter.RECENT_TRANSACTIONS -> "تراکنش‌های اخیر"
+                }
+                Chip(onClick = { onQuickFilterClick(filter) }) {
+                    FintrackLabelMediumText(text = label)
+                }
+            }
         }
     }
 }

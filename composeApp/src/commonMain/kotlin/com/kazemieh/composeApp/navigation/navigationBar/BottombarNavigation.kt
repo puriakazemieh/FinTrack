@@ -1,22 +1,22 @@
 package com.kazemieh.composeApp.navigation.navigationBar
 
 import androidx.compose.material3.SnackbarHostState
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.toRoute
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
-import com.kazemieh.dashboard.DashboardScreen
-import com.kazemieh.transactions.TransactionsScreen
 import com.kazemieh.composeApp.navigation.Screen
+import com.kazemieh.dashboard.DashboardScreen
 import com.kazemieh.profile.ProfileScreen
-import com.kazemieh.tools.ToolsScreen
 import com.kazemieh.search.ui.SearchScreen
+import com.kazemieh.tools.ToolsScreen
+import com.kazemieh.transactions.TransactionsScreen
 
 
 fun NavGraphBuilder.bottomBarNavGraph(
@@ -25,6 +25,7 @@ fun NavGraphBuilder.bottomBarNavGraph(
     onBackPressed: () -> Unit
 ) {
     val navigateToTransactions: (Any?) -> Unit = { data ->
+        navController.popBackStack()
         val route = when (data) {
             is Category -> Screen.Transactions(categoryId = data.id)
             is Source -> Screen.Transactions(sourceId = data.id)

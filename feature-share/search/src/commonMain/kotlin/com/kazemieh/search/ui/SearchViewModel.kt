@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import com.kazemieh.common.model.TransactionType
 import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
@@ -50,6 +51,7 @@ class SearchViewModel(
     val effect = _effect.receiveAsFlow()
 
     private val _query = MutableStateFlow("")
+    private val _filterParams = MutableStateFlow(TransactionFilterParams())
 
     init {
         getRecentSearchesUseCase()
@@ -58,11 +60,14 @@ class SearchViewModel(
             }
             .launchIn(viewModelScope)
 
-        _query
+        combine(_query, _filterParams) { q, params ->
+            params.copy(query = q)
+        }
             .debounce(300L)
             .distinctUntilChanged()
-            .onEach { q ->
-                if (q.isNotBlank()) {
+            .onEach { params ->
+                val q = params.query ?: ""
+                if (q.isNotBlank() || params.type != null) {
                     _state.update { it.copy(isLoading = true) }
                 } else {
                     _state.update {
@@ -77,10 +82,11 @@ class SearchViewModel(
                     }
                 }
             }
-            .flatMapLatest { q ->
+            .flatMapLatest { params ->
+                val q = params.query ?: ""
                 combine(
                     observeTransactionsUseCase(
-                        TransactionFilterParams(query = q),
+                        params,
                         PageRequest(limit = 20, offset = 0)
                     ),
                     searchCategoriesUseCase(q),
@@ -115,6 +121,7 @@ class SearchViewModel(
 
             is SearchIntent.ClearQuery -> {
                 _query.value = ""
+                _filterParams.value = TransactionFilterParams()
                 _state.update { it.copy(query = "") }
             }
 
@@ -125,7 +132,23 @@ class SearchViewModel(
             }
 
             is SearchIntent.SelectQuickFilter -> {
-                // TODO: Implement quick filters logic
+                val type = when (intent.filter) {
+                    QuickFilter.INCOME -> TransactionType.INCOME
+                    QuickFilter.EXPENSE -> TransactionType.EXPENSE
+                    QuickFilter.TRANSFER -> TransactionType.TRANSFER
+                    QuickFilter.RECENT_TRANSACTIONS -> TransactionType.ALL
+                }
+
+                val query = when (intent.filter) {
+                    QuickFilter.INCOME -> "درآمد"
+                    QuickFilter.EXPENSE -> "هزینه"
+                    QuickFilter.TRANSFER -> "انتقال"
+                    QuickFilter.RECENT_TRANSACTIONS -> ""
+                }
+
+                _filterParams.update { it.copy(type = type.count) }
+                _query.value = query
+                _state.update { it.copy(query = query) }
             }
 
             is SearchIntent.DeleteRecentSearch -> {
