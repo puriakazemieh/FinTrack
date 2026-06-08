@@ -11,12 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TextButton
@@ -39,10 +39,18 @@ import com.kazemieh.category.ui.add.AddCategoryBottomSheet
 import com.kazemieh.category.ui.delete.DeleteCategoryBottomSheet
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
-import com.kazemieh.designsystem.*
-import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.GlassBg0
+import com.kazemieh.designsystem.GlassBg1
+import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.GlassRed
+import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
-import com.kazemieh.designsystem.component.glass.*
+import com.kazemieh.designsystem.component.glass.EntityItem
+import com.kazemieh.designsystem.component.glass.EntityList
+import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.component.model.toCategory
 import com.kazemieh.designsystem.component.model.toItemUi
 import fintrack.core.designsystem.generated.resources.Res
@@ -65,7 +73,7 @@ fun CategoryPickerBottomSheet(
     onNavigateToTransactions: ((Category) -> Unit)? = null
 ) {
     LaunchedEffect(transactionType) {
-        viewModel.onIntent(CategoryIntent.LoadCategoryByType(transactionType))
+        viewModel.onIntent(CategoryIntent.LoadCategoryByType(transactionType, isHierarchical = true))
     }
 
     val state by viewModel.state.collectAsState()
@@ -77,6 +85,7 @@ fun CategoryPickerBottomSheet(
                 is CategoryEffect.AddedCategory -> {
                     onCategoryClick(effect.category)
                 }
+
                 CategoryEffect.OnDismiss -> onDismiss()
             }
         }
@@ -85,9 +94,9 @@ fun CategoryPickerBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = { 
+        onDismissRequest = {
             viewModel.onIntent(CategoryIntent.ResetFlags)
-            onDismiss() 
+            onDismiss()
         },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
@@ -100,9 +109,9 @@ fun CategoryPickerBottomSheet(
         ) {
             ScreenHeader(
                 title = stringResource(Res.string.category),
-                onClose = { 
+                onClose = {
                     viewModel.onIntent(CategoryIntent.ResetFlags)
-                    onDismiss() 
+                    onDismiss()
                 },
                 trailingContent = {
                     Row {
@@ -115,7 +124,8 @@ fun CategoryPickerBottomSheet(
                         }
                         TextButton(onClick = { isEditMode = !isEditMode }) {
                             FintrackLabelMediumText(
-                                text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
+                                text = if (isEditMode) stringResource(Res.string.cancell_)
+                                else stringResource(Res.string.edit),
                                 color = GlassText2
                             )
                         }
@@ -123,13 +133,17 @@ fun CategoryPickerBottomSheet(
                 }
             )
 
-            val entityItems = remember(state.categories) {
+            val entityItems = remember(state.categories, state.expandedCategoryIds, state.allCategories) {
                 state.categories.map {
+                    val hasChildren = state.allCategories.any { child -> child.parentId == it.id }
+                    val isExpanded = state.expandedCategoryIds.contains(it.id)
                     EntityItem(
                         id = it.id ?: 0,
                         name = it.name,
                         iconId = it.iconId,
-                        colorId = it.colorId
+                        colorId = it.colorId,
+                        parentId = it.parentId,
+                        badge = if (hasChildren && it.parentId == null) (if (isExpanded) "−" else "+") else null
                     )
                 }
             }
@@ -142,11 +156,7 @@ fun CategoryPickerBottomSheet(
                 items = entityItems,
                 showActions = isEditMode && !state.isReorderShow,
                 isReorderMode = state.isReorderShow,
-                onMove = { _, _ ->
-                    // UI handles immediate move, we need to collect final state or update on every move
-                    // For simplicity, let's collect final state when reorder mode is turned off
-                    // or just update on every move.
-                },
+                indentSubCategories = true,
                 onFilterClick = onNavigateToTransactions?.let { callback ->
                     { item ->
                         state.categories.find { it.id == item.id }?.let { callback(it) }
@@ -155,9 +165,12 @@ fun CategoryPickerBottomSheet(
                 },
                 onEditClick = { viewModel.onIntent(CategoryIntent.OnEditClick(state.categories.find { c -> c.id == it.id })) },
                 onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) },
+                onExpandClick = { item ->
+                    viewModel.onIntent(CategoryIntent.ToggleExpand(item.id))
+                },
                 onItemClick = { item ->
-                    state.categories.find { it.id == item.id }?.let {
-                        viewModel.onIntent(CategoryIntent.SelectedCategory(it))
+                    state.categories.find { it.id == item.id }?.let { category ->
+                        viewModel.onIntent(CategoryIntent.SelectedCategory(category))
                     }
                 }
             )
@@ -196,7 +209,7 @@ fun CategoryManageBottomSheet(
     onNavigateToTransactions: ((Category) -> Unit)? = null
 ) {
     LaunchedEffect(Unit) {
-        viewModel.onIntent(CategoryIntent.LoadCategoryByType(TransactionType.INCOME))
+        viewModel.onIntent(CategoryIntent.LoadCategoryByType(TransactionType.INCOME, isHierarchical = true))
     }
 
     val state by viewModel.state.collectAsState()
@@ -240,16 +253,20 @@ fun CategoryManageBottomSheet(
 
             TypeSwitcher(
                 selectedType = state.type,
-                onTypeSelected = { viewModel.onIntent(CategoryIntent.LoadCategoryByType(it)) }
+                onTypeSelected = { viewModel.onIntent(CategoryIntent.LoadCategoryByType(it, isHierarchical = true)) }
             )
 
-            val entityItems = remember(state.categories) {
+            val entityItems = remember(state.categories, state.expandedCategoryIds, state.allCategories) {
                 state.categories.map {
+                    val hasChildren = state.allCategories.any { child -> child.parentId == it.id }
+                    val isExpanded = state.expandedCategoryIds.contains(it.id)
                     EntityItem(
                         id = it.id ?: 0,
                         name = it.name,
                         iconId = it.iconId,
-                        colorId = it.colorId
+                        colorId = it.colorId,
+                        parentId = it.parentId,
+                        badge = if (hasChildren && it.parentId == null) (if (isExpanded) "−" else "+") else null
                     )
                 }
             }
@@ -262,6 +279,7 @@ fun CategoryManageBottomSheet(
                 items = entityItems,
                 showActions = !state.isReorderShow,
                 isReorderMode = state.isReorderShow,
+                indentSubCategories = true,
                 onMove = { from, to ->
                     val list = state.categories.toMutableList()
                     list.add(to, list.removeAt(from))
@@ -277,7 +295,15 @@ fun CategoryManageBottomSheet(
                     }
                 },
                 onEditClick = { viewModel.onIntent(CategoryIntent.OnEditClick(state.categories.find { c -> c.id == it.id })) },
-                onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) }
+                onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) },
+                onExpandClick = { item ->
+                    viewModel.onIntent(CategoryIntent.ToggleExpand(item.id))
+                },
+                onItemClick = { item ->
+                    state.categories.find { it.id == item.id }?.let { category ->
+                        viewModel.onIntent(CategoryIntent.SelectedCategory(category))
+                    }
+                }
             )
         }
     }

@@ -61,6 +61,7 @@ SELECT
     c.type AS category_type,
     c.colorId AS category_colorId,
     c.iconId AS category_iconId,
+    c.parentId AS category_parentId,
     s.id AS source_id,
     s.name AS source_name,
     s.balance AS source_balance,

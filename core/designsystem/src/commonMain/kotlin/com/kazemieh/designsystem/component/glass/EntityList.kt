@@ -85,10 +85,13 @@ fun EntityList(
     onDeleteClick: (EntityItem) -> Unit,
     onFilterClick: ((EntityItem) -> Unit)? = null,
     onItemClick: (EntityItem) -> Unit = {},
+    onExpandClick: ((EntityItem) -> Unit)? = null,
     emptyHint: String? = null,
     showActions: Boolean = true,
     isReorderMode: Boolean = false,
-    onMove: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> }
+    onMove: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> },
+    indentSubCategories: Boolean = false,
+    parentId: Long? = null
 ) {
     var internalItems by remember(items) { mutableStateOf(items) }
 
@@ -191,6 +194,8 @@ fun EntityList(
                                 onDelete = { onDeleteClick(it) },
                                 onFilter = onFilterClick?.let { callback -> { callback(it) } },
                                 onClick = { onItemClick(it) },
+                                onExpand = onExpandClick?.let { callback -> { callback(it) } },
+                                isSubCategory = indentSubCategories && it.parentId != null,
                                 modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp)
                             )
                         }
@@ -278,14 +283,18 @@ private fun EntityRow(
     onDelete: () -> Unit,
     onFilter: (() -> Unit)? = null,
     onClick: () -> Unit,
+    onExpand: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     isReorderMode: Boolean = false,
+    isSubCategory: Boolean = false,
     onMoveUp: () -> Unit = {},
     onMoveDown: () -> Unit = {}
 ) {
     val color = item.color ?: mainColor
     GlassCard(
-        modifier = modifier.clickable(enabled = !isReorderMode, onClick = onClick),
+        modifier = modifier
+            .padding(start = if (isSubCategory) 24.dp else 0.dp)
+            .clickable(enabled = !isReorderMode, onClick = onClick),
         padding = 10.dp
     ) {
         Row(
@@ -326,6 +335,10 @@ private fun EntityRow(
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
                             .background(color.copy(alpha = 0.12f))
+                            .then(
+                                if (onExpand != null) Modifier.clickable(onClick = onExpand)
+                                else Modifier
+                            )
                             .padding(horizontal = 7.dp, vertical = 2.dp)
                     ) {
                         FintrackLabelSmallText(
@@ -412,5 +425,6 @@ data class EntityItem(
     val badge: String? = null,
     val iconId: Int? = null,
     val colorId: Int? = null,
-    val color: Color? = null
+    val color: Color? = null,
+    val parentId: Long? = null
 )

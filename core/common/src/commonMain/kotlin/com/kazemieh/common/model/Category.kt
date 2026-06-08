@@ -11,7 +11,8 @@ data class Category(
     val type: TransactionType = TransactionType.INCOME,
     val colorId: Int,
     val iconId: Int,
-    val position: Int = 0
+    val position: Int = 0,
+    val parentId: Long? = null
 )
 
 

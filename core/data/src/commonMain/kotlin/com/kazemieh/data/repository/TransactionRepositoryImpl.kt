@@ -51,8 +51,12 @@ class TransactionRepositoryImpl(
         balanceDeltas: Map<Long, Int>
     ) = localDataSource.deleteTransactionWithBalance(transaction, balanceDeltas)
 
-    override fun observeCategories(type: TransactionType?): Flow<List<Category>> {
-        return localDataSource.observeCategories(type)
+    override fun observeCategories(type: TransactionType?, parentId: Long?): Flow<List<Category>> {
+        return localDataSource.observeCategories(type, parentId)
+    }
+
+    override fun observeCategoriesFlat(type: TransactionType?): Flow<List<Category>> {
+        return localDataSource.observeCategoriesFlat(type)
     }
 
     override suspend fun getCategoryById(id: Long): Category? {

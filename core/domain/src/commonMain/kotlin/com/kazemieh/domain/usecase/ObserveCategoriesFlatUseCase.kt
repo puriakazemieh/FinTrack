@@ -5,10 +5,10 @@ import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
 import kotlinx.coroutines.flow.Flow
 
-class ObserveCategoriesUseCase(
+class ObserveCategoriesFlatUseCase(
     private val repository: TransactionRepository
 ) {
-    suspend operator fun invoke(type: TransactionType? = null, parentId: Long? = null): Flow<List<Category>> {
-        return repository.observeCategories(type, parentId)
+    operator fun invoke(type: TransactionType? = null): Flow<List<Category>> {
+        return repository.observeCategoriesFlat(type)
     }
 }

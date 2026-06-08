@@ -108,7 +108,8 @@ class TransactionLocalDataSourceImpl(
             type = category.type.count.toLong(),
             colorId = category.colorId.toLong(),
             iconId = category.iconId.toLong(),
-            position = category.position.toLong()
+            position = category.position.toLong(),
+            parentId = category.parentId
         )
         categoryQueries.lastInsertRowId().awaitAsOne()
     }
@@ -122,6 +123,7 @@ class TransactionLocalDataSourceImpl(
                 colorId = category.colorId.toLong(),
                 iconId = category.iconId.toLong(),
                 position = category.position.toLong(),
+                parentId = category.parentId,
                 id = category.id ?: 0
             )
 
@@ -295,9 +297,17 @@ class TransactionLocalDataSourceImpl(
         tagQueries.lastInsertRowId().awaitAsOne()
     }
 
-    override fun observeCategories(type: TransactionType?): Flow<List<Category>> {
+    override fun observeCategories(type: TransactionType?, parentId: Long?): Flow<List<Category>> {
         val count = if (type == TransactionType.ALL) null else type?.count?.toLong()
-        return categoryQueries.observeCategories(count)
+        return categoryQueries.observeCategories(count, parentId)
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+            .map { list -> list.map { it.toCategory() } }
+    }
+
+    override fun observeCategoriesFlat(type: TransactionType?): Flow<List<Category>> {
+        val count = if (type == TransactionType.ALL) null else type?.count?.toLong()
+        return categoryQueries.observeCategoriesFlat(count)
             .asFlow()
             .mapToList(Dispatchers.Default)
             .map { list -> list.map { it.toCategory() } }

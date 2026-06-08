@@ -10,6 +10,7 @@ val transactionCategoryModule = module {
     viewModel {
         CategoryViewModel(
             observeCategoriesUseCase = get(),
+            observeCategoriesFlatUseCase = get(),
             updateCategoryPositionsUseCase = get()
         )
     }
@@ -25,7 +26,8 @@ val transactionAddCategoryModule = module {
     viewModel {
         AddCategoryViewModel(
             addCategoryUseCase = get(),
-            updateCategoryUseCase = get()
+            updateCategoryUseCase = get(),
+            observeCategoriesUseCase = get()
         )
     }
 }

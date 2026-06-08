@@ -5,34 +5,41 @@ CREATE TABLE IF NOT EXISTS category (
     type INTEGER NOT NULL,
     colorId INTEGER NOT NULL DEFAULT 1,
     iconId INTEGER NOT NULL DEFAULT 1,
-    position INTEGER NOT NULL DEFAULT 0
+    position INTEGER NOT NULL DEFAULT 0,
+    parentId INTEGER REFERENCES category(id)
 );
 
 -- Queries
 addCategory:
-INSERT INTO category(name, description, type, colorId, iconId, position)
-VALUES (?, ?, ?, ?, ?, ?);
+INSERT INTO category(name, description, type, colorId, iconId, position, parentId)
+VALUES (?, ?, ?, ?, ?, ?, ?);
 
 insertAllCategory:
-INSERT INTO category(name, description, type, colorId, iconId, position)
+INSERT INTO category(name, description, type, colorId, iconId, position, parentId)
 VALUES ?;
 
 updateCategory:
 UPDATE category
-SET name = ?, description = ?, type = ?, colorId = ?, iconId = ?, position = ?
+SET name = ?, description = ?, type = ?, colorId = ?, iconId = ?, position = ?, parentId = ?
 WHERE id = ?;
 
 updateCategoryPosition:
 UPDATE category SET position = ? WHERE id = ?;
 
 observeCategories:
+SELECT * FROM category
+WHERE (:type IS NULL OR type = :type)
+AND parentId IS :parentId
+ORDER BY position ASC;
+
+observeCategoriesFlat:
 SELECT * FROM category WHERE (:type IS NULL OR type = :type) ORDER BY position ASC;
 
 getFirstByType:
-SELECT * FROM category WHERE type = ? ORDER BY id LIMIT 1;
+SELECT * FROM category WHERE type = ? AND parentId IS NULL ORDER BY id LIMIT 1;
 
 getTransferCategoryOrNull:
-SELECT * FROM category WHERE type = 3 ORDER BY id LIMIT 1;
+SELECT * FROM category WHERE type = 3 AND parentId IS NULL ORDER BY id LIMIT 1;
 
 createTransferCategory:
 INSERT INTO category(name, type)
@@ -78,8 +85,8 @@ deleteCategory:
 DELETE FROM category WHERE id = ?;
 
 insertFullCategory:
-INSERT OR REPLACE INTO category(id, name, description, type, colorId, iconId, position)
-VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO category(id, name, description, type, colorId, iconId, position, parentId)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
 getMostUsedCategories:
 SELECT c.* FROM category c

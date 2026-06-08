@@ -6,6 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -176,6 +179,15 @@ fun AddCategoryContent(
             }
 
             item {
+                ParentCategorySelector(
+                    parentCategories = state.parentCategories,
+                    selectedParentId = state.draft.parentId,
+                    currentCategoryId = (state.mode as? AddCategoryMode.Edit)?.categoryId,
+                    onParentSelected = { onIntent(AddCategoryIntent.UpdateParentId(it)) }
+                )
+            }
+
+            item {
                 GlassCard(padding = 14.dp) {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         FintrackLabelMediumText(text = stringResource(Res.string.label_color), color = GlassText3)
@@ -205,6 +217,103 @@ fun AddCategoryContent(
     }
 }
 
+@Composable
+private fun ParentCategorySelector(
+    parentCategories: List<Category>,
+    selectedParentId: Long?,
+    currentCategoryId: Long?,
+    onParentSelected: (Long?) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val selectedParent = parentCategories.find { it.id == selectedParentId }
+
+    val availableParents = parentCategories.filter { it.id != currentCategoryId }
+
+    GlassCard(padding = 14.dp) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            FintrackLabelSmallText(text = "دسته‌بندی مادر", color = GlassText3)
+            
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(GlassBg1)
+                    .border(1.dp, GlassEdge, RoundedCornerShape(10.dp))
+                    .clickable { expanded = !expanded }
+                    .padding(12.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    FintrackBodyMediumText(
+                        text = selectedParent?.name ?: "انتخاب دسته‌بندی مادر (اختیاری)",
+                        color = if (selectedParent != null) GlassText else GlassText3
+                    )
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint = GlassText3,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+
+            if (expanded) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    // Option for "None"
+                    ParentCategoryItem(
+                        name = "بدون دسته‌بندی مادر",
+                        isSelected = selectedParentId == null,
+                        onClick = {
+                            onParentSelected(null)
+                            expanded = false
+                        }
+                    )
+                    
+                    availableParents.forEach { category ->
+                        ParentCategoryItem(
+                            name = category.name,
+                            isSelected = category.id == selectedParentId,
+                            onClick = {
+                                onParentSelected(category.id)
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ParentCategoryItem(
+    name: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(if (isSelected) GlassGreen.copy(alpha = 0.12f) else Color.Transparent)
+            .clickable(onClick = onClick)
+            .padding(10.dp)
+    ) {
+        FintrackBodyMediumText(
+            text = name,
+            color = if (isSelected) GlassGreen else GlassText,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+        )
+    }
+}
 @Composable
 private fun TypeSelector(
     selectedType: TransactionType,

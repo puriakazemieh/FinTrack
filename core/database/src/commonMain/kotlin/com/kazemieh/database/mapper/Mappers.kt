@@ -78,7 +78,8 @@ fun GetAllTransactionsFiltered.toTransactionWithRelations(): TransactionWithRela
             description = category_description,
             type = TransactionType.fromInt(category_type?.toInt() ?: TransactionType.TRANSFER.count),
             colorId = category_colorId?.toInt() ?: 1,
-            iconId = category_iconId?.toInt() ?: 19
+            iconId = category_iconId?.toInt() ?: 19,
+            parentId = category_parentId
         ),
         source = Source(
             id = source_id,
@@ -128,7 +129,8 @@ fun CategoryDb.toCategory() = Category(
     description = description,
     type = TransactionType.fromInt(type.toInt()),
     colorId = colorId.toInt(),
-    iconId = iconId.toInt()
+    iconId = iconId.toInt(),
+    parentId = parentId
 )
 
 fun ObserveCategorySumsByFilter.toCategorySum(): CategorySum {
