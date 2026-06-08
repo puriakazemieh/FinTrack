@@ -95,3 +95,9 @@ WHERE (:type IS NULL OR c.type = :type)
 GROUP BY c.id
 ORDER BY COUNT(t.id) DESC
 LIMIT :limit;
+
+searchCategories:
+SELECT * FROM category
+WHERE name LIKE ('%' || :query || '%')
+OR description LIKE ('%' || :query || '%')
+ORDER BY position ASC;

@@ -47,6 +47,7 @@ kotlin {
                 implementation(project(":core:common"))
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.koin.core)
+                implementation(libs.koin.core)
             }
         }
 

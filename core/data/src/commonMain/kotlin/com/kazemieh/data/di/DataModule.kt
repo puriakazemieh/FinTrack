@@ -5,5 +5,5 @@ import com.kazemieh.domain.repository.TransactionRepository
 import org.koin.dsl.module
 
 val dataModule = module {
-    single<TransactionRepository> { TransactionRepositoryImpl(get()) }
+    single<TransactionRepository> { TransactionRepositoryImpl(get(),get()) }
 }

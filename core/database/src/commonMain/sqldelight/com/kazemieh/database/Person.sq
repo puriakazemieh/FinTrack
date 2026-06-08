@@ -44,4 +44,10 @@ GROUP BY person.id
 ORDER BY COUNT(tp.transactionId) DESC
 LIMIT :limit;
 
+searchPersons:
+SELECT * FROM person
+WHERE name LIKE ('%' || :query || '%')
+OR description LIKE ('%' || :query || '%')
+ORDER BY position ASC;
+
 

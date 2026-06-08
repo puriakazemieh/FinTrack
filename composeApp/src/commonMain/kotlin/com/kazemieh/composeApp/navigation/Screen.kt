@@ -24,6 +24,9 @@ sealed class Screen {
     data object Profile : Screen()
 
     @Serializable
+    data object Search : Screen()
+
+    @Serializable
     data object BottomBarGraph : Screen()
 
 }

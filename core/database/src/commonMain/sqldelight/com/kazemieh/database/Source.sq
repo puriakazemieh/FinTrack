@@ -65,3 +65,12 @@ ORDER BY (
 ) DESC
 LIMIT :limit;
 
+searchSources:
+SELECT * FROM source
+WHERE name LIKE ('%' || :query || '%')
+OR description LIKE ('%' || :query || '%')
+OR cardNumber LIKE ('%' || :query || '%')
+OR shabaNumber LIKE ('%' || :query || '%')
+OR accountNumber LIKE ('%' || :query || '%')
+ORDER BY position ASC;
+

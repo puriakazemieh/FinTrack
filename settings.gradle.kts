@@ -56,6 +56,7 @@ include(":feature-share:category")
 include(":feature-share:source")
 include(":feature-share:tags")
 include(":feature-share:person")
+include(":feature-share:search")
 
 include(":feature-container:transactions")
 include(":feature-container:dashboard")

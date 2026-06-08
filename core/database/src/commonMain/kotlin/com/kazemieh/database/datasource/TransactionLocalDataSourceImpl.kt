@@ -64,6 +64,7 @@ class TransactionLocalDataSourceImpl(
             personIdsSize = if (transactionFilterParams.isAllPersons) 0 else personIds.size.toLong().coerceAtLeast(1),
             fromTimestamp = transactionFilterParams.fromTimestamp,
             toTimestamp = transactionFilterParams.toTimestamp,
+            query = transactionFilterParams.query,
             limit = request.limit.toLong(),
             offset = request.offset.toLong()
         )
@@ -94,7 +95,8 @@ class TransactionLocalDataSourceImpl(
             personIds = personIds,
             personIdsSize = if (transactionFilterParams.isAllPersons) 0 else personIds.size.toLong().coerceAtLeast(1),
             fromTimestamp = transactionFilterParams.fromTimestamp,
-            toTimestamp = transactionFilterParams.toTimestamp
+            toTimestamp = transactionFilterParams.toTimestamp,
+            query = transactionFilterParams.query
         )
             .asFlow()
             .mapToList(Dispatchers.Default)
@@ -420,6 +422,34 @@ class TransactionLocalDataSourceImpl(
             .asFlow()
             .mapToList(Dispatchers.Default)
             .map { it.map { p -> p.toPerson() } }
+    }
+
+    override fun searchCategories(query: String): Flow<List<Category>> {
+        return categoryQueries.searchCategories(query)
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+            .map { it.map { c -> c.toCategory() } }
+    }
+
+    override fun searchSources(query: String): Flow<List<Source>> {
+        return sourceQueries.searchSources(query)
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+            .map { it.map { s -> s.toSource() } }
+    }
+
+    override fun searchPersons(query: String): Flow<List<Person>> {
+        return personQueries.searchPersons(query)
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+            .map { it.map { p -> p.toPerson() } }
+    }
+
+    override fun searchTags(query: String): Flow<List<Tag>> {
+        return tagQueries.searchTags(query)
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+            .map { it.map { t -> t.toTag() } }
     }
 
     override suspend fun updateCategoryPosition(id: Long, position: Int) {

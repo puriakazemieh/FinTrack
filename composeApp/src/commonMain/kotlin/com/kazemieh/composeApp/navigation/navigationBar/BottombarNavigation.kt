@@ -16,6 +16,7 @@ import com.kazemieh.transactions.TransactionsScreen
 import com.kazemieh.composeApp.navigation.Screen
 import com.kazemieh.profile.ProfileScreen
 import com.kazemieh.tools.ToolsScreen
+import com.kazemieh.search.ui.SearchScreen
 
 
 fun NavGraphBuilder.bottomBarNavGraph(
@@ -45,7 +46,8 @@ fun NavGraphBuilder.bottomBarNavGraph(
         composable<Screen.Dashboard> { backStackEntry ->
             DashboardScreen(
                 snackbarHostState = snackbarHostState,
-                onNavigateToTransactions = navigateToTransactions
+                onNavigateToTransactions = navigateToTransactions,
+                onNavigateToSearch = { navController.navigate(Screen.Search) }
             )
         }
 
@@ -57,7 +59,8 @@ fun NavGraphBuilder.bottomBarNavGraph(
                 categoryId = args.categoryId,
                 sourceId = args.sourceId,
                 tagId = args.tagId,
-                personId = args.personId
+                personId = args.personId,
+                onNavigateToSearch = { navController.navigate(Screen.Search) }
             )
         }
 
@@ -69,6 +72,19 @@ fun NavGraphBuilder.bottomBarNavGraph(
             ProfileScreen(
                 snackbarHostState = snackbarHostState,
                 onNavigateToTransactions = navigateToTransactions
+            )
+        }
+
+        composable<Screen.Search> {
+            SearchScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToTransaction = { tx ->
+                    // Logic to show edit bottom sheet or navigate
+                },
+                onNavigateToCategory = { cat -> navigateToTransactions(cat) },
+                onNavigateToSource = { src -> navigateToTransactions(src) },
+                onNavigateToPerson = { p -> navigateToTransactions(p) },
+                onNavigateToTag = { t -> navigateToTransactions(t) }
             )
         }
 

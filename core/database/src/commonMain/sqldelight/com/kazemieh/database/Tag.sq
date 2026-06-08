@@ -46,4 +46,10 @@ GROUP BY tag.id
 ORDER BY COUNT(tt.transactionId) DESC
 LIMIT :limit;
 
+searchTags:
+SELECT * FROM tag
+WHERE name LIKE ('%' || :query || '%')
+OR description LIKE ('%' || :query || '%')
+ORDER BY position ASC;
+
 

@@ -43,6 +43,7 @@ fun TransactionsScreen(
     sourceId: Long? = null,
     tagId: Long? = null,
     personId: Long? = null,
+    onNavigateToSearch: () -> Unit = {},
     viewModel: TransactionsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -154,7 +155,7 @@ fun TransactionsScreen(
             TxHeader(
                 isSearchActive = state.isSearchActive,
                 isFilterActive = activeFilters.isNotEmpty(),
-                onSearchClick = { viewModel.onIntent(TransactionsIntent.OnToggleSearch) },
+                onSearchClick = onNavigateToSearch,
                 onFilterClick = { viewModel.onIntent(TransactionsIntent.OnToggleFilterSheet) }
             )
 

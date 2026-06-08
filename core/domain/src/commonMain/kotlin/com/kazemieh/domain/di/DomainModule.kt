@@ -1,42 +1,49 @@
 package com.kazemieh.domain.di
 
 import com.kazemieh.domain.usecase.AddCategoryUseCase
-import com.kazemieh.domain.usecase.AddSourceUseCase
 import com.kazemieh.domain.usecase.AddPersonUseCase
-import com.kazemieh.domain.usecase.SourceUseCases
+import com.kazemieh.domain.usecase.AddSourceUseCase
 import com.kazemieh.domain.usecase.AddTagUseCase
 import com.kazemieh.domain.usecase.AddTransactionUseCase
 import com.kazemieh.domain.usecase.DeleteCategoryUseCase
 import com.kazemieh.domain.usecase.DeletePersonUseCase
+import com.kazemieh.domain.usecase.DeleteRecentSearchUseCase
 import com.kazemieh.domain.usecase.DeleteSourceUseCase
 import com.kazemieh.domain.usecase.DeleteTagUseCase
 import com.kazemieh.domain.usecase.DeleteTransactionUseCase
-import com.kazemieh.domain.usecase.UpdateCategoryUseCase
-import com.kazemieh.domain.usecase.UpdatePersonUseCase
-import com.kazemieh.domain.usecase.UpdateCategoryPositionsUseCase
-import com.kazemieh.domain.usecase.UpdateSourcePositionsUseCase
-import com.kazemieh.domain.usecase.UpdateTagPositionsUseCase
-import com.kazemieh.domain.usecase.UpdatePersonPositionsUseCase
-import com.kazemieh.domain.usecase.UpdateSourceUseCase
-import com.kazemieh.domain.usecase.UpdateTagUseCase
-import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
-import com.kazemieh.domain.usecase.ObserveCategoriesFlatUseCase
 import com.kazemieh.domain.usecase.GetCategoryUseCase
+import com.kazemieh.domain.usecase.GetDefaultCategoryUseCase
+import com.kazemieh.domain.usecase.GetDefaultFinancialSourceUseCase
+import com.kazemieh.domain.usecase.GetRecentSearchesUseCase
+import com.kazemieh.domain.usecase.GetTransferCategoryUseCase
+import com.kazemieh.domain.usecase.ObserveCategoriesFlatUseCase
+import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
+import com.kazemieh.domain.usecase.ObserveCategorySumsUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedCategoriesUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedPersonsUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedSourcesUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedTagsUseCase
 import com.kazemieh.domain.usecase.ObservePersonsUseCase
+import com.kazemieh.domain.usecase.ObserveSourceUseCase
 import com.kazemieh.domain.usecase.ObserveSourcesUseCase
 import com.kazemieh.domain.usecase.ObserveTagsUseCase
 import com.kazemieh.domain.usecase.ObserveTransactionsUseCase
-import com.kazemieh.domain.usecase.ObserveCategorySumsUseCase
-import com.kazemieh.domain.usecase.GetDefaultCategoryUseCase
-import com.kazemieh.domain.usecase.GetDefaultFinancialSourceUseCase
-import com.kazemieh.domain.usecase.ObserveSourceUseCase
-import com.kazemieh.domain.usecase.GetTransferCategoryUseCase
+import com.kazemieh.domain.usecase.SaveRecentSearchUseCase
+import com.kazemieh.domain.usecase.SearchCategoriesUseCase
+import com.kazemieh.domain.usecase.SearchPersonsUseCase
+import com.kazemieh.domain.usecase.SearchSourcesUseCase
+import com.kazemieh.domain.usecase.SearchTagsUseCase
+import com.kazemieh.domain.usecase.SourceUseCases
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
+import com.kazemieh.domain.usecase.UpdateCategoryPositionsUseCase
+import com.kazemieh.domain.usecase.UpdateCategoryUseCase
+import com.kazemieh.domain.usecase.UpdatePersonPositionsUseCase
+import com.kazemieh.domain.usecase.UpdatePersonUseCase
+import com.kazemieh.domain.usecase.UpdateSourcePositionsUseCase
+import com.kazemieh.domain.usecase.UpdateSourceUseCase
+import com.kazemieh.domain.usecase.UpdateTagPositionsUseCase
+import com.kazemieh.domain.usecase.UpdateTagUseCase
 import com.kazemieh.domain.usecase.UpdateTransactionUseCase
-import com.kazemieh.domain.usecase.ObserveMostUsedCategoriesUseCase
-import com.kazemieh.domain.usecase.ObserveMostUsedSourcesUseCase
-import com.kazemieh.domain.usecase.ObserveMostUsedTagsUseCase
-import com.kazemieh.domain.usecase.ObserveMostUsedPersonsUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -75,6 +82,14 @@ val domainModule = module {
     factory { UpdateSourcePositionsUseCase(get()) }
     factory { UpdateTagPositionsUseCase(get()) }
     factory { UpdatePersonPositionsUseCase(get()) }
+
+    factory { SearchCategoriesUseCase(get()) }
+    factory { SearchSourcesUseCase(get()) }
+    factory { SearchPersonsUseCase(get()) }
+    factory { SearchTagsUseCase(get()) }
+    factory { GetRecentSearchesUseCase(get()) }
+    factory { SaveRecentSearchUseCase(get()) }
+    factory { DeleteRecentSearchUseCase(get()) }
 
 
     single {

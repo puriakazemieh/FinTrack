@@ -43,6 +43,9 @@ kotlin {
                 implementation(libs.russhwolf.settings)
                 implementation(libs.russhwolf.settings.noarg)
                 implementation(libs.russhwolf.settings.coroutines)
+//                implementation(libs.koin.compose)
+                implementation(libs.koin.core)
+//                implementation(libs.koin.compose.viewmodel)
             }
         }
     }

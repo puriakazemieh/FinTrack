@@ -47,6 +47,7 @@ kotlin {
                 implementation(libs.kotlinx.serialization)
                 implementation(project(":core:common"))
                 implementation(project(":core:domain"))
+                implementation(project(":core:preferences"))
                 implementation(project(":core:data-contract"))
                 implementation(libs.koin.core)
             }

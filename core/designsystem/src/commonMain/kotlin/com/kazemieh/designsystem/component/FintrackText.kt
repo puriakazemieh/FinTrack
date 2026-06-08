@@ -2,16 +2,43 @@ package com.kazemieh.designsystem.component
 
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.kazemieh.designsystem.vazirmatnFontFamily
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.material3.Text
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
+import com.kazemieh.designsystem.vazirmatnFontFamily
+
+@Composable
+fun FintrackBodyMediumText(
+    text: AnnotatedString,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onBackground,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    style: TextStyle = MaterialTheme.typography.bodyMedium.copy(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontFamily = vazirmatnFontFamily()
+    ),
+    textAlign: TextAlign = TextAlign.Start,
+    maxLines: Int = Int.MAX_VALUE,
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = style,
+        textAlign = textAlign,
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis
+    )
+}
 
 @Composable
 fun FintrackDisplayLargeText(

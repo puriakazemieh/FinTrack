@@ -75,6 +75,15 @@ interface TransactionRepository {
     fun observeMostUsedTags(limit: Long): Flow<List<Tag>>
     fun observeMostUsedPersons(limit: Long): Flow<List<Person>>
 
+    fun searchCategories(query: String): Flow<List<Category>>
+    fun searchSources(query: String): Flow<List<Source>>
+    fun searchPersons(query: String): Flow<List<Person>>
+    fun searchTags(query: String): Flow<List<Tag>>
+
+    fun getRecentSearches(): Flow<List<String>>
+    suspend fun saveRecentSearch(query: String)
+    suspend fun deleteRecentSearch(query: String)
+
     suspend fun updateCategoryPositions(positions: Map<Long, Int>)
     suspend fun updateSourcePositions(positions: Map<Long, Int>)
     suspend fun updateTagPositions(positions: Map<Long, Int>)

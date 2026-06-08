@@ -23,7 +23,9 @@ import com.kazemieh.financialsource.di.transactionFinancialSourceModule
 import com.kazemieh.person.di.transactionAddPersonModule
 import com.kazemieh.person.di.transactionDeletePersonModule
 import com.kazemieh.person.di.transactionPersonModule
+import com.kazemieh.preferences.preferencesModule
 import com.kazemieh.profile.di.profileModule
+import com.kazemieh.search.di.searchModule
 import com.kazemieh.tag.di.transactionAddTagModule
 import com.kazemieh.tag.di.transactionDeleteTagModule
 import com.kazemieh.tag.di.transactionTagModule
@@ -81,7 +83,8 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         toolsModule,
         dashboardModule,
         transactionsViewModelModule,
-
+        searchModule,
+        preferencesModule
         )
     startKoin {
         config?.invoke(this)

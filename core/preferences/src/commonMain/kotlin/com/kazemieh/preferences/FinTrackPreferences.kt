@@ -1,10 +1,12 @@
 package com.kazemieh.preferences
 
-import com.russhwolf.multiplatform.settings.Settings
-import com.russhwolf.multiplatform.settings.coroutines.toSuspendSettings
-import com.russhwolf.multiplatform.settings.coroutines.SuspendSettings
+import com.russhwolf.settings.ExperimentalSettingsApi
+import com.russhwolf.settings.Settings
+import com.russhwolf.settings.coroutines.SuspendSettings
+import com.russhwolf.settings.coroutines.toSuspendSettings
 
 class FinTrackPreferences(private val settings: Settings) {
+    @OptIn(ExperimentalSettingsApi::class)
     val suspendSettings: SuspendSettings = settings.toSuspendSettings()
 
     fun putString(key: String, value: String) = settings.putString(key, value)

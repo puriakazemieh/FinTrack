@@ -13,11 +13,44 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
 import com.kazemieh.domain.repository.TransactionRepository
+import com.kazemieh.preferences.FinTrackPreferences
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class TransactionRepositoryImpl(
-    private val localDataSource: TransactionLocalDataSource
+    private val localDataSource: TransactionLocalDataSource,
+    private val preferences: FinTrackPreferences
 ) : TransactionRepository {
+
+    private val _recentSearches = MutableStateFlow<List<String>>(emptyList())
+
+    init {
+        val recents = preferences.getString("recent_searches", "")
+        if (recents.isNotEmpty()) {
+            _recentSearches.value = recents.split("|")
+        }
+    }
+
+    override fun getRecentSearches(): Flow<List<String>> = _recentSearches.asStateFlow()
+
+    override suspend fun saveRecentSearch(query: String) {
+        if (query.isBlank()) return
+        val current = _recentSearches.value.toMutableList()
+        current.remove(query)
+        current.add(0, query)
+        val limited = current.take(10)
+        preferences.putString("recent_searches", limited.joinToString("|"))
+        _recentSearches.update { limited }
+    }
+
+    override suspend fun deleteRecentSearch(query: String) {
+        val current = _recentSearches.value.toMutableList()
+        current.remove(query)
+        preferences.putString("recent_searches", current.joinToString("|"))
+        _recentSearches.update { current }
+    }
 
     override fun observeTransactions(
         transactionFilterParams: TransactionFilterParams,
@@ -153,6 +186,22 @@ class TransactionRepositoryImpl(
 
     override fun observeMostUsedPersons(limit: Long): Flow<List<Person>> {
         return localDataSource.observeMostUsedPersons(limit)
+    }
+
+    override fun searchCategories(query: String): Flow<List<Category>> {
+        return localDataSource.searchCategories(query)
+    }
+
+    override fun searchSources(query: String): Flow<List<Source>> {
+        return localDataSource.searchSources(query)
+    }
+
+    override fun searchPersons(query: String): Flow<List<Person>> {
+        return localDataSource.searchPersons(query)
+    }
+
+    override fun searchTags(query: String): Flow<List<Tag>> {
+        return localDataSource.searchTags(query)
     }
 
     override suspend fun updateCategoryPositions(positions: Map<Long, Int>) {

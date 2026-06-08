@@ -46,7 +46,6 @@ import com.kazemieh.designsystem.GlassText
 import com.kazemieh.designsystem.GlassText3
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FAB
-import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
@@ -54,12 +53,10 @@ import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.BalanceHero
-import com.kazemieh.transaction.ui.main.rememberTransactionItemsProvider
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.msg_hello
 import fintrack.core.designsystem.generated.resources.placeholder_user_initial
 import fintrack.core.designsystem.generated.resources.placeholder_user_name
-import fintrack.core.designsystem.generated.resources.recent_transactions
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -67,7 +64,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun DashboardScreen(
     viewModel: DashboardViewModel = koinViewModel(),
     snackbarHostState: SnackbarHostState,
-    onNavigateToTransactions: (Any?) -> Unit = {}
+    onNavigateToTransactions: (Any?) -> Unit = {},
+    onNavigateToSearch: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
@@ -111,6 +109,7 @@ fun DashboardScreen(
         ) {
             item {
                 DashboardHeader(
+                    onNavigateToSearch = onNavigateToSearch,
                     modifier = Modifier.padding(
                         horizontal = space.large,
                         vertical = space.mediumSmall
@@ -139,7 +138,7 @@ fun DashboardScreen(
                             DashboardIntent.ShowTransactionBottomSheet(type = it)
                         )
                     },
-                    onSearchClick = { /* Handle search */ },
+                    onSearchClick = onNavigateToSearch,
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }
@@ -202,7 +201,8 @@ fun DashboardScreen(
 
 @Composable
 private fun DashboardHeader(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateToSearch: () -> Unit = {}
 ) {
     val space = LocalSpacing.current
     Row(
@@ -245,7 +245,7 @@ private fun DashboardHeader(
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             HeaderIconButton(icon = Icons.Default.Notifications) { /* Notification action */ }
-            HeaderIconButton(icon = Icons.Default.Search) { /* Search action */ }
+            HeaderIconButton(icon = Icons.Default.Search, onClick = onNavigateToSearch)
         }
     }
 }
