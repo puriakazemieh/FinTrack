@@ -15,7 +15,13 @@ data class SearchState(
     val persons: List<Person> = emptyList(),
     val tags: List<Tag> = emptyList(),
     val recentSearches: List<String> = emptyList(),
-    val quickFilters: List<QuickFilter> = QuickFilter.entries
+    val quickFilters: List<QuickFilter> = QuickFilter.entries,
+    val mostUsedCategories: List<Category> = emptyList(),
+    val mostUsedSources: List<Source> = emptyList(),
+    val mostUsedPersons: List<Person> = emptyList(),
+    val mostUsedTags: List<Tag> = emptyList(),
+    val showAddTransaction: Boolean = false,
+    val transactionWithRelations: TransactionWithRelations? = null
 )
 
 sealed interface SearchIntent {
@@ -24,6 +30,7 @@ sealed interface SearchIntent {
     data class SelectRecentSearch(val query: String) : SearchIntent
     data class SelectQuickFilter(val filter: QuickFilter) : SearchIntent
     data class DeleteRecentSearch(val query: String) : SearchIntent
+    data class ShowTransactionBottomSheet(val transaction: TransactionWithRelations? = null) : SearchIntent
 }
 
 sealed interface SearchEffect {
@@ -32,6 +39,7 @@ sealed interface SearchEffect {
     data class NavigateToSource(val source: Source) : SearchEffect
     data class NavigateToPerson(val person: Person) : SearchEffect
     data class NavigateToTag(val tag: Tag) : SearchEffect
+    data class NavigateToTransactionType(val type: com.kazemieh.common.model.TransactionType) : SearchEffect
     data object GoBack : SearchEffect
 }
 

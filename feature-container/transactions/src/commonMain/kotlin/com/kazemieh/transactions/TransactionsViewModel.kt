@@ -326,7 +326,7 @@ class TransactionsViewModel(
                             isAllTAgSelected = tags.isEmpty(),
                             selectedPerson = persons,
                             isAllPersonSelected = persons.isEmpty(),
-                            selectedTransactionType = if (categories.isNotEmpty()) categories.first().type else it.selectedTransactionType,
+                            selectedTransactionType = intent.transactionType ?: (if (categories.isNotEmpty()) categories.first().type else it.selectedTransactionType),
                             enableAnimationChart = !it.enableAnimationChart
                         )
                     }
@@ -510,7 +510,8 @@ sealed interface TransactionsIntent {
         val categoryId: Long? = null,
         val sourceId: Long? = null,
         val tagId: Long? = null,
-        val personId: Long? = null
+        val personId: Long? = null,
+        val transactionType: TransactionType? = null
     ) : TransactionsIntent
 
     data class OnDateSheetSubmit(

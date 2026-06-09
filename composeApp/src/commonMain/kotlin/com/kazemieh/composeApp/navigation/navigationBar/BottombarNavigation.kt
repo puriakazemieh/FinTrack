@@ -31,6 +31,7 @@ fun NavGraphBuilder.bottomBarNavGraph(
             is Source -> Screen.Transactions(sourceId = data.id)
             is Tag -> Screen.Transactions(tagId = data.id)
             is Person -> Screen.Transactions(personId = data.id)
+            is com.kazemieh.common.model.TransactionType -> Screen.Transactions(transactionType = data)
             is Boolean -> Screen.Transactions(resetFilters = data)
             else -> Screen.Transactions()
         }
@@ -61,6 +62,7 @@ fun NavGraphBuilder.bottomBarNavGraph(
                 sourceId = args.sourceId,
                 tagId = args.tagId,
                 personId = args.personId,
+                transactionType = args.transactionType,
                 onNavigateToSearch = { navController.navigate(Screen.Search) }
             )
         }
@@ -78,14 +80,13 @@ fun NavGraphBuilder.bottomBarNavGraph(
 
         composable<Screen.Search> {
             SearchScreen(
+                snackbarHostState = snackbarHostState,
                 onBack = { navController.popBackStack() },
-                onNavigateToTransaction = { tx ->
-                    // Logic to show edit bottom sheet or navigate
-                },
                 onNavigateToCategory = { cat -> navigateToTransactions(cat) },
                 onNavigateToSource = { src -> navigateToTransactions(src) },
                 onNavigateToPerson = { p -> navigateToTransactions(p) },
-                onNavigateToTag = { t -> navigateToTransactions(t) }
+                onNavigateToTag = { t -> navigateToTransactions(t) },
+                onNavigateToTransactionType = { type -> navigateToTransactions(type) }
             )
         }
 

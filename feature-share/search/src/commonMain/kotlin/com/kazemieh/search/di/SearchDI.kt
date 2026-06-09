@@ -14,7 +14,11 @@ val searchModule = module {
             searchTagsUseCase = get(),
             getRecentSearchesUseCase = get(),
             saveRecentSearchUseCase = get(),
-            deleteRecentSearchUseCase = get()
+            deleteRecentSearchUseCase = get(),
+            observeMostUsedCategoriesUseCase = get(),
+            observeMostUsedSourcesUseCase = get(),
+            observeMostUsedPersonsUseCase = get(),
+            observeMostUsedTagsUseCase = get()
         )
     }
 }

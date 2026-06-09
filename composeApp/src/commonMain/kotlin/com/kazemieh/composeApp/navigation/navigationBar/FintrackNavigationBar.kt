@@ -112,6 +112,7 @@ fun FintrackNavigationBar(
 
                 Box(
                     modifier = Modifier
+                        .padding(2.dp)
                         .weight(1f)
                         .fillMaxHeight()
                         .clip(CircleShape)

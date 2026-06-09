@@ -22,7 +22,6 @@ import com.kazemieh.category.ui.list.CategorySelectionBottomSheet
 import com.kazemieh.common.DateFilterType
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.toSignedPersianPrice
-import com.kazemieh.designsystem.GlassAmber
 import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassPurple
@@ -51,23 +50,25 @@ fun TransactionsScreen(
     sourceId: Long? = null,
     tagId: Long? = null,
     personId: Long? = null,
+    transactionType: TransactionType? = null,
     onNavigateToSearch: () -> Unit = {},
     viewModel: TransactionsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(resetFilters, state.resetFiltersHandled, categoryId, sourceId, tagId, personId) {
+    LaunchedEffect(resetFilters, state.resetFiltersHandled, categoryId, sourceId, tagId, personId, transactionType) {
         if (resetFilters && !state.resetFiltersHandled) {
             viewModel.onIntent(TransactionsIntent.ResetFilters)
         }
 
-        if (categoryId != null || sourceId != null || tagId != null || personId != null) {
+        if (categoryId != null || sourceId != null || tagId != null || personId != null || transactionType != null) {
             viewModel.onIntent(
                 TransactionsIntent.ApplyFilter(
                     categoryId = categoryId,
                     sourceId = sourceId,
                     tagId = tagId,
-                    personId = personId
+                    personId = personId,
+                    transactionType = transactionType
                 )
             )
         }

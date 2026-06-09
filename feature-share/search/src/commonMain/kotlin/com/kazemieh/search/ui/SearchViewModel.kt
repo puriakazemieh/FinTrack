@@ -11,6 +11,10 @@ import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.domain.usecase.DeleteRecentSearchUseCase
 import com.kazemieh.domain.usecase.GetRecentSearchesUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedCategoriesUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedPersonsUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedSourcesUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedTagsUseCase
 import com.kazemieh.domain.usecase.ObserveTransactionsUseCase
 import com.kazemieh.domain.usecase.SaveRecentSearchUseCase
 import com.kazemieh.domain.usecase.SearchCategoriesUseCase
@@ -41,7 +45,11 @@ class SearchViewModel(
     private val searchTagsUseCase: SearchTagsUseCase,
     private val getRecentSearchesUseCase: GetRecentSearchesUseCase,
     private val saveRecentSearchUseCase: SaveRecentSearchUseCase,
-    private val deleteRecentSearchUseCase: DeleteRecentSearchUseCase
+    private val deleteRecentSearchUseCase: DeleteRecentSearchUseCase,
+    private val observeMostUsedCategoriesUseCase: ObserveMostUsedCategoriesUseCase,
+    private val observeMostUsedSourcesUseCase: ObserveMostUsedSourcesUseCase,
+    private val observeMostUsedPersonsUseCase: ObserveMostUsedPersonsUseCase,
+    private val observeMostUsedTagsUseCase: ObserveMostUsedTagsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SearchState())
@@ -58,6 +66,22 @@ class SearchViewModel(
             .onEach { recents ->
                 _state.update { it.copy(recentSearches = recents) }
             }
+            .launchIn(viewModelScope)
+
+        observeMostUsedCategoriesUseCase(null)
+            .onEach { items -> _state.update { it.copy(mostUsedCategories = items) } }
+            .launchIn(viewModelScope)
+
+        observeMostUsedSourcesUseCase()
+            .onEach { items -> _state.update { it.copy(mostUsedSources = items) } }
+            .launchIn(viewModelScope)
+
+        observeMostUsedPersonsUseCase()
+            .onEach { items -> _state.update { it.copy(mostUsedPersons = items) } }
+            .launchIn(viewModelScope)
+
+        observeMostUsedTagsUseCase()
+            .onEach { items -> _state.update { it.copy(mostUsedTags = items) } }
             .launchIn(viewModelScope)
 
         combine(_query, _filterParams) { q, params ->
@@ -138,22 +162,23 @@ class SearchViewModel(
                     QuickFilter.TRANSFER -> TransactionType.TRANSFER
                     QuickFilter.RECENT_TRANSACTIONS -> TransactionType.ALL
                 }
-
-                val query = when (intent.filter) {
-                    QuickFilter.INCOME -> "درآمد"
-                    QuickFilter.EXPENSE -> "هزینه"
-                    QuickFilter.TRANSFER -> "انتقال"
-                    QuickFilter.RECENT_TRANSACTIONS -> ""
+                viewModelScope.launch {
+                    _effect.send(SearchEffect.NavigateToTransactionType(type))
                 }
-
-                _filterParams.update { it.copy(type = type.count) }
-                _query.value = query
-                _state.update { it.copy(query = query) }
             }
 
             is SearchIntent.DeleteRecentSearch -> {
                 viewModelScope.launch {
                     deleteRecentSearchUseCase(intent.query)
+                }
+            }
+
+            is SearchIntent.ShowTransactionBottomSheet -> {
+                _state.update {
+                    it.copy(
+                        showAddTransaction = !it.showAddTransaction,
+                        transactionWithRelations = intent.transaction
+                    )
                 }
             }
         }

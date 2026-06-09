@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -51,17 +50,19 @@ import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.SearchBar
+import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel = koinViewModel(),
+    snackbarHostState: androidx.compose.material3.SnackbarHostState,
     onBack: () -> Unit,
-    onNavigateToTransaction: (TransactionWithRelations) -> Unit = {},
     onNavigateToCategory: (Category) -> Unit = {},
     onNavigateToSource: (Source) -> Unit = {},
     onNavigateToPerson: (Person) -> Unit = {},
-    onNavigateToTag: (Tag) -> Unit = {}
+    onNavigateToTag: (Tag) -> Unit = {},
+    onNavigateToTransactionType: (com.kazemieh.common.model.TransactionType) -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
@@ -70,11 +71,14 @@ fun SearchScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is SearchEffect.GoBack -> onBack()
-                is SearchEffect.NavigateToTransaction -> onNavigateToTransaction(effect.transaction)
+                is SearchEffect.NavigateToTransaction -> {
+                    viewModel.onIntent(SearchIntent.ShowTransactionBottomSheet(effect.transaction))
+                }
                 is SearchEffect.NavigateToCategory -> onNavigateToCategory(effect.category)
                 is SearchEffect.NavigateToSource -> onNavigateToSource(effect.source)
                 is SearchEffect.NavigateToPerson -> onNavigateToPerson(effect.person)
                 is SearchEffect.NavigateToTag -> onNavigateToTag(effect.tag)
+                is SearchEffect.NavigateToTransactionType -> onNavigateToTransactionType(effect.type)
             }
         }
     }
@@ -108,9 +112,17 @@ fun SearchScreen(
                 SearchEmptyState(
                     recentSearches = state.recentSearches,
                     quickFilters = state.quickFilters,
+                    mostUsedCategories = state.mostUsedCategories,
+                    mostUsedSources = state.mostUsedSources,
+                    mostUsedPersons = state.mostUsedPersons,
+                    mostUsedTags = state.mostUsedTags,
                     onRecentClick = { viewModel.onIntent(SearchIntent.SelectRecentSearch(it)) },
                     onDeleteRecent = { viewModel.onIntent(SearchIntent.DeleteRecentSearch(it)) },
-                    onQuickFilterClick = { viewModel.onIntent(SearchIntent.SelectQuickFilter(it)) }
+                    onQuickFilterClick = { viewModel.onIntent(SearchIntent.SelectQuickFilter(it)) },
+                    onCategoryClick = onNavigateToCategory,
+                    onSourceClick = onNavigateToSource,
+                    onPersonClick = onNavigateToPerson,
+                    onTagClick = onNavigateToTag
                 )
             } else {
                 SearchResultList(
@@ -126,7 +138,7 @@ fun SearchScreen(
                                 tx.transaction.description ?: ""
                             )
                         )
-                        onNavigateToTransaction(tx)
+                        viewModel.onIntent(SearchIntent.ShowTransactionBottomSheet(tx))
                     },
                     onCategoryClick = { cat ->
                         viewModel.onIntent(SearchIntent.SelectRecentSearch(cat.name))
@@ -151,6 +163,15 @@ fun SearchScreen(
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         }
+
+        if (state.showAddTransaction) {
+            AddTransactionBottomSheet(
+                transactionWithRelations = state.transactionWithRelations,
+                snackbarHostState = snackbarHostState,
+                onDismiss = { viewModel.onIntent(SearchIntent.ShowTransactionBottomSheet()) },
+                transactionAdded = { viewModel.onIntent(SearchIntent.ShowTransactionBottomSheet()) },
+            )
+        }
     }
 }
 
@@ -159,16 +180,27 @@ fun SearchScreen(
 private fun SearchEmptyState(
     recentSearches: List<String>,
     quickFilters: List<QuickFilter>,
+    mostUsedCategories: List<Category>,
+    mostUsedSources: List<Source>,
+    mostUsedPersons: List<Person>,
+    mostUsedTags: List<Tag>,
     onRecentClick: (String) -> Unit,
     onDeleteRecent: (String) -> Unit,
-    onQuickFilterClick: (QuickFilter) -> Unit
+    onQuickFilterClick: (QuickFilter) -> Unit,
+    onCategoryClick: (Category) -> Unit,
+    onSourceClick: (Source) -> Unit,
+    onPersonClick: (Person) -> Unit,
+    onTagClick: (Tag) -> Unit
 ) {
     val space = LocalSpacing.current
-    Column(modifier = Modifier.fillMaxSize().padding(space.large)) {
+    LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = space.large)) {
         if (recentSearches.isNotEmpty()) {
-            FintrackTitleMediumText(text = "جستجوهای اخیر", fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(space.medium))
-            recentSearches.forEach { search ->
+            item {
+                Spacer(modifier = Modifier.height(space.large))
+                FintrackTitleMediumText(text = "جستجوهای اخیر", fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(space.medium))
+            }
+            items(recentSearches) { search ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -198,26 +230,53 @@ private fun SearchEmptyState(
             }
         }
 
-        Spacer(modifier = Modifier.height(space.large))
-        FintrackTitleMediumText(text = "فیلترهای سریع", fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(space.medium))
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(space.small),
-            verticalArrangement = Arrangement.spacedBy(space.small)
-        ) {
-            quickFilters.forEach { filter ->
-                val label = when (filter) {
-                    QuickFilter.INCOME -> "درآمدها"
-                    QuickFilter.EXPENSE -> "هزینه‌ها"
-                    QuickFilter.TRANSFER -> "انتقال‌ها"
-                    QuickFilter.RECENT_TRANSACTIONS -> "تراکنش‌های اخیر"
+        item {
+            Spacer(modifier = Modifier.height(space.large))
+            FintrackTitleMediumText(text = "فیلترهای سریع", fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(space.medium))
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(space.small),
+                verticalArrangement = Arrangement.spacedBy(space.small)
+            ) {
+                quickFilters.forEach { filter ->
+                    val label = when (filter) {
+                        QuickFilter.INCOME -> "درآمدها"
+                        QuickFilter.EXPENSE -> "هزینه‌ها"
+                        QuickFilter.TRANSFER -> "انتقال‌ها"
+                        QuickFilter.RECENT_TRANSACTIONS -> "تراکنش‌های اخیر"
+                    }
+                    Chip(onClick = { onQuickFilterClick(filter) }) {
+                        FintrackLabelMediumText(text = label)
+                    }
                 }
-                Chip(onClick = { onQuickFilterClick(filter) }) {
-                    FintrackLabelMediumText(text = label)
+
+                mostUsedCategories.forEach { category ->
+                    Chip(onClick = { onCategoryClick(category) }) {
+                        FintrackLabelMediumText(text = category.name)
+                    }
+                }
+
+                mostUsedSources.forEach { source ->
+                    Chip(onClick = { onSourceClick(source) }) {
+                        FintrackLabelMediumText(text = source.name)
+                    }
+                }
+
+                mostUsedPersons.forEach { person ->
+                    Chip(onClick = { onPersonClick(person) }) {
+                        FintrackLabelMediumText(text = person.name)
+                    }
+                }
+
+                mostUsedTags.forEach { tag ->
+                    Chip(onClick = { onTagClick(tag) }) {
+                        FintrackLabelMediumText(text = tag.name)
+                    }
                 }
             }
         }
+        item { Spacer(modifier = Modifier.height(space.large)) }
     }
 }
 
