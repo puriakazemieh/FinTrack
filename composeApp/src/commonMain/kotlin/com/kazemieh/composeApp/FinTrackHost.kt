@@ -19,13 +19,16 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.composeApp.navigation.AppNavHost
+import com.kazemieh.composeApp.navigation.Screen
 import com.kazemieh.composeApp.navigation.navigationBar.FintrackNavigationBar
 import com.kazemieh.designsystem.component.model.resolveString
 import kotlinx.coroutines.flow.collectLatest
 
 
 @Composable
-fun FinTrackHost() {
+fun FinTrackHost(
+    startDestination: Screen = Screen.BottomBarGraph
+) {
 
     val navController = rememberNavController()
 
@@ -56,14 +59,17 @@ fun FinTrackHost() {
                 AppNavHost(
                     navController = navController,
                     modifier = Modifier.fillMaxSize(),
-                    snackbarHostState = snackbarHostState
+                    snackbarHostState = snackbarHostState,
+                    startDestination = startDestination
                 )
 
-                FintrackNavigationBar(
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    navController = navController,
-                    onFabClick = { /* TODO: Global Add Transaction */ }
-                )
+                if (currentRoute != Screen.Onboarding::class.qualifiedName) {
+                    FintrackNavigationBar(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        navController = navController,
+                        onFabClick = { /* TODO: Global Add Transaction */ }
+                    )
+                }
 
                 // Snackbar above the navigation bar
                 SnackbarHost(

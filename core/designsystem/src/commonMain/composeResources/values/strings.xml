@@ -442,4 +442,20 @@
     <string name="biometric_title">ورود به فین‌ترک</string>
     <string name="biometric_subtitle">احراز هویت با اثر انگشت یا تشخیص چهره</string>
     <string name="biometric_failed">احراز هویت بیومتریک ناموفق بود</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">رد کردن</string>
+    <string name="onboarding_next">بعدی</string>
+    <string name="onboarding_previous">قبلی</string>
+    <string name="onboarding_start">شروع</string>
+    <string name="onboarding_welcome_title">خوش آمدید به فین‌تراک</string>
+    <string name="onboarding_welcome_desc">مدیریت هزینه‌ها و درآمدهای شما به ساده‌ترین شکل ممکن.</string>
+    <string name="onboarding_permissions_title">دسترسی‌ها</string>
+    <string name="onboarding_permissions_desc">برای عملکرد بهتر، فین‌تراک به برخی دسترسی‌ها نیاز دارد (مثل اعلان‌ها برای یادآوری ثبت تراکنش).</string>
+    <string name="onboarding_permissions_btn">اعطای دسترسی</string>
+    <string name="onboarding_setup_title">تنظیمات منبع مالی</string>
+    <string name="onboarding_setup_desc">می‌توانید اولین منبع مالی خود را تعریف کنید یا از مقادیر پیش‌فرض استفاده کنید.</string>
+    <string name="onboarding_setup_source_name">نام منبع (مثلاً نقدی یا بانک ملی)</string>
+    <string name="onboarding_setup_balance">موجودی اولیه</string>
+    <string name="onboarding_loading">در حال آماده‌سازی دیتای اولیه...</string>
 </resources>

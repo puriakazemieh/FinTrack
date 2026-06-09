@@ -38,6 +38,7 @@ import com.kazemieh.domain.usecase.SearchCategoriesUseCase
 import com.kazemieh.domain.usecase.SearchPersonsUseCase
 import com.kazemieh.domain.usecase.SearchSourcesUseCase
 import com.kazemieh.domain.usecase.SearchTagsUseCase
+import com.kazemieh.domain.usecase.SeedDataUseCase
 import com.kazemieh.domain.usecase.SetBooleanPreferenceUseCase
 import com.kazemieh.domain.usecase.SetStringPreferenceUseCase
 import com.kazemieh.domain.usecase.SourceUseCases
@@ -90,6 +91,7 @@ val domainModule = module {
     factory { UpdateTagPositionsUseCase(get()) }
     factory { UpdatePersonPositionsUseCase(get()) }
     factory { GetTransactionAmountRangeUseCase(get()) }
+    factory { SeedDataUseCase(get(), get()) }
 
     factory { GetBooleanPreferenceUseCase(get()) }
     factory { SetBooleanPreferenceUseCase(get()) }

@@ -13,6 +13,7 @@ import com.kazemieh.category.di.transactionCategoryModule
 import com.kazemieh.category.di.transactionDeleteCategoryModule
 import com.kazemieh.common.di.commonModule
 import com.kazemieh.dashboard.di.dashboardModule
+import com.kazemieh.onboarding.di.onboardingModule
 import com.kazemieh.data.di.dataModule
 import com.kazemieh.database.DatabaseInitializer
 import com.kazemieh.database.di.databaseModule
@@ -44,6 +45,7 @@ import com.kazemieh.transaction.di.transactionDeleteViewModelModule
 import com.kazemieh.transaction.di.transactionPresentationModule
 import com.kazemieh.transaction.di.transactionReportViewModelModule
 import com.kazemieh.transactions.di.transactionsViewModelModule
+import com.kazemieh.composeApp.navigation.Screen
 import org.koin.compose.koinInject
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
@@ -71,10 +73,16 @@ fun App() {
     }
 
     if (isReady) {
+        val isFirstRun = preferenceUseCases.getBooleanPreference(
+            com.kazemieh.domain.usecase.SeedDataUseCase.PREF_IS_FIRST_RUN,
+            true
+        )
+        val startDestination = if (isFirstRun) Screen.Onboarding else Screen.BottomBarGraph
+
         CompositionLocalProvider(LocalCurrency provides Currency.valueOf(currentCurrency)) {
             FintrackTheme(theme = AppTheme.valueOf(currentTheme)) {
                 LockGate {
-                    FinTrackHost()
+                    FinTrackHost(startDestination = startDestination)
                 }
             }
         }
@@ -107,6 +115,7 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         transactionAddPersonModule,
         toolsModule,
         dashboardModule,
+        onboardingModule,
         transactionsViewModelModule,
         searchModule,
         preferencesModule,

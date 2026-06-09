@@ -60,6 +60,7 @@ include(":feature-share:search")
 include(":feature-share:lock")
 
 include(":feature-container:transactions")
+include(":feature-container:onboarding")
 include(":feature-container:dashboard")
 include(":feature-container:profile")
 include(":feature-container:tools")

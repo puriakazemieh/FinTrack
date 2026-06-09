@@ -34,6 +34,9 @@ sealed class Screen {
     data object Search : Screen()
 
     @Serializable
+    data object Onboarding : Screen()
+
+    @Serializable
     data object BottomBarGraph : Screen()
 
 }
