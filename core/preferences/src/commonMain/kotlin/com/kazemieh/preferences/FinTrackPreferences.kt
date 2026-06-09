@@ -35,5 +35,9 @@ class FinTrackPreferences(private val settings: Settings) {
         const val PREF_USER_JOB = "pref_user_job"
         const val PREF_USER_GOAL = "pref_user_goal"
         const val PREF_USER_AVATAR = "pref_user_avatar"
+
+        const val PREF_LOCK_ENABLED = "pref_lock_enabled"
+        const val PREF_BIOMETRIC_ENABLED = "pref_biometric_enabled"
+        const val PREF_HASHED_PIN = "pref_hashed_pin"
     }
 }

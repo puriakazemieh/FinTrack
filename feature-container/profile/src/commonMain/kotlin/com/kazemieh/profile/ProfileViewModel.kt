@@ -2,6 +2,7 @@ package com.kazemieh.profile
 
 import androidx.lifecycle.ViewModel
 import com.kazemieh.domain.usecase.PreferenceUseCases
+import com.kazemieh.preferences.FinTrackPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -21,7 +22,8 @@ class ProfileViewModel(
         _state.update {
             it.copy(
                 isDarkModeEnabled = preferenceUseCases.getBooleanPreference(PREF_DARK_MODE, false),
-                isFingerprintEnabled = preferenceUseCases.getBooleanPreference(PREF_FINGERPRINT, false),
+                isFingerprintEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_BIOMETRIC_ENABLED, false),
+                isLockEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, false),
                 isBackupEnabled = preferenceUseCases.getBooleanPreference(PREF_BACKUP, true),
                 isPushNotificationsEnabled = preferenceUseCases.getBooleanPreference(PREF_PUSH_NOTIF, true),
                 isTransactionAlertsEnabled = preferenceUseCases.getBooleanPreference(PREF_TX_ALERTS, true)
@@ -38,7 +40,7 @@ class ProfileViewModel(
             }
             is ProfileIntent.ToggleFingerprint -> {
                 val newValue = !_state.value.isFingerprintEnabled
-                preferenceUseCases.setBooleanPreference(PREF_FINGERPRINT, newValue)
+                preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_BIOMETRIC_ENABLED, newValue)
                 _state.update { it.copy(isFingerprintEnabled = newValue) }
             }
             is ProfileIntent.ToggleBackup -> {
@@ -56,6 +58,11 @@ class ProfileViewModel(
                 preferenceUseCases.setBooleanPreference(PREF_TX_ALERTS, newValue)
                 _state.update { it.copy(isTransactionAlertsEnabled = newValue) }
             }
+            is ProfileIntent.ToggleLock -> {
+                val newValue = !_state.value.isLockEnabled
+                preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, newValue)
+                _state.update { it.copy(isLockEnabled = newValue) }
+            }
             ProfileIntent.Logout -> {
                 // Handle logout logic
             }
@@ -64,7 +71,6 @@ class ProfileViewModel(
 
     companion object {
         private const val PREF_DARK_MODE = "pref_dark_mode"
-        private const val PREF_FINGERPRINT = "pref_fingerprint"
         private const val PREF_BACKUP = "pref_backup"
         private const val PREF_PUSH_NOTIF = "pref_push_notif"
         private const val PREF_TX_ALERTS = "pref_tx_alerts"
@@ -74,6 +80,7 @@ class ProfileViewModel(
 data class ProfileState(
     val isDarkModeEnabled: Boolean = false,
     val isFingerprintEnabled: Boolean = false,
+    val isLockEnabled: Boolean = false,
     val isBackupEnabled: Boolean = true,
     val isPushNotificationsEnabled: Boolean = true,
     val isTransactionAlertsEnabled: Boolean = true,
@@ -86,5 +93,6 @@ sealed interface ProfileIntent {
     data object ToggleBackup : ProfileIntent
     data object TogglePushNotifications : ProfileIntent
     data object ToggleTransactionAlerts : ProfileIntent
+    data object ToggleLock : ProfileIntent
     data object Logout : ProfileIntent
 }

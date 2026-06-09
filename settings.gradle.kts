@@ -57,6 +57,7 @@ include(":feature-share:source")
 include(":feature-share:tags")
 include(":feature-share:person")
 include(":feature-share:search")
+include(":feature-share:lock")
 
 include(":feature-container:transactions")
 include(":feature-container:dashboard")

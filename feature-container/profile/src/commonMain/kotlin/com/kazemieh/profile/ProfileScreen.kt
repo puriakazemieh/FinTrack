@@ -108,6 +108,12 @@ fun ProfileScreen(
             item {
                 SettingsSection(title = stringResource(Res.string.section_security)) {
                     SettingItem(
+                        title = "قفل برنامه",
+                        icon = Icons.Default.Lock,
+                        on = state.isLockEnabled,
+                        onToggle = { viewModel.onIntent(ProfileIntent.ToggleLock) }
+                    )
+                    SettingItem(
                         title = stringResource(Res.string.setting_fingerprint),
                         icon = Icons.Default.Fingerprint,
                         on = state.isFingerprintEnabled,

@@ -431,4 +431,11 @@
     <string name="msg_profile_saved">تغییرات با موفقیت ذخیره شد</string>
 
 
+    <string name="setting_app_lock">قفل برنامه</string>
+    <string name="lock_welcome">خوش آمدید</string>
+    <string name="lock_enter_pin">کد عبور خود را وارد کنید</string>
+    <string name="lock_error_pin">کد وارد شده اشتباه است</string>
+    <string name="biometric_title">ورود به فین‌ترک</string>
+    <string name="biometric_subtitle">احراز هویت با اثر انگشت یا تشخیص چهره</string>
+    <string name="biometric_failed">احراز هویت بیومتریک ناموفق بود</string>
 </resources>
