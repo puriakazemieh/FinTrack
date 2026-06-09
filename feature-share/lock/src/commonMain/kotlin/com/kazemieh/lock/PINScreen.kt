@@ -40,8 +40,15 @@ fun PINScreen(
         Spacer(modifier = Modifier.height(space.extraLarge))
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            val title = when (state.mode) {
+                LockMode.UNLOCK -> stringResource(Res.string.lock_welcome)
+                LockMode.CREATE -> stringResource(Res.string.lock_create_pin)
+                LockMode.CONFIRM -> stringResource(Res.string.lock_confirm_pin)
+                LockMode.VERIFY_BEFORE_DISABLE -> stringResource(Res.string.lock_verify_to_disable)
+            }
+            
             FintrackHeadlineMediumText(
-                text = stringResource(Res.string.lock_welcome),
+                text = title,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(space.medium))
@@ -76,6 +83,7 @@ fun PINScreen(
                 FintrackBodyLargeText(
                     text = when(state.error) {
                         "lock_error_pin" -> stringResource(Res.string.lock_error_pin)
+                        "lock_error_mismatch" -> stringResource(Res.string.lock_error_mismatch)
                         "biometric_failed" -> stringResource(Res.string.biometric_failed)
                         else -> state.error
                     },
@@ -103,7 +111,7 @@ fun PINScreen(
                 ) {
                     row.forEach { key ->
                         val isEnabled = when (key) {
-                            KeypadKey.BIOMETRIC -> true
+                            KeypadKey.BIOMETRIC -> state.mode == LockMode.UNLOCK && state.isBiometricEnabled
                             KeypadKey.DELETE -> state.pin.isNotEmpty()
                             else -> state.pin.length < 4
                         }
@@ -123,7 +131,7 @@ fun PINScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             when (key) {
-                                KeypadKey.BIOMETRIC -> if (state.isBiometricEnabled) {
+                                KeypadKey.BIOMETRIC -> if (state.mode == LockMode.UNLOCK && state.isBiometricEnabled) {
                                     Icon(
                                         imageVector = Icons.Default.Fingerprint,
                                         contentDescription = null,

@@ -18,31 +18,33 @@ class LockViewModel(
     private val _effect = Channel<LockEffect>()
     val effect = _effect.receiveAsFlow()
 
-    init {
-        loadSettings()
-    }
+    private var firstTempPin: String = ""
 
-    private fun loadSettings() {
+    init {
         val isLockEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, false)
         val isBiometricEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_BIOMETRIC_ENABLED, false)
-        
         _state.update { 
             it.copy(
-                isLockEnabled = isLockEnabled,
+                isLockEnabled = isLockEnabled, 
                 isBiometricEnabled = isBiometricEnabled,
-                isLocked = isLockEnabled
-            )
-        }
-        
-        if (isLockEnabled && isBiometricEnabled) {
-            viewModelScope.launch {
-                _effect.send(LockEffect.TriggerBiometric)
-            }
+                isLocked = isLockEnabled,
+                isInitialized = true
+            ) 
         }
     }
 
     fun onIntent(intent: LockIntent) {
         when (intent) {
+            is LockIntent.Init -> {
+                _state.update { it.copy(mode = intent.mode, pin = "", error = null) }
+                if (intent.mode == LockMode.UNLOCK) {
+                    if (_state.value.isLockEnabled && _state.value.isBiometricEnabled) {
+                        viewModelScope.launch { _effect.send(LockEffect.TriggerBiometric) }
+                    }
+                } else {
+                    _state.update { it.copy(isLocked = true) }
+                }
+            }
             is LockIntent.KeyPressed -> {
                 handleKeypad(intent.key)
             }
@@ -62,15 +64,34 @@ class LockViewModel(
                 }
             }
             KeypadKey.BIOMETRIC -> {
-                // Handled via LockIntent.AuthenticateBiometric
+                viewModelScope.launch { _effect.send(LockEffect.TriggerBiometric) }
             }
             else -> {
                 if (_state.value.pin.length < 4) {
                     val newPin = _state.value.pin + key.toString()
                     _state.update { it.copy(pin = newPin, error = null) }
                     if (newPin.length == 4) {
-                        verifyPin(newPin)
+                        processCompletePin(newPin)
                     }
+                }
+            }
+        }
+    }
+
+    private fun processCompletePin(pin: String) {
+        when (_state.value.mode) {
+            LockMode.UNLOCK, LockMode.VERIFY_BEFORE_DISABLE -> {
+                verifyPin(pin)
+            }
+            LockMode.CREATE -> {
+                firstTempPin = pin
+                _state.update { it.copy(mode = LockMode.CONFIRM, pin = "") }
+            }
+            LockMode.CONFIRM -> {
+                if (pin == firstTempPin) {
+                    saveNewPin(pin)
+                } else {
+                    _state.update { it.copy(pin = "", error = "lock_error_mismatch", mode = LockMode.CREATE) }
                 }
             }
         }
@@ -79,7 +100,6 @@ class LockViewModel(
     private fun verifyPin(pin: String) {
         val savedHashedPin = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_HASHED_PIN, "")
         if (savedHashedPin.isEmpty()) {
-            // If no PIN is set but lock is enabled, we might want to force create or just allow
             unlock()
             return
         }
@@ -87,8 +107,16 @@ class LockViewModel(
         if (hashPin(pin) == savedHashedPin) {
             unlock()
         } else {
-            _state.update { it.copy(pin = "", error = "lock_error_pin") } // String key for UI
+            _state.update { it.copy(pin = "", error = "lock_error_pin") }
         }
+    }
+
+    private fun saveNewPin(pin: String) {
+        val hashed = hashPin(pin)
+        preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_HASHED_PIN, hashed)
+        preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, true)
+        _state.update { it.copy(isLockEnabled = true) }
+        unlock()
     }
 
     private fun unlock() {
@@ -105,7 +133,6 @@ class LockViewModel(
     }
 
     private fun hashPin(pin: String): String {
-        // Better than reversed, though ideally we'd use a real SHA-256 lib
         val salt = "FinTrack_2026_Secure_Salt"
         var hash = 7L
         val combined = pin + salt

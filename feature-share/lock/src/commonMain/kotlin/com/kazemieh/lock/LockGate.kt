@@ -1,6 +1,12 @@
 package com.kazemieh.lock
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -12,16 +18,22 @@ fun LockGate(
 ) {
     val viewModel: LockViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val biometricAuthenticator = rememberBiometricAuthenticator()
     val biometricTitle = stringResource(Res.string.biometric_title)
     val biometricSubtitle = stringResource(Res.string.biometric_subtitle)
 
+    // Re-check lock status when app starts or state changes
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(LockIntent.Init(LockMode.UNLOCK))
+    }
+
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is LockEffect.TriggerBiometric -> {
-                    if (biometricAuthenticator.isBiometricAvailable()) {
+                    if (state.isBiometricEnabled && biometricAuthenticator.isBiometricAvailable()) {
                         biometricAuthenticator.authenticate(
                             title = biometricTitle,
                             subtitle = biometricSubtitle,
@@ -34,18 +46,27 @@ fun LockGate(
                     // Handled by state change (isLocked = false)
                 }
                 is LockEffect.Error -> {
-                    // Optional: show snackbar or similar
+                    snackbarHostState.showSnackbar(effect.message)
                 }
             }
         }
     }
 
-    if (!state.isLockEnabled || !state.isLocked) {
-        content()
-    } else {
-        PINScreen(
-            state = state,
-            onIntent = viewModel::onIntent
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (state.isInitialized) {
+            if (!state.isLocked) {
+                content()
+            } else {
+                PINScreen(
+                    state = state,
+                    onIntent = viewModel::onIntent
+                )
+            }
+        }
+        
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
 }

@@ -1,11 +1,13 @@
 package com.kazemieh.profile
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.PreferenceUseCases
+import com.kazemieh.lock.LockMode
 import com.kazemieh.preferences.FinTrackPreferences
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 class ProfileViewModel(
     private val preferenceUseCases: PreferenceUseCases,
@@ -13,6 +15,9 @@ class ProfileViewModel(
 
     private val _state = MutableStateFlow(ProfileState())
     val state: StateFlow<ProfileState> = _state
+
+    private val _effect = Channel<ProfileEffect>()
+    val effect = _effect.receiveAsFlow()
 
     init {
         loadSettings()
@@ -39,9 +44,15 @@ class ProfileViewModel(
                 _state.update { it.copy(isDarkModeEnabled = newValue) }
             }
             is ProfileIntent.ToggleFingerprint -> {
-                val newValue = !_state.value.isFingerprintEnabled
-                preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_BIOMETRIC_ENABLED, newValue)
-                _state.update { it.copy(isFingerprintEnabled = newValue) }
+                if (!_state.value.isLockEnabled) {
+                    viewModelScope.launch {
+                        _effect.send(ProfileEffect.ShowLockPIN(LockMode.CREATE, true))
+                    }
+                } else {
+                    val newValue = !_state.value.isFingerprintEnabled
+                    preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_BIOMETRIC_ENABLED, newValue)
+                    _state.update { it.copy(isFingerprintEnabled = newValue) }
+                }
             }
             is ProfileIntent.ToggleBackup -> {
                 val newValue = !_state.value.isBackupEnabled
@@ -59,9 +70,19 @@ class ProfileViewModel(
                 _state.update { it.copy(isTransactionAlertsEnabled = newValue) }
             }
             is ProfileIntent.ToggleLock -> {
-                val newValue = !_state.value.isLockEnabled
-                preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, newValue)
-                _state.update { it.copy(isLockEnabled = newValue) }
+                val mode = if (_state.value.isLockEnabled) LockMode.VERIFY_BEFORE_DISABLE else LockMode.CREATE
+                viewModelScope.launch {
+                    _effect.send(ProfileEffect.ShowLockPIN(mode, false))
+                }
+            }
+            is ProfileIntent.SetLockState -> {
+                preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, intent.isEnabled)
+                if (!intent.isEnabled) {
+                    preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_BIOMETRIC_ENABLED, false)
+                    _state.update { it.copy(isLockEnabled = false, isFingerprintEnabled = false) }
+                } else {
+                    _state.update { it.copy(isLockEnabled = true) }
+                }
             }
             ProfileIntent.Logout -> {
                 // Handle logout logic
@@ -94,5 +115,10 @@ sealed interface ProfileIntent {
     data object TogglePushNotifications : ProfileIntent
     data object ToggleTransactionAlerts : ProfileIntent
     data object ToggleLock : ProfileIntent
+    data class SetLockState(val isEnabled: Boolean) : ProfileIntent
     data object Logout : ProfileIntent
+}
+
+sealed interface ProfileEffect {
+    data class ShowLockPIN(val mode: LockMode, val triggerFingerprint: Boolean) : ProfileEffect
 }

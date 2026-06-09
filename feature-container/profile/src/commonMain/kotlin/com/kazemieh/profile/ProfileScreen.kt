@@ -28,15 +28,70 @@ import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
+import com.kazemieh.lock.*
+import androidx.compose.runtime.*
+import org.koin.compose.viewmodel.koinViewModel as lockKoinViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     onNavigateToThemeAndCurrency: () -> Unit,
     onNavigateToProfileEdit: () -> Unit,
     viewModel: ProfileViewModel = koinViewModel(),
-//    snackbarHostState: SnackbarHostState
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
+    
+    var showLockSheet by remember { mutableStateOf(false) }
+    var lockDialogMode by remember { mutableStateOf(LockMode.CREATE) }
+    var shouldTriggerFingerprintAfterSetup by remember { mutableStateOf(false) }
+
+    val lockViewModel: LockViewModel = lockKoinViewModel()
+    val lockState by lockViewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is ProfileEffect.ShowLockPIN -> {
+                    lockDialogMode = effect.mode
+                    shouldTriggerFingerprintAfterSetup = effect.triggerFingerprint
+                    lockViewModel.onIntent(LockIntent.Init(effect.mode))
+                    showLockSheet = true
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(lockState.isLocked) {
+        if (!lockState.isLocked && showLockSheet) {
+            if (lockDialogMode == LockMode.CREATE || lockDialogMode == LockMode.CONFIRM) {
+                viewModel.onIntent(ProfileIntent.SetLockState(true))
+                if (shouldTriggerFingerprintAfterSetup) {
+                    viewModel.onIntent(ProfileIntent.ToggleFingerprint)
+                }
+            } else if (lockDialogMode == LockMode.VERIFY_BEFORE_DISABLE) {
+                viewModel.onIntent(ProfileIntent.SetLockState(false))
+            }
+            showLockSheet = false
+        }
+    }
+
+    if (showLockSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showLockSheet = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            dragHandle = { BottomSheetDefaults.DragHandle() },
+            containerColor = MaterialTheme.colorScheme.background,
+            content = {
+                Box(modifier = Modifier.fillMaxHeight(0.8f)) {
+                    PINScreen(
+                        state = lockState,
+                        onIntent = lockViewModel::onIntent
+                    )
+                }
+            }
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -111,13 +166,17 @@ fun ProfileScreen(
                         title = "قفل برنامه",
                         icon = Icons.Default.Lock,
                         on = state.isLockEnabled,
-                        onToggle = { viewModel.onIntent(ProfileIntent.ToggleLock) }
+                        onToggle = {
+                            viewModel.onIntent(ProfileIntent.ToggleLock)
+                        }
                     )
                     SettingItem(
                         title = stringResource(Res.string.setting_fingerprint),
                         icon = Icons.Default.Fingerprint,
                         on = state.isFingerprintEnabled,
-                        onToggle = { viewModel.onIntent(ProfileIntent.ToggleFingerprint) }
+                        onToggle = {
+                            viewModel.onIntent(ProfileIntent.ToggleFingerprint)
+                        }
                     )
                 }
             }

@@ -3,17 +3,19 @@ package com.kazemieh.lock
 data class LockState(
     val pin: String = "",
     val error: String? = null,
-    val isLocked: Boolean = true,
+    val isLocked: Boolean = false, // Start as false to prevent flicker, VM will init correctly
     val isBiometricAvailable: Boolean = false,
     val isBiometricEnabled: Boolean = false,
     val isLockEnabled: Boolean = false,
-    val mode: LockMode = LockMode.UNLOCK
+    val mode: LockMode = LockMode.UNLOCK,
+    val isInitialized: Boolean = false
 )
 
 enum class LockMode {
     UNLOCK, // Normal app entry
-    CREATE, // Setting up new PIN
-    CONFIRM // Confirming new PIN
+    CREATE, // Setting up new PIN (Step 1)
+    CONFIRM, // Confirming new PIN (Step 2)
+    VERIFY_BEFORE_DISABLE // Verify PIN before disabling lock in settings
 }
 
 enum class KeypadKey {
@@ -40,6 +42,7 @@ enum class KeypadKey {
 sealed interface LockIntent {
     data class KeyPressed(val key: KeypadKey) : LockIntent
     data object AuthenticateBiometric : LockIntent
+    data class Init(val mode: LockMode) : LockIntent
 }
 
 sealed interface LockEffect {
