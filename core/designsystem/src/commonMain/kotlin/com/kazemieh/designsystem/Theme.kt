@@ -34,10 +34,35 @@ private val LightColors = lightColorScheme(
 )
 
 private val DarkColors = darkColorScheme(
+    primary = md_theme_dark_primary,
+    onPrimary = md_theme_dark_onPrimary,
+    primaryContainer = md_theme_dark_primaryContainer,
+    onPrimaryContainer = md_theme_dark_onPrimaryContainer,
+    secondary = md_theme_dark_secondary,
+    onSecondary = md_theme_dark_onSecondary,
+    secondaryContainer = md_theme_dark_secondaryContainer,
+    onSecondaryContainer = md_theme_dark_onSecondaryContainer,
+    tertiary = md_theme_dark_tertiary,
+    onTertiary = md_theme_dark_onTertiary,
+    tertiaryContainer = md_theme_dark_tertiaryContainer,
+    onTertiaryContainer = md_theme_dark_onTertiaryContainer,
+    error = md_theme_dark_error,
+    onError = md_theme_dark_onError,
+    errorContainer = md_theme_dark_errorContainer,
+    onErrorContainer = md_theme_dark_onErrorContainer,
+    background = md_theme_dark_background,
+    onBackground = md_theme_dark_onBackground,
+    surface = md_theme_dark_surface,
+    onSurface = md_theme_dark_onSurface,
+    outline = md_theme_dark_outline,
+    outlineVariant = md_theme_dark_outlineVariant,
+)
+
+private val GlassDarkColors = darkColorScheme(
     primary = GlassGreen,
-    onPrimary = GlassGreenDark, // Standardized contrast color
-    primaryContainer = GlassGreenDeep, // For gradients
-    onPrimaryContainer = GlassGreenSoft, // For semantic backgrounds
+    onPrimary = GlassGreenDark,
+    primaryContainer = GlassGreenDeep,
+    onPrimaryContainer = GlassGreenSoft,
     secondary = GlassBlue,
     onSecondary = GlassBg0,
     secondaryContainer = GlassBlueSoft,
@@ -48,7 +73,7 @@ private val DarkColors = darkColorScheme(
     onBackground = GlassText,
     surface = GlassBgAccent,
     onSurface = GlassText,
-    surfaceVariant = GlassColor, // Used for glass surfaces
+    surfaceVariant = GlassColor,
     onSurfaceVariant = GlassText2,
     outline = GlassEdge,
     outlineVariant = GlassHairline,
@@ -58,14 +83,44 @@ private val DarkColors = darkColorScheme(
     onErrorContainer = GlassRed,
 )
 
+private val GlassLightColors = lightColorScheme(
+    primary = GlassGreenDeep,
+    onPrimary = Color.White,
+    primaryContainer = GlassGreenSoft,
+    onPrimaryContainer = GlassGreenDeep,
+    secondary = GlassBlue,
+    onSecondary = Color.White,
+    secondaryContainer = GlassBlueSoft,
+    onSecondaryContainer = GlassBlue,
+    tertiary = GlassPurple,
+    onTertiary = Color.White,
+    background = Color(0xFFF0F4F3),
+    onBackground = Color(0xFF06100E),
+    surface = Color.White,
+    onSurface = Color(0xFF06100E),
+    surfaceVariant = Color(0x0B000000),
+    onSurfaceVariant = Color(0xFF6B7280),
+    outline = Color(0xFFE5E7EB),
+    outlineVariant = Color(0xFFF3F4F6),
+    error = GlassRed,
+    onError = Color.White,
+    errorContainer = GlassRedSoft,
+    onErrorContainer = GlassRed,
+)
+
 
 @Composable
 fun FintrackTheme(
-    darkTheme: Boolean = true,
+    theme: AppTheme = AppTheme.GLASS_DARK,
     content: @Composable () -> Unit
 ) {
+    val colorScheme = when (theme) {
+        AppTheme.GLASS_DARK -> GlassDarkColors
+        AppTheme.GLASS_LIGHT -> GlassLightColors
+        AppTheme.PLAIN_DARK -> DarkColors
+        AppTheme.PLAIN_LIGHT -> LightColors
+    }
 
-    val colorScheme = if (darkTheme) DarkColors else LightColors
     CompositionLocalProvider(LocalSpacing provides Dimensions()) {
         MaterialTheme(
             colorScheme = colorScheme,
@@ -74,5 +129,4 @@ fun FintrackTheme(
             content = content
         )
     }
-
 }

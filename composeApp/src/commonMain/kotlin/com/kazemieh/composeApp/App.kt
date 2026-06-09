@@ -35,14 +35,36 @@ import com.kazemieh.transaction.di.transactionDeleteViewModelModule
 import com.kazemieh.transaction.di.transactionPresentationModule
 import com.kazemieh.transaction.di.transactionReportViewModelModule
 import com.kazemieh.transactions.di.transactionsViewModelModule
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import org.koin.compose.koinInject
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
+import com.kazemieh.domain.usecase.PreferenceUseCases
+import com.kazemieh.designsystem.AppTheme
+import com.kazemieh.money.Currency
+import com.kazemieh.designsystem.LocalCurrency
+import com.kazemieh.profile.ThemeAndCurrencyViewModel
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
 
 @Composable
 fun App() {
     val initializer = koinInject<DatabaseInitializer>()
+    val preferenceUseCases = koinInject<PreferenceUseCases>()
+
     var isReady by remember { mutableStateOf(false) }
+
+    val currentTheme by preferenceUseCases.getStringFlow(
+        ThemeAndCurrencyViewModel.PREF_THEME,
+        AppTheme.GLASS_DARK.name
+    ).collectAsState(AppTheme.GLASS_DARK.name)
+
+    val currentCurrency by preferenceUseCases.getStringFlow(
+        ThemeAndCurrencyViewModel.PREF_CURRENCY,
+        Currency.TOMAN.name
+    ).collectAsState(Currency.TOMAN.name)
 
     LaunchedEffect(Unit) {
         initializer.initialize()
@@ -50,8 +72,10 @@ fun App() {
     }
 
     if (isReady) {
-        FintrackTheme {
-            FinTrackHost()
+        CompositionLocalProvider(LocalCurrency provides Currency.valueOf(currentCurrency)) {
+            FintrackTheme(theme = AppTheme.valueOf(currentTheme)) {
+                FinTrackHost()
+            }
         }
     }
 }

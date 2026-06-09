@@ -12,6 +12,8 @@ import com.kazemieh.domain.usecase.DeleteSourceUseCase
 import com.kazemieh.domain.usecase.DeleteTagUseCase
 import com.kazemieh.domain.usecase.DeleteTransactionUseCase
 import com.kazemieh.domain.usecase.GetBooleanPreferenceUseCase
+import com.kazemieh.domain.usecase.GetStringFlowUseCase
+import com.kazemieh.domain.usecase.GetStringPreferenceUseCase
 import com.kazemieh.domain.usecase.GetCategoryUseCase
 import com.kazemieh.domain.usecase.GetDefaultCategoryUseCase
 import com.kazemieh.domain.usecase.GetDefaultFinancialSourceUseCase
@@ -37,6 +39,7 @@ import com.kazemieh.domain.usecase.SearchPersonsUseCase
 import com.kazemieh.domain.usecase.SearchSourcesUseCase
 import com.kazemieh.domain.usecase.SearchTagsUseCase
 import com.kazemieh.domain.usecase.SetBooleanPreferenceUseCase
+import com.kazemieh.domain.usecase.SetStringPreferenceUseCase
 import com.kazemieh.domain.usecase.SourceUseCases
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import com.kazemieh.domain.usecase.UpdateCategoryPositionsUseCase
@@ -90,6 +93,9 @@ val domainModule = module {
 
     factory { GetBooleanPreferenceUseCase(get()) }
     factory { SetBooleanPreferenceUseCase(get()) }
+    factory { GetStringPreferenceUseCase(get()) }
+    factory { SetStringPreferenceUseCase(get()) }
+    factory { GetStringFlowUseCase(get()) }
 
     factory { SearchCategoriesUseCase(get()) }
     factory { SearchSourcesUseCase(get()) }
@@ -110,7 +116,10 @@ val domainModule = module {
     single {
         PreferenceUseCases(
             getBooleanPreference = get(),
-            setBooleanPreference = get()
+            setBooleanPreference = get(),
+            getStringPreference = get(),
+            setStringPreference = get(),
+            getStringFlow = get()
         )
     }
     single {

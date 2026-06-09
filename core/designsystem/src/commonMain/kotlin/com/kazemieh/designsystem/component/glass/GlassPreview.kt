@@ -21,7 +21,7 @@ import com.kazemieh.designsystem.*
 @Preview
 @Composable
 fun GlassComponentsPreview() {
-    FintrackTheme(darkTheme = true) {
+    FintrackTheme(theme = AppTheme.GLASS_DARK) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

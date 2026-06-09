@@ -392,4 +392,15 @@
     <string name="user_name_default">پیمان کاظمیه</string>
     <string name="user_email_default">p.kazemieh@gmail.com</string>
 
+    <string name="setting_theme_currency">تم و واحد پول</string>
+    <string name="title_theme_currency">تنظیمات ظاهر و واحد پول</string>
+    <string name="label_theme">انتخاب تم</string>
+    <string name="label_currency">واحد پول</string>
+    <string name="theme_glass_dark">شیشه‌ای تیره</string>
+    <string name="theme_glass_light">شیشه‌ای روشن</string>
+    <string name="theme_plain_dark">تیره ساده</string>
+    <string name="theme_plain_light">روشن ساده</string>
+    <string name="currency_toman_full">تومان</string>
+    <string name="currency_rial_full">ریال</string>
+
 </resources>

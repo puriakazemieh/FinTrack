@@ -40,6 +40,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.russhwolf.settings)
                 implementation(libs.russhwolf.settings.noarg)
                 implementation(libs.russhwolf.settings.coroutines)

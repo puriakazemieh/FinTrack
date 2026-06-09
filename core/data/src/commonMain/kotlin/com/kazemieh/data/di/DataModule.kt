@@ -8,5 +8,5 @@ import org.koin.dsl.module
 
 val dataModule = module {
     single<TransactionRepository> { TransactionRepositoryImpl(get(),get()) }
-    single<PreferenceRepository> { PreferenceRepositoryImpl(get()) }
+    single<PreferenceRepository> { PreferenceRepositoryImpl(get(), get()) }
 }

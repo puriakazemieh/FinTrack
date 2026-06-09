@@ -2,6 +2,7 @@ package com.kazemieh.profile
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -20,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.Switch
 import fintrack.core.designsystem.generated.resources.*
@@ -28,6 +30,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ProfileScreen(
+    onNavigateToThemeAndCurrency: () -> Unit,
     viewModel: ProfileViewModel = koinViewModel(),
 //    snackbarHostState: SnackbarHostState
 ) {
@@ -87,6 +90,11 @@ fun ProfileScreen(
 
             item {
                 SettingsSection(title = stringResource(Res.string.section_display)) {
+                    SettingItem(
+                        title = stringResource(Res.string.setting_theme_currency),
+                        icon = Icons.Default.Palette,
+                        onClick = onNavigateToThemeAndCurrency
+                    )
                     SettingItem(
                         title = stringResource(Res.string.setting_dark_mode),
                         icon = Icons.Default.DarkMode,
@@ -159,22 +167,19 @@ fun ProfileHero() {
             color = MaterialTheme.colorScheme.primaryContainer
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Text(
+                FintrackHeadlineLargeText(
                     text = stringResource(Res.string.placeholder_user_initial),
-                    style = MaterialTheme.typography.headlineLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
         }
         Spacer(modifier = Modifier.height(space.medium))
-        Text(
+        FintrackTitleLargeText(
             text = stringResource(Res.string.user_name_default),
-            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
-        Text(
+        FintrackBodyMediumText(
             text = stringResource(Res.string.user_email_default),
-            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
@@ -191,14 +196,12 @@ fun SyncCard(modifier: Modifier = Modifier) {
                 tint = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.height(space.small))
-            Text(
+            FintrackLabelLargeText(
                 text = stringResource(Res.string.profile_sync_title),
-                style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold
             )
-            Text(
+            FintrackLabelSmallText(
                 text = stringResource(Res.string.profile_sync_desc, "۱۰ دقیقه پیش"),
-                style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -216,14 +219,12 @@ fun PremiumCard(modifier: Modifier = Modifier) {
                 tint = Color(0xFFFFD700)
             )
             Spacer(modifier = Modifier.height(space.small))
-            Text(
+            FintrackLabelLargeText(
                 text = stringResource(Res.string.profile_premium_title),
-                style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold
             )
-            Text(
+            FintrackLabelSmallText(
                 text = stringResource(Res.string.profile_premium_desc),
-                style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -237,9 +238,8 @@ fun SettingsSection(
 ) {
     val space = LocalSpacing.current
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
+        FintrackTitleSmallText(
             text = title,
-            style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = space.small)
         )
@@ -255,13 +255,15 @@ fun SettingsSection(
 fun SettingItem(
     title: String,
     icon: ImageVector,
-    on: Boolean,
-    onToggle: (Boolean) -> Unit
+    on: Boolean? = null,
+    onToggle: ((Boolean) -> Unit)? = null,
+    onClick: (() -> Unit)? = null
 ) {
     val space = LocalSpacing.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(enabled = onClick != null) { onClick?.invoke() }
             .padding(space.medium),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -272,12 +274,19 @@ fun SettingItem(
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.width(space.medium))
-        Text(
+        FintrackBodyLargeText(
             text = title,
-            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f)
         )
-        Switch(on = on, onToggle = onToggle)
+        if (on != null && onToggle != null) {
+            Switch(on = on, onToggle = onToggle)
+        } else if (onClick != null) {
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -295,6 +304,6 @@ fun LogoutButton(onClick: () -> Unit) {
     ) {
         Icon(imageVector = Icons.AutoMirrored.Filled.Logout, contentDescription = null)
         Spacer(modifier = Modifier.width(space.small))
-        Text(text = stringResource(Res.string.action_logout))
+        FintrackBodyLargeText(text = stringResource(Res.string.action_logout))
     }
 }

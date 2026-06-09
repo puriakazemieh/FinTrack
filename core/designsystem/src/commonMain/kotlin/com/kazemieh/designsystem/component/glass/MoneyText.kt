@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kazemieh.designsystem.LocalCurrency
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.money.Currency
 import com.kazemieh.money.MoneyFormatter
@@ -25,7 +26,7 @@ import org.jetbrains.compose.resources.stringResource
 fun MoneyText(
     amount: Long,
     modifier: Modifier = Modifier,
-    currency: Currency = Currency.TOMAN,
+    currency: Currency = LocalCurrency.current,
     size: Int = 13,
     weight: FontWeight = FontWeight.W500,
     color: Color = MaterialTheme.colorScheme.onSurface

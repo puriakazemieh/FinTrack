@@ -80,6 +80,7 @@ kotlin {
             implementation(project(":core:database"))
             implementation(project(":core:preferences"))
             implementation(project(":core:domain"))
+            implementation(project(":core:money"))
             implementation(project(":feature-share:transaction"))
             implementation(project(":feature-share:category"))
             implementation(project(":feature-share:source"))
