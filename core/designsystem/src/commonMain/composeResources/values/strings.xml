@@ -373,4 +373,23 @@
     <string name="month_bahman">بهمن</string>
     <string name="month_esfand">اسفند</string>
 
+    <!-- Profile & Settings -->
+    <string name="profile_settings">تنظیمات پروفایل</string>
+    <string name="profile_sync_title">همگام‌سازی داده‌ها</string>
+    <string name="profile_sync_desc">آخرین همگام‌سازی: %1$s</string>
+    <string name="profile_premium_title">اشتراک ویژه (پرمیوم)</string>
+    <string name="profile_premium_desc">دسترسی به تمام امکانات پیشرفته</string>
+    <string name="section_display">نمایش</string>
+    <string name="section_security">امنیت</string>
+    <string name="section_data">داده</string>
+    <string name="section_notifications">اعلان‌ها</string>
+    <string name="setting_dark_mode">حالت شب</string>
+    <string name="setting_fingerprint">ورود با اثر انگشت</string>
+    <string name="setting_backup">پشتیبان‌گیری خودکار</string>
+    <string name="setting_push_notifications">اعلان‌های آنی (Push)</string>
+    <string name="setting_transaction_alerts">هشدار تراکنش‌های مشکوک</string>
+    <string name="action_logout">خروج از حساب</string>
+    <string name="user_name_default">پیمان کاظمیه</string>
+    <string name="user_email_default">p.kazemieh@gmail.com</string>
+
 </resources>

@@ -73,8 +73,8 @@ fun NavGraphBuilder.bottomBarNavGraph(
 
         composable<Screen.Profile> { backStackEntry ->
             ProfileScreen(
-                snackbarHostState = snackbarHostState,
-                onNavigateToTransactions = navigateToTransactions
+//                snackbarHostState = snackbarHostState,
+//                onNavigateToTransactions = navigateToTransactions
             )
         }
 

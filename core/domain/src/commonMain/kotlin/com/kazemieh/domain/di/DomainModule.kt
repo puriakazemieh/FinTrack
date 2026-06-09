@@ -11,6 +11,7 @@ import com.kazemieh.domain.usecase.DeleteRecentSearchUseCase
 import com.kazemieh.domain.usecase.DeleteSourceUseCase
 import com.kazemieh.domain.usecase.DeleteTagUseCase
 import com.kazemieh.domain.usecase.DeleteTransactionUseCase
+import com.kazemieh.domain.usecase.GetBooleanPreferenceUseCase
 import com.kazemieh.domain.usecase.GetCategoryUseCase
 import com.kazemieh.domain.usecase.GetDefaultCategoryUseCase
 import com.kazemieh.domain.usecase.GetDefaultFinancialSourceUseCase
@@ -29,11 +30,13 @@ import com.kazemieh.domain.usecase.ObserveSourceUseCase
 import com.kazemieh.domain.usecase.ObserveSourcesUseCase
 import com.kazemieh.domain.usecase.ObserveTagsUseCase
 import com.kazemieh.domain.usecase.ObserveTransactionsUseCase
+import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.domain.usecase.SaveRecentSearchUseCase
 import com.kazemieh.domain.usecase.SearchCategoriesUseCase
 import com.kazemieh.domain.usecase.SearchPersonsUseCase
 import com.kazemieh.domain.usecase.SearchSourcesUseCase
 import com.kazemieh.domain.usecase.SearchTagsUseCase
+import com.kazemieh.domain.usecase.SetBooleanPreferenceUseCase
 import com.kazemieh.domain.usecase.SourceUseCases
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import com.kazemieh.domain.usecase.UpdateCategoryPositionsUseCase
@@ -85,6 +88,9 @@ val domainModule = module {
     factory { UpdatePersonPositionsUseCase(get()) }
     factory { GetTransactionAmountRangeUseCase(get()) }
 
+    factory { GetBooleanPreferenceUseCase(get()) }
+    factory { SetBooleanPreferenceUseCase(get()) }
+
     factory { SearchCategoriesUseCase(get()) }
     factory { SearchSourcesUseCase(get()) }
     factory { SearchPersonsUseCase(get()) }
@@ -99,6 +105,12 @@ val domainModule = module {
             updateSourceUseCase = get(),
             addSource = get(),
             observeSourceUseCase = get()
+        )
+    }
+    single {
+        PreferenceUseCases(
+            getBooleanPreference = get(),
+            setBooleanPreference = get()
         )
     }
     single {

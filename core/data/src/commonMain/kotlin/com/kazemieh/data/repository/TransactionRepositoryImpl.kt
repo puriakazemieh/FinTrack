@@ -12,8 +12,8 @@ import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
+import com.kazemieh.domain.repository.PreferenceRepository
 import com.kazemieh.domain.repository.TransactionRepository
-import com.kazemieh.preferences.FinTrackPreferences
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,13 +21,13 @@ import kotlinx.coroutines.flow.update
 
 class TransactionRepositoryImpl(
     private val localDataSource: TransactionLocalDataSource,
-    private val preferences: FinTrackPreferences
+    private val preferenceRepository: PreferenceRepository
 ) : TransactionRepository {
 
     private val _recentSearches = MutableStateFlow<List<String>>(emptyList())
 
     init {
-        val recents = preferences.getString("recent_searches", "")
+        val recents = preferenceRepository.getString("recent_searches", "")
         if (recents.isNotEmpty()) {
             _recentSearches.value = recents.split("|")
         }
@@ -41,14 +41,14 @@ class TransactionRepositoryImpl(
         current.remove(query)
         current.add(0, query)
         val limited = current.take(10)
-        preferences.putString("recent_searches", limited.joinToString("|"))
+        preferenceRepository.putString("recent_searches", limited.joinToString("|"))
         _recentSearches.update { limited }
     }
 
     override suspend fun deleteRecentSearch(query: String) {
         val current = _recentSearches.value.toMutableList()
         current.remove(query)
-        preferences.putString("recent_searches", current.joinToString("|"))
+        preferenceRepository.putString("recent_searches", current.joinToString("|"))
         _recentSearches.update { current }
     }
 
