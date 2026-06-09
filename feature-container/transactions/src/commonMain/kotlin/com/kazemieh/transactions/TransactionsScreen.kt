@@ -80,6 +80,7 @@ fun TransactionsScreen(
     val tomanUnit = stringResource(Res.string.unit_toman_short)
 
     val activeFilters = remember(
+        state.selectedTransactionType,
         state.selectedCategories,
         state.selectedSources,
         state.selectedTag,
@@ -91,6 +92,28 @@ fun TransactionsScreen(
         tomanUnit
     ) {
         buildList {
+            if (state.selectedTransactionType != TransactionType.ALL) {
+                val label = when (state.selectedTransactionType) {
+                    TransactionType.INCOME -> "درآمد"
+                    TransactionType.EXPENSE -> "هزینه"
+                    TransactionType.TRANSFER -> "انتقال"
+                    else -> ""
+                }
+                val color = when (state.selectedTransactionType) {
+                    TransactionType.INCOME -> GlassGreen
+                    TransactionType.EXPENSE -> GlassRed
+                    TransactionType.TRANSFER -> GlassBlue
+                    else -> null
+                }
+                add(
+                    FilterChipData(
+                        id = "tx_type",
+                        label = label,
+                        color = color,
+                        type = FilterType.TransactionType
+                    )
+                )
+            }
             if (state.selectedMinAmount > state.minAmountLimit || state.selectedMaxAmount < state.maxAmountLimit) {
                 val label = "${
                     state.selectedMinAmount.toLong().toSignedPersianPrice()
@@ -259,6 +282,12 @@ fun TransactionsScreen(
                                     state.minAmountLimit,
                                     state.maxAmountLimit
                                 )
+                            )
+                        }
+
+                        FilterType.TransactionType -> {
+                            viewModel.onIntent(
+                                TransactionsIntent.OnTransactionTypeSelected(TransactionType.ALL)
                             )
                         }
                     }

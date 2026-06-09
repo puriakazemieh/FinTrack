@@ -68,6 +68,7 @@ fun SearchScreen(
     val space = LocalSpacing.current
 
     LaunchedEffect(Unit) {
+        viewModel.onIntent(SearchIntent.ClearQuery(""))
         viewModel.effect.collect { effect ->
             when (effect) {
                 is SearchEffect.GoBack -> onBack()
@@ -297,9 +298,9 @@ private fun SearchResultList(
     val space = LocalSpacing.current
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         if (transactions.isNotEmpty()) {
-            item { ResultHeader("تراکنش‌ها") }
             items(transactions) { tx ->
                 ResultItem(
+                    type = "تراکنش",
                     text = tx.transaction.description ?: "",
                     query = query,
                     onClick = { onTransactionClick(tx) }
@@ -307,9 +308,9 @@ private fun SearchResultList(
             }
         }
         if (categories.isNotEmpty()) {
-            item { ResultHeader("دسته‌بندی‌ها") }
             items(categories) { cat ->
                 ResultItem(
+                    type = "دسته‌بندی",
                     text = cat.name,
                     query = query,
                     onClick = { onCategoryClick(cat) }
@@ -317,9 +318,9 @@ private fun SearchResultList(
             }
         }
         if (sources.isNotEmpty()) {
-            item { ResultHeader("منابع مالی") }
             items(sources) { src ->
                 ResultItem(
+                    type = "منبع مالی",
                     text = src.name,
                     query = query,
                     onClick = { onSourceClick(src) }
@@ -327,9 +328,9 @@ private fun SearchResultList(
             }
         }
         if (persons.isNotEmpty()) {
-            item { ResultHeader("اشخاص") }
             items(persons) { p ->
                 ResultItem(
+                    type = "شخص",
                     text = p.name,
                     query = query,
                     onClick = { onPersonClick(p) }
@@ -337,9 +338,9 @@ private fun SearchResultList(
             }
         }
         if (tags.isNotEmpty()) {
-            item { ResultHeader("تگ‌ها") }
             items(tags) { t ->
                 ResultItem(
+                    type = "تگ",
                     text = t.name,
                     query = query,
                     onClick = { onTagClick(t) }
@@ -349,18 +350,9 @@ private fun SearchResultList(
     }
 }
 
-@Composable
-private fun ResultHeader(title: String) {
-    val space = LocalSpacing.current
-    FintrackLabelSmallText(
-        text = title,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(horizontal = space.large, vertical = space.small)
-    )
-}
 
 @Composable
-private fun ResultItem(text: String, query: String, onClick: () -> Unit) {
+private fun ResultItem(type: String, text: String, query: String, onClick: () -> Unit) {
     val space = LocalSpacing.current
     Box(
         modifier = Modifier
@@ -368,18 +360,22 @@ private fun ResultItem(text: String, query: String, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(horizontal = space.large, vertical = space.medium)
     ) {
-        FintrackBodyMediumText(text = highlightText(text, query))
+        FintrackBodyMediumText(text = highlightText(type, text, query))
     }
 }
 
 @Composable
-private fun highlightText(text: String, query: String): AnnotatedString {
+private fun highlightText(type: String, text: String, query: String): AnnotatedString {
     return buildAnnotatedString {
+        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+            append("$type: ")
+        }
+
         val lowerText = text.lowercase()
         val lowerQuery = query.lowercase()
         var start = 0
         while (true) {
-            val index = lowerText.indexOf(lowerQuery, start)
+            val index = if (query.isEmpty()) -1 else lowerText.indexOf(lowerQuery, start)
             if (index == -1) {
                 append(text.substring(start))
                 break
