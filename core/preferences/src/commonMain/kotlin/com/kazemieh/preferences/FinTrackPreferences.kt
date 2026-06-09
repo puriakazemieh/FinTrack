@@ -23,4 +23,17 @@ class FinTrackPreferences(private val settings: Settings) {
 
     fun remove(key: String) = settings.remove(key)
     fun clear() = settings.clear()
+
+    companion object {
+        const val PREF_USER_NAME = "pref_user_name"
+        const val PREF_USER_FAMILY = "pref_user_family"
+        const val PREF_USER_EMAIL = "pref_user_email"
+        const val PREF_USER_PHONE = "pref_user_phone"
+        const val PREF_USER_BIRTHDAY = "pref_user_birthday"
+        const val PREF_USER_CITY = "pref_user_city"
+        const val PREF_USER_INCOME = "pref_user_income"
+        const val PREF_USER_JOB = "pref_user_job"
+        const val PREF_USER_GOAL = "pref_user_goal"
+        const val PREF_USER_AVATAR = "pref_user_avatar"
+    }
 }

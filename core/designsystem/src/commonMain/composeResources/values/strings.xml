@@ -403,4 +403,32 @@
     <string name="currency_toman_full">تومان</string>
     <string name="currency_rial_full">ریال</string>
 
+    <!-- Profile Edit -->
+    <string name="title_edit_profile">ویرایش پروفایل</string>
+    <string name="profile_completion">تکمیل پروفایل</string>
+    <string name="profile_completion_desc">با تکمیل پروفایل، از تمامی امکانات فین‌تراک بهره‌مند شوید.</string>
+    <string name="section_personal_info">اطلاعات شخصی</string>
+    <string name="section_extra_info">اطلاعات تکمیلی</string>
+    <string name="label_first_name">نام</string>
+    <string name="label_last_name">نام خانوادگی</string>
+    <string name="label_email">ایمیل</string>
+    <string name="label_phone">شماره همراه</string>
+    <string name="label_birthday">تاریخ تولد</string>
+    <string name="label_city">شهر</string>
+    <string name="label_monthly_income">درآمد ماهیانه</string>
+    <string name="label_job_title">شغل</string>
+    <string name="label_financial_goal">هدف مالی</string>
+    <string name="hint_enter_first_name">نام خود را وارد کنید</string>
+    <string name="hint_enter_last_name">نام خانوادگی خود را وارد کنید</string>
+    <string name="hint_enter_email">ایمیل خود را وارد کنید</string>
+    <string name="hint_enter_phone">شماره همراه خود را وارد کنید</string>
+    <string name="hint_enter_birthday">تاریخ تولد خود را انتخاب کنید</string>
+    <string name="hint_enter_city">شهر محل سکونت</string>
+    <string name="hint_enter_income">مثلاً ۵۰,۰۰۰,۰۰۰ تومان</string>
+    <string name="hint_enter_job">مثلاً توسعه‌دهنده نرم‌افزار</string>
+    <string name="hint_enter_goal">مثلاً خرید مسکن یا خودرو</string>
+    <string name="action_save_profile">ذخیره تغییرات</string>
+    <string name="msg_profile_saved">تغییرات با موفقیت ذخیره شد</string>
+
+
 </resources>

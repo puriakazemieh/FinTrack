@@ -31,6 +31,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ProfileScreen(
     onNavigateToThemeAndCurrency: () -> Unit,
+    onNavigateToProfileEdit: () -> Unit,
     viewModel: ProfileViewModel = koinViewModel(),
 //    snackbarHostState: SnackbarHostState
 ) {
@@ -75,7 +76,7 @@ fun ProfileScreen(
             contentPadding = PaddingValues(vertical = space.large)
         ) {
             item {
-                ProfileHero()
+                ProfileHero(onEditClick = onNavigateToProfileEdit)
             }
 
             item {
@@ -153,11 +154,14 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileHero() {
+fun ProfileHero(
+    onEditClick: () -> Unit
+) {
     val space = LocalSpacing.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onEditClick() }
             .padding(vertical = space.medium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

@@ -54,6 +54,7 @@ fun FintrackOutlinedTextField(
     maxLine : Int = if (singleLine) 1 else Int.MAX_VALUE,
     prefix: @Composable (() -> Unit)? = null,
     suffix: @Composable (() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
     onClick: () -> Unit = {},
 ) {
 
@@ -96,6 +97,7 @@ fun FintrackOutlinedTextField(
         keyboardActions = keyboardActions,
         prefix = prefix,
         suffix = suffix,
+        placeholder = placeholder,
         colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = textColor,
             unfocusedTextColor = textColor,

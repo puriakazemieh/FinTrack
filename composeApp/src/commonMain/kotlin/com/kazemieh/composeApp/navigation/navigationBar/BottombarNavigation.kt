@@ -13,6 +13,7 @@ import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.composeApp.navigation.Screen
 import com.kazemieh.dashboard.DashboardScreen
+import com.kazemieh.profile.ProfileEditScreen
 import com.kazemieh.profile.ProfileScreen
 import com.kazemieh.profile.ThemeAndCurrencyScreen
 import com.kazemieh.search.ui.SearchScreen
@@ -74,7 +75,14 @@ fun NavGraphBuilder.bottomBarNavGraph(
 
         composable<Screen.Profile> { backStackEntry ->
             ProfileScreen(
-                onNavigateToThemeAndCurrency = { navController.navigate(Screen.ThemeAndCurrency) }
+                onNavigateToThemeAndCurrency = { navController.navigate(Screen.ThemeAndCurrency) },
+                onNavigateToProfileEdit = { navController.navigate(Screen.ProfileEdit) }
+            )
+        }
+
+        composable<Screen.ProfileEdit> { backStackEntry ->
+            ProfileEditScreen(
+                onBack = { navController.popBackStack() }
             )
         }
 
