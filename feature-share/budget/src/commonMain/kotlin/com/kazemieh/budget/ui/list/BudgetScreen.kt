@@ -83,7 +83,7 @@ fun BudgetScreen(
         FAB(
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(top = 100.dp, start = space.large, end = space.large)
+                .padding(bottom = 100.dp, start = space.large, end = space.large)
         ) {
             viewModel.onIntent(BudgetIntent.ShowAddBudget())
         }

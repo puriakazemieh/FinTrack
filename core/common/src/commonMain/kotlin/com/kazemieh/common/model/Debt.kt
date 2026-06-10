@@ -13,7 +13,9 @@ data class Debt(
     val sourceId: Long? = null,
     val description: String? = null,
     val type: DebtType,
-    val isSettled: Boolean = false
+    val isSettled: Boolean = false,
+    val personName: String? = null,
+    val sourceName: String? = null
 )
 
 @Serializable

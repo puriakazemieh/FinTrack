@@ -22,7 +22,9 @@ fun ToolsScreen(
     onNavigateToBudget: () -> Unit,
     onNavigateToInstallment: () -> Unit,
     onNavigateToPerson: () -> Unit,
-    onNavigateToDebt: () -> Unit
+    onNavigateToDebt: () -> Unit,
+    onNavigateToCheck: () -> Unit,
+    onNavigateToFixedExpense: () -> Unit
 ) {
     val space = LocalSpacing.current
     Box(
@@ -62,6 +64,20 @@ fun ToolsScreen(
                 modifier = Modifier.padding(space.large)
             ) {
                 Text(stringResource(Res.string.navigation_debts))
+            }
+
+            Button(
+                onClick = onNavigateToCheck,
+                modifier = Modifier.padding(space.large)
+            ) {
+                Text("مدیریت چک‌ها")
+            }
+
+            Button(
+                onClick = onNavigateToFixedExpense,
+                modifier = Modifier.padding(space.large)
+            ) {
+                Text("هزینه‌های ثابت")
             }
         }
     }

@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.unit.dp
 import com.kazemieh.common.model.DebtType
 import com.kazemieh.common.toPersianPrice
 import com.kazemieh.debt.ui.add.AddDebtBottomSheet
@@ -42,18 +43,7 @@ fun DebtsScreen(
     val totalDebts = state.debts.filter { it.debt.type == DebtType.OWED_BY_ME && !it.debt.isSettled }
         .sumOf { it.debt.amount }
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showAddDebt = true },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ) {
-                Icon(Icons.Default.Add, contentDescription = null)
-            }
-        },
-        containerColor = androidx.compose.ui.graphics.Color.Transparent
-    ) { padding ->
+    Scaffold { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()

@@ -12,11 +12,13 @@ import com.kazemieh.budget.di.budgetModule
 import com.kazemieh.category.di.transactionAddCategoryModule
 import com.kazemieh.category.di.transactionCategoryModule
 import com.kazemieh.category.di.transactionDeleteCategoryModule
+import com.kazemieh.check.di.checkModule
 import com.kazemieh.common.di.commonModule
 import com.kazemieh.dashboard.di.dashboardModule
 import com.kazemieh.onboarding.di.onboardingModule
 import com.kazemieh.notifications.di.notificationModule
 import com.kazemieh.installment.di.installmentModule
+import com.kazemieh.fixed_expense.di.fixedExpenseModule
 import com.kazemieh.data.di.dataModule
 import com.kazemieh.database.DatabaseInitializer
 import com.kazemieh.database.di.databaseModule
@@ -127,7 +129,9 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         lockModule,
         notificationModule,
         budgetModule,
-        installmentModule
+        installmentModule,
+        checkModule,
+        fixedExpenseModule
     )
     startKoin {
         config?.invoke(this)

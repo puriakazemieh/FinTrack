@@ -13,8 +13,10 @@ import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.composeApp.navigation.Screen
+import com.kazemieh.check.ui.list.CheckListScreen
 import com.kazemieh.dashboard.DashboardScreen
 import com.kazemieh.debt.ui.list.DebtsScreen
+import com.kazemieh.fixed_expense.ui.list.FixedExpenseListScreen
 import com.kazemieh.installment.ui.list.InstallmentsScreen
 import com.kazemieh.notifications.ui.NotificationSettingsScreen
 import com.kazemieh.person.ui.detail.PersonDetailScreen
@@ -58,7 +60,9 @@ fun NavGraphBuilder.bottomBarNavGraph(
                 snackbarHostState = snackbarHostState,
                 onNavigateToTransactions = navigateToTransactions,
                 onNavigateToSearch = { navController.navigate(Screen.Search) },
-                onNavigateToBudget = { navController.navigate(Screen.Budget) }
+                onNavigateToBudget = { navController.navigate(Screen.Budget) },
+                onNavigateToCheck = { navController.navigate(Screen.Check) },
+                onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) }
             )
         }
 
@@ -82,7 +86,9 @@ fun NavGraphBuilder.bottomBarNavGraph(
                 onNavigateToBudget = { navController.navigate(Screen.Budget) },
                 onNavigateToInstallment = { navController.navigate(Screen.Installment) },
                 onNavigateToPerson = { navController.navigate(Screen.Person) },
-                onNavigateToDebt = { navController.navigate(Screen.Debt) }
+                onNavigateToDebt = { navController.navigate(Screen.Debt) },
+                onNavigateToCheck = { navController.navigate(Screen.Check) },
+                onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) }
             )
         }
 
@@ -118,6 +124,18 @@ fun NavGraphBuilder.bottomBarNavGraph(
         composable<Screen.Debt> {
             DebtsScreen(
                 snackbarHostState = snackbarHostState,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.Check> {
+            CheckListScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.FixedExpense> {
+            FixedExpenseListScreen(
                 onBack = { navController.popBackStack() }
             )
         }

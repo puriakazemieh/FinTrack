@@ -2,22 +2,30 @@ package com.kazemieh.domain.di
 
 import com.kazemieh.domain.usecase.AddBudgetUseCase
 import com.kazemieh.domain.usecase.AddCategoryUseCase
+import com.kazemieh.domain.usecase.AddCheckUseCase
 import com.kazemieh.domain.usecase.AddDebtUseCase
+import com.kazemieh.domain.usecase.AddFixedExpenseUseCase
 import com.kazemieh.domain.usecase.AddInstallmentUseCase
 import com.kazemieh.domain.usecase.AddPersonUseCase
 import com.kazemieh.domain.usecase.AddSourceUseCase
 import com.kazemieh.domain.usecase.AddTagUseCase
 import com.kazemieh.domain.usecase.AddTransactionUseCase
+import com.kazemieh.domain.usecase.CheckUseCaseGroup
 import com.kazemieh.domain.usecase.DeleteBudgetUseCase
 import com.kazemieh.domain.usecase.DeleteCategoryUseCase
+import com.kazemieh.domain.usecase.DeleteCheckUseCase
 import com.kazemieh.domain.usecase.DeleteDebtUseCase
+import com.kazemieh.domain.usecase.DeleteFixedExpenseUseCase
 import com.kazemieh.domain.usecase.DeleteInstallmentUseCase
 import com.kazemieh.domain.usecase.DeletePersonUseCase
 import com.kazemieh.domain.usecase.DeleteRecentSearchUseCase
 import com.kazemieh.domain.usecase.DeleteSourceUseCase
 import com.kazemieh.domain.usecase.DeleteTagUseCase
 import com.kazemieh.domain.usecase.DeleteTransactionUseCase
+import com.kazemieh.domain.usecase.FixedExpenseUseCaseGroup
 import com.kazemieh.domain.usecase.GetBooleanPreferenceUseCase
+import com.kazemieh.domain.usecase.GetCheckByIdUseCase
+import com.kazemieh.domain.usecase.GetFixedExpenseByIdUseCase
 import com.kazemieh.domain.usecase.GetStringFlowUseCase
 import com.kazemieh.domain.usecase.GetStringPreferenceUseCase
 import com.kazemieh.domain.usecase.GetCategoryUseCase
@@ -29,6 +37,9 @@ import com.kazemieh.domain.usecase.GetTransactionAmountRangeUseCase
 import com.kazemieh.domain.usecase.DebtUseCaseGroup
 import com.kazemieh.domain.usecase.InstallmentUseCaseGroup
 import com.kazemieh.domain.usecase.MarkInstallmentAsPaidUseCase
+import com.kazemieh.domain.usecase.ObserveAllChecksUseCase
+import com.kazemieh.domain.usecase.ObserveAllFixedExpensesUseCase
+import com.kazemieh.domain.usecase.ObserveChecksByStatusUseCase
 import com.kazemieh.domain.usecase.ObserveDebtsByPersonUseCase
 import com.kazemieh.domain.usecase.ObserveDebtsUseCase
 import com.kazemieh.domain.usecase.ObserveBudgetsWithProgressUseCase
@@ -59,7 +70,10 @@ import com.kazemieh.domain.usecase.SourceUseCases
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import com.kazemieh.domain.usecase.UpdateCategoryPositionsUseCase
 import com.kazemieh.domain.usecase.UpdateCategoryUseCase
+import com.kazemieh.domain.usecase.UpdateCheckUseCase
 import com.kazemieh.domain.usecase.UpdateDebtUseCase
+import com.kazemieh.domain.usecase.UpdateFixedExpenseUseCase
+import com.kazemieh.domain.usecase.UpdateNextDueDateUseCase
 import com.kazemieh.domain.usecase.UpdatePersonPositionsUseCase
 import com.kazemieh.domain.usecase.UpdatePersonUseCase
 import com.kazemieh.domain.usecase.UpdateSourcePositionsUseCase
@@ -131,6 +145,20 @@ val domainModule = module {
     factory { ObserveDebtsByPersonUseCase(get()) }
     factory { SettleDebtUseCase(get(), get()) }
 
+    factory { AddCheckUseCase(get()) }
+    factory { UpdateCheckUseCase(get()) }
+    factory { DeleteCheckUseCase(get()) }
+    factory { GetCheckByIdUseCase(get()) }
+    factory { ObserveAllChecksUseCase(get()) }
+    factory { ObserveChecksByStatusUseCase(get()) }
+
+    factory { AddFixedExpenseUseCase(get()) }
+    factory { UpdateFixedExpenseUseCase(get()) }
+    factory { DeleteFixedExpenseUseCase(get()) }
+    factory { GetFixedExpenseByIdUseCase(get()) }
+    factory { ObserveAllFixedExpensesUseCase(get()) }
+    factory { UpdateNextDueDateUseCase(get()) }
+
     factory { GetBooleanPreferenceUseCase(get()) }
     factory { SetBooleanPreferenceUseCase(get()) }
     factory { GetStringPreferenceUseCase(get()) }
@@ -178,6 +206,26 @@ val domainModule = module {
             observeDebtsUseCase = get(),
             observeDebtsByPersonUseCase = get(),
             settleDebtUseCase = get()
+        )
+    }
+    single {
+        CheckUseCaseGroup(
+            addCheckUseCase = get(),
+            updateCheckUseCase = get(),
+            deleteCheckUseCase = get(),
+            getCheckByIdUseCase = get(),
+            observeAllChecksUseCase = get(),
+            observeChecksByStatusUseCase = get()
+        )
+    }
+    single {
+        FixedExpenseUseCaseGroup(
+            addFixedExpenseUseCase = get(),
+            updateFixedExpenseUseCase = get(),
+            deleteFixedExpenseUseCase = get(),
+            getFixedExpenseByIdUseCase = get(),
+            observeAllFixedExpensesUseCase = get(),
+            updateNextDueDateUseCase = get()
         )
     }
     single {

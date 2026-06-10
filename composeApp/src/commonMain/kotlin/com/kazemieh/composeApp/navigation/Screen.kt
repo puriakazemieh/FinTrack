@@ -52,6 +52,12 @@ sealed class Screen {
     data object Debt : Screen()
 
     @Serializable
+    data object Check : Screen()
+
+    @Serializable
+    data object FixedExpense : Screen()
+
+    @Serializable
     data object Onboarding : Screen()
 
     @Serializable

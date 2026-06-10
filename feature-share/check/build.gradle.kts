@@ -10,14 +10,14 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "com.kazemieh.dashboard"
+        namespace = "com.kazemieh.check"
         compileSdk {
             version = release(36)
         }
         minSdk = 24
     }
 
-    val xcfName = "core:dashboardKit"
+    val xcfName = "core:checkKit"
 
     iosX64 {
         binaries.framework {
@@ -49,15 +49,10 @@ kotlin {
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.kotlinx.datetime)
                 implementation(project(":core:common"))
-                implementation(project(":feature-share:transaction"))
-                implementation(project(":feature-share:source"))
-                implementation(project(":feature-share:budget"))
-                implementation(project(":feature-share:installment"))
-
+                implementation(project(":core:domain"))
+                implementation(project(":feature-share:person"))
                 implementation(project(":core:designsystem"))
 
-                implementation(project(":feature-share:check"))
-                implementation(project(":feature-share:fixed-expense"))
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)
@@ -67,34 +62,11 @@ kotlin {
                 implementation(libs.compose.components.resources)
                 implementation(libs.compose.uiToolingPreview)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
-                implementation(libs.kotlinx.datetime)
 
                 implementation(libs.koin.compose)
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose.viewmodel)
             }
         }
-
-
-        androidMain {
-            dependencies {
-            }
-        }
-
-        iosMain {
-            dependencies {
-            }
-        }
-
-        jsMain {
-            dependencies {
-            }
-        }
-
-        jvmMain {
-            dependencies {
-            }
-        }
     }
-
 }

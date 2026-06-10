@@ -1,11 +1,18 @@
 package com.kazemieh.database.mapper
 
+import com.kazemieh.common.model.Budget
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
+import com.kazemieh.common.model.Check
+import com.kazemieh.common.model.CheckStatus
+import com.kazemieh.common.model.Debt
+import com.kazemieh.common.model.DebtType
+import com.kazemieh.common.model.FixedExpense
 import com.kazemieh.common.model.Installment
 import com.kazemieh.common.model.InstallmentFrequency
 import com.kazemieh.common.model.InstallmentWithRelations
 import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.RecurrenceType
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
@@ -15,9 +22,16 @@ import com.kazemieh.common.persiandatetime.domain.PersianDateTime
 import com.kazemieh.common.persiandatetime.extensions.persianMonth
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.database.GetAllTransactionsFiltered
+import com.kazemieh.database.ObserveAllChecks
+import com.kazemieh.database.ObserveAllDebts
+import com.kazemieh.database.ObserveAllFixedExpenses
+import com.kazemieh.database.ObserveChecksByStatus
 import com.kazemieh.database.ObserveInstallments
 import com.kazemieh.database.transaction.ObserveCategorySumsByFilter
 import com.kazemieh.database.Category as CategoryDb
+import com.kazemieh.database.Check_table as CheckDb
+import com.kazemieh.database.Debt as DebtDb
+import com.kazemieh.database.Fixed_expense as FixedExpenseDb
 import com.kazemieh.database.Installment as InstallmentDb
 import com.kazemieh.database.Person as PersonDb
 import com.kazemieh.database.Source as SourceDb
@@ -182,6 +196,101 @@ fun PersonDb.toPerson() = Person(
     id = id,
     name = name,
     description = description
+)
+
+// Debt Mappers
+fun DebtDb.toDebt() = Debt(
+    id = id,
+    personId = personId,
+    amount = amount,
+    date = date,
+    dueDate = dueDate,
+    sourceId = sourceId,
+    description = description,
+    type = DebtType.fromInt(type.toInt()),
+    isSettled = isSettled == 1L
+)
+
+fun ObserveAllDebts.toDebt() = Debt(
+    id = id,
+    personId = personId,
+    amount = amount,
+    date = date,
+    dueDate = dueDate,
+    sourceId = sourceId,
+    description = description,
+    type = DebtType.fromInt(type.toInt()),
+    isSettled = isSettled == 1L,
+    personName = personName,
+    sourceName = sourceName
+)
+
+// Check Mappers
+fun CheckDb.toCheck() = Check(
+    id = id,
+    amount = amount,
+    date = date,
+    dueDate = dueDate,
+    status = CheckStatus.valueOf(status),
+    personId = personId,
+    photoPath = photoPath,
+    description = description,
+    isIncoming = isIncoming == 1L
+)
+
+fun ObserveAllChecks.toCheck() = Check(
+    id = id,
+    amount = amount,
+    date = date,
+    dueDate = dueDate,
+    status = CheckStatus.valueOf(status),
+    personId = personId,
+    personName = personName,
+    photoPath = photoPath,
+    description = description,
+    isIncoming = isIncoming == 1L
+)
+
+fun ObserveChecksByStatus.toCheck() = Check(
+    id = id,
+    amount = amount,
+    date = date,
+    dueDate = dueDate,
+    status = CheckStatus.valueOf(status),
+    personId = personId,
+    personName = personName,
+    photoPath = photoPath,
+    description = description,
+    isIncoming = isIncoming == 1L
+)
+
+// Fixed Expense Mappers
+fun FixedExpenseDb.toFixedExpense() = FixedExpense(
+    id = id,
+    amount = amount,
+    categoryId = categoryId,
+    sourceId = sourceId,
+    description = description,
+    recurrence = RecurrenceType.valueOf(recurrence),
+    startDate = startDate,
+    nextDueDate = nextDueDate,
+    isAutoPostEnabled = isAutoPostEnabled == 1L,
+    isActive = isActive == 1L
+)
+
+fun ObserveAllFixedExpenses.toFixedExpense() = FixedExpense(
+    id = id,
+    amount = amount,
+    categoryId = categoryId,
+    categoryName = categoryName,
+    sourceId = sourceId,
+    sourceName = sourceName,
+    description = description,
+    recurrence = RecurrenceType.valueOf(recurrence),
+    startDate = startDate,
+    nextDueDate = nextDueDate,
+    isAutoPostEnabled = isAutoPostEnabled == 1L,
+    isActive = isActive == 1L
 )
 
 // Transaction Mappers

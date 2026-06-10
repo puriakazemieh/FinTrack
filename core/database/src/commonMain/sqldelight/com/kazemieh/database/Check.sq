@@ -1,0 +1,49 @@
+CREATE TABLE IF NOT EXISTS check_table (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    amount INTEGER NOT NULL,
+    date INTEGER NOT NULL,
+    dueDate INTEGER NOT NULL,
+    status TEXT NOT NULL,
+    personId INTEGER NOT NULL,
+    photoPath TEXT,
+    description TEXT,
+    isIncoming INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (personId) REFERENCES person(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_check_person ON check_table(personId);
+
+insertCheck:
+INSERT INTO check_table(amount, date, dueDate, status, personId, photoPath, description, isIncoming)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+updateCheck:
+UPDATE check_table
+SET amount = ?, date = ?, dueDate = ?, status = ?, personId = ?, photoPath = ?, description = ?, isIncoming = ?
+WHERE id = ?;
+
+deleteCheck:
+DELETE FROM check_table WHERE id = ?;
+
+getCheckById:
+SELECT * FROM check_table WHERE id = ?;
+
+observeAllChecks:
+SELECT
+    c.*,
+    p.name AS personName
+FROM check_table c
+INNER JOIN person p ON c.personId = p.id
+ORDER BY c.dueDate ASC;
+
+observeChecksByStatus:
+SELECT
+    c.*,
+    p.name AS personName
+FROM check_table c
+INNER JOIN person p ON c.personId = p.id
+WHERE c.status = ?
+ORDER BY c.dueDate ASC;
+
+lastInsertRowId:
+SELECT last_insert_rowid();

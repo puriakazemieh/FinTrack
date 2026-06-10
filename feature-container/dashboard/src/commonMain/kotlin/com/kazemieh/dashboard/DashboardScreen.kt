@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.budget.ui.component.BudgetWidget
+import com.kazemieh.check.ui.widget.CheckWidget
 import com.kazemieh.dashboard.component.QuickActions
 import com.kazemieh.dashboard.component.RecentTransactionsWidget
 import com.kazemieh.designsystem.GlassColor
@@ -51,6 +52,7 @@ import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
+import com.kazemieh.fixed_expense.ui.widget.FixedExpenseWidget
 import com.kazemieh.installment.ui.widget.InstallmentWidget
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
@@ -68,7 +70,9 @@ fun DashboardScreen(
     snackbarHostState: SnackbarHostState,
     onNavigateToTransactions: (Any?) -> Unit = {},
     onNavigateToSearch: () -> Unit = {},
-    onNavigateToBudget: () -> Unit = {}
+    onNavigateToBudget: () -> Unit = {},
+    onNavigateToCheck: () -> Unit = {},
+    onNavigateToFixedExpense: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
@@ -160,6 +164,24 @@ fun DashboardScreen(
             item {
                 InstallmentWidget(
                     onMoreClick = { /* Navigate to installments */ },
+                    modifier = Modifier.padding(horizontal = space.large)
+                )
+            }
+
+            item { Spacer(Modifier.height(space.large)) }
+
+            item {
+                CheckWidget(
+                    onMoreClick = onNavigateToCheck,
+                    modifier = Modifier.padding(horizontal = space.large)
+                )
+            }
+
+            item { Spacer(Modifier.height(space.large)) }
+
+            item {
+                FixedExpenseWidget(
+                    onMoreClick = onNavigateToFixedExpense,
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }

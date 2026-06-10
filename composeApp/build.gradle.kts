@@ -92,6 +92,8 @@ kotlin {
             implementation(project(":feature-share:search"))
             implementation(project(":feature-share:lock"))
             implementation(project(":feature-share:notifications"))
+            implementation(project(":feature-share:check"))
+            implementation(project(":feature-share:fixed-expense"))
             implementation(project(":feature-container:onboarding"))
             implementation(project(":feature-container:dashboard"))
             implementation(project(":feature-container:profile"))
