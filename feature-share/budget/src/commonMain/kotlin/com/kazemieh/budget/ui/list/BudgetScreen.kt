@@ -3,6 +3,7 @@ package com.kazemieh.budget.ui.list
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -55,7 +56,7 @@ fun BudgetScreen(
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                contentPadding = PaddingValues(
                     horizontal = space.large,
                     vertical = space.medium
                 )
@@ -82,7 +83,7 @@ fun BudgetScreen(
         FAB(
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(space.large)
+                .padding(top = 100.dp, start = space.large, end = space.large)
         ) {
             viewModel.onIntent(BudgetIntent.ShowAddBudget())
         }

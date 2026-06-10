@@ -519,4 +519,26 @@
     <string name="installment_reminder_message">موعد پرداخت قسط %1$s فرا رسیده است.</string>
     <string name="installment_widget_title">اقساط پیش رو</string>
     <string name="installment_reminders">یادآوری اقساط</string>
+
+    <!-- Debt & Credit -->
+    <string name="navigation_debts">بدهی و طلب</string>
+    <string name="title_debts_management">مدیریت بدهی‌ها و مطالبات شما</string>
+    <string name="debt_owed_to_me">طلب (بستانکار)</string>
+    <string name="debt_owed_by_me">بدهی (بدهکار)</string>
+    <string name="add_debt">افزودن بدهی/طلب</string>
+    <string name="edit_debt">ویرایش بدهی/طلب</string>
+    <string name="settle_debt">تسویه</string>
+    <string name="debt_settled">تسویه شد</string>
+    <string name="debt_amount">مبلغ</string>
+    <string name="due_date">سررسید</string>
+    <string name="debt_description">توضیحات بدهی</string>
+    <string name="debt_saved">بدهی با موفقیت ذخیره شد</string>
+    <string name="debt_deleted">بدهی حذف شد</string>
+    <string name="debt_settle_confirm">آیا از تسویه این مورد مطمئن هستید؟ یک تراکنش بانکی برای آن ثبت خواهد شد.</string>
+    <string name="person_ledger">دفتر حساب شخص</string>
+    <string name="total_debts">مجموع بدهی‌ها</string>
+    <string name="total_credits">مجموع مطالبات</string>
+    <string name="net_debt_balance">تراز نهایی</string>
+    <string name="debt_type">نوع مورد</string>
+    <string name="ledger_empty">هیچ تراکنش یا بدهی ثبت نشده است</string>
 </resources>

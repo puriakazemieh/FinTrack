@@ -14,8 +14,11 @@ import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.composeApp.navigation.Screen
 import com.kazemieh.dashboard.DashboardScreen
+import com.kazemieh.debt.ui.list.DebtsScreen
 import com.kazemieh.installment.ui.list.InstallmentsScreen
 import com.kazemieh.notifications.ui.NotificationSettingsScreen
+import com.kazemieh.person.ui.detail.PersonDetailScreen
+import com.kazemieh.person.ui.list.PersonsScreen
 import com.kazemieh.profile.ProfileEditScreen
 import com.kazemieh.profile.ProfileScreen
 import com.kazemieh.profile.ThemeAndCurrencyScreen
@@ -77,7 +80,9 @@ fun NavGraphBuilder.bottomBarNavGraph(
             ToolsScreen(
                 snackbarHostState = snackbarHostState,
                 onNavigateToBudget = { navController.navigate(Screen.Budget) },
-                onNavigateToInstallment = { navController.navigate(Screen.Installment) }
+                onNavigateToInstallment = { navController.navigate(Screen.Installment) },
+                onNavigateToPerson = { navController.navigate(Screen.Person) },
+                onNavigateToDebt = { navController.navigate(Screen.Debt) }
             )
         }
 
@@ -88,6 +93,32 @@ fun NavGraphBuilder.bottomBarNavGraph(
         composable<Screen.Installment> {
             InstallmentsScreen(
                 onAddInstallment = { /* I'll handle showing the bottom sheet in InstallmentsScreen */ }
+            )
+        }
+
+        composable<Screen.Person> {
+            PersonsScreen(
+                snackbarHostState = snackbarHostState,
+                onNavigateToDetail = { person ->
+                    navController.navigate(Screen.PersonDetail(person.id ?: 0L))
+                },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.PersonDetail> { backStackEntry ->
+            val args = backStackEntry.toRoute<Screen.PersonDetail>()
+            PersonDetailScreen(
+                personId = args.personId,
+                snackbarHostState = snackbarHostState,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.Debt> {
+            DebtsScreen(
+                snackbarHostState = snackbarHostState,
+                onBack = { navController.popBackStack() }
             )
         }
 

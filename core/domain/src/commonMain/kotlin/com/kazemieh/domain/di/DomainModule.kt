@@ -2,6 +2,7 @@ package com.kazemieh.domain.di
 
 import com.kazemieh.domain.usecase.AddBudgetUseCase
 import com.kazemieh.domain.usecase.AddCategoryUseCase
+import com.kazemieh.domain.usecase.AddDebtUseCase
 import com.kazemieh.domain.usecase.AddInstallmentUseCase
 import com.kazemieh.domain.usecase.AddPersonUseCase
 import com.kazemieh.domain.usecase.AddSourceUseCase
@@ -9,6 +10,7 @@ import com.kazemieh.domain.usecase.AddTagUseCase
 import com.kazemieh.domain.usecase.AddTransactionUseCase
 import com.kazemieh.domain.usecase.DeleteBudgetUseCase
 import com.kazemieh.domain.usecase.DeleteCategoryUseCase
+import com.kazemieh.domain.usecase.DeleteDebtUseCase
 import com.kazemieh.domain.usecase.DeleteInstallmentUseCase
 import com.kazemieh.domain.usecase.DeletePersonUseCase
 import com.kazemieh.domain.usecase.DeleteRecentSearchUseCase
@@ -24,8 +26,11 @@ import com.kazemieh.domain.usecase.GetDefaultFinancialSourceUseCase
 import com.kazemieh.domain.usecase.GetRecentSearchesUseCase
 import com.kazemieh.domain.usecase.GetTransferCategoryUseCase
 import com.kazemieh.domain.usecase.GetTransactionAmountRangeUseCase
+import com.kazemieh.domain.usecase.DebtUseCaseGroup
 import com.kazemieh.domain.usecase.InstallmentUseCaseGroup
 import com.kazemieh.domain.usecase.MarkInstallmentAsPaidUseCase
+import com.kazemieh.domain.usecase.ObserveDebtsByPersonUseCase
+import com.kazemieh.domain.usecase.ObserveDebtsUseCase
 import com.kazemieh.domain.usecase.ObserveBudgetsWithProgressUseCase
 import com.kazemieh.domain.usecase.ObserveCategoriesFlatUseCase
 import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
@@ -47,12 +52,14 @@ import com.kazemieh.domain.usecase.SearchPersonsUseCase
 import com.kazemieh.domain.usecase.SearchSourcesUseCase
 import com.kazemieh.domain.usecase.SearchTagsUseCase
 import com.kazemieh.domain.usecase.SeedDataUseCase
+import com.kazemieh.domain.usecase.SettleDebtUseCase
 import com.kazemieh.domain.usecase.SetBooleanPreferenceUseCase
 import com.kazemieh.domain.usecase.SetStringPreferenceUseCase
 import com.kazemieh.domain.usecase.SourceUseCases
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import com.kazemieh.domain.usecase.UpdateCategoryPositionsUseCase
 import com.kazemieh.domain.usecase.UpdateCategoryUseCase
+import com.kazemieh.domain.usecase.UpdateDebtUseCase
 import com.kazemieh.domain.usecase.UpdatePersonPositionsUseCase
 import com.kazemieh.domain.usecase.UpdatePersonUseCase
 import com.kazemieh.domain.usecase.UpdateSourcePositionsUseCase
@@ -117,6 +124,13 @@ val domainModule = module {
     factory { GetBudgetByCategoryIdUseCase(get()) }
     factory { GetBudgetSpentAmountUseCase(get()) }
 
+    factory { AddDebtUseCase(get()) }
+    factory { UpdateDebtUseCase(get()) }
+    factory { DeleteDebtUseCase(get()) }
+    factory { ObserveDebtsUseCase(get()) }
+    factory { ObserveDebtsByPersonUseCase(get()) }
+    factory { SettleDebtUseCase(get(), get()) }
+
     factory { GetBooleanPreferenceUseCase(get()) }
     factory { SetBooleanPreferenceUseCase(get()) }
     factory { GetStringPreferenceUseCase(get()) }
@@ -154,6 +168,16 @@ val domainModule = module {
             observeInstallmentsUseCase = get(),
             markInstallmentAsPaidUseCase = get(),
             deleteInstallmentUseCase = get()
+        )
+    }
+    single {
+        DebtUseCaseGroup(
+            addDebtUseCase = get(),
+            updateDebtUseCase = get(),
+            deleteDebtUseCase = get(),
+            observeDebtsUseCase = get(),
+            observeDebtsByPersonUseCase = get(),
+            settleDebtUseCase = get()
         )
     }
     single {

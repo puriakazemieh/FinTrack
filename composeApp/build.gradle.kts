@@ -88,6 +88,7 @@ kotlin {
             implementation(project(":feature-share:tags"))
             implementation(project(":feature-container:transactions"))
             implementation(project(":feature-share:person"))
+            implementation(project(":feature-share:debt"))
             implementation(project(":feature-share:search"))
             implementation(project(":feature-share:lock"))
             implementation(project(":feature-share:notifications"))

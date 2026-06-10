@@ -10,14 +10,14 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "com.kazemieh.person"
+        namespace = "com.kazemieh.debt"
         compileSdk {
             version = release(36)
         }
         minSdk = 24
     }
 
-    val xcfName = "core:personKit"
+    val xcfName = "core:debtKit"
 
     iosX64 {
         binaries.framework {
@@ -50,6 +50,7 @@ kotlin {
                 implementation(libs.kotlinx.datetime)
                 implementation(project(":core:common"))
                 implementation(project(":core:domain"))
+                implementation(project(":feature-share:person"))
                 implementation(project(":feature-share:source"))
 
                 implementation(project(":core:designsystem"))
@@ -63,7 +64,6 @@ kotlin {
                 implementation(libs.compose.components.resources)
                 implementation(libs.compose.uiToolingPreview)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
-                implementation(libs.kotlinx.datetime)
 
                 implementation(libs.koin.compose)
                 implementation(libs.koin.core)

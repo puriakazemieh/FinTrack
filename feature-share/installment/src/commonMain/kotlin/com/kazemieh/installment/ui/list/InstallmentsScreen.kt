@@ -132,7 +132,7 @@ fun InstallmentsScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(space.medium)
+                    contentPadding = PaddingValues(bottom = 100.dp)
                 ) {
                     items(items, key = { it.installment.id }) { item ->
                         val transactionDescription = stringResource(
@@ -170,7 +170,7 @@ fun InstallmentsScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(space.large)
-                .padding(bottom = 60.dp) // Avoid navigation bar
+                .padding(bottom = 100.dp) // Avoid navigation bar
         ) {
             showAddInstallment = true
         }

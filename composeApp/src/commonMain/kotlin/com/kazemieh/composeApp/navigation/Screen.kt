@@ -43,6 +43,15 @@ sealed class Screen {
     data object Installment : Screen()
 
     @Serializable
+    data object Person : Screen()
+
+    @Serializable
+    data class PersonDetail(val personId: Long) : Screen()
+
+    @Serializable
+    data object Debt : Screen()
+
+    @Serializable
     data object Onboarding : Screen()
 
     @Serializable

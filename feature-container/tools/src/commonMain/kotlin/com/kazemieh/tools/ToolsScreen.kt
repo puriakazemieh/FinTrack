@@ -13,18 +13,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.glass.ScreenHeader
-import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.label_budgets
-import fintrack.core.designsystem.generated.resources.navigation_installment
-import fintrack.core.designsystem.generated.resources.navigation_tools
-import fintrack.core.designsystem.generated.resources.title_tools_management
+import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ToolsScreen(
     snackbarHostState: SnackbarHostState,
     onNavigateToBudget: () -> Unit,
-    onNavigateToInstallment: () -> Unit
+    onNavigateToInstallment: () -> Unit,
+    onNavigateToPerson: () -> Unit,
+    onNavigateToDebt: () -> Unit
 ) {
     val space = LocalSpacing.current
     Box(
@@ -50,6 +48,20 @@ fun ToolsScreen(
                 modifier = Modifier.padding(space.large)
             ) {
                 Text(stringResource(Res.string.navigation_installment))
+            }
+
+            Button(
+                onClick = onNavigateToPerson,
+                modifier = Modifier.padding(space.large)
+            ) {
+                Text(stringResource(Res.string.persons))
+            }
+
+            Button(
+                onClick = onNavigateToDebt,
+                modifier = Modifier.padding(space.large)
+            ) {
+                Text(stringResource(Res.string.navigation_debts))
             }
         }
     }

@@ -1,0 +1,64 @@
+CREATE TABLE IF NOT EXISTS debt (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    personId INTEGER NOT NULL,
+    amount INTEGER NOT NULL,
+    date INTEGER NOT NULL,
+    dueDate INTEGER,
+    sourceId INTEGER,
+    description TEXT,
+    type INTEGER NOT NULL,
+    isSettled INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (personId) REFERENCES person(id) ON DELETE CASCADE,
+    FOREIGN KEY (sourceId) REFERENCES source(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_debt_person ON debt(personId);
+CREATE INDEX IF NOT EXISTS idx_debt_source ON debt(sourceId);
+
+insertDebt:
+INSERT INTO debt(personId, amount, date, dueDate, sourceId, description, type, isSettled)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+updateDebt:
+UPDATE debt
+SET personId = ?, amount = ?, date = ?, dueDate = ?, sourceId = ?, description = ?, type = ?, isSettled = ?
+WHERE id = ?;
+
+deleteDebt:
+DELETE FROM debt WHERE id = ?;
+
+getDebtById:
+SELECT * FROM debt WHERE id = ?;
+
+observeAllDebts:
+SELECT
+    d.*,
+    p.name AS personName,
+    p.description AS personDescription,
+    s.name AS sourceName,
+    s.colorId AS sourceColorId,
+    s.iconId AS sourceIconId
+FROM debt d
+INNER JOIN person p ON d.personId = p.id
+LEFT JOIN source s ON d.sourceId = s.id
+ORDER BY d.isSettled ASC, d.date DESC;
+
+observeDebtsByPerson:
+SELECT
+    d.*,
+    p.name AS personName,
+    p.description AS personDescription,
+    s.name AS sourceName,
+    s.colorId AS sourceColorId,
+    s.iconId AS sourceIconId
+FROM debt d
+INNER JOIN person p ON d.personId = p.id
+LEFT JOIN source s ON d.sourceId = s.id
+WHERE d.personId = ?
+ORDER BY d.date DESC;
+
+settleDebt:
+UPDATE debt SET isSettled = 1 WHERE id = ?;
+
+lastInsertRowId:
+SELECT last_insert_rowid();

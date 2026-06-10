@@ -25,6 +25,7 @@ import com.kazemieh.designsystem.FintrackTheme
 import com.kazemieh.designsystem.LocalCurrency
 import com.kazemieh.domain.di.domainModule
 import com.kazemieh.domain.usecase.PreferenceUseCases
+import com.kazemieh.debt.di.debtModule
 import com.kazemieh.financialsource.di.deleteSourceModule
 import com.kazemieh.financialsource.di.transactionAddFinancialSourceModule
 import com.kazemieh.financialsource.di.transactionFinancialSourceModule
@@ -114,6 +115,7 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         transactionTagModule,
         profileModule,
         transactionPersonModule,
+        debtModule,
         transactionDeletePersonModule,
         transactionAddPersonModule,
         toolsModule,

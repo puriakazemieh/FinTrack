@@ -129,7 +129,7 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .padding(horizontal = space.large),
             verticalArrangement = Arrangement.spacedBy(space.medium),
-            contentPadding = PaddingValues(vertical = space.large)
+            contentPadding = PaddingValues(bottom = 100.dp)
         ) {
             item {
                 ProfileHero(onEditClick = onNavigateToProfileEdit)
