@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import com.kazemieh.budget.ui.list.BudgetScreen
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
@@ -52,7 +53,8 @@ fun NavGraphBuilder.bottomBarNavGraph(
             DashboardScreen(
                 snackbarHostState = snackbarHostState,
                 onNavigateToTransactions = navigateToTransactions,
-                onNavigateToSearch = { navController.navigate(Screen.Search) }
+                onNavigateToSearch = { navController.navigate(Screen.Search) },
+                onNavigateToBudget = { navController.navigate(Screen.Budget) }
             )
         }
 
@@ -71,7 +73,14 @@ fun NavGraphBuilder.bottomBarNavGraph(
         }
 
         composable<Screen.Tools> { backStackEntry ->
-            ToolsScreen(snackbarHostState = snackbarHostState)
+            ToolsScreen(
+                snackbarHostState = snackbarHostState,
+                onNavigateToBudget = { navController.navigate(Screen.Budget) }
+            )
+        }
+
+        composable<Screen.Budget> {
+            BudgetScreen(onBack = { navController.popBackStack() })
         }
 
         composable<Screen.Profile> { backStackEntry ->

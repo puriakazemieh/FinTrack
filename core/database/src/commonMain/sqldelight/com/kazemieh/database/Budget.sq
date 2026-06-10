@@ -1,0 +1,39 @@
+CREATE TABLE IF NOT EXISTS budget (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    categoryId INTEGER NOT NULL,
+    amount INTEGER NOT NULL,
+    period TEXT NOT NULL,
+    startAt INTEGER NOT NULL,
+    isAlertEnabled INTEGER NOT NULL DEFAULT 1,
+    FOREIGN KEY (categoryId) REFERENCES category(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_budget_category ON budget(categoryId);
+
+observeBudgets:
+SELECT
+    b.*,
+    c.name AS categoryName,
+    c.colorId AS categoryColorId,
+    c.iconId AS categoryIconId,
+    c.type AS categoryType
+FROM budget b
+LEFT JOIN category c ON b.categoryId = c.id;
+
+getBudgetByCategoryId:
+SELECT * FROM budget WHERE categoryId = ?;
+
+getBudgetById:
+SELECT * FROM budget WHERE id = ?;
+
+insertBudget:
+INSERT INTO budget(categoryId, amount, period, startAt, isAlertEnabled)
+VALUES (?, ?, ?, ?, ?);
+
+updateBudget:
+UPDATE budget
+SET categoryId = ?, amount = ?, period = ?, startAt = ?, isAlertEnabled = ?
+WHERE id = ?;
+
+deleteBudget:
+DELETE FROM budget WHERE id = ?;

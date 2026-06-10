@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.budget.ui.component.BudgetWidget
 import com.kazemieh.dashboard.component.QuickActions
 import com.kazemieh.dashboard.component.RecentTransactionsWidget
 import com.kazemieh.designsystem.GlassColor
@@ -65,7 +66,8 @@ fun DashboardScreen(
     viewModel: DashboardViewModel = koinViewModel(),
     snackbarHostState: SnackbarHostState,
     onNavigateToTransactions: (Any?) -> Unit = {},
-    onNavigateToSearch: () -> Unit = {}
+    onNavigateToSearch: () -> Unit = {},
+    onNavigateToBudget: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
@@ -139,6 +141,15 @@ fun DashboardScreen(
                         )
                     },
                     onSearchClick = onNavigateToSearch,
+                    modifier = Modifier.padding(horizontal = space.large)
+                )
+            }
+
+            item { Spacer(Modifier.height(space.large)) }
+
+            item {
+                BudgetWidget(
+                    onMoreClick = onNavigateToBudget,
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }

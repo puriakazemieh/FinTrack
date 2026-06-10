@@ -94,6 +94,7 @@ kotlin {
             implementation(project(":feature-container:dashboard"))
             implementation(project(":feature-container:profile"))
             implementation(project(":feature-container:tools"))
+            implementation(project(":feature-share:budget"))
 
 
         }

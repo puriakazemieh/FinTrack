@@ -52,6 +52,12 @@ import com.kazemieh.domain.usecase.UpdateSourceUseCase
 import com.kazemieh.domain.usecase.UpdateTagPositionsUseCase
 import com.kazemieh.domain.usecase.UpdateTagUseCase
 import com.kazemieh.domain.usecase.UpdateTransactionUseCase
+import com.kazemieh.domain.usecase.ObserveBudgetsWithProgressUseCase
+import com.kazemieh.domain.usecase.AddBudgetUseCase
+import com.kazemieh.domain.usecase.UpdateBudgetUseCase
+import com.kazemieh.domain.usecase.DeleteBudgetUseCase
+import com.kazemieh.domain.usecase.GetBudgetByCategoryIdUseCase
+import com.kazemieh.domain.usecase.GetBudgetSpentAmountUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -92,6 +98,13 @@ val domainModule = module {
     factory { UpdatePersonPositionsUseCase(get()) }
     factory { GetTransactionAmountRangeUseCase(get()) }
     factory { SeedDataUseCase(get(), get()) }
+
+    factory { ObserveBudgetsWithProgressUseCase(get()) }
+    factory { AddBudgetUseCase(get()) }
+    factory { UpdateBudgetUseCase(get()) }
+    factory { DeleteBudgetUseCase(get()) }
+    factory { GetBudgetByCategoryIdUseCase(get()) }
+    factory { GetBudgetSpentAmountUseCase(get()) }
 
     factory { GetBooleanPreferenceUseCase(get()) }
     factory { SetBooleanPreferenceUseCase(get()) }

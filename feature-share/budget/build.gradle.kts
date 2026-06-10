@@ -4,20 +4,17 @@ plugins {
     alias(libs.plugins.android.lint)
     alias(libs.plugins.composeMultiplatformPlugin)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlinxSerialization)
 }
 
 kotlin {
     androidLibrary {
-        namespace = "com.kazemieh.dashboard"
-        compileSdk {
-            version = release(36)
-        }
+        namespace = "com.kazemieh.budget"
+        compileSdk = 36
         minSdk = 24
     }
 
-    val xcfName = "core:dashboardKit"
+    val xcfName = "core:budgetKit"
 
     iosX64 {
         binaries.framework {
@@ -49,49 +46,22 @@ kotlin {
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.kotlinx.datetime)
                 implementation(project(":core:common"))
-                implementation(project(":feature-share:transaction"))
-                implementation(project(":feature-share:source"))
-                implementation(project(":feature-share:budget"))
-
+                implementation(project(":core:domain"))
+                implementation(project(":core:jalali"))
                 implementation(project(":core:designsystem"))
+                implementation(project(":feature-share:category"))
 
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)
                 implementation(libs.compose.ui)
-                implementation(libs.compose.material.icons.core)
-                implementation(libs.compose.material.icons.extended)
                 implementation(libs.compose.components.resources)
-                implementation(libs.compose.uiToolingPreview)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
-                implementation(libs.kotlinx.datetime)
-
+                
                 implementation(libs.koin.compose)
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose.viewmodel)
             }
         }
-
-
-        androidMain {
-            dependencies {
-            }
-        }
-
-        iosMain {
-            dependencies {
-            }
-        }
-
-        jsMain {
-            dependencies {
-            }
-        }
-
-        jvmMain {
-            dependencies {
-            }
-        }
     }
-
 }

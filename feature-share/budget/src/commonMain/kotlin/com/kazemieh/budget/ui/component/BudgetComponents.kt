@@ -1,0 +1,214 @@
+package com.kazemieh.budget.ui.component
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.kazemieh.common.model.BudgetPeriod
+import com.kazemieh.common.model.BudgetWithProgress
+import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.glass.Chip
+import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.MoneyText
+import com.kazemieh.designsystem.picker.FinTrackIcons
+import com.kazemieh.designsystem.picker.FinTrackPickerColors
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+
+@Composable
+fun BudgetHero(
+    totalBudget: Long,
+    usedBudget: Long,
+    modifier: Modifier = Modifier
+) {
+    val progress = if (totalBudget > 0) usedBudget.toFloat() / totalBudget else 0f
+    val remaining = (totalBudget - usedBudget).coerceAtLeast(0)
+
+    GlassCard(
+        modifier = modifier.fillMaxWidth(),
+        padding = 18.dp
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.size(116.dp)) {
+                CircularProgress(progress = progress)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    FintrackTitleLargeText(
+                        text = "${(progress * 100).toInt()}%",
+                        fontWeight = FontWeight.Bold
+                    )
+                    FintrackLabelSmallText(text = stringResource(Res.string.label_budget_consumed), color = GlassText3)
+                }
+            }
+
+            Column(modifier = Modifier.weight(1f)) {
+                FintrackLabelSmallText(text = stringResource(Res.string.label_total_budget), color = GlassText3)
+                MoneyText(amount = totalBudget, size = 20)
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                FintrackLabelSmallText(text = stringResource(Res.string.label_remaining), color = GlassText3)
+                MoneyText(amount = remaining, size = 16, color = GlassGreen)
+                
+                Spacer(modifier = Modifier.height(6.dp))
+                FintrackLabelSmallText(
+                    text = stringResource(Res.string.label_days_remaining, 12), // Should be dynamic
+                    color = GlassAmber
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CircularProgress(progress: Float) {
+    Canvas(modifier = Modifier.size(116.dp)) {
+        drawCircle(
+            color = Color.White.copy(alpha = 0.1f),
+            style = Stroke(width = 4.dp.toPx())
+        )
+        drawArc(
+            color = GlassGreen,
+            startAngle = -90f,
+            sweepAngle = progress * 360f,
+            useCenter = false,
+            style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round)
+        )
+    }
+}
+
+@Composable
+fun BudgetPeriodSelector(
+    selectedPeriod: BudgetPeriod,
+    onPeriodSelected: (BudgetPeriod) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    GlassCard(padding = 14.dp, modifier = modifier) {
+        Column {
+            FintrackLabelMediumText(text = stringResource(Res.string.label_budget_period), color = GlassText3)
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                BudgetPeriod.entries.forEach { period ->
+                    val labelRes = when (period) {
+                        BudgetPeriod.DAILY -> Res.string.label_budget_period_daily
+                        BudgetPeriod.WEEKLY -> Res.string.label_budget_period_weekly
+                        BudgetPeriod.MONTHLY -> Res.string.label_budget_period_monthly
+                        BudgetPeriod.YEARLY -> Res.string.label_budget_period_yearly
+                    }
+                    Chip(
+                        active = selectedPeriod == period,
+                        onClick = { onPeriodSelected(period) },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        FintrackLabelSmallText(text = stringResource(labelRes))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun BudgetRow(
+    budgetProgress: BudgetWithProgress,
+    onEdit: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val isDark = isSystemInDarkTheme()
+    val color = FinTrackPickerColors.getColorById(budgetProgress.category?.colorId ?: 1, isDark)
+    val icon = FinTrackIcons.findIcon(budgetProgress.category?.iconId ?: 1).resource
+    val progress = budgetProgress.progress.coerceIn(0f, 1f)
+    val isOver = budgetProgress.progress > 1f
+
+    GlassCard(
+        modifier = modifier.fillMaxWidth().clickable { onEdit() },
+        padding = 12.dp
+    ) {
+        Column {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .background(color.copy(alpha = 0.2f))
+                        .border(0.5.dp, color.copy(alpha = 0.3f), MaterialTheme.shapes.small),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(icon),
+                        contentDescription = null,
+                        tint = color,
+                        modifier = Modifier.size(15.dp)
+                    )
+                }
+
+                Column(modifier = Modifier.weight(1f)) {
+                    FintrackLabelLargeText(text = budgetProgress.category?.name ?: "نامشخص", fontWeight = FontWeight.SemiBold)
+                    FintrackLabelSmallText(
+                        text = "${budgetProgress.spentAmount} از ${budgetProgress.budget.amount} ت",
+                        color = if (isOver) GlassRed else GlassText3
+                    )
+                }
+
+                FintrackLabelLargeText(
+                    text = "${(budgetProgress.progress * 100).toInt()}%",
+                    fontWeight = FontWeight.Bold,
+                    color = if (isOver) GlassRed else GlassText
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.1f))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(progress)
+                        .fillMaxHeight()
+                        .clip(CircleShape)
+                        .background(Brush.horizontalGradient(listOf(color, color.copy(alpha = 0.5f))))
+                )
+            }
+
+            if (isOver) {
+                Row(
+                    modifier = Modifier.padding(top = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(GlassRed))
+                    FintrackLabelSmallText(text = stringResource(Res.string.label_budget_over), color = GlassRed)
+                }
+            }
+        }
+    }
+}

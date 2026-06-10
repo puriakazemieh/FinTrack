@@ -469,4 +469,27 @@
     <string name="notif_quiet_end_label">زمان پایان</string>
     <string name="notif_permission_rationale">برای دریافت یادآوری‌های بودجه و چک، لطفاً دسترسی به اعلان‌ها را فعال کنید.</string>
     <string name="notif_channels_title">کانال‌های اطلاع‌رسانی</string>
+    <string name="title_my_budgets">بودجه‌های من</string>
+    <string name="label_budget_consumed">مصرف‌شده</string>
+    <string name="label_total_budget">کل بودجه</string>
+    <string name="label_remaining">مانده</string>
+    <string name="label_days_remaining">%1$d روز تا پایان ماه</string>
+    <string name="label_budget_amount">مبلغ بودجه</string>
+    <string name="label_budget_period">بازه‌ی زمانی</string>
+    <string name="label_budget_alert_80">هشدار وقتی ٪۸۰ مصرف شد</string>
+    <string name="label_budget_alert_desc">نوتیف ارسال می‌شود</string>
+    <string name="label_budget_over">بیش از بودجه — هشدار فعال</string>
+    <string name="label_budget_period_daily">روزانه</string>
+    <string name="label_budget_period_weekly">هفتگی</string>
+    <string name="label_budget_period_monthly">ماهانه</string>
+    <string name="label_budget_period_yearly">سالانه</string>
+    <string name="label_select_category">انتخاب دسته‌بندی</string>
+    <string name="label_new_budget">بودجه‌ی جدید</string>
+    <string name="label_edit_budget">ویرایش بودجه</string>
+    <string name="label_budget_sum">مجموع بودجه</string>
+    <string name="label_500k">۵۰۰ک</string>
+    <string name="label_1m">۱م</string>
+    <string name="label_2m">۲م</string>
+    <string name="label_3m">۳م</string>
+    <string name="label_5m">۵م</string>
 </resources>
