@@ -39,10 +39,9 @@ class NotificationSettingsViewModel(
     }
 
     private fun checkPermission() {
+        // Initial check, will be augmented by UI rationale state
         if (!notificationManager.hasPermission()) {
-            if (notificationManager.shouldShowRationale()) {
-                _state.update { it.copy(showPermissionRationale = true) }
-            }
+            // Wait for RefreshPermissionStatus from UI
         }
     }
 
@@ -54,7 +53,8 @@ class NotificationSettingsViewModel(
                     preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_BUDGET_ENABLED, newValue)
                     _state.update { it.copy(isBudgetNotifEnabled = newValue) }
                 } else {
-                    onIntent(NotificationSettingsIntent.RequestPermission)
+                    // Trigger flow via UI check
+                    _state.update { it.copy(triggerSystemPermissionRequest = true) }
                 }
             }
             NotificationSettingsIntent.ToggleInstallmentNotif -> {
@@ -63,7 +63,7 @@ class NotificationSettingsViewModel(
                     preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_INSTALLMENT_ENABLED, newValue)
                     _state.update { it.copy(isInstallmentNotifEnabled = newValue) }
                 } else {
-                    onIntent(NotificationSettingsIntent.RequestPermission)
+                    _state.update { it.copy(triggerSystemPermissionRequest = true) }
                 }
             }
             NotificationSettingsIntent.ToggleChequeNotif -> {
@@ -72,7 +72,7 @@ class NotificationSettingsViewModel(
                     preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_CHEQUE_ENABLED, newValue)
                     _state.update { it.copy(isChequeNotifEnabled = newValue) }
                 } else {
-                    onIntent(NotificationSettingsIntent.RequestPermission)
+                    _state.update { it.copy(triggerSystemPermissionRequest = true) }
                 }
             }
             NotificationSettingsIntent.ToggleQuietHours -> {
@@ -88,11 +88,15 @@ class NotificationSettingsViewModel(
                 preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_NOTIF_QUIET_END, intent.time)
                 _state.update { it.copy(quietEnd = intent.time) }
             }
-            NotificationSettingsIntent.RequestPermission -> {
-                if (notificationManager.shouldShowRationale()) {
+            is NotificationSettingsIntent.RefreshPermissionStatus -> {
+                if (!notificationManager.hasPermission() && intent.shouldShowRationale) {
                     _state.update { it.copy(showPermissionRationale = true) }
+                }
+            }
+            is NotificationSettingsIntent.RequestPermission -> {
+                if (intent.isRationaleShown) {
+                    _state.update { it.copy(triggerSystemPermissionRequest = true, showPermissionRationale = false) }
                 } else {
-                    // Check if permanently denied
                     val hasRequestedBefore = preferenceUseCases.getBooleanPreference("has_requested_notif_permission", false)
                     if (hasRequestedBefore && !notificationManager.hasPermission()) {
                         notificationManager.openSettings()
@@ -106,10 +110,6 @@ class NotificationSettingsViewModel(
                 _state.update { it.copy(triggerSystemPermissionRequest = false) }
                 if (intent.granted) {
                     _state.update { it.copy(showPermissionRationale = false) }
-                } else {
-                    if (!notificationManager.shouldShowRationale()) {
-                        // This might be the "Don't ask again" case
-                    }
                 }
             }
             NotificationSettingsIntent.DismissPermissionRationale -> {

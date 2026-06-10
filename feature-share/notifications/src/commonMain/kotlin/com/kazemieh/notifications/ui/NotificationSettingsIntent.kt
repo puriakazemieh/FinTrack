@@ -7,7 +7,8 @@ sealed interface NotificationSettingsIntent {
     data object ToggleQuietHours : NotificationSettingsIntent
     data class SetQuietStart(val time: String) : NotificationSettingsIntent
     data class SetQuietEnd(val time: String) : NotificationSettingsIntent
-    data object RequestPermission : NotificationSettingsIntent
+    data class RequestPermission(val isRationaleShown: Boolean) : NotificationSettingsIntent
     data class OnPermissionResult(val granted: Boolean) : NotificationSettingsIntent
+    data class RefreshPermissionStatus(val shouldShowRationale: Boolean) : NotificationSettingsIntent
     data object DismissPermissionRationale : NotificationSettingsIntent
 }

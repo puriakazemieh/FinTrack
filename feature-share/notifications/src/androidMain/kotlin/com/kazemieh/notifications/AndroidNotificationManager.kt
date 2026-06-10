@@ -57,16 +57,6 @@ class AndroidNotificationManager(private val context: Context) : NotificationMan
         }
     }
 
-    override fun shouldShowRationale(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            (context as? Activity)?.let {
-                ActivityCompat.shouldShowRequestPermissionRationale(it, Manifest.permission.POST_NOTIFICATIONS)
-            } ?: false
-        } else {
-            false
-        }
-    }
-
     override fun openSettings() {
         val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             android.content.Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {

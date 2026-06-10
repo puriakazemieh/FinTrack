@@ -5,7 +5,6 @@ interface NotificationManager {
     fun createChannel(id: String, name: String, importance: Int = 3)
     fun showNotification(id: Int, title: String, message: String, channelId: String)
     fun hasPermission(): Boolean
-    fun shouldShowRationale(): Boolean
     fun openSettings()
 
     companion object {

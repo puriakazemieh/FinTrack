@@ -36,6 +36,7 @@ fun NotificationSettingsScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
+    val shouldShowRationale = rememberShouldShowNotificationRationale()
 
     NotificationPermissionLauncher(
         trigger = state.triggerSystemPermissionRequest,
@@ -44,14 +45,17 @@ fun NotificationSettingsScreen(
         }
     )
 
+    LaunchedEffect(shouldShowRationale) {
+        viewModel.onIntent(NotificationSettingsIntent.RefreshPermissionStatus(shouldShowRationale))
+    }
+
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 NotificationSettingsEffect.RequestNotificationPermission -> {
-                    // This will be handled by the platform Activity or a platform-specific side effect
+                    // This intent is now handled via state trigger
                 }
                 is NotificationSettingsEffect.ShowMessage -> {
-                    // Show snackbar if needed, but handled globally via SnackbarController usually
                 }
             }
         }
@@ -80,7 +84,7 @@ fun NotificationSettingsScreen(
                 if (state.showPermissionRationale) {
                     item {
                         PermissionRationaleCard(
-                            onRequestPermission = { viewModel.onIntent(NotificationSettingsIntent.RequestPermission) },
+                            onRequestPermission = { viewModel.onIntent(NotificationSettingsIntent.RequestPermission(shouldShowRationale)) },
                             onDismiss = { viewModel.onIntent(NotificationSettingsIntent.DismissPermissionRationale) }
                         )
                     }
