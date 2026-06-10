@@ -39,5 +39,12 @@ class FinTrackPreferences(private val settings: Settings) {
         const val PREF_LOCK_ENABLED = "pref_lock_enabled"
         const val PREF_BIOMETRIC_ENABLED = "pref_biometric_enabled"
         const val PREF_HASHED_PIN = "pref_hashed_pin"
+
+        const val PREF_NOTIF_BUDGET_ENABLED = "pref_notif_budget_enabled"
+        const val PREF_NOTIF_INSTALLMENT_ENABLED = "pref_notif_installment_enabled"
+        const val PREF_NOTIF_CHEQUE_ENABLED = "pref_notif_cheque_enabled"
+        const val PREF_NOTIF_QUIET_HOURS_ENABLED = "pref_notif_quiet_hours_enabled"
+        const val PREF_NOTIF_QUIET_START = "pref_notif_quiet_start"
+        const val PREF_NOTIF_QUIET_END = "pref_notif_quiet_end"
     }
 }

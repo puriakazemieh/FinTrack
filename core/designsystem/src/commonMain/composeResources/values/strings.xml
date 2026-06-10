@@ -458,4 +458,15 @@
     <string name="onboarding_setup_source_name">نام منبع (مثلاً نقدی یا بانک ملی)</string>
     <string name="onboarding_setup_balance">موجودی اولیه</string>
     <string name="onboarding_loading">در حال آماده‌سازی دیتای اولیه...</string>
+
+    <!-- Notifications Settings -->
+    <string name="title_notification_settings">تنظیمات اعلان</string>
+    <string name="notif_budget_label">بودجه‌بندی</string>
+    <string name="notif_installment_label">اقساط</string>
+    <string name="notif_cheque_label">چک‌ها</string>
+    <string name="notif_quiet_hours">ساعات سکوت</string>
+    <string name="notif_quiet_start_label">زمان شروع</string>
+    <string name="notif_quiet_end_label">زمان پایان</string>
+    <string name="notif_permission_rationale">برای دریافت یادآوری‌های بودجه و چک، لطفاً دسترسی به اعلان‌ها را فعال کنید.</string>
+    <string name="notif_channels_title">کانال‌های اطلاع‌رسانی</string>
 </resources>

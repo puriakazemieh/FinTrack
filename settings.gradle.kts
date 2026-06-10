@@ -58,6 +58,7 @@ include(":feature-share:tags")
 include(":feature-share:person")
 include(":feature-share:search")
 include(":feature-share:lock")
+include(":feature-share:notifications")
 
 include(":feature-container:transactions")
 include(":feature-container:onboarding")

@@ -31,6 +31,9 @@ sealed class Screen {
     data object ProfileEdit : Screen()
 
     @Serializable
+    data object NotificationSettings : Screen()
+
+    @Serializable
     data object Search : Screen()
 
     @Serializable

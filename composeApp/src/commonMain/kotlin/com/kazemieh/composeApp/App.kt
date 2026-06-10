@@ -14,6 +14,7 @@ import com.kazemieh.category.di.transactionDeleteCategoryModule
 import com.kazemieh.common.di.commonModule
 import com.kazemieh.dashboard.di.dashboardModule
 import com.kazemieh.onboarding.di.onboardingModule
+import com.kazemieh.notifications.di.notificationModule
 import com.kazemieh.data.di.dataModule
 import com.kazemieh.database.DatabaseInitializer
 import com.kazemieh.database.di.databaseModule
@@ -119,7 +120,8 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         transactionsViewModelModule,
         searchModule,
         preferencesModule,
-        lockModule
+        lockModule,
+        notificationModule
     )
     startKoin {
         config?.invoke(this)

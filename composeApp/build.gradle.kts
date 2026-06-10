@@ -89,6 +89,7 @@ kotlin {
             implementation(project(":feature-share:person"))
             implementation(project(":feature-share:search"))
             implementation(project(":feature-share:lock"))
+            implementation(project(":feature-share:notifications"))
             implementation(project(":feature-container:onboarding"))
             implementation(project(":feature-container:dashboard"))
             implementation(project(":feature-container:profile"))

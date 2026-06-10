@@ -37,6 +37,7 @@ import org.koin.compose.viewmodel.koinViewModel as lockKoinViewModel
 fun ProfileScreen(
     onNavigateToThemeAndCurrency: () -> Unit,
     onNavigateToProfileEdit: () -> Unit,
+    onNavigateToNotifications: () -> Unit,
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -195,8 +196,13 @@ fun ProfileScreen(
             item {
                 SettingsSection(title = stringResource(Res.string.section_notifications)) {
                     SettingItem(
-                        title = stringResource(Res.string.setting_push_notifications),
+                        title = stringResource(Res.string.title_notification_settings),
                         icon = Icons.Default.Notifications,
+                        onClick = onNavigateToNotifications
+                    )
+                    SettingItem(
+                        title = stringResource(Res.string.setting_push_notifications),
+                        icon = Icons.Default.FlashOn,
                         on = state.isPushNotificationsEnabled,
                         onToggle = { viewModel.onIntent(ProfileIntent.TogglePushNotifications) }
                     )
