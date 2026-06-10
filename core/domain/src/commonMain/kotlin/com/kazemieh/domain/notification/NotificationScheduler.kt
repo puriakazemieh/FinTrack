@@ -1,13 +1,11 @@
-package com.kazemieh.notifications
-
-import kotlinx.datetime.LocalDateTime
+package com.kazemieh.domain.notification
 
 interface NotificationScheduler {
     fun scheduleReminder(
         id: String,
         title: String,
         message: String,
-        scheduledTime: LocalDateTime,
+        scheduledTime: kotlinx.datetime.LocalDateTime,
         channelId: String
     )
     fun cancelReminder(id: String)

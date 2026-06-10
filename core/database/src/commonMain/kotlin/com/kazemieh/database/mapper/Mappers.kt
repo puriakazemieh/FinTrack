@@ -2,6 +2,9 @@ package com.kazemieh.database.mapper
 
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
+import com.kazemieh.common.model.Installment
+import com.kazemieh.common.model.InstallmentFrequency
+import com.kazemieh.common.model.InstallmentWithRelations
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
@@ -12,8 +15,10 @@ import com.kazemieh.common.persiandatetime.domain.PersianDateTime
 import com.kazemieh.common.persiandatetime.extensions.persianMonth
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.database.GetAllTransactionsFiltered
+import com.kazemieh.database.ObserveInstallments
 import com.kazemieh.database.transaction.ObserveCategorySumsByFilter
 import com.kazemieh.database.Category as CategoryDb
+import com.kazemieh.database.Installment as InstallmentDb
 import com.kazemieh.database.Person as PersonDb
 import com.kazemieh.database.Source as SourceDb
 import com.kazemieh.database.Tag as TagDb
@@ -192,4 +197,67 @@ fun TransactionDb.toTransaction() = Transaction(
     timeStamp = timeStamp,
     date = PersianDateTime.parse(timeStamp).let { "${it.day} ${it.persianMonth().displayName} ${it.year}" }.toPersianDigits(),
     type = TransactionType.fromInt(type.toInt())
+)
+
+// Installment Mappers
+fun InstallmentDb.toInstallment() = Installment(
+    id = id,
+    title = title,
+    totalAmount = totalAmount,
+    installmentAmount = installmentAmount,
+    totalInstallments = totalInstallments.toInt(),
+    paidInstallments = paidInstallments.toInt(),
+    categoryId = categoryId,
+    sourceId = sourceId,
+    startDate = startDate,
+    nextDueDate = nextDueDate,
+    frequency = InstallmentFrequency.valueOf(frequency),
+    description = description,
+    isCompleted = isCompleted == 1L,
+    reminderEnabled = reminderEnabled == 1L
+)
+
+fun ObserveInstallments.toInstallmentWithRelations() = InstallmentWithRelations(
+    installment = Installment(
+        id = id,
+        title = title,
+        totalAmount = totalAmount,
+        installmentAmount = installmentAmount,
+        totalInstallments = totalInstallments.toInt(),
+        paidInstallments = paidInstallments.toInt(),
+        categoryId = categoryId,
+        sourceId = sourceId,
+        startDate = startDate,
+        nextDueDate = nextDueDate,
+        frequency = InstallmentFrequency.valueOf(frequency),
+        description = description,
+        isCompleted = isCompleted == 1L,
+        reminderEnabled = reminderEnabled == 1L
+    ),
+    category = Category(
+        id = category_id ?: 0L,
+        name = category_name ?: "",
+        description = category_description,
+        type = TransactionType.fromInt(category_type?.toInt() ?: TransactionType.EXPENSE.count),
+        colorId = category_colorId?.toInt() ?: 1,
+        iconId = category_iconId?.toInt() ?: 1,
+        parentId = category_parentId
+    ),
+    source = Source(
+        id = source_id ?: 0L,
+        name = source_name ?: "",
+        balance = source_balance?.toInt() ?: 0,
+        cardNumber = source_cardNumber,
+        description = source_description,
+        type = source_type?.toInt() ?: 0,
+        colorId = source_colorId?.toInt() ?: 1,
+        iconId = source_iconId?.toInt() ?: 1,
+        shabaNumber = source_shabaNumber,
+        accountNumber = source_accountNumber,
+        cvv2 = source_cvv2,
+        expirationMonth = source_expirationMonth,
+        expirationYear = source_expirationYear,
+        branchCode = source_branchCode,
+        branchName = source_branchName
+    )
 )

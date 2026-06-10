@@ -1,0 +1,68 @@
+CREATE TABLE IF NOT EXISTS installment (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    title TEXT NOT NULL,
+    totalAmount INTEGER NOT NULL,
+    installmentAmount INTEGER NOT NULL,
+    totalInstallments INTEGER NOT NULL,
+    paidInstallments INTEGER NOT NULL,
+    categoryId INTEGER NOT NULL,
+    sourceId INTEGER NOT NULL,
+    startDate INTEGER NOT NULL,
+    nextDueDate INTEGER NOT NULL,
+    frequency TEXT NOT NULL,
+    description TEXT,
+    isCompleted INTEGER NOT NULL DEFAULT 0,
+    reminderEnabled INTEGER NOT NULL DEFAULT 1,
+    FOREIGN KEY (categoryId) REFERENCES category(id) ON DELETE CASCADE,
+    FOREIGN KEY (sourceId) REFERENCES source(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_installment_nextDueDate ON installment(nextDueDate);
+
+insertInstallment:
+INSERT INTO installment(title, totalAmount, installmentAmount, totalInstallments, paidInstallments, categoryId, sourceId, startDate, nextDueDate, frequency, description, isCompleted, reminderEnabled)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateInstallment:
+UPDATE installment
+SET title = ?, totalAmount = ?, installmentAmount = ?, totalInstallments = ?, paidInstallments = ?, categoryId = ?, sourceId = ?, startDate = ?, nextDueDate = ?, frequency = ?, description = ?, isCompleted = ?, reminderEnabled = ?
+WHERE id = ?;
+
+deleteInstallment:
+DELETE FROM installment WHERE id = ?;
+
+getInstallmentById:
+SELECT * FROM installment WHERE id = ?;
+
+observeInstallments:
+SELECT
+    i.*,
+    c.id AS category_id,
+    c.name AS category_name,
+    c.description AS category_description,
+    c.type AS category_type,
+    c.colorId AS category_colorId,
+    c.iconId AS category_iconId,
+    c.parentId AS category_parentId,
+    s.id AS source_id,
+    s.name AS source_name,
+    s.balance AS source_balance,
+    s.cardNumber AS source_cardNumber,
+    s.description AS source_description,
+    s.type AS source_type,
+    s.colorId AS source_colorId,
+    s.iconId AS source_iconId,
+    s.shabaNumber AS source_shabaNumber,
+    s.accountNumber AS source_accountNumber,
+    s.cvv2 AS source_cvv2,
+    s.expirationMonth AS source_expirationMonth,
+    s.expirationYear AS source_expirationYear,
+    s.branchCode AS source_branchCode,
+    s.branchName AS source_branchName
+FROM installment i
+LEFT JOIN category c ON i.categoryId = c.id
+LEFT JOIN source s ON i.sourceId = s.id
+ORDER BY i.isCompleted ASC, i.nextDueDate ASC;
+
+lastInsertRowId:
+SELECT last_insert_rowid();

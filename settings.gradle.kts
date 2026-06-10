@@ -60,6 +60,7 @@ include(":feature-share:search")
 include(":feature-share:lock")
 include(":feature-share:notifications")
 include(":feature-share:budget")
+include(":feature-share:installment")
 
 include(":feature-container:transactions")
 include(":feature-container:onboarding")

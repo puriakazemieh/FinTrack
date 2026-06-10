@@ -121,7 +121,7 @@ fun SelectableFlowRowBottomSheet(
                 ) {
                     if (filteredItems.isEmpty()) {
                         item {
-                            EmptyListScreen(title)
+                            EmptyList(title)
                         }
                     } else {
                         items(filteredItems) { (item, resolvedTitle) ->

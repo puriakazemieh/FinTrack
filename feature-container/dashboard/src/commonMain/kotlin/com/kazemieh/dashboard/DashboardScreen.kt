@@ -51,6 +51,7 @@ import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
+import com.kazemieh.installment.ui.widget.InstallmentWidget
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.BalanceHero
@@ -150,6 +151,15 @@ fun DashboardScreen(
             item {
                 BudgetWidget(
                     onMoreClick = onNavigateToBudget,
+                    modifier = Modifier.padding(horizontal = space.large)
+                )
+            }
+
+            item { Spacer(Modifier.height(space.large)) }
+
+            item {
+                InstallmentWidget(
+                    onMoreClick = { /* Navigate to installments */ },
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }

@@ -19,7 +19,7 @@ import com.kazemieh.designsystem.GlassText
 import com.kazemieh.designsystem.GlassText2
 import com.kazemieh.designsystem.GlassText3
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.EmptyListScreen
+import com.kazemieh.designsystem.component.EmptyList
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.designsystem.component.glass.GlassTone
@@ -121,7 +121,7 @@ fun SelectableListBottomSheet(
                 }
             } else {
                 Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp)) {
-                    EmptyListScreen(title)
+                    EmptyList(title)
                 }
             }
 

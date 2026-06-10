@@ -14,6 +14,7 @@ import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.composeApp.navigation.Screen
 import com.kazemieh.dashboard.DashboardScreen
+import com.kazemieh.installment.ui.list.InstallmentsScreen
 import com.kazemieh.notifications.ui.NotificationSettingsScreen
 import com.kazemieh.profile.ProfileEditScreen
 import com.kazemieh.profile.ProfileScreen
@@ -75,12 +76,19 @@ fun NavGraphBuilder.bottomBarNavGraph(
         composable<Screen.Tools> { backStackEntry ->
             ToolsScreen(
                 snackbarHostState = snackbarHostState,
-                onNavigateToBudget = { navController.navigate(Screen.Budget) }
+                onNavigateToBudget = { navController.navigate(Screen.Budget) },
+                onNavigateToInstallment = { navController.navigate(Screen.Installment) }
             )
         }
 
         composable<Screen.Budget> {
             BudgetScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable<Screen.Installment> {
+            InstallmentsScreen(
+                onAddInstallment = { /* I'll handle showing the bottom sheet in InstallmentsScreen */ }
+            )
         }
 
         composable<Screen.Profile> { backStackEntry ->

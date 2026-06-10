@@ -53,7 +53,7 @@ import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.GlassText
 import com.kazemieh.designsystem.GlassText2
 import com.kazemieh.designsystem.GlassText3
-import com.kazemieh.designsystem.component.EmptyListScreen
+import com.kazemieh.designsystem.component.EmptyList
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
@@ -171,7 +171,7 @@ fun EntityList(
                     if (items.isEmpty()) {
                         item {
                             Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp)) {
-                                EmptyListScreen(emptyHint ?: stringResource(Res.string.msg_empty_list))
+                                EmptyList(emptyHint ?: stringResource(Res.string.msg_empty_list))
                             }
                         }
                     } else {

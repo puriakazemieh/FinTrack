@@ -40,6 +40,9 @@ sealed class Screen {
     data object Budget : Screen()
 
     @Serializable
+    data object Installment : Screen()
+
+    @Serializable
     data object Onboarding : Screen()
 
     @Serializable

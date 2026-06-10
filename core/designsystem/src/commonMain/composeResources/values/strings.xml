@@ -492,4 +492,31 @@
     <string name="label_2m">۲م</string>
     <string name="label_3m">۳م</string>
     <string name="label_5m">۵م</string>
+
+    <!-- Installment -->
+    <string name="navigation_installment">اقساط</string>
+    <string name="installment_upcoming">آینده</string>
+    <string name="installment_paid">پرداخت شده</string>
+    <string name="installment_overdue">معوقه</string>
+    <string name="add_installment">افزودن قسط</string>
+    <string name="installment_title">عنوان قسط</string>
+    <string name="installment_amount">مبلغ قسط</string>
+    <string name="total_installment_amount">مبلغ کل</string>
+    <string name="total_installments">تعداد کل اقساط</string>
+    <string name="paid_installments">اقساط پرداخت شده</string>
+    <string name="installment_frequency">دوره تکرار</string>
+    <string name="frequency_daily">روزانه</string>
+    <string name="frequency_weekly">هفتگی</string>
+    <string name="frequency_monthly">ماهانه</string>
+    <string name="frequency_yearly">سالانه</string>
+    <string name="installment_start_date">تاریخ شروع</string>
+    <string name="installment_next_date">سررسید بعدی</string>
+    <string name="mark_as_paid">پرداخت شد</string>
+    <string name="installment_deleted">قسط حذف شد</string>
+    <string name="installment_saved">قسط ذخیره شد</string>
+    <string name="remaining_installments">%1$d قسط باقی‌مانده</string>
+    <string name="installment_description">قسط %1$d از %2$d: %3$s</string>
+    <string name="installment_reminder_message">موعد پرداخت قسط %1$s فرا رسیده است.</string>
+    <string name="installment_widget_title">اقساط پیش رو</string>
+    <string name="installment_reminders">یادآوری اقساط</string>
 </resources>

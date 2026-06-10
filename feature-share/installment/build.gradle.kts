@@ -9,13 +9,14 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "com.kazemieh.budget"
+        namespace = "com.kazemieh.installment"
         compileSdk {
             version  = release(36)
         }
         minSdk = 24
     }
-    val xcfName = "core:budgetKit"
+
+    val xcfName = "feature:installmentKit"
 
     iosX64 {
         binaries.framework {
@@ -50,18 +51,25 @@ kotlin {
                 implementation(project(":core:domain"))
                 implementation(project(":core:jalali"))
                 implementation(project(":core:designsystem"))
+                implementation(project(":feature-share:source"))
                 implementation(project(":feature-share:category"))
+                implementation(project(":feature-share:notifications"))
 
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)
                 implementation(libs.compose.ui)
+                implementation(libs.compose.material.icons.core)
+                implementation(libs.compose.material.icons.extended)
                 implementation(libs.compose.components.resources)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
-                
+                implementation(compose.components.resources)
+
                 implementation(libs.koin.compose)
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose.viewmodel)
+
+
             }
         }
     }

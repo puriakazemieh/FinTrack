@@ -21,13 +21,16 @@ import fintrack.core.designsystem.generated.resources.empty_title_default
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun EmptyListScreen(title: String? ) {
+fun EmptyList(
+    title: String? = null,
+    modifier: Modifier = Modifier
+) {
     val space = LocalSpacing.current
 
-    val title = title ?: stringResource(Res.string.empty_title_default)
-    val text = stringResource(Res.string.empty_title, title)
+    val displayTitle = title ?: stringResource(Res.string.empty_title_default)
+    val text = stringResource(Res.string.empty_title, displayTitle)
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(space.huge),
         verticalArrangement = Arrangement.Center,

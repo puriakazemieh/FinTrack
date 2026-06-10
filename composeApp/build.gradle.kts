@@ -83,6 +83,7 @@ kotlin {
             implementation(project(":core:money"))
             implementation(project(":feature-share:transaction"))
             implementation(project(":feature-share:category"))
+            implementation(project(":feature-share:installment"))
             implementation(project(":feature-share:source"))
             implementation(project(":feature-share:tags"))
             implementation(project(":feature-container:transactions"))

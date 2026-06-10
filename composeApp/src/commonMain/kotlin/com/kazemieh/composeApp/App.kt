@@ -16,6 +16,7 @@ import com.kazemieh.common.di.commonModule
 import com.kazemieh.dashboard.di.dashboardModule
 import com.kazemieh.onboarding.di.onboardingModule
 import com.kazemieh.notifications.di.notificationModule
+import com.kazemieh.installment.di.installmentModule
 import com.kazemieh.data.di.dataModule
 import com.kazemieh.database.DatabaseInitializer
 import com.kazemieh.database.di.databaseModule
@@ -123,7 +124,8 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         preferencesModule,
         lockModule,
         notificationModule,
-        budgetModule
+        budgetModule,
+        installmentModule
     )
     startKoin {
         config?.invoke(this)

@@ -1,7 +1,7 @@
 package com.kazemieh.notifications.di
 
+import com.kazemieh.domain.notification.NotificationScheduler
 import com.kazemieh.notifications.NotificationManager
-import com.kazemieh.notifications.NotificationScheduler
 import org.koin.core.module.Module
 import org.koin.dsl.module
 

@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.EmptyListScreen
+import com.kazemieh.designsystem.component.EmptyList
 import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
 import com.kazemieh.designsystem.component.ItemScreen
@@ -89,7 +89,7 @@ fun ListBottomSheet(
                                 content = itemContent
                             )
                         }
-                    } else item { EmptyListScreen(title) }
+                    } else item { EmptyList(title) }
 
                     item { Spacer(Modifier.height(space.huge)) }
                 }
