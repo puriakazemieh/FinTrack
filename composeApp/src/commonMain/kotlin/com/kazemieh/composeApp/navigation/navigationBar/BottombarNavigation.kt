@@ -7,6 +7,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import com.kazemieh.asset.ui.add.AddAssetScreen
+import com.kazemieh.asset.ui.list.AssetsListScreen
 import com.kazemieh.budget.ui.list.BudgetScreen
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Person
@@ -136,6 +138,18 @@ fun NavGraphBuilder.bottomBarNavGraph(
 
         composable<Screen.FixedExpense> {
             FixedExpenseListScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.Assets> {
+            AssetsListScreen(
+                onAddAsset = { navController.navigate(Screen.AddAsset) }
+            )
+        }
+
+        composable<Screen.AddAsset> {
+            AddAssetScreen(
                 onBack = { navController.popBackStack() }
             )
         }

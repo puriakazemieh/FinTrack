@@ -1,0 +1,53 @@
+import com.kazemieh.common.model.AssetType;
+
+CREATE TABLE IF NOT EXISTS asset (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    name TEXT NOT NULL,
+    type TEXT AS AssetType NOT NULL,
+    quantity REAL NOT NULL,
+    purchasePrice INTEGER NOT NULL,
+    currentPrice INTEGER,
+    currency TEXT NOT NULL DEFAULT 'IRR',
+    description TEXT,
+    colorId INTEGER NOT NULL,
+    iconId INTEGER NOT NULL,
+    lastUpdate INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS asset_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    assetId INTEGER NOT NULL,
+    price INTEGER NOT NULL,
+    date INTEGER NOT NULL,
+    FOREIGN KEY (assetId) REFERENCES asset(id) ON DELETE CASCADE
+);
+
+addAsset:
+INSERT INTO asset(name, type, quantity, purchasePrice, currentPrice, currency, description, colorId, iconId, lastUpdate)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+observeAssets:
+SELECT * FROM asset ORDER BY id DESC;
+
+getAssetById:
+SELECT * FROM asset WHERE id = ?;
+
+updateAsset:
+UPDATE asset
+SET name = ?, type = ?, quantity = ?, purchasePrice = ?, currentPrice = ?, currency = ?, description = ?, colorId = ?, iconId = ?, lastUpdate = ?
+WHERE id = ?;
+
+updateAssetPrice:
+UPDATE asset SET currentPrice = ?, lastUpdate = ? WHERE id = ?;
+
+deleteAsset:
+DELETE FROM asset WHERE id = ?;
+
+addAssetHistory:
+INSERT INTO asset_history(assetId, price, date) VALUES (?, ?, ?);
+
+observeAssetHistory:
+SELECT * FROM asset_history WHERE assetId = ? ORDER BY date DESC;
+
+lastInsertRowId:
+SELECT last_insert_rowid();

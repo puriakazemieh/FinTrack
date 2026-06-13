@@ -81,7 +81,14 @@ import com.kazemieh.domain.usecase.UpdateSourceUseCase
 import com.kazemieh.domain.usecase.UpdateTagPositionsUseCase
 import com.kazemieh.domain.usecase.UpdateTagUseCase
 import com.kazemieh.domain.usecase.UpdateTransactionUseCase
+import com.kazemieh.domain.usecase.AssetUseCases
 import com.kazemieh.domain.usecase.AddBudgetUseCase as AddBudgetUseCaseAlias
+import com.kazemieh.domain.usecase.AddAssetUseCase
+import com.kazemieh.domain.usecase.DeleteAssetUseCase
+import com.kazemieh.domain.usecase.ObserveAssetHistoryUseCase
+import com.kazemieh.domain.usecase.ObserveAssetsUseCase
+import com.kazemieh.domain.usecase.SyncAssetRatesUseCase
+import com.kazemieh.domain.usecase.UpdateAssetUseCase
 import com.kazemieh.domain.usecase.UpdateBudgetUseCase
 import com.kazemieh.domain.usecase.GetBudgetByCategoryIdUseCase
 import com.kazemieh.domain.usecase.GetBudgetSpentAmountUseCase
@@ -172,6 +179,24 @@ val domainModule = module {
     factory { GetRecentSearchesUseCase(get()) }
     factory { SaveRecentSearchUseCase(get()) }
     factory { DeleteRecentSearchUseCase(get()) }
+
+    factory { AddAssetUseCase(get()) }
+    factory { DeleteAssetUseCase(get()) }
+    factory { ObserveAssetHistoryUseCase(get()) }
+    factory { ObserveAssetsUseCase(get()) }
+    factory { SyncAssetRatesUseCase(get()) }
+    factory { UpdateAssetUseCase(get()) }
+
+    single {
+        AssetUseCases(
+            observeAssets = get(),
+            addAsset = get(),
+            updateAsset = get(),
+            deleteAsset = get(),
+            syncAssetRates = get(),
+            observeAssetHistory = get()
+        )
+    }
 
 
     single {

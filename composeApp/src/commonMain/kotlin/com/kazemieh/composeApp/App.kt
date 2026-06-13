@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.kazemieh.asset.di.assetModule
 import com.kazemieh.budget.di.budgetModule
 import com.kazemieh.category.di.transactionAddCategoryModule
 import com.kazemieh.category.di.transactionCategoryModule
@@ -34,6 +35,7 @@ import com.kazemieh.financialsource.di.transactionFinancialSourceModule
 import com.kazemieh.lock.LockGate
 import com.kazemieh.lock.di.lockModule
 import com.kazemieh.money.Currency
+import com.kazemieh.network.di.networkModule
 import com.kazemieh.person.di.transactionAddPersonModule
 import com.kazemieh.person.di.transactionDeletePersonModule
 import com.kazemieh.person.di.transactionPersonModule
@@ -131,7 +133,9 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         budgetModule,
         installmentModule,
         checkModule,
-        fixedExpenseModule
+        fixedExpenseModule,
+        networkModule,
+        assetModule
     )
     startKoin {
         config?.invoke(this)

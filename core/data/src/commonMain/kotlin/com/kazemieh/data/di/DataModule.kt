@@ -1,5 +1,6 @@
 package com.kazemieh.data.di
 
+import com.kazemieh.data.repository.AssetRepositoryImpl
 import com.kazemieh.data.repository.BudgetRepositoryImpl
 import com.kazemieh.data.repository.CheckRepositoryImpl
 import com.kazemieh.data.repository.DebtRepositoryImpl
@@ -7,6 +8,7 @@ import com.kazemieh.data.repository.FixedExpenseRepositoryImpl
 import com.kazemieh.data.repository.InstallmentRepositoryImpl
 import com.kazemieh.data.repository.PreferenceRepositoryImpl
 import com.kazemieh.data.repository.TransactionRepositoryImpl
+import com.kazemieh.domain.repository.AssetRepository
 import com.kazemieh.domain.repository.BudgetRepository
 import com.kazemieh.domain.repository.CheckRepository
 import com.kazemieh.domain.repository.DebtRepository
@@ -24,4 +26,5 @@ val dataModule = module {
     single<DebtRepository> { DebtRepositoryImpl(get()) }
     single<CheckRepository> { CheckRepositoryImpl(get()) }
     single<FixedExpenseRepository> { FixedExpenseRepositoryImpl(get()) }
+    single<AssetRepository> { AssetRepositoryImpl(get(), get()) }
 }

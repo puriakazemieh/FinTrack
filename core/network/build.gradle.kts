@@ -1,20 +1,19 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
-    alias(libs.plugins.android.lint)
     alias(libs.plugins.kotlinxSerialization)
 }
 
 kotlin {
     androidLibrary {
-        namespace = "com.kazemieh.data"
+        namespace = "com.kazemieh.network"
         compileSdk {
             version = release(36)
         }
         minSdk = 24
     }
 
-    val xcfName = "core:commonKit"
+    val xcfName = "core:networkKit"
 
     iosX64 {
         binaries.framework {
@@ -43,13 +42,13 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(libs.kotlinx.coroutines.core)
-                implementation(libs.kotlinx.serialization)
                 implementation(project(":core:common"))
-                implementation(project(":core:domain"))
-                implementation(project(":core:network"))
-                implementation(project(":core:preferences"))
-                implementation(project(":core:data-contract"))
+                implementation(libs.kotlinx.datetime)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.kotlinx.json)
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kermit)
                 implementation(libs.koin.core)
             }
         }
@@ -57,11 +56,13 @@ kotlin {
 
         androidMain {
             dependencies {
+                implementation(libs.ktor.client.android)
             }
         }
 
         iosMain {
             dependencies {
+                implementation(libs.ktor.client.darwin)
             }
         }
 

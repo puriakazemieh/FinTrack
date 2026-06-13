@@ -1,15 +1,20 @@
 package com.kazemieh.database.di
 
+import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.db.SqlDriver
+import com.kazemieh.common.model.AssetType
+import com.kazemieh.data_contract.datasource.AssetLocalDataSource
 import com.kazemieh.data_contract.datasource.BudgetLocalDataSource
 import com.kazemieh.data_contract.datasource.CheckLocalDataSource
 import com.kazemieh.data_contract.datasource.DebtLocalDataSource
 import com.kazemieh.data_contract.datasource.FixedExpenseLocalDataSource
 import com.kazemieh.data_contract.datasource.InstallmentLocalDataSource
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
+import com.kazemieh.database.Asset as AssetDb
 import com.kazemieh.database.DatabaseInitializer
 import com.kazemieh.database.FinTrackDatabase
 import com.kazemieh.database.createDriver
+import com.kazemieh.database.datasource.AssetLocalDataSourceImpl
 import com.kazemieh.database.datasource.BudgetLocalDataSourceImpl
 import com.kazemieh.database.datasource.CheckLocalDataSourceImpl
 import com.kazemieh.database.datasource.DebtLocalDataSourceImpl
@@ -24,13 +29,22 @@ val databaseModule = module {
 
 
     single {
-        FinTrackDatabase(driver = get())
+        FinTrackDatabase(
+            driver = get(),
+            assetAdapter = AssetDb.Adapter(
+                typeAdapter = EnumColumnAdapter<AssetType>()
+            )
+        )
     }
 
     single { DatabaseInitializer(database = get(), get()) }
 
     single<TransactionLocalDataSource> {
         TransactionLocalDataSourceImpl(db = get())
+    }
+
+    single<AssetLocalDataSource> {
+        AssetLocalDataSourceImpl(db = get())
     }
 
     single<BudgetLocalDataSource> {

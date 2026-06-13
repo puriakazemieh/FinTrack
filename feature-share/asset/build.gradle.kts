@@ -2,19 +2,22 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.android.lint)
+    alias(libs.plugins.composeMultiplatformPlugin)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlinxSerialization)
 }
 
 kotlin {
     androidLibrary {
-        namespace = "com.kazemieh.data"
+        namespace = "com.kazemieh.asset"
         compileSdk {
             version = release(36)
         }
         minSdk = 24
     }
 
-    val xcfName = "core:commonKit"
+    val xcfName = "core:assetKit"
 
     iosX64 {
         binaries.framework {
@@ -43,14 +46,26 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.kotlinx.serialization)
+                implementation(libs.kotlinx.datetime)
                 implementation(project(":core:common"))
                 implementation(project(":core:domain"))
-                implementation(project(":core:network"))
-                implementation(project(":core:preferences"))
-                implementation(project(":core:data-contract"))
+                implementation(project(":core:designsystem"))
+
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.foundation)
+                implementation(libs.compose.material3)
+                implementation(libs.compose.ui)
+                implementation(libs.compose.material.icons.core)
+                implementation(libs.compose.material.icons.extended)
+                implementation(libs.compose.components.resources)
+                implementation(libs.compose.uiToolingPreview)
+                implementation(libs.androidx.lifecycle.runtimeCompose)
+                implementation(compose.components.resources)
+
+                implementation(libs.koin.compose)
                 implementation(libs.koin.core)
+                implementation(libs.koin.compose.viewmodel)
             }
         }
 

@@ -1,5 +1,8 @@
 package com.kazemieh.database.mapper
 
+import com.kazemieh.common.model.Asset
+import com.kazemieh.common.model.AssetHistory
+import com.kazemieh.common.model.AssetType
 import com.kazemieh.common.model.Budget
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.CategorySum
@@ -28,6 +31,8 @@ import com.kazemieh.database.ObserveAllFixedExpenses
 import com.kazemieh.database.ObserveChecksByStatus
 import com.kazemieh.database.ObserveInstallments
 import com.kazemieh.database.transaction.ObserveCategorySumsByFilter
+import com.kazemieh.database.Asset as AssetDb
+import com.kazemieh.database.Asset_history as AssetHistoryDb
 import com.kazemieh.database.Category as CategoryDb
 import com.kazemieh.database.Check_table as CheckDb
 import com.kazemieh.database.Debt as DebtDb
@@ -369,4 +374,26 @@ fun ObserveInstallments.toInstallmentWithRelations() = InstallmentWithRelations(
         branchCode = source_branchCode,
         branchName = source_branchName
     )
+)
+
+// Asset Mappers
+fun AssetDb.toAsset() = Asset(
+    id = id,
+    name = name,
+    type = type,
+    quantity = quantity,
+    purchasePrice = purchasePrice,
+    currentPrice = currentPrice,
+    currency = currency,
+    description = description,
+    colorId = colorId.toInt(),
+    iconId = iconId.toInt(),
+    lastUpdate = lastUpdate?.let { kotlin.time.Instant.fromEpochMilliseconds(it) }
+)
+
+fun AssetHistoryDb.toAssetHistory() = AssetHistory(
+    id = id,
+    assetId = assetId,
+    price = price,
+    date = kotlin.time.Instant.fromEpochMilliseconds(date)
 )

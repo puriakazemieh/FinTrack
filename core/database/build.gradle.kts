@@ -65,6 +65,7 @@ kotlin {
                 implementation("app.cash.sqldelight:async-extensions:${libs.versions.sqldelight.get()}")
                 implementation("app.cash.sqldelight:coroutines-extensions:${libs.versions.sqldelight.get()}")
                 implementation("app.cash.sqldelight:primitive-adapters:${libs.versions.sqldelight.get()}")
+                implementation(libs.kotlinx.datetime)
                 implementation(libs.koin.core)
                 implementation(libs.kotlinx.serialization)
             }
