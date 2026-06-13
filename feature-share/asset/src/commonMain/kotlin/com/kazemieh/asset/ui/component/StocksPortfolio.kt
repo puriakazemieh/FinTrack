@@ -7,7 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.model.Asset
 import com.kazemieh.common.model.AssetType
-import com.kazemieh.designsystem.component.FintrackText
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackTitleMediumText
 
 @Composable
 fun StocksPortfolio(
@@ -20,7 +21,7 @@ fun StocksPortfolio(
     Column(
         modifier = Modifier.padding(16.dp).fillMaxWidth()
     ) {
-        FintrackText("سبد سهام", style = MaterialTheme.typography.titleMedium)
+        FintrackTitleMediumText("سبد سهام")
         Spacer(modifier = Modifier.height(8.dp))
         
         stocks.forEach { stock ->
@@ -32,8 +33,8 @@ fun StocksPortfolio(
                     modifier = Modifier.padding(12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    FintrackText(stock.name)
-                    FintrackText("${stock.quantity} سهم")
+                    FintrackBodyMediumText(stock.name)
+                    FintrackBodyMediumText("${stock.quantity} سهم")
                 }
             }
         }

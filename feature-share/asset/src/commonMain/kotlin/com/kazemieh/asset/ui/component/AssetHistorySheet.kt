@@ -10,7 +10,8 @@ import androidx.compose.ui.unit.dp
 import com.kazemieh.asset.ui.AssetViewModel
 import com.kazemieh.common.model.Asset
 import com.kazemieh.common.toSignedPersianPrice
-import com.kazemieh.designsystem.component.FintrackText
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackTitleLargeText
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,7 +27,7 @@ fun AssetHistorySheet(
         Column(
             modifier = Modifier.padding(16.dp).fillMaxWidth()
         ) {
-            FintrackText("تاریخچه قیمت: ${asset.name}", style = MaterialTheme.typography.titleLarge)
+            FintrackTitleLargeText("تاریخچه قیمت: ${asset.name}")
             Spacer(modifier = Modifier.height(16.dp))
             
             LazyColumn(
@@ -38,8 +39,8 @@ fun AssetHistorySheet(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        FintrackText("۱۴۰۲/۰۳/${10+i}")
-                        FintrackText(asset.purchasePrice.toSignedPersianPrice())
+                        FintrackBodyMediumText("۱۴۰۲/۰۳/${10+i}")
+                        FintrackBodyMediumText(asset.purchasePrice.toSignedPersianPrice())
                     }
                     HorizontalDivider()
                 }

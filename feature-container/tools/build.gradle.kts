@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlinxSerialization)
 }
-
 kotlin {
     androidLibrary {
         namespace = "com.kazemieh.tools"

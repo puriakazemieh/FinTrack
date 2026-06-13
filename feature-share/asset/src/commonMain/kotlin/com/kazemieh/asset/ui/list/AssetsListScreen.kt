@@ -17,9 +17,10 @@ import com.kazemieh.asset.ui.AssetIntent
 import com.kazemieh.asset.ui.AssetViewModel
 import com.kazemieh.common.model.Asset
 import com.kazemieh.common.toSignedPersianPrice
-import com.kazemieh.designsystem.component.FintrackText
+import com.kazemieh.designsystem.component.*
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AssetsListScreen(
     onAddAsset: () -> Unit,
@@ -30,7 +31,7 @@ fun AssetsListScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { FintrackText("دارایی‌ها") },
+                title = { FintrackTitleLargeText("دارایی‌ها") },
                 actions = {
                     IconButton(onClick = { viewModel.onIntent(AssetIntent.SyncRates) }) {
                         Icon(Icons.Default.Refresh, contentDescription = "بروزرسانی")
@@ -72,8 +73,8 @@ fun TotalValueCard(totalValue: Long) {
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            FintrackText("ارزش کل دارایی‌ها", style = MaterialTheme.typography.titleMedium)
-            FintrackText(totalValue.toSignedPersianPrice(), style = MaterialTheme.typography.headlineLarge)
+            FintrackTitleMediumText("ارزش کل دارایی‌ها")
+            FintrackHeadlineLargeText(totalValue.toSignedPersianPrice())
         }
     }
 }
@@ -104,13 +105,13 @@ fun AssetRow(asset: Asset) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                FintrackText(asset.name, style = MaterialTheme.typography.titleMedium)
-                FintrackText("${asset.quantity} واحد", style = MaterialTheme.typography.bodySmall)
+                FintrackTitleMediumText(asset.name)
+                FintrackBodySmallText("${asset.quantity} واحد")
             }
             Column(horizontalAlignment = Alignment.End) {
-                FintrackText(asset.totalCurrentValue.toSignedPersianPrice())
-                FintrackText(
-                    "${asset.profitOrLossPercentage}%",
+                FintrackBodyLargeText(asset.totalCurrentValue.toSignedPersianPrice())
+                FintrackBodyMediumText(
+                    text = "${asset.profitOrLossPercentage}%",
                     color = if (asset.profitOrLoss >= 0) Color.Green else Color.Red
                 )
             }

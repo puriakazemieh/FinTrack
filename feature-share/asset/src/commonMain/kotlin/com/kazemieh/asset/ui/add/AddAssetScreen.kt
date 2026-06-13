@@ -9,11 +9,10 @@ import com.kazemieh.asset.ui.AssetIntent
 import com.kazemieh.asset.ui.AssetViewModel
 import com.kazemieh.common.model.Asset
 import com.kazemieh.common.model.AssetType
-import com.kazemieh.designsystem.component.FintrackButton
-import com.kazemieh.designsystem.component.FintrackText
-import com.kazemieh.designsystem.component.OutlinedTextField
+import com.kazemieh.designsystem.component.*
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddAssetScreen(
     onBack: () -> Unit,
@@ -28,7 +27,7 @@ fun AddAssetScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { FintrackText("افزودن دارایی") }
+                title = { FintrackTitleLargeText("افزودن دارایی") }
             )
         }
     ) { padding ->
@@ -36,10 +35,10 @@ fun AddAssetScreen(
             modifier = Modifier.padding(padding).padding(16.dp).fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            OutlinedTextField(
+            FintrackOutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { FintrackText("نام دارایی (مثلاً دلار یا طلای ۱۸)") },
+                label = { FintrackBodyMediumText("نام دارایی (مثلاً دلار یا طلای ۱۸)") },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -49,35 +48,36 @@ fun AddAssetScreen(
                     FilterChip(
                         selected = type == assetType,
                         onClick = { type = assetType },
-                        label = { FintrackText(assetType.name) }
+                        label = { FintrackLabelMediumText(assetType.name) }
                     )
                 }
             }
 
-            OutlinedTextField(
+            FintrackOutlinedTextField(
                 value = quantity,
                 onValueChange = { quantity = it },
-                label = { FintrackText("مقدار / تعداد") },
+                label = { FintrackBodyMediumText("مقدار / تعداد") },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            OutlinedTextField(
+            FintrackOutlinedTextField(
                 value = purchasePrice,
                 onValueChange = { purchasePrice = it },
-                label = { FintrackText("قیمت خرید هر واحد") },
+                label = { FintrackBodyMediumText("قیمت خرید هر واحد") },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            OutlinedTextField(
+            FintrackOutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { FintrackText("توضیحات") },
+                label = { FintrackBodyMediumText("توضیحات") },
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.weight(1f))
 
             FintrackButton(
+                text = "ذخیره",
                 onClick = {
                     val asset = Asset(
                         name = name,
@@ -92,9 +92,7 @@ fun AddAssetScreen(
                     onBack()
                 },
                 modifier = Modifier.fillMaxWidth()
-            ) {
-                FintrackText("ذخیره")
-            }
+            )
         }
     }
 }

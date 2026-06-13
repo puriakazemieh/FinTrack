@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.android.lint)
     alias(libs.plugins.kotlinxSerialization)
 }
-
 kotlin {
     androidLibrary {
         namespace = "com.kazemieh.data"
