@@ -91,6 +91,10 @@ class ProfileEditViewModel(
                 _state.update { it.copy(avatar = intent.avatar) }
                 calculateCompletion()
             }
+            ProfileEditIntent.RemoveAvatar -> {
+                _state.update { it.copy(avatar = null) }
+                calculateCompletion()
+            }
             ProfileEditIntent.SaveProfile -> saveProfile()
         }
     }
@@ -107,8 +111,10 @@ class ProfileEditViewModel(
         preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_USER_INCOME, currentState.income)
         preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_USER_JOB, currentState.jobTitle)
         preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_USER_GOAL, currentState.financialGoal)
-        currentState.avatar?.let {
-            preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_USER_AVATAR, Base64.encode(it))
+        if (currentState.avatar != null) {
+            preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_USER_AVATAR, Base64.encode(currentState.avatar))
+        } else {
+            preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_USER_AVATAR, "")
         }
 
         viewModelScope.launch {

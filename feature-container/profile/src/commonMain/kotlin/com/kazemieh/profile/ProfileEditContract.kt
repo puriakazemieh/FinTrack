@@ -27,7 +27,8 @@ sealed interface ProfileEditIntent {
     data class UpdateIncome(val income: String) : ProfileEditIntent
     data class UpdateJobTitle(val job: String) : ProfileEditIntent
     data class UpdateFinancialGoal(val goal: String) : ProfileEditIntent
-    data class UpdateAvatar(val avatar: ByteArray) : ProfileEditIntent
+    data class UpdateAvatar(val avatar: ByteArray?) : ProfileEditIntent
+    data object RemoveAvatar : ProfileEditIntent
     data object SaveProfile : ProfileEditIntent
 }
 

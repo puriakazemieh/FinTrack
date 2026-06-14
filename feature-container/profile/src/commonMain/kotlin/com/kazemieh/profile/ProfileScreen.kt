@@ -6,6 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -13,10 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -24,12 +28,16 @@ import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.Switch
+import com.kazemieh.designsystem.component.glass.WidgetCard
+import com.kazemieh.designsystem.component.model.UiText
 import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.decodeToImageBitmap
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 import com.kazemieh.lock.*
 import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel as lockKoinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,7 +58,10 @@ fun ProfileScreen(
     val lockViewModel: LockViewModel = lockKoinViewModel()
     val lockState by lockViewModel.state.collectAsStateWithLifecycle()
 
+    val scope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
+        viewModel.onIntent(ProfileIntent.Refresh)
         viewModel.effect.collect { effect ->
             when (effect) {
                 is ProfileEffect.ShowLockPIN -> {
@@ -132,21 +143,25 @@ fun ProfileScreen(
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
             item {
-                ProfileHero(onEditClick = onNavigateToProfileEdit)
+                ProfileHero(
+                    state = state,
+                    onEditClick = onNavigateToProfileEdit
+                )
             }
 
             item {
-                Row(
+                PremiumCard(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(space.medium)
-                ) {
-                    SyncCard(modifier = Modifier.weight(1f))
-                    PremiumCard(modifier = Modifier.weight(1f))
-                }
+                    onClick = {
+                        scope.launch {
+                            SnackbarController.showMessage(UiText.DynamicString("همه امکانات برای شما رایگان است"))
+                        }
+                    }
+                )
             }
 
             item {
-                SettingsSection(title = stringResource(Res.string.section_display)) {
+                WidgetCard(title = stringResource(Res.string.section_display)) {
                     SettingItem(
                         title = stringResource(Res.string.setting_theme_currency),
                         icon = Icons.Default.Palette,
@@ -162,7 +177,7 @@ fun ProfileScreen(
             }
 
             item {
-                SettingsSection(title = stringResource(Res.string.section_security)) {
+                WidgetCard(title = stringResource(Res.string.section_security)) {
                     SettingItem(
                         title = "قفل برنامه",
                         icon = Icons.Default.Lock,
@@ -182,8 +197,8 @@ fun ProfileScreen(
                 }
             }
 
-            item {
-                SettingsSection(title = stringResource(Res.string.section_data)) {
+            /*item {
+                WidgetCard(title = stringResource(Res.string.section_data)) {
                     SettingItem(
                         title = stringResource(Res.string.setting_backup),
                         icon = Icons.Default.Backup,
@@ -191,10 +206,10 @@ fun ProfileScreen(
                         onToggle = { viewModel.onIntent(ProfileIntent.ToggleBackup) }
                     )
                 }
-            }
+            }*/
 
             item {
-                SettingsSection(title = stringResource(Res.string.section_notifications)) {
+                WidgetCard(title = stringResource(Res.string.section_notifications)) {
                     SettingItem(
                         title = stringResource(Res.string.title_notification_settings),
                         icon = Icons.Default.Notifications,
@@ -217,7 +232,7 @@ fun ProfileScreen(
 
             item {
                 Spacer(modifier = Modifier.height(space.medium))
-                LogoutButton(onClick = { viewModel.onIntent(ProfileIntent.Logout) })
+                // LogoutButton(onClick = { viewModel.onIntent(ProfileIntent.Logout) })
                 Spacer(modifier = Modifier.height(space.extraLarge))
             }
         }
@@ -226,9 +241,13 @@ fun ProfileScreen(
 
 @Composable
 fun ProfileHero(
+    state: ProfileState,
     onEditClick: () -> Unit
 ) {
     val space = LocalSpacing.current
+    val fullName = "${state.firstName} ${state.lastName}".trim()
+    val contactInfo = state.email.ifEmpty { state.phone }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -242,41 +261,37 @@ fun ProfileHero(
             color = MaterialTheme.colorScheme.primaryContainer
         ) {
             Box(contentAlignment = Alignment.Center) {
-                FintrackHeadlineLargeText(
-                    text = stringResource(Res.string.placeholder_user_initial),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                if (state.avatar != null) {
+                    val bitmap = remember(state.avatar) { state.avatar.decodeToImageBitmap() }
+                    androidx.compose.foundation.Image(
+                        bitmap = bitmap,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize().rotate(-90f),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Face,
+                        contentDescription = null,
+                        modifier = Modifier.size(48.dp),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
             }
         }
-        Spacer(modifier = Modifier.height(space.medium))
-        FintrackTitleLargeText(
-            text = stringResource(Res.string.user_name_default),
-            fontWeight = FontWeight.Bold
-        )
-        FintrackBodyMediumText(
-            text = stringResource(Res.string.user_email_default),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-@Composable
-fun SyncCard(modifier: Modifier = Modifier) {
-    val space = LocalSpacing.current
-    GlassCard(modifier = modifier) {
-        Column {
-            Icon(
-                imageVector = Icons.Default.CloudSync,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.height(space.small))
-            FintrackLabelLargeText(
-                text = stringResource(Res.string.profile_sync_title),
+        if (fullName.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(space.medium))
+            FintrackTitleLargeText(
+                text = fullName,
                 fontWeight = FontWeight.Bold
             )
-            FintrackLabelSmallText(
-                text = stringResource(Res.string.profile_sync_desc, "۱۰ دقیقه پیش"),
+        }
+        if (contactInfo.isNotEmpty()) {
+            if (fullName.isEmpty()) {
+                Spacer(modifier = Modifier.height(space.medium))
+            }
+            FintrackBodyMediumText(
+                text = contactInfo,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -284,44 +299,47 @@ fun SyncCard(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun PremiumCard(modifier: Modifier = Modifier) {
-    val space = LocalSpacing.current
-    GlassCard(modifier = modifier) {
-        Column {
-            Icon(
-                imageVector = Icons.Default.Star,
-                contentDescription = null,
-                tint = Color(0xFFFFD700)
-            )
-            Spacer(modifier = Modifier.height(space.small))
-            FintrackLabelLargeText(
-                text = stringResource(Res.string.profile_premium_title),
-                fontWeight = FontWeight.Bold
-            )
-            FintrackLabelSmallText(
-                text = stringResource(Res.string.profile_premium_desc),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-@Composable
-fun SettingsSection(
-    title: String,
-    content: @Composable ColumnScope.() -> Unit
+fun PremiumCard(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
 ) {
     val space = LocalSpacing.current
-    Column(modifier = Modifier.fillMaxWidth()) {
-        FintrackTitleSmallText(
-            text = title,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = space.small)
-        )
-        GlassCard(padding = 0.dp) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                content()
+    GlassCard(
+        modifier = modifier.clickable { onClick() }
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                modifier = Modifier.size(48.dp),
+                shape = MaterialTheme.shapes.medium,
+                color = Color(0xFFFFD700).copy(alpha = 0.1f)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = null,
+                        tint = Color(0xFFFFD700)
+                    )
+                }
             }
+            Spacer(modifier = Modifier.width(space.medium))
+            Column(modifier = Modifier.weight(1f)) {
+                FintrackLabelLargeText(
+                    text = stringResource(Res.string.profile_premium_title),
+                    fontWeight = FontWeight.Bold
+                )
+                FintrackLabelSmallText(
+                    text = stringResource(Res.string.profile_premium_desc),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -357,7 +375,7 @@ fun SettingItem(
             Switch(on = on, onToggle = onToggle)
         } else if (onClick != null) {
             Icon(
-                imageVector = Icons.Default.ChevronRight,
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )

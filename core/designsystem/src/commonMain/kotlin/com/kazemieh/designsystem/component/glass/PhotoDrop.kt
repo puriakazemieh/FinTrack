@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -30,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.designsystem.GlassColor
 import com.kazemieh.designsystem.GlassEdgeStrong
-import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.GlassText3
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.picker.rememberImagePicker
@@ -57,25 +57,26 @@ fun PhotoDrop(
         Column {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.Center
             ) {
                 FintrackLabelSmallText(
                     text = stringResource(Res.string.label_attachment_fa),
-                    color = GlassText3
                 )
                 FintrackLabelSmallText(
-                    text = stringResource(Res.string.label_optional_fa),
+                    text = " (${stringResource(Res.string.label_optional_fa)})",
                     color = GlassText3,
-                    fontSize = 9.sp
+                    fontSize = 8.sp
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (photoBitmap != null) {
-                    ThumbnailCard(
-                        bitmap = photoBitmap,
-                        onRemove = onRemove
-                    )
-                } else {
+            if (photoBitmap != null) {
+                ThumbnailCard(
+                    bitmap = photoBitmap,
+                    onRemove = onRemove,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            } else {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+
                     PhotoActionCard(
                         icon = Icons.Default.CameraAlt,
                         label = stringResource(Res.string.label_camera_fa),
@@ -95,11 +96,13 @@ fun PhotoDrop(
 @Composable
 private fun ThumbnailCard(
     bitmap: ImageBitmap,
-    onRemove: () -> Unit
+    onRemove: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier
-            .size(64.dp)
+        modifier = modifier
+            .rotate(-90f)
+            .size(100.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(GlassColor)
             .border(1.5.dp, GlassEdgeStrong, RoundedCornerShape(12.dp))
@@ -110,7 +113,7 @@ private fun ThumbnailCard(
             contentScale = ContentScale.Crop,
             modifier = Modifier.matchParentSize()
         )
-        
+
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)

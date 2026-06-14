@@ -54,6 +54,7 @@ kotlin {
                 implementation(project(":core:preferences"))
                 implementation(project(":core:domain"))
                 implementation(project(":core:money"))
+                implementation(project(":core:jalali"))
 
                 implementation(project(":feature-share:source"))
                 implementation(project(":feature-share:category"))

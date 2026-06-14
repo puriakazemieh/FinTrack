@@ -8,6 +8,8 @@ import com.kazemieh.preferences.FinTrackPreferences
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 class ProfileViewModel(
     private val preferenceUseCases: PreferenceUseCases,
@@ -21,6 +23,28 @@ class ProfileViewModel(
 
     init {
         loadSettings()
+        loadProfile()
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    private fun loadProfile() {
+        _state.update {
+            it.copy(
+                firstName = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_NAME, ""),
+                lastName = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_FAMILY, ""),
+                email = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_EMAIL, ""),
+                phone = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_PHONE, ""),
+                avatar = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_AVATAR, "").let { base64 ->
+                    if (base64.isNotEmpty()) {
+                        try {
+                            Base64.decode(base64)
+                        } catch (e: Exception) {
+                            null
+                        }
+                    } else null
+                }
+            )
+        }
     }
 
     private fun loadSettings() {
@@ -75,6 +99,9 @@ class ProfileViewModel(
                     _effect.send(ProfileEffect.ShowLockPIN(mode, false))
                 }
             }
+            is ProfileIntent.Refresh -> {
+                loadProfile()
+            }
             is ProfileIntent.SetLockState -> {
                 preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, intent.isEnabled)
                 if (!intent.isEnabled) {
@@ -99,6 +126,11 @@ class ProfileViewModel(
 }
 
 data class ProfileState(
+    val firstName: String = "",
+    val lastName: String = "",
+    val email: String = "",
+    val phone: String = "",
+    val avatar: ByteArray? = null,
     val isDarkModeEnabled: Boolean = false,
     val isFingerprintEnabled: Boolean = false,
     val isLockEnabled: Boolean = false,
@@ -109,6 +141,7 @@ data class ProfileState(
 )
 
 sealed interface ProfileIntent {
+    data object Refresh : ProfileIntent
     data object ToggleDarkMode : ProfileIntent
     data object ToggleFingerprint : ProfileIntent
     data object ToggleBackup : ProfileIntent
