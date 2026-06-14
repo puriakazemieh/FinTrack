@@ -23,6 +23,7 @@ sealed interface AssetIntent {
     data object LoadAssets : AssetIntent
     data class AddAsset(val asset: Asset) : AssetIntent
     data class DeleteAsset(val id: Long) : AssetIntent
+    data class UpdateAsset(val asset: Asset) : AssetIntent
     data object SyncRates : AssetIntent
 }
 
@@ -49,6 +50,7 @@ class AssetViewModel(
             AssetIntent.LoadAssets -> observeAssets()
             is AssetIntent.AddAsset -> addAsset(intent.asset)
             is AssetIntent.DeleteAsset -> deleteAsset(intent.id)
+            is AssetIntent.UpdateAsset -> updateAsset(intent.asset)
             AssetIntent.SyncRates -> syncRates()
         }
     }
@@ -77,6 +79,13 @@ class AssetViewModel(
         viewModelScope.launch {
             assetUseCases.deleteAsset(id)
             _effect.send(AssetEffect.ShowMessage("دارایی حذف شد"))
+        }
+    }
+
+    private fun updateAsset(asset: Asset) {
+        viewModelScope.launch {
+            assetUseCases.updateAsset(asset)
+            _effect.send(AssetEffect.ShowMessage("دارایی بروزرسانی شد"))
         }
     }
 

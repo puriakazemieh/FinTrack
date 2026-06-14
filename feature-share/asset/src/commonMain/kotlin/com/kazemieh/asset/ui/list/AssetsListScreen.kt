@@ -1,6 +1,7 @@
 package com.kazemieh.asset.ui.list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,6 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kazemieh.asset.ui.AssetIntent
 import com.kazemieh.asset.ui.AssetViewModel
+import com.kazemieh.asset.ui.component.AssetActionsSheet
+import com.kazemieh.asset.ui.component.AssetHistorySheet
+import com.kazemieh.asset.ui.component.StocksPortfolio
 import com.kazemieh.common.model.Asset
 import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.component.*
@@ -27,6 +31,8 @@ fun AssetsListScreen(
     viewModel: AssetViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    var selectedAssetForActions by remember { mutableStateOf<Asset?>(null) }
+    var selectedAssetForHistory by remember { mutableStateOf<Asset?>(null) }
 
     Scaffold(
         topBar = {
@@ -56,11 +62,34 @@ fun AssetsListScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                item {
+                    StocksPortfolio(state.assets)
+                }
+
                 items(state.assets) { asset ->
-                    AssetRow(asset)
+                    AssetRow(
+                        asset = asset,
+                        onClick = { selectedAssetForActions = asset }
+                    )
                 }
             }
         }
+    }
+
+    selectedAssetForActions?.let { asset ->
+        AssetActionsSheet(
+            asset = asset,
+            onDismiss = { selectedAssetForActions = null },
+            onEdit = { /* TODO: Implement Edit */ },
+            onViewHistory = { selectedAssetForHistory = it }
+        )
+    }
+
+    selectedAssetForHistory?.let { asset ->
+        AssetHistorySheet(
+            asset = asset,
+            onDismiss = { selectedAssetForHistory = null }
+        )
     }
 }
 
@@ -96,9 +125,14 @@ fun CompositionBar(composition: Map<*, Double>) {
 }
 
 @Composable
-fun AssetRow(asset: Asset) {
+fun AssetRow(
+    asset: Asset,
+    onClick: () -> Unit
+) {
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),

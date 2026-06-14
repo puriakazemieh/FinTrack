@@ -64,7 +64,8 @@ fun NavGraphBuilder.bottomBarNavGraph(
                 onNavigateToSearch = { navController.navigate(Screen.Search) },
                 onNavigateToBudget = { navController.navigate(Screen.Budget) },
                 onNavigateToCheck = { navController.navigate(Screen.Check) },
-                onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) }
+                onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) },
+                onNavigateToAssets = { navController.navigate(Screen.Assets) }
             )
         }
 
@@ -90,7 +91,8 @@ fun NavGraphBuilder.bottomBarNavGraph(
                 onNavigateToPerson = { navController.navigate(Screen.Person) },
                 onNavigateToDebt = { navController.navigate(Screen.Debt) },
                 onNavigateToCheck = { navController.navigate(Screen.Check) },
-                onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) }
+                onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) },
+                onNavigateToAssets = { navController.navigate(Screen.Assets) }
             )
         }
 

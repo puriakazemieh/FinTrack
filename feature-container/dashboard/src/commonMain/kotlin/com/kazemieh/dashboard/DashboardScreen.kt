@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.asset.ui.component.AssetWidget
 import com.kazemieh.budget.ui.component.BudgetWidget
 import com.kazemieh.check.ui.widget.CheckWidget
 import com.kazemieh.dashboard.component.QuickActions
@@ -72,7 +73,8 @@ fun DashboardScreen(
     onNavigateToSearch: () -> Unit = {},
     onNavigateToBudget: () -> Unit = {},
     onNavigateToCheck: () -> Unit = {},
-    onNavigateToFixedExpense: () -> Unit = {}
+    onNavigateToFixedExpense: () -> Unit = {},
+    onNavigateToAssets: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
@@ -182,6 +184,15 @@ fun DashboardScreen(
             item {
                 FixedExpenseWidget(
                     onMoreClick = onNavigateToFixedExpense,
+                    modifier = Modifier.padding(horizontal = space.large)
+                )
+            }
+
+            item { Spacer(Modifier.height(space.large)) }
+
+            item {
+                AssetWidget(
+                    onMoreClick = onNavigateToAssets,
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }

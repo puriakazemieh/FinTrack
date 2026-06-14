@@ -50,6 +50,7 @@ kotlin {
 
                 implementation(project(":core:common"))
                 implementation(project(":core:designsystem"))
+                implementation(project(":feature-share:asset"))
 
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)

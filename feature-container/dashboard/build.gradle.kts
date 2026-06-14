@@ -53,6 +53,7 @@ kotlin {
                 implementation(project(":feature-share:source"))
                 implementation(project(":feature-share:budget"))
                 implementation(project(":feature-share:installment"))
+                implementation(project(":feature-share:asset"))
 
                 implementation(project(":core:designsystem"))
 
