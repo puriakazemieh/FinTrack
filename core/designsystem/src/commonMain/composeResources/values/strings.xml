@@ -467,6 +467,9 @@
     <string name="notif_quiet_hours">ساعات سکوت</string>
     <string name="notif_quiet_start_label">زمان شروع</string>
     <string name="notif_quiet_end_label">زمان پایان</string>
+    <string name="title_select_time">انتخاب زمان</string>
+    <string name="label_hour">ساعت</string>
+    <string name="label_minute">دقیقه</string>
     <string name="notif_permission_rationale">برای دریافت یادآوری‌های بودجه و چک، لطفاً دسترسی به اعلان‌ها را فعال کنید.</string>
     <string name="notif_channels_title">کانال‌های اطلاع‌رسانی</string>
     <string name="title_my_budgets">بودجه‌های من</string>

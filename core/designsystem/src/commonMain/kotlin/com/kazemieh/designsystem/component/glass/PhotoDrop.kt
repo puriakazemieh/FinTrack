@@ -57,7 +57,7 @@ fun PhotoDrop(
         Column {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Start
             ) {
                 FintrackLabelSmallText(
                     text = stringResource(Res.string.label_attachment_fa),

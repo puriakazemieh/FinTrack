@@ -7,9 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -25,10 +23,12 @@ import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.GlassTone
 import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.component.glass.Switch
+import com.kazemieh.designsystem.component.picker.FintrackTimePickerBottomSheet
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationSettingsScreen(
     onBack: () -> Unit,
@@ -37,6 +37,9 @@ fun NotificationSettingsScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
     val shouldShowRationale = rememberShouldShowNotificationRationale()
+
+    val showTimePicker = remember { mutableStateOf(false) }
+    var pickingStartTime by remember { mutableStateOf(true) }
 
     NotificationPermissionLauncher(
         trigger = state.triggerSystemPermissionRequest,
@@ -61,6 +64,18 @@ fun NotificationSettingsScreen(
         }
     }
 
+    FintrackTimePickerBottomSheet(
+        openSheet = showTimePicker,
+        initialTime = if (pickingStartTime) state.quietStart else state.quietEnd,
+        onConfirm = { time ->
+            if (pickingStartTime) {
+                viewModel.onIntent(NotificationSettingsIntent.SetQuietStart(time))
+            } else {
+                viewModel.onIntent(NotificationSettingsIntent.SetQuietEnd(time))
+            }
+        }
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -69,7 +84,7 @@ fun NotificationSettingsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = space.large)
+
         ) {
             ScreenHeader(
                 title = stringResource(Res.string.title_notification_settings),
@@ -77,7 +92,7 @@ fun NotificationSettingsScreen(
             )
 
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().padding(horizontal = space.large),
                 verticalArrangement = Arrangement.spacedBy(space.medium),
                 contentPadding = PaddingValues(vertical = space.medium)
             ) {
@@ -125,12 +140,18 @@ fun NotificationSettingsScreen(
                             TimePickerItem(
                                 title = stringResource(Res.string.notif_quiet_start_label),
                                 time = state.quietStart,
-                                onClick = { /* TODO: Show Time Picker */ }
+                                onClick = { 
+                                    pickingStartTime = true
+                                    showTimePicker.value = true
+                                }
                             )
                             TimePickerItem(
                                 title = stringResource(Res.string.notif_quiet_end_label),
                                 time = state.quietEnd,
-                                onClick = { /* TODO: Show Time Picker */ }
+                                onClick = { 
+                                    pickingStartTime = false
+                                    showTimePicker.value = true
+                                }
                             )
                         }
                     }
@@ -146,16 +167,14 @@ fun NotificationSection(
     content: @Composable ColumnScope.() -> Unit
 ) {
     val space = LocalSpacing.current
-    Column(modifier = Modifier.fillMaxWidth()) {
-        FintrackTitleSmallText(
-            text = title,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = space.small)
-        )
-        GlassCard(padding = 0.dp) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                content()
-            }
+    GlassCard(padding = 0.dp) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            FintrackTitleSmallText(
+                text = title,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(space.medium)
+            )
+            content()
         }
     }
 }
@@ -239,7 +258,7 @@ fun PermissionRationaleCard(
                 )
             }
             Spacer(modifier = Modifier.height(space.small))
-            FintrackBodyMediumText(
+            FintrackBodyMediumText( //todo use this
                 text = stringResource(Res.string.notif_permission_rationale),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

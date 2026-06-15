@@ -221,12 +221,12 @@ fun ProfileScreen(
                         on = state.isPushNotificationsEnabled,
                         onToggle = { viewModel.onIntent(ProfileIntent.TogglePushNotifications) }
                     )
-                    SettingItem(
+                   /* SettingItem( //todo use this
                         title = stringResource(Res.string.setting_transaction_alerts),
                         icon = Icons.Default.Warning,
                         on = state.isTransactionAlertsEnabled,
                         onToggle = { viewModel.onIntent(ProfileIntent.ToggleTransactionAlerts) }
-                    )
+                    )*/
                 }
             }
 

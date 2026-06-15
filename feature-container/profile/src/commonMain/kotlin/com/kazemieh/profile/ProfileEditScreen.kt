@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,7 +33,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodySmallText
@@ -143,8 +141,6 @@ fun ProfileEditScreen(
             ScreenHeader(
                 title = stringResource(Res.string.title_edit_profile),
                 onBack = onBack,
-                modifier = Modifier
-                    .padding(horizontal = space.medium)
             )
 
             LazyColumn(
@@ -302,13 +298,13 @@ fun ProfileField(
                     FintrackLabelSmallText(
                         text = label,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     if (isOptional) {
                         FintrackLabelSmallText(
                             text = " (${stringResource(Res.string.label_optional_fa)})",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 10.sp
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
