@@ -40,7 +40,6 @@ import com.kazemieh.person.di.transactionAddPersonModule
 import com.kazemieh.person.di.transactionDeletePersonModule
 import com.kazemieh.person.di.transactionPersonModule
 import com.kazemieh.preferences.preferencesModule
-import com.kazemieh.profile.ThemeAndCurrencyViewModel
 import com.kazemieh.profile.di.profileModule
 import com.kazemieh.search.di.searchModule
 import com.kazemieh.storage.storageModule
@@ -66,12 +65,12 @@ fun App() {
     var isReady by remember { mutableStateOf(false) }
 
     val currentTheme by preferenceUseCases.getStringFlow(
-        ThemeAndCurrencyViewModel.PREF_THEME,
+        com.kazemieh.preferences.FinTrackPreferences.PREF_THEME,
         AppTheme.GLASS_DARK.name
     ).collectAsState(AppTheme.GLASS_DARK.name)
 
     val currentCurrency by preferenceUseCases.getStringFlow(
-        ThemeAndCurrencyViewModel.PREF_CURRENCY,
+        com.kazemieh.preferences.FinTrackPreferences.PREF_CURRENCY,
         Currency.TOMAN.name
     ).collectAsState(Currency.TOMAN.name)
 

@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import com.kazemieh.designsystem.AppTheme
 import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.money.Currency
+import com.kazemieh.preferences.FinTrackPreferences.Companion.PREF_CURRENCY
+import com.kazemieh.preferences.FinTrackPreferences.Companion.PREF_THEME
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -42,11 +44,6 @@ class ThemeAndCurrencyViewModel(
                 _state.update { it.copy(selectedCurrency = intent.currency) }
             }
         }
-    }
-
-    companion object {
-        const val PREF_THEME = "pref_theme"
-        const val PREF_CURRENCY = "pref_currency"
     }
 }
 

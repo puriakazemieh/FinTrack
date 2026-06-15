@@ -2,6 +2,7 @@ package com.kazemieh.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.designsystem.AppTheme
 import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.lock.LockMode
 import com.kazemieh.preferences.FinTrackPreferences
@@ -24,6 +25,7 @@ class ProfileViewModel(
     init {
         loadSettings()
         loadProfile()
+        observeThemeChanges()
     }
 
     @OptIn(ExperimentalEncodingApi::class)
@@ -48,24 +50,39 @@ class ProfileViewModel(
     }
 
     private fun loadSettings() {
+        val currentThemeName = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_THEME, AppTheme.GLASS_DARK.name)
+        val currentTheme = try { AppTheme.valueOf(currentThemeName) } catch (e: Exception) { AppTheme.GLASS_DARK }
+
         _state.update {
             it.copy(
-                isDarkModeEnabled = preferenceUseCases.getBooleanPreference(PREF_DARK_MODE, false),
+                isDarkModeEnabled = currentTheme.isDark,
                 isFingerprintEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_BIOMETRIC_ENABLED, false),
                 isLockEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, false),
-                isBackupEnabled = preferenceUseCases.getBooleanPreference(PREF_BACKUP, true),
-                isPushNotificationsEnabled = preferenceUseCases.getBooleanPreference(PREF_PUSH_NOTIF, true),
-                isTransactionAlertsEnabled = preferenceUseCases.getBooleanPreference(PREF_TX_ALERTS, true)
+                isBackupEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_BACKUP, true),
+                isPushNotificationsEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_PUSH_NOTIF, true),
+                isTransactionAlertsEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_TX_ALERTS, true)
             )
         }
+    }
+
+    private fun observeThemeChanges() {
+        preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_THEME, AppTheme.GLASS_DARK.name)
+            .onEach { themeName ->
+                val theme = try { AppTheme.valueOf(themeName) } catch (e: Exception) { AppTheme.GLASS_DARK }
+                _state.update { it.copy(isDarkModeEnabled = theme.isDark) }
+            }
+            .launchIn(viewModelScope)
     }
 
     fun onIntent(intent: ProfileIntent) {
         when (intent) {
             is ProfileIntent.ToggleDarkMode -> {
-                val newValue = !_state.value.isDarkModeEnabled
-                preferenceUseCases.setBooleanPreference(PREF_DARK_MODE, newValue)
-                _state.update { it.copy(isDarkModeEnabled = newValue) }
+                val currentThemeName = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_THEME, AppTheme.GLASS_DARK.name)
+                val currentTheme = try { AppTheme.valueOf(currentThemeName) } catch (e: Exception) { AppTheme.GLASS_DARK }
+                
+                val newTheme = currentTheme.toggleDark()
+                preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_THEME, newTheme.name)
+                // Note: The UI state will be updated via observeThemeChanges flow
             }
             is ProfileIntent.ToggleFingerprint -> {
                 if (!_state.value.isLockEnabled) {
@@ -80,17 +97,17 @@ class ProfileViewModel(
             }
             is ProfileIntent.ToggleBackup -> {
                 val newValue = !_state.value.isBackupEnabled
-                preferenceUseCases.setBooleanPreference(PREF_BACKUP, newValue)
+                preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_BACKUP, newValue)
                 _state.update { it.copy(isBackupEnabled = newValue) }
             }
             is ProfileIntent.TogglePushNotifications -> {
                 val newValue = !_state.value.isPushNotificationsEnabled
-                preferenceUseCases.setBooleanPreference(PREF_PUSH_NOTIF, newValue)
+                preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_PUSH_NOTIF, newValue)
                 _state.update { it.copy(isPushNotificationsEnabled = newValue) }
             }
             is ProfileIntent.ToggleTransactionAlerts -> {
                 val newValue = !_state.value.isTransactionAlertsEnabled
-                preferenceUseCases.setBooleanPreference(PREF_TX_ALERTS, newValue)
+                preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_TX_ALERTS, newValue)
                 _state.update { it.copy(isTransactionAlertsEnabled = newValue) }
             }
             is ProfileIntent.ToggleLock -> {
@@ -115,13 +132,6 @@ class ProfileViewModel(
                 // Handle logout logic
             }
         }
-    }
-
-    companion object {
-        private const val PREF_DARK_MODE = "pref_dark_mode"
-        private const val PREF_BACKUP = "pref_backup"
-        private const val PREF_PUSH_NOTIF = "pref_push_notif"
-        private const val PREF_TX_ALERTS = "pref_tx_alerts"
     }
 }
 

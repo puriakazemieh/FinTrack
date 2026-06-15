@@ -1,5 +1,6 @@
 package com.kazemieh.notifications.ui
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -18,11 +22,11 @@ import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackButton
-import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.GlassTone
 import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.component.glass.Switch
+import com.kazemieh.designsystem.component.glass.WidgetCard
 import com.kazemieh.designsystem.component.picker.FintrackTimePickerBottomSheet
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -81,6 +85,31 @@ fun NotificationSettingsScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
+        // Decorative background blobs for glass effect (matching ProfileEditScreen)
+        val primaryColor = MaterialTheme.colorScheme.primary
+        val secondaryColor = MaterialTheme.colorScheme.secondary
+
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(primaryColor.copy(alpha = 0.15f), Color.Transparent),
+                    center = Offset(size.width * 0.8f, size.height * 0.2f),
+                    radius = 400.dp.toPx()
+                ),
+                center = Offset(size.width * 0.8f, size.height * 0.2f),
+                radius = 400.dp.toPx()
+            )
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(secondaryColor.copy(alpha = 0.1f), Color.Transparent),
+                    center = Offset(size.width * 0.2f, size.height * 0.8f),
+                    radius = 500.dp.toPx()
+                ),
+                center = Offset(size.width * 0.2f, size.height * 0.8f),
+                radius = 500.dp.toPx()
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -94,7 +123,7 @@ fun NotificationSettingsScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(horizontal = space.large),
                 verticalArrangement = Arrangement.spacedBy(space.medium),
-                contentPadding = PaddingValues(vertical = space.medium)
+                contentPadding = PaddingValues(bottom = 100.dp) // Matching profile content padding
             ) {
                 if (state.showPermissionRationale) {
                     item {
@@ -106,7 +135,7 @@ fun NotificationSettingsScreen(
                 }
 
                 item {
-                    NotificationSection(title = stringResource(Res.string.notif_channels_title)) {
+                    WidgetCard(title = stringResource(Res.string.notif_channels_title)) {
                         NotificationSettingItem(
                             title = stringResource(Res.string.notif_budget_label),
                             icon = Icons.Default.AccountBalanceWallet,
@@ -129,7 +158,7 @@ fun NotificationSettingsScreen(
                 }
 
                 item {
-                    NotificationSection(title = stringResource(Res.string.notif_quiet_hours)) {
+                    WidgetCard(title = stringResource(Res.string.notif_quiet_hours)) {
                         NotificationSettingItem(
                             title = stringResource(Res.string.notif_quiet_hours),
                             icon = Icons.Default.Bedtime,
@@ -162,24 +191,6 @@ fun NotificationSettingsScreen(
 }
 
 @Composable
-fun NotificationSection(
-    title: String,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    val space = LocalSpacing.current
-    GlassCard(padding = 0.dp) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            FintrackTitleSmallText(
-                text = title,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(space.medium)
-            )
-            content()
-        }
-    }
-}
-
-@Composable
 fun NotificationSettingItem(
     title: String,
     icon: ImageVector,
@@ -190,7 +201,7 @@ fun NotificationSettingItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(space.medium),
+            .padding(horizontal = 16.dp, vertical = space.small), // Matching profile field padding
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -219,7 +230,7 @@ fun TimePickerItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(space.medium),
+            .padding(horizontal = 16.dp, vertical = space.small), // Matching profile field padding
         verticalAlignment = Alignment.CenterVertically
     ) {
         FintrackBodyLargeText(

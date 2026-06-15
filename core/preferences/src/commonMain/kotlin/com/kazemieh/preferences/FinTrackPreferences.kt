@@ -40,6 +40,12 @@ class FinTrackPreferences(private val settings: Settings) {
         const val PREF_BIOMETRIC_ENABLED = "pref_biometric_enabled"
         const val PREF_HASHED_PIN = "pref_hashed_pin"
 
+        const val PREF_THEME = "pref_theme"
+        const val PREF_CURRENCY = "pref_currency"
+        const val PREF_BACKUP = "pref_backup"
+        const val PREF_PUSH_NOTIF = "pref_push_notif"
+        const val PREF_TX_ALERTS = "pref_tx_alerts"
+
         const val PREF_NOTIF_BUDGET_ENABLED = "pref_notif_budget_enabled"
         const val PREF_NOTIF_INSTALLMENT_ENABLED = "pref_notif_installment_enabled"
         const val PREF_NOTIF_CHEQUE_ENABLED = "pref_notif_cheque_enabled"
