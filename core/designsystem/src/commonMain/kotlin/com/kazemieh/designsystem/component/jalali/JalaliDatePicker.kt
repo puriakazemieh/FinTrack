@@ -75,6 +75,9 @@ import fintrack.core.designsystem.generated.resources.month_tir
 import org.jetbrains.compose.resources.stringResource
 
 
+import com.kazemieh.designsystem.LocalGlassColors
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JalaliDatePickerBottomSheet(
@@ -85,6 +88,7 @@ fun JalaliDatePickerBottomSheet(
     onConfirm: (JalaliCalendar) -> Unit,
 ) {
     if (openSheet.value) {
+        val glassColors = LocalGlassColors.current
         val initial = remember(initialDate) { initialDate ?: JalaliCalendar() }
         var tempSelectedDate by remember { mutableStateOf(initial) }
 
@@ -101,17 +105,17 @@ fun JalaliDatePickerBottomSheet(
                 onSelectDay = { tempSelectedDate = it },
                 onConfirm = { onConfirm(tempSelectedDate) },
                 backgroundColor = Color.Transparent,
-                dayOfWeekLabelColor = com.kazemieh.designsystem.GlassText3,
-                dropDownColor = com.kazemieh.designsystem.GlassText,
+                dayOfWeekLabelColor = glassColors.text3,
+                dropDownColor = glassColors.text,
                 selectedIconColor = com.kazemieh.designsystem.GlassGreen,
                 textColorHighlight = com.kazemieh.designsystem.GlassGreen,
-                textColor = com.kazemieh.designsystem.GlassText,
-                textDisabledColor = com.kazemieh.designsystem.GlassText3.copy(alpha = 0.38f),
+                textColor = glassColors.text,
+                textDisabledColor = glassColors.text3.copy(alpha = 0.38f),
                 cancelBtnColor = com.kazemieh.designsystem.GlassRed,
                 confirmBtnColor = com.kazemieh.designsystem.GlassGreen,
                 todayBtnColor = com.kazemieh.designsystem.GlassGreen,
                 todayBtnVisible = true,
-                nextPreviousBtnColor = com.kazemieh.designsystem.GlassText
+                nextPreviousBtnColor = glassColors.text
             )
         }
     }
@@ -299,6 +303,7 @@ fun JalaliCalendarView(
                                     FintrackBodyMediumText(
                                         text = day.toPersianDigits(),
                                         color = when {
+                                            selected -> Color.White
                                             isToday -> textColorHighlight
                                             disabled -> textDisabledColor
                                             else -> textColor

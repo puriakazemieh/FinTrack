@@ -20,16 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
 import com.kazemieh.common.toPersianDigits
-import com.kazemieh.jalali.JalaliCalendar
-import com.kazemieh.designsystem.GlassColor
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
-import com.kazemieh.designsystem.component.glass.SheetFrame
+import com.kazemieh.jalali.JalaliCalendar
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.action_select_date
 import fintrack.core.designsystem.generated.resources.date
@@ -70,7 +67,6 @@ fun DatePickerField(
     )
 }
 
-
 @Composable
 fun JalaliDatePickerDialog(
     openDialog: MutableState<Boolean>,
@@ -78,6 +74,7 @@ fun JalaliDatePickerDialog(
 ) {
     val space = LocalSpacing.current
     if (openDialog.value) {
+        val glassColors = LocalGlassColors.current
         Dialog(
             onDismissRequest = { openDialog.value = false },
 //            properties = DialogProperties(usePlatformDefaultWidth = true)
@@ -101,7 +98,7 @@ fun JalaliDatePickerDialog(
                         .wrapContentHeight(),
                     shape = MaterialTheme.shapes.large,
                     tonalElevation = AlertDialogDefaults.TonalElevation,
-                    color = GlassColor
+                    color = glassColors.glass
                 ) {
                     JalaliCalendarView(
                         openDialog = openDialog,
@@ -113,61 +110,21 @@ fun JalaliDatePickerDialog(
                             onConfirm(it)
                         },
                         backgroundColor = Color.Transparent,
-                        dayOfWeekLabelColor = GlassText3,
-                        dropDownColor = GlassText,
+                        dayOfWeekLabelColor = glassColors.text3,
+                        dropDownColor = glassColors.text,
                         selectedIconColor = GlassGreen,
                         textColorHighlight = GlassGreen,
-                        textColor = GlassText,
-                        textDisabledColor = GlassText3.copy(alpha = 0.38f),
+                        textColor = glassColors.text,
+                        textDisabledColor = glassColors.text3.copy(alpha = 0.38f),
                         cancelBtnColor = GlassRed,
                         confirmBtnColor = GlassGreen,
                         todayBtnColor = GlassGreen,
-                        nextPreviousBtnColor = GlassText
+                        nextPreviousBtnColor = glassColors.text
                     )
                 }
             }
 
         }
 
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun JalaliDatePickerBottomSheet(
-    openSheet: MutableState<Boolean>,
-    disableBeforeDate: JalaliCalendar? = null,
-    onConfirm: (JalaliCalendar) -> Unit,
-) {
-    if (openSheet.value) {
-        SheetFrame(
-            title = stringResource(Res.string.action_select_date),
-            onDismiss = { openSheet.value = false },
-            isFullScreen = false
-        ) {
-            JalaliCalendarView(
-                openDialog = openSheet,
-                initialDate = null,
-                disableBeforeDate = disableBeforeDate,
-                disableAfterDate = null,
-                onSelectDay = { },
-                onConfirm = {
-                    onConfirm(it)
-                },
-                backgroundColor = Color.Transparent,
-                dayOfWeekLabelColor = GlassText3,
-                dropDownColor = GlassText,
-                selectedIconColor = GlassGreen,
-                textColorHighlight = GlassGreen,
-                textColor = GlassText,
-                textDisabledColor = GlassText3.copy(alpha = 0.38f),
-                cancelBtnColor = GlassRed,
-                confirmBtnColor = GlassGreen,
-                todayBtnColor = GlassGreen,
-                nextPreviousBtnColor = GlassText,
-                todayBtnVisible = true
-            )
-        }
     }
 }

@@ -21,6 +21,8 @@ import com.kazemieh.designsystem.component.glass.SheetFrame
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 
+import com.kazemieh.designsystem.LocalGlassColors
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FintrackTimePickerBottomSheet(
@@ -29,6 +31,7 @@ fun FintrackTimePickerBottomSheet(
     onConfirm: (String) -> Unit
 ) {
     if (openSheet.value) {
+        val glassColors = LocalGlassColors.current
         val initialParts = initialTime.split(":")
         val initialHour = initialParts.getOrNull(0)?.toIntOrNull() ?: 0
         val initialMinute = initialParts.getOrNull(1)?.toIntOrNull() ?: 0
@@ -61,23 +64,24 @@ fun FintrackTimePickerBottomSheet(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TimeColumn(
-                        label = stringResource(Res.string.label_hour),
-                        range = 0..23,
-                        initialValue = initialHour,
-                        onValueChange = { selectedHour = it }
-                    )
-                    
-                    Text(
-                        text = ":",
-                        style = MaterialTheme.typography.displaySmall,
-                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp)
-                    )
-
-                    TimeColumn(
                         label = stringResource(Res.string.label_minute),
                         range = 0..59,
                         initialValue = initialMinute,
                         onValueChange = { selectedMinute = it }
+                    )
+
+                    Text(
+                        text = ":",
+                        style = MaterialTheme.typography.displaySmall,
+                        color = glassColors.text,
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp)
+                    )
+
+                    TimeColumn(
+                        label = stringResource(Res.string.label_hour),
+                        range = 0..23,
+                        initialValue = initialHour,
+                        onValueChange = { selectedHour = it }
                     )
                 }
             }
@@ -92,8 +96,9 @@ private fun TimeColumn(
     initialValue: Int,
     onValueChange: (Int) -> Unit
 ) {
+    val glassColors = LocalGlassColors.current
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        FintrackTitleMediumText(text = label, color = com.kazemieh.designsystem.GlassText3)
+        FintrackTitleMediumText(text = label, color = glassColors.text3)
         Spacer(modifier = Modifier.height(8.dp))
         
         val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialValue)
@@ -111,7 +116,7 @@ private fun TimeColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
-                    .background(com.kazemieh.designsystem.GlassText.copy(alpha = 0.1f), MaterialTheme.shapes.medium)
+                    .background(glassColors.text.copy(alpha = 0.1f), MaterialTheme.shapes.medium)
             )
 
             LazyColumn(
@@ -139,7 +144,7 @@ private fun TimeColumn(
                     ) {
                         FintrackTitleLargeText(
                             text = value.toString().padStart(2, '0').toPersianDigits(),
-                            color = if (isSelected) com.kazemieh.designsystem.GlassGreen else com.kazemieh.designsystem.GlassText,
+                            color = if (isSelected) com.kazemieh.designsystem.GlassGreen else glassColors.text,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                             fontSize = if (isSelected) 28.sp else 20.sp
                         )

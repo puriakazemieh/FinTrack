@@ -18,6 +18,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.common.toPersianDigits
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -238,8 +240,8 @@ fun TimePickerItem(
             modifier = Modifier.weight(1f)
         )
         FintrackBodyLargeText(
-            text = time,
-            color = MaterialTheme.colorScheme.primary,
+            text = time.toPersianDigits(),
+            color = LocalGlassColors.current.text,
             fontWeight = FontWeight.Bold
         )
     }
