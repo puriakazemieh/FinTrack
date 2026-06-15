@@ -37,6 +37,7 @@ fun SourceFilterSelectionContent(
         viewModel.onIntent(SourceIntent.LoadAllSource)
     }
 
+    val glassColors = LocalGlassColors.current
     val state by viewModel.state.collectAsState()
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -45,31 +46,23 @@ fun SourceFilterSelectionContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                FintrackLabelSmallText(
-                    text = stringResource(Res.string.financial_sources),
-                    color = GlassText2,
-                    fontWeight = FontWeight.Bold
-                )
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    tint = GlassBlue,
-                    modifier = Modifier
-                        .size(16.dp)
-                        .clickable { viewModel.onIntent(SourceIntent.OnAddSourceClick) }
-                )
-            }
+
             FintrackLabelSmallText(
                 text = stringResource(Res.string.all),
-                color = if (isAllSelected) GlassGreen else GlassText3,
+                color = if (isAllSelected) GlassGreen else glassColors.text,
                 modifier = Modifier.clickable {
                     val all = state.sources.toSet()
                     onSelectionChanged(if (isAllSelected) emptySet() else all, !isAllSelected)
                 }
+            )
+
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                tint = GlassBlue,
+                modifier = Modifier
+                    .size(16.dp)
+                    .clickable { viewModel.onIntent(SourceIntent.OnAddSourceClick) }
             )
         }
 
@@ -101,7 +94,7 @@ fun SourceFilterSelectionContent(
                 ) {
                     FintrackLabelSmallText(
                         text = source.name + if (active) " ✓" else "",
-                        color = if (active) Color.White else GlassText2
+                        color = if (active) glassColors.text3 else glassColors.text
                     )
                 }
             }

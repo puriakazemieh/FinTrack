@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.search_placeholder
 import org.jetbrains.compose.resources.stringResource
@@ -27,6 +27,7 @@ fun SearchBar(
     modifier: Modifier = Modifier,
     placeholder: String = stringResource(Res.string.search_placeholder)
 ) {
+    val glassColors = LocalGlassColors.current
     GlassCard(
         modifier = modifier.fillMaxWidth(),
         padding = 0.dp
@@ -41,7 +42,7 @@ fun SearchBar(
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = null,
-                tint = GlassText3,
+                tint = glassColors.text3,
                 modifier = Modifier.size(18.dp)
             )
             

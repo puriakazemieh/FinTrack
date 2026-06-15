@@ -9,7 +9,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import fintrack.core.designsystem.generated.resources.Res
@@ -26,6 +26,7 @@ fun GlassRangeSlider(
     steps: Int = 0,
     title: String? = null
 ) {
+    val glassColors = LocalGlassColors.current
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -33,7 +34,7 @@ fun GlassRangeSlider(
         if (title != null) {
             FintrackLabelSmallText(
                 text = title,
-                color = GlassText2,
+                color = glassColors.text2,
                 fontWeight = FontWeight.Bold
             )
         }

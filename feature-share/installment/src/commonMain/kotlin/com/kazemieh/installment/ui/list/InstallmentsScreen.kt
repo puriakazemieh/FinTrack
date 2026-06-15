@@ -36,10 +36,8 @@ import com.kazemieh.common.model.InstallmentWithRelations
 import com.kazemieh.common.persiandatetime.domain.PersianDateTime
 import com.kazemieh.common.persiandatetime.extensions.toDateString
 import com.kazemieh.common.toSignedPersianPrice
-import com.kazemieh.designsystem.GlassEdge
 import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.EmptyList
 import com.kazemieh.designsystem.component.FAB
@@ -52,13 +50,11 @@ import com.kazemieh.installment.ui.InstallmentIntent
 import com.kazemieh.installment.ui.InstallmentViewModel
 import com.kazemieh.installment.ui.add.AddInstallmentBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.installment_amount
 import fintrack.core.designsystem.generated.resources.installment_description
 import fintrack.core.designsystem.generated.resources.installment_next_date
 import fintrack.core.designsystem.generated.resources.installment_overdue
 import fintrack.core.designsystem.generated.resources.installment_paid
 import fintrack.core.designsystem.generated.resources.installment_reminder_message
-import fintrack.core.designsystem.generated.resources.installment_reminders
 import fintrack.core.designsystem.generated.resources.installment_upcoming
 import fintrack.core.designsystem.generated.resources.mark_as_paid
 import fintrack.core.designsystem.generated.resources.remaining_installments
@@ -141,7 +137,8 @@ fun InstallmentsScreen(
                             item.installment.totalInstallments,
                             item.installment.title
                         )
-                        val reminderTitle = stringResource(Res.string.installment_next_date) + ": " + item.installment.title
+                        val reminderTitle =
+                            stringResource(Res.string.installment_next_date) + ": " + item.installment.title
                         val reminderMessage = stringResource(
                             Res.string.installment_reminder_message,
                             item.installment.installmentAmount.toInt().toSignedPersianPrice()
@@ -190,6 +187,7 @@ fun InstallmentItem(
     onMarkAsPaid: () -> Unit,
     onDelete: () -> Unit
 ) {
+    val glassColors = LocalGlassColors.current
     val space = LocalSpacing.current
     val progress = item.installment.paidInstallments.toFloat() / item.installment.totalInstallments
 
@@ -208,20 +206,20 @@ fun InstallmentItem(
                 Column(modifier = Modifier.weight(1f)) {
                     FintrackTitleMediumText(
                         text = item.installment.title,
-                        color = GlassText
+                        color = glassColors.text
                     )
                     FintrackLabelSmallText(
                         text = stringResource(
                             Res.string.remaining_installments,
                             (item.installment.totalInstallments - item.installment.paidInstallments)
                         ),
-                        color = GlassText3
+                        color = glassColors.text3
                     )
                 }
 
                 FintrackTitleMediumText(
                     text = item.installment.installmentAmount.toInt().toSignedPersianPrice(),
-                    color = GlassText
+                    color = glassColors.text
                 )
             }
 
@@ -234,7 +232,7 @@ fun InstallmentItem(
                     .height(6.dp)
                     .clip(RoundedCornerShape(3.dp)),
                 color = GlassGreen,
-                trackColor = GlassEdge
+                trackColor = glassColors.glassEdge
             )
 
             Spacer(Modifier.height(space.medium))
@@ -246,7 +244,7 @@ fun InstallmentItem(
             ) {
                 FintrackLabelSmallText(
                     text = PersianDateTime.parse(item.installment.nextDueDate).toDateString(),
-                    color = GlassText3
+                    color = glassColors.text3
                 )
 
                 if (!item.installment.isCompleted) {

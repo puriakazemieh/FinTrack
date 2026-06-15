@@ -11,8 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.asset.ui.AssetViewModel
 import com.kazemieh.common.toSignedPersianPrice
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.MoneyText
 import com.kazemieh.designsystem.component.glass.WidgetCard
@@ -38,8 +37,8 @@ fun AssetWidget(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    FintrackLabelSmallText(text = "ارزش کل", color = GlassText3)
-                    MoneyText(amount = state.totalValue, size = 18, color = GlassText)
+                    FintrackLabelSmallText(text = "ارزش کل")
+                    MoneyText(amount = state.totalValue, size = 18)
                 }
             }
 
@@ -48,7 +47,7 @@ fun AssetWidget(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp)
-                    .background(Color.White.copy(alpha = 0.05f))
+                    .background(LocalGlassColors.current.text.copy(alpha = 0.05f))
             ) {
                 state.composition.forEach { (type, percentage) ->
                     Box(
@@ -75,8 +74,7 @@ fun AssetWidget(
                         )
                         Spacer(Modifier.width(4.dp))
                         FintrackLabelSmallText(
-                            text = "${type.name}: ${(percentage * 100).toInt()}%",
-                            color = GlassText3
+                            text = "${type.name}: ${(percentage * 100).toInt()}%"
                         )
                     }
                 }

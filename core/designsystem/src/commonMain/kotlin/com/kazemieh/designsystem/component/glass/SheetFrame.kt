@@ -12,8 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.*
 
 /**
@@ -37,6 +36,8 @@ fun SheetFrame(
     trailingContent: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val glassColors = LocalGlassColors.current
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
@@ -47,7 +48,7 @@ fun SheetFrame(
         Column(
             modifier = modifier
                 .let { if (isFullScreen) it.fillMaxSize() else it.wrapContentHeight() }
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
         ) {
             ScreenHeader(
                 title = title,

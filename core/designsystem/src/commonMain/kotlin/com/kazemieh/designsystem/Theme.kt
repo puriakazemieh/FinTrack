@@ -121,7 +121,17 @@ fun FintrackTheme(
         AppTheme.PLAIN_LIGHT -> LightColors
     }
 
-    CompositionLocalProvider(LocalSpacing provides Dimensions()) {
+    val glassColors = when (theme) {
+        AppTheme.GLASS_DARK -> DarkGlassColors
+        AppTheme.GLASS_LIGHT -> LightGlassColors
+        AppTheme.PLAIN_DARK -> DarkGlassColors // Fallback
+        AppTheme.PLAIN_LIGHT -> LightGlassColors // Fallback
+    }
+
+    CompositionLocalProvider(
+        LocalSpacing provides Dimensions(),
+        LocalGlassColors provides glassColors
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = fintrackTypography(),

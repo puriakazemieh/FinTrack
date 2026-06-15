@@ -59,21 +59,8 @@ import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toPersianDigits
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
-import com.kazemieh.designsystem.GlassBlue
-import com.kazemieh.designsystem.GlassBlueSoft
-import com.kazemieh.designsystem.GlassColor
-import com.kazemieh.designsystem.GlassEdgeStrong
-import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassGreenDark
-import com.kazemieh.designsystem.GlassGreenSoft
-import com.kazemieh.designsystem.GlassRedSoft
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText2
-import com.kazemieh.designsystem.GlassText3
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.glass.AddFrame
 import com.kazemieh.designsystem.component.glass.Chip
@@ -199,14 +186,16 @@ private fun BottomSheetContent(
         }
     }
 
-    val backgroundBrush = remember(state.transactionType) {
+    val glassColors = LocalGlassColors.current
+
+    val backgroundBrush = remember(state.transactionType, glassColors) {
         val topColor: Color = when (state.transactionType) {
             TransactionType.EXPENSE -> GlassRedSoft
             TransactionType.INCOME -> GlassGreenSoft
             TransactionType.TRANSFER -> GlassBlueSoft
-            else -> GlassBg1
+            else -> glassColors.bg1
         }
-        Brush.verticalGradient(listOf(topColor, GlassBg1, GlassBg0))
+        Brush.verticalGradient(listOf(topColor, glassColors.bg1, glassColors.bg0))
     }
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -416,7 +405,6 @@ fun AddTransactionContent(
                 ) {
                     PickerValue(
                         label = state.source?.name ?: stringResource(Res.string.select_source),
-                        color = GlassBlue,
                         icon = FinTrackIcons.findIcon(state.source?.iconId).resource
                     )
                 }
@@ -440,7 +428,6 @@ fun AddTransactionContent(
                 ) {
                     PickerValue(
                         label = state.sourceEnd?.name ?: stringResource(Res.string.select_source),
-                        color = GlassBlue,
                         icon = FinTrackIcons.findIcon(state.sourceEnd?.iconId).resource
                     )
                 }
@@ -463,11 +450,8 @@ fun AddTransactionContent(
                     error = state.isCategoryError,
                     onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.CategoryPicker)) }
                 ) {
-                    val color =
-                        colors.firstOrNull { it.id == state.category?.colorId }?.color ?: GlassGreen
                     PickerValue(
                         label = state.category?.name ?: stringResource(Res.string.select_category),
-                        color = color,
                         icon = if (state.transactionType == TransactionType.TRANSFER) Res.drawable.ic_cat_transfer else FinTrackIcons.findIcon(
                             state.category?.iconId
                         ).resource
@@ -494,7 +478,6 @@ fun AddTransactionContent(
                 ) {
                     PickerValue(
                         label = state.source?.name ?: stringResource(Res.string.select_source),
-                        color = GlassBlue,
                         icon = FinTrackIcons.findIcon(state.source?.iconId).resource
                     )
                 }
@@ -519,7 +502,6 @@ fun AddTransactionContent(
             ) {
                 PickerValue(
                     label = state.date ?: stringResource(Res.string.dp_today),
-                    color = GlassText2,
                     icon = Icons.Default.CalendarToday
                 )
             }
@@ -615,17 +597,16 @@ fun AddTransactionContent(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        FintrackLabelSmallText(
-                            text = stringResource(Res.string.label_note),
-                            color = GlassText3
-                        )
-                        FintrackLabelSmallText(
-                            text = stringResource(
-                                Res.string.label_char_count_limit,
-                                state.description.length.toLong().toPersianDigits(),
-                                250.toLong().toPersianDigits()
-                            ), color = GlassText3
-                        )
+                FintrackLabelSmallText(
+                    text = stringResource(Res.string.label_note)
+                )
+                FintrackLabelSmallText(
+                    text = stringResource(
+                        Res.string.label_char_count_limit,
+                        state.description.length.toLong().toPersianDigits(),
+                        250.toLong().toPersianDigits()
+                    )
+                )
                     }
                     BasicTextField(
                         value = state.description,
@@ -635,18 +616,17 @@ fun AddTransactionContent(
                             )
                         },
                         enabled = !state.isLoading,
-                        textStyle = MaterialTheme.typography.bodyMedium.copy(color = GlassText),
+                        textStyle = MaterialTheme.typography.bodyMedium.copy(color = LocalGlassColors.current.text),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         cursorBrush = Brush.verticalGradient(listOf(GlassGreen, GlassGreen)),
                         modifier = Modifier.fillMaxWidth(),
                         decorationBox = @Composable { innerTextField ->
                             Box {
-                                if (state.description.isEmpty()) {
-                                    FintrackBodyMediumText(
-                                        text = stringResource(Res.string.hint_transaction_description),
-                                        color = GlassText3
-                                    )
-                                }
+                        if (state.description.isEmpty()) {
+                            FintrackBodyMediumText(
+                                text = stringResource(Res.string.hint_transaction_description)
+                            )
+                        }
                                 innerTextField()
                             }
                         }
@@ -671,7 +651,6 @@ fun AddTransactionContent(
 @Composable
 private fun PickerValue(
     label: String,
-    color: Color,
     icon: Any? = null
 ) {
     ComposeRow(
@@ -680,15 +659,13 @@ private fun PickerValue(
     ) {
         FintrackBodyMediumText(
             text = label,
-            fontWeight = FontWeight.SemiBold,
-            color = GlassText
+            fontWeight = FontWeight.SemiBold
         )
         when (icon) {
             is org.jetbrains.compose.resources.DrawableResource -> {
                 Icon(
                     painter = painterResource(icon),
                     contentDescription = null,
-                    tint = GlassText3,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -697,7 +674,6 @@ private fun PickerValue(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = GlassText3,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -706,7 +682,6 @@ private fun PickerValue(
                 Icon(
                     painter = painterResource(Res.drawable.ic_1), // Placeholder arrow? 
                     contentDescription = null,
-                    tint = GlassText3,
                     modifier = Modifier.size(13.dp)
                 )
             }
@@ -729,7 +704,6 @@ private fun MostUsedCategoryChips(
     ) {
         FintrackLabelSmallText(
             text = stringResource(Res.string.label_most_used),
-            color = GlassText3,
             fontSize = 9.sp
         )
         FlowRow(
@@ -768,7 +742,6 @@ private fun MostUsedSourceChips(
     ) {
         FintrackLabelSmallText(
             text = stringResource(Res.string.label_most_used),
-            color = GlassText3,
             fontSize = 9.sp
         )
         FlowRow(
@@ -808,7 +781,6 @@ private fun MostUsedTagChips(
     ) {
         FintrackLabelSmallText(
             text = stringResource(Res.string.label_most_used),
-            color = GlassText3,
             fontSize = 9.sp
         )
         FlowRow(
@@ -850,7 +822,6 @@ private fun MostUsedPersonChips(
     ) {
         FintrackLabelSmallText(
             text = stringResource(Res.string.label_most_used),
-            color = GlassText3,
             fontSize = 9.sp
         )
         FlowRow(

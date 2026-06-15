@@ -11,8 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.kazemieh.check.ui.list.CheckListViewModel
 import com.kazemieh.common.model.CheckStatus
 import com.kazemieh.common.toPersianPrice
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.glass.WidgetCard
@@ -38,12 +37,10 @@ fun CheckWidget(
                     Column(modifier = Modifier.padding(vertical = 4.dp)) {
                         FintrackTitleSmallText(
                             text = check.personName ?: "نامشخص",
-                            color = GlassText,
                             fontWeight = FontWeight.SemiBold
                         )
                         FintrackBodyMediumText(
-                            text = "${check.amount.toPersianPrice()} تومان - سررسید: ${check.dueDate}", // TODO: Proper Date
-                            color = GlassText3
+                            text = "${check.amount.toPersianPrice()} تومان - سررسید: ${check.dueDate}" // TODO: Proper Date
                         )
                     }
                 }

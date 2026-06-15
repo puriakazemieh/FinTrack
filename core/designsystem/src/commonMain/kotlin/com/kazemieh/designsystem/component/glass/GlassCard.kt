@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+import com.kazemieh.designsystem.LocalGlassColors
 import androidx.compose.ui.draw.alpha
 
 /**
@@ -28,15 +29,17 @@ fun GlassCard(
     onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
+    val glassColors = LocalGlassColors.current
+
     val backgroundColor = when (tone) {
-        GlassTone.Default -> MaterialTheme.colorScheme.surfaceVariant // This is GlassColor (4.5% alpha)
-        GlassTone.Strong -> com.kazemieh.designsystem.GlassStrong // This is 8% alpha
+        GlassTone.Default -> glassColors.glass
+        GlassTone.Strong -> glassColors.glassStrong
         GlassTone.Error -> MaterialTheme.colorScheme.errorContainer
     }
 
     val borderColor = when (tone) {
-        GlassTone.Default -> MaterialTheme.colorScheme.outline
-        GlassTone.Strong -> com.kazemieh.designsystem.GlassEdgeStrong
+        GlassTone.Default -> glassColors.glassEdge
+        GlassTone.Strong -> glassColors.glassEdgeStrong
         GlassTone.Error -> MaterialTheme.colorScheme.error
     }
 

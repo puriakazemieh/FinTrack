@@ -201,7 +201,7 @@ fun NotificationSettingItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = space.small), // Matching profile field padding
+            .padding(space.medium),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(

@@ -45,14 +45,9 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.toPersianDigits
-import com.kazemieh.designsystem.GlassColor
-import com.kazemieh.designsystem.GlassEdge
 import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassHairline
 import com.kazemieh.designsystem.GlassRed
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText2
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.EmptyList
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodySmallText
@@ -215,6 +210,7 @@ fun EntityList(
 
 @Composable
 private fun SummaryHeader(summary: List<EntitySummary>?) {
+    val glassColors = LocalGlassColors.current
     if (summary != null) {
         GlassCard(
             modifier = Modifier
@@ -232,17 +228,17 @@ private fun SummaryHeader(summary: List<EntitySummary>?) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.weight(1f)
                     ) {
-                        FintrackLabelSmallText(text = s.label, color = GlassText3)
+                        FintrackLabelSmallText(text = s.label, color = glassColors.text3)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             FintrackTitleMediumText(
                                 text = s.value.toPersianDigits(),
                                 fontWeight = FontWeight.Bold,
-                                color = s.color ?: GlassText
+                                color = s.color ?: glassColors.text
                             )
                             s.unit?.let {
                                 FintrackLabelSmallText(
                                     text = it,
-                                    color = GlassText3,
+                                    color = glassColors.text3,
                                     modifier = Modifier.padding(start = 4.dp)
                                 )
                             }
@@ -251,7 +247,7 @@ private fun SummaryHeader(summary: List<EntitySummary>?) {
                     if (index < summary.lastIndex) {
                         VerticalDivider(
                             modifier = Modifier.height(30.dp),
-                            color = GlassHairline
+                            color = glassColors.glassHairline
                         )
                     }
                 }
@@ -286,6 +282,7 @@ private fun EntityRow(
     onMoveUp: () -> Unit = {},
     onMoveDown: () -> Unit = {}
 ) {
+    val glassColors = LocalGlassColors.current
     val color = item.color ?: mainColor
     GlassCard(
         modifier = modifier
@@ -302,7 +299,7 @@ private fun EntityRow(
                 Icon(
                     imageVector = Icons.Default.Reorder,
                     contentDescription = null,
-                    tint = GlassText3,
+                    tint = glassColors.text3,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -323,7 +320,7 @@ private fun EntityRow(
                 FintrackTitleSmallText(
                     text = item.name,
                     fontWeight = FontWeight.SemiBold,
-                    color = GlassText,
+                    color = glassColors.text,
                     maxLines = 1
                 )
                 item.badge?.let {
@@ -347,7 +344,7 @@ private fun EntityRow(
                 item.sub?.let {
                     FintrackBodySmallText(
                         text = it,
-                        color = GlassText3,
+                        color = glassColors.text3,
                         maxLines = 1
                     )
                 }
@@ -358,12 +355,12 @@ private fun EntityRow(
                     ActionIcon(
                         icon = Icons.Default.KeyboardArrowUp,
                         onClick = onMoveUp,
-                        color = GlassText2
+                        color = glassColors.text2
                     )
                     ActionIcon(
                         icon = Icons.Default.KeyboardArrowDown,
                         onClick = onMoveDown,
-                        color = GlassText2
+                        color = glassColors.text2
                     )
                 }
             } else if (showActions) {
@@ -375,7 +372,7 @@ private fun EntityRow(
                             color = GlassGreen
                         )
                     }
-                    ActionIcon(icon = Icons.Default.Edit, onClick = onEdit, color = GlassText2)
+                    ActionIcon(icon = Icons.Default.Edit, onClick = onEdit, color = glassColors.text2)
                     ActionIcon(icon = Icons.Default.Delete, onClick = onDelete, color = GlassRed)
                 }
             }
@@ -389,12 +386,13 @@ private fun ActionIcon(
     onClick: () -> Unit,
     color: Color
 ) {
+    val glassColors = LocalGlassColors.current
     Box(
         modifier = Modifier
             .size(32.dp)
             .clip(RoundedCornerShape(9.dp))
-            .background(GlassColor)
-            .border(1.dp, GlassEdge, RoundedCornerShape(9.dp))
+            .background(glassColors.glass)
+            .border(1.dp, glassColors.glassEdge, RoundedCornerShape(9.dp))
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {

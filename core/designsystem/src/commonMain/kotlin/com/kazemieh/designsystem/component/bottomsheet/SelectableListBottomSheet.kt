@@ -1,33 +1,39 @@
 package com.kazemieh.designsystem.component.bottomsheet
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText2
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.EmptyList
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.glass.SearchBar
-import com.kazemieh.designsystem.component.glass.GlassTone
 import com.kazemieh.designsystem.component.glass.ItemSelected
 import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.component.model.UiText
-import com.kazemieh.designsystem.component.model.asString
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.confirm
 import fintrack.core.designsystem.generated.resources.search_placeholder
@@ -67,10 +73,11 @@ fun SelectableListBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
+        val glassColors = LocalGlassColors.current
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
         ) {
             ScreenHeader(
                 title = title,
@@ -110,7 +117,10 @@ fun SelectableListBottomSheet(
                     items(itemsList, key = { it.id }) { item ->
                         val isSelected = selected.contains(item)
                         ItemSelected(
-                            modifier = Modifier.padding(vertical = space.mediumSmall, horizontal = 24.dp),
+                            modifier = Modifier.padding(
+                                vertical = space.mediumSmall,
+                                horizontal = 24.dp
+                            ),
                             isSelected = isSelected,
                             item = item,
                             onToggle = {

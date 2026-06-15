@@ -41,12 +41,10 @@ import com.kazemieh.budget.ui.component.BudgetWidget
 import com.kazemieh.check.ui.widget.CheckWidget
 import com.kazemieh.dashboard.component.QuickActions
 import com.kazemieh.dashboard.component.RecentTransactionsWidget
-import com.kazemieh.designsystem.GlassColor
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassGreenDark
 import com.kazemieh.designsystem.GlassGreenDeep
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
@@ -155,6 +153,25 @@ fun DashboardScreen(
             item { Spacer(Modifier.height(space.large)) }
 
             item {
+                RecentTransactionsWidget(
+                    onMoreClick = { onNavigateToTransactions(true) },
+                    onEdit = { transactionWithRelations ->
+                        viewModel.onIntent(
+                            DashboardIntent.ShowTransactionBottomSheet(transactionWithRelations)
+                        )
+                    },
+                    onDelete = { transactionWithRelations ->
+                        viewModel.onIntent(
+                            DashboardIntent.DeleteTransactionBottomSheet(transactionWithRelations)
+                        )
+                    },
+                    modifier = Modifier.padding(horizontal = space.large)
+                )
+            }
+
+            item { Spacer(Modifier.height(space.large)) }
+
+            item {
                 BudgetWidget(
                     onMoreClick = onNavigateToBudget,
                     modifier = Modifier.padding(horizontal = space.large)
@@ -199,22 +216,6 @@ fun DashboardScreen(
 
             item { Spacer(Modifier.height(space.large)) }
 
-            item {
-                RecentTransactionsWidget(
-                    onMoreClick = { onNavigateToTransactions(true) },
-                    onEdit = { transactionWithRelations ->
-                        viewModel.onIntent(
-                            DashboardIntent.ShowTransactionBottomSheet(transactionWithRelations)
-                        )
-                    },
-                    onDelete = { transactionWithRelations ->
-                        viewModel.onIntent(
-                            DashboardIntent.DeleteTransactionBottomSheet(transactionWithRelations)
-                        )
-                    },
-                    modifier = Modifier.padding(horizontal = space.large)
-                )
-            }
         }
 
         FAB(modifier = Modifier.padding(bottom = 60.dp)) { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) }
@@ -259,6 +260,7 @@ private fun DashboardHeader(
     onNavigateToSearch: () -> Unit = {}
 ) {
     val space = LocalSpacing.current
+    val glassColors = LocalGlassColors.current
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -286,13 +288,11 @@ private fun DashboardHeader(
             }
             Column {
                 FintrackLabelSmallText(
-                    text = stringResource(Res.string.msg_hello),
-                    color = GlassText3
+                    text = stringResource(Res.string.msg_hello)
                 )
                 FintrackTitleMediumText(
                     text = stringResource(Res.string.placeholder_user_name),
-                    fontWeight = FontWeight.SemiBold,
-                    color = GlassText
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
@@ -309,18 +309,18 @@ private fun HeaderIconButton(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     onClick: () -> Unit
 ) {
+    val glassColors = LocalGlassColors.current
     Box(
         modifier = Modifier
             .size(40.dp)
             .clip(MaterialTheme.shapes.medium)
-            .background(GlassColor)
+            .background(glassColors.glass)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = GlassText,
             modifier = Modifier.size(18.dp)
         )
     }

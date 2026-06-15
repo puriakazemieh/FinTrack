@@ -24,8 +24,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.toPersianDigits
-import com.kazemieh.designsystem.*
-import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.GlassBlue
+import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.GlassGreenDark
+import com.kazemieh.designsystem.GlassRed
+import com.kazemieh.designsystem.LocalGlassColors
+import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.FinTrackLeadingIcon
+import com.kazemieh.designsystem.component.EmptyList
+import com.kazemieh.designsystem.component.LeadingIconStyle
+import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.GlassTone
+import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.component.model.asString
@@ -54,6 +69,7 @@ fun SelectableFlowRowBottomSheet(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val space = LocalSpacing.current
+    val glassColors = LocalGlassColors.current
 
     val itemsList = remember(items) { items.toList().sortedBy { it.id } }
 
@@ -85,7 +101,7 @@ fun SelectableFlowRowBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
         ) {
             ScreenHeader(
                 title = title,
@@ -95,7 +111,7 @@ fun SelectableFlowRowBottomSheet(
                         TextButton(onClick = { isEditMode = !isEditMode }) {
                             FintrackLabelMediumText(
                                 text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
-                                color = GlassText2
+                                color = glassColors.text2
                             )
                         }
                     }
@@ -154,7 +170,7 @@ fun SelectableFlowRowBottomSheet(
                                     FintrackBodyMediumText(
                                         text = resolvedTitle,
                                         fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                                        color = if (isSelected) Color.White else GlassText2,
+                                        color = if (isSelected) glassColors.bg0 else glassColors.text2,
                                         modifier = Modifier.weight(1f)
                                     )
 
@@ -166,7 +182,7 @@ fun SelectableFlowRowBottomSheet(
                                             ActionIcon(
                                                 icon = Icons.Default.Edit,
                                                 onClick = { onEditClick?.invoke(item) },
-                                                color = GlassText2
+                                                color = glassColors.text2
                                             )
                                             ActionIcon(
                                                 icon = Icons.Default.Delete,
@@ -181,7 +197,7 @@ fun SelectableFlowRowBottomSheet(
                                                 .clip(RoundedCornerShape(6.dp))
                                                 .border(
                                                     width = 1.5.dp,
-                                                    color = if (isSelected) GlassGreen else GlassEdgeStrong,
+                                                    color = if (isSelected) GlassGreen else glassColors.glassEdgeStrong,
                                                     shape = RoundedCornerShape(6.dp)
                                                 )
                                                 .background(if (isSelected) GlassGreen else Color.Transparent),
@@ -262,12 +278,13 @@ private fun ActionIcon(
     onClick: () -> Unit,
     color: Color
 ) {
+    val glassColors = LocalGlassColors.current
     Box(
         modifier = Modifier
             .size(32.dp)
             .clip(RoundedCornerShape(9.dp))
-            .background(GlassColor)
-            .border(1.dp, GlassEdge, RoundedCornerShape(9.dp))
+            .background(glassColors.glass)
+            .border(1.dp, glassColors.glassEdge, RoundedCornerShape(9.dp))
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
@@ -286,11 +303,12 @@ private fun AddButton(
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
 ) {
+    val glassColors = LocalGlassColors.current
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
-            .border(1.5.dp, GlassEdgeStrong, RoundedCornerShape(12.dp))
+            .border(1.5.dp, glassColors.glassEdgeStrong, RoundedCornerShape(12.dp))
             .padding(12.dp),
         contentAlignment = Alignment.Center
     ) {

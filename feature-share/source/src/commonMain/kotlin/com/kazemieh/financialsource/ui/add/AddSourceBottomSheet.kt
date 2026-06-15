@@ -37,8 +37,7 @@ import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.GlassEdge
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassGreenSoft
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.CardItem
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -142,6 +141,7 @@ fun AddSourceContent(
     onIntent: (AddSourceIntent) -> Unit,
     onNavigateToTransactions: ((Source) -> Unit)? = null
 ) {
+    val glassColors = LocalGlassColors.current
     val rainbowColors = FinTrackPickerColors.rainbow()
     val colors = rainbowColors.map { it.color }
     val selectedColorIndex = remember(state.draft.colorId, rainbowColors) {
@@ -207,7 +207,7 @@ fun AddSourceContent(
                         FintrackHeadlineLargeText(
                             text = state.draft.name,
                             fontWeight = FontWeight.Bold,
-                            color = GlassText
+                            color = glassColors.text
                         )
                     }
                 }
@@ -234,18 +234,18 @@ fun AddSourceContent(
                         placeholder = {
                             FintrackBodyMediumText(
                                 text = stringResource(Res.string.hint_source_name_placeholder),
-                                color = GlassText3
+                                color = glassColors.text3
                             )
                         },
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedContainerColor = glassColors.text3,
+                            unfocusedContainerColor = glassColors.text3,
+                            focusedIndicatorColor = glassColors.text3,
+                            unfocusedIndicatorColor = glassColors.text3,
                             cursorColor = GlassGreen
                         ),
                         textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            color = GlassText,
+                            color = glassColors.text,
                             fontWeight = FontWeight.SemiBold
                         ),
                         modifier = Modifier.fillMaxWidth()
@@ -265,7 +265,7 @@ fun AddSourceContent(
                         placeholder = {
                             FintrackBodyMediumText(
                                 text = stringResource(Res.string.label_zero),
-                                color = GlassText3
+                                color = glassColors.text3
                             )
                         },
                         colors = TextFieldDefaults.colors(
@@ -284,7 +284,7 @@ fun AddSourceContent(
                         suffix = {
                             FintrackLabelSmallText(
                                 text = stringResource(Res.string.currency_toman),
-                                color = GlassText3
+                                color = glassColors.text3
                             )
                         }
                     )
@@ -299,7 +299,7 @@ fun AddSourceContent(
                                 text = stringResource(Res.string.label_card_info) + " (" + stringResource(
                                     Res.string.label_optional
                                 ) + ")",
-                                color = GlassText3
+                                color = glassColors.text3
                             )
 
                             TextField(
@@ -308,7 +308,7 @@ fun AddSourceContent(
                                 placeholder = {
                                     FintrackBodyMediumText(
                                         text = stringResource(Res.string.label_card_16_digits),
-                                        color = GlassText3
+                                        color = glassColors.text3
                                     )
                                 },
                                 visualTransformation = FourDigitGroupingTransformation(),
@@ -327,7 +327,7 @@ fun AddSourceContent(
                                     placeholder = {
                                         FintrackBodyMediumText(
                                             text = stringResource(Res.string.label_cvv2),
-                                            color = GlassText3
+                                            color = glassColors.text3
                                         )
                                     },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -349,7 +349,7 @@ fun AddSourceContent(
                                     placeholder = {
                                         FintrackBodyMediumText(
                                             text = stringResource(Res.string.label_exp_month),
-                                            color = GlassText3
+                                            color = glassColors.text3
                                         )
                                     },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -371,7 +371,7 @@ fun AddSourceContent(
                                     placeholder = {
                                         FintrackBodyMediumText(
                                             text = stringResource(Res.string.label_exp_year),
-                                            color = GlassText3
+                                            color = glassColors.text3
                                         )
                                     },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -393,7 +393,7 @@ fun AddSourceContent(
                                 text = stringResource(Res.string.label_account_shaba) + " (" + stringResource(
                                     Res.string.label_optional
                                 ) + ")",
-                                color = GlassText3
+                                color = glassColors.text3
                             )
                             TextField(
                                 value = state.draft.shabaNumber.orEmpty(),
@@ -401,7 +401,7 @@ fun AddSourceContent(
                                 placeholder = {
                                     FintrackBodyMediumText(
                                         text = stringResource(Res.string.label_shaba_no_ir),
-                                        color = GlassText3
+                                        color = glassColors.text3
                                     )
                                 },
                                 visualTransformation = FourDigitGroupingTransformation(),
@@ -418,7 +418,7 @@ fun AddSourceContent(
                                 placeholder = {
                                     FintrackBodyMediumText(
                                         text = stringResource(Res.string.label_account_number),
-                                        color = GlassText3
+                                        color = glassColors.text3
                                     )
                                 },
                                 visualTransformation = FourDigitGroupingTransformation(),
@@ -440,7 +440,7 @@ fun AddSourceContent(
                                 text = stringResource(Res.string.label_branch) + " (" + stringResource(
                                     Res.string.label_optional
                                 ) + ")",
-                                color = GlassText3
+                                color = glassColors.text3
                             )
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 TextField(
@@ -449,7 +449,7 @@ fun AddSourceContent(
                                     placeholder = {
                                         FintrackBodyMediumText(
                                             text = stringResource(Res.string.label_branch_code),
-                                            color = GlassText3
+                                            color = glassColors.text3
                                         )
                                     },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -465,7 +465,7 @@ fun AddSourceContent(
                                     placeholder = {
                                         FintrackBodyMediumText(
                                             text = stringResource(Res.string.label_branch_name),
-                                            color = GlassText3
+                                            color = glassColors.text3
                                         )
                                     },
                                     modifier = Modifier.weight(1f),
@@ -486,7 +486,7 @@ fun AddSourceContent(
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             FintrackLabelMediumText(
                                 text = stringResource(Res.string.label_color),
-                                color = GlassText3
+                                color = glassColors.text3
                             )
                             ColorSwatches(
                                 colors = colors,
@@ -510,7 +510,7 @@ fun AddSourceContent(
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         FintrackLabelMediumText(
                             text = stringResource(Res.string.label_icon),
-                            color = GlassText3
+                            color = glassColors.text3
                         )
                         IconGrid(
                             icons = if (state.draft.type == TypeSource.CREDIT) FinTrackSourceIcons.icons else FinTrackIcons.icons,
@@ -538,8 +538,9 @@ private fun SourceTypeSelector(
     onTypeSelected: (TypeSource) -> Unit
 ) {
     GlassCard(padding = 14.dp) {
+        val glassColors = LocalGlassColors.current
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            FintrackLabelSmallText(text = stringResource(Res.string.label_type), color = GlassText3)
+            FintrackLabelSmallText(text = stringResource(Res.string.label_type), color = glassColors.text3)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -557,7 +558,7 @@ private fun SourceTypeSelector(
                                     GlassGreen.copy(alpha = 0.33f),
                                     RoundedCornerShape(10.dp)
                                 )
-                                else Modifier.border(1.dp, GlassEdge, RoundedCornerShape(10.dp))
+                                else Modifier.border(1.dp, glassColors.glassEdge, RoundedCornerShape(10.dp))
                             )
                             .clickable { onTypeSelected(option) }
                             .padding(vertical = 10.dp),
@@ -565,7 +566,7 @@ private fun SourceTypeSelector(
                     ) {
                         FintrackBodyMediumText(
                             text = option.value.asString(),
-                            color = if (active) GlassGreen else GlassText3
+                            color = if (active) GlassGreen else glassColors.text3
                         )
                     }
                 }

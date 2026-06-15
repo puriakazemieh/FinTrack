@@ -9,8 +9,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.budget.ui.list.BudgetViewModel
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.MoneyText
@@ -50,8 +49,8 @@ fun BudgetWidget(
                 }
 
                 Column {
-                    FintrackLabelSmallText(text = stringResource(Res.string.label_budget_sum), color = GlassText3)
-                    MoneyText(amount = totalBudget, size = 16, color = GlassText)
+                    FintrackLabelSmallText(text = stringResource(Res.string.label_budget_sum))
+                    MoneyText(amount = totalBudget, size = 16)
                 }
             }
 

@@ -1,16 +1,11 @@
 package com.kazemieh.profile
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -18,6 +13,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -25,13 +22,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.designsystem.AppTheme
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.*
-import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.WidgetCard
 import com.kazemieh.money.Currency
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ThemeAndCurrencyScreen(
     onBack: () -> Unit,
@@ -40,48 +37,68 @@ fun ThemeAndCurrencyScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { FintrackTitleLargeText(stringResource(Res.string.title_theme_currency)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-                    }
-                }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        // Decorative background blobs
+        val primaryColor = MaterialTheme.colorScheme.primary
+        val secondaryColor = MaterialTheme.colorScheme.secondary
+
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(primaryColor.copy(alpha = 0.15f), Color.Transparent),
+                    center = Offset(size.width * 0.8f, size.height * 0.2f),
+                    radius = 400.dp.toPx()
+                ),
+                center = Offset(size.width * 0.8f, size.height * 0.2f),
+                radius = 400.dp.toPx()
+            )
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(secondaryColor.copy(alpha = 0.1f), Color.Transparent),
+                    center = Offset(size.width * 0.2f, size.height * 0.8f),
+                    radius = 500.dp.toPx()
+                ),
+                center = Offset(size.width * 0.2f, size.height * 0.8f),
+                radius = 500.dp.toPx()
             )
         }
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = space.large),
-            verticalArrangement = Arrangement.spacedBy(space.large),
-            contentPadding = PaddingValues(vertical = space.medium)
-        ) {
-            item {
-                FintrackTitleMediumText(
-                    text = stringResource(Res.string.label_theme),
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(space.medium))
-                ThemeGrid(
-                    selectedTheme = state.selectedTheme,
-                    onThemeSelected = { viewModel.onIntent(ThemeAndCurrencyIntent.SelectTheme(it)) }
-                )
-            }
 
-            item {
-                FintrackTitleMediumText(
-                    text = stringResource(Res.string.label_currency),
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(space.medium))
-                CurrencySection(
-                    selectedCurrency = state.selectedCurrency,
-                    onCurrencySelected = { viewModel.onIntent(ThemeAndCurrencyIntent.SelectCurrency(it)) }
-                )
+        Column(modifier = Modifier.fillMaxSize()) {
+            ScreenHeader(
+                title = stringResource(Res.string.title_theme_currency),
+                onBack = onBack
+            )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(horizontal = space.large),
+                verticalArrangement = Arrangement.spacedBy(space.medium),
+                contentPadding = PaddingValues(bottom = 100.dp)
+            ) {
+                item {
+                    WidgetCard(
+                        title = stringResource(Res.string.label_theme)
+                    ) {
+                        ThemeGrid(
+                            selectedTheme = state.selectedTheme,
+                            onThemeSelected = { viewModel.onIntent(ThemeAndCurrencyIntent.SelectTheme(it)) }
+                        )
+                    }
+                }
+
+                item {
+                    WidgetCard(
+                        title = stringResource(Res.string.label_currency)
+                    ) {
+                        CurrencySection(
+                            selectedCurrency = state.selectedCurrency,
+                            onCurrencySelected = { viewModel.onIntent(ThemeAndCurrencyIntent.SelectCurrency(it)) }
+                        )
+                    }
+                }
             }
         }
     }
@@ -99,7 +116,10 @@ fun ThemeGrid(
         AppTheme.PLAIN_LIGHT to Res.string.theme_plain_light
     )
 
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(
+        modifier = Modifier.padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
         themes.chunked(2).forEach { rowThemes ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -128,40 +148,46 @@ fun ThemeItem(
     theme: AppTheme
 ) {
     val space = LocalSpacing.current
-    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+    val primaryColor = MaterialTheme.colorScheme.primary
 
-    GlassCard(
+    Column(
         modifier = modifier
+            .clip(MaterialTheme.shapes.medium)
             .clickable(onClick = onClick)
-            .border(2.dp, borderColor, MaterialTheme.shapes.medium),
-        padding = 0.dp
+            .padding(space.small),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier.padding(space.medium),
-            horizontalAlignment = Alignment.CenterHorizontally
+        // Theme preview box
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .clip(MaterialTheme.shapes.medium)
+                .background(getThemePreviewColor(theme))
         ) {
-            // Theme preview box
-            Box(
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(MaterialTheme.shapes.small)
-                    .background(getThemePreviewColor(theme))
-            ) {
-                if (isSelected) {
-                    Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
+            if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(primaryColor.copy(alpha = 0.2f))
+                )
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = primaryColor,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(space.small)
+                        .size(20.dp)
+                )
             }
-            Spacer(modifier = Modifier.height(space.small))
-            FintrackLabelMediumText(
-                text = label,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-            )
         }
+        Spacer(modifier = Modifier.height(space.small))
+        FintrackLabelMediumText(
+            text = label,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+            color = if (isSelected) primaryColor else MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 
@@ -175,7 +201,7 @@ fun CurrencySection(
         Currency.RIAL to Res.string.currency_rial_full
     )
 
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column {
         currencies.forEach { (currency, labelRes) ->
             CurrencyItem(
                 label = stringResource(labelRes),
@@ -193,24 +219,26 @@ fun CurrencyItem(
     onClick: () -> Unit
 ) {
     val space = LocalSpacing.current
-    GlassCard(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
-        padding = space.medium
+            .clickable(onClick = onClick)
+            .padding(space.medium),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            FintrackBodyLargeText(
-                text = label,
-                modifier = Modifier.weight(1f)
+        FintrackBodyLargeText(
+            text = label,
+            modifier = Modifier.weight(1f),
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+        )
+        RadioButton(
+            selected = isSelected,
+            onClick = onClick,
+            colors = RadioButtonDefaults.colors(
+                selectedColor = MaterialTheme.colorScheme.primary
             )
-            RadioButton(
-                selected = isSelected,
-                onClick = onClick
-            )
-        }
+        )
     }
 }
 

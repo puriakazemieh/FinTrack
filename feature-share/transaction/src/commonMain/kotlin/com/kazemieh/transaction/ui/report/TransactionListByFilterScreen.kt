@@ -37,11 +37,9 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.common.toSignedPersianPrice
-import com.kazemieh.designsystem.GlassColor
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -167,7 +165,7 @@ fun TransactionListByFilterContent(
                 Box(modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
                     FintrackBodyMediumText(
                         text = stringResource(Res.string.msg_no_transaction_found),
-                        color = GlassText3
+                        color = LocalGlassColors.current.text3
                     )
                 }
             }
@@ -213,6 +211,7 @@ fun TransactionListByFilterContent(
 
 @Composable
 private fun DayHeader(date: String, count: Int, netAmount: Long) {
+    val glassColors = LocalGlassColors.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -224,18 +223,18 @@ private fun DayHeader(date: String, count: Int, netAmount: Long) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            FintrackBodyLargeText(text = date, fontWeight = FontWeight.Bold, color = GlassText)
+            FintrackBodyLargeText(text = date, fontWeight = FontWeight.Bold, color = glassColors.text)
             Box(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(GlassColor)
+                    .background(glassColors.glass)
                     .padding(horizontal = 8.dp, vertical = 2.dp)
             ) {
                 FintrackLabelSmallText(
                     text = count.toLong()
                         .toPersianDigits() + " " + stringResource(Res.string.unit_transaction),
                     fontSize = 10.sp,
-                    color = GlassText3
+                    color = glassColors.text3
                 )
             }
         }

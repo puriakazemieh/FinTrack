@@ -23,8 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Person
 import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.glass.AddFrame
 import com.kazemieh.designsystem.component.glass.Field
@@ -109,6 +108,7 @@ fun AddPersonContent(
     onIntent: (AddPersonIntent) -> Unit,
     onNavigateToTransactions: ((Person) -> Unit)? = null
 ) {
+    val glassColors = LocalGlassColors.current
     AddFrame(
         title = if (state.mode == AddPersonMode.Add) stringResource(Res.string.title_new_person) else stringResource(
             Res.string.title_edit_person
@@ -148,7 +148,7 @@ fun AddPersonContent(
                         placeholder = {
                             FintrackBodyMediumText(
                                 text = stringResource(Res.string.hint_enter_person_name),
-                                color = GlassText3
+                                color = glassColors.text3
                             )
                         },
                         colors = TextFieldDefaults.colors(
@@ -159,7 +159,7 @@ fun AddPersonContent(
                             cursorColor = GlassGreen
                         ),
                         textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            color = GlassText,
+                            color = glassColors.text,
                             fontWeight = FontWeight.SemiBold
                         ),
                         modifier = Modifier.fillMaxWidth()
@@ -175,7 +175,7 @@ fun AddPersonContent(
                         placeholder = {
                             FintrackBodyMediumText(
                                 text = stringResource(Res.string.hint_optional_note),
-                                color = GlassText3
+                                color = glassColors.text3
                             )
                         },
                         colors = TextFieldDefaults.colors(
@@ -185,7 +185,7 @@ fun AddPersonContent(
                             unfocusedIndicatorColor = Color.Transparent,
                             cursorColor = GlassGreen
                         ),
-                        textStyle = MaterialTheme.typography.bodyMedium.copy(color = GlassText),
+                        textStyle = MaterialTheme.typography.bodyMedium.copy(color = glassColors.text),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }

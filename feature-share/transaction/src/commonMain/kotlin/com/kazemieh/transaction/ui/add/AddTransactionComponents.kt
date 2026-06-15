@@ -41,14 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.GlassBlue
-import com.kazemieh.designsystem.GlassColor
-import com.kazemieh.designsystem.GlassEdge
-import com.kazemieh.designsystem.GlassEdgeStrong
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText2
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
@@ -72,6 +67,7 @@ fun GlassSegmentedSelector(
     onTypeSelected: (TransactionType) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val glassColors = LocalGlassColors.current
     val types = listOf(
         TransactionType.EXPENSE to stringResource(Res.string.type_expense),
         TransactionType.INCOME to stringResource(Res.string.type_income),
@@ -81,8 +77,8 @@ fun GlassSegmentedSelector(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(GlassColor, RoundedCornerShape(14.dp))
-            .border(1.dp, GlassEdge, RoundedCornerShape(14.dp))
+            .background(glassColors.glass, RoundedCornerShape(14.dp))
+            .border(1.dp, glassColors.glassEdge, RoundedCornerShape(14.dp))
             .padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
@@ -110,7 +106,7 @@ fun GlassSegmentedSelector(
             ) {
                 FintrackBodyMediumText(
                     text = label,
-                    color = if (active) color else GlassText3
+                    color = if (active) color else glassColors.text3
                 )
             }
         }
@@ -128,6 +124,7 @@ fun LargeAmountCard(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     modifier: Modifier = Modifier
 ) {
+    val glassColors = LocalGlassColors.current
     val focusRequester = remember { FocusRequester() }
     var focusRequested by rememberSaveable { mutableStateOf(false) }
 
@@ -160,8 +157,8 @@ fun LargeAmountCard(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(GlassColor)
-                        .border(1.dp, GlassEdge, RoundedCornerShape(8.dp))
+                        .background(glassColors.glass)
+                        .border(1.dp, glassColors.glassEdge, RoundedCornerShape(8.dp))
                         .clickable(onClick = onCalcClick)
                         .padding(horizontal = 9.dp, vertical = 3.dp)
                 ) {
@@ -172,12 +169,12 @@ fun LargeAmountCard(
                         Icon(
                             imageVector = Icons.Default.Calculate,
                             contentDescription = null,
-                            tint = GlassText3,
+                            tint = glassColors.text3,
                             modifier = Modifier.size(11.dp)
                         )
                         FintrackLabelSmallText(
                             text = stringResource(Res.string.label_calculator),
-                            color = GlassText3
+                            color = glassColors.text3
                         )
                     }
                 }
@@ -195,9 +192,9 @@ fun LargeAmountCard(
                     isError = isError,
                     enabled = enabled,
                     label = { FintrackBodyMediumText(text = stringResource(Res.string.amount)) },
-                    textColor = GlassText,
+                    textColor = glassColors.text,
                     containerColor = Color.Transparent,
-                    unfocusedBorderColor = GlassEdge,
+                    unfocusedBorderColor = glassColors.glassEdge,
                     focusedBorderColor = GlassGreen,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
@@ -207,7 +204,7 @@ fun LargeAmountCard(
                     suffix = {
                         FintrackBodyMediumText(
                             text = stringResource(Res.string.currency_toman),
-                            color = GlassText3
+                            color = glassColors.text3
                         )
                     },
                     modifier = Modifier
@@ -228,6 +225,7 @@ fun SectionContainer(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
+    val glassColors = LocalGlassColors.current
     GlassCard(
         modifier = modifier,
         padding = 14.dp
@@ -242,19 +240,19 @@ fun SectionContainer(
                     FintrackLabelMediumText(
                         text = title,
                         fontWeight = FontWeight.Bold,
-                        color = GlassText
+                        color = glassColors.text
                     )
                     sub?.let {
                         FintrackLabelSmallText(
                             text = it,
-                            color = GlassText3,
+                            color = glassColors.text3,
                             modifier = Modifier.padding(top = 2.dp)
                         )
                     }
                 }
                 FintrackLabelSmallText(
                     text = stringResource(Res.string.label_optional_fa),
-                    color = GlassText3,
+                    color = glassColors.text3,
                     fontSize = 9.sp
                 )
             }
@@ -278,6 +276,7 @@ fun AddChip(
     label: String,
     onClick: () -> Unit
 ) {
+    val glassColors = LocalGlassColors.current
     val stroke = remember {
         Stroke(width = 2f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f))
     }
@@ -291,14 +290,14 @@ fun AddChip(
     ) {
         androidx.compose.foundation.Canvas(modifier = Modifier.matchParentSize()) {
             drawRoundRect(
-                color = GlassEdgeStrong,
+                color = glassColors.glassEdgeStrong,
                 style = stroke,
                 cornerRadius = androidx.compose.ui.geometry.CornerRadius(99.dp.toPx())
             )
         }
         FintrackLabelSmallText(
             text = label,
-            color = GlassText2,
+            color = glassColors.text2,
             modifier = Modifier.padding(horizontal = 11.dp, vertical = 4.dp)
         )
     }

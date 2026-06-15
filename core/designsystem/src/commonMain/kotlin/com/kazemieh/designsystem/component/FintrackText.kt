@@ -14,11 +14,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import com.kazemieh.designsystem.vazirmatnFontFamily
 
+import com.kazemieh.designsystem.LocalGlassColors
+
 @Composable
 fun FintrackBodyMediumText(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.bodyMedium.copy(
@@ -44,7 +46,7 @@ fun FintrackBodyMediumText(
 fun FintrackDisplayLargeText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.displayLarge.copy(
@@ -70,7 +72,7 @@ fun FintrackDisplayLargeText(
 fun FintrackDisplayMediumText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.displayMedium.copy(
@@ -96,7 +98,7 @@ fun FintrackDisplayMediumText(
 fun FintrackDisplaySmallText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.displaySmall.copy(
@@ -122,7 +124,7 @@ fun FintrackDisplaySmallText(
 fun FintrackHeadlineLargeText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.headlineLarge.copy(
@@ -148,7 +150,7 @@ fun FintrackHeadlineLargeText(
 fun FintrackHeadlineMediumText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.headlineMedium.copy(
@@ -174,7 +176,7 @@ fun FintrackHeadlineMediumText(
 fun FintrackHeadlineSmallText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.headlineSmall.copy(
@@ -200,7 +202,7 @@ fun FintrackHeadlineSmallText(
 fun FintrackTitleLargeText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.titleLarge.copy(
@@ -226,7 +228,7 @@ fun FintrackTitleLargeText(
 fun FintrackTitleMediumText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.titleMedium.copy(
@@ -252,7 +254,7 @@ fun FintrackTitleMediumText(
 fun FintrackTitleSmallText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.titleSmall.copy(
@@ -278,7 +280,7 @@ fun FintrackTitleSmallText(
 fun FintrackBodyLargeText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.bodyLarge.copy(
@@ -304,7 +306,7 @@ fun FintrackBodyLargeText(
 fun FintrackBodyMediumText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.bodyMedium.copy(
@@ -330,7 +332,7 @@ fun FintrackBodyMediumText(
 fun FintrackBodySmallText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text2,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.bodySmall.copy(
@@ -356,7 +358,7 @@ fun FintrackBodySmallText(
 fun FintrackLabelLargeText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.labelLarge.copy(
@@ -382,7 +384,7 @@ fun FintrackLabelLargeText(
 fun FintrackLabelMediumText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text2,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.labelMedium.copy(
@@ -408,7 +410,7 @@ fun FintrackLabelMediumText(
 fun FintrackLabelSmallText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalGlassColors.current.text3,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     style: TextStyle = MaterialTheme.typography.labelSmall.copy(

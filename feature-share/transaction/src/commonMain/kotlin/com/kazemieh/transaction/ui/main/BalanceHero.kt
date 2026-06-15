@@ -72,7 +72,6 @@ fun BalanceHero(
                 ) {
                     FintrackTitleLargeText(
                         text = stringResource(Res.string.balance_total),
-                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.width(space.medium))
@@ -84,7 +83,6 @@ fun BalanceHero(
                     Spacer(Modifier.width(space.small))
                     FintrackTitleLargeText(
                         text = stringResource(Res.string.currency_toman),
-                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold
                     )
                 }

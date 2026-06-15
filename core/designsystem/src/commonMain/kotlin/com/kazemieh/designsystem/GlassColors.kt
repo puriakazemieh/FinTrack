@@ -1,5 +1,7 @@
 package com.kazemieh.designsystem
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 /**
@@ -28,3 +30,59 @@ val GlassPurple = Color(0xFFA78BFA)
 val GlassText = Color(0xFFF3F5F4)
 val GlassText2 = Color(0xA6F3F5F4)
 val GlassText3 = Color(0x6BF3F5F4)
+
+val DarkGlassText = Color(0xFFF3F5F4)
+val DarkGlassText2 = Color(0xA6F3F5F4)
+val DarkGlassText3 = Color(0x6BF3F5F4)
+
+val LightGlassText = Color(0xFF06100E)
+val LightGlassText2 = Color(0xFF4B5563)
+val LightGlassText3 = Color(0xFF9CA3AF)
+
+@Immutable
+data class GlassColors(
+    val bg0: Color,
+    val bg1: Color,
+    val bgAccent: Color,
+    val glass: Color,
+    val glassHover: Color,
+    val glassStrong: Color,
+    val glassEdge: Color,
+    val glassEdgeStrong: Color,
+    val glassHairline: Color,
+    val text: Color,
+    val text2: Color,
+    val text3: Color
+)
+
+val DarkGlassColors = GlassColors(
+    bg0 = GlassBg0,
+    bg1 = GlassBg1,
+    bgAccent = GlassBgAccent,
+    glass = GlassColor,
+    glassHover = GlassHover,
+    glassStrong = GlassStrong,
+    glassEdge = GlassEdge,
+    glassEdgeStrong = GlassEdgeStrong,
+    glassHairline = GlassHairline,
+    text = DarkGlassText,
+    text2 = DarkGlassText2,
+    text3 = DarkGlassText3
+)
+
+val LightGlassColors = GlassColors(
+    bg0 = Color(0xFFF0F4F3),
+    bg1 = Color(0xFFFFFFFF),
+    bgAccent = Color.White,
+    glass = Color(0x0B000000), // Matching GlassColor logic but for light
+    glassHover = Color(0x12000000),
+    glassStrong = Color(0x14000000),
+    glassEdge = Color(0xFFE5E7EB),
+    glassEdgeStrong = Color(0xFFD1D5DB),
+    glassHairline = Color(0xFFF3F4F6),
+    text = LightGlassText,
+    text2 = LightGlassText2,
+    text3 = LightGlassText3
+)
+
+val LocalGlassColors = staticCompositionLocalOf { DarkGlassColors }

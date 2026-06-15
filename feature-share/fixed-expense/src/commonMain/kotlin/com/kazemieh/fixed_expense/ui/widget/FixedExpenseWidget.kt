@@ -9,8 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.toPersianPrice
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.glass.WidgetCard
@@ -37,12 +36,10 @@ fun FixedExpenseWidget(
                     Column(modifier = Modifier.padding(vertical = 4.dp)) {
                         FintrackTitleSmallText(
                             text = expense.categoryName ?: "نامشخص",
-                            color = GlassText,
                             fontWeight = FontWeight.SemiBold
                         )
                         FintrackBodyMediumText(
-                            text = "${expense.amount.toPersianPrice()} تومان - ${expense.recurrence.name}",
-                            color = GlassText3
+                            text = "${expense.amount.toPersianPrice()} تومان - ${expense.recurrence.name}"
                         )
                     }
                 }

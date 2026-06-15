@@ -42,15 +42,7 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toPersianPrice
 import com.kazemieh.common.ImageStorage
-import com.kazemieh.designsystem.GlassBlue
-import com.kazemieh.designsystem.GlassBlueSoft
-import com.kazemieh.designsystem.GlassColor
-import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassGreenSoft
-import com.kazemieh.designsystem.GlassRed
-import com.kazemieh.designsystem.GlassRedSoft
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.btn_delete_transaction
@@ -127,12 +119,13 @@ private fun TxSwipeBackground(progress: Float) {
 fun TxRowMinimal(item: TransactionWithRelations, onClick: () -> Unit) {
     val (color, bgColor) = getTransactionColors(item.transaction.type)
     val icon = FinTrackIcons.findIcon(item.category.iconId)
+    val glassColors = LocalGlassColors.current
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
-            .background(GlassColor)
+            .background(glassColors.glass)
             .clickable(onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -143,10 +136,9 @@ fun TxRowMinimal(item: TransactionWithRelations, onClick: () -> Unit) {
         Column(modifier = Modifier.weight(1f)) {
             FintrackBodyMediumText(
                 text = item.category.name,
-                fontWeight = FontWeight.Bold,
-                color = GlassText
+                fontWeight = FontWeight.Bold
             )
-            FintrackLabelSmallText(text = item.source.name, color = GlassText3)
+            FintrackLabelSmallText(text = item.source.name)
         }
 
         TransactionAmountAndDate(
@@ -172,12 +164,13 @@ fun TxRow(
     val (color, bgColor) = getTransactionColors(item.transaction.type)
     val icon = FinTrackIcons.findIcon(item.category.iconId)
     val isTransfer = item.transaction.type == TransactionType.TRANSFER
+    val glassColors = LocalGlassColors.current
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
-            .background(GlassColor)
+            .background(glassColors.glass)
             .clickable {
                 if (isExpandable) isExpanded = !isExpanded else onClick(item)
             }
@@ -194,8 +187,7 @@ fun TxRow(
             Column(modifier = Modifier.weight(1f)) {
                 FintrackBodyMediumText(
                     text = item.category.name,
-                    fontWeight = FontWeight.Bold,
-                    color = GlassText
+                    fontWeight = FontWeight.Bold
                 )
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -206,7 +198,7 @@ fun TxRow(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                             contentDescription = stringResource(Res.string.label_to),
-                            tint = GlassText3,
+                            tint = LocalGlassColors.current.text3,
                             modifier = Modifier.size(12.dp)
                         )
                         Spacer(modifier = Modifier.width(2.dp))
@@ -263,7 +255,6 @@ private fun TransactionAmountAndDate(amount: Long, date: String, color: Color) {
         )
         FintrackLabelSmallText(
             text = date,
-            color = GlassText3,
             fontSize = 10.sp,
             modifier = Modifier.padding(top = 2.dp)
         )
@@ -272,17 +263,17 @@ private fun TransactionAmountAndDate(amount: Long, date: String, color: Color) {
 
 @Composable
 private fun SourceIconAndName(iconId: Int, name: String) {
+    val glassColors = LocalGlassColors.current
     val icon = FinTrackIcons.findIcon(iconId)
     Icon(
         painter = painterResource(icon.resource),
         contentDescription = null,
-        tint = GlassText3,
+        tint = glassColors.text3,
         modifier = Modifier.size(12.dp).padding(top = 2.dp)
     )
     Spacer(modifier = Modifier.width(4.dp))
     FintrackLabelSmallText(
         text = name,
-        color = GlassText3,
         maxLines = 1
     )
 }
@@ -303,13 +294,12 @@ private fun ExpandedContent(
                 Icon(
                     painter = painterResource(firstTagIcon.resource),
                     contentDescription = null,
-                    tint = GlassText3,
+                    tint = LocalGlassColors.current.text3,
                     modifier = Modifier.size(12.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 FintrackLabelSmallText(
-                    text = item.tags.joinToString("، ") { it.name },
-                    color = GlassText3
+                    text = item.tags.joinToString("، ") { it.name }
                 )
             }
         }
@@ -319,20 +309,19 @@ private fun ExpandedContent(
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = null,
-                    tint = GlassText3,
+                    tint = LocalGlassColors.current.text3,
                     modifier = Modifier.size(12.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 FintrackLabelSmallText(
-                    text = item.persons.joinToString("، ") { it.name },
-                    color = GlassText3
+                    text = item.persons.joinToString("، ") { it.name }
                 )
             }
         }
 
         item.transaction.description?.let {
             if (it.isNotEmpty()) {
-                FintrackLabelSmallText(text = it, color = GlassText3)
+                FintrackLabelSmallText(text = it)
             }
         }
 
@@ -399,6 +388,7 @@ private fun ExpandedContent(
 
 @Composable
 private fun CollapsedMetadata(item: TransactionWithRelations) {
+    val glassColors = LocalGlassColors.current
     if (item.tags.isNotEmpty() || item.persons.isNotEmpty()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -436,7 +426,7 @@ private fun CollapsedMetadata(item: TransactionWithRelations) {
 
     item.transaction.description?.let {
         if (it.isNotEmpty()) {
-            FintrackLabelSmallText(text = it, color = GlassText3, maxLines = 1)
+            FintrackLabelSmallText(text = it, maxLines = 1)
         }
     }
 }
@@ -453,19 +443,19 @@ private fun MetadataItem(
             Icon(
                 painter = painterResource(iconRes),
                 contentDescription = null,
-                tint = GlassText3,
+                tint = LocalGlassColors.current.text3,
                 modifier = Modifier.size(12.dp)
             )
         } else if (iconVector != null) {
             Icon(
                 imageVector = iconVector,
                 contentDescription = null,
-                tint = GlassText3,
+                tint = LocalGlassColors.current.text3,
                 modifier = Modifier.size(12.dp)
             )
         }
         Spacer(modifier = Modifier.width(2.dp))
-        FintrackLabelSmallText(text = text, color = GlassText3, maxLines = 1)
+        FintrackLabelSmallText(text = text, maxLines = 1)
     }
 }
 

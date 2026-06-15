@@ -27,8 +27,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
@@ -56,7 +55,8 @@ fun AddFrame(
     hero: @Composable (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val defaultBrush = Brush.verticalGradient(listOf(GlassBg1, GlassBg0))
+    val glassColors = LocalGlassColors.current
+    val defaultBrush = Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0))
     Box(
         modifier = modifier
             .fillMaxSize()

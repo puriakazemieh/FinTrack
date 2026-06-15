@@ -31,6 +31,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun SummaryCard(
     viewModel: TransactionReportViewModel = koinViewModel()
 ) {
+    val glassColors = LocalGlassColors.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
 
@@ -47,18 +48,18 @@ fun SummaryCard(
             ) {
                 FintrackLabelMediumText(
                     text = stringResource(Res.string.label_summary_period),
-                    color = GlassText2
+                    color = glassColors.text2
                 )
                 Box(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .background(GlassColor)
+                        .background(glassColors.glass)
                         .padding(horizontal = 8.dp, vertical = 2.dp)
                 ) {
                     FintrackLabelSmallText(
                         text = stringResource(Res.string.label_amount_with_unit, state.items.size.toLong().toPersianDigits(), stringResource(Res.string.unit_transaction)),
                         fontSize = 10.sp,
-                        color = GlassText3
+                        color = glassColors.text3
                     )
                 }
             }
@@ -93,7 +94,7 @@ fun SummaryCard(
                     TransactionType.INCOME.count -> Triple(stringResource(Res.string.label_income), state.totalIncome, GlassGreen)
                     TransactionType.EXPENSE.count -> Triple(stringResource(Res.string.label_expense), state.totalExpense, GlassRed)
                     TransactionType.TRANSFER.count -> Triple(stringResource(Res.string.type_transfer), state.totalTransfer, GlassBlue)
-                    else -> Triple("", 0L, GlassText)
+                    else -> Triple("", 0L, glassColors.text)
                 }
 
                 Row(
@@ -103,7 +104,7 @@ fun SummaryCard(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Box(modifier = Modifier.size(10.dp).clip(CircleShape).background(color))
-                        FintrackTitleSmallText(text = label, color = GlassText)
+                        FintrackTitleSmallText(text = label, color = glassColors.text)
                     }
                     FintrackTitleLargeText(
                         text = stringResource(Res.string.label_amount_with_unit, value.toPersianPrice(), stringResource(Res.string.unit_toman_short)),
@@ -124,9 +125,10 @@ private fun SummaryRow(
     color: Color,
     isBold: Boolean = false
 ) {
+    val glassColors = LocalGlassColors.current
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(color))
-        FintrackLabelSmallText(text = label, color = GlassText2, modifier = Modifier.weight(1f))
+        FintrackLabelSmallText(text = label, color = glassColors.text2, modifier = Modifier.weight(1f))
         val text = valueStr ?: stringResource(
             Res.string.label_amount_with_unit,
             value.toPersianPrice(),
@@ -143,6 +145,7 @@ private fun SummaryRow(
 
 @Composable
 private fun MiniDonut(income: Long, expense: Long, transfer: Long, modifier: Modifier = Modifier) {
+    val glassColors = LocalGlassColors.current
     val total = (income + expense + transfer).coerceAtLeast(1)
     val incomePct = (income.toFloat() / total).coerceIn(0f, 1f)
     val expensePct = (expense.toFloat() / total).coerceIn(0f, 1f)
@@ -151,7 +154,7 @@ private fun MiniDonut(income: Long, expense: Long, transfer: Long, modifier: Mod
     androidx.compose.foundation.Canvas(modifier = modifier) {
         val strokeWidth = 12f
         drawArc(
-            color = GlassHairline,
+            color = glassColors.glassHairline,
             startAngle = 0f,
             sweepAngle = 360f,
             useCenter = false,
@@ -201,6 +204,7 @@ private fun MiniDonut(income: Long, expense: Long, transfer: Long, modifier: Mod
 fun CategoryStrip(
     viewModel: TransactionReportViewModel = koinViewModel()
 ) {
+    val glassColors = LocalGlassColors.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val topCats = state.categorySums.sortedByDescending { it.totalAmount }
     if (topCats.isEmpty()) return
@@ -228,7 +232,7 @@ fun CategoryStrip(
                             iconSize = 12.dp,
                             corner = 7.dp
                         )
-                        FintrackLabelSmallText(text = cat.name, color = GlassText, modifier = Modifier.weight(1f))
+                        FintrackLabelSmallText(text = cat.name, color = glassColors.text, modifier = Modifier.weight(1f))
                         FintrackLabelSmallText(
                             text = stringResource(
                             Res.string.label_amount_with_unit,
@@ -246,7 +250,7 @@ fun CategoryStrip(
                             .fillMaxWidth()
                             .height(4.dp)
                             .clip(CircleShape)
-                            .background(GlassHairline)
+                            .background(glassColors.glassHairline)
                     ) {
                         val colors = com.kazemieh.designsystem.picker.FinTrackPickerColors.rainbow()
                         val color = colors.firstOrNull { it.id == cat.colorId }?.color ?: GlassGreen

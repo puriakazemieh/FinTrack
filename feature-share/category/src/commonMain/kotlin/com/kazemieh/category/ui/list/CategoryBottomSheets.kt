@@ -39,8 +39,7 @@ import com.kazemieh.category.ui.add.AddCategoryBottomSheet
 import com.kazemieh.category.ui.delete.DeleteCategoryBottomSheet
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.GlassText2
@@ -92,6 +91,7 @@ fun CategoryPickerBottomSheet(
     }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val glassColors = LocalGlassColors.current
 
     ModalBottomSheet(
         onDismissRequest = {
@@ -105,7 +105,7 @@ fun CategoryPickerBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
         ) {
             ScreenHeader(
                 title = stringResource(Res.string.category),
@@ -119,14 +119,13 @@ fun CategoryPickerBottomSheet(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.Sort,
                                 contentDescription = null,
-                                tint = if (state.isReorderShow) GlassGreen else GlassText2
+                                tint = if (state.isReorderShow) GlassGreen else LocalGlassColors.current.text2
                             )
                         }
                         TextButton(onClick = { isEditMode = !isEditMode }) {
                             FintrackLabelMediumText(
                                 text = if (isEditMode) stringResource(Res.string.cancell_)
-                                else stringResource(Res.string.edit),
-                                color = GlassText2
+                                else stringResource(Res.string.edit)
                             )
                         }
                     }
@@ -225,6 +224,7 @@ fun CategoryManageBottomSheet(
     }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val glassColors = LocalGlassColors.current
 
     ModalBottomSheet(
         onDismissRequest = { viewModel.onIntent(CategoryIntent.OnDismiss) },
@@ -235,7 +235,7 @@ fun CategoryManageBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
         ) {
             ScreenHeader(
                 title = stringResource(Res.string.category),
@@ -245,7 +245,7 @@ fun CategoryManageBottomSheet(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Sort,
                             contentDescription = null,
-                            tint = if (state.isReorderShow) GlassGreen else GlassText2
+                            tint = if (state.isReorderShow) GlassGreen else LocalGlassColors.current.text2
                         )
                     }
                 }
@@ -374,11 +374,11 @@ private fun TypeSwitcher(
                         .padding(vertical = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    FintrackLabelMediumText(
-                        text = label,
-                        fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-                        color = if (active) color else GlassText3
-                    )
+                        FintrackLabelMediumText(
+                            text = label,
+                            fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                            color = if (active) color else LocalGlassColors.current.text3
+                        )
                 }
             }
         }

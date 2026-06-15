@@ -20,6 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,18 +36,23 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.FourDigitGroupingTransformation
 import com.kazemieh.designsystem.component.glass.Fab
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.PhotoDrop
 import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.component.glass.WidgetCard
 import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
+import com.kazemieh.financialsource.ui.add.AddSourceIntent
 import com.kazemieh.jalali.JalaliCalendar
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.action_save_profile
@@ -58,6 +65,7 @@ import fintrack.core.designsystem.generated.resources.hint_enter_income
 import fintrack.core.designsystem.generated.resources.hint_enter_job
 import fintrack.core.designsystem.generated.resources.hint_enter_last_name
 import fintrack.core.designsystem.generated.resources.hint_enter_phone
+import fintrack.core.designsystem.generated.resources.label_account_number
 import fintrack.core.designsystem.generated.resources.label_birthday
 import fintrack.core.designsystem.generated.resources.label_city
 import fintrack.core.designsystem.generated.resources.label_email
@@ -288,39 +296,50 @@ fun ProfileField(
     isOptional: Boolean = true,
     onClick: () -> Unit = {}
 ) {
+    val glassColors = LocalGlassColors.current
     val space = LocalSpacing.current
     Column(modifier = Modifier.padding(vertical = space.small)) {
-        FintrackOutlinedTextField(
+        TextField(
             value = value,
             onValueChange = onValueChange,
+            placeholder = {
+                FintrackBodyMediumText(
+                    text = placeholder,
+                    color = glassColors.text3
+                )
+            },
             label = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     FintrackLabelSmallText(
                         text = label,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = glassColors.text2
                     )
                     if (isOptional) {
                         FintrackLabelSmallText(
                             text = " (${stringResource(Res.string.label_optional_fa)})",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = glassColors.text2
                         )
                     }
                 }
             },
-            placeholder = { FintrackLabelSmallText(placeholder) },
-            modifier = Modifier.fillMaxWidth(),
             keyboardOptions = keyboardOptions,
-            isPrice = isPrice,
-            readOnly = readOnly,
-            onClick = onClick
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = GlassGreen
+            ),
         )
     }
 }
 
 @Composable
 fun CompletionCard(percentage: Float) {
+    val glassColors = LocalGlassColors.current
     val space = LocalSpacing.current
     GlassCard(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -328,10 +347,10 @@ fun CompletionCard(percentage: Float) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                FintrackTitleMediumText(text = stringResource(Res.string.profile_completion))
+                FintrackTitleMediumText(text = stringResource(Res.string.profile_completion), color = glassColors.text)
                 FintrackBodySmallText(
                     text = stringResource(Res.string.profile_completion_desc),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = glassColors.text2
                 )
             }
             Spacer(modifier = Modifier.width(space.medium))
@@ -341,9 +360,9 @@ fun CompletionCard(percentage: Float) {
                     modifier = Modifier.size(60.dp),
                     strokeWidth = 6.dp,
                     color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+                    trackColor = glassColors.glass
                 )
-                FintrackLabelMediumText(text = "${(percentage * 100).toInt()}%")
+                FintrackLabelMediumText(text = "${(percentage * 100).toInt()}%", color = glassColors.text)
             }
         }
     }

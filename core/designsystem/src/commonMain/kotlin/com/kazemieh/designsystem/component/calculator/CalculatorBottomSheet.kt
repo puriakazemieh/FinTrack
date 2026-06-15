@@ -42,13 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.common.util.CalculatorParser
-import com.kazemieh.designsystem.GlassColor
-import com.kazemieh.designsystem.GlassEdge
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText2
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
@@ -80,6 +76,7 @@ fun CalculatorBottomSheet(
         }
     }
 
+    val glassColors = LocalGlassColors.current
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
@@ -101,20 +98,20 @@ fun CalculatorBottomSheet(
                 ) {
                     FintrackHeadlineSmallText(
                         text = expression.toPersianDigits().ifEmpty { "۰" },
-                        color = GlassText,
+                        color = glassColors.text,
                         textAlign = TextAlign.End,
                         maxLines = 1
                     )
                     FintrackBodyMediumText(
                         text = if (resultPreview.isNotEmpty() && resultPreview != expression)
                             resultPreview.toPersianDigits() else "",
-                        color = GlassText3,
+                        color = glassColors.text3,
                         textAlign = TextAlign.End,
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
 
-                HorizontalDivider(color = GlassEdge, thickness = 0.5.dp)
+                HorizontalDivider(color = glassColors.glassEdge, thickness = 0.5.dp)
 
                 // Percentage Helpers
                 Row(
@@ -216,12 +213,13 @@ fun KeyButton(
     key: String,
     onClick: () -> Unit
 ) {
+    val glassColors = LocalGlassColors.current
     val isAction = key in listOf("AC", "DEL", "OK", "=")
     val isOperator = key in listOf("+", "-", "×", "÷", "%")
     
     val containerColor = when {
         key == "OK" -> GlassGreen.copy(alpha = 0.9f)
-        isAction || isOperator -> GlassColor
+        isAction || isOperator -> glassColors.glass
         else -> Color.Transparent
     }
     
@@ -229,7 +227,7 @@ fun KeyButton(
         key == "OK" -> Color.White
         key == "AC" || key == "DEL" -> GlassRed
         isOperator -> GlassGreen
-        else -> GlassText
+        else -> glassColors.text
     }
 
     Box(
@@ -238,7 +236,7 @@ fun KeyButton(
             .clip(RoundedCornerShape(16.dp))
             .background(containerColor)
             .then(
-                if (!isAction && !isOperator) Modifier.border(1.dp, GlassEdge, RoundedCornerShape(16.dp))
+                if (!isAction && !isOperator) Modifier.border(1.dp, glassColors.glassEdge, RoundedCornerShape(16.dp))
                 else Modifier
             )
             .clickable(onClick = onClick),

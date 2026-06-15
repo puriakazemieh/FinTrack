@@ -37,6 +37,7 @@ fun PersonFilterSelectionContent(
         viewModel.onIntent(PersonIntent.GetAllPerson)
     }
 
+    val glassColors = LocalGlassColors.current
     val state by viewModel.state.collectAsState()
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -45,31 +46,22 @@ fun PersonFilterSelectionContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                FintrackLabelSmallText(
-                    text = stringResource(Res.string.persons),
-                    color = GlassText2,
-                    fontWeight = FontWeight.Bold
-                )
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    tint = GlassPurple,
-                    modifier = Modifier
-                        .size(16.dp)
-                        .clickable { viewModel.onIntent(PersonIntent.ShowAddPerson) }
-                )
-            }
+
             FintrackLabelSmallText(
                 text = stringResource(Res.string.all),
-                color = if (isAllSelected) GlassGreen else GlassText3,
+                color = if (isAllSelected) GlassGreen else glassColors.text,
                 modifier = Modifier.clickable {
                     val all = state.persons.toSet()
                     onSelectionChanged(if (isAllSelected) emptySet() else all, !isAllSelected)
                 }
+            )
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                tint = GlassPurple,
+                modifier = Modifier
+                    .size(16.dp)
+                    .clickable { viewModel.onIntent(PersonIntent.ShowAddPerson) }
             )
         }
 
@@ -101,7 +93,7 @@ fun PersonFilterSelectionContent(
                 ) {
                     FintrackLabelSmallText(
                         text = person.name + if (active) " ✓" else "",
-                        color = if (active) Color.White else GlassText2
+                        color = if (active) glassColors.text3 else glassColors.text
                     )
                 }
             }

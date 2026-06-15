@@ -37,6 +37,8 @@ fun CategoryFilterSelectionContent(
 ) {
     if (selectedTransactionType == TransactionType.TRANSFER) return
 
+    val glassColors = LocalGlassColors.current
+
     LaunchedEffect(Unit) {
         viewModel.onIntent(CategoryIntent.LoadCategoryByType(TransactionType.ALL))
     }
@@ -55,36 +57,26 @@ fun CategoryFilterSelectionContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                FintrackLabelSmallText(
-                    text = stringResource(Res.string.category),
-                    color = GlassText2,
-                    fontWeight = FontWeight.Bold
-                )
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    tint = GlassGreen,
-                    modifier = Modifier
-                        .size(16.dp)
-                        .clickable { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) }
-                )
-            }
             FintrackLabelSmallText(
                 text = stringResource(Res.string.all),
-                color = if (isAllSelected) GlassGreen else GlassText3,
+                color = if (isAllSelected) GlassGreen else glassColors.text,
                 modifier = Modifier.clickable {
                     val all = state.categories.toSet()
                     onSelectionChanged(if (isAllSelected) emptySet() else all, !isAllSelected)
                 }
             )
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                tint = GlassGreen,
+                modifier = Modifier
+                    .size(16.dp)
+                    .clickable { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) }
+            )
         }
 
         if (incomeCategories.isNotEmpty()) {
-            FintrackLabelSmallText(text = stringResource(Res.string.type_income), color = GlassText3)
+            FintrackLabelSmallText(text = stringResource(Res.string.type_income))
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -113,7 +105,7 @@ fun CategoryFilterSelectionContent(
                     ) {
                         FintrackLabelSmallText(
                             text = category.name + if (active) " ✓" else "",
-                            color = if (active) Color.White else GlassText2
+                            color = if (active) glassColors.text3 else glassColors.text
                         )
                     }
                 }
@@ -121,7 +113,7 @@ fun CategoryFilterSelectionContent(
         }
 
         if (expenseCategories.isNotEmpty()) {
-            FintrackLabelSmallText(text = stringResource(Res.string.type_expense), color = GlassText3)
+            FintrackLabelSmallText(text = stringResource(Res.string.type_expense))
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -150,7 +142,7 @@ fun CategoryFilterSelectionContent(
                     ) {
                         FintrackLabelSmallText(
                             text = category.name + if (active) " ✓" else "",
-                            color = if (active) Color.White else GlassText2
+                            color = if (active) LocalGlassColors.current.bg0 else LocalGlassColors.current.text
                         )
                     }
                 }

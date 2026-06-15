@@ -2,6 +2,7 @@ package com.kazemieh.designsystem.component.glass
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,6 +28,7 @@ fun Field(
     onClick: (() -> Unit)? = null,
     children: @Composable () -> Unit
 ) {
+    val glassColors = LocalGlassColors.current
     GlassCard(
         modifier = modifier.fillMaxWidth(),
         padding = 14.dp,
@@ -41,7 +43,7 @@ fun Field(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     FintrackLabelMediumText(
                         text = label,
-                        color = if (error) GlassRed else GlassText3
+                        color = if (error) GlassRed else glassColors.text3
                     )
                     if (required) {
                         FintrackLabelSmallText(
@@ -52,7 +54,7 @@ fun Field(
                     } else {
                         FintrackLabelSmallText(
                             text = " (${stringResource(Res.string.label_optional)})",
-                            color = GlassText3.copy(alpha = 0.6f),
+                            color = glassColors.text3.copy(alpha = 0.6f),
                             fontSize = 10.sp,
                             modifier = Modifier.padding(start = 2.dp)
                         )
@@ -67,7 +69,7 @@ fun Field(
             hint?.let {
                 FintrackLabelSmallText(
                     text = it,
-                    color = GlassText3.copy(alpha = 0.65f)
+                    color = glassColors.text3.copy(alpha = 0.65f)
                 )
             }
         }

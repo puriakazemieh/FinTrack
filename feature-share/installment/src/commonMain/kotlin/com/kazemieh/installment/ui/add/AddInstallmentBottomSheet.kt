@@ -31,12 +31,9 @@ import com.kazemieh.common.model.InstallmentFrequency
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.common.toSignedPersianPrice
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.glass.AddFrame
 import com.kazemieh.designsystem.component.glass.Field
 import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
@@ -92,6 +89,7 @@ fun AddInstallmentBottomSheet(
         }
     }
 
+    val glassColors = LocalGlassColors.current
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
@@ -119,7 +117,7 @@ fun AddInstallmentBottomSheet(
             },
             onClose = onDismiss,
             showHero = false,
-            backgroundBrush = Brush.verticalGradient(listOf(GlassBg1, GlassBg0))
+            backgroundBrush = Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0))
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
@@ -198,7 +196,7 @@ fun AddInstallmentBottomSheet(
                     ) {
                         PickerValue(
                             label = stringResource(Res.string.dp_today),
-                            color = GlassText2,
+                            color = glassColors.text2,
                             icon = Icons.Default.CalendarToday
                         )
                     }
@@ -218,7 +216,7 @@ fun AddInstallmentBottomSheet(
                         }
                         PickerValue(
                             label = freqLabel,
-                            color = GlassText
+                            color = glassColors.text
                         )
                     }
                 }

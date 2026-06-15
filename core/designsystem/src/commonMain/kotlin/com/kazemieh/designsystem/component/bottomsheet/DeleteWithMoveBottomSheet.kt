@@ -26,9 +26,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
-import com.kazemieh.designsystem.GlassText
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
@@ -66,6 +64,7 @@ fun DeleteWithMoveBottomSheetContent(
     dismissButtonText: String,
     isLoading: Boolean = false,
 ) {
+    val glassColors = LocalGlassColors.current
     val space = LocalSpacing.current
 
     val finalTitle = title ?: if (itemName != null) {
@@ -83,7 +82,7 @@ fun DeleteWithMoveBottomSheetContent(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
         ) {
             ScreenHeader(
                 title = finalTitle,
@@ -117,7 +116,7 @@ fun DeleteWithMoveBottomSheetContent(
                         FintrackBodyMediumText(
                             text = deleteAllText,
                             fontWeight = if (isDeleteAll) FontWeight.Bold else FontWeight.Medium,
-                            color = GlassText
+                            color = glassColors.text
                         )
                     }
                 }
@@ -144,7 +143,7 @@ fun DeleteWithMoveBottomSheetContent(
                         FintrackBodyMediumText(
                             text = moveToAnotherText,
                             fontWeight = if (!isDeleteAll) FontWeight.Bold else FontWeight.Medium,
-                            color = GlassText
+                            color = glassColors.text
                         )
                     }
                 }

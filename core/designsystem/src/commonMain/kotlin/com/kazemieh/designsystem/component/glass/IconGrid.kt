@@ -15,9 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.kazemieh.designsystem.GlassColor
-import com.kazemieh.designsystem.GlassEdge
-import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.picker.PickableIcon
 import org.jetbrains.compose.resources.painterResource
 
@@ -29,13 +27,14 @@ fun IconGrid(
     onIconPick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val glassColors = LocalGlassColors.current
     LazyHorizontalGrid(
         rows = GridCells.Fixed(3),
         modifier = modifier
             .fillMaxWidth()
             .height(180.dp)
-            .background(GlassColor, RoundedCornerShape(12.dp))
-            .border(1.dp, GlassEdge, RoundedCornerShape(12.dp))
+            .background(glassColors.glass, RoundedCornerShape(12.dp))
+            .border(1.dp, glassColors.glassEdge, RoundedCornerShape(12.dp))
             .padding(8.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -62,7 +61,7 @@ fun IconGrid(
                 Icon(
                     painter = painterResource(icon.resource),
                     contentDescription = null,
-                    tint = if (isSelected) color else GlassText2,
+                    tint = if (isSelected) color else glassColors.text2,
                     modifier = Modifier.size(24.dp)
                 )
             }

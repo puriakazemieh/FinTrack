@@ -2,9 +2,22 @@ package com.kazemieh.designsystem.component.bottomsheet
 
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -12,12 +25,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.GlassTone
 import com.kazemieh.designsystem.component.glass.ScreenHeader
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.cancell_
@@ -25,9 +38,6 @@ import fintrack.core.designsystem.generated.resources.confirm
 import fintrack.core.designsystem.generated.resources.delete_confirm_question
 import fintrack.core.designsystem.generated.resources.transaction_delete
 import org.jetbrains.compose.resources.stringResource
-
-
-import com.kazemieh.designsystem.component.glass.GlassTone
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,10 +73,11 @@ fun DeleteBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
+        val glassColors = LocalGlassColors.current
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
         ) {
             ScreenHeader(
                 title = finalTitle,
@@ -82,7 +93,7 @@ fun DeleteBottomSheet(
                     .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-              
+
                 GlassCard(
                     onClick = confirmClicked,
                     enabled = confirmEnabled && !isLoading,
@@ -93,8 +104,7 @@ fun DeleteBottomSheet(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 12.dp)
-                        ,
+                            .padding(vertical = 12.dp),
                         contentAlignment = Alignment.Center,
 
                         ) {

@@ -100,6 +100,7 @@ fun AddCategoryContent(
     onIntent: (AddCategoryIntent) -> Unit,
     onNavigateToTransactions: ((Category) -> Unit)? = null
 ) {
+    val glassColors = LocalGlassColors.current
     val space = LocalSpacing.current
     val rainbowColors = FinTrackPickerColors.rainbow()
     val colors = rainbowColors.map { it.color }
@@ -117,7 +118,7 @@ fun AddCategoryContent(
             TransactionType.TRANSFER -> GlassBlueSoft
             else -> GlassBg1
         }
-        Brush.verticalGradient(listOf(topColor, GlassBg1, GlassBg0))
+        Brush.verticalGradient(listOf(topColor, glassColors.bg1, glassColors.bg0))
     }
 
     AddFrame(
@@ -164,7 +165,7 @@ fun AddCategoryContent(
                     TextField(
                         value = state.draft.name,
                         onValueChange = { onIntent(AddCategoryIntent.UpdateName(it)) },
-                        placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.hint_enter_category_name), color = GlassText3) },
+                        placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.hint_enter_category_name), color = glassColors.text3) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
@@ -172,8 +173,12 @@ fun AddCategoryContent(
                             unfocusedIndicatorColor = Color.Transparent,
                             cursorColor = GlassGreen
                         ),
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = GlassText, fontWeight = FontWeight.SemiBold),
-                        modifier = Modifier.fillMaxWidth()
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = glassColors.text, fontWeight = FontWeight.SemiBold),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(glassColors.bg1)
+                            .border(1.dp, glassColors.glassEdge, RoundedCornerShape(10.dp))
                     )
                 }
             }
@@ -190,7 +195,7 @@ fun AddCategoryContent(
             item {
                 GlassCard(padding = 14.dp) {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        FintrackLabelMediumText(text = stringResource(Res.string.label_color), color = GlassText3)
+                        FintrackLabelMediumText(text = stringResource(Res.string.label_color), color = glassColors.text3)
                         ColorSwatches(
                             colors = colors,
                             pickedIndex = selectedColorIndex,
@@ -203,7 +208,7 @@ fun AddCategoryContent(
             item {
                 GlassCard(padding = 14.dp) {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        FintrackLabelMediumText(text = stringResource(Res.string.label_icon), color = GlassText3)
+                        FintrackLabelMediumText(text = stringResource(Res.string.label_icon), color = glassColors.text3)
                         IconGrid(
                             icons = FinTrackIcons.icons,
                             pickedIndex = selectedIconIndex,
@@ -229,16 +234,17 @@ private fun ParentCategorySelector(
 
     val availableParents = parentCategories.filter { it.id != currentCategoryId }
 
+    val glassColors = LocalGlassColors.current
     GlassCard(padding = 14.dp) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            FintrackLabelSmallText(text = "دسته‌بندی مادر", color = GlassText3)
+            FintrackLabelSmallText(text = "دسته‌بندی مادر", color = glassColors.text3)
             
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
-                    .background(GlassBg1)
-                    .border(1.dp, GlassEdge, RoundedCornerShape(10.dp))
+                    .background(glassColors.bg1)
+                    .border(1.dp, glassColors.glassEdge, RoundedCornerShape(10.dp))
                     .clickable { expanded = !expanded }
                     .padding(12.dp)
             ) {
@@ -249,12 +255,12 @@ private fun ParentCategorySelector(
                 ) {
                     FintrackBodyMediumText(
                         text = selectedParent?.name ?: "انتخاب دسته‌بندی مادر (اختیاری)",
-                        color = if (selectedParent != null) GlassText else GlassText3
+                        color = if (selectedParent != null) glassColors.text else glassColors.text3
                     )
                     Icon(
                         imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                         contentDescription = null,
-                        tint = GlassText3,
+                        tint = glassColors.text3,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -299,6 +305,7 @@ private fun ParentCategoryItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val glassColors = LocalGlassColors.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -309,7 +316,7 @@ private fun ParentCategoryItem(
     ) {
         FintrackBodyMediumText(
             text = name,
-            color = if (isSelected) GlassGreen else GlassText,
+            color = if (isSelected) GlassGreen else glassColors.text,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
         )
     }
@@ -319,6 +326,7 @@ private fun TypeSelector(
     selectedType: TransactionType,
     onTypeSelected: (TransactionType) -> Unit
 ) {
+    val glassColors = LocalGlassColors.current
     val types = listOf(
         TransactionType.EXPENSE to stringResource(Res.string.label_expense),
         TransactionType.INCOME to stringResource(Res.string.label_income)
@@ -326,7 +334,7 @@ private fun TypeSelector(
 
     GlassCard(padding = 14.dp) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            FintrackLabelSmallText(text = stringResource(Res.string.label_type), color = GlassText3)
+            FintrackLabelSmallText(text = stringResource(Res.string.label_type), color = glassColors.text3)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -347,7 +355,7 @@ private fun TypeSelector(
                                     color.copy(alpha = 0.33f),
                                     RoundedCornerShape(10.dp)
                                 )
-                                else Modifier.border(1.dp, GlassEdge, RoundedCornerShape(10.dp))
+                                else Modifier.border(1.dp, glassColors.glassEdge, RoundedCornerShape(10.dp))
                             )
                             .clickable { onTypeSelected(type) }
                             .padding(vertical = 10.dp),
@@ -356,7 +364,7 @@ private fun TypeSelector(
                         FintrackBodyMediumText(
                             text = label,
                             fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-                            color = if (active) color else GlassText3
+                            color = if (active) color else glassColors.text3
                         )
                     }
                 }

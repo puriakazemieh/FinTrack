@@ -55,17 +55,17 @@ fun BudgetHero(
                         text = "${(progress * 100).toInt()}%",
                         fontWeight = FontWeight.Bold
                     )
-                    FintrackLabelSmallText(text = stringResource(Res.string.label_budget_consumed), color = GlassText3)
+                    FintrackLabelSmallText(text = stringResource(Res.string.label_budget_consumed))
                 }
             }
 
             Column(modifier = Modifier.weight(1f)) {
-                FintrackLabelSmallText(text = stringResource(Res.string.label_total_budget), color = GlassText3)
+                FintrackLabelSmallText(text = stringResource(Res.string.label_total_budget))
                 MoneyText(amount = totalBudget, size = 20)
                 
                 Spacer(modifier = Modifier.height(8.dp))
                 
-                FintrackLabelSmallText(text = stringResource(Res.string.label_remaining), color = GlassText3)
+                FintrackLabelSmallText(text = stringResource(Res.string.label_remaining))
                 MoneyText(amount = remaining, size = 16, color = GlassGreen)
                 
                 Spacer(modifier = Modifier.height(6.dp))
@@ -80,9 +80,10 @@ fun BudgetHero(
 
 @Composable
 fun CircularProgress(progress: Float) {
+    val glassColors = LocalGlassColors.current
     Canvas(modifier = Modifier.size(116.dp)) {
         drawCircle(
-            color = Color.White.copy(alpha = 0.1f),
+            color = glassColors.text.copy(alpha = 0.1f),
             style = Stroke(width = 4.dp.toPx())
         )
         drawArc(
@@ -103,7 +104,7 @@ fun BudgetPeriodSelector(
 ) {
     GlassCard(padding = 14.dp, modifier = modifier) {
         Column {
-            FintrackLabelMediumText(text = stringResource(Res.string.label_budget_period), color = GlassText3)
+            FintrackLabelMediumText(text = stringResource(Res.string.label_budget_period))
             Spacer(modifier = Modifier.height(10.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -170,14 +171,14 @@ fun BudgetRow(
                     FintrackLabelLargeText(text = budgetProgress.category?.name ?: "نامشخص", fontWeight = FontWeight.SemiBold)
                     FintrackLabelSmallText(
                         text = "${budgetProgress.spentAmount} از ${budgetProgress.budget.amount} ت",
-                        color = if (isOver) GlassRed else GlassText3
+                        color = if (isOver) GlassRed else LocalGlassColors.current.text3
                     )
                 }
 
                 FintrackLabelLargeText(
                     text = "${(budgetProgress.progress * 100).toInt()}%",
                     fontWeight = FontWeight.Bold,
-                    color = if (isOver) GlassRed else GlassText
+                    color = if (isOver) GlassRed else LocalGlassColors.current.text
                 )
             }
 
@@ -188,7 +189,7 @@ fun BudgetRow(
                     .fillMaxWidth()
                     .height(6.dp)
                     .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.1f))
+                    .background(LocalGlassColors.current.text.copy(alpha = 0.1f))
             ) {
                 Box(
                     modifier = Modifier

@@ -33,12 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.toSignedPersianPrice
-import com.kazemieh.designsystem.GlassColor
-import com.kazemieh.designsystem.GlassEdge
-import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassGreenSoft
-import com.kazemieh.designsystem.GlassRed
-import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
@@ -85,6 +80,7 @@ private fun SourceTile(
     source: Source,
     onClick: () -> Unit
 ) {
+    val glassColors = LocalGlassColors.current
 
     val color = when {
         source.balance < 0 -> GlassRed
@@ -96,8 +92,8 @@ private fun SourceTile(
         modifier = Modifier
             .size(width = 90.dp, height = 56.dp)
             .clip(RoundedCornerShape(14.dp))
-            .background(GlassColor)
-            .border(1.dp, GlassEdge, RoundedCornerShape(14.dp))
+            .background(glassColors.glass)
+            .border(1.dp, glassColors.glassEdge, RoundedCornerShape(14.dp))
             .clickable(onClick = onClick)
             .padding(8.dp)
     ) {
@@ -121,8 +117,7 @@ private fun SourceTile(
                 FintrackLabelSmallText(
                     text = source.name,
                     fontSize = 10.5.sp,
-                    maxLines = 1,
-                    color = GlassText2
+                    maxLines = 1
                 )
 
             }

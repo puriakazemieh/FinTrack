@@ -15,8 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.InstallmentWithRelations
 import com.kazemieh.common.toSignedPersianPrice
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.WidgetCard
@@ -64,21 +63,18 @@ private fun InstallmentRowMinimal(item: InstallmentWithRelations) {
     ) {
         Column {
             FintrackLabelMediumText(
-                text = item.installment.title,
-                color = GlassText
+                text = item.installment.title
             )
             FintrackLabelSmallText(
                 text = stringResource(
                     Res.string.remaining_installments,
                     (item.installment.totalInstallments - item.installment.paidInstallments)
-                ),
-                color = GlassText3
+                )
             )
         }
 
         FintrackLabelMediumText(
-            text = item.installment.installmentAmount.toInt().toSignedPersianPrice(),
-            color = GlassText
+            text = item.installment.installmentAmount.toInt().toSignedPersianPrice()
         )
     }
 }

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.GlassCard
 import fintrack.core.designsystem.generated.resources.*
@@ -80,6 +81,7 @@ private fun QuickActionItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
+    val glassColors = LocalGlassColors.current
     GlassCard(
         modifier = modifier,
         padding = 0.dp,
@@ -109,8 +111,7 @@ private fun QuickActionItem(
             FintrackLabelSmallText(
                 text = label,
                 fontSize = 11.sp,
-                fontWeight = FontWeight.W500,
-                color = GlassText
+                fontWeight = FontWeight.W500
             )
         }
     }

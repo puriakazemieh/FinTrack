@@ -3,31 +3,17 @@ package com.kazemieh.tag.ui.list
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
-import com.kazemieh.designsystem.GlassGreen
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import com.kazemieh.common.model.Tag
-import com.kazemieh.designsystem.GlassBg0
-import androidx.compose.foundation.layout.Row
-import com.kazemieh.designsystem.GlassBg1
+import com.kazemieh.designsystem.LocalGlassColors
+import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassText2
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.bottomsheet.SelectableFlowRowBottomSheet
@@ -62,7 +48,7 @@ fun TagPickerBottomSheet(
     LaunchedEffect(selectedTags) { viewModel.onIntent(TagIntent.SetAllSelectedTags(selectedTags)) }
 
     val state by viewModel.state.collectAsState()
-    val initialSelection = state.initialSelectionItem.map { it.toItemUi() }.toSet()
+    val initialSelection = state.items.filter { item -> selectedTags?.any { it.id == item.id } == true }.toSet()
 
     SelectableFlowRowBottomSheet(
         title = stringResource(Res.string.tags),
@@ -133,6 +119,7 @@ fun TagPickerSingleBottomSheet(
     }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val glassColors = LocalGlassColors.current
 
     ModalBottomSheet(
         onDismissRequest = {
@@ -146,7 +133,7 @@ fun TagPickerSingleBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
         ) {
             ScreenHeader(
                 title = stringResource(Res.string.tags),
@@ -155,23 +142,20 @@ fun TagPickerSingleBottomSheet(
                     onDismiss()
                 },
                 trailingContent = {
-                    Row {
                         IconButton(onClick = { viewModel.onIntent(TagIntent.OnToggleReorder) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.Sort,
                                 contentDescription = null,
-                                tint = if (state.isReorderShow) GlassGreen else GlassText2
+                                tint = if (state.isReorderShow) GlassGreen else LocalGlassColors.current.text2
                             )
                         }
                         if (showEditButton) {
                             TextButton(onClick = { isEditMode = !isEditMode }) {
                                 FintrackLabelMediumText(
-                                    text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
-                                    color = GlassText2
+                                    text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit)
                                 )
                             }
                         }
-                    }
                 }
             )
 

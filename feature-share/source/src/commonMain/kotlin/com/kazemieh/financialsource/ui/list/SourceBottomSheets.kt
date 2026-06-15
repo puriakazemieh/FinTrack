@@ -27,8 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.toPersianDigits
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassText2
 import com.kazemieh.designsystem.LocalSpacing
@@ -86,6 +85,7 @@ private fun SourceBottomSheetCore(
     }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val glassColors = LocalGlassColors.current
 
     ModalBottomSheet(
         onDismissRequest = {
@@ -99,7 +99,7 @@ private fun SourceBottomSheetCore(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
         ) {
             ScreenHeader(
                 title = stringResource(Res.string.source),
@@ -113,14 +113,13 @@ private fun SourceBottomSheetCore(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.Sort,
                                 contentDescription = null,
-                                tint = if (state.isReorderShow) GlassGreen else GlassText2
+                                tint = if (state.isReorderShow) GlassGreen else LocalGlassColors.current.text2
                             )
                         }
                         if (showEditButton) {
                             TextButton(onClick = { isEditMode = !isEditMode }) {
                                 FintrackLabelMediumText(
-                                    text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
-                                    color = GlassText2
+                                    text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit)
                                 )
                             }
                         }

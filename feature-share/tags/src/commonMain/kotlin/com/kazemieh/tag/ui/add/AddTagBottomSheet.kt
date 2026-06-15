@@ -24,8 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Tag
 import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.glass.AddFrame
@@ -118,6 +117,7 @@ fun AddTagContent(
         FinTrackIcons.icons.indexOfFirst { it.id == state.draft.iconId }.coerceAtLeast(0)
     }
 
+    val glassColors = LocalGlassColors.current
     AddFrame(
         title = if (state.mode == AddTagMode.Add) stringResource(Res.string.title_new_tag) else stringResource(
             Res.string.title_edit_tag
@@ -162,7 +162,7 @@ fun AddTagContent(
                                     Res.string.hint_search_in,
                                     stringResource(Res.string.tags)
                                 ).replace(stringResource(Res.string.hint_search_in, ""), ""),
-                                color = GlassText3
+                                color = glassColors.text3
                             )
                         },
                         colors = TextFieldDefaults.colors(
@@ -173,7 +173,7 @@ fun AddTagContent(
                             cursorColor = GlassGreen
                         ),
                         textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            color = GlassText,
+                            color = glassColors.text,
                             fontWeight = FontWeight.SemiBold
                         ),
                         modifier = Modifier.fillMaxWidth()
@@ -189,7 +189,7 @@ fun AddTagContent(
                         placeholder = {
                             FintrackBodyMediumText(
                                 text = stringResource(Res.string.hint_optional_note),
-                                color = GlassText3
+                                color = glassColors.text3
                             )
                         },
                         colors = TextFieldDefaults.colors(
@@ -199,7 +199,7 @@ fun AddTagContent(
                             unfocusedIndicatorColor = Color.Transparent,
                             cursorColor = GlassGreen
                         ),
-                        textStyle = MaterialTheme.typography.bodyMedium.copy(color = GlassText),
+                        textStyle = MaterialTheme.typography.bodyMedium.copy(color = glassColors.text),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -210,7 +210,7 @@ fun AddTagContent(
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         FintrackLabelMediumText(
                             text = stringResource(Res.string.label_color),
-                            color = GlassText3
+                            color = glassColors.text3
                         )
                         ColorSwatches(
                             colors = colors,
@@ -233,7 +233,7 @@ fun AddTagContent(
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         FintrackLabelMediumText(
                             text = stringResource(Res.string.label_icon),
-                            color = GlassText3
+                            color = glassColors.text3
                         )
                         IconGrid(
                             icons = FinTrackIcons.icons,

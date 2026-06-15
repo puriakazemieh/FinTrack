@@ -42,24 +42,9 @@ import androidx.compose.ui.unit.dp
 import com.kazemieh.common.persiandatetime.extensions.persianMonth
 import com.kazemieh.common.DateFilterType
 import com.kazemieh.common.toPersianDigits
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassColor
-import com.kazemieh.designsystem.GlassEdge
-import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassRed
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText2
-import com.kazemieh.designsystem.GlassText3
-import com.kazemieh.designsystem.component.FintrackBodyLargeText
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
-import com.kazemieh.designsystem.component.FintrackLabelMediumText
-import com.kazemieh.designsystem.component.FintrackLabelSmallText
-import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.designsystem.component.glass.Chip
-import com.kazemieh.designsystem.component.glass.GlassCard
-import com.kazemieh.designsystem.component.glass.GlassTone
-import com.kazemieh.designsystem.component.glass.SheetFrame
+import com.kazemieh.designsystem.*
+import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.jalali.JalaliCalendar
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.action_select_date
@@ -99,13 +84,11 @@ fun TxHeader(
     ) {
         Column {
             FintrackLabelSmallText(
-                text = stringResource(Res.string.label_management),
-                color = GlassText3
+                text = stringResource(Res.string.label_management)
             )
             FintrackHeadlineSmallText(
                 text = stringResource(Res.string.label_transactions_plural),
-                fontWeight = FontWeight.Bold,
-                color = GlassText
+                fontWeight = FontWeight.Bold
             )
         }
 
@@ -132,6 +115,7 @@ private fun HeaderButton(
     isActive: Boolean = false,
     showDot: Boolean = false
 ) {
+    val glassColors = LocalGlassColors.current
     Box {
         GlassCard(
             modifier = Modifier.size(40.dp),
@@ -143,7 +127,7 @@ private fun HeaderButton(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = if (isActive) GlassGreen else GlassText,
+                    tint = if (isActive) GlassGreen else glassColors.text,
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -194,7 +178,7 @@ fun PeriodSelector(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack, // RTL Prev is ArrowBack
                         contentDescription = null,
-                        tint = GlassText2,
+                        tint = LocalGlassColors.current.text2,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -206,13 +190,11 @@ fun PeriodSelector(
                     FintrackBodyLargeText(
                         text = periodLabel,
                         fontWeight = FontWeight.Bold,
-                        color = GlassText,
                         textAlign = TextAlign.Center
                     )
                     if (periodSubLabel.isNotEmpty()) {
                         FintrackLabelSmallText(
                             text = periodSubLabel,
-                            color = GlassText3,
                             textAlign = TextAlign.Center,
                             maxLines = 2
                         )
@@ -223,7 +205,7 @@ fun PeriodSelector(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward, // RTL Next is ArrowForward
                         contentDescription = null,
-                        tint = GlassText2,
+                        tint = LocalGlassColors.current.text2,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -247,7 +229,7 @@ fun PeriodSelector(
                     FintrackLabelMediumText(
                         text = label,
                         fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-                        color = if (active) GlassBg0 else GlassText2
+                        color = if (active) LocalGlassColors.current.bg0 else LocalGlassColors.current.text2
                     )
                 }
             }
@@ -286,7 +268,6 @@ fun ActiveFilters(
 
         FintrackLabelSmallText(
             text = stringResource(Res.string.btn_clear_all),
-            color = GlassText3,
             modifier = Modifier
                 .clickable(onClick = onClearAll)
                 .padding(4.dp)
@@ -300,8 +281,9 @@ private fun FilterChip(
     color: Color?,
     onRemove: () -> Unit
 ) {
-    val bgColor = color?.copy(alpha = 0.12f) ?: GlassColor
-    val borderColor = color?.copy(alpha = 0.33f) ?: GlassEdge
+    val glassColors = LocalGlassColors.current
+    val bgColor = color?.copy(alpha = 0.12f) ?: glassColors.glass
+    val borderColor = color?.copy(alpha = 0.33f) ?: glassColors.glassEdge
 
     Row(
         modifier = Modifier
@@ -314,12 +296,12 @@ private fun FilterChip(
     ) {
         FintrackLabelSmallText(
             text = label,
-            color = color ?: GlassText2
+            color = color ?: glassColors.text2
         )
         Icon(
             imageVector = Icons.Default.Close,
             contentDescription = null,
-            tint = color ?: GlassText2,
+            tint = color ?: glassColors.text2,
             modifier = Modifier.size(10.dp)
         )
     }
@@ -372,7 +354,8 @@ fun DateFilterBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onDateRange(type) }
-                    .padding(vertical = 12.dp, horizontal = 16.dp)
+                    .padding(vertical = 12.dp, horizontal = 16.dp),
+                color = LocalGlassColors.current.text
             )
         }
 
@@ -497,20 +480,20 @@ private fun DateInput(
     }
 
     Column(modifier = modifier) {
-        FintrackLabelMediumText(text = label, color = GlassText3)
+        FintrackLabelMediumText(text = label)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
                 .clip(MaterialTheme.shapes.small)
-                .background(if (isError) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f) else GlassColor)
+                .background(if (isError) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f) else LocalGlassColors.current.glass)
                 .clickable(onClick = onClick)
                 .padding(horizontal = 12.dp),
             contentAlignment = Alignment.CenterStart
         ) {
             FintrackBodyMediumText(
                 text = displayValue.ifEmpty { stringResource(Res.string.action_select_date) },
-                color = if (displayValue.isEmpty()) GlassText3 else GlassText
+                color = if (displayValue.isEmpty()) LocalGlassColors.current.text3 else LocalGlassColors.current.text
             )
         }
     }
