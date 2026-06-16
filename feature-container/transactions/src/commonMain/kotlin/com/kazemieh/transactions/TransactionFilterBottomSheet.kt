@@ -36,6 +36,7 @@ import com.kazemieh.person.ui.list.PersonFilterSelectionContent
 import com.kazemieh.tag.ui.list.TagFilterSelectionContent
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.all
+import fintrack.core.designsystem.generated.resources.amount
 import fintrack.core.designsystem.generated.resources.btn_clear_all
 import fintrack.core.designsystem.generated.resources.category
 import fintrack.core.designsystem.generated.resources.custom_range

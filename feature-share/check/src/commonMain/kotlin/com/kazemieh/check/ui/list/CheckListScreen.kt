@@ -29,6 +29,7 @@ import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.EntitySummary
 import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.component.glass.Tabs
+import com.kazemieh.designsystem.component.model.UiText
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -94,7 +95,7 @@ fun CheckListScreen(
                     onAddClick = { showAddCheck = true },
                     summary = listOf(
                         EntitySummary(
-                            label =  stringResource(Res.string.label_total_amount),
+                            label =  UiText.StringResourceText(Res.string.label_total_amount),
                             value = totalAmount.toPersianPrice(),
                             unit = stringResource(Res.string.currency_toman),
                             color = MaterialTheme.colorScheme.primary

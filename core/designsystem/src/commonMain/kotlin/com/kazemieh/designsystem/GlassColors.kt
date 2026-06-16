@@ -85,4 +85,34 @@ val LightGlassColors = GlassColors(
     text3 = LightGlassText3
 )
 
+val PlainDarkGlassColors = GlassColors(
+    bg0 = md_theme_dark_background,
+    bg1 = Color(0xFF2A2E2A), // Slightly lighter than bg0
+    bgAccent = md_theme_dark_surface,
+    glass = Color(0xFF2E332E), // Solid color fallback
+    glassHover = Color(0xFF383D38),
+    glassStrong = Color(0xFF424742),
+    glassEdge = md_theme_dark_outlineVariant,
+    glassEdgeStrong = md_theme_dark_outline,
+    glassHairline = Color(0xFF2D322D),
+    text = md_theme_dark_onBackground,
+    text2 = md_theme_dark_onSurface.copy(alpha = 0.7f),
+    text3 = md_theme_dark_onSurface.copy(alpha = 0.5f)
+)
+
+val PlainLightGlassColors = GlassColors(
+    bg0 = md_theme_light_background,
+    bg1 = Color(0xFFF1F4EE), // Slightly darker/different than bg0
+    bgAccent = md_theme_light_surface,
+    glass = Color(0xFFEFF2EC), // Solid color fallback
+    glassHover = Color(0xFFE5E9E1),
+    glassStrong = Color(0xFFDBE1D6),
+    glassEdge = md_theme_light_outlineVariant,
+    glassEdgeStrong = md_theme_light_outline,
+    glassHairline = Color(0xFFF5F7F2),
+    text = md_theme_light_onBackground,
+    text2 = md_theme_light_onSurface.copy(alpha = 0.7f),
+    text3 = md_theme_light_onSurface.copy(alpha = 0.5f)
+)
+
 val LocalGlassColors = staticCompositionLocalOf { DarkGlassColors }

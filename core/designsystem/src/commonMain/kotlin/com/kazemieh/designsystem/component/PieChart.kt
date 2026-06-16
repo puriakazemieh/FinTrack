@@ -61,7 +61,12 @@ import com.kazemieh.designsystem.vazirmatnFontFamily
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.currency_toman
 import fintrack.core.designsystem.generated.resources.label_amount_with_unit
+import fintrack.core.designsystem.generated.resources.label_and_separator
 import fintrack.core.designsystem.generated.resources.label_percentage_suffix
+import fintrack.core.designsystem.generated.resources.label_units_billion
+import fintrack.core.designsystem.generated.resources.label_units_million
+import fintrack.core.designsystem.generated.resources.label_units_thousand
+import fintrack.core.designsystem.generated.resources.label_units_trillion
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.PI

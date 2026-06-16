@@ -124,8 +124,8 @@ fun FintrackTheme(
     val glassColors = when (theme) {
         AppTheme.GLASS_DARK -> DarkGlassColors
         AppTheme.GLASS_LIGHT -> LightGlassColors
-        AppTheme.PLAIN_DARK -> DarkGlassColors // Fallback
-        AppTheme.PLAIN_LIGHT -> LightGlassColors // Fallback
+        AppTheme.PLAIN_DARK -> PlainDarkGlassColors
+        AppTheme.PLAIN_LIGHT -> PlainLightGlassColors
     }
 
     CompositionLocalProvider(

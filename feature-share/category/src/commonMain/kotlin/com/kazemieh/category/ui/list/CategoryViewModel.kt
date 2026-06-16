@@ -6,6 +6,8 @@ import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.component.glass.EntitySummary
 import com.kazemieh.designsystem.component.model.ItemUi
+import com.kazemieh.designsystem.component.model.UiText
+import fintrack.core.designsystem.generated.resources.*
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.domain.usecase.ObserveCategoriesFlatUseCase
 import com.kazemieh.domain.usecase.ObserveCategoriesUseCase

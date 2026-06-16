@@ -19,6 +19,7 @@ import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.EntitySummary
 import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.model.UiText
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -64,13 +65,13 @@ fun DebtsScreen(
                     onAddClick = { showAddDebt = true },
                     summary = listOf(
                         EntitySummary(
-                            label = stringResource(Res.string.total_credits),
+                            label = UiText.StringResourceText(Res.string.total_credits),
                             value = totalCredits.toPersianPrice(),
                             unit = stringResource(Res.string.currency_toman),
                             color = MaterialTheme.colorScheme.primary
                         ),
                         EntitySummary(
-                            label = stringResource(Res.string.total_debts),
+                            label = UiText.StringResourceText(Res.string.total_debts),
                             value = totalDebts.toPersianPrice(),
                             unit = stringResource(Res.string.currency_toman),
                             color = MaterialTheme.colorScheme.error

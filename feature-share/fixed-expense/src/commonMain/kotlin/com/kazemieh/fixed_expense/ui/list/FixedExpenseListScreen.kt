@@ -23,6 +23,7 @@ import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.EntitySummary
 import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.fixed_expense.ui.detail.AddFixedExpenseBottomSheet
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -60,7 +61,7 @@ fun FixedExpenseListScreen(
                     onAddClick = { showAddExpense = true },
                     summary = listOf(
                         EntitySummary(
-                            label = stringResource(Res.string.label_approx_monthly_total),
+                            label = UiText.StringResourceText(Res.string.label_approx_monthly_total),
                             value = totalMonthlyAmount.toPersianPrice(),
                             unit = stringResource(Res.string.currency_toman),
                             color = MaterialTheme.colorScheme.primary

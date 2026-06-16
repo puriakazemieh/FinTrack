@@ -59,6 +59,7 @@ import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.designsystem.component.model.asString
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.hint_search_in
+import fintrack.core.designsystem.generated.resources.label_add_specific_new_entity
 import fintrack.core.designsystem.generated.resources.msg_empty_list
 import org.jetbrains.compose.resources.stringResource
 import sh.calvin.reorderable.ReorderableItem

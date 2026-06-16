@@ -76,6 +76,8 @@ import fintrack.core.designsystem.generated.resources.label_last_name
 import fintrack.core.designsystem.generated.resources.label_monthly_income
 import fintrack.core.designsystem.generated.resources.label_optional_fa
 import fintrack.core.designsystem.generated.resources.label_phone
+import fintrack.core.designsystem.generated.resources.optional_wrapper
+import fintrack.core.designsystem.generated.resources.percentage_format
 import fintrack.core.designsystem.generated.resources.profile_completion
 import fintrack.core.designsystem.generated.resources.profile_completion_desc
 import fintrack.core.designsystem.generated.resources.section_extra_info

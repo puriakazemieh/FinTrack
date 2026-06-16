@@ -24,7 +24,6 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassPurple
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.model.asString
@@ -36,8 +35,11 @@ import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.report.TransactionListByFilterScreen
 import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.label_amount_with_unit
+import fintrack.core.designsystem.generated.resources.income
+import fintrack.core.designsystem.generated.resources.label_to
+import fintrack.core.designsystem.generated.resources.outcoming
 import fintrack.core.designsystem.generated.resources.placeholder_period_range
+import fintrack.core.designsystem.generated.resources.transfer
 import fintrack.core.designsystem.generated.resources.unit_toman_short
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -56,7 +58,15 @@ fun TransactionsScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(resetFilters, state.resetFiltersHandled, categoryId, sourceId, tagId, personId, transactionType) {
+    LaunchedEffect(
+        resetFilters,
+        state.resetFiltersHandled,
+        categoryId,
+        sourceId,
+        tagId,
+        personId,
+        transactionType
+    ) {
         if (resetFilters && !state.resetFiltersHandled) {
             viewModel.onIntent(TransactionsIntent.ResetFilters)
         }

@@ -15,6 +15,7 @@ import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.EntitySummary
 import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.model.UiText
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -49,19 +50,19 @@ fun PersonDetailScreen(
                 onAddClick = { /* Show Add Debt with pre-selected person? */ },
                 summary = listOf(
                     EntitySummary(
-                        label = stringResource(Res.string.total_credits),
+                        label = UiText.StringResourceText(Res.string.total_credits),
                         value = state.totalCredits.toPersianPrice(),
                         unit = stringResource(Res.string.currency_toman),
                         color = MaterialTheme.colorScheme.primary
                     ),
                     EntitySummary(
-                        label = stringResource(Res.string.total_debts),
+                        label = UiText.StringResourceText(Res.string.total_debts),
                         value = state.totalDebts.toPersianPrice(),
                         unit = stringResource(Res.string.currency_toman),
                         color = MaterialTheme.colorScheme.error
                     ),
                     EntitySummary(
-                        label = stringResource(Res.string.balance),
+                        label = UiText.StringResourceText(Res.string.balance),
                         value = state.balance.toPersianPrice(),
                         unit = stringResource(Res.string.currency_toman),
                         color = if (state.balance >= 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
