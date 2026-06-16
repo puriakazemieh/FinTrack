@@ -29,9 +29,7 @@ import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
-import com.kazemieh.designsystem.component.glass.GlassCard
-import com.kazemieh.designsystem.component.glass.GlassTone
-import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.*
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.cancell_
 import fintrack.core.designsystem.generated.resources.confirm
@@ -73,78 +71,83 @@ fun DeleteBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        val glassColors = LocalGlassColors.current
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            ScreenHeader(
-                title = finalTitle,
-                onClose = dismissClicked
-            )
-
-            Spacer(modifier = Modifier.height(space.large))
-
-            // Footer / CTAs
+            FintrackBackgroundBlobs()
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                ScreenHeader(
+                    title = finalTitle,
+                    onClose = dismissClicked
+                )
 
-                GlassCard(
-                    onClick = confirmClicked,
-                    enabled = confirmEnabled && !isLoading,
-                    tone = GlassTone.Error,
-                    padding = 0.dp,
-                    modifier = Modifier.fillMaxWidth()
+                Spacer(modifier = Modifier.height(space.large))
+
+                // Footer / CTAs
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp),
-                        contentAlignment = Alignment.Center,
 
+                    GlassCard(
+                        onClick = confirmClicked,
+                        enabled = confirmEnabled && !isLoading,
+                        tone = GlassTone.Error,
+                        padding = 0.dp,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp),
+                            contentAlignment = Alignment.Center,
+
+                            ) {
+                            if (isLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    color = MaterialTheme.colorScheme.onError,
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                FintrackTitleMediumText(
+                                    text = confirmButtonText,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.W600
+                                )
+                            }
+                        }
+                    }
+                    GlassCard(
+                        onClick = { if (dismissEnabled && !isLoading) dismissClicked() },
+                        enabled = dismissEnabled && !isLoading,
+                        padding = 0.dp,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                        if (isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                color = MaterialTheme.colorScheme.onError,
-                                strokeWidth = 2.dp
-                            )
-                        } else {
-                            FintrackTitleMediumText(
-                                text = confirmButtonText,
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.W600
+                            FintrackTitleSmallText(
+                                text = dismissButtonText,
+                                fontWeight = FontWeight.W500,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
                 }
-                GlassCard(
-                    onClick = { if (dismissEnabled && !isLoading) dismissClicked() },
-                    enabled = dismissEnabled && !isLoading,
-                    padding = 0.dp,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        FintrackTitleSmallText(
-                            text = dismissButtonText,
-                            fontWeight = FontWeight.W500,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
     }
 }

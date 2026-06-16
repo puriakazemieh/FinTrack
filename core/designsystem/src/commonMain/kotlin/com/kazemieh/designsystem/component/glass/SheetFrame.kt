@@ -45,70 +45,77 @@ fun SheetFrame(
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         dragHandle = null
     ) {
-        Column(
+        Box(
             modifier = modifier
                 .let { if (isFullScreen) it.fillMaxSize() else it.wrapContentHeight() }
-                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            ScreenHeader(
-                title = title,
-                sub = sub,
-                onClose = onDismiss,
-                trailingContent = trailingContent
-            )
+            FintrackBackgroundBlobs()
+            Column(modifier = Modifier.fillMaxSize()) {
+                ScreenHeader(
+                    title = title,
+                    sub = sub,
+                    onClose = onDismiss,
+                    trailingContent = trailingContent
+                )
 
-            // Scrollable Content
-            Column(
-                modifier = Modifier
-                    .let { if (isFullScreen) it.weight(1f) else it.wrapContentHeight() }
-                    .padding(horizontal = 24.dp)
-            ) {
-                content()
-            }
-
-            // Footer / CTAs
-            if (primaryButtonText != null) {
+                // Scrollable Content
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                        .let { if (isFullScreen) it.weight(1f) else it.wrapContentHeight() }
+                        .padding(horizontal = 24.dp)
                 ) {
-                    Button(
-                        onClick = { onPrimaryClick?.invoke() },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        )
+                    content()
+                }
+
+                // Footer / CTAs
+                if (primaryButtonText != null) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        FintrackTitleMediumText(text = primaryButtonText, fontSize = 15.sp, fontWeight = FontWeight.W600)
-                    }
-                    
-                    if (secondaryButtonText != null) {
-                        GlassCard(
-                            onClick = onSecondaryClick,
-                            padding = 0.dp,
-                            modifier = Modifier.fillMaxWidth()
+                        Button(
+                            onClick = { onPrimaryClick?.invoke() },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            )
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 12.dp),
-                                contentAlignment = Alignment.Center
+                            FintrackTitleMediumText(
+                                text = primaryButtonText,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.W600
+                            )
+                        }
+
+                        if (secondaryButtonText != null) {
+                            GlassCard(
+                                onClick = onSecondaryClick,
+                                padding = 0.dp,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                FintrackTitleSmallText(
-                                    text = secondaryButtonText,
-                                    fontWeight = FontWeight.W500,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 12.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    FintrackTitleSmallText(
+                                        text = secondaryButtonText,
+                                        fontWeight = FontWeight.W500,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
                             }
                         }
                     }
+                } else {
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-            } else {
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -49,6 +50,7 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.glass.Chip
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,127 +82,134 @@ fun CalculatorBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 24.dp)
-            ) {
-                // Display Area
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            FintrackBackgroundBlobs()
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
-                    horizontalAlignment = Alignment.End
+                        .padding(bottom = 24.dp)
                 ) {
-                    FintrackHeadlineSmallText(
-                        text = expression.toPersianDigits().ifEmpty { "۰" },
-                        color = glassColors.text,
-                        textAlign = TextAlign.End,
-                        maxLines = 1
-                    )
-                    FintrackBodyMediumText(
-                        text = if (resultPreview.isNotEmpty() && resultPreview != expression)
-                            resultPreview.toPersianDigits() else "",
-                        color = glassColors.text3,
-                        textAlign = TextAlign.End,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                }
+                    // Display Area
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        FintrackHeadlineSmallText(
+                            text = expression.toPersianDigits().ifEmpty { "۰" },
+                            color = glassColors.text,
+                            textAlign = TextAlign.End,
+                            maxLines = 1
+                        )
+                        FintrackBodyMediumText(
+                            text = if (resultPreview.isNotEmpty() && resultPreview != expression)
+                                resultPreview.toPersianDigits() else "",
+                            color = glassColors.text3,
+                            textAlign = TextAlign.End,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
 
-                HorizontalDivider(color = glassColors.glassEdge, thickness = 0.5.dp)
+                    HorizontalDivider(color = glassColors.glassEdge, thickness = 0.5.dp)
 
-                // Percentage Helpers
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    listOf("+5%", "+10%", "+15%", "+20%").forEach { percent ->
-                        Chip(
-                            color = GlassGreen,
-                            onClick = {
-                                if (expression.isNotEmpty() && expression.last().isDigit()) {
-                                    expression += percent
-                                    updateResult()
+                    // Percentage Helpers
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp, vertical = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        listOf("+5%", "+10%", "+15%", "+20%").forEach { percent ->
+                            Chip(
+                                color = GlassGreen,
+                                onClick = {
+                                    if (expression.isNotEmpty() && expression.last().isDigit()) {
+                                        expression += percent
+                                        updateResult()
+                                    }
                                 }
+                            ) {
+                                FintrackLabelMediumText(
+                                    text = percent.toPersianDigits(),
+                                    color = GlassGreen
+                                )
                             }
-                        ) {
-                            FintrackLabelMediumText(
-                                text = percent.toPersianDigits(),
-                                color = GlassGreen
-                            )
                         }
                     }
-                }
 
-                // Keypad
-                val keys = listOf(
-                    "AC", "÷", "×", "DEL",
-                    "7", "8", "9", "-",
-                    "4", "5", "6", "+",
-                    "1", "2", "3", "=",
-                    "%", "0", ".", "OK"
-                )
+                    // Keypad
+                    val keys = listOf(
+                        "AC", "÷", "×", "DEL",
+                        "7", "8", "9", "-",
+                        "4", "5", "6", "+",
+                        "1", "2", "3", "=",
+                        "%", "0", ".", "OK"
+                    )
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(4),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(keys) { key ->
-                        KeyButton(
-                            key = key,
-                            onClick = {
-                                when (key) {
-                                    "AC" -> {
-                                        expression = ""
-                                        resultPreview = ""
-                                    }
-                                    "DEL" -> {
-                                        if (expression.isNotEmpty()) {
-                                            expression = expression.dropLast(1)
-                                            updateResult()
-                                        }
-                                    }
-                                    "=" -> {
-                                        val res = CalculatorParser.evaluate(expression)
-                                        if (res != "Error") {
-                                            expression = res
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(4),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(keys) { key ->
+                            KeyButton(
+                                key = key,
+                                onClick = {
+                                    when (key) {
+                                        "AC" -> {
+                                            expression = ""
                                             resultPreview = ""
                                         }
-                                    }
-                                    "OK" -> {
-                                        val finalResult = CalculatorParser.evaluate(expression)
-                                        if (finalResult != "Error") {
-                                            onConfirm(finalResult)
-                                        }
-                                    }
-                                    else -> {
-                                        val lastChar = expression.lastOrNull()
-                                        val isOperator = key in listOf("+", "-", "×", "÷", "%")
-                                        val lastIsOperator = lastChar in listOf('+', '-', '×', '÷', '%')
-                                        
-                                        if (isOperator && (expression.isEmpty() || lastIsOperator)) {
-                                            // Don't allow starting with operator or consecutive operators
-                                            if (key == "-" && expression.isEmpty()) {
-                                                expression += key
+                                        "DEL" -> {
+                                            if (expression.isNotEmpty()) {
+                                                expression = expression.dropLast(1)
+                                                updateResult()
                                             }
-                                        } else {
-                                            expression += key
-                                            updateResult()
+                                        }
+                                        "=" -> {
+                                            val res = CalculatorParser.evaluate(expression)
+                                            if (res != "Error") {
+                                                expression = res
+                                                resultPreview = ""
+                                            }
+                                        }
+                                        "OK" -> {
+                                            val finalResult = CalculatorParser.evaluate(expression)
+                                            if (finalResult != "Error") {
+                                                onConfirm(finalResult)
+                                            }
+                                        }
+                                        else -> {
+                                            val lastChar = expression.lastOrNull()
+                                            val isOperator = key in listOf("+", "-", "×", "÷", "%")
+                                            val lastIsOperator = lastChar in listOf('+', '-', '×', '÷', '%')
+                                            
+                                            if (isOperator && (expression.isEmpty() || lastIsOperator)) {
+                                                // Don't allow starting with operator or consecutive operators
+                                                if (key == "-" && expression.isEmpty()) {
+                                                    expression += key
+                                                }
+                                            } else {
+                                                expression += key
+                                                updateResult()
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }

@@ -1,5 +1,6 @@
 package com.kazemieh.asset.ui.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -17,6 +18,7 @@ import com.kazemieh.asset.ui.AssetViewModel
 import com.kazemieh.common.model.Asset
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import org.koin.compose.viewmodel.koinViewModel
 
 import fintrack.core.designsystem.generated.resources.*
@@ -31,46 +33,57 @@ fun AssetActionsSheet(
     onViewHistory: (Asset) -> Unit,
     viewModel: AssetViewModel = koinViewModel()
 ) {
-    ModalBottomSheet(onDismissRequest = onDismiss) {
-        Column(
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = null
+    ) {
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-                .padding(bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            FintrackTitleLargeText(
-                text = asset.name,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+            FintrackBackgroundBlobs()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .padding(bottom = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FintrackTitleLargeText(
+                    text = asset.name,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
 
-            ActionItem(
-                icon = Icons.Default.Edit,
-                title = stringResource(Res.string.action_edit_asset),
-                onClick = {
-                    onEdit(asset)
-                    onDismiss()
-                }
-            )
+                ActionItem(
+                    icon = Icons.Default.Edit,
+                    title = stringResource(Res.string.action_edit_asset),
+                    onClick = {
+                        onEdit(asset)
+                        onDismiss()
+                    }
+                )
 
-            ActionItem(
-                icon = Icons.Default.History,
-                title = stringResource(Res.string.action_view_history),
-                onClick = {
-                    onViewHistory(asset)
-                    onDismiss()
-                }
-            )
+                ActionItem(
+                    icon = Icons.Default.History,
+                    title = stringResource(Res.string.action_view_history),
+                    onClick = {
+                        onViewHistory(asset)
+                        onDismiss()
+                    }
+                )
 
-            ActionItem(
-                icon = Icons.Default.Delete,
-                title = stringResource(Res.string.action_delete_asset),
-                color = MaterialTheme.colorScheme.error,
-                onClick = {
-                    viewModel.onIntent(AssetIntent.DeleteAsset(asset.id ?: 0L))
-                    onDismiss()
-                }
-            )
+                ActionItem(
+                    icon = Icons.Default.Delete,
+                    title = stringResource(Res.string.action_delete_asset),
+                    color = MaterialTheme.colorScheme.error,
+                    onClick = {
+                        viewModel.onIntent(AssetIntent.DeleteAsset(asset.id ?: 0L))
+                        onDismiss()
+                    }
+                )
+            }
         }
     }
 }

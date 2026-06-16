@@ -1,23 +1,51 @@
 package com.kazemieh.profile
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -25,19 +53,36 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.FintrackBodyLargeText
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackLabelLargeText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.component.FintrackTitleLargeText
+import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.Switch
 import com.kazemieh.designsystem.component.glass.WidgetCard
-import com.kazemieh.designsystem.component.model.UiText
-import fintrack.core.designsystem.generated.resources.*
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
+import com.kazemieh.lock.LockIntent
+import com.kazemieh.lock.LockMode
+import com.kazemieh.lock.LockViewModel
+import com.kazemieh.lock.PINScreen
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.action_logout
+import fintrack.core.designsystem.generated.resources.label_app_lock
+import fintrack.core.designsystem.generated.resources.profile_premium_desc
+import fintrack.core.designsystem.generated.resources.profile_premium_title
+import fintrack.core.designsystem.generated.resources.section_display
+import fintrack.core.designsystem.generated.resources.section_notifications
+import fintrack.core.designsystem.generated.resources.section_security
+import fintrack.core.designsystem.generated.resources.setting_dark_mode
+import fintrack.core.designsystem.generated.resources.setting_fingerprint
+import fintrack.core.designsystem.generated.resources.setting_push_notifications
+import fintrack.core.designsystem.generated.resources.setting_theme_currency
+import fintrack.core.designsystem.generated.resources.title_notification_settings
 import org.jetbrains.compose.resources.decodeToImageBitmap
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-
-import com.kazemieh.lock.*
-import androidx.compose.runtime.*
-import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel as lockKoinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,7 +95,7 @@ fun ProfileScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
-    
+
     var showLockSheet by remember { mutableStateOf(false) }
     var lockDialogMode by remember { mutableStateOf(LockMode.CREATE) }
     var shouldTriggerFingerprintAfterSetup by remember { mutableStateOf(false) }
@@ -92,10 +137,16 @@ fun ProfileScreen(
         ModalBottomSheet(
             onDismissRequest = { showLockSheet = false },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            dragHandle = { BottomSheetDefaults.DragHandle() },
+            dragHandle = null,
             containerColor = MaterialTheme.colorScheme.background,
             content = {
-                Box(modifier = Modifier.fillMaxHeight(0.8f)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.8f)
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
+                    FintrackBackgroundBlobs()
                     PINScreen(
                         state = lockState,
                         onIntent = lockViewModel::onIntent
@@ -105,36 +156,7 @@ fun ProfileScreen(
         )
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        // Decorative background blobs
-        val primaryColor = MaterialTheme.colorScheme.primary
-        val secondaryColor = MaterialTheme.colorScheme.secondary
-
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(primaryColor.copy(alpha = 0.15f), Color.Transparent),
-                    center = Offset(size.width * 0.8f, size.height * 0.2f),
-                    radius = 400.dp.toPx()
-                ),
-                center = Offset(size.width * 0.8f, size.height * 0.2f),
-                radius = 400.dp.toPx()
-            )
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(secondaryColor.copy(alpha = 0.1f), Color.Transparent),
-                    center = Offset(size.width * 0.2f, size.height * 0.8f),
-                    radius = 500.dp.toPx()
-                ),
-                center = Offset(size.width * 0.2f, size.height * 0.8f),
-                radius = 500.dp.toPx()
-            )
-        }
-
+    FintrackScreen {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -219,12 +241,12 @@ fun ProfileScreen(
                         on = state.isPushNotificationsEnabled,
                         onToggle = { viewModel.onIntent(ProfileIntent.TogglePushNotifications) }
                     )
-                   /* SettingItem( //todo use this
-                        title = stringResource(Res.string.setting_transaction_alerts),
-                        icon = Icons.Default.Warning,
-                        on = state.isTransactionAlertsEnabled,
-                        onToggle = { viewModel.onIntent(ProfileIntent.ToggleTransactionAlerts) }
-                    )*/
+                    /* SettingItem( //todo use this
+                         title = stringResource(Res.string.setting_transaction_alerts),
+                         icon = Icons.Default.Warning,
+                         on = state.isTransactionAlertsEnabled,
+                         onToggle = { viewModel.onIntent(ProfileIntent.ToggleTransactionAlerts) }
+                     )*/
                 }
             }
 

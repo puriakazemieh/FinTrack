@@ -23,7 +23,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
@@ -32,6 +31,7 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.glass.ItemSelected
 import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.component.glass.SearchBar
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.component.model.UiText
 import fintrack.core.designsystem.generated.resources.Res
@@ -73,80 +73,85 @@ fun SelectableListBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        val glassColors = LocalGlassColors.current
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            ScreenHeader(
-                title = title,
-                onClose = onDismiss
-            )
-
-            SearchBar(
-                query = query,
-                onQueryChange = onQueryChange,
-                placeholder = stringResource(Res.string.search_placeholder),
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
-            )
-
-            if (showSelectAll && itemsList.size > 1) {
-                val text = stringResource(Res.string.select_All)
-                val allItem = ItemUi(id = 0, title = UiText.DynamicString(text))
-
-                ItemSelected(
-                    modifier = Modifier.padding(
-                        vertical = space.mediumSmall,
-                        horizontal = 24.dp
-                    ),
-                    isSelected = isAllSelected,
-                    item = allItem,
-                    onToggle = {
-                        selected = if (isAllSelected) emptySet() else items
-                    }
-                )
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 24.dp))
-            }
-
-            if (itemsList.isNotEmpty()) {
-                LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(bottom = 100.dp)
-                ) {
-                    items(itemsList, key = { it.id }) { item ->
-                        val isSelected = selected.contains(item)
-                        ItemSelected(
-                            modifier = Modifier.padding(
-                                vertical = space.mediumSmall,
-                                horizontal = 24.dp
-                            ),
-                            isSelected = isSelected,
-                            item = item,
-                            onToggle = {
-                                selected = if (isSelected) selected - item else selected + item
-                            }
-                        )
-                    }
-                }
-            } else {
-                Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp)) {
-                    EmptyList(title)
-                }
-            }
-
-            // Fixed CTA at bottom
-            Box(
+            FintrackBackgroundBlobs()
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp)
+                    .fillMaxSize()
             ) {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    onClick = { onConfirm(selected, isAllSelected) }
+                ScreenHeader(
+                    title = title,
+                    onClose = onDismiss
+                )
+
+                SearchBar(
+                    query = query,
+                    onQueryChange = onQueryChange,
+                    placeholder = stringResource(Res.string.search_placeholder),
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                )
+
+                if (showSelectAll && itemsList.size > 1) {
+                    val text = stringResource(Res.string.select_All)
+                    val allItem = ItemUi(id = 0, title = UiText.DynamicString(text))
+
+                    ItemSelected(
+                        modifier = Modifier.padding(
+                            vertical = space.mediumSmall,
+                            horizontal = 24.dp
+                        ),
+                        isSelected = isAllSelected,
+                        item = allItem,
+                        onToggle = {
+                            selected = if (isAllSelected) emptySet() else items
+                        }
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 24.dp))
+                }
+
+                if (itemsList.isNotEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier.weight(1f),
+                        contentPadding = PaddingValues(bottom = 100.dp)
+                    ) {
+                        items(itemsList, key = { it.id }) { item ->
+                            val isSelected = selected.contains(item)
+                            ItemSelected(
+                                modifier = Modifier.padding(
+                                    vertical = space.mediumSmall,
+                                    horizontal = 24.dp
+                                ),
+                                isSelected = isSelected,
+                                item = item,
+                                onToggle = {
+                                    selected = if (isSelected) selected - item else selected + item
+                                }
+                            )
+                        }
+                    }
+                } else {
+                    Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp)) {
+                        EmptyList(title)
+                    }
+                }
+
+                // Fixed CTA at bottom
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp)
                 ) {
-                    FintrackBodyMediumText(text = stringResource(Res.string.confirm))
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        onClick = { onConfirm(selected, isAllSelected) }
+                    ) {
+                        FintrackBodyMediumText(text = stringResource(Res.string.confirm))
+                    }
                 }
             }
         }

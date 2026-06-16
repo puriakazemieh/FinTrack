@@ -32,9 +32,7 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
-import com.kazemieh.designsystem.component.glass.GlassCard
-import com.kazemieh.designsystem.component.glass.GlassTone
-import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.*
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.delete_confirm_question
 import fintrack.core.designsystem.generated.resources.move
@@ -79,21 +77,26 @@ fun DeleteWithMoveBottomSheetContent(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            ScreenHeader(
-                title = finalTitle,
-                onClose = onDismiss
-            )
-
+            FintrackBackgroundBlobs()
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
             ) {
+                ScreenHeader(
+                    title = finalTitle,
+                    onClose = onDismiss
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                ) {
                 Spacer(Modifier.height(space.medium))
 
                 GlassCard(
@@ -239,4 +242,5 @@ fun DeleteWithMoveBottomSheetContent(
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
+}
 }

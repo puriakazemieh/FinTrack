@@ -28,6 +28,7 @@ import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.person.ui.list.PersonPickerSingleBottomSheet
 import fintrack.core.designsystem.generated.resources.*
 import kotlinx.datetime.Instant
@@ -60,93 +61,99 @@ fun AddCheckBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            ScreenHeader(
-                title = stringResource(Res.string.title_add_check),
-                onClose = onDismiss
-            )
-
+            FintrackBackgroundBlobs()
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-                    .padding(space.large),
-                verticalArrangement = Arrangement.spacedBy(space.medium)
+                    .fillMaxSize()
             ) {
-                // Incoming/Outgoing Toggle
-                GlassCard(padding = 0.dp) {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        TypeButton(
-                            text = stringResource(Res.string.label_outgoing_check),
-                            selected = !state.isIncoming,
-                            onClick = { viewModel.onIntent(AddCheckIntent.SetIsIncoming(false)) },
-                            modifier = Modifier.weight(1f),
-                            selectedColor = MaterialTheme.colorScheme.error
-                        )
-                        TypeButton(
-                            text = stringResource(Res.string.label_incoming_check),
-                            selected = state.isIncoming,
-                            onClick = { viewModel.onIntent(AddCheckIntent.SetIsIncoming(true)) },
-                            modifier = Modifier.weight(1f),
-                            selectedColor = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-
-                // Amount
-                FintrackOutlinedTextField(
-                    value = state.amount,
-                    onValueChange = { viewModel.onIntent(AddCheckIntent.SetAmount(it)) },
-                    label = { FintrackBodyMediumText(stringResource(Res.string.label_check_amount)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true
+                ScreenHeader(
+                    title = stringResource(Res.string.title_add_check),
+                    onClose = onDismiss
                 )
 
-                // Person Picker
-                PickerField(
-                    label = stringResource(Res.string.label_counterparty),
-                    value = state.person?.name ?: stringResource(Res.string.not_choose),
-                    icon = Icons.Default.Person,
-                    onClick = { showPersonPicker = true }
-                )
-
-                // Date Picker (Issued Date)
-                PickerField(
-                    label = stringResource(Res.string.label_issue_date),
-                    value = Instant.fromEpochMilliseconds(state.date).toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
-                    icon = Icons.Default.CalendarMonth,
-                    onClick = { /* TODO: Date Picker */ }
-                )
-
-                // Due Date Picker
-                PickerField(
-                    label = stringResource(Res.string.label_due_date),
-                    value = Instant.fromEpochMilliseconds(state.dueDate).toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
-                    icon = Icons.Default.CalendarMonth,
-                    onClick = { /* TODO: Date Picker */ }
-                )
-
-                // Description
-                FintrackOutlinedTextField(
-                    value = state.description,
-                    onValueChange = { viewModel.onIntent(AddCheckIntent.SetDescription(it)) },
-                    label = { FintrackBodyMediumText(stringResource(Res.string.description)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(space.medium))
-
-                Button(
-                    onClick = { viewModel.onIntent(AddCheckIntent.Submit) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.large
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .padding(space.large),
+                    verticalArrangement = Arrangement.spacedBy(space.medium)
                 ) {
-                    FintrackBodyLargeText(stringResource(Res.string.save_))
+                    // Incoming/Outgoing Toggle
+                    GlassCard(padding = 0.dp) {
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            TypeButton(
+                                text = stringResource(Res.string.label_outgoing_check),
+                                selected = !state.isIncoming,
+                                onClick = { viewModel.onIntent(AddCheckIntent.SetIsIncoming(false)) },
+                                modifier = Modifier.weight(1f),
+                                selectedColor = MaterialTheme.colorScheme.error
+                            )
+                            TypeButton(
+                                text = stringResource(Res.string.label_incoming_check),
+                                selected = state.isIncoming,
+                                onClick = { viewModel.onIntent(AddCheckIntent.SetIsIncoming(true)) },
+                                modifier = Modifier.weight(1f),
+                                selectedColor = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+
+                    // Amount
+                    FintrackOutlinedTextField(
+                        value = state.amount,
+                        onValueChange = { viewModel.onIntent(AddCheckIntent.SetAmount(it)) },
+                        label = { FintrackBodyMediumText(stringResource(Res.string.label_check_amount)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true
+                    )
+
+                    // Person Picker
+                    PickerField(
+                        label = stringResource(Res.string.label_counterparty),
+                        value = state.person?.name ?: stringResource(Res.string.not_choose),
+                        icon = Icons.Default.Person,
+                        onClick = { showPersonPicker = true }
+                    )
+
+                    // Date Picker (Issued Date)
+                    PickerField(
+                        label = stringResource(Res.string.label_issue_date),
+                        value = Instant.fromEpochMilliseconds(state.date).toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
+                        icon = Icons.Default.CalendarMonth,
+                        onClick = { /* TODO: Date Picker */ }
+                    )
+
+                    // Due Date Picker
+                    PickerField(
+                        label = stringResource(Res.string.label_due_date),
+                        value = Instant.fromEpochMilliseconds(state.dueDate).toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
+                        icon = Icons.Default.CalendarMonth,
+                        onClick = { /* TODO: Date Picker */ }
+                    )
+
+                    // Description
+                    FintrackOutlinedTextField(
+                        value = state.description,
+                        onValueChange = { viewModel.onIntent(AddCheckIntent.SetDescription(it)) },
+                        label = { FintrackBodyMediumText(stringResource(Res.string.description)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(space.medium))
+
+                    Button(
+                        onClick = { viewModel.onIntent(AddCheckIntent.Submit) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.large
+                    ) {
+                        FintrackBodyLargeText(stringResource(Res.string.save_))
+                    }
                 }
             }
         }

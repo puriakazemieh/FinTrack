@@ -116,8 +116,7 @@ fun AddInstallmentBottomSheet(
                 )
             },
             onClose = onDismiss,
-            showHero = false,
-            backgroundBrush = Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0))
+            showHero = false
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),

@@ -27,6 +27,7 @@ import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import com.kazemieh.person.ui.list.PersonPickerSingleBottomSheet
 import fintrack.core.designsystem.generated.resources.*
@@ -63,92 +64,98 @@ fun AddDebtBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            ScreenHeader(
-                title = stringResource(Res.string.add_debt),
-                onClose = onDismiss
-            )
-
+            FintrackBackgroundBlobs()
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(space.large),
-                verticalArrangement = Arrangement.spacedBy(space.medium)
+                    .fillMaxSize()
             ) {
-                // Type Selector
-                GlassCard(padding = 0.dp) {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        TypeButton(
-                            text = stringResource(Res.string.debt_owed_by_me),
-                            selected = state.type == DebtType.OWED_BY_ME,
-                            onClick = { viewModel.onIntent(AddDebtIntent.SetType(DebtType.OWED_BY_ME)) },
-                            modifier = Modifier.weight(1f),
-                            selectedColor = MaterialTheme.colorScheme.error
-                        )
-                        TypeButton(
-                            text = stringResource(Res.string.debt_owed_to_me),
-                            selected = state.type == DebtType.OWED_TO_ME,
-                            onClick = { viewModel.onIntent(AddDebtIntent.SetType(DebtType.OWED_TO_ME)) },
-                            modifier = Modifier.weight(1f),
-                            selectedColor = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-
-                // Amount
-                FintrackOutlinedTextField(
-                    value = state.amount,
-                    onValueChange = { viewModel.onIntent(AddDebtIntent.SetAmount(it)) },
-                    label = { FintrackBodyMediumText(stringResource(Res.string.debt_amount)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true
+                ScreenHeader(
+                    title = stringResource(Res.string.add_debt),
+                    onClose = onDismiss
                 )
 
-                // Person Picker
-                PickerField(
-                    label = stringResource(Res.string.person_name),
-                    value = state.person?.name ?: stringResource(Res.string.person_choose),
-                    icon = Icons.Default.Person,
-                    onClick = { showPersonPicker = true }
-                )
-
-                // Date Picker (Simplified for now, using text field or existing date logic)
-                PickerField(
-                    label = stringResource(Res.string.date),
-                    value = Instant.fromEpochMilliseconds(state.date).toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
-                    icon = Icons.Default.CalendarMonth,
-                    onClick = { /* TODO: Date Picker */ }
-                )
-
-                // Source Picker (Optional for settlement)
-                PickerField(
-                    label = stringResource(Res.string.source),
-                    value = state.source?.name ?: stringResource(Res.string.source_choose),
-                    icon = Icons.Default.Wallet,
-                    onClick = { showSourcePicker = true }
-                )
-
-                // Description
-                FintrackOutlinedTextField(
-                    value = state.description,
-                    onValueChange = { viewModel.onIntent(AddDebtIntent.SetDescription(it)) },
-                    label = { FintrackBodyMediumText(stringResource(Res.string.description)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(space.medium))
-
-                Button(
-                    onClick = { viewModel.onIntent(AddDebtIntent.Submit) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.large
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(space.large),
+                    verticalArrangement = Arrangement.spacedBy(space.medium)
                 ) {
-                    FintrackBodyLargeText(stringResource(Res.string.save_))
+                    // Type Selector
+                    GlassCard(padding = 0.dp) {
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            TypeButton(
+                                text = stringResource(Res.string.debt_owed_by_me),
+                                selected = state.type == DebtType.OWED_BY_ME,
+                                onClick = { viewModel.onIntent(AddDebtIntent.SetType(DebtType.OWED_BY_ME)) },
+                                modifier = Modifier.weight(1f),
+                                selectedColor = MaterialTheme.colorScheme.error
+                            )
+                            TypeButton(
+                                text = stringResource(Res.string.debt_owed_to_me),
+                                selected = state.type == DebtType.OWED_TO_ME,
+                                onClick = { viewModel.onIntent(AddDebtIntent.SetType(DebtType.OWED_TO_ME)) },
+                                modifier = Modifier.weight(1f),
+                                selectedColor = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+
+                    // Amount
+                    FintrackOutlinedTextField(
+                        value = state.amount,
+                        onValueChange = { viewModel.onIntent(AddDebtIntent.SetAmount(it)) },
+                        label = { FintrackBodyMediumText(stringResource(Res.string.debt_amount)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true
+                    )
+
+                    // Person Picker
+                    PickerField(
+                        label = stringResource(Res.string.person_name),
+                        value = state.person?.name ?: stringResource(Res.string.person_choose),
+                        icon = Icons.Default.Person,
+                        onClick = { showPersonPicker = true }
+                    )
+
+                    // Date Picker (Simplified for now, using text field or existing date logic)
+                    PickerField(
+                        label = stringResource(Res.string.date),
+                        value = Instant.fromEpochMilliseconds(state.date).toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
+                        icon = Icons.Default.CalendarMonth,
+                        onClick = { /* TODO: Date Picker */ }
+                    )
+
+                    // Source Picker (Optional for settlement)
+                    PickerField(
+                        label = stringResource(Res.string.source),
+                        value = state.source?.name ?: stringResource(Res.string.source_choose),
+                        icon = Icons.Default.Wallet,
+                        onClick = { showSourcePicker = true }
+                    )
+
+                    // Description
+                    FintrackOutlinedTextField(
+                        value = state.description,
+                        onValueChange = { viewModel.onIntent(AddDebtIntent.SetDescription(it)) },
+                        label = { FintrackBodyMediumText(stringResource(Res.string.description)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(space.medium))
+
+                    Button(
+                        onClick = { viewModel.onIntent(AddDebtIntent.Submit) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.large
+                    ) {
+                        FintrackBodyLargeText(stringResource(Res.string.save_))
+                    }
                 }
             }
         }

@@ -1,6 +1,7 @@
 package com.kazemieh.financialsource.ui.list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,6 +42,7 @@ import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.designsystem.component.model.toSource
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
@@ -85,7 +87,6 @@ private fun SourceBottomSheetCore(
     }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val glassColors = LocalGlassColors.current
 
     ModalBottomSheet(
         onDismissRequest = {
@@ -96,86 +97,92 @@ private fun SourceBottomSheetCore(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            ScreenHeader(
-                title = stringResource(Res.string.source),
-                onClose = {
-                    viewModel.onIntent(SourceIntent.ResetFlags)
-                    onDismiss()
-                },
-                trailingContent = {
-                    Row {
-                        IconButton(onClick = { viewModel.onIntent(SourceIntent.OnToggleReorder) }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Sort,
-                                contentDescription = null,
-                                tint = if (state.isReorderShow) GlassGreen else LocalGlassColors.current.text2
-                            )
-                        }
-                        if (showEditButton) {
-                            TextButton(onClick = { isEditMode = !isEditMode }) {
-                                FintrackLabelMediumText(
-                                    text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit)
+            FintrackBackgroundBlobs()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                ScreenHeader(
+                    title = stringResource(Res.string.source),
+                    onClose = {
+                        viewModel.onIntent(SourceIntent.ResetFlags)
+                        onDismiss()
+                    },
+                    trailingContent = {
+                        Row {
+                            IconButton(onClick = { viewModel.onIntent(SourceIntent.OnToggleReorder) }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Sort,
+                                    contentDescription = null,
+                                    tint = if (state.isReorderShow) GlassGreen else LocalGlassColors.current.text2
                                 )
+                            }
+                            if (showEditButton) {
+                                TextButton(onClick = { isEditMode = !isEditMode }) {
+                                    FintrackLabelMediumText(
+                                        text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit)
+                                    )
+                                }
                             }
                         }
                     }
-                }
-            )
+                )
 
-            EntityList(
-                title = stringResource(Res.string.source),
-                query = state.searchQuery,
-                onQueryChange = { viewModel.onIntent(SourceIntent.UpdateSearchQuery(it)) },
-                showActions = isEditMode && !state.isReorderShow,
-                isReorderMode = state.isReorderShow,
-                onMove = { from, to ->
-                    val list = state.sources.toMutableList()
-                    list.add(to, list.removeAt(from))
-                    val positions = list.mapIndexed { index, source ->
-                        source.id!! to index
-                    }.toMap()
-                    viewModel.onIntent(SourceIntent.UpdatePositions(positions))
-                },
-                items = state.filteredSources.map { source ->
-                    EntityItem(
-                        id = source.id ?: 0L,
-                        name = source.name,
-                        sub = if (source.type == 1) source.cardNumber else source.description,
-                        badge = source.formattedBalance + " " + stringResource(Res.string.currency_toman),
-                        iconId = source.iconId,
-                        colorId = source.colorId
-                    )
-                },
-                onItemClick = { item ->
-                    if (clickable) {
+                EntityList(
+                    title = stringResource(Res.string.source),
+                    query = state.searchQuery,
+                    onQueryChange = { viewModel.onIntent(SourceIntent.UpdateSearchQuery(it)) },
+                    showActions = isEditMode && !state.isReorderShow,
+                    isReorderMode = state.isReorderShow,
+                    onMove = { from, to ->
+                        val list = state.sources.toMutableList()
+                        list.add(to, list.removeAt(from))
+                        val positions = list.mapIndexed { index, source ->
+                            source.id!! to index
+                        }.toMap()
+                        viewModel.onIntent(SourceIntent.UpdatePositions(positions))
+                    },
+                    items = state.filteredSources.map { source ->
+                        EntityItem(
+                            id = source.id ?: 0L,
+                            name = source.name,
+                            sub = if (source.type == 1) source.cardNumber else source.description,
+                            badge = source.formattedBalance + " " + stringResource(Res.string.currency_toman),
+                            iconId = source.iconId,
+                            colorId = source.colorId
+                        )
+                    },
+                    onItemClick = { item ->
+                        if (clickable) {
+                            state.sources.find { it.id == item.id }?.let {
+                                viewModel.onIntent(SourceIntent.SelectedSource(it))
+                            }
+                        }
+                    },
+                    onAddClick = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
+                    onFilterClick = onNavigateToTransactions?.let { callback ->
+                        { item ->
+                            state.sources.find { it.id == item.id }?.let { callback(it) }
+                            onDismiss()
+                        }
+                    },
+                    onEditClick = { item ->
                         state.sources.find { it.id == item.id }?.let {
-                            viewModel.onIntent(SourceIntent.SelectedSource(it))
+                            viewModel.onIntent(SourceIntent.OnEditClick(it))
+                        }
+                    },
+                    onDeleteClick = { item ->
+                        state.sources.find { it.id == item.id }?.let {
+                            viewModel.onIntent(SourceIntent.OnDeleteClick(it))
                         }
                     }
-                },
-                onAddClick = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
-                onFilterClick = onNavigateToTransactions?.let { callback ->
-                    { item ->
-                        state.sources.find { it.id == item.id }?.let { callback(it) }
-                        onDismiss()
-                    }
-                },
-                onEditClick = { item ->
-                    state.sources.find { it.id == item.id }?.let {
-                        viewModel.onIntent(SourceIntent.OnEditClick(it))
-                    }
-                },
-                onDeleteClick = { item ->
-                    state.sources.find { it.id == item.id }?.let {
-                        viewModel.onIntent(SourceIntent.OnDeleteClick(it))
-                    }
-                }
-            )
+                )
+            }
         }
     }
 

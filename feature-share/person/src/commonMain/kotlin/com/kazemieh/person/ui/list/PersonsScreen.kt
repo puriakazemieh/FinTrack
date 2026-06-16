@@ -11,7 +11,7 @@ import com.kazemieh.designsystem.GlassBg0
 import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
-import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.person.ui.add.AddPersonBottomSheet
 import com.kazemieh.person.ui.delete.DeletePersonBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
@@ -33,18 +33,12 @@ fun PersonsScreen(
         viewModel.onIntent(PersonIntent.GetAllPerson)
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+    FintrackScreen(
+        title = stringResource(Res.string.persons),
+        sub = stringResource(Res.string.title_person_management),
+        onClose = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            ScreenHeader(
-                title = stringResource(Res.string.persons),
-                sub = stringResource(Res.string.title_person_management),
-                onClose = onBack
-            )
-
             EntityList(
                 title = stringResource(Res.string.persons),
                 query = state.searchQuery,

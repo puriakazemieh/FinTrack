@@ -1,6 +1,8 @@
 package com.kazemieh.designsystem.component.bottomsheet
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,30 +33,38 @@ fun FormBottomSheetScaffold(
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = null
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .padding(space.mediumLarge)
-                .padding(bottom = space.mediumLarge),
-            verticalArrangement = Arrangement.spacedBy(space.mediumLarge)
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
         ) {
+            FintrackBackgroundBlobs()
             Column(
-                modifier = Modifier.weight(1f, fill = false),
+                modifier = Modifier
+                    .padding(space.mediumLarge)
+                    .padding(bottom = space.mediumLarge),
                 verticalArrangement = Arrangement.spacedBy(space.mediumLarge)
             ) {
-                content()
-            }
+                Column(
+                    modifier = Modifier.weight(1f, fill = false),
+                    verticalArrangement = Arrangement.spacedBy(space.mediumLarge)
+                ) {
+                    content()
+                }
 
-            Button(
-                onClick = onPrimaryClick,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                FintrackBodyMediumText(text = primaryButtonText)
+                Button(
+                    onClick = onPrimaryClick,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    FintrackBodyMediumText(text = primaryButtonText)
+                }
             }
         }
     }

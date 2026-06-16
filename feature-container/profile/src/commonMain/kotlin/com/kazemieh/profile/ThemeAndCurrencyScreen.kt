@@ -1,31 +1,51 @@
 package com.kazemieh.profile
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.designsystem.AppTheme
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.*
-import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.FintrackBodyLargeText
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
+import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.WidgetCard
 import com.kazemieh.money.Currency
-import fintrack.core.designsystem.generated.resources.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.currency_rial_full
+import fintrack.core.designsystem.generated.resources.currency_toman_full
+import fintrack.core.designsystem.generated.resources.label_currency
+import fintrack.core.designsystem.generated.resources.label_theme
+import fintrack.core.designsystem.generated.resources.theme_glass_dark
+import fintrack.core.designsystem.generated.resources.theme_glass_light
+import fintrack.core.designsystem.generated.resources.theme_plain_dark
+import fintrack.core.designsystem.generated.resources.theme_plain_light
+import fintrack.core.designsystem.generated.resources.title_theme_currency
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -37,67 +57,40 @@ fun ThemeAndCurrencyScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+    FintrackScreen(
+        title = stringResource(Res.string.title_theme_currency),
+        onBack = onBack
     ) {
-        // Decorative background blobs
-        val primaryColor = MaterialTheme.colorScheme.primary
-        val secondaryColor = MaterialTheme.colorScheme.secondary
-
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(primaryColor.copy(alpha = 0.15f), Color.Transparent),
-                    center = Offset(size.width * 0.8f, size.height * 0.2f),
-                    radius = 400.dp.toPx()
-                ),
-                center = Offset(size.width * 0.8f, size.height * 0.2f),
-                radius = 400.dp.toPx()
-            )
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(secondaryColor.copy(alpha = 0.1f), Color.Transparent),
-                    center = Offset(size.width * 0.2f, size.height * 0.8f),
-                    radius = 500.dp.toPx()
-                ),
-                center = Offset(size.width * 0.2f, size.height * 0.8f),
-                radius = 500.dp.toPx()
-            )
-        }
-
-        Column(modifier = Modifier.fillMaxSize()) {
-            ScreenHeader(
-                title = stringResource(Res.string.title_theme_currency),
-                onBack = onBack
-            )
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(horizontal = space.large),
-                verticalArrangement = Arrangement.spacedBy(space.medium),
-                contentPadding = PaddingValues(bottom = 100.dp)
-            ) {
-                item {
-                    WidgetCard(
-                        title = stringResource(Res.string.label_theme)
-                    ) {
-                        ThemeGrid(
-                            selectedTheme = state.selectedTheme,
-                            onThemeSelected = { viewModel.onIntent(ThemeAndCurrencyIntent.SelectTheme(it)) }
-                        )
-                    }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(horizontal = space.large),
+            verticalArrangement = Arrangement.spacedBy(space.medium),
+            contentPadding = PaddingValues(bottom = 100.dp)
+        ) {
+            item {
+                WidgetCard(
+                    title = stringResource(Res.string.label_theme)
+                ) {
+                    ThemeGrid(
+                        selectedTheme = state.selectedTheme,
+                        onThemeSelected = { viewModel.onIntent(ThemeAndCurrencyIntent.SelectTheme(it)) }
+                    )
                 }
+            }
 
-                item {
-                    WidgetCard(
-                        title = stringResource(Res.string.label_currency)
-                    ) {
-                        CurrencySection(
-                            selectedCurrency = state.selectedCurrency,
-                            onCurrencySelected = { viewModel.onIntent(ThemeAndCurrencyIntent.SelectCurrency(it)) }
-                        )
-                    }
+            item {
+                WidgetCard(
+                    title = stringResource(Res.string.label_currency)
+                ) {
+                    CurrencySection(
+                        selectedCurrency = state.selectedCurrency,
+                        onCurrencySelected = {
+                            viewModel.onIntent(
+                                ThemeAndCurrencyIntent.SelectCurrency(
+                                    it
+                                )
+                            )
+                        }
+                    )
                 }
             }
         }

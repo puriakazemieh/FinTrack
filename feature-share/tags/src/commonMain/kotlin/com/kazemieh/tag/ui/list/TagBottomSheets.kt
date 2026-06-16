@@ -1,6 +1,7 @@
 package com.kazemieh.tag.ui.list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
@@ -10,7 +11,6 @@ import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import com.kazemieh.common.model.Tag
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.GlassGreen
@@ -21,6 +21,7 @@ import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.designsystem.component.model.toTag
 import com.kazemieh.tag.ui.add.AddTagBottomSheet
@@ -119,7 +120,6 @@ fun TagPickerSingleBottomSheet(
     }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val glassColors = LocalGlassColors.current
 
     ModalBottomSheet(
         onDismissRequest = {
@@ -130,79 +130,85 @@ fun TagPickerSingleBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            ScreenHeader(
-                title = stringResource(Res.string.tags),
-                onClose = {
-                    viewModel.onIntent(TagIntent.ResetFlags)
-                    onDismiss()
-                },
-                trailingContent = {
-                        IconButton(onClick = { viewModel.onIntent(TagIntent.OnToggleReorder) }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Sort,
-                                contentDescription = null,
-                                tint = if (state.isReorderShow) GlassGreen else LocalGlassColors.current.text2
-                            )
-                        }
-                        if (showEditButton) {
-                            TextButton(onClick = { isEditMode = !isEditMode }) {
-                                FintrackLabelMediumText(
-                                    text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit)
+            FintrackBackgroundBlobs()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                ScreenHeader(
+                    title = stringResource(Res.string.tags),
+                    onClose = {
+                        viewModel.onIntent(TagIntent.ResetFlags)
+                        onDismiss()
+                    },
+                    trailingContent = {
+                            IconButton(onClick = { viewModel.onIntent(TagIntent.OnToggleReorder) }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Sort,
+                                    contentDescription = null,
+                                    tint = if (state.isReorderShow) GlassGreen else LocalGlassColors.current.text2
                                 )
                             }
-                        }
-                }
-            )
+                            if (showEditButton) {
+                                TextButton(onClick = { isEditMode = !isEditMode }) {
+                                    FintrackLabelMediumText(
+                                        text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit)
+                                    )
+                                }
+                            }
+                    }
+                )
 
-            EntityList(
-                title = stringResource(Res.string.tags),
-                query = state.searchQuery,
-                onQueryChange = { viewModel.onIntent(TagIntent.UpdateSearchQuery(it)) },
-                onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
-                showActions = isEditMode && !state.isReorderShow,
-                isReorderMode = state.isReorderShow,
-                onMove = { from, to ->
-                    val list = state.tags.toMutableList()
-                    list.add(to, list.removeAt(from))
-                    val positions = list.mapIndexed { index, tag ->
-                        tag.id!! to index
-                    }.toMap()
-                    viewModel.onIntent(TagIntent.UpdatePositions(positions))
-                },
-                onFilterClick = onNavigateToTransactions?.let { callback ->
-                    { item ->
-                        state.tags.find { it.id == item.id }?.let { callback(it) }
-                        onDismiss()
+                EntityList(
+                    title = stringResource(Res.string.tags),
+                    query = state.searchQuery,
+                    onQueryChange = { viewModel.onIntent(TagIntent.UpdateSearchQuery(it)) },
+                    onAddClick = { viewModel.onIntent(TagIntent.ShowAddTag) },
+                    showActions = isEditMode && !state.isReorderShow,
+                    isReorderMode = state.isReorderShow,
+                    onMove = { from, to ->
+                        val list = state.tags.toMutableList()
+                        list.add(to, list.removeAt(from))
+                        val positions = list.mapIndexed { index, tag ->
+                            tag.id!! to index
+                        }.toMap()
+                        viewModel.onIntent(TagIntent.UpdatePositions(positions))
+                    },
+                    onFilterClick = onNavigateToTransactions?.let { callback ->
+                        { item ->
+                            state.tags.find { it.id == item.id }?.let { callback(it) }
+                            onDismiss()
+                        }
+                    },
+                    items = state.filteredTags.map {
+                        EntityItem(
+                            id = it.id ?: 0,
+                            name = it.name,
+                            sub = it.description,
+                            iconId = it.iconId,
+                            colorId = it.colorId
+                        )
+                    },
+                    onEditClick = { item ->
+                        state.tags.find { it.id == item.id }?.let {
+                            viewModel.onIntent(TagIntent.OnEditClick(it))
+                        }
+                    },
+                    onDeleteClick = { item ->
+                        state.tags.find { it.id == item.id }?.let {
+                            viewModel.onIntent(TagIntent.OnDeleteClick(it))
+                        }
+                    },
+                    onItemClick = { item ->
+                        state.tags.find { it.id == item.id }?.let { onTagClick(it) }
                     }
-                },
-                items = state.filteredTags.map {
-                    EntityItem(
-                        id = it.id ?: 0,
-                        name = it.name,
-                        sub = it.description,
-                        iconId = it.iconId,
-                        colorId = it.colorId
-                    )
-                },
-                onEditClick = { item ->
-                    state.tags.find { it.id == item.id }?.let {
-                        viewModel.onIntent(TagIntent.OnEditClick(it))
-                    }
-                },
-                onDeleteClick = { item ->
-                    state.tags.find { it.id == item.id }?.let {
-                        viewModel.onIntent(TagIntent.OnDeleteClick(it))
-                    }
-                },
-                onItemClick = { item ->
-                    state.tags.find { it.id == item.id }?.let { onTagClick(it) }
-                }
-            )
+                )
+            }
         }
     }
 

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -49,6 +50,7 @@ import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.Chip
+import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import fintrack.core.designsystem.generated.resources.*
@@ -86,8 +88,10 @@ fun SearchScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
+    FintrackScreen(
+        title = null, // Use custom header below
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -103,67 +107,62 @@ fun SearchScreen(
                     modifier = Modifier.weight(1f)
                 )
             }
-        }
-    ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            if (state.query.isEmpty()) {
-                SearchEmptyState(
-                    recentSearches = state.recentSearches,
-                    quickFilters = state.quickFilters,
-                    mostUsedCategories = state.mostUsedCategories,
-                    mostUsedSources = state.mostUsedSources,
-                    mostUsedPersons = state.mostUsedPersons,
-                    mostUsedTags = state.mostUsedTags,
-                    onRecentClick = { viewModel.onIntent(SearchIntent.SelectRecentSearch(it)) },
-                    onDeleteRecent = { viewModel.onIntent(SearchIntent.DeleteRecentSearch(it)) },
-                    onQuickFilterClick = { viewModel.onIntent(SearchIntent.SelectQuickFilter(it)) },
-                    onCategoryClick = onNavigateToCategory,
-                    onSourceClick = onNavigateToSource,
-                    onPersonClick = onNavigateToPerson,
-                    onTagClick = onNavigateToTag
-                )
-            } else {
-                SearchResultList(
-                    query = state.query,
-                    transactions = state.transactions,
-                    categories = state.categories,
-                    sources = state.sources,
-                    persons = state.persons,
-                    tags = state.tags,
-                    onTransactionClick = { tx ->
-                        viewModel.onIntent(
-                            SearchIntent.SelectRecentSearch(
-                                tx.transaction.description ?: ""
-                            )
-                        )
-                        viewModel.onIntent(SearchIntent.ShowTransactionBottomSheet(tx))
-                    },
-                    onCategoryClick = { cat ->
-                        viewModel.onIntent(SearchIntent.SelectRecentSearch(cat.name))
-                        onNavigateToCategory(cat)
-                    },
-                    onSourceClick = { src ->
-                        viewModel.onIntent(SearchIntent.SelectRecentSearch(src.name))
-                        onNavigateToSource(src)
-                    },
-                    onPersonClick = { p ->
-                        viewModel.onIntent(SearchIntent.SelectRecentSearch(p.name))
-                        onNavigateToPerson(p)
-                    },
-                    onTagClick = { t ->
-                        viewModel.onIntent(SearchIntent.SelectRecentSearch(t.name))
-                        onNavigateToTag(t)
-                    }
-                )
-            }
 
-            if (state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            Box(modifier = Modifier.weight(1f)) {
+                if (state.query.isEmpty()) {
+                    SearchEmptyState(
+                        recentSearches = state.recentSearches,
+                        quickFilters = state.quickFilters,
+                        mostUsedCategories = state.mostUsedCategories,
+                        mostUsedSources = state.mostUsedSources,
+                        mostUsedPersons = state.mostUsedPersons,
+                        mostUsedTags = state.mostUsedTags,
+                        onRecentClick = { viewModel.onIntent(SearchIntent.SelectRecentSearch(it)) },
+                        onDeleteRecent = { viewModel.onIntent(SearchIntent.DeleteRecentSearch(it)) },
+                        onQuickFilterClick = { viewModel.onIntent(SearchIntent.SelectQuickFilter(it)) },
+                        onCategoryClick = onNavigateToCategory,
+                        onSourceClick = onNavigateToSource,
+                        onPersonClick = onNavigateToPerson,
+                        onTagClick = onNavigateToTag
+                    )
+                } else {
+                    SearchResultList(
+                        query = state.query,
+                        transactions = state.transactions,
+                        categories = state.categories,
+                        sources = state.sources,
+                        persons = state.persons,
+                        tags = state.tags,
+                        onTransactionClick = { tx ->
+                            viewModel.onIntent(
+                                SearchIntent.SelectRecentSearch(
+                                    tx.transaction.description ?: ""
+                                )
+                            )
+                            viewModel.onIntent(SearchIntent.ShowTransactionBottomSheet(tx))
+                        },
+                        onCategoryClick = { cat ->
+                            viewModel.onIntent(SearchIntent.SelectRecentSearch(cat.name))
+                            onNavigateToCategory(cat)
+                        },
+                        onSourceClick = { src ->
+                            viewModel.onIntent(SearchIntent.SelectRecentSearch(src.name))
+                            onNavigateToSource(src)
+                        },
+                        onPersonClick = { p ->
+                            viewModel.onIntent(SearchIntent.SelectRecentSearch(p.name))
+                            onNavigateToPerson(p)
+                        },
+                        onTagClick = { t ->
+                            viewModel.onIntent(SearchIntent.SelectRecentSearch(t.name))
+                            onNavigateToTag(t)
+                        }
+                    )
+                }
+
+                if (state.isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
             }
         }
 

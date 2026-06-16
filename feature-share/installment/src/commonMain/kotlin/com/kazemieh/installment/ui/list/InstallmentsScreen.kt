@@ -45,6 +45,7 @@ import com.kazemieh.designsystem.component.FintrackButton
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.installment.ui.InstallmentIntent
 import com.kazemieh.installment.ui.InstallmentViewModel
@@ -82,11 +83,20 @@ fun InstallmentsScreen(
         viewModel.onIntent(InstallmentIntent.Init)
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    FintrackScreen(
+        floatingActionButton = {
+            FAB(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(space.large)
+                    .padding(bottom = 100.dp) // Avoid navigation bar
+            ) {
+                showAddInstallment = true
+            }
+        }
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+            modifier = Modifier.fillMaxSize()
         ) {
             TabRow(
                 selectedTabIndex = selectedTabIndex,
@@ -161,15 +171,6 @@ fun InstallmentsScreen(
                     }
                 }
             }
-        }
-
-        FAB(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(space.large)
-                .padding(bottom = 100.dp) // Avoid navigation bar
-        ) {
-            showAddInstallment = true
         }
 
         if (showAddInstallment) {

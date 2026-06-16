@@ -17,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
@@ -30,17 +29,7 @@ import com.kazemieh.designsystem.GlassGreenDark
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackLabelMediumText
-import com.kazemieh.designsystem.component.FintrackLabelSmallText
-import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.designsystem.component.FinTrackLeadingIcon
-import com.kazemieh.designsystem.component.EmptyList
-import com.kazemieh.designsystem.component.LeadingIconStyle
-import com.kazemieh.designsystem.component.glass.GlassCard
-import com.kazemieh.designsystem.component.glass.GlassTone
-import com.kazemieh.designsystem.component.glass.ScreenHeader
-import com.kazemieh.designsystem.component.glass.SearchBar
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.component.model.asString
@@ -98,31 +87,38 @@ fun SelectableFlowRowBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            ScreenHeader(
-                title = title,
-                onClose = onDismiss,
-                trailingContent = {
-                    if (showEditButton) {
-                        TextButton(onClick = { isEditMode = !isEditMode }) {
-                            FintrackLabelMediumText(
-                                text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit),
-                                color = glassColors.text2
-                            )
-                        }
-                    }
-                }
-            )
-
+            FintrackBackgroundBlobs()
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 24.dp)
+                    .fillMaxSize()
             ) {
+                ScreenHeader(
+                    title = title,
+                    onClose = onDismiss,
+                    trailingContent = {
+                        if (showEditButton) {
+                            TextButton(onClick = { isEditMode = !isEditMode }) {
+                                FintrackLabelMediumText(
+                                    text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(
+                                        Res.string.edit
+                                    ),
+                                    color = glassColors.text2
+                                )
+                            }
+                        }
+                    }
+                )
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 24.dp)
+                ) {
                 SearchBar(
                     query = searchQuery,
                     onQueryChange = { searchQuery = it },
@@ -270,6 +266,7 @@ fun SelectableFlowRowBottomSheet(
             content()
         }
     }
+}
 }
 
 @Composable

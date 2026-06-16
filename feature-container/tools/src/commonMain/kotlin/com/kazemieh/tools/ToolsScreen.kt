@@ -1,7 +1,5 @@
 package com.kazemieh.tools
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -12,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
-import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.FintrackScreen
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 
@@ -28,17 +26,11 @@ fun ToolsScreen(
     onNavigateToAssets: () -> Unit
 ) {
     val space = LocalSpacing.current
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+    FintrackScreen(
+        title = stringResource(Res.string.navigation_tools),
+        sub = stringResource(Res.string.title_tools_management)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            ScreenHeader(
-                title = stringResource(Res.string.navigation_tools),
-                sub = stringResource(Res.string.title_tools_management)
-            )
-
             Button(
                 onClick = onNavigateToBudget,
                 modifier = Modifier.padding(space.large)

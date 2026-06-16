@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.cancell_
 import fintrack.core.designsystem.generated.resources.choose_color
@@ -124,99 +125,107 @@ fun ColorIconPickerBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = null
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .background(MaterialTheme.colorScheme.background)
         ) {
+            FintrackBackgroundBlobs()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
 
-            val isAnyIconTintable = remember(icons) { icons.any { it.isTintable } }
+                val isAnyIconTintable = remember(icons) { icons.any { it.isTintable } }
 
-            if (isAnyIconTintable) {
+                if (isAnyIconTintable) {
+                    FintrackTitleMediumText(
+                        text = stringResource(Res.string.choose_color),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    LazyRow(
+                        state = colorListState,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        contentPadding = PaddingValues(horizontal = 2.dp)
+                    ) {
+                        items(colors, key = { it.id }) { item ->
+                            ColorChip(
+                                item = item,
+                                selected = item.id == selectedColor.id,
+                                onClick = { selectedColor = item }
+                            )
+                        }
+                    }
+                }
+
                 FintrackTitleMediumText(
-                    text = stringResource(Res.string.choose_color),
+                    text = stringResource(Res.string.choose_icon),
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
-                LazyRow(
-                    state = colorListState,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    contentPadding = PaddingValues(horizontal = 2.dp)
+                LazyVerticalGrid(
+                    state = iconGridState,
+                    columns = GridCells.Fixed(columns),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 180.dp, max = 320.dp)
                 ) {
-                    items(colors, key = { it.id }) { item ->
-                        ColorChip(
-                            item = item,
-                            selected = item.id == selectedColor.id,
-                            onClick = { selectedColor = item }
+                    items(icons, key = { it.id }) { icon ->
+                        IconCell(
+                            icon = icon,
+                            tint = if (icon.isTintable) selectedColor.color else Color.Unspecified,
+                            selected = icon.id == selectedIcon.id,
+                            onClick = { selectedIcon = icon }
                         )
                     }
                 }
-            }
-
-            FintrackTitleMediumText(
-                text = stringResource(Res.string.choose_icon),
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            LazyVerticalGrid(
-                state = iconGridState,
-                columns = GridCells.Fixed(columns),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 180.dp, max = 320.dp)
-            ) {
-                items(icons, key = { it.id }) { icon ->
-                    IconCell(
-                        icon = icon,
-                        tint = if (icon.isTintable) selectedColor.color else Color.Unspecified,
-                        selected = icon.id == selectedIcon.id,
-                        onClick = { selectedIcon = icon }
-                    )
-                }
-            }
 
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(space.large),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(space.mediumSmall)
-            ) {
-                Button(
-                    onClick = { onSave(selectedColor, selectedIcon) },
-                    modifier = Modifier.weight(1f),
-                    shape = MaterialTheme.shapes.medium,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(space.large),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(space.mediumSmall)
                 ) {
-                    FintrackTitleMediumText(
-                        text = stringResource(Res.string.save_),
-                        color = MaterialTheme.colorScheme.background
-                    )
-                }
+                    Button(
+                        onClick = { onSave(selectedColor, selectedIcon) },
+                        modifier = Modifier.weight(1f),
+                        shape = MaterialTheme.shapes.medium,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    ) {
+                        FintrackTitleMediumText(
+                            text = stringResource(Res.string.save_),
+                            color = MaterialTheme.colorScheme.background
+                        )
+                    }
 
-                Button(
-                    onClick = onDismiss,
-                    modifier = Modifier.weight(1f),
-                    shape = MaterialTheme.shapes.medium,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.onError
-                    )
-                ) {
-                    FintrackTitleMediumText(
-                        text = stringResource(Res.string.cancell_),
-                        color = MaterialTheme.colorScheme.background
-                    )
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f),
+                        shape = MaterialTheme.shapes.medium,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError
+                        )
+                    ) {
+                        FintrackTitleMediumText(
+                            text = stringResource(Res.string.cancell_),
+                            color = MaterialTheme.colorScheme.background
+                        )
+                    }
                 }
             }
         }

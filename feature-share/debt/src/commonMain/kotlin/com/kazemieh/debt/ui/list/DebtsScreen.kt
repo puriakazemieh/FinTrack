@@ -18,7 +18,7 @@ import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.EntitySummary
-import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.model.UiText
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -44,60 +44,51 @@ fun DebtsScreen(
     val totalDebts = state.debts.filter { it.debt.type == DebtType.OWED_BY_ME && !it.debt.isSettled }
         .sumOf { it.debt.amount }
 
-    Scaffold { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
-                .padding(padding)
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                ScreenHeader(
-                    title = stringResource(Res.string.navigation_debts),
-                    sub = stringResource(Res.string.title_debts_management),
-                    onClose = onBack
-                )
-
-                EntityList(
-                    title = stringResource(Res.string.navigation_debts),
-                    query = "",
-                    onQueryChange = {},
-                    onAddClick = { showAddDebt = true },
-                    summary = listOf(
-                        EntitySummary(
-                            label = UiText.StringResourceText(Res.string.total_credits),
-                            value = totalCredits.toPersianPrice(),
-                            unit = stringResource(Res.string.currency_toman),
-                            color = MaterialTheme.colorScheme.primary
-                        ),
-                        EntitySummary(
-                            label = UiText.StringResourceText(Res.string.total_debts),
-                            value = totalDebts.toPersianPrice(),
-                            unit = stringResource(Res.string.currency_toman),
-                            color = MaterialTheme.colorScheme.error
-                        )
+    FintrackScreen(
+        title = stringResource(Res.string.navigation_debts),
+        sub = stringResource(Res.string.title_debts_management),
+        onClose = onBack
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            EntityList(
+                title = stringResource(Res.string.navigation_debts),
+                query = "",
+                onQueryChange = {},
+                onAddClick = { showAddDebt = true },
+                summary = listOf(
+                    EntitySummary(
+                        label = UiText.StringResourceText(Res.string.total_credits),
+                        value = totalCredits.toPersianPrice(),
+                        unit = stringResource(Res.string.currency_toman),
+                        color = MaterialTheme.colorScheme.primary
                     ),
-                    items = state.debts.map {
-                        EntityItem(
-                            id = it.debt.id,
-                            name = it.person.name,
-                            sub = it.debt.description,
-                            badge = it.debt.amount.toPersianPrice(),
-                            color = if (it.debt.type == DebtType.OWED_TO_ME) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-                        )
-                    },
-                    onItemClick = { /* Navigate to detail? */ },
-                    onDeleteClick = { viewModel.onIntent(DebtIntent.DeleteDebt(it.id)) },
-                    onEditClick = { /* TODO */ },
-                    showActions = true
-                )
-            }
+                    EntitySummary(
+                        label = UiText.StringResourceText(Res.string.total_debts),
+                        value = totalDebts.toPersianPrice(),
+                        unit = stringResource(Res.string.currency_toman),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                ),
+                items = state.debts.map {
+                    EntityItem(
+                        id = it.debt.id,
+                        name = it.person.name,
+                        sub = it.debt.description,
+                        badge = it.debt.amount.toPersianPrice(),
+                        color = if (it.debt.type == DebtType.OWED_TO_ME) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                    )
+                },
+                onItemClick = { /* Navigate to detail? */ },
+                onDeleteClick = { viewModel.onIntent(DebtIntent.DeleteDebt(it.id)) },
+                onEditClick = { /* TODO */ },
+                showActions = true
+            )
         }
-    }
 
-    if (showAddDebt) {
-        AddDebtBottomSheet(
-            onDismiss = { showAddDebt = false }
-        )
+        if (showAddDebt) {
+            AddDebtBottomSheet(
+                onDismiss = { showAddDebt = false }
+            )
+        }
     }
 }

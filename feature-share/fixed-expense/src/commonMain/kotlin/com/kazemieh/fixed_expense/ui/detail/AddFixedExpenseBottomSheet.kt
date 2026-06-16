@@ -33,6 +33,7 @@ import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import fintrack.core.designsystem.generated.resources.*
 import kotlinx.datetime.Instant
@@ -67,101 +68,107 @@ fun AddFixedExpenseBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            ScreenHeader(
-                title = stringResource(Res.string.title_add_fixed_expense),
-                onClose = onDismiss
-            )
-
+            FintrackBackgroundBlobs()
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-                    .padding(space.large),
-                verticalArrangement = Arrangement.spacedBy(space.medium)
+                    .fillMaxSize()
             ) {
-                // Amount
-                FintrackOutlinedTextField(
-                    value = state.amount,
-                    onValueChange = { viewModel.onIntent(AddFixedExpenseIntent.SetAmount(it)) },
-                    label = { FintrackBodyMediumText(stringResource(Res.string.label_expense_amount)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true
+                ScreenHeader(
+                    title = stringResource(Res.string.title_add_fixed_expense),
+                    onClose = onDismiss
                 )
 
-                // Category Picker
-                PickerField(
-                    label = stringResource(Res.string.category),
-                    value = state.category?.name ?: stringResource(Res.string.select_category),
-                    icon = Icons.Default.Category,
-                    onClick = { showCategoryPicker = true }
-                )
-
-                // Source Picker
-                PickerField(
-                    label = stringResource(Res.string.source),
-                    value = state.source?.name ?: stringResource(Res.string.select_source),
-                    icon = Icons.Default.Wallet,
-                    onClick = { showSourcePicker = true }
-                )
-
-                // Recurrence Picker
-                PickerField(
-                    label = stringResource(Res.string.installment_frequency),
-                    value = when (state.recurrence) {
-                        RecurrenceType.DAILY -> stringResource(Res.string.frequency_daily)
-                        RecurrenceType.WEEKLY -> stringResource(Res.string.frequency_weekly)
-                        RecurrenceType.MONTHLY -> stringResource(Res.string.frequency_monthly)
-                        RecurrenceType.YEARLY -> stringResource(Res.string.frequency_yearly)
-                        RecurrenceType.CUSTOM -> stringResource(Res.string.custom_date)
-                        RecurrenceType.ONCE -> stringResource(Res.string.dp_today) // TODO: Better string for ONCE
-                    },
-                    icon = Icons.Default.Repeat,
-                    onClick = { showRecurrencePicker = true }
-                )
-
-                // Start Date Picker
-                PickerField(
-                    label = stringResource(Res.string.start),
-                    value = Instant.fromEpochMilliseconds(state.startDate).toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
-                    icon = Icons.Default.CalendarMonth,
-                    onClick = { /* TODO: Date Picker */ }
-                )
-
-                // Auto Post Toggle
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .padding(space.large),
+                    verticalArrangement = Arrangement.spacedBy(space.medium)
                 ) {
-                    FintrackBodyLargeText(stringResource(Res.string.label_auto_post_enabled))
-                    Switch(
-                        checked = state.isAutoPostEnabled,
-                        onCheckedChange = { viewModel.onIntent(AddFixedExpenseIntent.SetAutoPost(it)) }
+                    // Amount
+                    FintrackOutlinedTextField(
+                        value = state.amount,
+                        onValueChange = { viewModel.onIntent(AddFixedExpenseIntent.SetAmount(it)) },
+                        label = { FintrackBodyMediumText(stringResource(Res.string.label_expense_amount)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true
                     )
-                }
 
-                // Description
-                FintrackOutlinedTextField(
-                    value = state.description,
-                    onValueChange = { viewModel.onIntent(AddFixedExpenseIntent.SetDescription(it)) },
-                    label = { FintrackBodyMediumText(stringResource(Res.string.description)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    // Category Picker
+                    PickerField(
+                        label = stringResource(Res.string.category),
+                        value = state.category?.name ?: stringResource(Res.string.select_category),
+                        icon = Icons.Default.Category,
+                        onClick = { showCategoryPicker = true }
+                    )
 
-                Spacer(modifier = Modifier.height(space.medium))
+                    // Source Picker
+                    PickerField(
+                        label = stringResource(Res.string.source),
+                        value = state.source?.name ?: stringResource(Res.string.select_source),
+                        icon = Icons.Default.Wallet,
+                        onClick = { showSourcePicker = true }
+                    )
 
-                Button(
-                    onClick = { viewModel.onIntent(AddFixedExpenseIntent.Submit) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.large
-                ) {
-                    FintrackBodyLargeText(stringResource(Res.string.save_))
+                    // Recurrence Picker
+                    PickerField(
+                        label = stringResource(Res.string.installment_frequency),
+                        value = when (state.recurrence) {
+                            RecurrenceType.DAILY -> stringResource(Res.string.frequency_daily)
+                            RecurrenceType.WEEKLY -> stringResource(Res.string.frequency_weekly)
+                            RecurrenceType.MONTHLY -> stringResource(Res.string.frequency_monthly)
+                            RecurrenceType.YEARLY -> stringResource(Res.string.frequency_yearly)
+                            RecurrenceType.CUSTOM -> stringResource(Res.string.custom_date)
+                            RecurrenceType.ONCE -> stringResource(Res.string.dp_today) // TODO: Better string for ONCE
+                        },
+                        icon = Icons.Default.Repeat,
+                        onClick = { showRecurrencePicker = true }
+                    )
+
+                    // Start Date Picker
+                    PickerField(
+                        label = stringResource(Res.string.start),
+                        value = Instant.fromEpochMilliseconds(state.startDate).toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
+                        icon = Icons.Default.CalendarMonth,
+                        onClick = { /* TODO: Date Picker */ }
+                    )
+
+                    // Auto Post Toggle
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        FintrackBodyLargeText(stringResource(Res.string.label_auto_post_enabled))
+                        Switch(
+                            checked = state.isAutoPostEnabled,
+                            onCheckedChange = { viewModel.onIntent(AddFixedExpenseIntent.SetAutoPost(it)) }
+                        )
+                    }
+
+                    // Description
+                    FintrackOutlinedTextField(
+                        value = state.description,
+                        onValueChange = { viewModel.onIntent(AddFixedExpenseIntent.SetDescription(it)) },
+                        label = { FintrackBodyMediumText(stringResource(Res.string.description)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(space.medium))
+
+                    Button(
+                        onClick = { viewModel.onIntent(AddFixedExpenseIntent.Submit) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.large
+                    ) {
+                        FintrackBodyLargeText(stringResource(Res.string.save_))
+                    }
                 }
             }
         }
@@ -210,30 +217,39 @@ fun RecurrencePickerBottomSheet(
     onDismiss: () -> Unit
 ) {
     ModalBottomSheet(
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = null
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            FintrackTitleMediumText(stringResource(Res.string.title_select_recurrence), modifier = Modifier.padding(bottom = 16.dp))
-            RecurrenceType.entries.forEach { type ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onRecurrenceClick(type) }
-                        .padding(vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(selected = type == selectedRecurrence, onClick = null)
-                    Spacer(modifier = Modifier.width(12.dp))
-                    FintrackBodyLargeText(
-                        when (type) {
-                            RecurrenceType.DAILY -> stringResource(Res.string.frequency_daily)
-                            RecurrenceType.WEEKLY -> stringResource(Res.string.frequency_weekly)
-                            RecurrenceType.MONTHLY -> stringResource(Res.string.frequency_monthly)
-                            RecurrenceType.YEARLY -> stringResource(Res.string.frequency_yearly)
-                            RecurrenceType.CUSTOM -> stringResource(Res.string.custom_date)
-                            RecurrenceType.ONCE -> stringResource(Res.string.dp_today)
-                        }
-                    )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            FintrackBackgroundBlobs()
+            Column(modifier = Modifier.padding(16.dp)) {
+                FintrackTitleMediumText(stringResource(Res.string.title_select_recurrence), modifier = Modifier.padding(bottom = 16.dp))
+                RecurrenceType.entries.forEach { type ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onRecurrenceClick(type) }
+                            .padding(vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(selected = type == selectedRecurrence, onClick = null)
+                        Spacer(modifier = Modifier.width(12.dp))
+                        FintrackBodyLargeText(
+                            when (type) {
+                                RecurrenceType.DAILY -> stringResource(Res.string.frequency_daily)
+                                RecurrenceType.WEEKLY -> stringResource(Res.string.frequency_weekly)
+                                RecurrenceType.MONTHLY -> stringResource(Res.string.frequency_monthly)
+                                RecurrenceType.YEARLY -> stringResource(Res.string.frequency_yearly)
+                                RecurrenceType.CUSTOM -> stringResource(Res.string.custom_date)
+                                RecurrenceType.ONCE -> stringResource(Res.string.dp_today)
+                            }
+                        )
+                    }
                 }
             }
         }

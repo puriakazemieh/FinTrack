@@ -14,7 +14,7 @@ import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.EntitySummary
-import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.model.UiText
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -31,18 +31,12 @@ fun PersonDetailScreen(
     val state by viewModel.state.collectAsState()
     val space = LocalSpacing.current
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
+    FintrackScreen(
+        title = state.person?.name ?: stringResource(Res.string.person_name),
+        sub = state.person?.description ?: "",
+        onClose = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            ScreenHeader(
-                title = state.person?.name ?: stringResource(Res.string.person_name),
-                sub = state.person?.description ?: "",
-                onClose = onBack
-            )
-
             EntityList(
                 title = stringResource(Res.string.navigation_debts),
                 query = "",

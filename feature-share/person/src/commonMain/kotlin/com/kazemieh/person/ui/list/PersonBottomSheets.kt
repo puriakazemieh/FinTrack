@@ -1,6 +1,7 @@
 package com.kazemieh.person.ui.list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,17 +25,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import com.kazemieh.common.model.Person
 import com.kazemieh.designsystem.LocalGlassColors
-import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassText2
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.bottomsheet.SelectableFlowRowBottomSheet
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.designsystem.component.model.toPerson
 import com.kazemieh.person.ui.add.AddPersonBottomSheet
@@ -151,79 +150,85 @@ fun PersonPickerSingleBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            ScreenHeader(
-                title = stringResource(Res.string.persons),
-                onClose = {
-                    viewModel.onIntent(PersonIntent.ResetFlags)
-                    onDismiss()
-                },
-                trailingContent = {
-                        IconButton(onClick = { viewModel.onIntent(PersonIntent.OnToggleReorder) }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Sort,
-                                contentDescription = null,
-                                tint = if (state.isReorderShow) GlassGreen else LocalGlassColors.current.text2
-                            )
-                        }
-                        if (showEditButton) {
-                            TextButton(onClick = { isEditMode = !isEditMode }) {
-                                FintrackLabelMediumText(
-                                    text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit)
+            FintrackBackgroundBlobs()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                ScreenHeader(
+                    title = stringResource(Res.string.persons),
+                    onClose = {
+                        viewModel.onIntent(PersonIntent.ResetFlags)
+                        onDismiss()
+                    },
+                    trailingContent = {
+                            IconButton(onClick = { viewModel.onIntent(PersonIntent.OnToggleReorder) }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Sort,
+                                    contentDescription = null,
+                                    tint = if (state.isReorderShow) GlassGreen else LocalGlassColors.current.text2
                                 )
                             }
-                        }
-                }
-            )
+                            if (showEditButton) {
+                                TextButton(onClick = { isEditMode = !isEditMode }) {
+                                    FintrackLabelMediumText(
+                                        text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit)
+                                    )
+                                }
+                            }
+                    }
+                )
 
-            EntityList(
-                title = stringResource(Res.string.persons),
-                query = state.searchQuery,
-                onQueryChange = { viewModel.onIntent(PersonIntent.UpdateSearchQuery(it)) },
-                onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
-                showActions = isEditMode && !state.isReorderShow,
-                isReorderMode = state.isReorderShow,
-                onMove = { from, to ->
-                    val list = state.persons.toMutableList()
-                    list.add(to, list.removeAt(from))
-                    val positions = list.mapIndexed { index, person ->
-                        person.id!! to index
-                    }.toMap()
-                    viewModel.onIntent(PersonIntent.UpdatePositions(positions))
-                },
-                onFilterClick = onNavigateToTransactions?.let { callback ->
-                    { item ->
-                        state.persons.find { it.id == item.id }?.let { callback(it) }
-                        onDismiss()
+                EntityList(
+                    title = stringResource(Res.string.persons),
+                    query = state.searchQuery,
+                    onQueryChange = { viewModel.onIntent(PersonIntent.UpdateSearchQuery(it)) },
+                    onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
+                    showActions = isEditMode && !state.isReorderShow,
+                    isReorderMode = state.isReorderShow,
+                    onMove = { from, to ->
+                        val list = state.persons.toMutableList()
+                        list.add(to, list.removeAt(from))
+                        val positions = list.mapIndexed { index, person ->
+                            person.id!! to index
+                        }.toMap()
+                        viewModel.onIntent(PersonIntent.UpdatePositions(positions))
+                    },
+                    onFilterClick = onNavigateToTransactions?.let { callback ->
+                        { item ->
+                            state.persons.find { it.id == item.id }?.let { callback(it) }
+                            onDismiss()
+                        }
+                    },
+                    items = state.filteredPersons.map {
+                        EntityItem(
+                            id = it.id ?: 0,
+                            name = it.name,
+                            sub = it.description,
+                            iconId = 1,
+                            colorId = 1
+                        )
+                    },
+                    onEditClick = { item ->
+                        state.persons.find { it.id == item.id }?.let {
+                            viewModel.onIntent(PersonIntent.OnEditClick(it))
+                        }
+                    },
+                    onDeleteClick = { item ->
+                        state.persons.find { it.id == item.id }?.let {
+                            viewModel.onIntent(PersonIntent.OnDeleteClick(it))
+                        }
+                    },
+                    onItemClick = { item ->
+                        state.persons.find { it.id == item.id }?.let { onPersonClick(it) }
                     }
-                },
-                items = state.filteredPersons.map {
-                    EntityItem(
-                        id = it.id ?: 0,
-                        name = it.name,
-                        sub = it.description,
-                        iconId = 1,
-                        colorId = 1
-                    )
-                },
-                onEditClick = { item ->
-                    state.persons.find { it.id == item.id }?.let {
-                        viewModel.onIntent(PersonIntent.OnEditClick(it))
-                    }
-                },
-                onDeleteClick = { item ->
-                    state.persons.find { it.id == item.id }?.let {
-                        viewModel.onIntent(PersonIntent.OnDeleteClick(it))
-                    }
-                },
-                onItemClick = { item ->
-                    state.persons.find { it.id == item.id }?.let { onPersonClick(it) }
-                }
-            )
+                )
+            }
         }
     }
 

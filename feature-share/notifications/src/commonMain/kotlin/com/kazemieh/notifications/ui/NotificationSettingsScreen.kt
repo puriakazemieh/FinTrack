@@ -1,19 +1,36 @@
 package com.kazemieh.notifications.ui
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Bedtime
+import androidx.compose.material.icons.filled.ConfirmationNumber
+import androidx.compose.material.icons.filled.EventRepeat
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -21,14 +38,29 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.FintrackBodyLargeText
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackButton
+import com.kazemieh.designsystem.component.FintrackLabelLargeText
+import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.GlassTone
-import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.component.glass.Switch
 import com.kazemieh.designsystem.component.glass.WidgetCard
 import com.kazemieh.designsystem.component.picker.FintrackTimePickerBottomSheet
-import fintrack.core.designsystem.generated.resources.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.cancell_
+import fintrack.core.designsystem.generated.resources.confirm
+import fintrack.core.designsystem.generated.resources.notif_budget_label
+import fintrack.core.designsystem.generated.resources.notif_channels_title
+import fintrack.core.designsystem.generated.resources.notif_cheque_label
+import fintrack.core.designsystem.generated.resources.notif_installment_label
+import fintrack.core.designsystem.generated.resources.notif_permission_rationale
+import fintrack.core.designsystem.generated.resources.notif_quiet_end_label
+import fintrack.core.designsystem.generated.resources.notif_quiet_hours
+import fintrack.core.designsystem.generated.resources.notif_quiet_start_label
+import fintrack.core.designsystem.generated.resources.setting_push_notifications
+import fintrack.core.designsystem.generated.resources.title_notification_settings
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -62,6 +94,7 @@ fun NotificationSettingsScreen(
                 NotificationSettingsEffect.RequestNotificationPermission -> {
                     // This intent is now handled via state trigger
                 }
+
                 is NotificationSettingsEffect.ShowMessage -> {
                 }
             }
@@ -80,109 +113,78 @@ fun NotificationSettingsScreen(
         }
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+    FintrackScreen(
+        title = stringResource(Res.string.title_notification_settings),
+        onBack = onBack
     ) {
-        // Decorative background blobs for glass effect (matching ProfileEditScreen)
-        val primaryColor = MaterialTheme.colorScheme.primary
-        val secondaryColor = MaterialTheme.colorScheme.secondary
-
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(primaryColor.copy(alpha = 0.15f), Color.Transparent),
-                    center = Offset(size.width * 0.8f, size.height * 0.2f),
-                    radius = 400.dp.toPx()
-                ),
-                center = Offset(size.width * 0.8f, size.height * 0.2f),
-                radius = 400.dp.toPx()
-            )
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(secondaryColor.copy(alpha = 0.1f), Color.Transparent),
-                    center = Offset(size.width * 0.2f, size.height * 0.8f),
-                    radius = 500.dp.toPx()
-                ),
-                center = Offset(size.width * 0.2f, size.height * 0.8f),
-                radius = 500.dp.toPx()
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(horizontal = space.large),
+            verticalArrangement = Arrangement.spacedBy(space.medium),
+            contentPadding = PaddingValues(bottom = 100.dp) // Matching profile content padding
         ) {
-            ScreenHeader(
-                title = stringResource(Res.string.title_notification_settings),
-                onBack = onBack
-            )
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(horizontal = space.large),
-                verticalArrangement = Arrangement.spacedBy(space.medium),
-                contentPadding = PaddingValues(bottom = 100.dp) // Matching profile content padding
-            ) {
-                if (state.showPermissionRationale) {
-                    item {
-                        PermissionRationaleCard(
-                            onRequestPermission = { viewModel.onIntent(NotificationSettingsIntent.RequestPermission(shouldShowRationale)) },
-                            onDismiss = { viewModel.onIntent(NotificationSettingsIntent.DismissPermissionRationale) }
-                        )
-                    }
-                }
-
+            if (state.showPermissionRationale) {
                 item {
-                    WidgetCard(title = stringResource(Res.string.notif_channels_title)) {
-                        NotificationSettingItem(
-                            title = stringResource(Res.string.notif_budget_label),
-                            icon = Icons.Default.AccountBalanceWallet,
-                            on = state.isBudgetNotifEnabled,
-                            onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleBudgetNotif) }
-                        )
-                        NotificationSettingItem(
-                            title = stringResource(Res.string.notif_installment_label),
-                            icon = Icons.Default.EventRepeat,
-                            on = state.isInstallmentNotifEnabled,
-                            onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleInstallmentNotif) }
-                        )
-                        NotificationSettingItem(
-                            title = stringResource(Res.string.notif_cheque_label),
-                            icon = Icons.Default.ConfirmationNumber,
-                            on = state.isChequeNotifEnabled,
-                            onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleChequeNotif) }
-                        )
-                    }
+                    PermissionRationaleCard(
+                        onRequestPermission = {
+                            viewModel.onIntent(
+                                NotificationSettingsIntent.RequestPermission(
+                                    shouldShowRationale
+                                )
+                            )
+                        },
+                        onDismiss = { viewModel.onIntent(NotificationSettingsIntent.DismissPermissionRationale) }
+                    )
                 }
+            }
 
-                item {
-                    WidgetCard(title = stringResource(Res.string.notif_quiet_hours)) {
-                        NotificationSettingItem(
-                            title = stringResource(Res.string.notif_quiet_hours),
-                            icon = Icons.Default.Bedtime,
-                            on = state.isQuietHoursEnabled,
-                            onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleQuietHours) }
+            item {
+                WidgetCard(title = stringResource(Res.string.notif_channels_title)) {
+                    NotificationSettingItem(
+                        title = stringResource(Res.string.notif_budget_label),
+                        icon = Icons.Default.AccountBalanceWallet,
+                        on = state.isBudgetNotifEnabled,
+                        onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleBudgetNotif) }
+                    )
+                    NotificationSettingItem(
+                        title = stringResource(Res.string.notif_installment_label),
+                        icon = Icons.Default.EventRepeat,
+                        on = state.isInstallmentNotifEnabled,
+                        onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleInstallmentNotif) }
+                    )
+                    NotificationSettingItem(
+                        title = stringResource(Res.string.notif_cheque_label),
+                        icon = Icons.Default.ConfirmationNumber,
+                        on = state.isChequeNotifEnabled,
+                        onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleChequeNotif) }
+                    )
+                }
+            }
+
+            item {
+                WidgetCard(title = stringResource(Res.string.notif_quiet_hours)) {
+                    NotificationSettingItem(
+                        title = stringResource(Res.string.notif_quiet_hours),
+                        icon = Icons.Default.Bedtime,
+                        on = state.isQuietHoursEnabled,
+                        onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleQuietHours) }
+                    )
+                    if (state.isQuietHoursEnabled) {
+                        TimePickerItem(
+                            title = stringResource(Res.string.notif_quiet_start_label),
+                            time = state.quietStart,
+                            onClick = {
+                                pickingStartTime = true
+                                showTimePicker.value = true
+                            }
                         )
-                        if (state.isQuietHoursEnabled) {
-                            TimePickerItem(
-                                title = stringResource(Res.string.notif_quiet_start_label),
-                                time = state.quietStart,
-                                onClick = { 
-                                    pickingStartTime = true
-                                    showTimePicker.value = true
-                                }
-                            )
-                            TimePickerItem(
-                                title = stringResource(Res.string.notif_quiet_end_label),
-                                time = state.quietEnd,
-                                onClick = { 
-                                    pickingStartTime = false
-                                    showTimePicker.value = true
-                                }
-                            )
-                        }
+                        TimePickerItem(
+                            title = stringResource(Res.string.notif_quiet_end_label),
+                            time = state.quietEnd,
+                            onClick = {
+                                pickingStartTime = false
+                                showTimePicker.value = true
+                            }
+                        )
                     }
                 }
             }

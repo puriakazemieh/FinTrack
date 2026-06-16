@@ -11,6 +11,7 @@ import com.kazemieh.asset.ui.component.CustomAssetSheet
 import com.kazemieh.common.model.Asset
 import com.kazemieh.common.model.AssetType
 import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.glass.FintrackScreen
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -28,15 +29,12 @@ fun AddAssetScreen(
     var description by remember { mutableStateOf("") }
     var showCustomSheet by remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { FintrackTitleLargeText(stringResource(Res.string.title_add_asset)) }
-            )
-        }
-    ) { padding ->
+    FintrackScreen(
+        title = stringResource(Res.string.title_add_asset),
+        onBack = onBack
+    ) {
         Column(
-            modifier = Modifier.padding(padding).padding(16.dp).fillMaxSize(),
+            modifier = Modifier.padding(16.dp).fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             FintrackOutlinedTextField(
@@ -47,7 +45,10 @@ fun AddAssetScreen(
             )
 
             // Asset Type Selector
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
                 AssetType.entries.forEach { assetType ->
                     FilterChip(
                         selected = type == assetType,
@@ -109,9 +110,9 @@ fun AddAssetScreen(
 
     if (showCustomSheet) {
         CustomAssetSheet(
-            onDismiss = { 
+            onDismiss = {
                 showCustomSheet = false
-                onBack() 
+                onBack()
             }
         )
     }

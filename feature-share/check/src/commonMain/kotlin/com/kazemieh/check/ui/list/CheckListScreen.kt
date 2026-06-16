@@ -27,7 +27,7 @@ import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.EntitySummary
-import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.Tabs
 import com.kazemieh.designsystem.component.model.UiText
 import fintrack.core.designsystem.generated.resources.*
@@ -60,67 +60,57 @@ fun CheckListScreen(
     val filteredChecks = state.checks.filter { it.status == currentStatus }
     val totalAmount = filteredChecks.sumOf { it.amount }
 
-    Scaffold { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
-                .padding(padding)
-                .padding(100.dp)
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                ScreenHeader(
-                    title = stringResource(Res.string.title_check_management),
-                    sub = stringResource(Res.string.sub_check_list_management_desc),
-                    onClose = onBack
+    FintrackScreen(
+        title = stringResource(Res.string.title_check_management),
+        sub = stringResource(Res.string.sub_check_list_management_desc),
+        onClose = onBack
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Tabs(
+                tabs = tabs,
+                active = selectedTab,
+                onChange = { selectedTab = it },
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                counts = listOf(
+                    state.checks.count { it.status == CheckStatus.PENDING },
+                    state.checks.count { it.status == CheckStatus.PASSED },
+                    state.checks.count { it.status == CheckStatus.REJECTED },
+                    state.checks.count { it.status == CheckStatus.CANCELLED }
                 )
+            )
 
-                Tabs(
-                    tabs = tabs,
-                    active = selectedTab,
-                    onChange = { selectedTab = it },
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
-                    counts = listOf(
-                        state.checks.count { it.status == CheckStatus.PENDING },
-                        state.checks.count { it.status == CheckStatus.PASSED },
-                        state.checks.count { it.status == CheckStatus.REJECTED },
-                        state.checks.count { it.status == CheckStatus.CANCELLED }
+            EntityList(
+                title = stringResource(Res.string.title_check_management),
+                query = "",
+                onQueryChange = {},
+                onAddClick = { showAddCheck = true },
+                summary = listOf(
+                    EntitySummary(
+                        label = UiText.StringResourceText(Res.string.label_total_amount),
+                        value = totalAmount.toPersianPrice(),
+                        unit = stringResource(Res.string.currency_toman),
+                        color = MaterialTheme.colorScheme.primary
                     )
-                )
-
-                EntityList(
-                    title = stringResource(Res.string.title_check_management),
-                    query = "",
-                    onQueryChange = {},
-                    onAddClick = { showAddCheck = true },
-                    summary = listOf(
-                        EntitySummary(
-                            label =  UiText.StringResourceText(Res.string.label_total_amount),
-                            value = totalAmount.toPersianPrice(),
-                            unit = stringResource(Res.string.currency_toman),
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    ),
-                    items = filteredChecks.map {
-                        EntityItem(
-                            id = it.id,
-                            name = it.personName ?: stringResource(Res.string.label_unknown_person),
-                            sub = it.description,
-                            badge = it.amount.toPersianPrice(),
-                            color = if (it.isIncoming) GlassGreen else GlassRed
-                        )
-                    },
-                    onEditClick = { /* TODO */ },
-                    onDeleteClick = { viewModel.onIntent(CheckListIntent.DeleteCheck(it.id)) },
-                    showActions = true
-                )
-            }
+                ),
+                items = filteredChecks.map {
+                    EntityItem(
+                        id = it.id,
+                        name = it.personName ?: stringResource(Res.string.label_unknown_person),
+                        sub = it.description,
+                        badge = it.amount.toPersianPrice(),
+                        color = if (it.isIncoming) GlassGreen else GlassRed
+                    )
+                },
+                onEditClick = { /* TODO */ },
+                onDeleteClick = { viewModel.onIntent(CheckListIntent.DeleteCheck(it.id)) },
+                showActions = true
+            )
         }
-    }
 
-    if (showAddCheck) {
-        AddCheckBottomSheet(
-            onDismiss = { showAddCheck = false }
-        )
+        if (showAddCheck) {
+            AddCheckBottomSheet(
+                onDismiss = { showAddCheck = false }
+            )
+        }
     }
 }

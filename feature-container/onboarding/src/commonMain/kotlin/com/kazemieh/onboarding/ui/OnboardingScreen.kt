@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.glass.FintrackScreen
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -35,67 +36,69 @@ fun OnboardingScreen(
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .padding(24.dp)
-            .statusBarsPadding()
-            .navigationBarsPadding(),
-        contentAlignment = Alignment.Center
-    ) {
-        if (state.isLoading) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                CircularProgressIndicator()
-                Spacer(modifier = Modifier.height(16.dp))
-                FintrackBodyLargeText(text = stringResource(Res.string.onboarding_loading))
-            }
-        } else {
-            // Skip button at top right
-            TextButton(
-                onClick = { viewModel.onIntent(OnboardingIntent.Skip) },
-                modifier = Modifier.align(Alignment.TopEnd)
-            ) {
-                FintrackLabelLargeText(
-                    text = stringResource(Res.string.onboarding_skip)
-                )
-            }
-
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                StepContent(
-                    state = state,
-                    onUpdateSource = { name, balance ->
-                        viewModel.onIntent(OnboardingIntent.UpdateSourceDetails(name, balance))
-                    },
-                    modifier = Modifier.weight(1f)
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+    FintrackScreen {
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .padding(24.dp)
+                .statusBarsPadding()
+                .navigationBarsPadding(),
+            contentAlignment = Alignment.Center
+        ) {
+            if (state.isLoading) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator()
+                    Spacer(modifier = Modifier.height(16.dp))
+                    FintrackBodyLargeText(text = stringResource(Res.string.onboarding_loading))
+                }
+            } else {
+                // Skip button at top right
+                TextButton(
+                    onClick = { viewModel.onIntent(OnboardingIntent.Skip) },
+                    modifier = Modifier.align(Alignment.TopEnd)
                 ) {
-                    if (state.currentStep > 1) {
-                        OutlinedButton(
-                            onClick = { viewModel.onIntent(OnboardingIntent.PreviousStep) },
-                            modifier = Modifier.weight(1f).height(56.dp).padding(end = 8.dp)
-                        ) {
-                            FintrackBodyLargeText(text = stringResource(Res.string.onboarding_previous))
-                        }
-                    }
+                    FintrackLabelLargeText(
+                        text = stringResource(Res.string.onboarding_skip)
+                    )
+                }
 
-                    Button(
-                        onClick = { viewModel.onIntent(OnboardingIntent.NextStep) },
-                        modifier = Modifier.weight(1f).height(56.dp).padding(start = 8.dp)
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    StepContent(
+                        state = state,
+                        onUpdateSource = { name, balance ->
+                            viewModel.onIntent(OnboardingIntent.UpdateSourceDetails(name, balance))
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        FintrackBodyLargeText(
-                            text = if (state.currentStep == 3) {
-                                stringResource(Res.string.onboarding_start)
-                            } else {
-                                stringResource(Res.string.onboarding_next)
+                        if (state.currentStep > 1) {
+                            OutlinedButton(
+                                onClick = { viewModel.onIntent(OnboardingIntent.PreviousStep) },
+                                modifier = Modifier.weight(1f).height(56.dp).padding(end = 8.dp)
+                            ) {
+                                FintrackBodyLargeText(text = stringResource(Res.string.onboarding_previous))
                             }
-                        )
+                        }
+
+                        Button(
+                            onClick = { viewModel.onIntent(OnboardingIntent.NextStep) },
+                            modifier = Modifier.weight(1f).height(56.dp).padding(start = 8.dp)
+                        ) {
+                            FintrackBodyLargeText(
+                                text = if (state.currentStep == 3) {
+                                    stringResource(Res.string.onboarding_start)
+                                } else {
+                                    stringResource(Res.string.onboarding_next)
+                                }
+                            )
+                        }
                     }
                 }
             }

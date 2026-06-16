@@ -1,7 +1,5 @@
 package com.kazemieh.profile
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,8 +27,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.input.KeyboardType
@@ -43,16 +39,13 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
-import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.designsystem.component.FourDigitGroupingTransformation
 import com.kazemieh.designsystem.component.glass.Fab
+import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.PhotoDrop
-import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.component.glass.WidgetCard
 import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
-import com.kazemieh.financialsource.ui.add.AddSourceIntent
 import com.kazemieh.jalali.JalaliCalendar
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.action_save_profile
@@ -65,7 +58,6 @@ import fintrack.core.designsystem.generated.resources.hint_enter_income
 import fintrack.core.designsystem.generated.resources.hint_enter_job
 import fintrack.core.designsystem.generated.resources.hint_enter_last_name
 import fintrack.core.designsystem.generated.resources.hint_enter_phone
-import fintrack.core.designsystem.generated.resources.label_account_number
 import fintrack.core.designsystem.generated.resources.label_birthday
 import fintrack.core.designsystem.generated.resources.label_city
 import fintrack.core.designsystem.generated.resources.label_email
@@ -117,172 +109,136 @@ fun ProfileEditScreen(
         }
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+    FintrackScreen(
+        title = stringResource(Res.string.title_edit_profile),
+        onBack = onBack,
     ) {
-        // Decorative background blobs for glass effect
-        val primaryColor = MaterialTheme.colorScheme.primary
-        val secondaryColor = MaterialTheme.colorScheme.secondary
-
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(primaryColor.copy(alpha = 0.15f), Color.Transparent),
-                    center = Offset(size.width * 0.8f, size.height * 0.2f),
-                    radius = 400.dp.toPx()
-                ),
-                center = Offset(size.width * 0.8f, size.height * 0.2f),
-                radius = 400.dp.toPx()
-            )
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(secondaryColor.copy(alpha = 0.1f), Color.Transparent),
-                    center = Offset(size.width * 0.2f, size.height * 0.8f),
-                    radius = 500.dp.toPx()
-                ),
-                center = Offset(size.width * 0.2f, size.height * 0.8f),
-                radius = 500.dp.toPx()
-            )
-        }
-
-        Column(modifier = Modifier.fillMaxSize()) {
-            ScreenHeader(
-                title = stringResource(Res.string.title_edit_profile),
-                onBack = onBack,
-            )
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = space.large),
-                verticalArrangement = Arrangement.spacedBy(space.medium),
-                contentPadding = PaddingValues(bottom = 100.dp)
-            ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = space.large),
+            verticalArrangement = Arrangement.spacedBy(space.medium),
+            contentPadding = PaddingValues(bottom = 100.dp)
+        ) {
 //                item {
 //                    CompletionCard(state.completionPercentage)
 //                }
 
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = space.medium),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        PhotoDrop(
-                            photoBitmap = state.avatar?.decodeToImageBitmap(),
-                            onImagePicked = { viewModel.onIntent(ProfileEditIntent.UpdateAvatar(it)) },
-                            onRemove = { viewModel.onIntent(ProfileEditIntent.RemoveAvatar) },
-                            modifier = Modifier.size(166.dp) // Larger square size
-                        )
-                    }
-                }
-
-                item {
-                    WidgetCard(
-                        title = stringResource(Res.string.section_personal_info),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        ProfileField(
-                            label = stringResource(Res.string.label_first_name),
-                            value = state.firstName,
-                            onValueChange = {
-                                viewModel.onIntent(
-                                    ProfileEditIntent.UpdateFirstName(
-                                        it
-                                    )
-                                )
-                            },
-                            placeholder = stringResource(Res.string.hint_enter_first_name)
-                        )
-                        ProfileField(
-                            label = stringResource(Res.string.label_last_name),
-                            value = state.lastName,
-                            onValueChange = { viewModel.onIntent(ProfileEditIntent.UpdateLastName(it)) },
-                            placeholder = stringResource(Res.string.hint_enter_last_name)
-                        )
-                        ProfileField(
-                            label = stringResource(Res.string.label_email),
-                            value = state.email,
-                            onValueChange = { viewModel.onIntent(ProfileEditIntent.UpdateEmail(it)) },
-                            placeholder = stringResource(Res.string.hint_enter_email),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-                        )
-                        ProfileField(
-                            label = stringResource(Res.string.label_phone),
-                            value = state.phone,
-                            onValueChange = { viewModel.onIntent(ProfileEditIntent.UpdatePhone(it)) },
-                            placeholder = stringResource(Res.string.hint_enter_phone),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-                        )
-                        ProfileField(
-                            label = stringResource(Res.string.label_birthday),
-                            value = state.birthday,
-                            onValueChange = { },
-                            placeholder = stringResource(Res.string.hint_enter_birthday),
-                            readOnly = true,
-                            onClick = { showDatePicker.value = true }
-                        )
-                        ProfileField(
-                            label = stringResource(Res.string.label_city),
-                            value = state.city,
-                            onValueChange = { viewModel.onIntent(ProfileEditIntent.UpdateCity(it)) },
-                            placeholder = stringResource(Res.string.hint_enter_city)
-                        )
-                    }
-                }
-
-                item {
-                    WidgetCard(
-                        title = stringResource(Res.string.section_extra_info),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        ProfileField(
-                            label = stringResource(Res.string.label_monthly_income),
-                            value = state.income,
-                            onValueChange = { viewModel.onIntent(ProfileEditIntent.UpdateIncome(it)) },
-                            placeholder = stringResource(Res.string.hint_enter_income),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            isPrice = true
-                        )
-                        ProfileField(
-                            label = stringResource(Res.string.label_job_title),
-                            value = state.jobTitle,
-                            onValueChange = { viewModel.onIntent(ProfileEditIntent.UpdateJobTitle(it)) },
-                            placeholder = stringResource(Res.string.hint_enter_job)
-                        )
-                        ProfileField(
-                            label = stringResource(Res.string.label_financial_goal),
-                            value = state.financialGoal,
-                            onValueChange = {
-                                viewModel.onIntent(
-                                    ProfileEditIntent.UpdateFinancialGoal(
-                                        it
-                                    )
-                                )
-                            },
-                            placeholder = stringResource(Res.string.hint_enter_goal)
-                        )
-                    }
-                }
-                item {
-                    Fab(
-                        label = stringResource(Res.string.action_save_profile),
-                        icon = rememberVectorPainter(Icons.Default.Save),
-                        onClick = { viewModel.onIntent(ProfileEditIntent.SaveProfile) },
-                        modifier = Modifier.fillMaxWidth()
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = space.medium),
+                    contentAlignment = Alignment.Center
+                ) {
+                    PhotoDrop(
+                        photoBitmap = state.avatar?.decodeToImageBitmap(),
+                        onImagePicked = { viewModel.onIntent(ProfileEditIntent.UpdateAvatar(it)) },
+                        onRemove = { viewModel.onIntent(ProfileEditIntent.RemoveAvatar) },
+                        modifier = Modifier.size(166.dp) // Larger square size
                     )
-                }
-                item {
-                    Spacer(Modifier.height(4.dp))
                 }
             }
 
+            item {
+                WidgetCard(
+                    title = stringResource(Res.string.section_personal_info),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    ProfileField(
+                        label = stringResource(Res.string.label_first_name),
+                        value = state.firstName,
+                        onValueChange = {
+                            viewModel.onIntent(
+                                ProfileEditIntent.UpdateFirstName(
+                                    it
+                                )
+                            )
+                        },
+                        placeholder = stringResource(Res.string.hint_enter_first_name)
+                    )
+                    ProfileField(
+                        label = stringResource(Res.string.label_last_name),
+                        value = state.lastName,
+                        onValueChange = { viewModel.onIntent(ProfileEditIntent.UpdateLastName(it)) },
+                        placeholder = stringResource(Res.string.hint_enter_last_name)
+                    )
+                    ProfileField(
+                        label = stringResource(Res.string.label_email),
+                        value = state.email,
+                        onValueChange = { viewModel.onIntent(ProfileEditIntent.UpdateEmail(it)) },
+                        placeholder = stringResource(Res.string.hint_enter_email),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                    )
+                    ProfileField(
+                        label = stringResource(Res.string.label_phone),
+                        value = state.phone,
+                        onValueChange = { viewModel.onIntent(ProfileEditIntent.UpdatePhone(it)) },
+                        placeholder = stringResource(Res.string.hint_enter_phone),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                    )
+                    ProfileField(
+                        label = stringResource(Res.string.label_birthday),
+                        value = state.birthday,
+                        onValueChange = { },
+                        placeholder = stringResource(Res.string.hint_enter_birthday),
+                        readOnly = true,
+                        onClick = { showDatePicker.value = true }
+                    )
+                    ProfileField(
+                        label = stringResource(Res.string.label_city),
+                        value = state.city,
+                        onValueChange = { viewModel.onIntent(ProfileEditIntent.UpdateCity(it)) },
+                        placeholder = stringResource(Res.string.hint_enter_city)
+                    )
+                }
+            }
+
+            item {
+                WidgetCard(
+                    title = stringResource(Res.string.section_extra_info),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    ProfileField(
+                        label = stringResource(Res.string.label_monthly_income),
+                        value = state.income,
+                        onValueChange = { viewModel.onIntent(ProfileEditIntent.UpdateIncome(it)) },
+                        placeholder = stringResource(Res.string.hint_enter_income),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        isPrice = true
+                    )
+                    ProfileField(
+                        label = stringResource(Res.string.label_job_title),
+                        value = state.jobTitle,
+                        onValueChange = { viewModel.onIntent(ProfileEditIntent.UpdateJobTitle(it)) },
+                        placeholder = stringResource(Res.string.hint_enter_job)
+                    )
+                    ProfileField(
+                        label = stringResource(Res.string.label_financial_goal),
+                        value = state.financialGoal,
+                        onValueChange = {
+                            viewModel.onIntent(
+                                ProfileEditIntent.UpdateFinancialGoal(
+                                    it
+                                )
+                            )
+                        },
+                        placeholder = stringResource(Res.string.hint_enter_goal)
+                    )
+                }
+            }
+            item {
+                Fab(
+                    label = stringResource(Res.string.action_save_profile),
+                    icon = rememberVectorPainter(Icons.Default.Save),
+                    onClick = { viewModel.onIntent(ProfileEditIntent.SaveProfile) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            item {
+                Spacer(Modifier.height(4.dp))
+            }
         }
-
-
     }
 }
 
@@ -319,7 +275,10 @@ fun ProfileField(
                     )
                     if (isOptional) {
                         FintrackLabelSmallText(
-                            text = stringResource(Res.string.optional_wrapper, stringResource(Res.string.label_optional_fa)),
+                            text = stringResource(
+                                Res.string.optional_wrapper,
+                                stringResource(Res.string.label_optional_fa)
+                            ),
                             style = MaterialTheme.typography.labelSmall,
                             color = glassColors.text2
                         )
@@ -349,7 +308,10 @@ fun CompletionCard(percentage: Float) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                FintrackTitleMediumText(text = stringResource(Res.string.profile_completion), color = glassColors.text)
+                FintrackTitleMediumText(
+                    text = stringResource(Res.string.profile_completion),
+                    color = glassColors.text
+                )
                 FintrackBodySmallText(
                     text = stringResource(Res.string.profile_completion_desc),
                     color = glassColors.text2
@@ -364,7 +326,12 @@ fun CompletionCard(percentage: Float) {
                     color = MaterialTheme.colorScheme.primary,
                     trackColor = glassColors.glass
                 )
-                FintrackLabelMediumText(text = stringResource(Res.string.percentage_format, (percentage * 100).toInt()), color = glassColors.text)
+                FintrackLabelMediumText(
+                    text = stringResource(
+                        Res.string.percentage_format,
+                        (percentage * 100).toInt()
+                    ), color = glassColors.text
+                )
             }
         }
     }

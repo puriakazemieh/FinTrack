@@ -50,6 +50,7 @@ import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.model.toCategory
 import com.kazemieh.designsystem.component.model.toItemUi
 import fintrack.core.designsystem.generated.resources.Res
@@ -102,77 +103,83 @@ fun CategoryPickerBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            ScreenHeader(
-                title = stringResource(Res.string.category),
-                onClose = {
-                    viewModel.onIntent(CategoryIntent.ResetFlags)
-                    onDismiss()
-                },
-                trailingContent = {
-                    Row {
-                        IconButton(onClick = { viewModel.onIntent(CategoryIntent.OnToggleReorder) }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Sort,
-                                contentDescription = null,
-                                tint = if (state.isReorderShow) GlassGreen else LocalGlassColors.current.text2
-                            )
-                        }
-                        TextButton(onClick = { isEditMode = !isEditMode }) {
-                            FintrackLabelMediumText(
-                                text = if (isEditMode) stringResource(Res.string.cancell_)
-                                else stringResource(Res.string.edit)
-                            )
-                        }
-                    }
-                }
-            )
-
-            val entityItems = remember(state.categories, state.expandedCategoryIds, state.allCategories) {
-                state.categories.map {
-                    val hasChildren = state.allCategories.any { child -> child.parentId == it.id }
-                    val isExpanded = state.expandedCategoryIds.contains(it.id)
-                    EntityItem(
-                        id = it.id ?: 0,
-                        name = it.name,
-                        iconId = it.iconId,
-                        colorId = it.colorId,
-                        parentId = it.parentId,
-                        badge = if (hasChildren && it.parentId == null) (if (isExpanded) "−" else "+") else null
-                    )
-                }
-            }
-
-            EntityList(
-                title = stringResource(Res.string.category),
-                query = state.query,
-                onQueryChange = { viewModel.onIntent(CategoryIntent.SetQuery(it)) },
-                onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
-                items = entityItems,
-                showActions = isEditMode && !state.isReorderShow,
-                isReorderMode = state.isReorderShow,
-                indentSubCategories = true,
-                onFilterClick = onNavigateToTransactions?.let { callback ->
-                    { item ->
-                        state.categories.find { it.id == item.id }?.let { callback(it) }
+            FintrackBackgroundBlobs()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                ScreenHeader(
+                    title = stringResource(Res.string.category),
+                    onClose = {
+                        viewModel.onIntent(CategoryIntent.ResetFlags)
                         onDismiss()
+                    },
+                    trailingContent = {
+                        Row {
+                            IconButton(onClick = { viewModel.onIntent(CategoryIntent.OnToggleReorder) }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Sort,
+                                    contentDescription = null,
+                                    tint = if (state.isReorderShow) GlassGreen else LocalGlassColors.current.text2
+                                )
+                            }
+                            TextButton(onClick = { isEditMode = !isEditMode }) {
+                                FintrackLabelMediumText(
+                                    text = if (isEditMode) stringResource(Res.string.cancell_)
+                                    else stringResource(Res.string.edit)
+                                )
+                            }
+                        }
                     }
-                },
-                onEditClick = { viewModel.onIntent(CategoryIntent.OnEditClick(state.categories.find { c -> c.id == it.id })) },
-                onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) },
-                onExpandClick = { item ->
-                    viewModel.onIntent(CategoryIntent.ToggleExpand(item.id))
-                },
-                onItemClick = { item ->
-                    state.categories.find { it.id == item.id }?.let { category ->
-                        viewModel.onIntent(CategoryIntent.SelectedCategory(category))
+                )
+
+                val entityItems = remember(state.categories, state.expandedCategoryIds, state.allCategories) {
+                    state.categories.map {
+                        val hasChildren = state.allCategories.any { child -> child.parentId == it.id }
+                        val isExpanded = state.expandedCategoryIds.contains(it.id)
+                        EntityItem(
+                            id = it.id ?: 0,
+                            name = it.name,
+                            iconId = it.iconId,
+                            colorId = it.colorId,
+                            parentId = it.parentId,
+                            badge = if (hasChildren && it.parentId == null) (if (isExpanded) "−" else "+") else null
+                        )
                     }
                 }
-            )
+
+                EntityList(
+                    title = stringResource(Res.string.category),
+                    query = state.query,
+                    onQueryChange = { viewModel.onIntent(CategoryIntent.SetQuery(it)) },
+                    onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
+                    items = entityItems,
+                    showActions = isEditMode && !state.isReorderShow,
+                    isReorderMode = state.isReorderShow,
+                    indentSubCategories = true,
+                    onFilterClick = onNavigateToTransactions?.let { callback ->
+                        { item ->
+                            state.categories.find { it.id == item.id }?.let { callback(it) }
+                            onDismiss()
+                        }
+                    },
+                    onEditClick = { viewModel.onIntent(CategoryIntent.OnEditClick(state.categories.find { c -> c.id == it.id })) },
+                    onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) },
+                    onExpandClick = { item ->
+                        viewModel.onIntent(CategoryIntent.ToggleExpand(item.id))
+                    },
+                    onItemClick = { item ->
+                        state.categories.find { it.id == item.id }?.let { category ->
+                            viewModel.onIntent(CategoryIntent.SelectedCategory(category))
+                        }
+                    }
+                )
+            }
         }
     }
 
@@ -232,79 +239,85 @@ fun CategoryManageBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(glassColors.bg1, glassColors.bg0)))
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            ScreenHeader(
-                title = stringResource(Res.string.category),
-                onClose = { viewModel.onIntent(CategoryIntent.OnDismiss) },
-                trailingContent = {
-                    IconButton(onClick = { viewModel.onIntent(CategoryIntent.OnToggleReorder) }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Sort,
-                            contentDescription = null,
-                            tint = if (state.isReorderShow) GlassGreen else LocalGlassColors.current.text2
+            FintrackBackgroundBlobs()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                ScreenHeader(
+                    title = stringResource(Res.string.category),
+                    onClose = { viewModel.onIntent(CategoryIntent.OnDismiss) },
+                    trailingContent = {
+                        IconButton(onClick = { viewModel.onIntent(CategoryIntent.OnToggleReorder) }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Sort,
+                                contentDescription = null,
+                                tint = if (state.isReorderShow) GlassGreen else LocalGlassColors.current.text2
+                            )
+                        }
+                    }
+                )
+
+                TypeSwitcher(
+                    selectedType = state.type,
+                    onTypeSelected = { viewModel.onIntent(CategoryIntent.LoadCategoryByType(it, isHierarchical = true)) }
+                )
+
+                val entityItems = remember(state.categories, state.expandedCategoryIds, state.allCategories) {
+                    state.categories.map {
+                        val hasChildren = state.allCategories.any { child -> child.parentId == it.id }
+                        val isExpanded = state.expandedCategoryIds.contains(it.id)
+                        EntityItem(
+                            id = it.id ?: 0,
+                            name = it.name,
+                            iconId = it.iconId,
+                            colorId = it.colorId,
+                            parentId = it.parentId,
+                            badge = if (hasChildren && it.parentId == null) (if (isExpanded) "−" else "+") else null
                         )
                     }
                 }
-            )
 
-            TypeSwitcher(
-                selectedType = state.type,
-                onTypeSelected = { viewModel.onIntent(CategoryIntent.LoadCategoryByType(it, isHierarchical = true)) }
-            )
-
-            val entityItems = remember(state.categories, state.expandedCategoryIds, state.allCategories) {
-                state.categories.map {
-                    val hasChildren = state.allCategories.any { child -> child.parentId == it.id }
-                    val isExpanded = state.expandedCategoryIds.contains(it.id)
-                    EntityItem(
-                        id = it.id ?: 0,
-                        name = it.name,
-                        iconId = it.iconId,
-                        colorId = it.colorId,
-                        parentId = it.parentId,
-                        badge = if (hasChildren && it.parentId == null) (if (isExpanded) "−" else "+") else null
-                    )
-                }
+                EntityList(
+                    title = stringResource(Res.string.category),
+                    query = state.query,
+                    onQueryChange = { viewModel.onIntent(CategoryIntent.SetQuery(it)) },
+                    onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
+                    items = entityItems,
+                    showActions = !state.isReorderShow,
+                    isReorderMode = state.isReorderShow,
+                    indentSubCategories = true,
+                    onMove = { from, to ->
+                        val list = state.categories.toMutableList()
+                        list.add(to, list.removeAt(from))
+                        val positions = list.mapIndexed { index, category ->
+                            category.id!! to index
+                        }.toMap()
+                        viewModel.onIntent(CategoryIntent.UpdatePositions(positions))
+                    },
+                    onFilterClick = onNavigateToTransactions?.let { callback ->
+                        { item ->
+                            state.categories.find { it.id == item.id }?.let { callback(it) }
+                            onDismiss()
+                        }
+                    },
+                    onEditClick = { viewModel.onIntent(CategoryIntent.OnEditClick(state.categories.find { c -> c.id == it.id })) },
+                    onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) },
+                    onExpandClick = { item ->
+                        viewModel.onIntent(CategoryIntent.ToggleExpand(item.id))
+                    },
+                    onItemClick = { item ->
+                        state.categories.find { it.id == item.id }?.let { category ->
+                            viewModel.onIntent(CategoryIntent.SelectedCategory(category))
+                        }
+                    }
+                )
             }
-
-            EntityList(
-                title = stringResource(Res.string.category),
-                query = state.query,
-                onQueryChange = { viewModel.onIntent(CategoryIntent.SetQuery(it)) },
-                onAddClick = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
-                items = entityItems,
-                showActions = !state.isReorderShow,
-                isReorderMode = state.isReorderShow,
-                indentSubCategories = true,
-                onMove = { from, to ->
-                    val list = state.categories.toMutableList()
-                    list.add(to, list.removeAt(from))
-                    val positions = list.mapIndexed { index, category ->
-                        category.id!! to index
-                    }.toMap()
-                    viewModel.onIntent(CategoryIntent.UpdatePositions(positions))
-                },
-                onFilterClick = onNavigateToTransactions?.let { callback ->
-                    { item ->
-                        state.categories.find { it.id == item.id }?.let { callback(it) }
-                        onDismiss()
-                    }
-                },
-                onEditClick = { viewModel.onIntent(CategoryIntent.OnEditClick(state.categories.find { c -> c.id == it.id })) },
-                onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) },
-                onExpandClick = { item ->
-                    viewModel.onIntent(CategoryIntent.ToggleExpand(item.id))
-                },
-                onItemClick = { item ->
-                    state.categories.find { it.id == item.id }?.let { category ->
-                        viewModel.onIntent(CategoryIntent.SelectedCategory(category))
-                    }
-                }
-            )
         }
     }
 
