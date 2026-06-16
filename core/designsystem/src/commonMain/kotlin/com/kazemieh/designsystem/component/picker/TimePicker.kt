@@ -14,9 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.toPersianDigits
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackTitleLargeText
-import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.SheetFrame
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -70,10 +68,8 @@ fun FintrackTimePickerBottomSheet(
                         onValueChange = { selectedMinute = it }
                     )
 
-                    Text(
+                    FintrackDisplaySmallText(
                         text = ":",
-                        style = MaterialTheme.typography.displaySmall,
-                        color = glassColors.text,
                         modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp)
                     )
 

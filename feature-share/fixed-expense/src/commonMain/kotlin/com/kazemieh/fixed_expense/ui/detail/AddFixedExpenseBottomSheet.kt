@@ -73,7 +73,7 @@ fun AddFixedExpenseBottomSheet(
                 .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
         ) {
             ScreenHeader(
-                title = "افزودن هزینه ثابت",
+                title = stringResource(Res.string.title_add_fixed_expense),
                 onClose = onDismiss
             )
 
@@ -88,7 +88,7 @@ fun AddFixedExpenseBottomSheet(
                 FintrackOutlinedTextField(
                     value = state.amount,
                     onValueChange = { viewModel.onIntent(AddFixedExpenseIntent.SetAmount(it)) },
-                    label = { FintrackBodyMediumText("مبلغ هزینه") },
+                    label = { FintrackBodyMediumText(stringResource(Res.string.label_expense_amount)) },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true
@@ -96,30 +96,30 @@ fun AddFixedExpenseBottomSheet(
 
                 // Category Picker
                 PickerField(
-                    label = "دسته‌بندی",
-                    value = state.category?.name ?: "انتخاب دسته‌بندی",
+                    label = stringResource(Res.string.category),
+                    value = state.category?.name ?: stringResource(Res.string.select_category),
                     icon = Icons.Default.Category,
                     onClick = { showCategoryPicker = true }
                 )
 
                 // Source Picker
                 PickerField(
-                    label = "منبع مالی",
-                    value = state.source?.name ?: "انتخاب منبع",
+                    label = stringResource(Res.string.source),
+                    value = state.source?.name ?: stringResource(Res.string.select_source),
                     icon = Icons.Default.Wallet,
                     onClick = { showSourcePicker = true }
                 )
 
                 // Recurrence Picker
                 PickerField(
-                    label = "دوره تکرار",
+                    label = stringResource(Res.string.installment_frequency),
                     value = when (state.recurrence) {
-                        RecurrenceType.DAILY -> "روزانه"
-                        RecurrenceType.WEEKLY -> "هفتگی"
-                        RecurrenceType.MONTHLY -> "ماهانه"
-                        RecurrenceType.YEARLY -> "سالانه"
-                        RecurrenceType.CUSTOM -> "سفارشی"
-                        RecurrenceType.ONCE -> "یک‌بار"
+                        RecurrenceType.DAILY -> stringResource(Res.string.frequency_daily)
+                        RecurrenceType.WEEKLY -> stringResource(Res.string.frequency_weekly)
+                        RecurrenceType.MONTHLY -> stringResource(Res.string.frequency_monthly)
+                        RecurrenceType.YEARLY -> stringResource(Res.string.frequency_yearly)
+                        RecurrenceType.CUSTOM -> stringResource(Res.string.custom_date)
+                        RecurrenceType.ONCE -> stringResource(Res.string.dp_today) // TODO: Better string for ONCE
                     },
                     icon = Icons.Default.Repeat,
                     onClick = { showRecurrencePicker = true }
@@ -127,7 +127,7 @@ fun AddFixedExpenseBottomSheet(
 
                 // Start Date Picker
                 PickerField(
-                    label = "تاریخ شروع",
+                    label = stringResource(Res.string.start),
                     value = Instant.fromEpochMilliseconds(state.startDate).toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
                     icon = Icons.Default.CalendarMonth,
                     onClick = { /* TODO: Date Picker */ }
@@ -139,7 +139,7 @@ fun AddFixedExpenseBottomSheet(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    FintrackBodyLargeText("ثبت خودکار در سررسید")
+                    FintrackBodyLargeText(stringResource(Res.string.label_auto_post_enabled))
                     Switch(
                         checked = state.isAutoPostEnabled,
                         onCheckedChange = { viewModel.onIntent(AddFixedExpenseIntent.SetAutoPost(it)) }
@@ -150,7 +150,7 @@ fun AddFixedExpenseBottomSheet(
                 FintrackOutlinedTextField(
                     value = state.description,
                     onValueChange = { viewModel.onIntent(AddFixedExpenseIntent.SetDescription(it)) },
-                    label = { FintrackBodyMediumText("توضیحات") },
+                    label = { FintrackBodyMediumText(stringResource(Res.string.description)) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -213,7 +213,7 @@ fun RecurrencePickerBottomSheet(
         onDismissRequest = onDismiss
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            FintrackTitleMediumText("انتخاب دوره تکرار", modifier = Modifier.padding(bottom = 16.dp))
+            FintrackTitleMediumText(stringResource(Res.string.title_select_recurrence), modifier = Modifier.padding(bottom = 16.dp))
             RecurrenceType.entries.forEach { type ->
                 Row(
                     modifier = Modifier
@@ -226,12 +226,12 @@ fun RecurrencePickerBottomSheet(
                     Spacer(modifier = Modifier.width(12.dp))
                     FintrackBodyLargeText(
                         when (type) {
-                            RecurrenceType.DAILY -> "روزانه"
-                            RecurrenceType.WEEKLY -> "هفتگی"
-                            RecurrenceType.MONTHLY -> "ماهانه"
-                            RecurrenceType.YEARLY -> "سالانه"
-                            RecurrenceType.CUSTOM -> "سفارشی"
-                            RecurrenceType.ONCE -> "یک‌بار"
+                            RecurrenceType.DAILY -> stringResource(Res.string.frequency_daily)
+                            RecurrenceType.WEEKLY -> stringResource(Res.string.frequency_weekly)
+                            RecurrenceType.MONTHLY -> stringResource(Res.string.frequency_monthly)
+                            RecurrenceType.YEARLY -> stringResource(Res.string.frequency_yearly)
+                            RecurrenceType.CUSTOM -> stringResource(Res.string.custom_date)
+                            RecurrenceType.ONCE -> stringResource(Res.string.dp_today)
                         }
                     )
                 }

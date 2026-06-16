@@ -10,6 +10,8 @@ import com.kazemieh.asset.ui.AssetViewModel
 import com.kazemieh.common.model.Asset
 import com.kazemieh.common.model.AssetType
 import com.kazemieh.designsystem.component.*
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,38 +33,38 @@ fun CustomAssetSheet(
                 .padding(bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            FintrackTitleLargeText("افزودن دارایی سفارشی")
+            FintrackTitleLargeText(stringResource(Res.string.title_add_custom_asset))
 
             FintrackOutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { FintrackBodyMediumText("نام دارایی") },
+                label = { FintrackBodyMediumText(stringResource(Res.string.source_name_label)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             FintrackOutlinedTextField(
                 value = quantity,
                 onValueChange = { quantity = it },
-                label = { FintrackBodyMediumText("مقدار") },
+                label = { FintrackBodyMediumText(stringResource(Res.string.label_quantity)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             FintrackOutlinedTextField(
                 value = currentPrice,
                 onValueChange = { currentPrice = it },
-                label = { FintrackBodyMediumText("ارزش فعلی هر واحد (ریال)") },
+                label = { FintrackBodyMediumText(stringResource(Res.string.label_current_unit_value)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             FintrackOutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { FintrackBodyMediumText("توضیحات") },
+                label = { FintrackBodyMediumText(stringResource(Res.string.description)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             FintrackButton(
-                text = "ذخیره",
+                text = stringResource(Res.string.save_),
                 onClick = {
                     val asset = Asset(
                         name = name,

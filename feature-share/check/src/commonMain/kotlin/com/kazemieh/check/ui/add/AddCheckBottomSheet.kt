@@ -66,7 +66,7 @@ fun AddCheckBottomSheet(
                 .background(Brush.verticalGradient(listOf(GlassBg1, GlassBg0)))
         ) {
             ScreenHeader(
-                title = "افزودن چک جدید",
+                title = stringResource(Res.string.title_add_check),
                 onClose = onDismiss
             )
 
@@ -81,14 +81,14 @@ fun AddCheckBottomSheet(
                 GlassCard(padding = 0.dp) {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         TypeButton(
-                            text = "چک پرداختی",
+                            text = stringResource(Res.string.label_outgoing_check),
                             selected = !state.isIncoming,
                             onClick = { viewModel.onIntent(AddCheckIntent.SetIsIncoming(false)) },
                             modifier = Modifier.weight(1f),
                             selectedColor = MaterialTheme.colorScheme.error
                         )
                         TypeButton(
-                            text = "چک دریافتی",
+                            text = stringResource(Res.string.label_incoming_check),
                             selected = state.isIncoming,
                             onClick = { viewModel.onIntent(AddCheckIntent.SetIsIncoming(true)) },
                             modifier = Modifier.weight(1f),
@@ -101,7 +101,7 @@ fun AddCheckBottomSheet(
                 FintrackOutlinedTextField(
                     value = state.amount,
                     onValueChange = { viewModel.onIntent(AddCheckIntent.SetAmount(it)) },
-                    label = { FintrackBodyMediumText("مبلغ چک") },
+                    label = { FintrackBodyMediumText(stringResource(Res.string.label_check_amount)) },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true
@@ -109,15 +109,15 @@ fun AddCheckBottomSheet(
 
                 // Person Picker
                 PickerField(
-                    label = "طرف حساب",
-                    value = state.person?.name ?: "انتخاب شخص",
+                    label = stringResource(Res.string.label_counterparty),
+                    value = state.person?.name ?: stringResource(Res.string.not_choose),
                     icon = Icons.Default.Person,
                     onClick = { showPersonPicker = true }
                 )
 
                 // Date Picker (Issued Date)
                 PickerField(
-                    label = "تاریخ صدور",
+                    label = stringResource(Res.string.label_issue_date),
                     value = Instant.fromEpochMilliseconds(state.date).toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
                     icon = Icons.Default.CalendarMonth,
                     onClick = { /* TODO: Date Picker */ }
@@ -125,7 +125,7 @@ fun AddCheckBottomSheet(
 
                 // Due Date Picker
                 PickerField(
-                    label = "تاریخ سررسید",
+                    label = stringResource(Res.string.label_due_date),
                     value = Instant.fromEpochMilliseconds(state.dueDate).toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
                     icon = Icons.Default.CalendarMonth,
                     onClick = { /* TODO: Date Picker */ }
@@ -135,7 +135,7 @@ fun AddCheckBottomSheet(
                 FintrackOutlinedTextField(
                     value = state.description,
                     onValueChange = { viewModel.onIntent(AddCheckIntent.SetDescription(it)) },
-                    label = { FintrackBodyMediumText("توضیحات") },
+                    label = { FintrackBodyMediumText(stringResource(Res.string.description)) },
                     modifier = Modifier.fillMaxWidth()
                 )
 

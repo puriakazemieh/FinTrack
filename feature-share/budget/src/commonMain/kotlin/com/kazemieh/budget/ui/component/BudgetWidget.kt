@@ -43,7 +43,7 @@ fun BudgetWidget(
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.size(64.dp)) {
                     CircularProgress(progress = progress)
                     FintrackLabelSmallText(
-                        text = "${(progress * 100).toInt()}%",
+                        text = stringResource(Res.string.percentage_format, (progress * 100).toInt()),
                         fontWeight = FontWeight.Bold
                     )
                 }

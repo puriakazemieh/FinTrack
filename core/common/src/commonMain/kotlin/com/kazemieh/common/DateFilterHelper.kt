@@ -332,7 +332,7 @@ object DateFilterHelper {
             }
 
             else -> {
-                DateRangeLabel.Text("${startP.day} $startMonthName تا ${endP.day} $endMonthName")
+                DateRangeLabel.Text("${startP.day} $startMonthName — ${endP.day} $endMonthName")
             }
         }
     }

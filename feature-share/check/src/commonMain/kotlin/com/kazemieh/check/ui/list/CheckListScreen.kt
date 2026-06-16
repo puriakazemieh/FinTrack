@@ -43,11 +43,10 @@ fun CheckListScreen(
     var showAddCheck by remember { mutableStateOf(false) }
 
     val tabs = listOf(
-        "در جریان",
-        "پاس شده",
-        "برگشتی",
-        "ابطال شده",
-
+        stringResource(Res.string.label_check_status_ongoing),
+        stringResource(Res.string.label_check_status_passed),
+        stringResource(Res.string.label_check_status_returned),
+        stringResource(Res.string.label_check_status_cancelled),
     )
 
     val currentStatus = when (selectedTab) {
@@ -70,8 +69,8 @@ fun CheckListScreen(
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 ScreenHeader(
-                    title = "مدیریت چک‌ها",
-                    sub = "لیست چک‌های دریافتی و پرداختی",
+                    title = stringResource(Res.string.title_check_management),
+                    sub = stringResource(Res.string.sub_check_list_management_desc),
                     onClose = onBack
                 )
 
@@ -89,13 +88,13 @@ fun CheckListScreen(
                 )
 
                 EntityList(
-                    title = "چک‌ها",
+                    title = stringResource(Res.string.title_check_management),
                     query = "",
                     onQueryChange = {},
                     onAddClick = { showAddCheck = true },
                     summary = listOf(
                         EntitySummary(
-                            label =  "مجموع مبلغ",
+                            label =  stringResource(Res.string.label_total_amount),
                             value = totalAmount.toPersianPrice(),
                             unit = stringResource(Res.string.currency_toman),
                             color = MaterialTheme.colorScheme.primary
@@ -104,7 +103,7 @@ fun CheckListScreen(
                     items = filteredChecks.map {
                         EntityItem(
                             id = it.id,
-                            name = it.personName ?: "نامشخص",
+                            name = it.personName ?: stringResource(Res.string.label_unknown_person),
                             sub = it.description,
                             badge = it.amount.toPersianPrice(),
                             color = if (it.isIncoming) GlassGreen else GlassRed

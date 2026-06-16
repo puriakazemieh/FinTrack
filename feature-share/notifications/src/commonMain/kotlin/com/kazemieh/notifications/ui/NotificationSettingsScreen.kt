@@ -21,9 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.FintrackBodyLargeText
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackButton
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.GlassTone
 import com.kazemieh.designsystem.component.glass.ScreenHeader
@@ -281,7 +279,7 @@ fun PermissionRationaleCard(
                 horizontalArrangement = Arrangement.End
             ) {
                 TextButton(onClick = onDismiss) {
-                    Text(stringResource(Res.string.cancell_))
+                    FintrackLabelLargeText(stringResource(Res.string.cancell_))
                 }
                 Spacer(modifier = Modifier.width(space.small))
                 FintrackButton(

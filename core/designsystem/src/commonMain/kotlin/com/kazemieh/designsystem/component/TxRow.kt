@@ -46,7 +46,10 @@ import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.btn_delete_transaction
+import fintrack.core.designsystem.generated.resources.label_and_separator
 import fintrack.core.designsystem.generated.resources.label_amount_with_unit
+import fintrack.core.designsystem.generated.resources.label_comma
+import fintrack.core.designsystem.generated.resources.label_more_count
 import fintrack.core.designsystem.generated.resources.label_to
 import fintrack.core.designsystem.generated.resources.title_edit_transaction
 import fintrack.core.designsystem.generated.resources.unit_toman_short
@@ -299,7 +302,7 @@ private fun ExpandedContent(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 FintrackLabelSmallText(
-                    text = item.tags.joinToString("، ") { it.name }
+                    text = item.tags.joinToString(stringResource(Res.string.label_comma)) { it.name }
                 )
             }
         }
@@ -314,7 +317,7 @@ private fun ExpandedContent(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 FintrackLabelSmallText(
-                    text = item.persons.joinToString("، ") { it.name }
+                    text = item.persons.joinToString(stringResource(Res.string.label_comma)) { it.name }
                 )
             }
         }
@@ -397,9 +400,9 @@ private fun CollapsedMetadata(item: TransactionWithRelations) {
         ) {
             if (item.tags.isNotEmpty()) {
                 val tagsText = if (item.tags.size > 2) {
-                    item.tags.take(2).joinToString("، ") { it.name } + " (+${item.tags.size - 2})"
+                    item.tags.take(2).joinToString(stringResource(Res.string.label_and_separator)) { it.name } + stringResource(Res.string.label_more_count, item.tags.size - 2)
                 } else {
-                    item.tags.joinToString("، ") { it.name }
+                    item.tags.joinToString(stringResource(Res.string.label_and_separator)) { it.name }
                 }
                 MetadataItem(
                     iconRes = FinTrackIcons.findIcon(item.tags.first().iconId).resource,
@@ -411,9 +414,9 @@ private fun CollapsedMetadata(item: TransactionWithRelations) {
             if (item.persons.isNotEmpty()) {
                 val personsText = if (item.persons.size > 2) {
                     item.persons.take(2)
-                        .joinToString("، ") { it.name } + " (+${item.persons.size - 2})"
+                        .joinToString(stringResource(Res.string.label_and_separator)) { it.name } + stringResource(Res.string.label_more_count, item.persons.size - 2)
                 } else {
-                    item.persons.joinToString("، ") { it.name }
+                    item.persons.joinToString(stringResource(Res.string.label_and_separator)) { it.name }
                 }
                 MetadataItem(
                     iconVector = Icons.Default.Person,

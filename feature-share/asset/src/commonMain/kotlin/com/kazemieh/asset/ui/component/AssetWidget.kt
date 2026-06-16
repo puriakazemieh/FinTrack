@@ -10,11 +10,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.asset.ui.AssetViewModel
-import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.MoneyText
 import com.kazemieh.designsystem.component.glass.WidgetCard
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -26,7 +27,7 @@ fun AssetWidget(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     WidgetCard(
-        title = "دارایی‌ها",
+        title = stringResource(Res.string.title_assets_management),
         onMore = onMoreClick,
         modifier = modifier
     ) {
@@ -37,7 +38,7 @@ fun AssetWidget(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    FintrackLabelSmallText(text = "ارزش کل")
+                    FintrackLabelSmallText(text = stringResource(Res.string.label_total_value))
                     MoneyText(amount = state.totalValue, size = 18)
                 }
             }
@@ -74,7 +75,11 @@ fun AssetWidget(
                         )
                         Spacer(Modifier.width(4.dp))
                         FintrackLabelSmallText(
-                            text = "${type.name}: ${(percentage * 100).toInt()}%"
+                            text = stringResource(
+                                Res.string.label_percentage_suffix,
+                                type.name,
+                                (percentage * 100).toInt()
+                            )
                         )
                     }
                 }

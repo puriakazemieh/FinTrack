@@ -66,6 +66,7 @@
     <string name="custom_range_whit">%2$تا%1$</string>
     <string name="month_with_year">%1$s %2$d</string>
     <string name="single_day">%1$d %2$s %3$d</string>
+    <string name="range_text_short">%1$s تا %2$s</string>
     <string name="range_text">%1$s تا %2$s</string>
 
     <string name="check_name_person_source">لطفاً نام شخص را وارد کنید</string>
@@ -145,6 +146,11 @@
     <string name="custom_range">بازه انتخابی</string>
 
     <string name="test_ok">OK</string>
+
+    <string name="percentage_format">%1$d%%</string>
+    <string name="optional_wrapper">(%1$s)</string>
+    <string name="label_more_count"> (+%1$d)</string>
+    <string name="mock_date">۱۴۰۲/۰۳/%1$d</string>
 
     <string name="bank_abank">آبانک</string>
     <string name="bank_ansar">انصار</string>
@@ -350,6 +356,101 @@
     <string name="dp_dow_thu">پ</string>
     <string name="dp_dow_fri">ج</string>
 
+    <!-- Tools -->
+    <string name="title_check_management">مدیریت چک‌ها</string>
+    <string name="title_fixed_expense_management">هزینه‌های ثابت</string>
+    <string name="title_assets_management">دارایی‌ها</string>
+
+    <!-- Assets -->
+    <string name="title_add_asset">افزودن دارایی</string>
+    <string name="label_asset_name_hint">نام دارایی (مثلاً دلار یا طلای ۱۸)</string>
+    <string name="label_quantity">مقدار / تعداد</string>
+    <string name="label_purchase_price">قیمت خرید هر واحد</string>
+    <string name="btn_add_custom_asset">افزودن دارایی سفارشی / ارزهای دیگر</string>
+    <string name="title_price_history">تاریخچه قیمت: %1$s</string>
+    <string name="title_add_custom_asset">افزودن دارایی سفارشی</string>
+    <string name="label_current_unit_value">ارزش فعلی هر واحد (ریال)</string>
+    <string name="title_stocks_portfolio">سبد سهام</string>
+    <string name="label_shares_count">%1$s سهم</string>
+    <string name="label_total_assets_value">ارزش کل دارایی‌ها</string>
+    <string name="label_units_count">%1$s واحد</string>
+    <string name="label_total_value">ارزش کل</string>
+    <string name="action_edit_asset">ویرایش دارایی</string>
+    <string name="action_view_history">مشاهده تاریخچه</string>
+    <string name="action_delete_asset">حذف دارایی</string>
+
+    <!-- Checks -->
+    <string name="title_add_check">افزودن چک جدید</string>
+    <string name="label_outgoing_check">چک پرداختی</string>
+    <string name="label_incoming_check">چک دریافتی</string>
+    <string name="label_check_amount">مبلغ چک</string>
+    <string name="label_counterparty">طرف حساب</string>
+    <string name="label_issue_date">تاریخ صدور</string>
+    <string name="label_due_date">تاریخ سررسید</string>
+    <string name="sub_check_list_management">لیست چک‌های دریافتی و پرداختی</string>
+    <string name="label_total_amount">مجموع مبلغ</string>
+    <string name="title_ongoing_checks">چک‌های در جریان</string>
+    <string name="label_check_summary">%1$s تومان - سررسید: %2$s</string>
+
+    <!-- Fixed Expenses -->
+    <string name="title_add_fixed_expense">افزودن هزینه ثابت</string>
+    <string name="label_expense_amount">مبلغ هزینه</string>
+    <string name="label_auto_post_enabled">ثبت خودکار در سررسید</string>
+    <string name="sub_fixed_expense_management">مدیریت مخارج دوره‌ای و تکرار شونده</string>
+    <string name="label_approx_monthly_total">مجموع ماهانه تقریبی</string>
+    <string name="title_upcoming_fixed_expenses">هزینه‌های ثابت پیش‌رو</string>
+    <string name="label_fixed_expense_summary">%1$s تومان - %2$s</string>
+    <string name="title_select_recurrence">انتخاب دوره تکرار</string>
+
+    <!-- Search & Filter -->
+    <string name="title_recent_searches">جستجوهای اخیر</string>
+    <string name="title_quick_filters">فیلترهای سریع</string>
+    <string name="label_amount_filter">مبلغ</string>
+
+    <!-- General -->
+    <string name="label_parent_category">دسته‌بندی مادر</string>
+
+    <!-- Assets Additional -->
+    <string name="title_price_history_label">تاریخچه قیمت: %1$s</string>
+    <string name="label_total_assets">ارزش کل</string>
+    <string name="label_shares_suffix">%1$s سهم</string>
+    <string name="title_edit_asset">ویرایش دارایی</string>
+    <string name="title_view_history">مشاهده تاریخچه</string>
+    <string name="title_delete_asset_action">حذف دارایی</string>
+    <string name="label_add_new_entity">افزودن مورد جدید</string>
+    <string name="label_add_specific_new_entity">افزودن %1$s جدید</string>
+
+    <!-- Checks Additional -->
+    <string name="label_check_status_ongoing">در جریان</string>
+    <string name="label_check_status_passed">پاس شده</string>
+    <string name="label_check_status_returned">برگشتی</string>
+    <string name="label_check_status_cancelled">ابطال شده</string>
+    <string name="title_check_list_management">مدیریت چک‌ها</string>
+    <string name="sub_check_list_management_desc">لیست چک‌های دریافتی و پرداختی</string>
+    <string name="title_ongoing_checks_label">چک‌های در جریان</string>
+    <string name="label_unknown_person">نامشخص</string>
+
+    <!-- Fixed Expenses Additional -->
+    <string name="title_upcoming_fixed_expenses_label">هزینه‌های ثابت پیش‌رو</string>
+
+    <!-- General Additional -->
+    <string name="label_parent_category_optional">انتخاب دسته‌بندی مادر (اختیاری)</string>
+    <string name="label_no_parent_category">بدون دسته‌بندی مادر</string>
+    <string name="label_toman_suffix">%1$s تومان</string>
+    <string name="label_toman_date_summary">%1$s تومان - سررسید: %2$s</string>
+    <string name="label_toman_recurrence_summary">%1$s تومان - %2$s</string>
+    <string name="label_days_count">%1$s روز</string>
+    <string name="label_amount_range_summary">%1$s تا %2$s</string>
+    <string name="label_units_thousand">هزار</string>
+    <string name="label_units_million">میلیون</string>
+    <string name="label_units_billion">میلیارد</string>
+    <string name="label_units_trillion">تریلیون</string>
+    <string name="label_and_separator"> و </string>
+
+    <!-- Profile Additional -->
+    <string name="msg_all_features_free">همه امکانات برای شما رایگان است</string>
+    <string name="label_app_lock">قفل برنامه</string>
+
     <string name="msg_mandatory_fields_error">موارد اجباری باید پر بشه</string>
     <string name="label_most_used">پراستفاده‌ها</string>
 
@@ -544,4 +645,14 @@
     <string name="net_debt_balance">تراز نهایی</string>
     <string name="debt_type">نوع مورد</string>
     <string name="ledger_empty">هیچ تراکنش یا بدهی ثبت نشده است</string>
+    <string name="label_percentage_value">%1$s%%</string>
+    <string name="label_spent_of_budget">%1$s از %2$s ت</string>
+    <string name="msg_asset_added">دارایی با موفقیت اضافه شد</string>
+    <string name="msg_asset_deleted">دارایی حذف شد</string>
+    <string name="msg_asset_updated">دارایی بروزرسانی شد</string>
+    <string name="label_unknown">نامشخص</string>
+    <string name="label_comma">، </string>
+    <string name="label_dash"> — </string>
+    <string name="label_until"> تا </string>
+    <string name="label_day_singular">روز</string>
 </resources>

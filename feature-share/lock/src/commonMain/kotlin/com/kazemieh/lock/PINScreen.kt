@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
-import com.kazemieh.designsystem.component.FintrackHeadlineMediumText
+import com.kazemieh.designsystem.component.*
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 
@@ -145,9 +145,8 @@ fun PINScreen(
                                     modifier = Modifier.size(28.dp),
                                     tint = if (isEnabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                                 )
-                                else -> Text(
+                                else -> FintrackHeadlineSmallText(
                                     text = key.toString(),
-                                    fontSize = 24.sp,
                                     fontWeight = FontWeight.Medium,
                                     color = if (isEnabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                                 )

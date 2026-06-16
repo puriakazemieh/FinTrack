@@ -14,8 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.kazemieh.designsystem.component.FintrackBodyLargeText
-import com.kazemieh.designsystem.component.FintrackHeadlineMediumText
+import com.kazemieh.designsystem.component.*
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -55,9 +54,8 @@ fun OnboardingScreen(
                 onClick = { viewModel.onIntent(OnboardingIntent.Skip) },
                 modifier = Modifier.align(Alignment.TopEnd)
             ) {
-                Text(
-                    text = stringResource(Res.string.onboarding_skip),
-                    style = MaterialTheme.typography.labelLarge
+                FintrackLabelLargeText(
+                    text = stringResource(Res.string.onboarding_skip)
                 )
             }
 
@@ -83,7 +81,7 @@ fun OnboardingScreen(
                             onClick = { viewModel.onIntent(OnboardingIntent.PreviousStep) },
                             modifier = Modifier.weight(1f).height(56.dp).padding(end = 8.dp)
                         ) {
-                            Text(text = stringResource(Res.string.onboarding_previous))
+                            FintrackBodyLargeText(text = stringResource(Res.string.onboarding_previous))
                         }
                     }
 
@@ -91,7 +89,7 @@ fun OnboardingScreen(
                         onClick = { viewModel.onIntent(OnboardingIntent.NextStep) },
                         modifier = Modifier.weight(1f).height(56.dp).padding(start = 8.dp)
                     ) {
-                        Text(
+                        FintrackBodyLargeText(
                             text = if (state.currentStep == 3) {
                                 stringResource(Res.string.onboarding_start)
                             } else {
@@ -190,7 +188,7 @@ fun SetupStep(
     OutlinedTextField(
         value = name,
         onValueChange = { onUpdate(it, balance) },
-        label = { Text(stringResource(Res.string.onboarding_setup_source_name)) },
+        label = { FintrackBodyMediumText(stringResource(Res.string.onboarding_setup_source_name)) },
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium
     )
@@ -198,7 +196,7 @@ fun SetupStep(
     OutlinedTextField(
         value = balance,
         onValueChange = { onUpdate(name, it) },
-        label = { Text(stringResource(Res.string.onboarding_setup_balance)) },
+        label = { FintrackBodyMediumText(stringResource(Res.string.onboarding_setup_balance)) },
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(

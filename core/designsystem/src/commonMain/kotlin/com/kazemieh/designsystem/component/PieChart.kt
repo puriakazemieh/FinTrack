@@ -112,16 +112,25 @@ private fun textColorForBackground(bg: Color): Color {
 }
 
 // ---------- توابع کمکی برای فرمت اعداد ----------
+@Composable
 fun formatCurrency(amount: Long): String {
+    val units = listOf(
+        "",
+        stringResource(Res.string.label_units_thousand),
+        stringResource(Res.string.label_units_million),
+        stringResource(Res.string.label_units_billion),
+        stringResource(Res.string.label_units_trillion)
+    )
+    val separator = stringResource(Res.string.label_and_separator)
+
     return buildString {
         var num = amount
-        val units = listOf("", "هزار", "میلیون", "میلیارد", "تریلیون")
         var unitIndex = 0
 
         while (num >= 1000 && unitIndex < units.lastIndex) {
             if (num % 1000 != 0L) {
                 val part = num % 1000
-                if (isNotEmpty()) insert(0, " و ")
+                if (isNotEmpty()) insert(0, separator)
                 insert(0, "${part} ${units[unitIndex]}")
             }
             num /= 1000
@@ -129,7 +138,7 @@ fun formatCurrency(amount: Long): String {
         }
 
         if (num > 0 || isEmpty()) {
-            if (isNotEmpty()) insert(0, " و ")
+            if (isNotEmpty()) insert(0, separator)
             insert(0, "$num ${units[unitIndex]}")
         }
     }

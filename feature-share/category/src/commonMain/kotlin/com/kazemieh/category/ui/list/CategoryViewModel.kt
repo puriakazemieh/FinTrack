@@ -201,9 +201,9 @@ class CategoryViewModel(
 
     private fun updateSummary(income: Int, expense: Int, transfer: Int) {
         val summaries = listOf(
-            EntitySummary("درآمد", income.toString()),
-            EntitySummary("هزینه", expense.toString()),
-            EntitySummary("انتقال", transfer.toString())
+            EntitySummary(UiText.StringResourceText(Res.string.type_income), income.toString()),
+            EntitySummary(UiText.StringResourceText(Res.string.type_expense), expense.toString()),
+            EntitySummary(UiText.StringResourceText(Res.string.type_transfer), transfer.toString())
         )
         _state.update { it.copy(summaries = summaries) }
     }

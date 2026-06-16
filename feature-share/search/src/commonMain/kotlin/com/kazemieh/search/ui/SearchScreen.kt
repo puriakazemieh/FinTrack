@@ -51,6 +51,8 @@ import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -198,7 +200,7 @@ private fun SearchEmptyState(
         if (recentSearches.isNotEmpty()) {
             item {
                 Spacer(modifier = Modifier.height(space.large))
-                FintrackTitleMediumText(text = "جستجوهای اخیر", fontWeight = FontWeight.Bold)
+                FintrackTitleMediumText(text = stringResource(Res.string.title_recent_searches), fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(space.medium))
             }
             items(recentSearches) { search ->
@@ -233,7 +235,7 @@ private fun SearchEmptyState(
 
         item {
             Spacer(modifier = Modifier.height(space.large))
-            FintrackTitleMediumText(text = "فیلترهای سریع", fontWeight = FontWeight.Bold)
+            FintrackTitleMediumText(text = stringResource(Res.string.title_quick_filters), fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(space.medium))
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
@@ -242,10 +244,10 @@ private fun SearchEmptyState(
             ) {
                 quickFilters.forEach { filter ->
                     val label = when (filter) {
-                        QuickFilter.INCOME -> "درآمدها"
-                        QuickFilter.EXPENSE -> "هزینه‌ها"
-                        QuickFilter.TRANSFER -> "انتقال‌ها"
-                        QuickFilter.RECENT_TRANSACTIONS -> "تراکنش‌های اخیر"
+                        QuickFilter.INCOME -> stringResource(Res.string.incoming)
+                        QuickFilter.EXPENSE -> stringResource(Res.string.outcoming)
+                        QuickFilter.TRANSFER -> stringResource(Res.string.transfer)
+                        QuickFilter.RECENT_TRANSACTIONS -> stringResource(Res.string.recent_transactions)
                     }
                     Chip(onClick = { onQuickFilterClick(filter) }) {
                         FintrackLabelMediumText(text = label)
@@ -300,7 +302,7 @@ private fun SearchResultList(
         if (transactions.isNotEmpty()) {
             items(transactions) { tx ->
                 ResultItem(
-                    type = "تراکنش",
+                    type = stringResource(Res.string.transaction),
                     text = tx.transaction.description ?: "",
                     query = query,
                     onClick = { onTransactionClick(tx) }
@@ -310,7 +312,7 @@ private fun SearchResultList(
         if (categories.isNotEmpty()) {
             items(categories) { cat ->
                 ResultItem(
-                    type = "دسته‌بندی",
+                    type = stringResource(Res.string.category),
                     text = cat.name,
                     query = query,
                     onClick = { onCategoryClick(cat) }
@@ -320,7 +322,7 @@ private fun SearchResultList(
         if (sources.isNotEmpty()) {
             items(sources) { src ->
                 ResultItem(
-                    type = "منبع مالی",
+                    type = stringResource(Res.string.source),
                     text = src.name,
                     query = query,
                     onClick = { onSourceClick(src) }
@@ -330,7 +332,7 @@ private fun SearchResultList(
         if (persons.isNotEmpty()) {
             items(persons) { p ->
                 ResultItem(
-                    type = "شخص",
+                    type = stringResource(Res.string.person_name),
                     text = p.name,
                     query = query,
                     onClick = { onPersonClick(p) }
@@ -340,7 +342,7 @@ private fun SearchResultList(
         if (tags.isNotEmpty()) {
             items(tags) { t ->
                 ResultItem(
-                    type = "تگ",
+                    type = stringResource(Res.string.tag_name),
                     text = t.name,
                     query = query,
                     onClick = { onTagClick(t) }

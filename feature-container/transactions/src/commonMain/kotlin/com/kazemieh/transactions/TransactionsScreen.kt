@@ -78,6 +78,11 @@ fun TransactionsScreen(
 
     val colors = FinTrackPickerColors.rainbow()
     val tomanUnit = stringResource(Res.string.unit_toman_short)
+    val labelTo = stringResource(Res.string.label_to)
+
+    val incomeLabel = stringResource(Res.string.income)
+    val expenseLabel = stringResource(Res.string.outcoming)
+    val transferLabel = stringResource(Res.string.transfer)
 
     val activeFilters = remember(
         state.selectedTransactionType,
@@ -89,14 +94,17 @@ fun TransactionsScreen(
         state.selectedMaxAmount,
         state.minAmountLimit,
         state.maxAmountLimit,
-        tomanUnit
+        tomanUnit,
+        incomeLabel,
+        expenseLabel,
+        transferLabel
     ) {
         buildList {
             if (state.selectedTransactionType != TransactionType.ALL) {
                 val label = when (state.selectedTransactionType) {
-                    TransactionType.INCOME -> "درآمد"
-                    TransactionType.EXPENSE -> "هزینه"
-                    TransactionType.TRANSFER -> "انتقال"
+                    TransactionType.INCOME -> incomeLabel
+                    TransactionType.EXPENSE -> expenseLabel
+                    TransactionType.TRANSFER -> transferLabel
                     else -> ""
                 }
                 val color = when (state.selectedTransactionType) {
@@ -117,7 +125,7 @@ fun TransactionsScreen(
             if (state.selectedMinAmount > state.minAmountLimit || state.selectedMaxAmount < state.maxAmountLimit) {
                 val label = "${
                     state.selectedMinAmount.toLong().toSignedPersianPrice()
-                } تا ${state.selectedMaxAmount.toLong().toSignedPersianPrice()} $tomanUnit"
+                } $labelTo ${state.selectedMaxAmount.toLong().toSignedPersianPrice()} $tomanUnit"
                 add(
                     FilterChipData(
                         id = "amount_range",

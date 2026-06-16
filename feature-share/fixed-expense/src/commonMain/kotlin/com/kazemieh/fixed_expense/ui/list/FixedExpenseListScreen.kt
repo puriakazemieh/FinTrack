@@ -48,19 +48,19 @@ fun FixedExpenseListScreen(
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 ScreenHeader(
-                    title = "هزینه‌های ثابت",
-                    sub = "مدیریت مخارج دوره‌ای و تکرار شونده",
+                    title = stringResource(Res.string.title_fixed_expense_management),
+                    sub = stringResource(Res.string.sub_fixed_expense_management),
                     onClose = onBack
                 )
 
                 EntityList(
-                    title = "هزینه ثابت",
+                    title = stringResource(Res.string.title_fixed_expense_management),
                     query = "",
                     onQueryChange = {},
                     onAddClick = { showAddExpense = true },
                     summary = listOf(
                         EntitySummary(
-                            label = "مجموع ماهانه تقریبی",
+                            label = stringResource(Res.string.label_approx_monthly_total),
                             value = totalMonthlyAmount.toPersianPrice(),
                             unit = stringResource(Res.string.currency_toman),
                             color = MaterialTheme.colorScheme.primary
@@ -69,7 +69,7 @@ fun FixedExpenseListScreen(
                     items = state.expenses.map {
                         EntityItem(
                             id = it.id,
-                            name = it.categoryName ?: "نامشخص",
+                            name = it.categoryName ?: stringResource(Res.string.label_unknown_person),
                             sub = "${it.recurrence.name} - ${it.description ?: ""}",
                             badge = it.amount.toPersianPrice(),
                             color = if (it.isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline

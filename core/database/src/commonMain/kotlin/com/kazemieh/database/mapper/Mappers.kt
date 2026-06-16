@@ -98,7 +98,7 @@ fun GetAllTransactionsFiltered.toTransactionWithRelations(): TransactionWithRela
         ),
         category = Category(
             id = category_id ?: 0L,
-            name = category_name ?: "انتقال",
+            name = category_name ?: "",
             description = category_description,
             type = TransactionType.fromInt(category_type?.toInt() ?: TransactionType.TRANSFER.count),
             colorId = category_colorId?.toInt() ?: 1,
@@ -160,7 +160,7 @@ fun CategoryDb.toCategory() = Category(
 fun ObserveCategorySumsByFilter.toCategorySum(): CategorySum {
     return CategorySum(
         categoryId = categoryId ?: 0L,
-        name = name ?: "انتقال",
+        name = name ?: "",
         totalAmount = totalAmount ?: 0,
         type = TransactionType.fromInt(type?.toInt() ?: TransactionType.TRANSFER.count),
         colorId = colorId?.toInt() ?: 1,

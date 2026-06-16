@@ -153,9 +153,7 @@ fun ProfileScreen(
                 PremiumCard(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                        scope.launch {
-                            SnackbarController.showMessage(UiText.DynamicString("همه امکانات برای شما رایگان است"))
-                        }
+                        viewModel.onIntent(ProfileIntent.ShowPremiumInfo)
                     }
                 )
             }
@@ -179,7 +177,7 @@ fun ProfileScreen(
             item {
                 WidgetCard(title = stringResource(Res.string.section_security)) {
                     SettingItem(
-                        title = "قفل برنامه",
+                        title = stringResource(Res.string.label_app_lock),
                         icon = Icons.Default.Lock,
                         on = state.isLockEnabled,
                         onToggle = {

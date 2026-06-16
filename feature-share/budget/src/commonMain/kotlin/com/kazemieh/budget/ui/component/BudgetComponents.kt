@@ -52,7 +52,7 @@ fun BudgetHero(
                 CircularProgress(progress = progress)
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     FintrackTitleLargeText(
-                        text = "${(progress * 100).toInt()}%",
+                        text = stringResource(Res.string.label_percentage_value, (progress * 100).toInt()),
                         fontWeight = FontWeight.Bold
                     )
                     FintrackLabelSmallText(text = stringResource(Res.string.label_budget_consumed))
@@ -168,15 +168,22 @@ fun BudgetRow(
                 }
 
                 Column(modifier = Modifier.weight(1f)) {
-                    FintrackLabelLargeText(text = budgetProgress.category?.name ?: "نامشخص", fontWeight = FontWeight.SemiBold)
+                    FintrackLabelLargeText(text = budgetProgress.category?.name ?: stringResource(Res.string.label_unknown), fontWeight = FontWeight.SemiBold)
                     FintrackLabelSmallText(
-                        text = "${budgetProgress.spentAmount} از ${budgetProgress.budget.amount} ت",
+                        text = stringResource(
+                            Res.string.label_spent_of_budget,
+                            budgetProgress.spentAmount,
+                            budgetProgress.budget.amount
+                        ),
                         color = if (isOver) GlassRed else LocalGlassColors.current.text3
                     )
                 }
 
                 FintrackLabelLargeText(
-                    text = "${(budgetProgress.progress * 100).toInt()}%",
+                    text = stringResource(
+                        Res.string.label_percentage_value,
+                        (budgetProgress.progress * 100).toInt()
+                    ),
                     fontWeight = FontWeight.Bold,
                     color = if (isOver) GlassRed else LocalGlassColors.current.text
                 )

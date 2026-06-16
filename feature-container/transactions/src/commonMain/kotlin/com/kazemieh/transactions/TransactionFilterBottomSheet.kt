@@ -187,7 +187,7 @@ fun TransactionFilterBottomSheet(
                 }
             }
 
-            FilterSection(title = "مبلغ") {
+            FilterSection(title = stringResource(Res.string.amount)) {
                 // Amount Range Section
                 GlassRangeSlider(
                     value = state.selectedMinAmount..state.selectedMaxAmount,

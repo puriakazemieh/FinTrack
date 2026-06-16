@@ -19,6 +19,9 @@ import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
 import org.koin.compose.viewmodel.koinViewModel
 
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AssetActionsSheet(
@@ -43,7 +46,7 @@ fun AssetActionsSheet(
 
             ActionItem(
                 icon = Icons.Default.Edit,
-                title = "ویرایش دارایی",
+                title = stringResource(Res.string.action_edit_asset),
                 onClick = {
                     onEdit(asset)
                     onDismiss()
@@ -52,7 +55,7 @@ fun AssetActionsSheet(
 
             ActionItem(
                 icon = Icons.Default.History,
-                title = "مشاهده تاریخچه",
+                title = stringResource(Res.string.action_view_history),
                 onClick = {
                     onViewHistory(asset)
                     onDismiss()
@@ -61,7 +64,7 @@ fun AssetActionsSheet(
 
             ActionItem(
                 icon = Icons.Default.Delete,
-                title = "حذف دارایی",
+                title = stringResource(Res.string.action_delete_asset),
                 color = MaterialTheme.colorScheme.error,
                 onClick = {
                     viewModel.onIntent(AssetIntent.DeleteAsset(asset.id ?: 0L))

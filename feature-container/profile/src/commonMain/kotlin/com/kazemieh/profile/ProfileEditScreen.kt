@@ -317,7 +317,7 @@ fun ProfileField(
                     )
                     if (isOptional) {
                         FintrackLabelSmallText(
-                            text = " (${stringResource(Res.string.label_optional_fa)})",
+                            text = stringResource(Res.string.optional_wrapper, stringResource(Res.string.label_optional_fa)),
                             style = MaterialTheme.typography.labelSmall,
                             color = glassColors.text2
                         )
@@ -362,7 +362,7 @@ fun CompletionCard(percentage: Float) {
                     color = MaterialTheme.colorScheme.primary,
                     trackColor = glassColors.glass
                 )
-                FintrackLabelMediumText(text = "${(percentage * 100).toInt()}%", color = glassColors.text)
+                FintrackLabelMediumText(text = stringResource(Res.string.percentage_format, (percentage * 100).toInt()), color = glassColors.text)
             }
         }
     }

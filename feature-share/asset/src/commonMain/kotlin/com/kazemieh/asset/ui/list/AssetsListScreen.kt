@@ -22,6 +22,8 @@ import com.kazemieh.asset.ui.component.StocksPortfolio
 import com.kazemieh.common.model.Asset
 import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.component.*
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,17 +39,17 @@ fun AssetsListScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { FintrackTitleLargeText("دارایی‌ها") },
+                title = { FintrackTitleLargeText(stringResource(Res.string.title_assets_management)) },
                 actions = {
                     IconButton(onClick = { viewModel.onIntent(AssetIntent.SyncRates) }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "بروزرسانی")
+                        Icon(Icons.Default.Refresh, contentDescription = stringResource(Res.string.label_retry)) // Using existing retry label for sync description
                     }
                 }
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddAsset) {
-                Icon(Icons.Default.Add, contentDescription = "افزودن دارایی")
+                Icon(Icons.Default.Add, contentDescription = stringResource(Res.string.title_add_asset))
             }
         }
     ) { padding ->
@@ -102,7 +104,7 @@ fun TotalValueCard(totalValue: Long) {
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            FintrackTitleMediumText("ارزش کل دارایی‌ها")
+            FintrackTitleMediumText(stringResource(Res.string.label_total_assets_value))
             FintrackHeadlineLargeText(totalValue.toSignedPersianPrice())
         }
     }
@@ -140,12 +142,12 @@ fun AssetRow(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 FintrackTitleMediumText(asset.name)
-                FintrackBodySmallText("${asset.quantity} واحد")
+                FintrackBodySmallText(stringResource(Res.string.label_units_count, asset.quantity.toString()))
             }
             Column(horizontalAlignment = Alignment.End) {
                 FintrackBodyLargeText(asset.totalCurrentValue.toSignedPersianPrice())
                 FintrackBodyMediumText(
-                    text = "${asset.profitOrLossPercentage}%",
+                    text = stringResource(Res.string.label_percentage_value, asset.profitOrLossPercentage),
                     color = if (asset.profitOrLoss >= 0) Color.Green else Color.Red
                 )
             }

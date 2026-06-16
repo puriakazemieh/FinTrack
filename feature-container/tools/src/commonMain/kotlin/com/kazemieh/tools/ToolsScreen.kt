@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.glass.ScreenHeader
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -43,49 +43,49 @@ fun ToolsScreen(
                 onClick = onNavigateToBudget,
                 modifier = Modifier.padding(space.large)
             ) {
-                Text(stringResource(Res.string.label_budgets))
+                FintrackBodyLargeText(stringResource(Res.string.label_budgets))
             }
 
             Button(
                 onClick = onNavigateToInstallment,
                 modifier = Modifier.padding(space.large)
             ) {
-                Text(stringResource(Res.string.navigation_installment))
+                FintrackBodyLargeText(stringResource(Res.string.navigation_installment))
             }
 
             Button(
                 onClick = onNavigateToPerson,
                 modifier = Modifier.padding(space.large)
             ) {
-                Text(stringResource(Res.string.persons))
+                FintrackBodyLargeText(stringResource(Res.string.persons))
             }
 
             Button(
                 onClick = onNavigateToDebt,
                 modifier = Modifier.padding(space.large)
             ) {
-                Text(stringResource(Res.string.navigation_debts))
+                FintrackBodyLargeText(stringResource(Res.string.navigation_debts))
             }
 
             Button(
                 onClick = onNavigateToCheck,
                 modifier = Modifier.padding(space.large)
             ) {
-                Text("مدیریت چک‌ها")
+                FintrackBodyLargeText(stringResource(Res.string.title_check_management))
             }
 
             Button(
                 onClick = onNavigateToFixedExpense,
                 modifier = Modifier.padding(space.large)
             ) {
-                Text("هزینه‌های ثابت")
+                FintrackBodyLargeText(stringResource(Res.string.title_fixed_expense_management))
             }
 
             Button(
                 onClick = onNavigateToAssets,
                 modifier = Modifier.padding(space.large)
             ) {
-                Text("دارایی‌ها")
+                FintrackBodyLargeText(stringResource(Res.string.title_assets_management))
             }
         }
     }

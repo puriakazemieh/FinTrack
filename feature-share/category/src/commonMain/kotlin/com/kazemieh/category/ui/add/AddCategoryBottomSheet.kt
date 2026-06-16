@@ -237,7 +237,7 @@ private fun ParentCategorySelector(
     val glassColors = LocalGlassColors.current
     GlassCard(padding = 14.dp) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            FintrackLabelSmallText(text = "دسته‌بندی مادر", color = glassColors.text3)
+            FintrackLabelSmallText(text = stringResource(Res.string.label_parent_category), color = glassColors.text3)
             
             Box(
                 modifier = Modifier
@@ -254,7 +254,7 @@ private fun ParentCategorySelector(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     FintrackBodyMediumText(
-                        text = selectedParent?.name ?: "انتخاب دسته‌بندی مادر (اختیاری)",
+                        text = selectedParent?.name ?: stringResource(Res.string.label_parent_category_optional),
                         color = if (selectedParent != null) glassColors.text else glassColors.text3
                     )
                     Icon(
@@ -275,7 +275,7 @@ private fun ParentCategorySelector(
                 ) {
                     // Option for "None"
                     ParentCategoryItem(
-                        name = "بدون دسته‌بندی مادر",
+                        name = stringResource(Res.string.label_no_parent_category),
                         isSelected = selectedParentId == null,
                         onClick = {
                             onParentSelected(null)

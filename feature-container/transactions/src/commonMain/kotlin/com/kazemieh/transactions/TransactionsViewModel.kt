@@ -38,6 +38,8 @@ import fintrack.core.designsystem.generated.resources.this_week
 import fintrack.core.designsystem.generated.resources.today
 import fintrack.core.designsystem.generated.resources.tomorrow
 import fintrack.core.designsystem.generated.resources.yesterday
+import fintrack.core.designsystem.generated.resources.label_day
+import fintrack.core.designsystem.generated.resources.range_text
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -206,13 +208,25 @@ class TransactionsViewModel(
                     val endP = DateFilterHelper.persianDateFromMillis(intent.endTimeStamp, TimeZone.currentSystemDefault())
                     
                     val actualRangeText = if (startP.year == endP.year && startP.month == endP.month && startP.day == endP.day) {
-                        "${startP.day.toPersianDigits()} ${startP.persianMonth().displayName} ${startP.year.toPersianDigits()}"
+                        UiText.DynamicString("${startP.day.toPersianDigits()} ${startP.persianMonth().displayName} ${startP.year.toPersianDigits()}")
                     } else if (startP.year == endP.year) {
-                        "${startP.day.toPersianDigits()} ${startP.persianMonth().displayName} تا ${endP.day.toPersianDigits()} ${endP.persianMonth().displayName} ${endP.year.toPersianDigits()}"
+                        UiText.StringResourceText(
+                            Res.string.range_text,
+                            listOf(
+                                "${startP.day.toPersianDigits()} ${startP.persianMonth().displayName}",
+                                "${endP.day.toPersianDigits()} ${endP.persianMonth().displayName} ${endP.year.toPersianDigits()}"
+                            )
+                        )
                     } else {
-                        "${startP.day.toPersianDigits()} ${startP.persianMonth().displayName} ${startP.year.toPersianDigits()} تا ${endP.day.toPersianDigits()} ${endP.persianMonth().displayName} ${endP.year.toPersianDigits()}"
+                        UiText.StringResourceText(
+                            Res.string.range_text,
+                            listOf(
+                                "${startP.day.toPersianDigits()} ${startP.persianMonth().displayName} ${startP.year.toPersianDigits()}",
+                                "${endP.day.toPersianDigits()} ${endP.persianMonth().displayName} ${endP.year.toPersianDigits()}"
+                            )
+                        )
                     }
-                    val uiText = UiText.DynamicString(actualRangeText)
+                    val uiText = actualRangeText
                     val subLabel = getPeriodSubLabel(range)
 
                     _state.update {
@@ -379,7 +393,10 @@ class TransactionsViewModel(
                 Instant.fromEpochMilliseconds(range.start).toLocalDateTime(timeZone).date.toEpochDays()) + 1
 
         if (range.filterType == DateFilterType.CUSTOM_RANGE) {
-            return UiText.DynamicString("${daysBetween.toPersianDigits()} روز")
+            return UiText.StringResourceText(
+                Res.string.label_day,
+                listOf(daysBetween.toPersianDigits())
+            )
         }
 
         if (range.filterType == DateFilterType.TODAY) return UiText.DynamicString("")

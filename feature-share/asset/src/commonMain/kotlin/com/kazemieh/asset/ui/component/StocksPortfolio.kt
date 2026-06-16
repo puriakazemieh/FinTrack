@@ -9,6 +9,8 @@ import com.kazemieh.common.model.Asset
 import com.kazemieh.common.model.AssetType
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun StocksPortfolio(
@@ -21,7 +23,7 @@ fun StocksPortfolio(
     Column(
         modifier = Modifier.padding(16.dp).fillMaxWidth()
     ) {
-        FintrackTitleMediumText("سبد سهام")
+        FintrackTitleMediumText(stringResource(Res.string.title_stocks_portfolio))
         Spacer(modifier = Modifier.height(8.dp))
         
         stocks.forEach { stock ->
@@ -34,7 +36,7 @@ fun StocksPortfolio(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     FintrackBodyMediumText(stock.name)
-                    FintrackBodyMediumText("${stock.quantity} سهم")
+                    FintrackBodyMediumText(stringResource(Res.string.label_shares_suffix, stock.quantity))
                 }
             }
         }

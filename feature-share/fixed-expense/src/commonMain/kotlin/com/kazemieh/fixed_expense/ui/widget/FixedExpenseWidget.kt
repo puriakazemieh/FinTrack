@@ -14,6 +14,8 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.glass.WidgetCard
 import com.kazemieh.fixed_expense.ui.list.FixedExpenseListViewModel
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -27,7 +29,7 @@ fun FixedExpenseWidget(
 
     if (activeExpenses.isNotEmpty()) {
         WidgetCard(
-            title = "هزینه‌های ثابت پیش‌رو",
+            title = stringResource(Res.string.title_upcoming_fixed_expenses_label),
             onMore = onMoreClick,
             modifier = modifier
         ) {
@@ -35,11 +37,11 @@ fun FixedExpenseWidget(
                 activeExpenses.take(2).forEach { expense ->
                     Column(modifier = Modifier.padding(vertical = 4.dp)) {
                         FintrackTitleSmallText(
-                            text = expense.categoryName ?: "نامشخص",
+                            text = expense.categoryName ?: stringResource(Res.string.label_unknown_person),
                             fontWeight = FontWeight.SemiBold
                         )
                         FintrackBodyMediumText(
-                            text = "${expense.amount.toPersianPrice()} تومان - ${expense.recurrence.name}"
+                            text = stringResource(Res.string.label_toman_recurrence_summary, expense.amount.toPersianPrice(), expense.recurrence.name)
                         )
                     }
                 }

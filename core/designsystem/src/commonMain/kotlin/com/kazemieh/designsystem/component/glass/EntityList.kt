@@ -55,6 +55,8 @@ import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.LeadingIconStyle
+import com.kazemieh.designsystem.component.model.UiText
+import com.kazemieh.designsystem.component.model.asString
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.hint_search_in
 import fintrack.core.designsystem.generated.resources.msg_empty_list
@@ -197,7 +199,7 @@ fun EntityList(
 
         if (!isReorderMode) {
             Fab(
-                label = addLabel ?: "افزودن ${title.split(" ").first()} جدید",
+                label = addLabel ?: stringResource(Res.string.label_add_specific_new_entity, title.split(" ").first()),
                 icon = rememberVectorPainter(Icons.Default.Add),
                 onClick = onAddClick,
                 modifier = Modifier
@@ -228,7 +230,7 @@ private fun SummaryHeader(summary: List<EntitySummary>?) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.weight(1f)
                     ) {
-                        FintrackLabelSmallText(text = s.label, color = glassColors.text3)
+                        FintrackLabelSmallText(text = s.label.asString(), color = glassColors.text3)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             FintrackTitleMediumText(
                                 text = s.value.toPersianDigits(),
@@ -406,7 +408,7 @@ private fun ActionIcon(
 }
 
 data class EntitySummary(
-    val label: String,
+    val label: UiText,
     val value: String,
     val unit: String? = null,
     val color: Color? = null

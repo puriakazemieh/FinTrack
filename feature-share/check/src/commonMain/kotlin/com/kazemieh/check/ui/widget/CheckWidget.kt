@@ -15,6 +15,8 @@ import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.glass.WidgetCard
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -28,7 +30,7 @@ fun CheckWidget(
 
     if (pendingChecks.isNotEmpty()) {
         WidgetCard(
-            title = "چک‌های در جریان",
+            title = stringResource(Res.string.title_ongoing_checks_label),
             onMore = onMoreClick,
             modifier = modifier
         ) {
@@ -36,11 +38,11 @@ fun CheckWidget(
                 pendingChecks.take(2).forEach { check ->
                     Column(modifier = Modifier.padding(vertical = 4.dp)) {
                         FintrackTitleSmallText(
-                            text = check.personName ?: "نامشخص",
+                            text = check.personName ?: stringResource(Res.string.label_unknown_person),
                             fontWeight = FontWeight.SemiBold
                         )
                         FintrackBodyMediumText(
-                            text = "${check.amount.toPersianPrice()} تومان - سررسید: ${check.dueDate}" // TODO: Proper Date
+                            text = stringResource(Res.string.label_toman_date_summary, check.amount.toPersianPrice(), check.dueDate)
                         )
                     }
                 }

@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Asset
 import com.kazemieh.common.model.AssetType
+import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.AssetUseCases
+import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +30,7 @@ sealed interface AssetIntent {
 }
 
 sealed interface AssetEffect {
-    data class ShowMessage(val message: String) : AssetEffect
+    data class ShowMessage(val message: UiText) : AssetEffect
 }
 
 class AssetViewModel(
@@ -71,21 +73,21 @@ class AssetViewModel(
     private fun addAsset(asset: Asset) {
         viewModelScope.launch {
             assetUseCases.addAsset(asset)
-            _effect.send(AssetEffect.ShowMessage("دارایی با موفقیت اضافه شد"))
+            _effect.send(AssetEffect.ShowMessage(UiText.StringResourceText(Res.string.msg_asset_added)))
         }
     }
 
     private fun deleteAsset(id: Long) {
         viewModelScope.launch {
             assetUseCases.deleteAsset(id)
-            _effect.send(AssetEffect.ShowMessage("دارایی حذف شد"))
+            _effect.send(AssetEffect.ShowMessage(UiText.StringResourceText(Res.string.msg_asset_deleted)))
         }
     }
 
     private fun updateAsset(asset: Asset) {
         viewModelScope.launch {
             assetUseCases.updateAsset(asset)
-            _effect.send(AssetEffect.ShowMessage("دارایی بروزرسانی شد"))
+            _effect.send(AssetEffect.ShowMessage(UiText.StringResourceText(Res.string.msg_asset_updated)))
         }
     }
 
