@@ -480,6 +480,7 @@
     <string name="profile_sync_desc">آخرین همگام‌سازی: %1$s</string>
     <string name="profile_premium_title">اشتراک ویژه (پرمیوم)</string>
     <string name="profile_premium_desc">دسترسی به تمام امکانات پیشرفته</string>
+    <string name="premium_all_features_free">همه امکانات برای شما رایگان است</string>
     <string name="section_display">نمایش</string>
     <string name="section_security">امنیت</string>
     <string name="section_data">داده</string>

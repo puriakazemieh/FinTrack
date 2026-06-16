@@ -3,9 +3,12 @@ package com.kazemieh.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.designsystem.AppTheme
+import com.kazemieh.designsystem.component.SnackbarController
+import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.lock.LockMode
 import com.kazemieh.preferences.FinTrackPreferences
+import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -119,6 +122,11 @@ class ProfileViewModel(
             is ProfileIntent.Refresh -> {
                 loadProfile()
             }
+            is ProfileIntent.ShowPremiumInfo -> {
+                viewModelScope.launch {
+                    SnackbarController.showMessage(UiText.StringResourceText(Res.string.premium_all_features_free))
+                }
+            }
             is ProfileIntent.SetLockState -> {
                 preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, intent.isEnabled)
                 if (!intent.isEnabled) {
@@ -152,6 +160,7 @@ data class ProfileState(
 
 sealed interface ProfileIntent {
     data object Refresh : ProfileIntent
+    data object ShowPremiumInfo : ProfileIntent
     data object ToggleDarkMode : ProfileIntent
     data object ToggleFingerprint : ProfileIntent
     data object ToggleBackup : ProfileIntent
