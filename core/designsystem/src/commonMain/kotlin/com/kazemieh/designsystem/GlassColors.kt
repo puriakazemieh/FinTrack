@@ -52,7 +52,8 @@ data class GlassColors(
     val glassHairline: Color,
     val text: Color,
     val text2: Color,
-    val text3: Color
+    val text3: Color,
+    val isGlass: Boolean
 )
 
 val DarkGlassColors = GlassColors(
@@ -67,7 +68,8 @@ val DarkGlassColors = GlassColors(
     glassHairline = GlassHairline,
     text = DarkGlassText,
     text2 = DarkGlassText2,
-    text3 = DarkGlassText3
+    text3 = DarkGlassText3,
+    isGlass = true
 )
 
 val LightGlassColors = GlassColors(
@@ -82,7 +84,8 @@ val LightGlassColors = GlassColors(
     glassHairline = Color(0xFFF3F4F6),
     text = LightGlassText,
     text2 = LightGlassText2,
-    text3 = LightGlassText3
+    text3 = LightGlassText3,
+    isGlass = true
 )
 
 val PlainDarkGlassColors = GlassColors(
@@ -97,7 +100,8 @@ val PlainDarkGlassColors = GlassColors(
     glassHairline = Color(0xFF2D322D),
     text = md_theme_dark_onBackground,
     text2 = md_theme_dark_onSurface.copy(alpha = 0.7f),
-    text3 = md_theme_dark_onSurface.copy(alpha = 0.5f)
+    text3 = md_theme_dark_onSurface.copy(alpha = 0.5f),
+    isGlass = false
 )
 
 val PlainLightGlassColors = GlassColors(
@@ -112,7 +116,8 @@ val PlainLightGlassColors = GlassColors(
     glassHairline = Color(0xFFF5F7F2),
     text = md_theme_light_onBackground,
     text2 = md_theme_light_onSurface.copy(alpha = 0.7f),
-    text3 = md_theme_light_onSurface.copy(alpha = 0.5f)
+    text3 = md_theme_light_onSurface.copy(alpha = 0.5f),
+    isGlass = false
 )
 
 val LocalGlassColors = staticCompositionLocalOf { DarkGlassColors }

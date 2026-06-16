@@ -14,6 +14,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.LocalGlassColors
 
 @Composable
 fun FintrackScreen(
@@ -60,6 +61,8 @@ fun FintrackScreen(
 
 @Composable
 fun FintrackBackgroundBlobs() {
+    if (!LocalGlassColors.current.isGlass) return
+
     val primaryColor = MaterialTheme.colorScheme.primary
     val secondaryColor = MaterialTheme.colorScheme.secondary
 
