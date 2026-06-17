@@ -37,7 +37,7 @@ val databaseModule = module {
         )
     }
 
-    single { DatabaseInitializer(database = get(), get()) }
+    single { DatabaseInitializer(get()) }
 
     single<TransactionLocalDataSource> {
         TransactionLocalDataSourceImpl(db = get())
