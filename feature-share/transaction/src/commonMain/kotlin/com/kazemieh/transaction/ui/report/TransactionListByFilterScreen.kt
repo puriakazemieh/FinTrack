@@ -69,7 +69,6 @@ fun TransactionListByFilterScreen(
     toTimestamp: Long? = null,
     minAmount: Long? = null,
     maxAmount: Long? = null,
-    enableAnimationChart: Boolean = true,
     onDelete: (TransactionWithRelations) -> Unit = {},
     onEdit: (TransactionWithRelations) -> Unit = {},
     viewModel: TransactionReportViewModel = koinViewModel()
@@ -104,12 +103,9 @@ fun TransactionListByFilterScreen(
     TransactionListByFilterContent(
         state = state,
         listState = listState,
-        enableAnimationChart = enableAnimationChart,
         onDelete = onDelete,
         onEdit = onEdit,
         onLoadMore = { viewModel.onIntent(TransactionReportIntent.LoadNextPage) },
-        onRetryRefresh = { viewModel.onIntent(TransactionReportIntent.RetryRefresh) },
-        onRetryAppend = { viewModel.onIntent(TransactionReportIntent.RetryAppend) }
     )
 }
 
@@ -119,14 +115,10 @@ fun TransactionListByFilterScreen(
 fun TransactionListByFilterContent(
     state: TransactionReportState,
     listState: LazyListState,
-    enableAnimationChart: Boolean,
     onDelete: (TransactionWithRelations) -> Unit = {},
     onEdit: (TransactionWithRelations) -> Unit = {},
     onLoadMore: () -> Unit,
-    onRetryRefresh: () -> Unit,
-    onRetryAppend: () -> Unit,
 ) {
-    val space = LocalSpacing.current
 
     LaunchedEffect(state.items.size, state.endReached, state.isAppending, state.isRefreshing) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0 }

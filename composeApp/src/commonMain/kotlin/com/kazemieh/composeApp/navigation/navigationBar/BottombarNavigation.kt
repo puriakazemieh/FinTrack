@@ -65,7 +65,8 @@ fun NavGraphBuilder.bottomBarNavGraph(
                 onNavigateToBudget = { navController.navigate(Screen.Budget) },
                 onNavigateToCheck = { navController.navigate(Screen.Check) },
                 onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) },
-                onNavigateToAssets = { navController.navigate(Screen.Assets) }
+                onNavigateToAssets = { navController.navigate(Screen.Assets) },
+                onNavigateToProfileEdit = { navController.navigate(Screen.ProfileEdit) }
             )
         }
 

@@ -14,8 +14,16 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Sort
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,12 +33,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.toPersianDigits
-import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassText2
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -41,8 +47,8 @@ import com.kazemieh.designsystem.component.LeadingIconStyle
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
-import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
+import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.component.model.toItemUi
 import com.kazemieh.designsystem.component.model.toSource
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
@@ -125,7 +131,9 @@ private fun SourceBottomSheetCore(
                             if (showEditButton) {
                                 TextButton(onClick = { isEditMode = !isEditMode }) {
                                     FintrackLabelMediumText(
-                                        text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(Res.string.edit)
+                                        text = if (isEditMode) stringResource(Res.string.cancell_) else stringResource(
+                                            Res.string.edit
+                                        )
                                     )
                                 }
                             }

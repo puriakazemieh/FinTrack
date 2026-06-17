@@ -1,19 +1,34 @@
 package com.kazemieh.designsystem.component.glass
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.designsystem.LocalGlassColors
-import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.FintrackTitleSmallText
 
 /**
  * 2.8 SheetFrame — bottom sheet shell
@@ -25,9 +40,8 @@ fun SheetFrame(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     sub: String? = null,
+    horizontalPadding: Dp = 24.dp,
     isFullScreen: Boolean = true,
-    topOffset: Dp = 40.dp,
-    hero: @Composable (() -> Unit)? = null,
     primaryButtonText: String? = null,
     onPrimaryClick: (() -> Unit)? = null,
     secondaryButtonText: String? = null,
@@ -36,7 +50,6 @@ fun SheetFrame(
     trailingContent: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val glassColors = LocalGlassColors.current
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -63,7 +76,7 @@ fun SheetFrame(
                 Column(
                     modifier = Modifier
                         .let { if (isFullScreen) it.weight(1f) else it.wrapContentHeight() }
-                        .padding(horizontal = 24.dp)
+                        .padding(horizontal = horizontalPadding)
                 ) {
                     content()
                 }

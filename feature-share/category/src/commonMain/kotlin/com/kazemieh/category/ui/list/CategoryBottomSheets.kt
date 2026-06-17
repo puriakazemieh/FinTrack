@@ -31,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,18 +38,16 @@ import com.kazemieh.category.ui.add.AddCategoryBottomSheet
 import com.kazemieh.category.ui.delete.DeleteCategoryBottomSheet
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
-import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
-import com.kazemieh.designsystem.GlassText2
-import com.kazemieh.designsystem.GlassText3
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.ScreenHeader
-import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.model.toCategory
 import com.kazemieh.designsystem.component.model.toItemUi
 import fintrack.core.designsystem.generated.resources.Res
@@ -73,7 +70,12 @@ fun CategoryPickerBottomSheet(
     onNavigateToTransactions: ((Category) -> Unit)? = null
 ) {
     LaunchedEffect(transactionType) {
-        viewModel.onIntent(CategoryIntent.LoadCategoryByType(transactionType, isHierarchical = true))
+        viewModel.onIntent(
+            CategoryIntent.LoadCategoryByType(
+                transactionType,
+                isHierarchical = true
+            )
+        )
     }
 
     val state by viewModel.state.collectAsState()
@@ -138,20 +140,22 @@ fun CategoryPickerBottomSheet(
                     }
                 )
 
-                val entityItems = remember(state.categories, state.expandedCategoryIds, state.allCategories) {
-                    state.categories.map {
-                        val hasChildren = state.allCategories.any { child -> child.parentId == it.id }
-                        val isExpanded = state.expandedCategoryIds.contains(it.id)
-                        EntityItem(
-                            id = it.id ?: 0,
-                            name = it.name,
-                            iconId = it.iconId,
-                            colorId = it.colorId,
-                            parentId = it.parentId,
-                            badge = if (hasChildren && it.parentId == null) (if (isExpanded) "−" else "+") else null
-                        )
+                val entityItems =
+                    remember(state.categories, state.expandedCategoryIds, state.allCategories) {
+                        state.categories.map {
+                            val hasChildren =
+                                state.allCategories.any { child -> child.parentId == it.id }
+                            val isExpanded = state.expandedCategoryIds.contains(it.id)
+                            EntityItem(
+                                id = it.id ?: 0,
+                                name = it.name,
+                                iconId = it.iconId,
+                                colorId = it.colorId,
+                                parentId = it.parentId,
+                                badge = if (hasChildren && it.parentId == null) (if (isExpanded) "−" else "+") else null
+                            )
+                        }
                     }
-                }
 
                 EntityList(
                     title = stringResource(Res.string.category),
@@ -215,7 +219,12 @@ fun CategoryManageBottomSheet(
     onNavigateToTransactions: ((Category) -> Unit)? = null
 ) {
     LaunchedEffect(Unit) {
-        viewModel.onIntent(CategoryIntent.LoadCategoryByType(TransactionType.INCOME, isHierarchical = true))
+        viewModel.onIntent(
+            CategoryIntent.LoadCategoryByType(
+                TransactionType.INCOME,
+                isHierarchical = true
+            )
+        )
     }
 
     val state by viewModel.state.collectAsState()
@@ -265,23 +274,32 @@ fun CategoryManageBottomSheet(
 
                 TypeSwitcher(
                     selectedType = state.type,
-                    onTypeSelected = { viewModel.onIntent(CategoryIntent.LoadCategoryByType(it, isHierarchical = true)) }
-                )
-
-                val entityItems = remember(state.categories, state.expandedCategoryIds, state.allCategories) {
-                    state.categories.map {
-                        val hasChildren = state.allCategories.any { child -> child.parentId == it.id }
-                        val isExpanded = state.expandedCategoryIds.contains(it.id)
-                        EntityItem(
-                            id = it.id ?: 0,
-                            name = it.name,
-                            iconId = it.iconId,
-                            colorId = it.colorId,
-                            parentId = it.parentId,
-                            badge = if (hasChildren && it.parentId == null) (if (isExpanded) "−" else "+") else null
+                    onTypeSelected = {
+                        viewModel.onIntent(
+                            CategoryIntent.LoadCategoryByType(
+                                it,
+                                isHierarchical = true
+                            )
                         )
                     }
-                }
+                )
+
+                val entityItems =
+                    remember(state.categories, state.expandedCategoryIds, state.allCategories) {
+                        state.categories.map {
+                            val hasChildren =
+                                state.allCategories.any { child -> child.parentId == it.id }
+                            val isExpanded = state.expandedCategoryIds.contains(it.id)
+                            EntityItem(
+                                id = it.id ?: 0,
+                                name = it.name,
+                                iconId = it.iconId,
+                                colorId = it.colorId,
+                                parentId = it.parentId,
+                                badge = if (hasChildren && it.parentId == null) (if (isExpanded) "−" else "+") else null
+                            )
+                        }
+                    }
 
                 EntityList(
                     title = stringResource(Res.string.category),
@@ -387,11 +405,11 @@ private fun TypeSwitcher(
                         .padding(vertical = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                        FintrackLabelMediumText(
-                            text = label,
-                            fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-                            color = if (active) color else LocalGlassColors.current.text3
-                        )
+                    FintrackLabelMediumText(
+                        text = label,
+                        fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                        color = if (active) color else LocalGlassColors.current.text3
+                    )
                 }
             }
         }

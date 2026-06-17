@@ -1,10 +1,7 @@
 package com.kazemieh.installment.ui.add
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -21,15 +18,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.list.CategoryPickerBottomSheet
 import com.kazemieh.common.model.InstallmentFrequency
 import com.kazemieh.common.model.TransactionType
-import com.kazemieh.common.toPersianDigits
 import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassGreen
@@ -53,8 +47,6 @@ import fintrack.core.designsystem.generated.resources.frequency_weekly
 import fintrack.core.designsystem.generated.resources.frequency_yearly
 import fintrack.core.designsystem.generated.resources.installment_amount
 import fintrack.core.designsystem.generated.resources.installment_frequency
-import fintrack.core.designsystem.generated.resources.installment_next_date
-import fintrack.core.designsystem.generated.resources.installment_reminder_message
 import fintrack.core.designsystem.generated.resources.installment_title
 import fintrack.core.designsystem.generated.resources.save_
 import fintrack.core.designsystem.generated.resources.select_category
@@ -74,7 +66,7 @@ fun AddInstallmentBottomSheet(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    
+
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
@@ -82,6 +74,7 @@ fun AddInstallmentBottomSheet(
                     onSuccess()
                     onDismiss()
                 }
+
                 is AddInstallmentEffect.Error -> {
                     // Show snackbar?
                 }
@@ -107,7 +100,8 @@ fun AddInstallmentBottomSheet(
             primaryLabel = stringResource(Res.string.save_),
             onPrimaryClick = {
                 val reminderTitle = state.title
-                val reminderMessage = state.installmentAmount.toIntOrNull()?.toSignedPersianPrice() ?: "0"
+                val reminderMessage =
+                    state.installmentAmount.toIntOrNull()?.toSignedPersianPrice() ?: "0"
                 viewModel.onIntent(
                     AddInstallmentIntent.Submit(
                         reminderTitle = reminderTitle,
@@ -135,7 +129,13 @@ fun AddInstallmentBottomSheet(
                     LargeInstallmentField(
                         value = state.installmentAmount,
                         label = stringResource(Res.string.installment_amount),
-                        onValueChange = { viewModel.onIntent(AddInstallmentIntent.SetInstallmentAmount(it)) },
+                        onValueChange = {
+                            viewModel.onIntent(
+                                AddInstallmentIntent.SetInstallmentAmount(
+                                    it
+                                )
+                            )
+                        },
                         keyboardType = KeyboardType.Number
                     )
                 }
@@ -153,7 +153,13 @@ fun AddInstallmentBottomSheet(
                     LargeInstallmentField(
                         value = state.totalInstallments,
                         label = stringResource(Res.string.total_installments),
-                        onValueChange = { viewModel.onIntent(AddInstallmentIntent.SetTotalInstallments(it)) },
+                        onValueChange = {
+                            viewModel.onIntent(
+                                AddInstallmentIntent.SetTotalInstallments(
+                                    it
+                                )
+                            )
+                        },
                         keyboardType = KeyboardType.Number
                     )
                 }
@@ -164,9 +170,11 @@ fun AddInstallmentBottomSheet(
                         required = true,
                         onClick = { showCategoryPicker = true }
                     ) {
-                        val color = colors.firstOrNull { it.id == state.category?.colorId }?.color ?: GlassGreen
+                        val color = colors.firstOrNull { it.id == state.category?.colorId }?.color
+                            ?: GlassGreen
                         PickerValue(
-                            label = state.category?.name ?: stringResource(Res.string.select_category),
+                            label = state.category?.name
+                                ?: stringResource(Res.string.select_category),
                             color = color,
                             icon = FinTrackIcons.findIcon(state.category?.iconId).resource
                         )

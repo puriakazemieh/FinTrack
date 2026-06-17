@@ -1,26 +1,32 @@
 package com.kazemieh.debt.ui.list
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.unit.dp
 import com.kazemieh.common.model.DebtType
 import com.kazemieh.common.toPersianPrice
 import com.kazemieh.debt.ui.add.AddDebtBottomSheet
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.EntitySummary
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.model.UiText
-import fintrack.core.designsystem.generated.resources.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.currency_toman
+import fintrack.core.designsystem.generated.resources.navigation_debts
+import fintrack.core.designsystem.generated.resources.title_debts_management
+import fintrack.core.designsystem.generated.resources.total_credits
+import fintrack.core.designsystem.generated.resources.total_debts
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -39,10 +45,12 @@ fun DebtsScreen(
 
     var showAddDebt by remember { mutableStateOf(false) }
 
-    val totalCredits = state.debts.filter { it.debt.type == DebtType.OWED_TO_ME && !it.debt.isSettled }
-        .sumOf { it.debt.amount }
-    val totalDebts = state.debts.filter { it.debt.type == DebtType.OWED_BY_ME && !it.debt.isSettled }
-        .sumOf { it.debt.amount }
+    val totalCredits =
+        state.debts.filter { it.debt.type == DebtType.OWED_TO_ME && !it.debt.isSettled }
+            .sumOf { it.debt.amount }
+    val totalDebts =
+        state.debts.filter { it.debt.type == DebtType.OWED_BY_ME && !it.debt.isSettled }
+            .sumOf { it.debt.amount }
 
     FintrackScreen(
         title = stringResource(Res.string.navigation_debts),

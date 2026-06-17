@@ -4,6 +4,7 @@ package com.kazemieh.dashboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,11 +26,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,9 +39,7 @@ import com.kazemieh.budget.ui.component.BudgetWidget
 import com.kazemieh.check.ui.widget.CheckWidget
 import com.kazemieh.dashboard.component.QuickActions
 import com.kazemieh.dashboard.component.RecentTransactionsWidget
-import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassGreenDark
-import com.kazemieh.designsystem.GlassGreenDeep
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FAB
@@ -71,7 +69,8 @@ fun DashboardScreen(
     onNavigateToBudget: () -> Unit = {},
     onNavigateToCheck: () -> Unit = {},
     onNavigateToFixedExpense: () -> Unit = {},
-    onNavigateToAssets: () -> Unit = {}
+    onNavigateToAssets: () -> Unit = {},
+    onNavigateToProfileEdit: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
@@ -86,7 +85,10 @@ fun DashboardScreen(
         ) {
             item {
                 DashboardHeader(
+                    userName = state.userName,
+                    userInitial = state.userInitial,
                     onNavigateToSearch = onNavigateToSearch,
+                    onProfileClick = onNavigateToProfileEdit,
                     modifier = Modifier.padding(
                         horizontal = space.large,
                         vertical = space.mediumSmall
@@ -227,10 +229,11 @@ fun DashboardScreen(
 @Composable
 private fun DashboardHeader(
     modifier: Modifier = Modifier,
-    onNavigateToSearch: () -> Unit = {}
+    userName: String,
+    userInitial: String,
+    onNavigateToSearch: () -> Unit = {},
+    onProfileClick: () -> Unit = {}
 ) {
-    val space = LocalSpacing.current
-    val glassColors = LocalGlassColors.current
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -240,17 +243,22 @@ private fun DashboardHeader(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onProfileClick
+            )
         ) {
             Box(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(MaterialTheme.shapes.medium)
-                    .background(Brush.linearGradient(listOf(GlassGreen, GlassGreenDeep))),
+                    .background(GlassGreenDark.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
                 FintrackLabelMediumText(
-                    text = stringResource(Res.string.placeholder_user_initial),
+                    text = userInitial,
                     color = GlassGreenDark,
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp
@@ -261,7 +269,7 @@ private fun DashboardHeader(
                     text = stringResource(Res.string.msg_hello)
                 )
                 FintrackTitleMediumText(
-                    text = stringResource(Res.string.placeholder_user_name),
+                    text = userName,
                     fontWeight = FontWeight.SemiBold
                 )
             }

@@ -69,6 +69,7 @@ fun TransactionFilterBottomSheet(
         title = stringResource(Res.string.report),
         sub = stringResource(Res.string.msg_filters_combined),
         onDismiss = onDismiss,
+        horizontalPadding = 20.dp,
         trailingContent = {
             TextButton(onClick = { onIntent(TransactionsIntent.ResetFilters) }) {
                 FintrackLabelMediumText(
@@ -204,7 +205,6 @@ fun TransactionFilterBottomSheet(
                 )
             }
             // Sources Section
-
             FilterSection(title = stringResource(Res.string.financial_sources)) {
                 SourceFilterSelectionContent(
                     selectedSources = state.selectedSources,

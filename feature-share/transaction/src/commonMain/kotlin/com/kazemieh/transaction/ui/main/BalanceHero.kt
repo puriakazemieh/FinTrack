@@ -58,7 +58,6 @@ fun BalanceHero(
 
     GlassCard(
         modifier = modifier.fillMaxWidth(),
-        tone = GlassTone.Strong,
         padding = 16.dp
     ) {
         Column {

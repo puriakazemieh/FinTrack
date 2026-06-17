@@ -1,18 +1,39 @@
 package com.kazemieh.debt.ui.add
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Wallet
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
@@ -21,16 +42,29 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.DebtType
 import com.kazemieh.common.persiandatetime.extensions.toDateString
 import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.FintrackBodyLargeText
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackLabelLargeText
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
+import com.kazemieh.designsystem.component.FintrackOutlinedTextField
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.ScreenHeader
-import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import com.kazemieh.person.ui.list.PersonPickerSingleBottomSheet
-import fintrack.core.designsystem.generated.resources.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.add_debt
+import fintrack.core.designsystem.generated.resources.date
+import fintrack.core.designsystem.generated.resources.debt_amount
+import fintrack.core.designsystem.generated.resources.debt_owed_by_me
+import fintrack.core.designsystem.generated.resources.debt_owed_to_me
+import fintrack.core.designsystem.generated.resources.description
+import fintrack.core.designsystem.generated.resources.person_choose
+import fintrack.core.designsystem.generated.resources.person_name
+import fintrack.core.designsystem.generated.resources.save_
+import fintrack.core.designsystem.generated.resources.source
+import fintrack.core.designsystem.generated.resources.source_choose
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.stringResource
@@ -126,7 +160,8 @@ fun AddDebtBottomSheet(
                     // Date Picker (Simplified for now, using text field or existing date logic)
                     PickerField(
                         label = stringResource(Res.string.date),
-                        value = Instant.fromEpochMilliseconds(state.date).toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
+                        value = Instant.fromEpochMilliseconds(state.date)
+                            .toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
                         icon = Icons.Default.CalendarMonth,
                         onClick = { /* TODO: Date Picker */ }
                     )
@@ -200,7 +235,10 @@ fun TypeButton(
         contentColor = if (selected) selectedColor else MaterialTheme.colorScheme.onSurfaceVariant
     ) {
         Box(contentAlignment = Alignment.Center) {
-            FintrackLabelLargeText(text = text, color = if (selected) selectedColor else MaterialTheme.colorScheme.onSurfaceVariant)
+            FintrackLabelLargeText(
+                text = text,
+                color = if (selected) selectedColor else MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -224,10 +262,19 @@ fun PickerField(
                 modifier = Modifier.padding(space.medium),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
                 Spacer(modifier = Modifier.width(space.small))
                 FintrackBodyLargeText(text = value, modifier = Modifier.weight(1f))
-                Icon(Icons.Default.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                Icon(
+                    Icons.Default.ChevronRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }

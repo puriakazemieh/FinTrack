@@ -303,7 +303,6 @@ fun TransactionsScreen(
                 toTimestamp = state.endDateTimeStamp,
                 minAmount = state.selectedMinAmount.toLong(),
                 maxAmount = state.selectedMaxAmount.toLong(),
-                enableAnimationChart = state.enableAnimationChart,
                 onEdit = { transactionWithRelations ->
                     viewModel.onIntent(
                         TransactionsIntent.ShowTransactionBottomSheet(transactionWithRelations)

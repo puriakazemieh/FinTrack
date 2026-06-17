@@ -1,7 +1,12 @@
 package com.kazemieh.category.ui.list
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
@@ -12,17 +17,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.add.AddCategoryBottomSheet
 import com.kazemieh.category.ui.delete.DeleteCategoryBottomSheet
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
-import com.kazemieh.designsystem.*
-import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.GlassRed
+import com.kazemieh.designsystem.LocalGlassColors
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.Chip
-import fintrack.core.designsystem.generated.resources.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.all
+import fintrack.core.designsystem.generated.resources.type_expense
+import fintrack.core.designsystem.generated.resources.type_income
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -45,11 +53,15 @@ fun CategoryFilterSelectionContent(
 
     val state by viewModel.state.collectAsState()
 
-    val showIncome = selectedTransactionType == TransactionType.ALL || selectedTransactionType == TransactionType.INCOME
-    val showExpense = selectedTransactionType == TransactionType.ALL || selectedTransactionType == TransactionType.EXPENSE
+    val showIncome =
+        selectedTransactionType == TransactionType.ALL || selectedTransactionType == TransactionType.INCOME
+    val showExpense =
+        selectedTransactionType == TransactionType.ALL || selectedTransactionType == TransactionType.EXPENSE
 
-    val incomeCategories = if (showIncome) state.categories.filter { it.type == TransactionType.INCOME } else emptyList()
-    val expenseCategories = if (showExpense) state.categories.filter { it.type == TransactionType.EXPENSE } else emptyList()
+    val incomeCategories =
+        if (showIncome) state.categories.filter { it.type == TransactionType.INCOME } else emptyList()
+    val expenseCategories =
+        if (showExpense) state.categories.filter { it.type == TransactionType.EXPENSE } else emptyList()
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(
@@ -142,7 +154,7 @@ fun CategoryFilterSelectionContent(
                     ) {
                         FintrackLabelSmallText(
                             text = category.name + if (active) " ✓" else "",
-                            color = if (active) LocalGlassColors.current.bg0 else LocalGlassColors.current.text
+                            color = if (active) glassColors.text3 else glassColors.text
                         )
                     }
                 }

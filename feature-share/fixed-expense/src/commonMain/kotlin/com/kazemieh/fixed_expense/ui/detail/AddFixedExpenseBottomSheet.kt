@@ -2,7 +2,17 @@ package com.kazemieh.fixed_expense.ui.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -12,12 +22,23 @@ import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Wallet
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -27,15 +48,35 @@ import com.kazemieh.common.model.RecurrenceType
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.persiandatetime.extensions.toDateString
 import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.FintrackBodyLargeText
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
+import com.kazemieh.designsystem.component.FintrackOutlinedTextField
+import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.ScreenHeader
-import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
-import fintrack.core.designsystem.generated.resources.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.category
+import fintrack.core.designsystem.generated.resources.custom_date
+import fintrack.core.designsystem.generated.resources.description
+import fintrack.core.designsystem.generated.resources.dp_today
+import fintrack.core.designsystem.generated.resources.frequency_daily
+import fintrack.core.designsystem.generated.resources.frequency_monthly
+import fintrack.core.designsystem.generated.resources.frequency_weekly
+import fintrack.core.designsystem.generated.resources.frequency_yearly
+import fintrack.core.designsystem.generated.resources.installment_frequency
+import fintrack.core.designsystem.generated.resources.label_auto_post_enabled
+import fintrack.core.designsystem.generated.resources.label_expense_amount
+import fintrack.core.designsystem.generated.resources.save_
+import fintrack.core.designsystem.generated.resources.select_category
+import fintrack.core.designsystem.generated.resources.select_source
+import fintrack.core.designsystem.generated.resources.source
+import fintrack.core.designsystem.generated.resources.start
+import fintrack.core.designsystem.generated.resources.title_add_fixed_expense
+import fintrack.core.designsystem.generated.resources.title_select_recurrence
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.stringResource
@@ -134,7 +175,8 @@ fun AddFixedExpenseBottomSheet(
                     // Start Date Picker
                     PickerField(
                         label = stringResource(Res.string.start),
-                        value = Instant.fromEpochMilliseconds(state.startDate).toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
+                        value = Instant.fromEpochMilliseconds(state.startDate)
+                            .toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
                         icon = Icons.Default.CalendarMonth,
                         onClick = { /* TODO: Date Picker */ }
                     )
@@ -148,7 +190,13 @@ fun AddFixedExpenseBottomSheet(
                         FintrackBodyLargeText(stringResource(Res.string.label_auto_post_enabled))
                         Switch(
                             checked = state.isAutoPostEnabled,
-                            onCheckedChange = { viewModel.onIntent(AddFixedExpenseIntent.SetAutoPost(it)) }
+                            onCheckedChange = {
+                                viewModel.onIntent(
+                                    AddFixedExpenseIntent.SetAutoPost(
+                                        it
+                                    )
+                                )
+                            }
                         )
                     }
 
@@ -228,7 +276,10 @@ fun RecurrencePickerBottomSheet(
         ) {
             FintrackBackgroundBlobs()
             Column(modifier = Modifier.padding(16.dp)) {
-                FintrackTitleMediumText(stringResource(Res.string.title_select_recurrence), modifier = Modifier.padding(bottom = 16.dp))
+                FintrackTitleMediumText(
+                    stringResource(Res.string.title_select_recurrence),
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
                 RecurrenceType.entries.forEach { type ->
                     Row(
                         modifier = Modifier
@@ -275,10 +326,19 @@ private fun PickerField(
                 modifier = Modifier.padding(space.medium),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
                 Spacer(modifier = Modifier.width(space.small))
                 FintrackBodyLargeText(text = value, modifier = Modifier.weight(1f))
-                Icon(Icons.Default.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                Icon(
+                    Icons.Default.ChevronRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }

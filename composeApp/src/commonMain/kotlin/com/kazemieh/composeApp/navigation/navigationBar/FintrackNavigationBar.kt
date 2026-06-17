@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -55,7 +54,11 @@ fun FintrackNavigationBar(
 
             when {
                 routeToAnalyze.contains("Dashboard", ignoreCase = true) -> Destinations.DASHBOARD
-                routeToAnalyze.contains("Transactions", ignoreCase = true) -> Destinations.TRANSACTIONS
+                routeToAnalyze.contains(
+                    "Transactions",
+                    ignoreCase = true
+                ) -> Destinations.TRANSACTIONS
+
                 routeToAnalyze.contains("Tools", ignoreCase = true) -> Destinations.TOOLS
                 routeToAnalyze.contains("Profile", ignoreCase = true) -> Destinations.PROFILE
                 else -> Destinations.DASHBOARD
@@ -117,7 +120,8 @@ fun FintrackNavigationBar(
                         .fillMaxHeight()
                         .clip(CircleShape)
                         .clickable {
-                            val currentRoute = navController.currentBackStackEntry?.destination?.route.toString()
+                            val currentRoute =
+                                navController.currentBackStackEntry?.destination?.route.toString()
                             val isSearchOpen = currentRoute.contains("Search", ignoreCase = true)
 
                             if (!isSelected) {
@@ -154,14 +158,7 @@ fun FintrackNavigationBar(
                 .align(Alignment.TopCenter)
                 .size(56.dp) // Slightly adjusted size
                 .clip(CircleShape)
-                .background(
-                    Brush.linearGradient(
-                        listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
-                        )
-                    )
-                )
+                .background(MaterialTheme.colorScheme.primary)
                 .clickable(onClick = onFabClick),
             contentAlignment = Alignment.Center
         ) {

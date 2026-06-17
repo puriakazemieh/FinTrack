@@ -1,22 +1,31 @@
 package com.kazemieh.person.ui.detail
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import com.kazemieh.common.model.DebtType
 import com.kazemieh.common.toPersianPrice
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.EntitySummary
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.model.UiText
-import fintrack.core.designsystem.generated.resources.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.balance
+import fintrack.core.designsystem.generated.resources.currency_toman
+import fintrack.core.designsystem.generated.resources.debt_settled
+import fintrack.core.designsystem.generated.resources.description
+import fintrack.core.designsystem.generated.resources.label_active
+import fintrack.core.designsystem.generated.resources.navigation_debts
+import fintrack.core.designsystem.generated.resources.person_name
+import fintrack.core.designsystem.generated.resources.total_credits
+import fintrack.core.designsystem.generated.resources.total_debts
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -66,7 +75,9 @@ fun PersonDetailScreen(
                     EntityItem(
                         id = it.debt.id,
                         name = it.debt.description ?: stringResource(Res.string.description),
-                        sub = if (it.debt.isSettled) stringResource(Res.string.debt_settled) else stringResource(Res.string.label_active),
+                        sub = if (it.debt.isSettled) stringResource(Res.string.debt_settled) else stringResource(
+                            Res.string.label_active
+                        ),
                         badge = it.debt.amount.toPersianPrice(),
                         color = if (it.debt.type == DebtType.OWED_TO_ME) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                     )

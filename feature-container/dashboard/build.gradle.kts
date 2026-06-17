@@ -56,6 +56,8 @@ kotlin {
                 implementation(project(":feature-share:asset"))
 
                 implementation(project(":core:designsystem"))
+                implementation(project(":core:domain"))
+                implementation(project(":core:preferences"))
 
                 implementation(project(":feature-share:check"))
                 implementation(project(":feature-share:fixed-expense"))

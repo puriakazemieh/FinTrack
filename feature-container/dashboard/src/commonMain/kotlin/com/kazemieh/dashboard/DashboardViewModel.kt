@@ -1,19 +1,49 @@
 package com.kazemieh.dashboard
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.domain.usecase.PreferenceUseCases
+import com.kazemieh.preferences.FinTrackPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
 
-class DashboardViewModel : ViewModel() {
+class DashboardViewModel(
+    private val preferenceUseCases: PreferenceUseCases
+) : ViewModel() {
 
     private val _state = MutableStateFlow(DashboardState())
     val state: StateFlow<DashboardState> = _state.asStateFlow()
+
+    init {
+        observeUserName()
+    }
+
+    private fun observeUserName() {
+        combine(
+            preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_USER_NAME, ""),
+            preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_USER_FAMILY, "")
+        ) { name, family ->
+            val fullName = listOf(name, family).filter { it.isNotBlank() }.joinToString(" ")
+            val displayName = if (fullName.isBlank()) "کاربر" else fullName
+            val displayInitial = if (fullName.isBlank()) "پ" else fullName.first().toString()
+
+            _state.update {
+                it.copy(
+                    userName = displayName,
+                    userInitial = displayInitial
+                )
+            }
+        }.launchIn(viewModelScope)
+    }
 
     fun onIntent(intent: DashboardIntent) {
         when (intent) {
@@ -63,7 +93,9 @@ data class DashboardState(
     val transactionWithRelations: TransactionWithRelations? = null,
     val initialTransactionType: TransactionType? = null,
     val isBalanceVisible: Boolean = true,
-    val growthPercentage: String = "+2.5%" // Placeholder
+    val growthPercentage: String = "+2.5%", // Placeholder
+    val userName: String = "کاربر",
+    val userInitial: String = "پ"
 )
 
 

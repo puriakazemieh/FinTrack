@@ -1,13 +1,9 @@
 package com.kazemieh.check.ui.list
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -15,13 +11,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import com.kazemieh.check.ui.add.AddCheckBottomSheet
 import com.kazemieh.common.model.CheckStatus
 import com.kazemieh.common.toPersianPrice
-import com.kazemieh.designsystem.GlassBg0
-import com.kazemieh.designsystem.GlassBg1
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.component.glass.EntityItem
@@ -30,7 +23,16 @@ import com.kazemieh.designsystem.component.glass.EntitySummary
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.Tabs
 import com.kazemieh.designsystem.component.model.UiText
-import fintrack.core.designsystem.generated.resources.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.currency_toman
+import fintrack.core.designsystem.generated.resources.label_check_status_cancelled
+import fintrack.core.designsystem.generated.resources.label_check_status_ongoing
+import fintrack.core.designsystem.generated.resources.label_check_status_passed
+import fintrack.core.designsystem.generated.resources.label_check_status_returned
+import fintrack.core.designsystem.generated.resources.label_total_amount
+import fintrack.core.designsystem.generated.resources.label_unknown_person
+import fintrack.core.designsystem.generated.resources.sub_check_list_management_desc
+import fintrack.core.designsystem.generated.resources.title_check_management
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 

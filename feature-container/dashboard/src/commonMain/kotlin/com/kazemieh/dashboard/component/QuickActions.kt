@@ -80,7 +80,7 @@ private fun QuickActionItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    val glassColors = LocalGlassColors.current
+
     GlassCard(
         modifier = modifier,
         padding = 0.dp,
