@@ -36,7 +36,7 @@ class LockViewModel(
     fun onIntent(intent: LockIntent) {
         when (intent) {
             is LockIntent.Init -> {
-                _state.update { it.copy(mode = intent.mode, pin = "", error = null) }
+                _state.update { it.copy(mode = intent.mode, pin = "", error = null, subtitle = intent.subtitle) }
                 if (intent.mode == LockMode.UNLOCK) {
                     if (_state.value.isLockEnabled && _state.value.isBiometricEnabled) {
                         viewModelScope.launch { _effect.send(LockEffect.TriggerBiometric) }

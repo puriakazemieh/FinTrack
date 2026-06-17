@@ -539,6 +539,7 @@
     <string name="lock_create_pin">یک کد عبور جدید انتخاب کنید</string>
     <string name="lock_confirm_pin">کد عبور را دوباره وارد کنید</string>
     <string name="lock_verify_to_disable">برای غیرفعال کردن قفل، رمز را وارد کنید</string>
+    <string name="lock_biometric_backup_pin">برای فعال شدن اثر انگشت باید یک رمز پشتیبان قرار دهید</string>
     <string name="lock_error_pin">کد وارد شده اشتباه است</string>
     <string name="lock_error_mismatch">کدها با هم مطابقت ندارند</string>
     <string name="biometric_title">ورود به فین‌ترک</string>

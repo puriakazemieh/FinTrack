@@ -63,6 +63,7 @@ import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.Switch
 import com.kazemieh.designsystem.component.glass.WidgetCard
 import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
+import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.lock.LockIntent
 import com.kazemieh.lock.LockMode
 import com.kazemieh.lock.LockViewModel
@@ -70,6 +71,7 @@ import com.kazemieh.lock.PINScreen
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.action_logout
 import fintrack.core.designsystem.generated.resources.label_app_lock
+import fintrack.core.designsystem.generated.resources.lock_biometric_backup_pin
 import fintrack.core.designsystem.generated.resources.profile_premium_desc
 import fintrack.core.designsystem.generated.resources.profile_premium_title
 import fintrack.core.designsystem.generated.resources.section_display
@@ -112,7 +114,10 @@ fun ProfileScreen(
                 is ProfileEffect.ShowLockPIN -> {
                     lockDialogMode = effect.mode
                     shouldTriggerFingerprintAfterSetup = effect.triggerFingerprint
-                    lockViewModel.onIntent(LockIntent.Init(effect.mode))
+                    val subtitle = if (effect.triggerFingerprint) {
+                        UiText.StringResourceText(Res.string.lock_biometric_backup_pin)
+                    } else null
+                    lockViewModel.onIntent(LockIntent.Init(effect.mode, subtitle))
                     showLockSheet = true
                 }
             }

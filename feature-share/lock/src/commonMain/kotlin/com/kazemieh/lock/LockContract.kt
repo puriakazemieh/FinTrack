@@ -1,5 +1,7 @@
 package com.kazemieh.lock
 
+import com.kazemieh.designsystem.component.model.UiText
+
 data class LockState(
     val pin: String = "",
     val error: String? = null,
@@ -8,6 +10,7 @@ data class LockState(
     val isBiometricEnabled: Boolean = false,
     val isLockEnabled: Boolean = false,
     val mode: LockMode = LockMode.UNLOCK,
+    val subtitle: UiText? = null,
     val isInitialized: Boolean = false
 )
 
@@ -42,7 +45,7 @@ enum class KeypadKey {
 sealed interface LockIntent {
     data class KeyPressed(val key: KeypadKey) : LockIntent
     data object AuthenticateBiometric : LockIntent
-    data class Init(val mode: LockMode) : LockIntent
+    data class Init(val mode: LockMode, val subtitle: UiText? = null) : LockIntent
 }
 
 sealed interface LockEffect {
