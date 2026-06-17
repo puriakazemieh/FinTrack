@@ -28,7 +28,7 @@ sealed class Screen {
     data object ThemeAndCurrency : Screen()
 
     @Serializable
-    data object ProfileEdit : Screen()
+    data object EditProfile : Screen()
 
     @Serializable
     data object NotificationSettings : Screen()

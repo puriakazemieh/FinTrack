@@ -66,7 +66,7 @@ fun NavGraphBuilder.bottomBarNavGraph(
                 onNavigateToCheck = { navController.navigate(Screen.Check) },
                 onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) },
                 onNavigateToAssets = { navController.navigate(Screen.Assets) },
-                onNavigateToProfileEdit = { navController.navigate(Screen.ProfileEdit) }
+                onNavigateToProfileEdit = { navController.navigate(Screen.EditProfile) }
             )
         }
 
@@ -160,12 +160,12 @@ fun NavGraphBuilder.bottomBarNavGraph(
         composable<Screen.Profile> { backStackEntry ->
             ProfileScreen(
                 onNavigateToThemeAndCurrency = { navController.navigate(Screen.ThemeAndCurrency) },
-                onNavigateToProfileEdit = { navController.navigate(Screen.ProfileEdit) },
+                onNavigateToProfileEdit = { navController.navigate(Screen.EditProfile) },
                 onNavigateToNotifications = { navController.navigate(Screen.NotificationSettings) }
             )
         }
 
-        composable<Screen.ProfileEdit> { backStackEntry ->
+        composable<Screen.EditProfile> { backStackEntry ->
             ProfileEditScreen(
                 onBack = { navController.popBackStack() }
             )

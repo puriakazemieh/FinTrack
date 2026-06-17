@@ -3,7 +3,6 @@ package com.kazemieh.profile
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -117,8 +116,7 @@ fun ProfileEditScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = space.large),
-            verticalArrangement = Arrangement.spacedBy(space.medium),
-            contentPadding = PaddingValues(bottom = 100.dp)
+            verticalArrangement = Arrangement.spacedBy(space.medium)
         ) {
 //                item {
 //                    CompletionCard(state.completionPercentage)

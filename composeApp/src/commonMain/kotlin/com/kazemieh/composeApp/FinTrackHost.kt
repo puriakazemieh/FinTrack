@@ -1,5 +1,12 @@
 package com.kazemieh.composeApp
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -34,8 +41,15 @@ fun FinTrackHost(
 
     val currentRoute =
         navController.currentBackStackEntryAsState().value?.destination?.route.orEmpty()
-//    val topLevelRoutes = Destinations.entries.map { it.path }
-//    val showBottomBar = currentRoute in topLevelRoutes
+    val showBottomBar = remember(currentRoute) {
+        val topLevelScreens = listOf(
+            Screen.Dashboard::class.qualifiedName,
+            Screen.Tools::class.qualifiedName,
+            Screen.Transactions::class.qualifiedName,
+            Screen.Profile::class.qualifiedName
+        )
+        topLevelScreens.any { currentRoute.contains(it ?: "") }
+    }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -63,9 +77,21 @@ fun FinTrackHost(
                     startDestination = startDestination
                 )
 
-                if (currentRoute != Screen.Onboarding::class.qualifiedName) {
+                AnimatedVisibility(
+                    visible = showBottomBar,
+                    enter = fadeIn(animationSpec = tween(400)) +
+                            slideInVertically(
+                                animationSpec = tween(400, easing = FastOutSlowInEasing),
+                                initialOffsetY = { it }
+                            ),
+                    exit = fadeOut(animationSpec = tween(400)) +
+                            slideOutVertically(
+                                animationSpec = tween(400, easing = FastOutSlowInEasing),
+                                targetOffsetY = { it }
+                            ),
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                ) {
                     FintrackNavigationBar(
-                        modifier = Modifier.align(Alignment.BottomCenter),
                         navController = navController,
                         onFabClick = { /* TODO: Global Add Transaction */ }
                     )
