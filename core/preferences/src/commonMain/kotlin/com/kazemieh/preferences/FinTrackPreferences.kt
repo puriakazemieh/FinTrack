@@ -41,6 +41,9 @@ class FinTrackPreferences(private val settings: Settings) {
         const val PREF_HASHED_PIN = "pref_hashed_pin"
 
         const val PREF_THEME = "pref_theme"
+        const val PREF_THEME_MODE = "pref_theme_mode"
+        const val PREF_THEME_START_TIME = "pref_theme_start_time"
+        const val PREF_THEME_END_TIME = "pref_theme_end_time"
         const val PREF_CURRENCY = "pref_currency"
         const val PREF_BACKUP = "pref_backup"
         const val PREF_PUSH_NOTIF = "pref_push_notif"

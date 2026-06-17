@@ -1,23 +1,12 @@
 package com.kazemieh.database
 
-import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.async.coroutines.awaitCreate
 import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
-import com.kazemieh.common.model.TransactionType
 import com.kazemieh.database.FinTrackDatabase.Companion.Schema
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-
-class DatabaseInitializer(
-    private val database: FinTrackDatabase,
-    private val driver: SqlDriver,
-) {
-
-    private val _ready = CompletableDeferred<Unit>()
-    val ready: Deferred<Unit> = _ready
+class DatabaseInitializer(private val driver: SqlDriver) {
     suspend fun initialize() = withContext(Dispatchers.Default) {
         try {
             Schema.awaitCreate(driver)
@@ -51,7 +40,5 @@ class DatabaseInitializer(
                 println("Migration check failed: ${ex.message}")
             }
         }
-
-        _ready.complete(Unit)
     }
 }

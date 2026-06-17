@@ -497,6 +497,12 @@
     <string name="setting_theme_currency">تم و واحد پول</string>
     <string name="title_theme_currency">تنظیمات ظاهر و واحد پول</string>
     <string name="label_theme">انتخاب تم</string>
+    <string name="label_theme_mode">حالت تغییر تم</string>
+    <string name="theme_mode_manual">دستی</string>
+    <string name="theme_mode_system">هماهنگ با سیستم</string>
+    <string name="theme_mode_sunrise_sunset">طلوع و غروب خورشید</string>
+    <string name="theme_mode_custom_time">زمان‌بندی دلخواه</string>
+    <string name="label_theme_dark_time">زمان تم تاریک</string>
     <string name="label_currency">واحد پول</string>
     <string name="theme_glass_dark">شیشه‌ای تیره</string>
     <string name="theme_glass_light">شیشه‌ای روشن</string>

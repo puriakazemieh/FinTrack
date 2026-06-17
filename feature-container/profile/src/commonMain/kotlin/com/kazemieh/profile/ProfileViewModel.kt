@@ -3,6 +3,7 @@ package com.kazemieh.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.designsystem.AppTheme
+import com.kazemieh.designsystem.ThemeMode
 import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.PreferenceUseCases
@@ -83,9 +84,16 @@ class ProfileViewModel(
                 val currentThemeName = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_THEME, AppTheme.GLASS_DARK.name)
                 val currentTheme = try { AppTheme.valueOf(currentThemeName) } catch (e: Exception) { AppTheme.GLASS_DARK }
                 
+                val currentModeName = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_THEME_MODE, ThemeMode.MANUAL.name)
+                val currentMode = try { ThemeMode.valueOf(currentModeName) } catch (e: Exception) { ThemeMode.MANUAL }
+
                 val newTheme = currentTheme.toggleDark()
                 preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_THEME, newTheme.name)
-                // Note: The UI state will be updated via observeThemeChanges flow
+                
+                // If the user manually toggles, we switch to MANUAL mode to ensure their choice sticks
+                if (currentMode != ThemeMode.MANUAL) {
+                    preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_THEME_MODE, ThemeMode.MANUAL.name)
+                }
             }
             is ProfileIntent.ToggleFingerprint -> {
                 if (!_state.value.isLockEnabled) {
