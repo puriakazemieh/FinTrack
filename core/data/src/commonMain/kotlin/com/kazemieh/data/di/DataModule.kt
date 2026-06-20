@@ -6,7 +6,9 @@ import com.kazemieh.data.repository.CheckRepositoryImpl
 import com.kazemieh.data.repository.DebtRepositoryImpl
 import com.kazemieh.data.repository.FixedExpenseRepositoryImpl
 import com.kazemieh.data.repository.InstallmentRepositoryImpl
+import com.kazemieh.data.repository.NoteRepositoryImpl
 import com.kazemieh.data.repository.PreferenceRepositoryImpl
+import com.kazemieh.data.repository.ShoppingRepositoryImpl
 import com.kazemieh.data.repository.TransactionRepositoryImpl
 import com.kazemieh.domain.repository.AssetRepository
 import com.kazemieh.domain.repository.BudgetRepository
@@ -14,7 +16,9 @@ import com.kazemieh.domain.repository.CheckRepository
 import com.kazemieh.domain.repository.DebtRepository
 import com.kazemieh.domain.repository.FixedExpenseRepository
 import com.kazemieh.domain.repository.InstallmentRepository
+import com.kazemieh.domain.repository.NoteRepository
 import com.kazemieh.domain.repository.PreferenceRepository
+import com.kazemieh.domain.repository.ShoppingRepository
 import com.kazemieh.domain.repository.TransactionRepository
 import org.koin.dsl.module
 
@@ -27,4 +31,6 @@ val dataModule = module {
     single<CheckRepository> { CheckRepositoryImpl(get()) }
     single<FixedExpenseRepository> { FixedExpenseRepositoryImpl(get()) }
     single<AssetRepository> { AssetRepositoryImpl(get(), get()) }
+    single<ShoppingRepository> { ShoppingRepositoryImpl(get()) }
+    single<NoteRepository> { NoteRepositoryImpl(get()) }
 }

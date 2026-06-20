@@ -23,7 +23,9 @@ fun ToolsScreen(
     onNavigateToDebt: () -> Unit,
     onNavigateToCheck: () -> Unit,
     onNavigateToFixedExpense: () -> Unit,
-    onNavigateToAssets: () -> Unit
+    onNavigateToAssets: () -> Unit,
+    onNavigateToShopping: () -> Unit,
+    onNavigateToNotes: () -> Unit
 ) {
     val space = LocalSpacing.current
     FintrackScreen(
@@ -78,6 +80,20 @@ fun ToolsScreen(
                 modifier = Modifier.padding(space.large)
             ) {
                 FintrackBodyLargeText(stringResource(Res.string.title_assets_management))
+            }
+
+            Button(
+                onClick = onNavigateToShopping,
+                modifier = Modifier.padding(space.large)
+            ) {
+                FintrackBodyLargeText(stringResource(Res.string.shopping_list))
+            }
+
+            Button(
+                onClick = onNavigateToNotes,
+                modifier = Modifier.padding(space.large)
+            ) {
+                FintrackBodyLargeText(stringResource(Res.string.notes))
             }
         }
     }

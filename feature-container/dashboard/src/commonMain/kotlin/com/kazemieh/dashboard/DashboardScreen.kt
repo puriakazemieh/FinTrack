@@ -50,6 +50,8 @@ import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.fixed_expense.ui.widget.FixedExpenseWidget
 import com.kazemieh.installment.ui.widget.InstallmentWidget
+import com.kazemieh.shopping.ui.ShoppingWidget
+import com.kazemieh.notes.ui.list.NotesWidget
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.BalanceHero
@@ -70,6 +72,8 @@ fun DashboardScreen(
     onNavigateToCheck: () -> Unit = {},
     onNavigateToFixedExpense: () -> Unit = {},
     onNavigateToAssets: () -> Unit = {},
+    onNavigateToShopping: () -> Unit = {},
+    onNavigateToNotes: () -> Unit = {},
     onNavigateToProfileEdit: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -182,6 +186,24 @@ fun DashboardScreen(
             item {
                 AssetWidget(
                     onMoreClick = onNavigateToAssets,
+                    modifier = Modifier.padding(horizontal = space.large)
+                )
+            }
+
+            item { Spacer(Modifier.height(space.large)) }
+
+            item {
+                ShoppingWidget(
+                    onMoreClick = onNavigateToShopping,
+                    modifier = Modifier.padding(horizontal = space.large)
+                )
+            }
+
+            item { Spacer(Modifier.height(space.large)) }
+
+            item {
+                NotesWidget(
+                    onMoreClick = onNavigateToNotes,
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }

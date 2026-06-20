@@ -21,6 +21,8 @@ import com.kazemieh.onboarding.di.onboardingModule
 import com.kazemieh.notifications.di.notificationModule
 import com.kazemieh.installment.di.installmentModule
 import com.kazemieh.fixed_expense.di.fixedExpenseModule
+import com.kazemieh.shopping.di.shoppingModule
+import com.kazemieh.notes.di.notesModule
 import com.kazemieh.data.di.dataModule
 import com.kazemieh.database.DatabaseInitializer
 import com.kazemieh.database.di.databaseModule
@@ -202,6 +204,8 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         installmentModule,
         checkModule,
         fixedExpenseModule,
+        shoppingModule,
+        notesModule,
         networkModule,
         assetModule
     )

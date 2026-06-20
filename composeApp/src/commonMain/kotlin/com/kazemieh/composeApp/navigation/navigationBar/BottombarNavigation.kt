@@ -14,6 +14,9 @@ import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
+import com.kazemieh.notes.ui.edit.NoteEditScreen
+import com.kazemieh.notes.ui.list.NotesListScreen
+import com.kazemieh.shopping.ui.ShoppingListScreen
 import com.kazemieh.composeApp.navigation.Screen
 import com.kazemieh.check.ui.list.CheckListScreen
 import com.kazemieh.dashboard.DashboardScreen
@@ -31,6 +34,9 @@ import com.kazemieh.search.ui.SearchScreen
 import com.kazemieh.tools.ToolsScreen
 import com.kazemieh.transactions.TransactionsScreen
 
+
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 fun NavGraphBuilder.bottomBarNavGraph(
     navController: NavHostController,
@@ -67,6 +73,8 @@ fun NavGraphBuilder.bottomBarNavGraph(
                 onNavigateToCheck = { navController.navigate(Screen.Check) },
                 onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) },
                 onNavigateToAssets = { navController.navigate(Screen.Assets) },
+                onNavigateToShopping = { navController.navigate(Screen.Shopping) },
+                onNavigateToNotes = { navController.navigate(Screen.Notes) },
                 onNavigateToProfileEdit = { navController.navigate(Screen.EditProfile) }
             )
         }
@@ -94,7 +102,9 @@ fun NavGraphBuilder.bottomBarNavGraph(
                 onNavigateToDebt = { navController.navigate(Screen.Debt) },
                 onNavigateToCheck = { navController.navigate(Screen.Check) },
                 onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) },
-                onNavigateToAssets = { navController.navigate(Screen.Assets) }
+                onNavigateToAssets = { navController.navigate(Screen.Assets) },
+                onNavigateToShopping = { navController.navigate(Screen.Shopping) },
+                onNavigateToNotes = { navController.navigate(Screen.Notes) }
             )
         }
 
@@ -154,6 +164,31 @@ fun NavGraphBuilder.bottomBarNavGraph(
 
         composable<Screen.AddAsset> {
             AddAssetScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.Shopping> {
+            ShoppingListScreen(
+                viewModel = koinViewModel(),
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.Notes> {
+            NotesListScreen(
+                viewModel = koinViewModel(),
+                onAddNote = { navController.navigate(Screen.NoteEdit(0L)) },
+                onEditNote = { id -> navController.navigate(Screen.NoteEdit(id)) },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.NoteEdit> { backStackEntry ->
+            val args = backStackEntry.toRoute<Screen.NoteEdit>()
+            NoteEditScreen(
+                viewModel = koinViewModel(),
+                noteId = args.noteId,
                 onBack = { navController.popBackStack() }
             )
         }

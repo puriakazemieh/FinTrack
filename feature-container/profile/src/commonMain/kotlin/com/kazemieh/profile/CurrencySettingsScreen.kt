@@ -32,11 +32,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
-import com.kazemieh.designsystem.component.FintrackFAB
+import com.kazemieh.designsystem.component.FintrackButton
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
-import com.kazemieh.designsystem.component.bottomsheet.FintrackModalBottomSheet
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.Switch
@@ -60,8 +63,7 @@ fun CurrencySettingsScreen(
         title = stringResource(Res.string.label_currency),
         onBack = onBack,
         floatingActionButton = {
-            FintrackFAB(
-                icon = Icons.Default.Add,
+            FAB(
                 onClick = { showAddDialog = true }
             )
         }
@@ -403,6 +405,7 @@ fun CurrencyListItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddCurrencyBottomSheet(
     onDismiss: () -> Unit,
@@ -414,22 +417,16 @@ fun AddCurrencyBottomSheet(
     var name by remember { mutableStateOf("") }
     var isCrypto by remember { mutableStateOf(false) }
 
-    FintrackModalBottomSheet(
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val title = stringResource(Res.string.add_custom_currency)
+    val cryptoLabel = stringResource(Res.string.currency_type_crypto)
+    val fiatLabel = stringResource(Res.string.currency_type_fiat)
+
+    ModalBottomSheet(
         onDismissRequest = onDismiss,
-        title = stringResource(Res.string.add_custom_currency),
-        onConfirm = {
-            if (code.isNotEmpty() && symbol.isNotEmpty() && name.isNotEmpty()) {
-                onConfirm(
-                    Currency(
-                        code = code.uppercase(),
-                        symbol = symbol,
-                        displayName = name,
-                        type = if (isCrypto) CurrencyType.CRYPTO else CurrencyType.FIAT
-                    )
-                )
-            }
-        },
-        confirmEnabled = code.isNotEmpty() && symbol.isNotEmpty() && name.isNotEmpty()
+        sheetState = sheetState,
+        dragHandle = null,
+        containerColor = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
@@ -437,6 +434,11 @@ fun AddCurrencyBottomSheet(
                 .padding(space.large),
             verticalArrangement = Arrangement.spacedBy(space.medium)
         ) {
+            FintrackTitleLargeText(
+                text = title,
+                modifier = Modifier.padding(bottom = space.medium)
+            )
+            
             FintrackOutlinedTextField(
                 value = code,
                 onValueChange = { code = it },
@@ -458,11 +460,30 @@ fun AddCurrencyBottomSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 FintrackBodyLargeText(
-                    text = if (isCrypto) stringResource(Res.string.currency_type_crypto) else stringResource(Res.string.currency_type_fiat),
+                    text = if (isCrypto) cryptoLabel else fiatLabel,
                     modifier = Modifier.weight(1f)
                 )
                 Switch(on = isCrypto, onToggle = { isCrypto = it })
             }
+
+            FintrackButton(
+                text = stringResource(Res.string.confirm),
+                onClick = {
+                    if (code.isNotEmpty() && symbol.isNotEmpty() && name.isNotEmpty()) {
+                        onConfirm(
+                            Currency(
+                                code = code.uppercase(),
+                                symbol = symbol,
+                                displayName = name,
+                                type = if (isCrypto) CurrencyType.CRYPTO else CurrencyType.FIAT
+                            )
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = code.isNotEmpty() && symbol.isNotEmpty() && name.isNotEmpty()
+            )
+            Spacer(modifier = Modifier.height(space.large))
         }
     }
 }

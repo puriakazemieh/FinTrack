@@ -66,6 +66,8 @@ include(":feature-share:budget")
 include(":feature-share:installment")
 include(":feature-share:check")
 include(":feature-share:fixed-expense")
+include(":feature-share:shopping")
+include(":feature-share:notes")
 
 include(":feature-container:transactions")
 include(":feature-container:onboarding")

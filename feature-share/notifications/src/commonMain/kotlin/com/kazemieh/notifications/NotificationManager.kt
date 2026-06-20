@@ -11,5 +11,7 @@ interface NotificationManager {
         const val CHANNEL_BUDGET = "budget_reminders"
         const val CHANNEL_INSTALLMENT = "installment_reminders"
         const val CHANNEL_CHEQUE = "cheque_reminders"
+        const val CHANNEL_SHOPPING = "shopping_reminders"
+        const val CHANNEL_NOTE = "note_reminders"
     }
 }

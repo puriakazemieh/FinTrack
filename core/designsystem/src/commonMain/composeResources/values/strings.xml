@@ -880,4 +880,29 @@
     <string name="currency_type_fiat">فیات</string>
     <string name="currency_type_crypto">رمز ارز</string>
     <string name="msg_currency_added">واحد پول با موفقیت اضافه شد</string>
+
+    <!-- Shopping List -->
+    <string name="shopping_list">لیست خرید</string>
+    <string name="add_to_shopping_list">افزودن به لیست خرید...</string>
+    <string name="shopping_item_deleted">آیتم حذف شد</string>
+    <string name="estimated_price">قیمت تخمینی</string>
+    <string name="total_sum">جمع کل</string>
+    <string name="priority_high">اولویت بالا</string>
+    <string name="priority_normal">اولویت معمولی</string>
+
+    <!-- Notes -->
+    <string name="notes">یادداشت‌ها</string>
+    <string name="add_note">افزودن یادداشت</string>
+    <string name="edit_note">ویرایش یادداشت</string>
+    <string name="note_title_hint">عنوان...</string>
+    <string name="note_content_hint">بنویسید...</string>
+    <string name="note_deleted">یادداشت حذف شد</string>
+    <string name="note_pinned">پین شد</string>
+    <string name="note_unpinned">آن‌پین شد</string>
+    <string name="note_locked">قفل شد</string>
+    <string name="note_unlocked">باز شد</string>
+    <string name="note_not_found">یادداشت یافت نشد</string>
+    <string name="reminder">یادآور</string>
+    <string name="shopping_list_empty">لیست خرید خالی است</string>
+    <string name="notes_empty">یادداشتی وجود ندارد</string>
 </resources>

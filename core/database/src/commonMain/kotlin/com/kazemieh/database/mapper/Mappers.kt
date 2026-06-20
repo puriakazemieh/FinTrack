@@ -14,6 +14,8 @@ import com.kazemieh.common.model.FixedExpense
 import com.kazemieh.common.model.Installment
 import com.kazemieh.common.model.InstallmentFrequency
 import com.kazemieh.common.model.InstallmentWithRelations
+import com.kazemieh.common.model.ShoppingItem
+import com.kazemieh.common.model.Note
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.RecurrenceType
 import com.kazemieh.common.model.Source
@@ -38,7 +40,9 @@ import com.kazemieh.database.Check_table as CheckDb
 import com.kazemieh.database.Debt as DebtDb
 import com.kazemieh.database.Fixed_expense as FixedExpenseDb
 import com.kazemieh.database.Installment as InstallmentDb
+import com.kazemieh.database.Note as NoteDb
 import com.kazemieh.database.Person as PersonDb
+import com.kazemieh.database.Shopping_item as ShoppingItemDb
 import com.kazemieh.database.Source as SourceDb
 import com.kazemieh.database.Tag as TagDb
 import com.kazemieh.database.Transactions as TransactionDb
@@ -396,4 +400,28 @@ fun AssetHistoryDb.toAssetHistory() = AssetHistory(
     assetId = assetId,
     price = price,
     date = kotlin.time.Instant.fromEpochMilliseconds(date)
+)
+
+// Shopping Mappers
+fun ShoppingItemDb.toShoppingItem() = ShoppingItem(
+    id = id,
+    name = name,
+    isChecked = isChecked,
+    priority = priority.toInt(),
+    estimatedPrice = estimatedPrice,
+    reminderTime = reminderTime,
+    categoryId = categoryId,
+    position = position.toInt()
+)
+
+// Note Mappers
+fun NoteDb.toNote(tags: List<Tag> = emptyList()) = Note(
+    id = id,
+    title = title,
+    content = content,
+    color = color,
+    isPinned = isPinned,
+    isLocked = isLocked,
+    updatedAt = updatedAt,
+    tags = tags
 )

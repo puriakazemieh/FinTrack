@@ -28,3 +28,5 @@ suspend fun UiText.resolveString(): String {
         is UiText.StringResourceText -> getString(resource, *args.toTypedArray())
     }
 }
+
+fun String.asUiText() = UiText.DynamicString(this)

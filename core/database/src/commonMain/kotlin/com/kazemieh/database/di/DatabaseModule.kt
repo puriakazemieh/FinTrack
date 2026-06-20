@@ -9,6 +9,8 @@ import com.kazemieh.data_contract.datasource.CheckLocalDataSource
 import com.kazemieh.data_contract.datasource.DebtLocalDataSource
 import com.kazemieh.data_contract.datasource.FixedExpenseLocalDataSource
 import com.kazemieh.data_contract.datasource.InstallmentLocalDataSource
+import com.kazemieh.data_contract.datasource.NoteLocalDataSource
+import com.kazemieh.data_contract.datasource.ShoppingLocalDataSource
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
 import com.kazemieh.database.Asset as AssetDb
 import com.kazemieh.database.DatabaseInitializer
@@ -20,6 +22,8 @@ import com.kazemieh.database.datasource.CheckLocalDataSourceImpl
 import com.kazemieh.database.datasource.DebtLocalDataSourceImpl
 import com.kazemieh.database.datasource.FixedExpenseLocalDataSourceImpl
 import com.kazemieh.database.datasource.InstallmentLocalDataSourceImpl
+import com.kazemieh.database.datasource.NoteLocalDataSourceImpl
+import com.kazemieh.database.datasource.ShoppingLocalDataSourceImpl
 import com.kazemieh.database.datasource.TransactionLocalDataSourceImpl
 import org.koin.dsl.module
 
@@ -65,5 +69,13 @@ val databaseModule = module {
 
     single<FixedExpenseLocalDataSource> {
         FixedExpenseLocalDataSourceImpl(database = get())
+    }
+
+    single<ShoppingLocalDataSource> {
+        ShoppingLocalDataSourceImpl(db = get())
+    }
+
+    single<NoteLocalDataSource> {
+        NoteLocalDataSourceImpl(db = get())
     }
 }

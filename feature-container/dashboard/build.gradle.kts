@@ -54,6 +54,8 @@ kotlin {
                 implementation(project(":feature-share:budget"))
                 implementation(project(":feature-share:installment"))
                 implementation(project(":feature-share:asset"))
+                implementation(project(":feature-share:shopping"))
+                implementation(project(":feature-share:notes"))
 
                 implementation(project(":core:designsystem"))
                 implementation(project(":core:domain"))

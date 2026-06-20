@@ -67,6 +67,15 @@ sealed class Screen {
     data object AddAsset : Screen()
 
     @Serializable
+    data object Shopping : Screen()
+
+    @Serializable
+    data object Notes : Screen()
+
+    @Serializable
+    data class NoteEdit(val noteId: Long = 0) : Screen()
+
+    @Serializable
     data object Onboarding : Screen()
 
     @Serializable

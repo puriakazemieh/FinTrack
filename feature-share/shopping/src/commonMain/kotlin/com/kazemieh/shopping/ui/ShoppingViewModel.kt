@@ -1,0 +1,144 @@
+package com.kazemieh.shopping.ui
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.model.ShoppingItem
+import com.kazemieh.domain.usecase.AddShoppingItemUseCase
+import com.kazemieh.domain.usecase.DeleteShoppingItemUseCase
+import com.kazemieh.domain.usecase.ObserveShoppingItemsUseCase
+import com.kazemieh.domain.usecase.UpdateShoppingItemUseCase
+import com.kazemieh.domain.usecase.UpdateShoppingPositionsUseCase
+import com.kazemieh.domain.notification.NotificationScheduler
+import com.kazemieh.notifications.NotificationManager
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.shopping_list
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.getString
+
+data class ShoppingState(
+    val items: List<ShoppingItem> = emptyList(),
+    val isLoading: Boolean = false,
+    val newItemName: String = "",
+    val newItemEstimatedPrice: String = "",
+    val newItemPriority: Int = 0
+)
+
+sealed interface ShoppingIntent {
+    data class OnNewItemNameChanged(val name: String) : ShoppingIntent
+    data class OnNewItemPriceChanged(val price: String) : ShoppingIntent
+    data class OnNewItemPriorityChanged(val priority: Int) : ShoppingIntent
+    data object OnAddItem : ShoppingIntent
+    data class OnToggleItem(val item: ShoppingItem) : ShoppingIntent
+    data class OnDeleteItem(val id: Long) : ShoppingIntent
+    data class OnReorder(val from: Int, val to: Int) : ShoppingIntent
+}
+
+sealed interface ShoppingEffect {
+    data class ShowError(val message: String) : ShoppingEffect
+}
+
+class ShoppingViewModel(
+    private val observeShoppingItems: ObserveShoppingItemsUseCase,
+    private val addShoppingItem: AddShoppingItemUseCase,
+    private val updateShoppingItem: UpdateShoppingItemUseCase,
+    private val deleteShoppingItem: DeleteShoppingItemUseCase,
+    private val updatePositions: UpdateShoppingPositionsUseCase,
+    private val notificationScheduler: NotificationScheduler
+) : ViewModel() {
+
+    private val _state = MutableStateFlow(ShoppingState())
+    val state = _state.asStateFlow()
+
+    private val _effect = Channel<ShoppingEffect>()
+    val effect = _effect.receiveAsFlow()
+
+    init {
+        _state.update { it.copy(isLoading = true) }
+        observeShoppingItems()
+            .onEach { items ->
+                _state.update { it.copy(items = items, isLoading = false) }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    fun onIntent(intent: ShoppingIntent) {
+        when (intent) {
+            is ShoppingIntent.OnNewItemNameChanged -> {
+                _state.update { it.copy(newItemName = intent.name) }
+            }
+            is ShoppingIntent.OnNewItemPriceChanged -> {
+                _state.update { it.copy(newItemEstimatedPrice = intent.price) }
+            }
+            is ShoppingIntent.OnNewItemPriorityChanged -> {
+                _state.update { it.copy(newItemPriority = intent.priority) }
+            }
+            ShoppingIntent.OnAddItem -> addItem()
+            is ShoppingIntent.OnToggleItem -> toggleItem(intent.item)
+            is ShoppingIntent.OnDeleteItem -> deleteItem(intent.id)
+            is ShoppingIntent.OnReorder -> reorderItems(intent.from, intent.to)
+        }
+    }
+
+    private fun addItem() {
+        val name = _state.value.newItemName
+        if (name.isBlank()) return
+
+        viewModelScope.launch {
+            val newItem = ShoppingItem(
+                name = name,
+                estimatedPrice = _state.value.newItemEstimatedPrice.toDoubleOrNull() ?: 0.0,
+                priority = _state.value.newItemPriority,
+                position = (_state.value.items.maxOfOrNull { it.position } ?: -1) + 1
+            )
+            val id = addShoppingItem(newItem)
+            newItem.reminderTime?.let { reminderTime ->
+                notificationScheduler.scheduleReminder(
+                    id = "shopping_$id",
+                    title = getString(Res.string.shopping_list),
+                    message = newItem.name,
+                    scheduledTime = Instant.fromEpochMilliseconds(reminderTime).toLocalDateTime(TimeZone.currentSystemDefault()),
+                    channelId = NotificationManager.CHANNEL_SHOPPING
+                )
+            }
+            _state.update { it.copy(newItemName = "", newItemEstimatedPrice = "", newItemPriority = 0) }
+        }
+    }
+
+    private fun toggleItem(item: ShoppingItem) {
+        viewModelScope.launch {
+            updateShoppingItem(item.copy(isChecked = !item.isChecked))
+        }
+    }
+
+    private fun deleteItem(id: Long) {
+        viewModelScope.launch {
+            deleteShoppingItem(id)
+        }
+    }
+
+    private fun reorderItems(from: Int, to: Int) {
+        val list = _state.value.items.toMutableList()
+        val item = list.removeAt(from)
+        list.add(to, item)
+
+        val updatedList = list.mapIndexed { index, shoppingItem ->
+            shoppingItem.copy(position = index)
+        }
+
+        _state.update { it.copy(items = updatedList) }
+
+        viewModelScope.launch {
+            updatePositions(updatedList)
+        }
+    }
+}

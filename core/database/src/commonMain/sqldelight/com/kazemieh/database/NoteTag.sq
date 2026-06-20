@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS note_tag (
+    noteId INTEGER NOT NULL,
+    tagId INTEGER NOT NULL,
+    PRIMARY KEY (noteId, tagId),
+    FOREIGN KEY (noteId) REFERENCES note(id) ON DELETE CASCADE,
+    FOREIGN KEY (tagId) REFERENCES tag(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_note_tag_note ON note_tag(noteId);
+CREATE INDEX IF NOT EXISTS idx_note_tag_tag ON note_tag(tagId);
+
+insertNoteTagCrossRef:
+INSERT OR IGNORE INTO note_tag(noteId, tagId)
+VALUES (?, ?);
+
+deleteAllTagRefsForNote:
+DELETE FROM note_tag WHERE noteId = ?;
+
+getTagsForNote:
+SELECT t.* FROM tag t
+INNER JOIN note_tag nt ON t.id = nt.tagId
+WHERE nt.noteId = ?;
