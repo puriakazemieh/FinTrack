@@ -4,6 +4,7 @@ package com.kazemieh.fintrack
 import android.app.Application
 import com.kazemieh.composeApp.initKoin
 import com.kazemieh.notifications.NotificationManager
+import com.kazemieh.sync.SyncWorker
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 
@@ -19,5 +20,6 @@ class FinTrackApplication : Application() {
         }
 
         notificationManager.createChannels()
+        SyncWorker.enqueuePeriodicWork(this)
     }
 }

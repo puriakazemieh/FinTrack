@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS note (
     color INTEGER NOT NULL DEFAULT -1, -- 0xFFFFFFFF
     isPinned INTEGER AS Boolean NOT NULL DEFAULT 0,
     isLocked INTEGER AS Boolean NOT NULL DEFAULT 0,
-    updatedAt INTEGER NOT NULL DEFAULT 0
+    updatedAt INTEGER NOT NULL DEFAULT 0,
+    syncStatus INTEGER NOT NULL DEFAULT 0
 );
 
 observeNotes:
@@ -15,22 +16,42 @@ getNoteById:
 SELECT * FROM note WHERE id = ?;
 
 addNote:
-INSERT INTO note(title, content, color, isPinned, isLocked, updatedAt)
-VALUES (?, ?, ?, ?, ?, ?);
+INSERT INTO note(title, content, color, isPinned, isLocked, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?);
 
 updateNote:
 UPDATE note
-SET title = ?, content = ?, color = ?, isPinned = ?, isLocked = ?, updatedAt = ?
+SET title = ?, content = ?, color = ?, isPinned = ?, isLocked = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 deleteNote:
 DELETE FROM note WHERE id = ?;
 
 updatePin:
-UPDATE note SET isPinned = ? WHERE id = ?;
+UPDATE note SET isPinned = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
 
 updateLock:
-UPDATE note SET isLocked = ? WHERE id = ?;
+UPDATE note SET isLocked = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
+
+insertFullNote:
+INSERT OR REPLACE INTO note(id, title, content, color, isPinned, isLocked, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+getModifiedNotes:
+SELECT * FROM note WHERE syncStatus = 1;
+
+markNoteAsSynced:
+UPDATE note SET syncStatus = 0 WHERE id = ?;
+
+insertFullNote:
+INSERT OR REPLACE INTO note(id, title, content, color, isPinned, isLocked, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+getModifiedNotes:
+SELECT * FROM note WHERE syncStatus = 1;
+
+markNoteAsSynced:
+UPDATE note SET syncStatus = 0 WHERE id = ?;

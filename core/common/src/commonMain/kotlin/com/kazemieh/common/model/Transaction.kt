@@ -16,7 +16,9 @@ data class Transaction(
     val photoPath: String? = null,
     val timeStamp: Long = Clock.System.now().toEpochMilliseconds(),
     val date: String = "",
-    val type: TransactionType
+    val type: TransactionType,
+    val updatedAt: Long = 0,
+    val syncStatus: SyncStatus = SyncStatus.SYNCED
 ) {
 
     val amountTransferFormated: String?

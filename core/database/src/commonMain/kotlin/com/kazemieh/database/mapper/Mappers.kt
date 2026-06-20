@@ -19,6 +19,7 @@ import com.kazemieh.common.model.Note
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.RecurrenceType
 import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.SyncStatus
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionType
@@ -98,7 +99,9 @@ fun GetAllTransactionsFiltered.toTransactionWithRelations(): TransactionWithRela
             photoPath = photoPath,
             timeStamp = timeStamp,
             date = PersianDateTime.parse(timeStamp).let { "${it.day} ${it.persianMonth().displayName} ${it.year}" }.toPersianDigits(),
-            type = TransactionType.fromInt(type.toInt())
+            type = TransactionType.fromInt(type.toInt()),
+            updatedAt = updatedAt,
+            syncStatus = SyncStatus.fromInt(syncStatus.toInt())
         ),
         category = Category(
             id = category_id ?: 0L,
@@ -158,7 +161,9 @@ fun CategoryDb.toCategory() = Category(
     type = TransactionType.fromInt(type.toInt()),
     colorId = colorId.toInt(),
     iconId = iconId.toInt(),
-    parentId = parentId
+    parentId = parentId,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 fun ObserveCategorySumsByFilter.toCategorySum(): CategorySum {
@@ -188,7 +193,9 @@ fun SourceDb.toSource() = Source(
     expirationMonth = expirationMonth,
     expirationYear = expirationYear,
     branchCode = branchCode,
-    branchName = branchName
+    branchName = branchName,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 // Tag Mappers
@@ -197,14 +204,18 @@ fun TagDb.toTag() = Tag(
     name = name,
     description = description,
     colorId = colorId.toInt(),
-    iconId = iconId.toInt()
+    iconId = iconId.toInt(),
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 // Person Mappers
 fun PersonDb.toPerson() = Person(
     id = id,
     name = name,
-    description = description
+    description = description,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 // Debt Mappers
@@ -217,7 +228,9 @@ fun DebtDb.toDebt() = Debt(
     sourceId = sourceId,
     description = description,
     type = DebtType.fromInt(type.toInt()),
-    isSettled = isSettled == 1L
+    isSettled = isSettled == 1L,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 fun ObserveAllDebts.toDebt() = Debt(
@@ -231,7 +244,9 @@ fun ObserveAllDebts.toDebt() = Debt(
     type = DebtType.fromInt(type.toInt()),
     isSettled = isSettled == 1L,
     personName = personName,
-    sourceName = sourceName
+    sourceName = sourceName,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 // Check Mappers
@@ -244,7 +259,9 @@ fun CheckDb.toCheck() = Check(
     personId = personId,
     photoPath = photoPath,
     description = description,
-    isIncoming = isIncoming == 1L
+    isIncoming = isIncoming == 1L,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 fun ObserveAllChecks.toCheck() = Check(
@@ -257,7 +274,9 @@ fun ObserveAllChecks.toCheck() = Check(
     personName = personName,
     photoPath = photoPath,
     description = description,
-    isIncoming = isIncoming == 1L
+    isIncoming = isIncoming == 1L,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 fun ObserveChecksByStatus.toCheck() = Check(
@@ -270,7 +289,9 @@ fun ObserveChecksByStatus.toCheck() = Check(
     personName = personName,
     photoPath = photoPath,
     description = description,
-    isIncoming = isIncoming == 1L
+    isIncoming = isIncoming == 1L,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 // Fixed Expense Mappers
@@ -284,7 +305,9 @@ fun FixedExpenseDb.toFixedExpense() = FixedExpense(
     startDate = startDate,
     nextDueDate = nextDueDate,
     isAutoPostEnabled = isAutoPostEnabled == 1L,
-    isActive = isActive == 1L
+    isActive = isActive == 1L,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 fun ObserveAllFixedExpenses.toFixedExpense() = FixedExpense(
@@ -299,7 +322,9 @@ fun ObserveAllFixedExpenses.toFixedExpense() = FixedExpense(
     startDate = startDate,
     nextDueDate = nextDueDate,
     isAutoPostEnabled = isAutoPostEnabled == 1L,
-    isActive = isActive == 1L
+    isActive = isActive == 1L,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 // Transaction Mappers
@@ -314,7 +339,9 @@ fun TransactionDb.toTransaction() = Transaction(
     photoPath = photoPath,
     timeStamp = timeStamp,
     date = PersianDateTime.parse(timeStamp).let { "${it.day} ${it.persianMonth().displayName} ${it.year}" }.toPersianDigits(),
-    type = TransactionType.fromInt(type.toInt())
+    type = TransactionType.fromInt(type.toInt()),
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 // Installment Mappers
@@ -332,7 +359,9 @@ fun InstallmentDb.toInstallment() = Installment(
     frequency = InstallmentFrequency.valueOf(frequency),
     description = description,
     isCompleted = isCompleted == 1L,
-    reminderEnabled = reminderEnabled == 1L
+    reminderEnabled = reminderEnabled == 1L,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 fun ObserveInstallments.toInstallmentWithRelations() = InstallmentWithRelations(
@@ -392,14 +421,18 @@ fun AssetDb.toAsset() = Asset(
     description = description,
     colorId = colorId.toInt(),
     iconId = iconId.toInt(),
-    lastUpdate = lastUpdate?.let { kotlin.time.Instant.fromEpochMilliseconds(it) }
+    lastUpdate = lastUpdate?.let { kotlin.time.Instant.fromEpochMilliseconds(it) },
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 fun AssetHistoryDb.toAssetHistory() = AssetHistory(
     id = id,
     assetId = assetId,
     price = price,
-    date = kotlin.time.Instant.fromEpochMilliseconds(date)
+    date = kotlin.time.Instant.fromEpochMilliseconds(date),
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 // Shopping Mappers
@@ -414,7 +447,14 @@ fun ShoppingItemDb.toShoppingItem() = ShoppingItem(
     position = position.toInt()
 )
 
-// Note Mappers
+fun com.kazemieh.database.Sync_history.toSyncHistory() = SyncHistory(
+    id = id,
+    timestamp = timestamp,
+    type = SyncType.valueOf(type),
+    status = SyncResultStatus.valueOf(status),
+    recordCount = recordCount.toInt(),
+    errorMessage = errorMessage
+)
 fun NoteDb.toNote(tags: List<Tag> = emptyList()) = Note(
     id = id,
     title = title,
@@ -423,5 +463,6 @@ fun NoteDb.toNote(tags: List<Tag> = emptyList()) = Note(
     isPinned = isPinned,
     isLocked = isLocked,
     updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt()),
     tags = tags
 )

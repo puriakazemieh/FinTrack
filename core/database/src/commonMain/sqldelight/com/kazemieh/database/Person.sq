@@ -2,15 +2,17 @@ CREATE TABLE IF NOT EXISTS person (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     name TEXT NOT NULL,
     description TEXT,
-    position INTEGER NOT NULL DEFAULT 0
+    position INTEGER NOT NULL DEFAULT 0,
+    updatedAt INTEGER NOT NULL DEFAULT 0,
+    syncStatus INTEGER NOT NULL DEFAULT 0
 );
 
 addPerson:
-INSERT INTO person(name, description, position)
-VALUES (?, ?, ?);
+INSERT INTO person(name, description, position, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?);
 
 insertAllPerson:
-INSERT INTO person(name, description, position)
+INSERT INTO person(name, description, position, updatedAt, syncStatus)
 VALUES ?;
 
 observePersons:
@@ -24,18 +26,18 @@ DELETE FROM person WHERE id = ?;
 
 updatePerson:
 UPDATE person
-SET name = ?, description = ?, position = ?
+SET name = ?, description = ?, position = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 updatePersonPosition:
-UPDATE person SET position = ? WHERE id = ?;
+UPDATE person SET position = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertFullPerson:
-INSERT OR REPLACE INTO person(id, name, description, position)
-VALUES (?, ?, ?, ?);
+INSERT OR REPLACE INTO person(id, name, description, position, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?);
 
 getMostUsedPersons:
 SELECT person.* FROM person
@@ -49,5 +51,11 @@ SELECT * FROM person
 WHERE name LIKE ('%' || :query || '%')
 OR description LIKE ('%' || :query || '%')
 ORDER BY position ASC;
+
+getModifiedPersons:
+SELECT * FROM person WHERE syncStatus = 1;
+
+markPersonAsSynced:
+UPDATE person SET syncStatus = 0 WHERE id = ?;
 
 

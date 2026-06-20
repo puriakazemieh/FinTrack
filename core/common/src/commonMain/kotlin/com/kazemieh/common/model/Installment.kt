@@ -18,7 +18,9 @@ data class Installment(
     val frequency: InstallmentFrequency,
     val description: String? = null,
     val isCompleted: Boolean = false, // آیا تمام اقساط پرداخت شده؟
-    val reminderEnabled: Boolean = true
+    val reminderEnabled: Boolean = true,
+    val updatedAt: Long = 0,
+    val syncStatus: SyncStatus = SyncStatus.SYNCED
 )
 
 @Serializable

@@ -11,4 +11,9 @@ interface NoteLocalDataSource {
     suspend fun deleteNote(id: Long)
     suspend fun updatePin(id: Long, isPinned: Boolean)
     suspend fun updateLock(id: Long, isLocked: Boolean)
+
+    suspend fun getAllNotes(): List<Note>
+    suspend fun insertFullNote(note: Note)
+    suspend fun getModifiedNotes(): List<Note>
+    suspend fun markNoteAsSynced(id: Long)
 }

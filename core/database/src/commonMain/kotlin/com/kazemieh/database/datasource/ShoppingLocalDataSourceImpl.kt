@@ -4,6 +4,7 @@ import com.kazemieh.common.model.ShoppingItem
 import com.kazemieh.data_contract.datasource.ShoppingLocalDataSource
 import com.kazemieh.database.FinTrackDb
 import com.kazemieh.database.mapper.toShoppingItem
+import kotlinx.datetime.Clock
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +31,7 @@ class ShoppingLocalDataSourceImpl(
 
     override suspend fun addShoppingItem(item: ShoppingItem): Long {
         return db.transactionWithResult {
+            val now = Clock.System.now().toEpochMilliseconds()
             queries.addShoppingItem(
                 name = item.name,
                 isChecked = item.isChecked,
@@ -37,13 +39,16 @@ class ShoppingLocalDataSourceImpl(
                 estimatedPrice = item.estimatedPrice,
                 reminderTime = item.reminderTime,
                 categoryId = item.categoryId,
-                position = item.position.toLong()
+                position = item.position.toLong(),
+                updatedAt = now,
+                syncStatus = 1
             )
             queries.lastInsertRowId().executeAsOne()
         }
     }
 
     override suspend fun updateShoppingItem(item: ShoppingItem) {
+        val now = Clock.System.now().toEpochMilliseconds()
         queries.updateShoppingItem(
             name = item.name,
             isChecked = item.isChecked,
@@ -52,6 +57,8 @@ class ShoppingLocalDataSourceImpl(
             reminderTime = item.reminderTime,
             categoryId = item.categoryId,
             position = item.position.toLong(),
+            updatedAt = now,
+            syncStatus = 1,
             id = item.id
         )
     }
@@ -62,9 +69,37 @@ class ShoppingLocalDataSourceImpl(
 
     override suspend fun updatePositions(items: List<ShoppingItem>) {
         db.transaction {
+            val now = Clock.System.now().toEpochMilliseconds()
             items.forEach { item ->
-                queries.updateShoppingItemPosition(item.position.toLong(), item.id)
+                queries.updateShoppingItemPosition(item.position.toLong(), now, 1, item.id)
             }
         }
+    }
+
+    override suspend fun getAllShoppingItems(): List<ShoppingItem> = withContext(Dispatchers.Default) {
+        queries.observeShoppingItems().executeAsList().map { it.toShoppingItem() }
+    }
+
+    override suspend fun insertFullShoppingItem(item: ShoppingItem) = withContext(Dispatchers.Default) {
+        queries.insertFullShoppingItem(
+            id = item.id,
+            name = item.name,
+            isChecked = item.isChecked,
+            priority = item.priority.toLong(),
+            estimatedPrice = item.estimatedPrice,
+            reminderTime = item.reminderTime,
+            categoryId = item.categoryId,
+            position = item.position.toLong(),
+            updatedAt = item.updatedAt,
+            syncStatus = item.syncStatus.value.toLong()
+        )
+    }
+
+    override suspend fun getModifiedShoppingItems(): List<ShoppingItem> = withContext(Dispatchers.Default) {
+        queries.getModifiedShoppingItems().executeAsList().map { it.toShoppingItem() }
+    }
+
+    override suspend fun markShoppingItemAsSynced(id: Long) {
+        queries.markShoppingItemAsSynced(id)
     }
 }

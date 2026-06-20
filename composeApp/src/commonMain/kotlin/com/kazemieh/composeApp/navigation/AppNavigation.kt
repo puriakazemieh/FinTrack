@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.kazemieh.composeApp.navigation.navigationBar.bottomBarNavGraph
 import com.kazemieh.onboarding.ui.OnboardingScreen
+import com.kazemieh.sync.ui.BackupRestoreScreen
 
 
 @Composable
@@ -33,6 +34,11 @@ fun AppNavHost(
                             popUpTo(Screen.Onboarding) { inclusive = true }
                         }
                     }
+                )
+            }
+            composable<Screen.BackupRestore> {
+                BackupRestoreScreen(
+                    onBackClick = { navController.popBackStack() }
                 )
             }
             bottomBarNavGraph(navController, snackbarHostState) { }

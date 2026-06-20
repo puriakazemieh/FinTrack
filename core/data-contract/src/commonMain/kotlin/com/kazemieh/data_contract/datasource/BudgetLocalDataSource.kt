@@ -11,4 +11,9 @@ interface BudgetLocalDataSource {
     suspend fun updateBudget(budget: Budget): Int
     suspend fun deleteBudget(id: Long)
     suspend fun getSpentAmountByCategory(categoryId: Long, from: Long, to: Long): Long
+
+    suspend fun getAllBudgets(): List<Budget>
+    suspend fun insertFullBudget(budget: Budget)
+    suspend fun getModifiedBudgets(): List<Budget>
+    suspend fun markBudgetAsSynced(id: Long)
 }

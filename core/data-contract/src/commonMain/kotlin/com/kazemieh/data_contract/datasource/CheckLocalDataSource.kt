@@ -11,4 +11,9 @@ interface CheckLocalDataSource {
     suspend fun getCheckById(id: Long): Check?
     fun observeAllChecks(): Flow<List<Check>>
     fun observeChecksByStatus(status: CheckStatus): Flow<List<Check>>
+
+    suspend fun getAllChecks(): List<Check>
+    suspend fun insertFullCheck(check: Check)
+    suspend fun getModifiedChecks(): List<Check>
+    suspend fun markCheckAsSynced(id: Long)
 }

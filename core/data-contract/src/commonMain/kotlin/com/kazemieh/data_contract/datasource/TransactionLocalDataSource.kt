@@ -83,4 +83,26 @@ interface TransactionLocalDataSource {
     suspend fun updatePersonPosition(id: Long, position: Int)
 
     suspend fun getTransactionAmountRange(): Pair<Long, Long>
+
+    suspend fun getAllTransactions(): List<Transaction>
+    suspend fun insertFullTransaction(transaction: Transaction)
+    suspend fun getAllCategories(): List<Category>
+    suspend fun insertFullCategory(category: Category)
+    suspend fun getAllSources(): List<Source>
+    suspend fun insertFullSource(source: Source)
+    suspend fun getAllTags(): List<Tag>
+    suspend fun insertFullTag(tag: Tag)
+    suspend fun getAllPersons(): List<Person>
+    suspend fun insertFullPerson(person: Person)
+
+    suspend fun getModifiedTransactions(): List<Transaction>
+    suspend fun markTransactionAsSynced(id: Long)
+    suspend fun getModifiedCategories(): List<Category>
+    suspend fun markCategoryAsSynced(id: Long)
+    suspend fun getModifiedSources(): List<Source>
+    suspend fun markSourceAsSynced(id: Long)
+    suspend fun getModifiedTags(): List<Tag>
+    suspend fun markTagAsSynced(id: Long)
+    suspend fun getModifiedPersons(): List<Person>
+    suspend fun markPersonAsSynced(id: Long)
 }

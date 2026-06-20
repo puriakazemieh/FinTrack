@@ -1,0 +1,18 @@
+CREATE TABLE IF NOT EXISTS sync_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    timestamp INTEGER NOT NULL,
+    type TEXT NOT NULL, -- 'AUTO_DRIVE', 'AUTO_SERVER', 'MANUAL'
+    status TEXT NOT NULL, -- 'SUCCESS', 'FAILED'
+    recordCount INTEGER NOT NULL,
+    errorMessage TEXT
+);
+
+insertSyncHistory:
+INSERT INTO sync_history(timestamp, type, status, recordCount, errorMessage)
+VALUES (?, ?, ?, ?, ?);
+
+getLatestSyncHistory:
+SELECT * FROM sync_history ORDER BY timestamp DESC LIMIT :limit;
+
+getLatestSuccessfulSync:
+SELECT * FROM sync_history WHERE status = 'SUCCESS' ORDER BY timestamp DESC LIMIT 1;

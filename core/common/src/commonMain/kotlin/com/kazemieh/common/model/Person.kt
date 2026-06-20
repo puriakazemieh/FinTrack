@@ -8,5 +8,7 @@ data class Person(
     val id: Long? = null,
     val name: String,
     val description: String? = null,
-    val position: Int = 0
+    val position: Int = 0,
+    val updatedAt: Long = 0,
+    val syncStatus: SyncStatus = SyncStatus.SYNCED
 )

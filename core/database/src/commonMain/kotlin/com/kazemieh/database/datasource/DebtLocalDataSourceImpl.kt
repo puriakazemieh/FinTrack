@@ -9,6 +9,7 @@ import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.data_contract.datasource.DebtLocalDataSource
 import com.kazemieh.database.FinTrackDatabase
+import kotlinx.datetime.Clock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -33,6 +34,7 @@ class DebtLocalDataSourceImpl(db: FinTrackDatabase) : DebtLocalDataSource {
     }
 
     override suspend fun insertDebt(debt: Debt): Long {
+        val now = Clock.System.now().toEpochMilliseconds()
         queries.insertDebt(
             personId = debt.personId,
             amount = debt.amount,
@@ -41,12 +43,15 @@ class DebtLocalDataSourceImpl(db: FinTrackDatabase) : DebtLocalDataSource {
             sourceId = debt.sourceId,
             description = debt.description,
             type = debt.type.value.toLong(),
-            isSettled = if (debt.isSettled) 1L else 0L
+            isSettled = if (debt.isSettled) 1L else 0L,
+            updatedAt = now,
+            syncStatus = 1
         )
         return queries.lastInsertRowId().executeAsOne()
     }
 
     override suspend fun updateDebt(debt: Debt): Int {
+        val now = Clock.System.now().toEpochMilliseconds()
         queries.updateDebt(
             personId = debt.personId,
             amount = debt.amount,
@@ -56,6 +61,8 @@ class DebtLocalDataSourceImpl(db: FinTrackDatabase) : DebtLocalDataSource {
             description = debt.description,
             type = debt.type.value.toLong(),
             isSettled = if (debt.isSettled) 1L else 0L,
+            updatedAt = now,
+            syncStatus = 1,
             id = debt.id
         )
         return 1
@@ -66,7 +73,36 @@ class DebtLocalDataSourceImpl(db: FinTrackDatabase) : DebtLocalDataSource {
     }
 
     override suspend fun settleDebt(id: Long) {
-        queries.settleDebt(id)
+        val now = Clock.System.now().toEpochMilliseconds()
+        queries.settleDebt(now, 1, id)
+    }
+
+    override suspend fun getAllDebts(): List<Debt> = withContext(Dispatchers.Default) {
+        queries.observeAllDebts().awaitAsList().map { it.toDebt() }
+    }
+
+    override suspend fun insertFullDebt(debt: Debt) = withContext(Dispatchers.Default) {
+        queries.insertFullDebt(
+            id = debt.id,
+            personId = debt.personId,
+            amount = debt.amount,
+            date = debt.date,
+            dueDate = debt.dueDate,
+            sourceId = debt.sourceId,
+            description = debt.description,
+            type = debt.type.value.toLong(),
+            isSettled = if (debt.isSettled) 1L else 0L,
+            updatedAt = debt.updatedAt,
+            syncStatus = debt.syncStatus.value.toLong()
+        )
+    }
+
+    override suspend fun getModifiedDebts(): List<Debt> = withContext(Dispatchers.Default) {
+        queries.getModifiedDebts().awaitAsList().map { it.toDebt() }
+    }
+
+    override suspend fun markDebtAsSynced(id: Long) {
+        queries.markDebtAsSynced(id)
     }
 
     private fun com.kazemieh.database.ObserveAllDebts.toDebtWithRelations(): DebtWithRelations {

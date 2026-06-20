@@ -22,5 +22,7 @@ data class Source(
     val expirationYear: String? = null,
     val branchCode: String? = null,
     val branchName: String? = null,
-    val position: Int = 0
+    val position: Int = 0,
+    val updatedAt: Long = 0,
+    val syncStatus: SyncStatus = SyncStatus.SYNCED
 )

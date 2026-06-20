@@ -13,7 +13,9 @@ data class Check(
     val personName: String? = null,
     val photoPath: String? = null,
     val description: String? = null,
-    val isIncoming: Boolean = false // True if received from others, False if issued by me
+    val isIncoming: Boolean = false, // True if received from others, False if issued by me
+    val updatedAt: Long = 0,
+    val syncStatus: SyncStatus = SyncStatus.SYNCED
 )
 
 enum class CheckStatus {

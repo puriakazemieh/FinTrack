@@ -9,7 +9,9 @@ data class Budget(
     val amount: Long,
     val period: BudgetPeriod,
     val startAt: Long,
-    val isAlertEnabled: Boolean = true
+    val isAlertEnabled: Boolean = true,
+    val updatedAt: Long = 0,
+    val syncStatus: SyncStatus = SyncStatus.SYNCED
 )
 
 @Serializable

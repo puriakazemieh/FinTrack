@@ -24,7 +24,9 @@ import com.kazemieh.database.mapper.toCategorySum
 import com.kazemieh.database.mapper.toPerson
 import com.kazemieh.database.mapper.toSource
 import com.kazemieh.database.mapper.toTag
+import com.kazemieh.database.mapper.toTransaction
 import com.kazemieh.database.mapper.toTransactionWithRelations
+import kotlinx.datetime.Clock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -108,6 +110,7 @@ class TransactionLocalDataSourceImpl(
     }
 
     override suspend fun addCategory(category: Category): Long = withContext(Dispatchers.Default) {
+        val now = Clock.System.now().toEpochMilliseconds()
         categoryQueries.addCategory(
             name = category.name,
             description = category.description,
@@ -115,13 +118,16 @@ class TransactionLocalDataSourceImpl(
             colorId = category.colorId.toLong(),
             iconId = category.iconId.toLong(),
             position = category.position.toLong(),
-            parentId = category.parentId
+            parentId = category.parentId,
+            updatedAt = now,
+            syncStatus = 1
         )
         categoryQueries.lastInsertRowId().awaitAsOne()
     }
 
     override suspend fun updateCategory(category: Category): Int =
         withContext(Dispatchers.Default) {
+            val now = Clock.System.now().toEpochMilliseconds()
             categoryQueries.updateCategory(
                 name = category.name,
                 description = category.description,
@@ -130,6 +136,8 @@ class TransactionLocalDataSourceImpl(
                 iconId = category.iconId.toLong(),
                 position = category.position.toLong(),
                 parentId = category.parentId,
+                updatedAt = now,
+                syncStatus = 1,
                 id = category.id ?: 0
             )
 
@@ -146,6 +154,7 @@ class TransactionLocalDataSourceImpl(
 
     override suspend fun updateSource(source: Source): Int = withContext(Dispatchers.Default) {
         val id = source.id ?: throw IllegalArgumentException("Source ID cannot be null")
+        val now = Clock.System.now().toEpochMilliseconds()
 
         sourceQueries.updateSource(
             name = source.name,
@@ -163,6 +172,8 @@ class TransactionLocalDataSourceImpl(
             branchCode = source.branchCode,
             branchName = source.branchName,
             position = source.position.toLong(),
+            updatedAt = now,
+            syncStatus = 1,
             id = id
         )
 
@@ -176,22 +187,28 @@ class TransactionLocalDataSourceImpl(
     }
 
     override suspend fun updateTag(tag: Tag): Int = withContext(Dispatchers.Default) {
+        val now = Clock.System.now().toEpochMilliseconds()
         tagQueries.updateTag(
             name = tag.name,
             description = tag.description,
             colorId = tag.colorId.toLong(),
             iconId = tag.iconId.toLong(),
             position = tag.position.toLong(),
+            updatedAt = now,
+            syncStatus = 1,
             id = tag.id ?: 0
         )
         1
     }
 
     override suspend fun updatePerson(person: Person): Int = withContext(Dispatchers.Default) {
+        val now = Clock.System.now().toEpochMilliseconds()
         personQueries.updatePerson(
             name = person.name,
             description = person.description,
             position = person.position.toLong(),
+            updatedAt = now,
+            syncStatus = 1,
             id = person.id ?: 0
         )
         1
@@ -272,6 +289,7 @@ class TransactionLocalDataSourceImpl(
         }
 
     override suspend fun addSource(source: Source): Long = withContext(Dispatchers.Default) {
+        val now = Clock.System.now().toEpochMilliseconds()
         sourceQueries.addSource(
             name = source.name,
             balance = source.balance.toLong(),
@@ -287,18 +305,23 @@ class TransactionLocalDataSourceImpl(
             expirationYear = source.expirationYear,
             branchCode = source.branchCode,
             branchName = source.branchName,
-            position = source.position.toLong()
+            position = source.position.toLong(),
+            updatedAt = now,
+            syncStatus = 1
         )
         sourceQueries.lastInsertRowId().awaitAsOne()
     }
 
     override suspend fun addTag(tag: Tag): Long = withContext(Dispatchers.Default) {
+        val now = Clock.System.now().toEpochMilliseconds()
         tagQueries.addTag(
             name = tag.name,
             description = tag.description,
             colorId = tag.colorId.toLong(),
             iconId = tag.iconId.toLong(),
-            position = tag.position.toLong()
+            position = tag.position.toLong(),
+            updatedAt = now,
+            syncStatus = 1
         )
         tagQueries.lastInsertRowId().awaitAsOne()
     }
@@ -348,7 +371,8 @@ class TransactionLocalDataSourceImpl(
 
     override suspend fun adjustSourceBalance(id: Long, delta: Int): Unit =
         withContext(Dispatchers.Default) {
-            sourceQueries.adjustBalance(delta.toLong(), id)
+            val now = Clock.System.now().toEpochMilliseconds()
+            sourceQueries.adjustBalance(delta.toLong(), now, 1, id)
         }
 
     override suspend fun getDefaultCategory(type: TransactionType): Category =
@@ -361,12 +385,13 @@ class TransactionLocalDataSourceImpl(
     override suspend fun getTransferCategory(): Category =
         withContext(Dispatchers.Default) {
             db.transactionWithResult {
+                val now = Clock.System.now().toEpochMilliseconds()
                 var transfer = categoryQueries.getTransferCategoryOrNull()
                     .awaitAsOneOrNull()
                     ?.toCategory()
 
                 if (transfer == null) {
-                    categoryQueries.createTransferCategory()
+                    categoryQueries.createTransferCategory(now)
                     transfer = categoryQueries.getTransferCategoryOrNull()
                         .awaitAsOne()
                         .toCategory()
@@ -385,10 +410,13 @@ class TransactionLocalDataSourceImpl(
 
     override suspend fun addPerson(person: Person): Long =
         withContext(Dispatchers.Default) {
+            val now = Clock.System.now().toEpochMilliseconds()
             personQueries.addPerson(
                 name = person.name,
                 description = person.description,
-                position = person.position.toLong()
+                position = person.position.toLong(),
+                updatedAt = now,
+                syncStatus = 1
             )
             personQueries.lastInsertRowId().awaitAsOne()
         }
@@ -457,24 +485,129 @@ class TransactionLocalDataSourceImpl(
     }
 
     override suspend fun updateCategoryPosition(id: Long, position: Int) {
-        categoryQueries.updateCategoryPosition(position.toLong(), id)
+        val now = Clock.System.now().toEpochMilliseconds()
+        categoryQueries.updateCategoryPosition(position.toLong(), now, 1, id)
     }
 
     override suspend fun updateSourcePosition(id: Long, position: Int) {
-        sourceQueries.updateSourcePosition(position.toLong(), id)
+        val now = Clock.System.now().toEpochMilliseconds()
+        sourceQueries.updateSourcePosition(position.toLong(), now, 1, id)
     }
 
     override suspend fun updateTagPosition(id: Long, position: Int) {
-        tagQueries.updateTagPosition(position.toLong(), id)
+        val now = Clock.System.now().toEpochMilliseconds()
+        tagQueries.updateTagPosition(position.toLong(), now, 1, id)
     }
 
     override suspend fun updatePersonPosition(id: Long, position: Int) {
-        personQueries.updatePersonPosition(position.toLong(), id)
+        val now = Clock.System.now().toEpochMilliseconds()
+        personQueries.updatePersonPosition(position.toLong(), now, 1, id)
     }
 
     override suspend fun getTransactionAmountRange(): Pair<Long, Long> = withContext(Dispatchers.Default) {
         val row = transactionQueries.getTransactionAmountRange().awaitAsOne()
         Pair(row.MIN ?: 0L, row.MAX ?: 1_000_000L)
+    }
+
+    override suspend fun getAllTransactions(): List<Transaction> = withContext(Dispatchers.Default) {
+        transactionQueries.getAllTransactionsFiltered(null, emptyList(), 0, emptyList(), 0, emptyList(), 0, emptyList(), 0, null, null, null, null, null, 1000000, 0)
+            .awaitAsList()
+            .map { it.toTransaction() }
+    }
+
+    override suspend fun insertFullTransaction(transaction: Transaction) = withContext(Dispatchers.Default) {
+        transactionQueries.insertFullTransaction(
+            id = transaction.id,
+            amount = transaction.amount.toLong(),
+            amountTransfer = transaction.amountTransfer.toLong(),
+            categoryId = transaction.categoryId,
+            sourceId = transaction.sourceId,
+            sourceEndId = transaction.sourceEndId,
+            description = transaction.description,
+            photoPath = transaction.photoPath,
+            timeStamp = transaction.timeStamp,
+            type = transaction.type.count.toLong(),
+            updatedAt = transaction.updatedAt,
+            syncStatus = transaction.syncStatus.value.toLong()
+        )
+    }
+
+    override suspend fun getAllCategories(): List<Category> = withContext(Dispatchers.Default) {
+        categoryQueries.observeCategoriesFlat(null).awaitAsList().map { it.toCategory() }
+    }
+
+    override suspend fun insertFullCategory(category: Category) = withContext(Dispatchers.Default) {
+        categoryQueries.insertFullCategory(
+            id = category.id ?: 0,
+            name = category.name,
+            description = category.description,
+            type = category.type.count.toLong(),
+            colorId = category.colorId.toLong(),
+            iconId = category.iconId.toLong(),
+            position = category.position.toLong(),
+            parentId = category.parentId,
+            updatedAt = category.updatedAt,
+            syncStatus = category.syncStatus.value.toLong()
+        )
+    }
+
+    override suspend fun getAllSources(): List<Source> = withContext(Dispatchers.Default) {
+        sourceQueries.observeSources().awaitAsList().map { it.toSource() }
+    }
+
+    override suspend fun insertFullSource(source: Source) = withContext(Dispatchers.Default) {
+        sourceQueries.insertFullSource(
+            id = source.id ?: 0,
+            name = source.name,
+            balance = source.balance.toLong(),
+            cardNumber = source.cardNumber,
+            description = source.description,
+            type = source.type.toLong(),
+            colorId = source.colorId.toLong(),
+            iconId = source.iconId.toLong(),
+            shabaNumber = source.shabaNumber,
+            accountNumber = source.accountNumber,
+            cvv2 = source.cvv2,
+            expirationMonth = source.expirationMonth,
+            expirationYear = source.expirationYear,
+            branchCode = source.branchCode,
+            branchName = source.branchName,
+            position = source.position.toLong(),
+            updatedAt = source.updatedAt,
+            syncStatus = source.syncStatus.value.toLong()
+        )
+    }
+
+    override suspend fun getAllTags(): List<Tag> = withContext(Dispatchers.Default) {
+        tagQueries.observeTags().awaitAsList().map { it.toTag() }
+    }
+
+    override suspend fun insertFullTag(tag: Tag) = withContext(Dispatchers.Default) {
+        tagQueries.insertFullTag(
+            id = tag.id ?: 0,
+            name = tag.name,
+            description = tag.description,
+            colorId = tag.colorId.toLong(),
+            iconId = tag.iconId.toLong(),
+            position = tag.position.toLong(),
+            updatedAt = tag.updatedAt,
+            syncStatus = tag.syncStatus.value.toLong()
+        )
+    }
+
+    override suspend fun getAllPersons(): List<Person> = withContext(Dispatchers.Default) {
+        personQueries.observePersons().awaitAsList().map { it.toPerson() }
+    }
+
+    override suspend fun insertFullPerson(person: Person) = withContext(Dispatchers.Default) {
+        personQueries.insertFullPerson(
+            id = person.id ?: 0,
+            name = person.name,
+            description = person.description,
+            position = person.position.toLong(),
+            updatedAt = person.updatedAt,
+            syncStatus = person.syncStatus.value.toLong()
+        )
     }
 
     override suspend fun addTransactionWithBalance(
@@ -484,7 +617,7 @@ class TransactionLocalDataSourceImpl(
         balanceDeltas: Map<Long, Int>
     ): Long = withContext(Dispatchers.Default) {
         db.transactionWithResult {
-
+            val now = Clock.System.now().toEpochMilliseconds()
             transactionQueries.insertTransaction(
                 amount = transaction.amount.toLong(),
                 amountTransfer = transaction.amountTransfer.toLong(),
@@ -494,7 +627,9 @@ class TransactionLocalDataSourceImpl(
                 description = transaction.description,
                 photoPath = transaction.photoPath,
                 timeStamp = transaction.timeStamp,
-                type = transaction.type.count.toLong()
+                type = transaction.type.count.toLong(),
+                updatedAt = now,
+                syncStatus = 1
             )
 
             val transactionId = transactionQueries.lastInsertRowId().awaitAsOne()
@@ -509,7 +644,7 @@ class TransactionLocalDataSourceImpl(
 
 
             balanceDeltas.forEach { (sourceId, delta) ->
-                sourceQueries.adjustBalance(delta.toLong(), sourceId)
+                sourceQueries.adjustBalance(delta.toLong(), now, 1, sourceId)
             }
 
             transactionId
@@ -523,7 +658,7 @@ class TransactionLocalDataSourceImpl(
         balanceDeltas: Map<Long, Int>
     ): Long = withContext(Dispatchers.Default) {
         db.transactionWithResult {
-
+            val now = Clock.System.now().toEpochMilliseconds()
             transactionQueries.updateTransaction(
                 amount = transaction.amount.toLong(),
                 amountTransfer = transaction.amountTransfer.toLong(),
@@ -534,6 +669,8 @@ class TransactionLocalDataSourceImpl(
                 photoPath = transaction.photoPath,
                 timeStamp = transaction.timeStamp,
                 type = transaction.type.count.toLong(),
+                updatedAt = now,
+                syncStatus = 1,
                 id = transaction.id
             )
 
@@ -565,11 +702,52 @@ class TransactionLocalDataSourceImpl(
         balanceDeltas: Map<Long, Int>
     ) = withContext(Dispatchers.Default) {
         db.transaction {
+            val now = Clock.System.now().toEpochMilliseconds()
             transactionQueries.deleteTransaction(transaction.id)
 
             balanceDeltas.forEach { (sourceId, delta) ->
-                sourceQueries.adjustBalance(delta.toLong(), sourceId)
+                sourceQueries.adjustBalance(delta.toLong(), now, 1, sourceId)
             }
         }
+    }
+
+    override suspend fun getModifiedTransactions(): List<Transaction> = withContext(Dispatchers.Default) {
+        transactionQueries.getModifiedTransactions().awaitAsList().map { it.toTransaction() }
+    }
+
+    override suspend fun markTransactionAsSynced(id: Long) {
+        transactionQueries.markTransactionAsSynced(id)
+    }
+
+    override suspend fun getModifiedCategories(): List<Category> = withContext(Dispatchers.Default) {
+        categoryQueries.getModifiedCategories().awaitAsList().map { it.toCategory() }
+    }
+
+    override suspend fun markCategoryAsSynced(id: Long) {
+        categoryQueries.markCategoryAsSynced(id)
+    }
+
+    override suspend fun getModifiedSources(): List<Source> = withContext(Dispatchers.Default) {
+        sourceQueries.getModifiedSources().awaitAsList().map { it.toSource() }
+    }
+
+    override suspend fun markSourceAsSynced(id: Long) {
+        sourceQueries.markSourceAsSynced(id)
+    }
+
+    override suspend fun getModifiedTags(): List<Tag> = withContext(Dispatchers.Default) {
+        tagQueries.getModifiedTags().awaitAsList().map { it.toTag() }
+    }
+
+    override suspend fun markTagAsSynced(id: Long) {
+        tagQueries.markTagAsSynced(id)
+    }
+
+    override suspend fun getModifiedPersons(): List<Person> = withContext(Dispatchers.Default) {
+        personQueries.getModifiedPersons().awaitAsList().map { it.toPerson() }
+    }
+
+    override suspend fun markPersonAsSynced(id: Long) {
+        personQueries.markPersonAsSynced(id)
     }
 }

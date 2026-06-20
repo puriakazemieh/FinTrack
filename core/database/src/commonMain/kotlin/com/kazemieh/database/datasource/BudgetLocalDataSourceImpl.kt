@@ -8,6 +8,7 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.data_contract.datasource.BudgetLocalDataSource
 import com.kazemieh.database.FinTrackDatabase
 import com.kazemieh.database.ObserveBudgets
+import kotlinx.datetime.Clock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -54,24 +55,30 @@ class BudgetLocalDataSourceImpl(
     }
 
     override suspend fun addBudget(budget: Budget): Long {
+        val now = Clock.System.now().toEpochMilliseconds()
         queries.insertBudget(
             categoryId = budget.categoryId,
             amount = budget.amount,
             period = budget.period.name,
             startAt = budget.startAt,
-            isAlertEnabled = if (budget.isAlertEnabled) 1L else 0L
+            isAlertEnabled = if (budget.isAlertEnabled) 1L else 0L,
+            updatedAt = now,
+            syncStatus = 1
         )
         return queries.getBudgetByCategoryId(budget.categoryId).executeAsOne().id
     }
 
     override suspend fun updateBudget(budget: Budget): Int {
+        val now = Clock.System.now().toEpochMilliseconds()
         queries.updateBudget(
             id = budget.id!!,
             categoryId = budget.categoryId,
             amount = budget.amount,
             period = budget.period.name,
             startAt = budget.startAt,
-            isAlertEnabled = if (budget.isAlertEnabled) 1L else 0L
+            isAlertEnabled = if (budget.isAlertEnabled) 1L else 0L,
+            updatedAt = now,
+            syncStatus = 1
         )
         return 1
     }
@@ -82,6 +89,53 @@ class BudgetLocalDataSourceImpl(
 
     override suspend fun getSpentAmountByCategory(categoryId: Long, from: Long, to: Long): Long {
         return transactionQueries.getSpentAmountByCategory(categoryId, from, to).executeAsOne().SUM ?: 0L
+    }
+
+    override suspend fun getAllBudgets(): List<Budget> = withContext(Dispatchers.Default) {
+        queries.observeBudgets().awaitAsList().map {
+            Budget(
+                id = it.id,
+                categoryId = it.categoryId,
+                amount = it.amount,
+                period = BudgetPeriod.valueOf(it.period),
+                startAt = it.startAt,
+                isAlertEnabled = it.isAlertEnabled == 1L,
+                updatedAt = it.updatedAt,
+                syncStatus = com.kazemieh.common.model.SyncStatus.fromInt(it.syncStatus.toInt())
+            )
+        }
+    }
+
+    override suspend fun insertFullBudget(budget: Budget) = withContext(Dispatchers.Default) {
+        queries.insertFullBudget(
+            id = budget.id ?: 0,
+            categoryId = budget.categoryId,
+            amount = budget.amount,
+            period = budget.period.name,
+            startAt = budget.startAt,
+            isAlertEnabled = if (budget.isAlertEnabled) 1L else 0L,
+            updatedAt = budget.updatedAt,
+            syncStatus = budget.syncStatus.value.toLong()
+        )
+    }
+
+    override suspend fun getModifiedBudgets(): List<Budget> = withContext(Dispatchers.Default) {
+        queries.getModifiedBudgets().awaitAsList().map {
+            Budget(
+                id = it.id,
+                categoryId = it.categoryId,
+                amount = it.amount,
+                period = BudgetPeriod.valueOf(it.period),
+                startAt = it.startAt,
+                isAlertEnabled = it.isAlertEnabled == 1L,
+                updatedAt = it.updatedAt,
+                syncStatus = com.kazemieh.common.model.SyncStatus.fromInt(it.syncStatus.toInt())
+            )
+        }
+    }
+
+    override suspend fun markBudgetAsSynced(id: Long) {
+        queries.markBudgetAsSynced(id)
     }
 
     private fun ObserveBudgets.toBudgetWithProgress(spent: Long): BudgetWithProgress {

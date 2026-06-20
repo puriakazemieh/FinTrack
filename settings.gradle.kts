@@ -68,6 +68,8 @@ include(":feature-share:check")
 include(":feature-share:fixed-expense")
 include(":feature-share:shopping")
 include(":feature-share:notes")
+include(":feature-share:backup-export")
+include(":feature-share:sync")
 
 include(":feature-container:transactions")
 include(":feature-container:onboarding")

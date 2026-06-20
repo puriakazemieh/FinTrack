@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS installment (
     description TEXT,
     isCompleted INTEGER NOT NULL DEFAULT 0,
     reminderEnabled INTEGER NOT NULL DEFAULT 1,
+    updatedAt INTEGER NOT NULL DEFAULT 0,
+    syncStatus INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (categoryId) REFERENCES category(id) ON DELETE CASCADE,
     FOREIGN KEY (sourceId) REFERENCES source(id) ON DELETE CASCADE
 );
@@ -20,12 +22,12 @@ CREATE TABLE IF NOT EXISTS installment (
 CREATE INDEX IF NOT EXISTS idx_installment_nextDueDate ON installment(nextDueDate);
 
 insertInstallment:
-INSERT INTO installment(title, totalAmount, installmentAmount, totalInstallments, paidInstallments, categoryId, sourceId, startDate, nextDueDate, frequency, description, isCompleted, reminderEnabled)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO installment(title, totalAmount, installmentAmount, totalInstallments, paidInstallments, categoryId, sourceId, startDate, nextDueDate, frequency, description, isCompleted, reminderEnabled, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateInstallment:
 UPDATE installment
-SET title = ?, totalAmount = ?, installmentAmount = ?, totalInstallments = ?, paidInstallments = ?, categoryId = ?, sourceId = ?, startDate = ?, nextDueDate = ?, frequency = ?, description = ?, isCompleted = ?, reminderEnabled = ?
+SET title = ?, totalAmount = ?, installmentAmount = ?, totalInstallments = ?, paidInstallments = ?, categoryId = ?, sourceId = ?, startDate = ?, nextDueDate = ?, frequency = ?, description = ?, isCompleted = ?, reminderEnabled = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 deleteInstallment:
@@ -66,3 +68,13 @@ ORDER BY i.isCompleted ASC, i.nextDueDate ASC;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
+
+insertFullInstallment:
+INSERT OR REPLACE INTO installment(id, title, totalAmount, installmentAmount, totalInstallments, paidInstallments, categoryId, sourceId, startDate, nextDueDate, frequency, description, isCompleted, reminderEnabled, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getModifiedInstallments:
+SELECT * FROM installment WHERE syncStatus = 1;
+
+markInstallmentAsSynced:
+UPDATE installment SET syncStatus = 0 WHERE id = ?;

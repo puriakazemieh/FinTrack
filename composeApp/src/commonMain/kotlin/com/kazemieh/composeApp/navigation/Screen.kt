@@ -79,6 +79,9 @@ sealed class Screen {
     data object Onboarding : Screen()
 
     @Serializable
+    data object BackupRestore : Screen()
+
+    @Serializable
     data object BottomBarGraph : Screen()
 
 }

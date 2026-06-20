@@ -15,7 +15,9 @@ data class Debt(
     val type: DebtType,
     val isSettled: Boolean = false,
     val personName: String? = null,
-    val sourceName: String? = null
+    val sourceName: String? = null,
+    val updatedAt: Long = 0,
+    val syncStatus: SyncStatus = SyncStatus.SYNCED
 )
 
 @Serializable

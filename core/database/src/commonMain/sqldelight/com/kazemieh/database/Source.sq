@@ -14,12 +14,14 @@ CREATE TABLE IF NOT EXISTS source (
     expirationYear TEXT,
     branchCode TEXT,
     branchName TEXT,
-    position INTEGER NOT NULL DEFAULT 0
+    position INTEGER NOT NULL DEFAULT 0,
+    updatedAt INTEGER NOT NULL DEFAULT 0,
+    syncStatus INTEGER NOT NULL DEFAULT 0
 );
 
 addSource:
-INSERT INTO source(name, balance, cardNumber, description, type, colorId, iconId, shabaNumber, accountNumber, cvv2, expirationMonth, expirationYear, branchCode, branchName, position)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO source(name, balance, cardNumber, description, type, colorId, iconId, shabaNumber, accountNumber, cvv2, expirationMonth, expirationYear, branchCode, branchName, position, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 observeSources:
 SELECT * FROM source ORDER BY position ASC;
@@ -29,7 +31,7 @@ SELECT * FROM source WHERE id = ?;
 
 adjustBalance:
 UPDATE source
-SET balance = balance + ?
+SET balance = balance + ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 deleteSource:
@@ -37,11 +39,11 @@ DELETE FROM source WHERE id = ?;
 
 updateSource:
 UPDATE source
-SET name = ?, balance = ?, cardNumber = ?, description = ?, type = ?, colorId = ?, iconId = ?, shabaNumber = ?, accountNumber = ?, cvv2 = ?, expirationMonth = ?, expirationYear = ?, branchCode = ?, branchName = ?, position = ?
+SET name = ?, balance = ?, cardNumber = ?, description = ?, type = ?, colorId = ?, iconId = ?, shabaNumber = ?, accountNumber = ?, cvv2 = ?, expirationMonth = ?, expirationYear = ?, branchCode = ?, branchName = ?, position = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 updateSourcePosition:
-UPDATE source SET position = ? WHERE id = ?;
+UPDATE source SET position = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
 
 getDefaultSource:
 SELECT * FROM source ORDER BY id LIMIT 1;
@@ -53,8 +55,8 @@ getSourceById:
 SELECT * FROM source WHERE id = ?;
 
 insertFullSource:
-INSERT OR REPLACE INTO source(id, name, balance, cardNumber, description, type, colorId, iconId, shabaNumber, accountNumber, cvv2, expirationMonth, expirationYear, branchCode, branchName, position)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO source(id, name, balance, cardNumber, description, type, colorId, iconId, shabaNumber, accountNumber, cvv2, expirationMonth, expirationYear, branchCode, branchName, position, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getMostUsedSources:
 SELECT * FROM source
@@ -73,4 +75,10 @@ OR cardNumber LIKE ('%' || :query || '%')
 OR shabaNumber LIKE ('%' || :query || '%')
 OR accountNumber LIKE ('%' || :query || '%')
 ORDER BY position ASC;
+
+getModifiedSources:
+SELECT * FROM source WHERE syncStatus = 1;
+
+markSourceAsSynced:
+UPDATE source SET syncStatus = 0 WHERE id = ?;
 

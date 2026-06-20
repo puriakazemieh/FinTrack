@@ -14,5 +14,6 @@ data class Note(
     val isPinned: Boolean = false,
     val isLocked: Boolean = false,
     val updatedAt: Long = 0,
+    val syncStatus: SyncStatus = SyncStatus.SYNCED,
     val tags: List<Tag> = emptyList()
 )

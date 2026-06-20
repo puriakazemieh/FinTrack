@@ -6,25 +6,27 @@ CREATE TABLE IF NOT EXISTS category (
     colorId INTEGER NOT NULL DEFAULT 1,
     iconId INTEGER NOT NULL DEFAULT 1,
     position INTEGER NOT NULL DEFAULT 0,
-    parentId INTEGER REFERENCES category(id)
+    parentId INTEGER REFERENCES category(id),
+    updatedAt INTEGER NOT NULL DEFAULT 0,
+    syncStatus INTEGER NOT NULL DEFAULT 0
 );
 
 -- Queries
 addCategory:
-INSERT INTO category(name, description, type, colorId, iconId, position, parentId)
-VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT INTO category(name, description, type, colorId, iconId, position, parentId, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 insertAllCategory:
-INSERT INTO category(name, description, type, colorId, iconId, position, parentId)
+INSERT INTO category(name, description, type, colorId, iconId, position, parentId, updatedAt, syncStatus)
 VALUES ?;
 
 updateCategory:
 UPDATE category
-SET name = ?, description = ?, type = ?, colorId = ?, iconId = ?, position = ?, parentId = ?
+SET name = ?, description = ?, type = ?, colorId = ?, iconId = ?, position = ?, parentId = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 updateCategoryPosition:
-UPDATE category SET position = ? WHERE id = ?;
+UPDATE category SET position = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
 
 observeCategories:
 SELECT * FROM category
@@ -42,8 +44,8 @@ getTransferCategoryOrNull:
 SELECT * FROM category WHERE type = 3 AND parentId IS NULL ORDER BY id LIMIT 1;
 
 createTransferCategory:
-INSERT INTO category(name, type)
-VALUES ('انتقال', 3);
+INSERT INTO category(name, type, updatedAt, syncStatus)
+VALUES ('انتقال', 3, ?, 1);
 
 lastInsertRowId:
 SELECT last_insert_rowid();
@@ -53,8 +55,8 @@ SELECT * FROM category WHERE id = ?;
 
 -- اضافه کردن کتگوری انتقال اگر وجود نداشت
 insertTransferCategoryIfMissing:
-INSERT OR IGNORE INTO category (name, type, colorId, iconId, description)
-VALUES ('انتقال', 3, 1, 1, NULL);
+INSERT OR IGNORE INTO category (name, type, colorId, iconId, description, updatedAt, syncStatus)
+VALUES ('انتقال', 3, 1, 1, NULL, ?, 1);
 
 -- کوئری برای observeCategorySums
 observeCategorySumsByFilter:
@@ -85,8 +87,8 @@ deleteCategory:
 DELETE FROM category WHERE id = ?;
 
 insertFullCategory:
-INSERT OR REPLACE INTO category(id, name, description, type, colorId, iconId, position, parentId)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO category(id, name, description, type, colorId, iconId, position, parentId, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getMostUsedCategories:
 SELECT c.* FROM category c
@@ -101,3 +103,9 @@ SELECT * FROM category
 WHERE name LIKE ('%' || :query || '%')
 OR description LIKE ('%' || :query || '%')
 ORDER BY position ASC;
+
+getModifiedCategories:
+SELECT * FROM category WHERE syncStatus = 1;
+
+markCategoryAsSynced:
+UPDATE category SET syncStatus = 0 WHERE id = ?;

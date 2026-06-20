@@ -905,4 +905,40 @@
     <string name="reminder">یادآور</string>
     <string name="shopping_list_empty">لیست خرید خالی است</string>
     <string name="notes_empty">یادداشتی وجود ندارد</string>
+
+    <!-- Backup & Sync -->
+    <string name="backup_restore_title">پشتیبان‌گیری و بازیابی</string>
+    <string name="backup_restore_subtitle">حفاظت از داده‌های شما</string>
+    <string name="backup_active_protection">محافظت فعال</string>
+    <string name="backup_last_time">آخرین پشتیبان: %1$s</string>
+    <string name="backup_now">پشتیبان الان</string>
+    <string name="backup_stats_transactions">تراکنش‌ها</string>
+    <string name="backup_stats_sources">منابع</string>
+    <string name="backup_stats_assets">دارایی‌ها</string>
+    <string name="backup_destinations">مقصدهای پشتیبان</string>
+    <string name="backup_drive_title">Google Drive</string>
+    <string name="backup_drive_desc">متصل · هر روز</string>
+    <string name="backup_server_title">سرور FinTrack</string>
+    <string name="backup_server_desc">پریمیوم · هر ۱۵ دقیقه</string>
+    <string name="backup_local_title">فایل محلی</string>
+    <string name="backup_local_desc">دانلود برای آرشیو دستی</string>
+    <string name="backup_saved_list">پشتیبان‌های ذخیره‌شده</string>
+    <string name="backup_restore_btn">بازیابی</string>
+    <string name="backup_records_count">%1$d رکورد</string>
+    <string name="backup_manual_actions">عملیات دستی</string>
+    <string name="backup_export_json">خروجی JSON</string>
+    <string name="backup_import_file">ورود از فایل</string>
+
+    <!-- Export -->
+    <string name="export_title">خروجی گرفتن</string>
+    <string name="export_subtitle">%1$d تراکنش · %2$s تا %3$s</string>
+    <string name="export_fintrack_file">فایل FinTrack</string>
+    <string name="export_fintrack_desc">JSON رمزنگاری‌شده · برای بازیابی</string>
+    <string name="export_excel_title">Excel (.xlsx)</string>
+    <string name="export_excel_desc">جدول کامل · فقط اندروید</string>
+    <string name="export_pdf_title">PDF گزارش</string>
+    <string name="export_pdf_desc">گزارش تصویری با نمودار</string>
+    <string name="export_csv_title">CSV ساده</string>
+    <string name="export_csv_desc">برای نرم‌افزارهای دیگر</string>
+    <string name="export_range_label">بازه‌ی خروجی</string>
 </resources>

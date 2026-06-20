@@ -12,7 +12,9 @@ data class Category(
     val colorId: Int,
     val iconId: Int,
     val position: Int = 0,
-    val parentId: Long? = null
+    val parentId: Long? = null,
+    val updatedAt: Long = 0,
+    val syncStatus: SyncStatus = SyncStatus.SYNCED
 )
 
 

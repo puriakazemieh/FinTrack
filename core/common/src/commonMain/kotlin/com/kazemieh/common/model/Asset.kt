@@ -24,7 +24,9 @@ data class Asset(
     val description: String? = null,
     val colorId: Int,
     val iconId: Int,
-    val lastUpdate: Instant? = null
+    val lastUpdate: Instant? = null,
+    val updatedAt: Long = 0,
+    val syncStatus: SyncStatus = SyncStatus.SYNCED
 ) {
     val totalPurchaseValue: Long = (quantity * purchasePrice).toLong()
     val totalCurrentValue: Long = (quantity * (currentPrice ?: purchasePrice)).toLong()
@@ -48,5 +50,7 @@ data class AssetHistory(
     val id: Long? = null,
     val assetId: Long,
     val price: Long,
-    val date: Instant
+    val date: Instant,
+    val updatedAt: Long = 0,
+    val syncStatus: SyncStatus = SyncStatus.SYNCED
 )

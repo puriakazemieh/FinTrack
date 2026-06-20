@@ -14,5 +14,7 @@ data class ShoppingItem(
     val estimatedPrice: Double = 0.0,
     val reminderTime: Long? = null,
     val categoryId: Long? = null,
-    val position: Int = 0
+    val position: Int = 0,
+    val updatedAt: Long = 0,
+    val syncStatus: SyncStatus = SyncStatus.SYNCED
 )

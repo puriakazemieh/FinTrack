@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS fixed_expense (
     nextDueDate INTEGER NOT NULL,
     isAutoPostEnabled INTEGER NOT NULL DEFAULT 0,
     isActive INTEGER NOT NULL DEFAULT 1,
+    updatedAt INTEGER NOT NULL DEFAULT 0,
+    syncStatus INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (categoryId) REFERENCES category(id) ON DELETE CASCADE,
     FOREIGN KEY (sourceId) REFERENCES source(id) ON DELETE CASCADE
 );
@@ -17,12 +19,12 @@ CREATE INDEX IF NOT EXISTS idx_fixed_expense_category ON fixed_expense(categoryI
 CREATE INDEX IF NOT EXISTS idx_fixed_expense_source ON fixed_expense(sourceId);
 
 insertFixedExpense:
-INSERT INTO fixed_expense(amount, categoryId, sourceId, description, recurrence, startDate, nextDueDate, isAutoPostEnabled, isActive)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO fixed_expense(amount, categoryId, sourceId, description, recurrence, startDate, nextDueDate, isAutoPostEnabled, isActive, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateFixedExpense:
 UPDATE fixed_expense
-SET amount = ?, categoryId = ?, sourceId = ?, description = ?, recurrence = ?, startDate = ?, nextDueDate = ?, isAutoPostEnabled = ?, isActive = ?
+SET amount = ?, categoryId = ?, sourceId = ?, description = ?, recurrence = ?, startDate = ?, nextDueDate = ?, isAutoPostEnabled = ?, isActive = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 deleteFixedExpense:
@@ -42,7 +44,17 @@ INNER JOIN source s ON f.sourceId = s.id
 ORDER BY f.nextDueDate ASC;
 
 updateNextDueDate:
-UPDATE fixed_expense SET nextDueDate = ? WHERE id = ?;
+UPDATE fixed_expense SET nextDueDate = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
+
+insertFullFixedExpense:
+INSERT OR REPLACE INTO fixed_expense(id, amount, categoryId, sourceId, description, recurrence, startDate, nextDueDate, isAutoPostEnabled, isActive, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getModifiedFixedExpenses:
+SELECT * FROM fixed_expense WHERE syncStatus = 1;
+
+markFixedExpenseAsSynced:
+UPDATE fixed_expense SET syncStatus = 0 WHERE id = ?;

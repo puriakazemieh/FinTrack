@@ -10,4 +10,9 @@ interface ShoppingLocalDataSource {
     suspend fun updateShoppingItem(item: ShoppingItem)
     suspend fun deleteShoppingItem(id: Long)
     suspend fun updatePositions(items: List<ShoppingItem>)
+
+    suspend fun getAllShoppingItems(): List<ShoppingItem>
+    suspend fun insertFullShoppingItem(item: ShoppingItem)
+    suspend fun getModifiedShoppingItems(): List<ShoppingItem>
+    suspend fun markShoppingItemAsSynced(id: Long)
 }

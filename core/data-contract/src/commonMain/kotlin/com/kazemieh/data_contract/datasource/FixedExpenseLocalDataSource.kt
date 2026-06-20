@@ -10,4 +10,9 @@ interface FixedExpenseLocalDataSource {
     suspend fun getFixedExpenseById(id: Long): FixedExpense?
     fun observeAllFixedExpenses(): Flow<List<FixedExpense>>
     suspend fun updateNextDueDate(id: Long, nextDueDate: Long)
+
+    suspend fun getAllFixedExpenses(): List<FixedExpense>
+    suspend fun insertFullFixedExpense(expense: FixedExpense)
+    suspend fun getModifiedFixedExpenses(): List<FixedExpense>
+    suspend fun markFixedExpenseAsSynced(id: Long)
 }

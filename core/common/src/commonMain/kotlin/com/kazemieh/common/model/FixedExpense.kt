@@ -15,7 +15,9 @@ data class FixedExpense(
     val startDate: Long,
     val nextDueDate: Long,
     val isAutoPostEnabled: Boolean = false,
-    val isActive: Boolean = true
+    val isActive: Boolean = true,
+    val updatedAt: Long = 0,
+    val syncStatus: SyncStatus = SyncStatus.SYNCED
 )
 
 enum class RecurrenceType {
