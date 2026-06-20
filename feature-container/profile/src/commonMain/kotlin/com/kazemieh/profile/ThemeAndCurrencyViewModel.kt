@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import com.kazemieh.designsystem.AppTheme
 import com.kazemieh.designsystem.ThemeMode
 import com.kazemieh.domain.usecase.PreferenceUseCases
-import com.kazemieh.money.Currency
-import com.kazemieh.preferences.FinTrackPreferences.Companion.PREF_CURRENCY
 import com.kazemieh.preferences.FinTrackPreferences.Companion.PREF_THEME
 import com.kazemieh.preferences.FinTrackPreferences.Companion.PREF_THEME_END_TIME
 import com.kazemieh.preferences.FinTrackPreferences.Companion.PREF_THEME_MODE
@@ -30,15 +28,13 @@ class ThemeAndCurrencyViewModel(
         val modeName = preferenceUseCases.getStringPreference(PREF_THEME_MODE, ThemeMode.MANUAL.name)
         val startTime = preferenceUseCases.getStringPreference(PREF_THEME_START_TIME, "20:00")
         val endTime = preferenceUseCases.getStringPreference(PREF_THEME_END_TIME, "07:00")
-        val currencyName = preferenceUseCases.getStringPreference(PREF_CURRENCY, Currency.TOMAN.name)
 
         _state.update {
             it.copy(
                 selectedTheme = try { AppTheme.valueOf(themeName) } catch (e: Exception) { AppTheme.GLASS_DARK },
                 selectedMode = try { ThemeMode.valueOf(modeName) } catch (e: Exception) { ThemeMode.MANUAL },
                 startTime = startTime,
-                endTime = endTime,
-                selectedCurrency = try { Currency.valueOf(currencyName) } catch (e: Exception) { Currency.TOMAN }
+                endTime = endTime
             )
         }
     }
@@ -61,10 +57,6 @@ class ThemeAndCurrencyViewModel(
                 preferenceUseCases.setStringPreference(PREF_THEME_END_TIME, intent.time)
                 _state.update { it.copy(endTime = intent.time) }
             }
-            is ThemeAndCurrencyIntent.SelectCurrency -> {
-                preferenceUseCases.setStringPreference(PREF_CURRENCY, intent.currency.name)
-                _state.update { it.copy(selectedCurrency = intent.currency) }
-            }
         }
     }
 }
@@ -73,8 +65,7 @@ data class ThemeAndCurrencyState(
     val selectedTheme: AppTheme = AppTheme.GLASS_DARK,
     val selectedMode: ThemeMode = ThemeMode.MANUAL,
     val startTime: String = "20:00",
-    val endTime: String = "07:00",
-    val selectedCurrency: Currency = Currency.TOMAN
+    val endTime: String = "07:00"
 )
 
 sealed interface ThemeAndCurrencyIntent {
@@ -82,5 +73,4 @@ sealed interface ThemeAndCurrencyIntent {
     data class SelectMode(val mode: ThemeMode) : ThemeAndCurrencyIntent
     data class SetStartTime(val time: String) : ThemeAndCurrencyIntent
     data class SetEndTime(val time: String) : ThemeAndCurrencyIntent
-    data class SelectCurrency(val currency: Currency) : ThemeAndCurrencyIntent
 }

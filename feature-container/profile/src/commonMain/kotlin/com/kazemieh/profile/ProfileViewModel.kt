@@ -8,11 +8,20 @@ import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.lock.LockMode
+import com.kazemieh.money.Currency
 import com.kazemieh.preferences.FinTrackPreferences
-import fintrack.core.designsystem.generated.resources.*
+import com.kazemieh.preferences.FinTrackPreferences.Companion.PREF_CURRENCY
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.premium_all_features_free
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -30,17 +39,33 @@ class ProfileViewModel(
         loadSettings()
         loadProfile()
         observeThemeChanges()
+        observeCurrencyChanges()
     }
 
     @OptIn(ExperimentalEncodingApi::class)
     private fun loadProfile() {
         _state.update {
             it.copy(
-                firstName = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_NAME, ""),
-                lastName = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_FAMILY, ""),
-                email = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_EMAIL, ""),
-                phone = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_PHONE, ""),
-                avatar = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_AVATAR, "").let { base64 ->
+                firstName = preferenceUseCases.getStringPreference(
+                    FinTrackPreferences.PREF_USER_NAME,
+                    ""
+                ),
+                lastName = preferenceUseCases.getStringPreference(
+                    FinTrackPreferences.PREF_USER_FAMILY,
+                    ""
+                ),
+                email = preferenceUseCases.getStringPreference(
+                    FinTrackPreferences.PREF_USER_EMAIL,
+                    ""
+                ),
+                phone = preferenceUseCases.getStringPreference(
+                    FinTrackPreferences.PREF_USER_PHONE,
+                    ""
+                ),
+                avatar = preferenceUseCases.getStringPreference(
+                    FinTrackPreferences.PREF_USER_AVATAR,
+                    ""
+                ).let { base64 ->
                     if (base64.isNotEmpty()) {
                         try {
                             Base64.decode(base64)
@@ -54,25 +79,76 @@ class ProfileViewModel(
     }
 
     private fun loadSettings() {
-        val currentThemeName = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_THEME, AppTheme.GLASS_DARK.name)
-        val currentTheme = try { AppTheme.valueOf(currentThemeName) } catch (e: Exception) { AppTheme.GLASS_DARK }
+        val currentThemeName = preferenceUseCases.getStringPreference(
+            FinTrackPreferences.PREF_THEME,
+            AppTheme.GLASS_DARK.name
+        )
+        val currentTheme = try {
+            AppTheme.valueOf(currentThemeName)
+        } catch (e: Exception) {
+            AppTheme.GLASS_DARK
+        }
 
         _state.update {
             it.copy(
                 isDarkModeEnabled = currentTheme.isDark,
-                isFingerprintEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_BIOMETRIC_ENABLED, false),
-                isLockEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, false),
-                isBackupEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_BACKUP, true),
-                isPushNotificationsEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_PUSH_NOTIF, true),
-                isTransactionAlertsEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_TX_ALERTS, true)
+                isFingerprintEnabled = preferenceUseCases.getBooleanPreference(
+                    FinTrackPreferences.PREF_BIOMETRIC_ENABLED,
+                    false
+                ),
+                isLockEnabled = preferenceUseCases.getBooleanPreference(
+                    FinTrackPreferences.PREF_LOCK_ENABLED,
+                    false
+                ),
+                isBackupEnabled = preferenceUseCases.getBooleanPreference(
+                    FinTrackPreferences.PREF_BACKUP,
+                    true
+                ),
+                isPushNotificationsEnabled = preferenceUseCases.getBooleanPreference(
+                    FinTrackPreferences.PREF_PUSH_NOTIF,
+                    true
+                ),
+                isTransactionAlertsEnabled = preferenceUseCases.getBooleanPreference(
+                    FinTrackPreferences.PREF_TX_ALERTS,
+                    true
+                ),
+                selectedCurrency = preferenceUseCases.getStringPreference(PREF_CURRENCY, "")
+                    .let { json ->
+                        if (json.isNotEmpty()) {
+                            try {
+                                Json.decodeFromString<Currency>(json)
+                            } catch (e: Exception) {
+                                Currency.TOMAN
+                            }
+                        } else Currency.TOMAN
+                    }
             )
         }
+    }
+
+    private fun observeCurrencyChanges() {
+        preferenceUseCases.getStringFlow(PREF_CURRENCY, "")
+            .onEach { json ->
+                if (json.isNotEmpty()) {
+                    val currency = try {
+                        Json.decodeFromString<Currency>(json)
+                    } catch (e: Exception) {
+                        Currency.TOMAN
+                    }
+                    _state.update { it.copy(selectedCurrency = currency) }
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun observeThemeChanges() {
         preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_THEME, AppTheme.GLASS_DARK.name)
             .onEach { themeName ->
-                val theme = try { AppTheme.valueOf(themeName) } catch (e: Exception) { AppTheme.GLASS_DARK }
+                val theme = try {
+                    AppTheme.valueOf(themeName)
+                } catch (e: Exception) {
+                    AppTheme.GLASS_DARK
+                }
                 _state.update { it.copy(isDarkModeEnabled = theme.isDark) }
             }
             .launchIn(viewModelScope)
@@ -81,20 +157,41 @@ class ProfileViewModel(
     fun onIntent(intent: ProfileIntent) {
         when (intent) {
             is ProfileIntent.ToggleDarkMode -> {
-                val currentThemeName = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_THEME, AppTheme.GLASS_DARK.name)
-                val currentTheme = try { AppTheme.valueOf(currentThemeName) } catch (e: Exception) { AppTheme.GLASS_DARK }
-                
-                val currentModeName = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_THEME_MODE, ThemeMode.MANUAL.name)
-                val currentMode = try { ThemeMode.valueOf(currentModeName) } catch (e: Exception) { ThemeMode.MANUAL }
+                val currentThemeName = preferenceUseCases.getStringPreference(
+                    FinTrackPreferences.PREF_THEME,
+                    AppTheme.GLASS_DARK.name
+                )
+                val currentTheme = try {
+                    AppTheme.valueOf(currentThemeName)
+                } catch (e: Exception) {
+                    AppTheme.GLASS_DARK
+                }
+
+                val currentModeName = preferenceUseCases.getStringPreference(
+                    FinTrackPreferences.PREF_THEME_MODE,
+                    ThemeMode.MANUAL.name
+                )
+                val currentMode = try {
+                    ThemeMode.valueOf(currentModeName)
+                } catch (e: Exception) {
+                    ThemeMode.MANUAL
+                }
 
                 val newTheme = currentTheme.toggleDark()
-                preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_THEME, newTheme.name)
-                
+                preferenceUseCases.setStringPreference(
+                    FinTrackPreferences.PREF_THEME,
+                    newTheme.name
+                )
+
                 // If the user manually toggles, we switch to MANUAL mode to ensure their choice sticks
                 if (currentMode != ThemeMode.MANUAL) {
-                    preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_THEME_MODE, ThemeMode.MANUAL.name)
+                    preferenceUseCases.setStringPreference(
+                        FinTrackPreferences.PREF_THEME_MODE,
+                        ThemeMode.MANUAL.name
+                    )
                 }
             }
+
             is ProfileIntent.ToggleFingerprint -> {
                 if (!_state.value.isLockEnabled) {
                     viewModelScope.launch {
@@ -102,48 +199,78 @@ class ProfileViewModel(
                     }
                 } else {
                     val newValue = !_state.value.isFingerprintEnabled
-                    preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_BIOMETRIC_ENABLED, newValue)
+                    preferenceUseCases.setBooleanPreference(
+                        FinTrackPreferences.PREF_BIOMETRIC_ENABLED,
+                        newValue
+                    )
                     _state.update { it.copy(isFingerprintEnabled = newValue) }
                 }
             }
+
             is ProfileIntent.ToggleBackup -> {
                 val newValue = !_state.value.isBackupEnabled
                 preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_BACKUP, newValue)
                 _state.update { it.copy(isBackupEnabled = newValue) }
             }
+
             is ProfileIntent.TogglePushNotifications -> {
                 val newValue = !_state.value.isPushNotificationsEnabled
-                preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_PUSH_NOTIF, newValue)
+                preferenceUseCases.setBooleanPreference(
+                    FinTrackPreferences.PREF_PUSH_NOTIF,
+                    newValue
+                )
                 _state.update { it.copy(isPushNotificationsEnabled = newValue) }
             }
+
             is ProfileIntent.ToggleTransactionAlerts -> {
                 val newValue = !_state.value.isTransactionAlertsEnabled
-                preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_TX_ALERTS, newValue)
+                preferenceUseCases.setBooleanPreference(
+                    FinTrackPreferences.PREF_TX_ALERTS,
+                    newValue
+                )
                 _state.update { it.copy(isTransactionAlertsEnabled = newValue) }
             }
+
+            is ProfileIntent.SelectCurrency -> {
+                val currencyJson = Json.encodeToString(intent.currency)
+                preferenceUseCases.setStringPreference(PREF_CURRENCY, currencyJson)
+                _state.update { it.copy(selectedCurrency = intent.currency) }
+            }
+
             is ProfileIntent.ToggleLock -> {
-                val mode = if (_state.value.isLockEnabled) LockMode.VERIFY_BEFORE_DISABLE else LockMode.CREATE
+                val mode =
+                    if (_state.value.isLockEnabled) LockMode.VERIFY_BEFORE_DISABLE else LockMode.CREATE
                 viewModelScope.launch {
                     _effect.send(ProfileEffect.ShowLockPIN(mode, false))
                 }
             }
+
             is ProfileIntent.Refresh -> {
                 loadProfile()
             }
+
             is ProfileIntent.ShowPremiumInfo -> {
                 viewModelScope.launch {
                     SnackbarController.showMessage(UiText.StringResourceText(Res.string.premium_all_features_free))
                 }
             }
+
             is ProfileIntent.SetLockState -> {
-                preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, intent.isEnabled)
+                preferenceUseCases.setBooleanPreference(
+                    FinTrackPreferences.PREF_LOCK_ENABLED,
+                    intent.isEnabled
+                )
                 if (!intent.isEnabled) {
-                    preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_BIOMETRIC_ENABLED, false)
+                    preferenceUseCases.setBooleanPreference(
+                        FinTrackPreferences.PREF_BIOMETRIC_ENABLED,
+                        false
+                    )
                     _state.update { it.copy(isLockEnabled = false, isFingerprintEnabled = false) }
                 } else {
                     _state.update { it.copy(isLockEnabled = true) }
                 }
             }
+
             ProfileIntent.Logout -> {
                 // Handle logout logic
             }
@@ -163,6 +290,7 @@ data class ProfileState(
     val isBackupEnabled: Boolean = true,
     val isPushNotificationsEnabled: Boolean = true,
     val isTransactionAlertsEnabled: Boolean = true,
+    val selectedCurrency: Currency = Currency.TOMAN,
     val isLoading: Boolean = false
 )
 
@@ -174,6 +302,7 @@ sealed interface ProfileIntent {
     data object ToggleBackup : ProfileIntent
     data object TogglePushNotifications : ProfileIntent
     data object ToggleTransactionAlerts : ProfileIntent
+    data class SelectCurrency(val currency: Currency) : ProfileIntent
     data object ToggleLock : ProfileIntent
     data class SetLockState(val isEnabled: Boolean) : ProfileIntent
     data object Logout : ProfileIntent

@@ -26,8 +26,8 @@ import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,7 +41,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,19 +57,24 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelLargeText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
+import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.Switch
 import com.kazemieh.designsystem.component.glass.WidgetCard
-import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.lock.LockIntent
 import com.kazemieh.lock.LockMode
 import com.kazemieh.lock.LockViewModel
 import com.kazemieh.lock.PINScreen
+import com.kazemieh.money.Currency
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.action_logout
+import fintrack.core.designsystem.generated.resources.currency_rial_full
+import fintrack.core.designsystem.generated.resources.currency_toman_full
 import fintrack.core.designsystem.generated.resources.label_app_lock
+import fintrack.core.designsystem.generated.resources.label_currency
+import fintrack.core.designsystem.generated.resources.label_theme
 import fintrack.core.designsystem.generated.resources.lock_biometric_backup_pin
 import fintrack.core.designsystem.generated.resources.profile_premium_desc
 import fintrack.core.designsystem.generated.resources.profile_premium_title
@@ -80,7 +84,6 @@ import fintrack.core.designsystem.generated.resources.section_security
 import fintrack.core.designsystem.generated.resources.setting_dark_mode
 import fintrack.core.designsystem.generated.resources.setting_fingerprint
 import fintrack.core.designsystem.generated.resources.setting_push_notifications
-import fintrack.core.designsystem.generated.resources.setting_theme_currency
 import fintrack.core.designsystem.generated.resources.title_notification_settings
 import org.jetbrains.compose.resources.decodeToImageBitmap
 import org.jetbrains.compose.resources.stringResource
@@ -90,7 +93,8 @@ import org.koin.compose.viewmodel.koinViewModel as lockKoinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    onNavigateToThemeAndCurrency: () -> Unit,
+    onNavigateToThemeSettings: () -> Unit,
+    onNavigateToCurrencySettings: () -> Unit,
     onNavigateToProfileEdit: () -> Unit,
     onNavigateToNotifications: () -> Unit,
     viewModel: ProfileViewModel = koinViewModel(),
@@ -105,7 +109,6 @@ fun ProfileScreen(
     val lockViewModel: LockViewModel = lockKoinViewModel()
     val lockState by lockViewModel.state.collectAsStateWithLifecycle()
 
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(ProfileIntent.Refresh)
@@ -188,15 +191,30 @@ fun ProfileScreen(
             item {
                 WidgetCard(title = stringResource(Res.string.section_display)) {
                     SettingItem(
-                        title = stringResource(Res.string.setting_theme_currency),
+                        title = stringResource(Res.string.label_theme),
                         icon = Icons.Default.Palette,
-                        onClick = onNavigateToThemeAndCurrency
+                        onClick = onNavigateToThemeSettings
                     )
                     SettingItem(
                         title = stringResource(Res.string.setting_dark_mode),
                         icon = Icons.Default.DarkMode,
                         on = state.isDarkModeEnabled,
                         onToggle = { viewModel.onIntent(ProfileIntent.ToggleDarkMode) }
+                    )
+                }
+            }
+
+            item {
+                WidgetCard(title = stringResource(Res.string.label_currency)) {
+                    SettingItem(
+                        title = stringResource(Res.string.label_currency),
+                        icon = Icons.Default.Payments,
+                        onClick = onNavigateToCurrencySettings
+                    )
+                    Spacer(modifier = Modifier.height(space.small))
+                    CurrencyQuickSelector(
+                        selectedCurrency = state.selectedCurrency,
+                        onCurrencySelected = { viewModel.onIntent(ProfileIntent.SelectCurrency(it)) }
                     )
                 }
             }
@@ -364,6 +382,67 @@ fun PremiumCard(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+fun CurrencyQuickSelector(
+    selectedCurrency: Currency,
+    onCurrencySelected: (Currency) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        CurrencyOption(
+            modifier = Modifier.weight(1f),
+            label = stringResource(Res.string.currency_toman_full),
+            isSelected = selectedCurrency == Currency.TOMAN,
+            onClick = { onCurrencySelected(Currency.TOMAN) }
+        )
+        CurrencyOption(
+            modifier = Modifier.weight(1f),
+            label = stringResource(Res.string.currency_rial_full),
+            isSelected = selectedCurrency == Currency.RIAL,
+            onClick = { onCurrencySelected(Currency.RIAL) }
+        )
+    }
+}
+
+@Composable
+fun CurrencyOption(
+    modifier: Modifier = Modifier,
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val space = LocalSpacing.current
+    val backgroundColor = if (isSelected) {
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+    }
+    val contentColor = if (isSelected) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
+    Surface(
+        modifier = modifier.height(40.dp),
+        onClick = onClick,
+        shape = MaterialTheme.shapes.medium,
+        color = backgroundColor,
+        contentColor = contentColor
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            FintrackLabelLargeText(
+                text = label,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
             )
         }
     }

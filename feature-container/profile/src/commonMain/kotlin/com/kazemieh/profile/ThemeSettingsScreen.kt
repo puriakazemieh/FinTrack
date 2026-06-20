@@ -22,8 +22,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,11 +40,7 @@ import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.WidgetCard
 import com.kazemieh.designsystem.component.picker.FintrackTimePickerBottomSheet
-import com.kazemieh.money.Currency
 import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.currency_rial_full
-import fintrack.core.designsystem.generated.resources.currency_toman_full
-import fintrack.core.designsystem.generated.resources.label_currency
 import fintrack.core.designsystem.generated.resources.label_theme
 import fintrack.core.designsystem.generated.resources.label_theme_dark_time
 import fintrack.core.designsystem.generated.resources.label_theme_mode
@@ -60,20 +54,19 @@ import fintrack.core.designsystem.generated.resources.theme_mode_sunrise_sunset
 import fintrack.core.designsystem.generated.resources.theme_mode_system
 import fintrack.core.designsystem.generated.resources.theme_plain_dark
 import fintrack.core.designsystem.generated.resources.theme_plain_light
-import fintrack.core.designsystem.generated.resources.title_theme_currency
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ThemeAndCurrencyScreen(
+fun ThemeSettingsScreen(
     onBack: () -> Unit,
     viewModel: ThemeAndCurrencyViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
 
-    val showTimePicker = remember { mutableStateOf(false) }
-    var pickingStartTime by remember { mutableStateOf(true) }
+    val showTimePicker = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    var pickingStartTime by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(true) }
 
     FintrackTimePickerBottomSheet(
         openSheet = showTimePicker,
@@ -88,7 +81,7 @@ fun ThemeAndCurrencyScreen(
     )
 
     FintrackScreen(
-        title = stringResource(Res.string.title_theme_currency),
+        title = stringResource(Res.string.label_theme),
         onBack = onBack
     ) {
         LazyColumn(
@@ -140,23 +133,6 @@ fun ThemeAndCurrencyScreen(
                             }
                         )
                     }
-                }
-            }
-
-            item {
-                WidgetCard(
-                    title = stringResource(Res.string.label_currency)
-                ) {
-                    CurrencySection(
-                        selectedCurrency = state.selectedCurrency,
-                        onCurrencySelected = {
-                            viewModel.onIntent(
-                                ThemeAndCurrencyIntent.SelectCurrency(
-                                    it
-                                )
-                            )
-                        }
-                    )
                 }
             }
         }
@@ -325,57 +301,6 @@ fun ThemeItem(
             text = label,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
             color = if (isSelected) primaryColor else MaterialTheme.colorScheme.onSurface
-        )
-    }
-}
-
-@Composable
-fun CurrencySection(
-    selectedCurrency: Currency,
-    onCurrencySelected: (Currency) -> Unit
-) {
-    val currencies = listOf(
-        Currency.TOMAN to Res.string.currency_toman_full,
-        Currency.RIAL to Res.string.currency_rial_full
-    )
-
-    Column {
-        currencies.forEach { (currency, labelRes) ->
-            CurrencyItem(
-                label = stringResource(labelRes),
-                isSelected = currency == selectedCurrency,
-                onClick = { onCurrencySelected(currency) }
-            )
-        }
-    }
-}
-
-@Composable
-fun CurrencyItem(
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    val space = LocalSpacing.current
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(space.medium),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        FintrackBodyLargeText(
-            text = label,
-            modifier = Modifier.weight(1f),
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-        )
-        RadioButton(
-            selected = isSelected,
-            onClick = onClick,
-            colors = RadioButtonDefaults.colors(
-                selectedColor = MaterialTheme.colorScheme.primary
-            )
         )
     }
 }

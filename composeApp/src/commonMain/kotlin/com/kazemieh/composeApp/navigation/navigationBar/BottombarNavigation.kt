@@ -23,9 +23,10 @@ import com.kazemieh.installment.ui.list.InstallmentsScreen
 import com.kazemieh.notifications.ui.NotificationSettingsScreen
 import com.kazemieh.person.ui.detail.PersonDetailScreen
 import com.kazemieh.person.ui.list.PersonsScreen
+import com.kazemieh.profile.CurrencySettingsScreen
 import com.kazemieh.profile.ProfileEditScreen
 import com.kazemieh.profile.ProfileScreen
-import com.kazemieh.profile.ThemeAndCurrencyScreen
+import com.kazemieh.profile.ThemeSettingsScreen
 import com.kazemieh.search.ui.SearchScreen
 import com.kazemieh.tools.ToolsScreen
 import com.kazemieh.transactions.TransactionsScreen
@@ -159,7 +160,8 @@ fun NavGraphBuilder.bottomBarNavGraph(
 
         composable<Screen.Profile> { backStackEntry ->
             ProfileScreen(
-                onNavigateToThemeAndCurrency = { navController.navigate(Screen.ThemeAndCurrency) },
+                onNavigateToThemeSettings = { navController.navigate(Screen.ThemeSettings) },
+                onNavigateToCurrencySettings = { navController.navigate(Screen.CurrencySettings) },
                 onNavigateToProfileEdit = { navController.navigate(Screen.EditProfile) },
                 onNavigateToNotifications = { navController.navigate(Screen.NotificationSettings) }
             )
@@ -177,8 +179,14 @@ fun NavGraphBuilder.bottomBarNavGraph(
             )
         }
 
-        composable<Screen.ThemeAndCurrency> { backStackEntry ->
-            ThemeAndCurrencyScreen(
+        composable<Screen.ThemeSettings> { backStackEntry ->
+            ThemeSettingsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.CurrencySettings> { backStackEntry ->
+            CurrencySettingsScreen(
                 onBack = { navController.popBackStack() }
             )
         }

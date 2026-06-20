@@ -25,7 +25,10 @@ sealed class Screen {
     data object Profile : Screen()
 
     @Serializable
-    data object ThemeAndCurrency : Screen()
+    data object ThemeSettings : Screen()
+
+    @Serializable
+    data object CurrencySettings : Screen()
 
     @Serializable
     data object EditProfile : Screen()
