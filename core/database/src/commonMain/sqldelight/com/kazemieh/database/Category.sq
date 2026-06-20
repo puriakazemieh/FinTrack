@@ -32,10 +32,11 @@ observeCategories:
 SELECT * FROM category
 WHERE (:type IS NULL OR type = :type)
 AND parentId IS :parentId
+AND syncStatus != 2
 ORDER BY position ASC;
 
 observeCategoriesFlat:
-SELECT * FROM category WHERE (:type IS NULL OR type = :type) ORDER BY position ASC;
+SELECT * FROM category WHERE (:type IS NULL OR type = :type) AND syncStatus != 2 ORDER BY position ASC;
 
 getFirstByType:
 SELECT * FROM category WHERE type = ? AND parentId IS NULL ORDER BY id LIMIT 1;
@@ -84,6 +85,9 @@ WHERE
 GROUP BY c.id, c.name, c.type, c.colorId, c.iconId;
 
 deleteCategory:
+UPDATE category SET syncStatus = 2, updatedAt = ? WHERE id = ?;
+
+physicallyDeleteCategory:
 DELETE FROM category WHERE id = ?;
 
 insertFullCategory:

@@ -9,6 +9,8 @@ data class SyncHistory(
     val type: SyncType,
     val status: SyncResultStatus,
     val recordCount: Int,
+    val insertedCount: Int = 0,
+    val updatedCount: Int = 0,
     val errorMessage: String? = null
 )
 

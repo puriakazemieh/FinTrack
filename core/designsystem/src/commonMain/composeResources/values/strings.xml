@@ -924,7 +924,7 @@
     <string name="backup_local_desc">دانلود برای آرشیو دستی</string>
     <string name="backup_saved_list">پشتیبان‌های ذخیره‌شده</string>
     <string name="backup_restore_btn">بازیابی</string>
-    <string name="backup_records_count">%1$d رکورد</string>
+    <string name="backup_records_count">%1$d مورد (%2$d جدید، %3$d تغییر)</string>
     <string name="backup_manual_actions">عملیات دستی</string>
     <string name="backup_export_json">خروجی JSON</string>
     <string name="backup_import_file">ورود از فایل</string>

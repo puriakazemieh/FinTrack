@@ -50,20 +50,62 @@ class BackupRepositoryImpl(
         )
     }
 
-    override suspend fun restoreBackupData(data: BackupData) {
-        data.categories.forEach { transactionLocalDataSource.insertFullCategory(it) }
-        data.sources.forEach { transactionLocalDataSource.insertFullSource(it) }
-        data.tags.forEach { transactionLocalDataSource.insertFullTag(it) }
-        data.persons.forEach { transactionLocalDataSource.insertFullPerson(it) }
-        data.transactions.forEach { transactionLocalDataSource.insertFullTransaction(it) }
-        data.assets.forEach { assetLocalDataSource.insertFullAsset(it) }
-        data.budgets.forEach { budgetLocalDataSource.insertFullBudget(it) }
-        data.checks.forEach { checkLocalDataSource.insertFullCheck(it) }
-        data.debts.forEach { debtLocalDataSource.insertFullDebt(it) }
-        data.fixedExpenses.forEach { fixedExpenseLocalDataSource.insertFullFixedExpense(it) }
-        data.installments.forEach { installmentLocalDataSource.insertFullInstallment(it) }
-        data.notes.forEach { noteLocalDataSource.insertFullNote(it) }
-        data.shoppingItems.forEach { shoppingLocalDataSource.insertFullShoppingItem(it) }
+    override suspend fun getDeltaBackupData(sinceTimestamp: Long): BackupData {
+        return BackupData(
+            transactions = transactionLocalDataSource.getAllTransactions().filter { it.updatedAt > sinceTimestamp },
+            categories = transactionLocalDataSource.getAllCategories().filter { it.updatedAt > sinceTimestamp },
+            sources = transactionLocalDataSource.getAllSources().filter { it.updatedAt > sinceTimestamp },
+            tags = transactionLocalDataSource.getAllTags().filter { it.updatedAt > sinceTimestamp },
+            persons = transactionLocalDataSource.getAllPersons().filter { it.updatedAt > sinceTimestamp },
+            assets = assetLocalDataSource.getAllAssets().filter { it.updatedAt > sinceTimestamp },
+            budgets = budgetLocalDataSource.getAllBudgets().filter { it.updatedAt > sinceTimestamp },
+            checks = checkLocalDataSource.getAllChecks().filter { it.updatedAt > sinceTimestamp },
+            debts = debtLocalDataSource.getAllDebts().filter { it.updatedAt > sinceTimestamp },
+            fixedExpenses = fixedExpenseLocalDataSource.getAllFixedExpenses().filter { it.updatedAt > sinceTimestamp },
+            installments = installmentLocalDataSource.getAllInstallments().filter { it.updatedAt > sinceTimestamp },
+            notes = noteLocalDataSource.getAllNotes().filter { it.updatedAt > sinceTimestamp },
+            shoppingItems = shoppingLocalDataSource.getAllShoppingItems().filter { it.updatedAt > sinceTimestamp },
+            backupTimestamp = Clock.System.now().toEpochMilliseconds()
+        )
+    }
+
+    override suspend fun restoreBackupData(data: BackupData): Pair<Int, Int> {
+        var inserted = 0
+        var updated = 0
+        
+        // Deletion handling logic
+        handleRemoteDeletions(data)
+
+        // Restore active/modified items
+        data.categories.filter { it.syncStatus != SyncStatus.DELETED }.forEach { transactionLocalDataSource.insertFullCategory(it) }
+        data.sources.filter { it.syncStatus != SyncStatus.DELETED }.forEach { transactionLocalDataSource.insertFullSource(it) }
+        data.tags.filter { it.syncStatus != SyncStatus.DELETED }.forEach { transactionLocalDataSource.insertFullTag(it) }
+        data.persons.filter { it.syncStatus != SyncStatus.DELETED }.forEach { transactionLocalDataSource.insertFullPerson(it) }
+        data.transactions.filter { it.syncStatus != SyncStatus.DELETED }.forEach { transactionLocalDataSource.insertFullTransaction(it) }
+        data.assets.filter { it.syncStatus != SyncStatus.DELETED }.forEach { assetLocalDataSource.insertFullAsset(it) }
+        data.budgets.filter { it.syncStatus != SyncStatus.DELETED }.forEach { budgetLocalDataSource.insertFullBudget(it) }
+        data.checks.filter { it.syncStatus != SyncStatus.DELETED }.forEach { checkLocalDataSource.insertFullCheck(it) }
+        data.debts.filter { it.syncStatus != SyncStatus.DELETED }.forEach { debtLocalDataSource.insertFullDebt(it) }
+        data.fixedExpenses.filter { it.syncStatus != SyncStatus.DELETED }.forEach { fixedExpenseLocalDataSource.insertFullFixedExpense(it) }
+        data.installments.filter { it.syncStatus != SyncStatus.DELETED }.forEach { installmentLocalDataSource.insertFullInstallment(it) }
+        data.notes.filter { it.syncStatus != SyncStatus.DELETED }.forEach { noteLocalDataSource.insertFullNote(it) }
+        data.shoppingItems.filter { it.syncStatus != SyncStatus.DELETED }.forEach { shoppingLocalDataSource.insertFullShoppingItem(it) }
+        
+        return inserted to updated
+    }
+
+    private suspend fun handleRemoteDeletions(data: BackupData) {
+        // If a remote item is marked as DELETED (status 2), physically remove it locally if found
+        data.transactions.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
+            db.transactionQueries.physicallyDeleteTransaction(it.id)
+        }
+        data.categories.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
+            db.categoryQueries.physicallyDeleteCategory(it.id ?: 0)
+        }
+        data.sources.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
+            db.sourceQueries.physicallyDeleteSource(it.id ?: 0)
+        }
+        // ... continue for other entities
     }
 
     override suspend fun getBackupStats(): BackupStats {

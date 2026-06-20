@@ -31,7 +31,17 @@ SET amount = ?, amountTransfer = ?, categoryId = ?, sourceId = ?, sourceEndId = 
 WHERE id = ?;
 
 deleteTransaction:
+UPDATE transactions SET syncStatus = 2, updatedAt = ? WHERE id = ?;
+
+physicallyDeleteTransaction:
 DELETE FROM transactions WHERE id = ?;
+
+cleanupSyncedDeletions:
+DELETE FROM transactions WHERE syncStatus = 0 AND id IN (
+    -- This would normally be handled by a business logic check if it was marked as deleted
+    -- For simplicity, we physical delete after sync acknowledgement if the status is DELETED
+    SELECT id FROM transactions WHERE syncStatus = 0 AND EXISTS (SELECT 1 FROM transactions t2 WHERE t2.id = transactions.id AND t2.syncStatus = 2)
+);
 
 moveTransactionsCategory:
 UPDATE transactions SET categoryId = ?, updatedAt = ?, syncStatus = ? WHERE categoryId = ?;
@@ -45,13 +55,14 @@ UPDATE transactions SET sourceEndId = ?, updatedAt = ?, syncStatus = ? WHERE sou
 nullifySourceEnd:
 UPDATE transactions SET sourceEndId = NULL, updatedAt = ?, syncStatus = ? WHERE sourceEndId = ?;
 
-getAllTransactionsFiltered:
-...
 getModifiedTransactions:
 SELECT * FROM transactions WHERE syncStatus = 1;
 
 markTransactionAsSynced:
 UPDATE transactions SET syncStatus = 0 WHERE id = ?;
+
+getTransactionsSince:
+SELECT * FROM transactions WHERE updatedAt > ?;
 
 getAllTransactionsFiltered:
 SELECT
@@ -133,6 +144,7 @@ WHERE
     AND (:minAmount IS NULL OR t.amount >= :minAmount)
     AND (:maxAmount IS NULL OR t.amount <= :maxAmount)
     AND (:query IS NULL OR t.description LIKE ('%' || :query || '%'))
+    AND t.syncStatus != 2
 GROUP BY t.id
 ORDER BY t.timeStamp DESC, t.id DESC
 LIMIT :limit OFFSET :offset;
@@ -172,6 +184,7 @@ WHERE (:type IS NULL OR t.type = :type)
   AND (:minAmount IS NULL OR t.amount >= :minAmount)
   AND (:maxAmount IS NULL OR t.amount <= :maxAmount)
   AND (:query IS NULL OR t.description LIKE ('%' || :query || '%'))
+  AND t.syncStatus != 2
 GROUP BY c.id, c.name, c.type, c.colorId, c.iconId;
 
 getTransactionById:

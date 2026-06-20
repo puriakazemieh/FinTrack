@@ -16,9 +16,9 @@ data class Debt(
     val isSettled: Boolean = false,
     val personName: String? = null,
     val sourceName: String? = null,
-    val updatedAt: Long = 0,
-    val syncStatus: SyncStatus = SyncStatus.SYNCED
-)
+    override val updatedAt: Long = 0,
+    override val syncStatus: SyncStatus = SyncStatus.SYNCED
+) : SyncableEntity
 
 @Serializable
 data class DebtWithRelations(

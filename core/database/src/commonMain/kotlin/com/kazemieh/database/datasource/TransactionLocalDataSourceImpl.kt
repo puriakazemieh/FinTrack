@@ -219,19 +219,22 @@ class TransactionLocalDataSourceImpl(
             db.transaction {
                 val fromId = requireNotNull(category.id)
                 val toId = moveCategory?.id
+                val now = Clock.System.now().toEpochMilliseconds()
 
                 if (toId != null) {
                     transactionQueries.moveTransactionsCategory(
                         categoryId = toId,
+                        updatedAt = now,
+                        syncStatus = 1,
                         categoryId_ = fromId
                     )
                 }
 
                 // اگر کتگوری انتقال وجود نداشت، بساز
-                categoryQueries.insertTransferCategoryIfMissing()
+                categoryQueries.insertTransferCategoryIfMissing(now, 1)
 
-                // حالا کتگوری رو پاک کن
-                categoryQueries.deleteCategory(fromId)
+                // حالا کتگوری رو به عنوان حذف شده علامت بزن
+                categoryQueries.deleteCategory(now, fromId)
             }
         }
 
@@ -240,13 +243,14 @@ class TransactionLocalDataSourceImpl(
             db.transaction {
                 val fromId = requireNotNull(deleteTag.id)
                 val toId = moveTag?.id
+                val now = Clock.System.now().toEpochMilliseconds()
 
                 if (toId != null) {
                     transactionTagQueries.copyTagRefs(fromTagId = fromId, toTagId = toId)
                 }
 
                 transactionTagQueries.deleteTagRefs(fromId)
-                tagQueries.deleteTag(fromId)
+                tagQueries.deleteTag(now, fromId)
             }
         }
 
@@ -255,6 +259,7 @@ class TransactionLocalDataSourceImpl(
             db.transaction {
                 val fromId = requireNotNull(deletePerson.id)
                 val toId = movePerson?.id
+                val now = Clock.System.now().toEpochMilliseconds()
 
                 if (toId != null) {
                     transactionPersonQueries.copyPersonRefs(
@@ -264,7 +269,7 @@ class TransactionLocalDataSourceImpl(
                 }
 
                 transactionPersonQueries.deletePersonRefs(fromId)
-                personQueries.deletePerson(fromId)
+                personQueries.deletePerson(now, fromId)
             }
         }
 
@@ -273,18 +278,21 @@ class TransactionLocalDataSourceImpl(
             db.transaction {
                 val fromId = requireNotNull(deleteSource.id)
                 val toId = moveSource?.id
+                val now = Clock.System.now().toEpochMilliseconds()
 
                 if (toId != null) {
-                    transactionQueries.moveTransactionsSource(sourceId = toId, sourceId_ = fromId)
+                    transactionQueries.moveTransactionsSource(sourceId = toId, updatedAt = now, syncStatus = 1, sourceId_ = fromId)
                     transactionQueries.moveTransactionsSourceEnd(
                         sourceEndId = toId,
+                        updatedAt = now,
+                        syncStatus = 1,
                         sourceEndId_ = fromId
                     )
                 } else {
-                    transactionQueries.nullifySourceEnd(fromId)
+                    transactionQueries.nullifySourceEnd(now, 1, fromId)
                 }
 
-                sourceQueries.deleteSource(fromId)
+                sourceQueries.deleteSource(now, fromId)
             }
         }
 
@@ -703,7 +711,7 @@ class TransactionLocalDataSourceImpl(
     ) = withContext(Dispatchers.Default) {
         db.transaction {
             val now = Clock.System.now().toEpochMilliseconds()
-            transactionQueries.deleteTransaction(transaction.id)
+            transactionQueries.deleteTransaction(now, transaction.id)
 
             balanceDeltas.forEach { (sourceId, delta) ->
                 sourceQueries.adjustBalance(delta.toLong(), now, 1, sourceId)

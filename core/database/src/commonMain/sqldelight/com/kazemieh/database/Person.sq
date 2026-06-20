@@ -16,12 +16,15 @@ INSERT INTO person(name, description, position, updatedAt, syncStatus)
 VALUES ?;
 
 observePersons:
-SELECT * FROM person ORDER BY position ASC;
+SELECT * FROM person WHERE syncStatus != 2 ORDER BY position ASC;
 
 getPersonById:
-SELECT * FROM person WHERE id = ?;
+SELECT * FROM person WHERE id = ? AND syncStatus != 2;
 
 deletePerson:
+UPDATE person SET syncStatus = 2, updatedAt = ? WHERE id = ?;
+
+physicallyDeletePerson:
 DELETE FROM person WHERE id = ?;
 
 updatePerson:

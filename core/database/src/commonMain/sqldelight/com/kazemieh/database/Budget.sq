@@ -20,13 +20,14 @@ SELECT
     c.iconId AS categoryIconId,
     c.type AS categoryType
 FROM budget b
-LEFT JOIN category c ON b.categoryId = c.id;
+LEFT JOIN category c ON b.categoryId = c.id
+WHERE b.syncStatus != 2;
 
 getBudgetByCategoryId:
-SELECT * FROM budget WHERE categoryId = ?;
+SELECT * FROM budget WHERE categoryId = ? AND syncStatus != 2;
 
 getBudgetById:
-SELECT * FROM budget WHERE id = ?;
+SELECT * FROM budget WHERE id = ? AND syncStatus != 2;
 
 insertBudget:
 INSERT INTO budget(categoryId, amount, period, startAt, isAlertEnabled, updatedAt, syncStatus)
@@ -35,9 +36,12 @@ VALUES (?, ?, ?, ?, ?, ?, ?);
 updateBudget:
 UPDATE budget
 SET categoryId = ?, amount = ?, period = ?, startAt = ?, isAlertEnabled = ?, updatedAt = ?, syncStatus = ?
-WHERE id = ?;
+WHERE id = ? AND syncStatus != 2;
 
 deleteBudget:
+UPDATE budget SET syncStatus = 2, updatedAt = ? WHERE id = ?;
+
+physicallyDeleteBudget:
 DELETE FROM budget WHERE id = ?;
 
 insertFullBudget:

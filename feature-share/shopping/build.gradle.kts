@@ -14,6 +14,16 @@ kotlin {
         minSdk = 24
     }
 
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    js(IR) {
+        browser()
+    }
+
+    jvm()
+
     sourceSets {
         commonMain {
             dependencies {

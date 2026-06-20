@@ -15,6 +15,6 @@ data class ShoppingItem(
     val reminderTime: Long? = null,
     val categoryId: Long? = null,
     val position: Int = 0,
-    val updatedAt: Long = 0,
-    val syncStatus: SyncStatus = SyncStatus.SYNCED
-)
+    override val updatedAt: Long = 0,
+    override val syncStatus: SyncStatus = SyncStatus.SYNCED
+) : SyncableEntity

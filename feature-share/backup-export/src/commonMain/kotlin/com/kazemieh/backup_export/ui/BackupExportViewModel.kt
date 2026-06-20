@@ -29,6 +29,7 @@ sealed interface BackupExportIntent {
     data object ExportCsv : BackupExportIntent
     data object ExportExcel : BackupExportIntent
     data object ExportPdf : BackupExportIntent
+    data class ImportJson(val content: String) : BackupExportIntent
 }
 
 class BackupExportViewModel(
@@ -63,6 +64,22 @@ class BackupExportViewModel(
             BackupExportIntent.ExportCsv -> exportCsv()
             BackupExportIntent.ExportExcel -> exportExcel()
             BackupExportIntent.ExportPdf -> exportPdf()
+            is BackupExportIntent.ImportJson -> importJson(intent.content)
+        }
+    }
+
+    private fun importJson(content: String) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            try {
+                backupManager.importFromJson(content)
+                _effect.send(BackupExportEffect.ShowMessage("Restore successful"))
+                loadStats()
+            } catch (e: Exception) {
+                _effect.send(BackupExportEffect.ShowMessage("Import failed: ${e.message}"))
+            } finally {
+                _state.update { it.copy(isLoading = false) }
+            }
         }
     }
 
@@ -115,7 +132,14 @@ class BackupExportViewModel(
     }
 
     private fun getTimestampsFromRange(range: String): Pair<Long?, Long?> {
-        // Basic implementation for range logic
-        return null to null // TODO: Implement real range calculation
+        val now = Clock.System.now().toEpochMilliseconds()
+        val oneDay = 24 * 60 * 60 * 1000L
+        return when (range) {
+            "این ماه" -> (now - 30 * oneDay) to now
+            "۳ ماه" -> (now - 90 * oneDay) to now
+            "۶ ماه" -> (now - 180 * oneDay) to now
+            "امسال" -> (now - 365 * oneDay) to now
+            else -> null to null
+        }
     }
 }

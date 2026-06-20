@@ -13,10 +13,10 @@ CREATE TABLE IF NOT EXISTS shopping_item (
 );
 
 observeShoppingItems:
-SELECT * FROM shopping_item ORDER BY position ASC;
+SELECT * FROM shopping_item WHERE syncStatus != 2 ORDER BY position ASC;
 
 getShoppingItemById:
-SELECT * FROM shopping_item WHERE id = ?;
+SELECT * FROM shopping_item WHERE id = ? AND syncStatus != 2;
 
 addShoppingItem:
 INSERT INTO shopping_item(name, isChecked, priority, estimatedPrice, reminderTime, categoryId, position, updatedAt, syncStatus)
@@ -28,6 +28,9 @@ SET name = ?, isChecked = ?, priority = ?, estimatedPrice = ?, reminderTime = ?,
 WHERE id = ?;
 
 deleteShoppingItem:
+UPDATE shopping_item SET syncStatus = 2, updatedAt = ? WHERE id = ?;
+
+physicallyDeleteShoppingItem:
 DELETE FROM shopping_item WHERE id = ?;
 
 updateShoppingItemPosition:

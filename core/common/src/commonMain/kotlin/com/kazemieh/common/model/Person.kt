@@ -9,6 +9,6 @@ data class Person(
     val name: String,
     val description: String? = null,
     val position: Int = 0,
-    val updatedAt: Long = 0,
-    val syncStatus: SyncStatus = SyncStatus.SYNCED
-)
+    override val updatedAt: Long = 0,
+    override val syncStatus: SyncStatus = SyncStatus.SYNCED
+) : SyncableEntity

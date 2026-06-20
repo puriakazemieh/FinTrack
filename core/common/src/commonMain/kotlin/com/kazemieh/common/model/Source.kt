@@ -23,6 +23,6 @@ data class Source(
     val branchCode: String? = null,
     val branchName: String? = null,
     val position: Int = 0,
-    val updatedAt: Long = 0,
-    val syncStatus: SyncStatus = SyncStatus.SYNCED
-)
+    override val updatedAt: Long = 0,
+    override val syncStatus: SyncStatus = SyncStatus.SYNCED
+) : SyncableEntity

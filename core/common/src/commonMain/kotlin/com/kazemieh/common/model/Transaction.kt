@@ -17,9 +17,9 @@ data class Transaction(
     val timeStamp: Long = Clock.System.now().toEpochMilliseconds(),
     val date: String = "",
     val type: TransactionType,
-    val updatedAt: Long = 0,
-    val syncStatus: SyncStatus = SyncStatus.SYNCED
-) {
+    override val updatedAt: Long = 0,
+    override val syncStatus: SyncStatus = SyncStatus.SYNCED
+) : SyncableEntity {
 
     val amountTransferFormated: String?
         get() = if (type == TransactionType.TRANSFER) amountTransfer.toPersianPrice() else null

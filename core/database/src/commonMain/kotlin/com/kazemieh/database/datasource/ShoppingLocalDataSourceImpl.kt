@@ -64,7 +64,8 @@ class ShoppingLocalDataSourceImpl(
     }
 
     override suspend fun deleteShoppingItem(id: Long) {
-        queries.deleteShoppingItem(id)
+        val now = Clock.System.now().toEpochMilliseconds()
+        queries.deleteShoppingItem(now, id)
     }
 
     override suspend fun updatePositions(items: List<ShoppingItem>) {

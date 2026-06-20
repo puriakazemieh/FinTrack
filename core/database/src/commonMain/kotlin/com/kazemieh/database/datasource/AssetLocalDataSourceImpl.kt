@@ -65,7 +65,8 @@ class AssetLocalDataSourceImpl(
     }
 
     override suspend fun deleteAsset(assetId: Long) = withContext(Dispatchers.Default) {
-        assetQueries.deleteAsset(assetId)
+        val now = Clock.System.now().toEpochMilliseconds()
+        assetQueries.deleteAsset(now, assetId)
         Unit
     }
 

@@ -18,12 +18,15 @@ INSERT INTO tag(name, description, colorId, iconId, position, updatedAt, syncSta
 VALUES ?;
 
 observeTags:
-SELECT * FROM tag ORDER BY position ASC;
+SELECT * FROM tag WHERE syncStatus != 2 ORDER BY position ASC;
 
 getTagById:
-SELECT * FROM tag WHERE id = ?;
+SELECT * FROM tag WHERE id = ? AND syncStatus != 2;
 
 deleteTag:
+UPDATE tag SET syncStatus = 2, updatedAt = ? WHERE id = ?;
+
+physicallyDeleteTag:
 DELETE FROM tag WHERE id = ?;
 
 updateTag:

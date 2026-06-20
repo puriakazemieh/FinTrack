@@ -84,7 +84,8 @@ class BudgetLocalDataSourceImpl(
     }
 
     override suspend fun deleteBudget(id: Long) {
-        queries.deleteBudget(id)
+        val now = Clock.System.now().toEpochMilliseconds()
+        queries.deleteBudget(now, id)
     }
 
     override suspend fun getSpentAmountByCategory(categoryId: Long, from: Long, to: Long): Long {

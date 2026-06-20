@@ -24,10 +24,10 @@ INSERT INTO source(name, balance, cardNumber, description, type, colorId, iconId
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 observeSources:
-SELECT * FROM source ORDER BY position ASC;
+SELECT * FROM source WHERE syncStatus != 2 ORDER BY position ASC;
 
 observeSourceById:
-SELECT * FROM source WHERE id = ?;
+SELECT * FROM source WHERE id = ? AND syncStatus != 2;
 
 adjustBalance:
 UPDATE source
@@ -35,6 +35,9 @@ SET balance = balance + ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 deleteSource:
+UPDATE source SET syncStatus = 2, updatedAt = ? WHERE id = ?;
+
+physicallyDeleteSource:
 DELETE FROM source WHERE id = ?;
 
 updateSource:

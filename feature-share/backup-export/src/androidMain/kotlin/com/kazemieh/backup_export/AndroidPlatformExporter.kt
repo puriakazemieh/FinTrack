@@ -43,23 +43,33 @@ class AndroidPlatformExporter(
         val file = File(path)
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
         val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "application/octet-stream"
+            type = getMimeType(file.extension)
             putExtra(Intent.EXTRA_STREAM, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        val chooser = Intent.createChooser(intent, "Share Export")
+        startShareIntent(intent, "Share Export")
+    }
+
+    override fun shareText(content: String, title: String) {
+        // For larger data, it's better to save to a file first.
+        val file = File(context.cacheDir, "fintrack_data.json")
+        file.writeText(content)
+        shareFile(file.absolutePath)
+    }
+
+    private fun startShareIntent(intent: Intent, title: String) {
+        val chooser = Intent.createChooser(intent, title)
         chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(chooser)
     }
 
-    override fun shareText(content: String, title: String) {
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, content)
-            putExtra(Intent.EXTRA_TITLE, title)
+    private fun getMimeType(extension: String): String {
+        return when (extension) {
+            "xlsx" -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            "pdf" -> "application/pdf"
+            "json" -> "application/json"
+            "csv" -> "text/csv"
+            else -> "application/octet-stream"
         }
-        val chooser = Intent.createChooser(intent, "Share Data")
-        chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        context.startActivity(chooser)
     }
 }

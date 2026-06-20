@@ -31,10 +31,13 @@ SET title = ?, totalAmount = ?, installmentAmount = ?, totalInstallments = ?, pa
 WHERE id = ?;
 
 deleteInstallment:
+UPDATE installment SET syncStatus = 2, updatedAt = ? WHERE id = ?;
+
+physicallyDeleteInstallment:
 DELETE FROM installment WHERE id = ?;
 
 getInstallmentById:
-SELECT * FROM installment WHERE id = ?;
+SELECT * FROM installment WHERE id = ? AND syncStatus != 2;
 
 observeInstallments:
 SELECT
@@ -64,6 +67,7 @@ SELECT
 FROM installment i
 LEFT JOIN category c ON i.categoryId = c.id
 LEFT JOIN source s ON i.sourceId = s.id
+WHERE i.syncStatus != 2
 ORDER BY i.isCompleted ASC, i.nextDueDate ASC;
 
 lastInsertRowId:

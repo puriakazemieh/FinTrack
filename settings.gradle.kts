@@ -70,6 +70,7 @@ include(":feature-share:shopping")
 include(":feature-share:notes")
 include(":feature-share:backup-export")
 include(":feature-share:sync")
+include(":server")
 
 include(":feature-container:transactions")
 include(":feature-container:onboarding")

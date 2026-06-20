@@ -52,7 +52,8 @@ class CheckLocalDataSourceImpl(
     }
 
     override suspend fun deleteCheck(id: Long) {
-        queries.deleteCheck(id)
+        val now = Clock.System.now().toEpochMilliseconds()
+        queries.deleteCheck(now, id)
     }
 
     override suspend fun getCheckById(id: Long): Check? {

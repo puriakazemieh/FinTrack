@@ -3,9 +3,11 @@ package com.kazemieh.sync.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.*
+import com.kazemieh.common.util.DateUtils
 import com.kazemieh.domain.repository.BackupStats
 import com.kazemieh.domain.repository.BackupRepository
 import com.kazemieh.sync.GoogleDriveSyncManager
+import com.kazemieh.sync.ServerSyncManager
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +18,7 @@ import kotlinx.datetime.Clock
 
 data class SyncState(
     val lastBackup: String = "—",
+    val lastSyncTimestamp: Long = 0L,
     val stats: BackupStats? = null,
     val history: List<SyncHistory> = emptyList(),
     val isGoogleDriveEnabled: Boolean = true,
@@ -30,12 +33,13 @@ sealed interface SyncEffect {
 sealed interface SyncIntent {
     data object BackupNow : SyncIntent
     data class ToggleGoogleDrive(val enabled: Boolean) : SyncIntent
-    data class RestoreBackup(val time: String) : SyncIntent
+    data class RestoreBackup(val timestamp: Long) : SyncIntent
 }
 
 class SyncViewModel(
     private val backupRepository: BackupRepository,
-    private val googleDriveSyncManager: GoogleDriveSyncManager
+    private val googleDriveSyncManager: GoogleDriveSyncManager,
+    private val serverSyncManager: ServerSyncManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncState())
@@ -53,10 +57,13 @@ class SyncViewModel(
             val stats = backupRepository.getBackupStats()
             val history = backupRepository.getSyncHistory()
             val latestSuccess = history.firstOrNull { it.status == SyncResultStatus.SUCCESS }
+            val now = Clock.System.now().toEpochMilliseconds()
+            
             _state.update { it.copy(
                 stats = stats, 
                 history = history,
-                lastBackup = latestSuccess?.timestamp?.toString() ?: "—" // TODO: Format date
+                lastSyncTimestamp = latestSuccess?.timestamp ?: 0L,
+                lastBackup = latestSuccess?.let { DateUtils.getRelativeTime(it.timestamp, now) } ?: "—"
             ) }
         }
     }
@@ -67,7 +74,7 @@ class SyncViewModel(
             is SyncIntent.ToggleGoogleDrive -> {
                 _state.update { it.copy(isGoogleDriveEnabled = intent.enabled) }
             }
-            is SyncIntent.RestoreBackup -> restoreBackup(intent.time)
+            is SyncIntent.RestoreBackup -> restoreBackup(intent.timestamp)
         }
     }
 
@@ -75,13 +82,26 @@ class SyncViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             try {
-                googleDriveSyncManager.syncWithDrive()
+                var totalInserted = 0
+                var totalUpdated = 0
+
+                if (_state.value.isGoogleDriveEnabled) {
+                    googleDriveSyncManager.syncWithDrive()
+                }
+                
+                if (_state.value.isServerSyncEnabled) {
+                    val (inserted, updated) = serverSyncManager.syncWithServer(_state.value.lastSyncTimestamp)
+                    totalInserted += inserted
+                    totalUpdated += updated
+                }
                 
                 backupRepository.addSyncHistory(SyncHistory(
                     timestamp = Clock.System.now().toEpochMilliseconds(),
                     type = SyncType.MANUAL,
                     status = SyncResultStatus.SUCCESS,
-                    recordCount = 0 // TODO: Get merged count
+                    recordCount = totalInserted + totalUpdated,
+                    insertedCount = totalInserted,
+                    updatedCount = totalUpdated
                 ))
                 
                 _effect.send(SyncEffect.ShowMessage("Backup and sync successful"))
@@ -102,9 +122,9 @@ class SyncViewModel(
         }
     }
 
-    private fun restoreBackup(time: String) {
+    private fun restoreBackup(time: Long) {
         viewModelScope.launch {
-            _effect.send(SyncEffect.ShowMessage("Restoring backup from $time..."))
+            _effect.send(SyncEffect.ShowMessage("Restoring backup..."))
         }
     }
 }

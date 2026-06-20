@@ -53,7 +53,8 @@ class FixedExpenseLocalDataSourceImpl(
     }
 
     override suspend fun deleteFixedExpense(id: Long) {
-        queries.deleteFixedExpense(id)
+        val now = Clock.System.now().toEpochMilliseconds()
+        queries.deleteFixedExpense(now, id)
     }
 
     override suspend fun getFixedExpenseById(id: Long): FixedExpense? {

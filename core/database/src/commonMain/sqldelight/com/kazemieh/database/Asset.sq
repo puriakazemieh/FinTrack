@@ -31,20 +31,23 @@ INSERT INTO asset(name, type, quantity, purchasePrice, currentPrice, currency, d
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 observeAssets:
-SELECT * FROM asset ORDER BY id DESC;
+SELECT * FROM asset WHERE syncStatus != 2 ORDER BY id DESC;
 
 getAssetById:
-SELECT * FROM asset WHERE id = ?;
+SELECT * FROM asset WHERE id = ? AND syncStatus != 2;
 
 updateAsset:
 UPDATE asset
 SET name = ?, type = ?, quantity = ?, purchasePrice = ?, currentPrice = ?, currency = ?, description = ?, colorId = ?, iconId = ?, lastUpdate = ?, updatedAt = ?, syncStatus = ?
-WHERE id = ?;
+WHERE id = ? AND syncStatus != 2;
 
 updateAssetPrice:
-UPDATE asset SET currentPrice = ?, lastUpdate = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
+UPDATE asset SET currentPrice = ?, lastUpdate = ?, updatedAt = ?, syncStatus = ? WHERE id = ? AND syncStatus != 2;
 
 deleteAsset:
+UPDATE asset SET syncStatus = 2, updatedAt = ? WHERE id = ?;
+
+physicallyDeleteAsset:
 DELETE FROM asset WHERE id = ?;
 
 addAssetHistory:
@@ -72,9 +75,3 @@ SELECT last_insert_rowid();
 insertFullAsset:
 INSERT OR REPLACE INTO asset(id, name, type, quantity, purchasePrice, currentPrice, currency, description, colorId, iconId, lastUpdate, updatedAt, syncStatus)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-
-getModifiedAssets:
-SELECT * FROM asset WHERE syncStatus = 1;
-
-markAssetAsSynced:
-UPDATE asset SET syncStatus = 0 WHERE id = ?;

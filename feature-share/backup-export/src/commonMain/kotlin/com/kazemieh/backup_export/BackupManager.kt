@@ -22,7 +22,11 @@ class BackupManager(
     }
 
     suspend fun importFromJson(jsonString: String, encrypted: Boolean = true) {
-        val decrypted = if (encrypted) SecurityUtils.decrypt(jsonString) else jsonString
+        val decrypted = try {
+            if (encrypted) SecurityUtils.decrypt(jsonString) else jsonString
+        } catch (e: Exception) {
+            jsonString // Fallback to plain if decryption fails
+        }
         val data = json.decodeFromString<BackupData>(decrypted)
         backupRepository.restoreBackupData(data)
     }

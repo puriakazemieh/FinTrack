@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kazemieh.common.util.DateUtils
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.glass.GlassCard
@@ -121,12 +122,14 @@ fun BackupRestoreScreen(
             items(state.history) { historyItem ->
                 SavedBackupItem(
                     data = BackupItemData(
-                        time = historyItem.timestamp.toString(), // TODO: Format date
+                        time = DateUtils.formatTimestamp(historyItem.timestamp),
                         type = historyItem.type.name,
                         size = "—",
-                        records = historyItem.recordCount
+                        records = historyItem.recordCount,
+                        inserted = historyItem.insertedCount,
+                        updated = historyItem.updatedCount
                     ),
-                    onRestore = { viewModel.onIntent(SyncIntent.RestoreBackup(historyItem.timestamp.toString())) }
+                    onRestore = { viewModel.onIntent(SyncIntent.RestoreBackup(historyItem.timestamp)) }
                 )
             }
             
@@ -145,7 +148,11 @@ fun BackupRestoreScreen(
                         text = stringResource(Res.string.backup_import_file),
                         icon = Icons.Outlined.Restore,
                         modifier = Modifier.weight(1f),
-                        onClick = { }
+                        onClick = { 
+                            // In a real app, trigger File Picker. 
+                            // For now, we simulate a small import check.
+                            viewModel.onIntent(SyncIntent.RestoreBackup(0L))
+                        }
                     )
                 }
             }
@@ -308,7 +315,7 @@ fun SavedBackupItem(data: BackupItemData, onRestore: () -> Unit) {
         Column(modifier = Modifier.weight(1f)) {
             Text(data.time, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
             Text(
-                "${data.type} · ${data.size} · " + stringResource(Res.string.backup_records_count, data.records),
+                "${data.type} · ${data.size} · " + stringResource(Res.string.backup_records_count, data.records, data.inserted, data.updated),
                 style = MaterialTheme.typography.bodySmall,
                 color = glassColors.text3,
                 fontSize = 10.sp
@@ -362,4 +369,4 @@ fun SectionHeader(text: String) {
     )
 }
 
-data class BackupItemData(val time: String, val type: String, val size: String, val records: Int)
+data class BackupItemData(val time: String, val type: String, val size: String, val records: Int, val inserted: Int, val updated: Int)

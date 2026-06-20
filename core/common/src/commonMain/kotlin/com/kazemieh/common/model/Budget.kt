@@ -10,9 +10,9 @@ data class Budget(
     val period: BudgetPeriod,
     val startAt: Long,
     val isAlertEnabled: Boolean = true,
-    val updatedAt: Long = 0,
-    val syncStatus: SyncStatus = SyncStatus.SYNCED
-)
+    override val updatedAt: Long = 0,
+    override val syncStatus: SyncStatus = SyncStatus.SYNCED
+) : SyncableEntity
 
 @Serializable
 enum class BudgetPeriod {

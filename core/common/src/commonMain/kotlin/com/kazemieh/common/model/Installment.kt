@@ -19,9 +19,9 @@ data class Installment(
     val description: String? = null,
     val isCompleted: Boolean = false, // آیا تمام اقساط پرداخت شده؟
     val reminderEnabled: Boolean = true,
-    val updatedAt: Long = 0,
-    val syncStatus: SyncStatus = SyncStatus.SYNCED
-)
+    override val updatedAt: Long = 0,
+    override val syncStatus: SyncStatus = SyncStatus.SYNCED
+) : SyncableEntity
 
 @Serializable
 data class InstallmentWithRelations(

@@ -69,7 +69,8 @@ class DebtLocalDataSourceImpl(db: FinTrackDatabase) : DebtLocalDataSource {
     }
 
     override suspend fun deleteDebt(id: Long) {
-        queries.deleteDebt(id)
+        val now = Clock.System.now().toEpochMilliseconds()
+        queries.deleteDebt(now, id)
     }
 
     override suspend fun settleDebt(id: Long) {

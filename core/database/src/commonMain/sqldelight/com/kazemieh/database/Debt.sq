@@ -27,10 +27,13 @@ SET personId = ?, amount = ?, date = ?, dueDate = ?, sourceId = ?, description =
 WHERE id = ?;
 
 deleteDebt:
+UPDATE debt SET syncStatus = 2, updatedAt = ? WHERE id = ?;
+
+physicallyDeleteDebt:
 DELETE FROM debt WHERE id = ?;
 
 getDebtById:
-SELECT * FROM debt WHERE id = ?;
+SELECT * FROM debt WHERE id = ? AND syncStatus != 2;
 
 observeAllDebts:
 SELECT
@@ -43,6 +46,7 @@ SELECT
 FROM debt d
 INNER JOIN person p ON d.personId = p.id
 LEFT JOIN source s ON d.sourceId = s.id
+WHERE d.syncStatus != 2
 ORDER BY d.isSettled ASC, d.date DESC;
 
 observeDebtsByPerson:
@@ -56,7 +60,7 @@ SELECT
 FROM debt d
 INNER JOIN person p ON d.personId = p.id
 LEFT JOIN source s ON d.sourceId = s.id
-WHERE d.personId = ?
+WHERE d.personId = ? AND d.syncStatus != 2
 ORDER BY d.date DESC;
 
 settleDebt:

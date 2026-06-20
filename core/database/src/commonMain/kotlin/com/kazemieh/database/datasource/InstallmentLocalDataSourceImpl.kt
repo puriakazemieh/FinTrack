@@ -80,7 +80,8 @@ class InstallmentLocalDataSourceImpl(
     }
 
     override suspend fun deleteInstallment(id: Long): Unit = withContext(Dispatchers.Default) {
-        installmentQueries.deleteInstallment(id)
+        val now = Clock.System.now().toEpochMilliseconds()
+        installmentQueries.deleteInstallment(now, id)
     }
 
     override suspend fun getAllInstallments(): List<Installment> = withContext(Dispatchers.Default) {

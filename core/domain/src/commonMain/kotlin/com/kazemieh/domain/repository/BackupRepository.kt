@@ -1,7 +1,7 @@
 package com.kazemieh.domain.repository
 
 import com.kazemieh.common.model.*
-import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class BackupData(
@@ -39,7 +39,8 @@ data class BackupStats(
 
 interface BackupRepository {
     suspend fun getBackupData(fromTimestamp: Long? = null, toTimestamp: Long? = null): BackupData
-    suspend fun restoreBackupData(data: BackupData)
+    suspend fun getDeltaBackupData(sinceTimestamp: Long): BackupData
+    suspend fun restoreBackupData(data: BackupData): Pair<Int, Int> // Returns (inserted, updated)
     suspend fun getBackupStats(): BackupStats
     
     suspend fun addSyncHistory(history: SyncHistory)

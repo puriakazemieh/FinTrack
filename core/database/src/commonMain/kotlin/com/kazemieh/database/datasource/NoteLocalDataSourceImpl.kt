@@ -79,7 +79,8 @@ class NoteLocalDataSourceImpl(
     }
 
     override suspend fun deleteNote(id: Long) {
-        noteQueries.deleteNote(id)
+        val now = Clock.System.now().toEpochMilliseconds()
+        noteQueries.deleteNote(now, id)
     }
 
     override suspend fun updatePin(id: Long, isPinned: Boolean) {

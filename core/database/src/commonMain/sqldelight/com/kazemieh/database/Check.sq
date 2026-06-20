@@ -24,18 +24,13 @@ UPDATE check_table
 SET amount = ?, date = ?, dueDate = ?, status = ?, personId = ?, photoPath = ?, description = ?, isIncoming = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
-deleteCheck:
-DELETE FROM check_table WHERE id = ?;
-
-getCheckById:
-SELECT * FROM check_table WHERE id = ?;
-
 observeAllChecks:
 SELECT
     c.*,
     p.name AS personName
 FROM check_table c
 INNER JOIN person p ON c.personId = p.id
+WHERE c.syncStatus != 2
 ORDER BY c.dueDate ASC;
 
 observeChecksByStatus:
@@ -44,8 +39,17 @@ SELECT
     p.name AS personName
 FROM check_table c
 INNER JOIN person p ON c.personId = p.id
-WHERE c.status = ?
+WHERE c.status = ? AND c.syncStatus != 2
 ORDER BY c.dueDate ASC;
+
+getCheckById:
+SELECT * FROM check_table WHERE id = ? AND syncStatus != 2;
+
+deleteCheck:
+UPDATE check_table SET syncStatus = 2, updatedAt = ? WHERE id = ?;
+
+physicallyDeleteCheck:
+DELETE FROM check_table WHERE id = ?;
 
 lastInsertRowId:
 SELECT last_insert_rowid();

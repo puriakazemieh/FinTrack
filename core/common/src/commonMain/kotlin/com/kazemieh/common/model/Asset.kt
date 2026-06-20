@@ -25,9 +25,9 @@ data class Asset(
     val colorId: Int,
     val iconId: Int,
     val lastUpdate: Instant? = null,
-    val updatedAt: Long = 0,
-    val syncStatus: SyncStatus = SyncStatus.SYNCED
-) {
+    override val updatedAt: Long = 0,
+    override val syncStatus: SyncStatus = SyncStatus.SYNCED
+) : SyncableEntity {
     val totalPurchaseValue: Long = (quantity * purchasePrice).toLong()
     val totalCurrentValue: Long = (quantity * (currentPrice ?: purchasePrice)).toLong()
     
@@ -51,6 +51,6 @@ data class AssetHistory(
     val assetId: Long,
     val price: Long,
     val date: Instant,
-    val updatedAt: Long = 0,
-    val syncStatus: SyncStatus = SyncStatus.SYNCED
-)
+    override val updatedAt: Long = 0,
+    override val syncStatus: SyncStatus = SyncStatus.SYNCED
+) : SyncableEntity

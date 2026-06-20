@@ -11,6 +11,6 @@ data class Tag(
     val colorId: Int,
     val iconId: Int,
     val position: Int = 0,
-    val updatedAt: Long = 0,
-    val syncStatus: SyncStatus = SyncStatus.SYNCED
-)
+    override val updatedAt: Long = 0,
+    override val syncStatus: SyncStatus = SyncStatus.SYNCED
+) : SyncableEntity

@@ -13,7 +13,7 @@ data class Note(
     val color: Long = 0xFFFFFFFF, // پیش‌فرض سفید
     val isPinned: Boolean = false,
     val isLocked: Boolean = false,
-    val updatedAt: Long = 0,
-    val syncStatus: SyncStatus = SyncStatus.SYNCED,
+    override val updatedAt: Long = 0,
+    override val syncStatus: SyncStatus = SyncStatus.SYNCED,
     val tags: List<Tag> = emptyList()
-)
+) : SyncableEntity

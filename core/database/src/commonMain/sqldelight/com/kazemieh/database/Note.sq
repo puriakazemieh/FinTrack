@@ -10,10 +10,10 @@ CREATE TABLE IF NOT EXISTS note (
 );
 
 observeNotes:
-SELECT * FROM note ORDER BY isPinned DESC, updatedAt DESC;
+SELECT * FROM note WHERE syncStatus != 2 ORDER BY isPinned DESC, updatedAt DESC;
 
 getNoteById:
-SELECT * FROM note WHERE id = ?;
+SELECT * FROM note WHERE id = ? AND syncStatus != 2;
 
 addNote:
 INSERT INTO note(title, content, color, isPinned, isLocked, updatedAt, syncStatus)
@@ -25,6 +25,9 @@ SET title = ?, content = ?, color = ?, isPinned = ?, isLocked = ?, updatedAt = ?
 WHERE id = ?;
 
 deleteNote:
+UPDATE note SET syncStatus = 2, updatedAt = ? WHERE id = ?;
+
+physicallyDeleteNote:
 DELETE FROM note WHERE id = ?;
 
 updatePin:
@@ -35,16 +38,6 @@ UPDATE note SET isLocked = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
-
-insertFullNote:
-INSERT OR REPLACE INTO note(id, title, content, color, isPinned, isLocked, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-
-getModifiedNotes:
-SELECT * FROM note WHERE syncStatus = 1;
-
-markNoteAsSynced:
-UPDATE note SET syncStatus = 0 WHERE id = ?;
 
 insertFullNote:
 INSERT OR REPLACE INTO note(id, title, content, color, isPinned, isLocked, updatedAt, syncStatus)
