@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material3.*
@@ -20,16 +21,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.SnackbarController
-import com.kazemieh.designsystem.component.glass.Chip
-import com.kazemieh.designsystem.component.glass.GlassCard
-import com.kazemieh.designsystem.component.glass.SheetFrame
+import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.component.model.UiText
-import com.kazemieh.designsystem.theme.LocalSpacing
 import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ExportSheet(
     viewModel: BackupExportViewModel = koinViewModel(),
@@ -43,16 +42,16 @@ fun ExportSheet(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is BackupExportEffect.ShowMessage -> {
-                    SnackbarController.showSnackbar(UiText.DynamicString(effect.message))
+                    SnackbarController.showMessage(UiText.DynamicString(effect.message))
                 }
             }
         }
     }
 
     SheetFrame(
-        onClose = onClose,
+        onDismiss = onClose,
         title = stringResource(Res.string.export_title),
-        subtitle = stringResource(
+        sub = stringResource(
             Res.string.export_subtitle,
             state.transactionCount,
             state.dateRange.first,
@@ -94,7 +93,7 @@ fun ExportSheet(
                 ExportOptionItem(
                     title = stringResource(Res.string.export_csv_title),
                     subtitle = stringResource(Res.string.export_csv_desc),
-                    icon = Icons.Default.List,
+                    icon = Icons.AutoMirrored.Filled.List,
                     color = GlassAmber,
                     onClick = { viewModel.onIntent(BackupExportIntent.ExportCsv) }
                 )
@@ -120,7 +119,7 @@ fun ExportSheet(
                     stringResource(Res.string.this_month),
                     "۳ ماه",
                     "۶ ماه",
-                    stringResource(Res.string.this_year),
+                    stringResource(Res.string.label_this_year),
                     stringResource(Res.string.all),
                     stringResource(Res.string.custom_range)
                 )

@@ -13,6 +13,32 @@ kotlin {
         minSdk = 24
     }
 
+    val xcfName = "core:backup_exportKit"
+
+    iosX64 {
+        binaries.framework {
+            baseName = xcfName
+        }
+    }
+
+    iosArm64 {
+        binaries.framework {
+            baseName = xcfName
+        }
+    }
+
+    iosSimulatorArm64 {
+        binaries.framework {
+            baseName = xcfName
+        }
+    }
+
+    js {
+        browser()
+    }
+
+    jvm()
+
     sourceSets {
         commonMain {
             dependencies {
@@ -25,12 +51,17 @@ kotlin {
                 implementation(libs.koin.compose)
                 implementation(libs.koin.compose.viewmodel)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
+
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.foundation)
+                implementation(libs.compose.material3)
+                implementation(libs.compose.material.icons.extended)
+                implementation(libs.compose.components.resources)
             }
         }
         androidMain {
             dependencies {
-                implementation(libs.poi)
-                implementation(libs.poi.ooxml)
+                implementation(libs.fastexcel)
             }
         }
     }

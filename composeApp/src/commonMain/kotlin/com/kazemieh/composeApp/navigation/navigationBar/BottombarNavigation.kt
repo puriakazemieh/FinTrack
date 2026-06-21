@@ -34,10 +34,6 @@ import com.kazemieh.search.ui.SearchScreen
 import com.kazemieh.tools.ToolsScreen
 import com.kazemieh.transactions.TransactionsScreen
 
-
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
-
 fun NavGraphBuilder.bottomBarNavGraph(
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
@@ -170,14 +166,12 @@ fun NavGraphBuilder.bottomBarNavGraph(
 
         composable<Screen.Shopping> {
             ShoppingListScreen(
-                viewModel = koinViewModel(),
                 onBack = { navController.popBackStack() }
             )
         }
 
         composable<Screen.Notes> {
             NotesListScreen(
-                viewModel = koinViewModel(),
                 onAddNote = { navController.navigate(Screen.NoteEdit(0L)) },
                 onEditNote = { id -> navController.navigate(Screen.NoteEdit(id)) },
                 onBack = { navController.popBackStack() }
@@ -187,7 +181,6 @@ fun NavGraphBuilder.bottomBarNavGraph(
         composable<Screen.NoteEdit> { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.NoteEdit>()
             NoteEditScreen(
-                viewModel = koinViewModel(),
                 noteId = args.noteId,
                 onBack = { navController.popBackStack() }
             )

@@ -49,12 +49,13 @@ import fintrack.core.designsystem.generated.resources.priority_normal
 import fintrack.core.designsystem.generated.resources.shopping_list
 import fintrack.core.designsystem.generated.resources.total_sum
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyColumnState
 
 @Composable
 fun ShoppingListScreen(
-    viewModel: ShoppingViewModel,
+    viewModel: ShoppingViewModel= koinViewModel(),
     onBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()

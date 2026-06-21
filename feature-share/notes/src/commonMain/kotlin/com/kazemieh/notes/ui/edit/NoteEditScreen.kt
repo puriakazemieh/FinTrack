@@ -55,10 +55,11 @@ import fintrack.core.designsystem.generated.resources.save_
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun NoteEditScreen(
-    viewModel: NoteEditViewModel,
+    viewModel: NoteEditViewModel= koinViewModel(),
     noteId: Long,
     onBack: () -> Unit
 ) {

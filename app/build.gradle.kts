@@ -51,6 +51,7 @@ dependencies {
     implementation(project(":composeApp"))
     implementation(project(":core:designsystem"))
     implementation(project(":feature-share:notifications"))
+    implementation(project(":feature-share:sync"))
 
 
     implementation(libs.androidx.activity.compose)

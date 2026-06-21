@@ -21,7 +21,6 @@ import com.kazemieh.onboarding.di.onboardingModule
 import com.kazemieh.notifications.di.notificationModule
 import com.kazemieh.installment.di.installmentModule
 import com.kazemieh.fixed_expense.di.fixedExpenseModule
-import com.kazemieh.shopping.di.shoppingModule
 import com.kazemieh.notes.di.notesModule
 import com.kazemieh.data.di.dataModule
 import com.kazemieh.database.DatabaseInitializer
@@ -66,6 +65,7 @@ import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.koinInject
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
+import shoppingModule
 import kotlin.time.Clock
 
 @Composable
@@ -97,8 +97,8 @@ fun App() {
 
     val currentCurrency by preferenceUseCases.getStringFlow(
         FinTrackPreferences.PREF_CURRENCY,
-        Currency.TOMAN.name
-    ).collectAsState(Currency.TOMAN.name)
+        ""
+    ).collectAsState("")
 
     val isSystemDark = isSystemInDarkTheme()
 

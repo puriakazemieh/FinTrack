@@ -35,10 +35,11 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.notes
 import fintrack.core.designsystem.generated.resources.add_note
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun NotesListScreen(
-    viewModel: NotesViewModel,
+    viewModel: NotesViewModel= koinViewModel(),
     onAddNote: () -> Unit,
     onEditNote: (Long) -> Unit,
     onBack: () -> Unit
