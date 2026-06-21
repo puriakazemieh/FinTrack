@@ -36,13 +36,6 @@ UPDATE transactions SET syncStatus = 2, updatedAt = ? WHERE id = ?;
 physicallyDeleteTransaction:
 DELETE FROM transactions WHERE id = ?;
 
-cleanupSyncedDeletions:
-DELETE FROM transactions WHERE syncStatus = 0 AND id IN (
-    -- This would normally be handled by a business logic check if it was marked as deleted
-    -- For simplicity, we physical delete after sync acknowledgement if the status is DELETED
-    SELECT id FROM transactions WHERE syncStatus = 0 AND EXISTS (SELECT 1 FROM transactions t2 WHERE t2.id = transactions.id AND t2.syncStatus = 2)
-);
-
 moveTransactionsCategory:
 UPDATE transactions SET categoryId = ?, updatedAt = ?, syncStatus = ? WHERE categoryId = ?;
 
@@ -64,6 +57,9 @@ UPDATE transactions SET syncStatus = 0 WHERE id = ?;
 getTransactionsSince:
 SELECT * FROM transactions WHERE updatedAt > ?;
 
+getAllTransactions:
+SELECT * FROM transactions;
+
 getAllTransactionsFiltered:
 SELECT
     t.id,
@@ -76,6 +72,8 @@ SELECT
     t.photoPath,
     t.timeStamp,
     t.type,
+    t.updatedAt,
+    t.syncStatus,
     c.id AS category_id,
     c.name AS category_name,
     c.description AS category_description,

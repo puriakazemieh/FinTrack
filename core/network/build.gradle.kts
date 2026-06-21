@@ -46,6 +46,7 @@ kotlin {
                 implementation(project(":core:domain"))
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.encoding)
                 implementation(libs.ktor.client.content.negotiation)
                 implementation(libs.ktor.serialization.kotlinx.json)
                 implementation(libs.kotlinx.coroutines.core)

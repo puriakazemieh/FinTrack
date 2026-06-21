@@ -21,14 +21,14 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun AssetWidget(
     viewModel: AssetViewModel = koinViewModel(),
-    onMoreClick: () -> Unit,
+    onMore: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     WidgetCard(
         title = stringResource(Res.string.title_assets_management),
-        onMore = onMoreClick,
+        onMore = onMore,
         modifier = modifier
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {

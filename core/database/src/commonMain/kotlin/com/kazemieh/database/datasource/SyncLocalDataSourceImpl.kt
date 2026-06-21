@@ -1,8 +1,6 @@
 package com.kazemieh.database.datasource
 
-import com.kazemieh.common.model.*
 import com.kazemieh.data_contract.datasource.*
-import com.kazemieh.database.FinTrackDatabase
 
 class SyncLocalDataSourceImpl(
     private val transactionLocalDataSource: TransactionLocalDataSource,

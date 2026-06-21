@@ -1,8 +1,10 @@
-CREATE TABLE IF NOT EXISTS shopping_item (
+import kotlin.Boolean;
+
+CREATE TABLE IF NOT EXISTS shopping_item_table (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     name TEXT NOT NULL,
     isChecked INTEGER AS Boolean NOT NULL DEFAULT 0,
-    priority INTEGER NOT NULL DEFAULT 0,
+    priority INTEGER NOT NULL DEFAULT 1,
     estimatedPrice REAL NOT NULL DEFAULT 0.0,
     reminderTime INTEGER,
     categoryId INTEGER,
@@ -13,38 +15,38 @@ CREATE TABLE IF NOT EXISTS shopping_item (
 );
 
 observeShoppingItems:
-SELECT * FROM shopping_item WHERE syncStatus != 2 ORDER BY position ASC;
+SELECT * FROM shopping_item_table WHERE syncStatus != 2 ORDER BY position ASC;
 
 getShoppingItemById:
-SELECT * FROM shopping_item WHERE id = ? AND syncStatus != 2;
+SELECT * FROM shopping_item_table WHERE id = ? AND syncStatus != 2;
 
 addShoppingItem:
-INSERT INTO shopping_item(name, isChecked, priority, estimatedPrice, reminderTime, categoryId, position, updatedAt, syncStatus)
+INSERT INTO shopping_item_table(name, isChecked, priority, estimatedPrice, reminderTime, categoryId, position, updatedAt, syncStatus)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateShoppingItem:
-UPDATE shopping_item
+UPDATE shopping_item_table
 SET name = ?, isChecked = ?, priority = ?, estimatedPrice = ?, reminderTime = ?, categoryId = ?, position = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 deleteShoppingItem:
-UPDATE shopping_item SET syncStatus = 2, updatedAt = ? WHERE id = ?;
+UPDATE shopping_item_table SET syncStatus = 2, updatedAt = ? WHERE id = ?;
 
 physicallyDeleteShoppingItem:
-DELETE FROM shopping_item WHERE id = ?;
+DELETE FROM shopping_item_table WHERE id = ?;
 
 updateShoppingItemPosition:
-UPDATE shopping_item SET position = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
+UPDATE shopping_item_table SET position = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertFullShoppingItem:
-INSERT OR REPLACE INTO shopping_item(id, name, isChecked, priority, estimatedPrice, reminderTime, categoryId, position, updatedAt, syncStatus)
+INSERT OR REPLACE INTO shopping_item_table(id, name, isChecked, priority, estimatedPrice, reminderTime, categoryId, position, updatedAt, syncStatus)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getModifiedShoppingItems:
-SELECT * FROM shopping_item WHERE syncStatus = 1;
+SELECT * FROM shopping_item_table WHERE syncStatus = 1;
 
 markShoppingItemAsSynced:
-UPDATE shopping_item SET syncStatus = 0 WHERE id = ?;
+UPDATE shopping_item_table SET syncStatus = 0 WHERE id = ?;

@@ -20,7 +20,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun FixedExpenseWidget(
-    onMoreClick: () -> Unit,
+    onMore: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FixedExpenseListViewModel = koinViewModel()
 ) {
@@ -30,7 +30,7 @@ fun FixedExpenseWidget(
     if (activeExpenses.isNotEmpty()) {
         WidgetCard(
             title = stringResource(Res.string.title_upcoming_fixed_expenses_label),
-            onMore = onMoreClick,
+            onMore = onMore,
             modifier = modifier
         ) {
             Column {

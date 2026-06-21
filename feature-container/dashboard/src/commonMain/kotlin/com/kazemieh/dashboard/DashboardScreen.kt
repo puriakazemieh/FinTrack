@@ -130,7 +130,7 @@ fun DashboardScreen(
 
             item {
                 RecentTransactionsWidget(
-                    onMoreClick = { onNavigateToTransactions(true) },
+                    onMore = { onNavigateToTransactions(true) },
                     onEdit = { transactionWithRelations ->
                         viewModel.onIntent(
                             DashboardIntent.ShowTransactionBottomSheet(transactionWithRelations)
@@ -149,7 +149,7 @@ fun DashboardScreen(
 
             item {
                 BudgetWidget(
-                    onMoreClick = onNavigateToBudget,
+                    onMore = onNavigateToBudget,
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }
@@ -158,7 +158,7 @@ fun DashboardScreen(
 
             item {
                 InstallmentWidget(
-                    onMoreClick = { /* Navigate to installments */ },
+                    onMore = { /* Navigate to installments */ },
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }
@@ -167,7 +167,7 @@ fun DashboardScreen(
 
             item {
                 CheckWidget(
-                    onMoreClick = onNavigateToCheck,
+                    onMore = onNavigateToCheck,
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }
@@ -176,7 +176,7 @@ fun DashboardScreen(
 
             item {
                 FixedExpenseWidget(
-                    onMoreClick = onNavigateToFixedExpense,
+                    onMore = onNavigateToFixedExpense,
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }
@@ -185,7 +185,7 @@ fun DashboardScreen(
 
             item {
                 AssetWidget(
-                    onMoreClick = onNavigateToAssets,
+                    onMore = onNavigateToAssets,
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }
@@ -194,7 +194,7 @@ fun DashboardScreen(
 
             item {
                 ShoppingWidget(
-                    onMoreClick = onNavigateToShopping,
+                    onMore = onNavigateToShopping,
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }
@@ -203,7 +203,7 @@ fun DashboardScreen(
 
             item {
                 NotesWidget(
-                    onMoreClick = onNavigateToNotes,
+                    onMore = onNavigateToNotes,
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }

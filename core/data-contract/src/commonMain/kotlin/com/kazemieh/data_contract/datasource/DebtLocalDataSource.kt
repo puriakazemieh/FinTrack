@@ -17,4 +17,5 @@ interface DebtLocalDataSource {
     suspend fun insertFullDebt(debt: Debt)
     suspend fun getModifiedDebts(): List<Debt>
     suspend fun markDebtAsSynced(id: Long)
+    suspend fun physicallyDeleteDebt(id: Long)
 }

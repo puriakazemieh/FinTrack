@@ -1,38 +1,10 @@
 package com.kazemieh.database.mapper
 
-import com.kazemieh.common.model.Asset
-import com.kazemieh.common.model.AssetHistory
-import com.kazemieh.common.model.AssetType
-import com.kazemieh.common.model.Budget
-import com.kazemieh.common.model.Category
-import com.kazemieh.common.model.CategorySum
-import com.kazemieh.common.model.Check
-import com.kazemieh.common.model.CheckStatus
-import com.kazemieh.common.model.Debt
-import com.kazemieh.common.model.DebtType
-import com.kazemieh.common.model.FixedExpense
-import com.kazemieh.common.model.Installment
-import com.kazemieh.common.model.InstallmentFrequency
-import com.kazemieh.common.model.InstallmentWithRelations
-import com.kazemieh.common.model.ShoppingItem
-import com.kazemieh.common.model.Note
-import com.kazemieh.common.model.Person
-import com.kazemieh.common.model.RecurrenceType
-import com.kazemieh.common.model.Source
-import com.kazemieh.common.model.SyncStatus
-import com.kazemieh.common.model.Tag
-import com.kazemieh.common.model.Transaction
-import com.kazemieh.common.model.TransactionType
-import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.common.model.*
 import com.kazemieh.common.persiandatetime.domain.PersianDateTime
 import com.kazemieh.common.persiandatetime.extensions.persianMonth
 import com.kazemieh.common.toPersianDigits
-import com.kazemieh.database.GetAllTransactionsFiltered
-import com.kazemieh.database.ObserveAllChecks
-import com.kazemieh.database.ObserveAllDebts
-import com.kazemieh.database.ObserveAllFixedExpenses
-import com.kazemieh.database.ObserveChecksByStatus
-import com.kazemieh.database.ObserveInstallments
+import com.kazemieh.database.*
 import com.kazemieh.database.transaction.ObserveCategorySumsByFilter
 import com.kazemieh.database.Asset as AssetDb
 import com.kazemieh.database.Asset_history as AssetHistoryDb
@@ -41,9 +13,9 @@ import com.kazemieh.database.Check_table as CheckDb
 import com.kazemieh.database.Debt as DebtDb
 import com.kazemieh.database.Fixed_expense as FixedExpenseDb
 import com.kazemieh.database.Installment as InstallmentDb
-import com.kazemieh.database.Note as NoteDb
+import com.kazemieh.database.Note_table as NoteDb
 import com.kazemieh.database.Person as PersonDb
-import com.kazemieh.database.Shopping_item as ShoppingItemDb
+import com.kazemieh.database.Shopping_item_table as ShoppingItemDb
 import com.kazemieh.database.Source as SourceDb
 import com.kazemieh.database.Tag as TagDb
 import com.kazemieh.database.Transactions as TransactionDb
@@ -91,14 +63,15 @@ fun GetAllTransactionsFiltered.toTransactionWithRelations(): TransactionWithRela
         transaction = Transaction(
             id = id,
             amount = amount.toInt(),
-            amountTransfer = amountTransfer!!.toInt(),
+            amountTransfer = amountTransfer?.toInt() ?: 0,
             categoryId = categoryId,
             sourceId = sourceId,
             sourceEndId = sourceEndId,
             description = description,
             photoPath = photoPath,
             timeStamp = timeStamp,
-            date = PersianDateTime.parse(timeStamp).let { "${it.day} ${it.persianMonth().displayName} ${it.year}" }.toPersianDigits(),
+            date = PersianDateTime.parse(timeStamp)
+                .let { "${it.day} ${it.persianMonth().displayName} ${it.year}" }.toPersianDigits(),
             type = TransactionType.fromInt(type.toInt()),
             updatedAt = updatedAt,
             syncStatus = SyncStatus.fromInt(syncStatus.toInt())
@@ -107,7 +80,9 @@ fun GetAllTransactionsFiltered.toTransactionWithRelations(): TransactionWithRela
             id = category_id ?: 0L,
             name = category_name ?: "",
             description = category_description,
-            type = TransactionType.fromInt(category_type?.toInt() ?: TransactionType.TRANSFER.count),
+            type = TransactionType.fromInt(
+                category_type?.toInt() ?: TransactionType.TRANSFER.count
+            ),
             colorId = category_colorId?.toInt() ?: 1,
             iconId = category_iconId?.toInt() ?: 19,
             parentId = category_parentId
@@ -249,6 +224,136 @@ fun ObserveAllDebts.toDebt() = Debt(
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
+fun ObserveDebtsByPerson.toDebt() = Debt(
+    id = id,
+    personId = personId,
+    amount = amount,
+    date = date,
+    dueDate = dueDate,
+    sourceId = sourceId,
+    description = description,
+    type = DebtType.fromInt(type.toInt()),
+    isSettled = isSettled == 1L,
+    personName = personName,
+    sourceName = sourceName,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
+)
+
+fun ObserveAllDebts.toDebtWithRelations() = DebtWithRelations(
+    debt = this.toDebt(),
+    person = Person(
+        id = personId,
+        name = personName,
+        description = personDescription,
+        updatedAt = 0,
+        syncStatus = SyncStatus.SYNCED
+    ),
+    source = sourceId?.let {
+        Source(
+            id = it,
+            name = sourceName ?: "",
+            colorId = sourceColorId?.toInt() ?: 0,
+            iconId = sourceIconId?.toInt() ?: 0,
+            updatedAt = 0,
+            syncStatus = SyncStatus.SYNCED
+        )
+    }
+)
+
+fun ObserveDebtsByPerson.toDebtWithRelations() = DebtWithRelations(
+    debt = this.toDebt(),
+    person = Person(
+        id = personId,
+        name = personName,
+        description = personDescription,
+        updatedAt = 0,
+        syncStatus = SyncStatus.SYNCED
+    ),
+    source = sourceId?.let {
+        Source(
+            id = it,
+            name = sourceName ?: "",
+            colorId = sourceColorId?.toInt() ?: 0,
+            iconId = sourceIconId?.toInt() ?: 0,
+            updatedAt = 0,
+            syncStatus = SyncStatus.SYNCED
+        )
+    }
+)
+
+fun InstallmentDb.toInstallment() = Installment(
+    id = id,
+    title = title,
+    totalAmount = totalAmount,
+    installmentAmount = installmentAmount,
+    totalInstallments = totalInstallments.toInt(),
+    paidInstallments = paidInstallments.toInt(),
+    categoryId = categoryId,
+    sourceId = sourceId,
+    startDate = startDate,
+    nextDueDate = nextDueDate,
+    frequency = InstallmentFrequency.valueOf(frequency),
+    description = description,
+    isCompleted = isCompleted == 1L,
+    reminderEnabled = reminderEnabled == 1L,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
+)
+
+fun ObserveInstallments.toInstallment() = Installment(
+    id = id,
+    title = title,
+    totalAmount = totalAmount,
+    installmentAmount = installmentAmount,
+    totalInstallments = totalInstallments.toInt(),
+    paidInstallments = paidInstallments.toInt(),
+    categoryId = categoryId,
+    sourceId = sourceId,
+    startDate = startDate,
+    nextDueDate = nextDueDate,
+    frequency = InstallmentFrequency.valueOf(frequency),
+    description = description,
+    isCompleted = isCompleted == 1L,
+    reminderEnabled = reminderEnabled == 1L,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
+)
+
+fun ObserveInstallments.toInstallmentWithRelations() = InstallmentWithRelations(
+    installment = this.toInstallment(),
+    category = Category(
+        id = category_id ?: 0L,
+        name = category_name ?: "",
+        description = category_description,
+        type = TransactionType.fromInt(category_type?.toInt() ?: TransactionType.EXPENSE.count),
+        colorId = category_colorId?.toInt() ?: 1,
+        iconId = category_iconId?.toInt() ?: 1,
+        parentId = category_parentId,
+        updatedAt = 0,
+        syncStatus = SyncStatus.SYNCED
+    ),
+    source = Source(
+        id = source_id ?: 0L,
+        name = source_name ?: "",
+        balance = source_balance?.toInt() ?: 0,
+        cardNumber = source_cardNumber,
+        description = source_description,
+        type = source_type?.toInt() ?: 0,
+        colorId = source_colorId?.toInt() ?: 1,
+        iconId = source_iconId?.toInt() ?: 1,
+        shabaNumber = source_shabaNumber,
+        accountNumber = source_accountNumber,
+        cvv2 = source_cvv2,
+        expirationMonth = source_expirationMonth,
+        expirationYear = source_expirationYear,
+        branchCode = source_branchCode,
+        branchName = source_branchName,
+        updatedAt = 0,
+        syncStatus = SyncStatus.SYNCED
+    )
+)
+
 // Check Mappers
 fun CheckDb.toCheck() = Check(
     id = id,
@@ -331,7 +436,7 @@ fun ObserveAllFixedExpenses.toFixedExpense() = FixedExpense(
 fun TransactionDb.toTransaction() = Transaction(
     id = id,
     amount = amount.toInt(),
-    amountTransfer = amountTransfer!!.toInt(),
+    amountTransfer = amountTransfer?.toInt() ?: 0,
     categoryId = categoryId,
     sourceId = sourceId,
     sourceEndId = sourceEndId,
@@ -342,71 +447,6 @@ fun TransactionDb.toTransaction() = Transaction(
     type = TransactionType.fromInt(type.toInt()),
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())
-)
-
-// Installment Mappers
-fun InstallmentDb.toInstallment() = Installment(
-    id = id,
-    title = title,
-    totalAmount = totalAmount,
-    installmentAmount = installmentAmount,
-    totalInstallments = totalInstallments.toInt(),
-    paidInstallments = paidInstallments.toInt(),
-    categoryId = categoryId,
-    sourceId = sourceId,
-    startDate = startDate,
-    nextDueDate = nextDueDate,
-    frequency = InstallmentFrequency.valueOf(frequency),
-    description = description,
-    isCompleted = isCompleted == 1L,
-    reminderEnabled = reminderEnabled == 1L,
-    updatedAt = updatedAt,
-    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
-)
-
-fun ObserveInstallments.toInstallmentWithRelations() = InstallmentWithRelations(
-    installment = Installment(
-        id = id,
-        title = title,
-        totalAmount = totalAmount,
-        installmentAmount = installmentAmount,
-        totalInstallments = totalInstallments.toInt(),
-        paidInstallments = paidInstallments.toInt(),
-        categoryId = categoryId,
-        sourceId = sourceId,
-        startDate = startDate,
-        nextDueDate = nextDueDate,
-        frequency = InstallmentFrequency.valueOf(frequency),
-        description = description,
-        isCompleted = isCompleted == 1L,
-        reminderEnabled = reminderEnabled == 1L
-    ),
-    category = Category(
-        id = category_id ?: 0L,
-        name = category_name ?: "",
-        description = category_description,
-        type = TransactionType.fromInt(category_type?.toInt() ?: TransactionType.EXPENSE.count),
-        colorId = category_colorId?.toInt() ?: 1,
-        iconId = category_iconId?.toInt() ?: 1,
-        parentId = category_parentId
-    ),
-    source = Source(
-        id = source_id ?: 0L,
-        name = source_name ?: "",
-        balance = source_balance?.toInt() ?: 0,
-        cardNumber = source_cardNumber,
-        description = source_description,
-        type = source_type?.toInt() ?: 0,
-        colorId = source_colorId?.toInt() ?: 1,
-        iconId = source_iconId?.toInt() ?: 1,
-        shabaNumber = source_shabaNumber,
-        accountNumber = source_accountNumber,
-        cvv2 = source_cvv2,
-        expirationMonth = source_expirationMonth,
-        expirationYear = source_expirationYear,
-        branchCode = source_branchCode,
-        branchName = source_branchName
-    )
 )
 
 // Asset Mappers
@@ -444,7 +484,9 @@ fun ShoppingItemDb.toShoppingItem() = ShoppingItem(
     estimatedPrice = estimatedPrice,
     reminderTime = reminderTime,
     categoryId = categoryId,
-    position = position.toInt()
+    position = position.toInt(),
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 fun com.kazemieh.database.Sync_history.toSyncHistory() = SyncHistory(
@@ -453,8 +495,11 @@ fun com.kazemieh.database.Sync_history.toSyncHistory() = SyncHistory(
     type = SyncType.valueOf(type),
     status = SyncResultStatus.valueOf(status),
     recordCount = recordCount.toInt(),
+    insertedCount = insertedCount.toInt(),
+    updatedCount = updatedCount.toInt(),
     errorMessage = errorMessage
 )
+
 fun NoteDb.toNote(tags: List<Tag> = emptyList()) = Note(
     id = id,
     title = title,

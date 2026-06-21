@@ -105,4 +105,10 @@ interface TransactionLocalDataSource {
     suspend fun markTagAsSynced(id: Long)
     suspend fun getModifiedPersons(): List<Person>
     suspend fun markPersonAsSynced(id: Long)
+
+    suspend fun physicallyDeleteTransaction(id: Long)
+    suspend fun physicallyDeleteCategory(id: Long)
+    suspend fun physicallyDeleteSource(id: Long)
+    suspend fun physicallyDeleteTag(id: Long)
+    suspend fun physicallyDeletePerson(id: Long)
 }

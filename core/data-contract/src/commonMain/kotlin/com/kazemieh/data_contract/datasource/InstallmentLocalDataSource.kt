@@ -15,4 +15,5 @@ interface InstallmentLocalDataSource {
     suspend fun insertFullInstallment(installment: Installment)
     suspend fun getModifiedInstallments(): List<Installment>
     suspend fun markInstallmentAsSynced(id: Long)
+    suspend fun physicallyDeleteInstallment(id: Long)
 }

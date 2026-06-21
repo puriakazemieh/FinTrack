@@ -1,20 +1,25 @@
 package com.kazemieh.database.datasource
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.kazemieh.common.model.Debt
-import com.kazemieh.common.model.DebtType
 import com.kazemieh.common.model.DebtWithRelations
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.SyncStatus
+import com.kazemieh.common.model.DebtType
 import com.kazemieh.data_contract.datasource.DebtLocalDataSource
 import com.kazemieh.database.FinTrackDatabase
-import kotlinx.datetime.Clock
+import com.kazemieh.database.mapper.toDebt
+import com.kazemieh.database.mapper.toDebtWithRelations
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import kotlin.time.Clock
 
-class DebtLocalDataSourceImpl(db: FinTrackDatabase) : DebtLocalDataSource {
+class DebtLocalDataSourceImpl(private val db: FinTrackDatabase) : DebtLocalDataSource {
     private val queries = db.debtQueries
 
     override fun observeAllDebts(): Flow<List<DebtWithRelations>> {
@@ -29,11 +34,11 @@ class DebtLocalDataSourceImpl(db: FinTrackDatabase) : DebtLocalDataSource {
         }
     }
 
-    override suspend fun getDebtById(id: Long): Debt? {
-        return queries.getDebtById(id).executeAsOneOrNull()?.toDebt()
+    override suspend fun getDebtById(id: Long): Debt? = withContext(Dispatchers.Default) {
+        queries.getDebtById(id).executeAsOneOrNull()?.toDebt()
     }
 
-    override suspend fun insertDebt(debt: Debt): Long {
+    override suspend fun insertDebt(debt: Debt): Long = withContext(Dispatchers.Default) {
         val now = Clock.System.now().toEpochMilliseconds()
         queries.insertDebt(
             personId = debt.personId,
@@ -47,10 +52,10 @@ class DebtLocalDataSourceImpl(db: FinTrackDatabase) : DebtLocalDataSource {
             updatedAt = now,
             syncStatus = 1
         )
-        return queries.lastInsertRowId().executeAsOne()
+        queries.lastInsertRowId().executeAsOne()
     }
 
-    override suspend fun updateDebt(debt: Debt): Int {
+    override suspend fun updateDebt(debt: Debt): Int = withContext(Dispatchers.Default) {
         val now = Clock.System.now().toEpochMilliseconds()
         queries.updateDebt(
             personId = debt.personId,
@@ -65,37 +70,43 @@ class DebtLocalDataSourceImpl(db: FinTrackDatabase) : DebtLocalDataSource {
             syncStatus = 1,
             id = debt.id
         )
-        return 1
+        1
     }
 
     override suspend fun deleteDebt(id: Long) {
-        val now = Clock.System.now().toEpochMilliseconds()
-        queries.deleteDebt(now, id)
+        withContext(Dispatchers.Default) {
+            val now = Clock.System.now().toEpochMilliseconds()
+            queries.deleteDebt(now, id)
+        }
     }
 
     override suspend fun settleDebt(id: Long) {
-        val now = Clock.System.now().toEpochMilliseconds()
-        queries.settleDebt(now, 1, id)
+        withContext(Dispatchers.Default) {
+            val now = Clock.System.now().toEpochMilliseconds()
+            queries.settleDebt(now, 1, id)
+        }
     }
 
     override suspend fun getAllDebts(): List<Debt> = withContext(Dispatchers.Default) {
         queries.observeAllDebts().awaitAsList().map { it.toDebt() }
     }
 
-    override suspend fun insertFullDebt(debt: Debt) = withContext(Dispatchers.Default) {
-        queries.insertFullDebt(
-            id = debt.id,
-            personId = debt.personId,
-            amount = debt.amount,
-            date = debt.date,
-            dueDate = debt.dueDate,
-            sourceId = debt.sourceId,
-            description = debt.description,
-            type = debt.type.value.toLong(),
-            isSettled = if (debt.isSettled) 1L else 0L,
-            updatedAt = debt.updatedAt,
-            syncStatus = debt.syncStatus.value.toLong()
-        )
+    override suspend fun insertFullDebt(debt: Debt) {
+        withContext(Dispatchers.Default) {
+            queries.insertFullDebt(
+                id = debt.id,
+                personId = debt.personId,
+                amount = debt.amount,
+                date = debt.date,
+                dueDate = debt.dueDate,
+                sourceId = debt.sourceId,
+                description = debt.description,
+                type = debt.type.value.toLong(),
+                isSettled = if (debt.isSettled) 1L else 0L,
+                updatedAt = debt.updatedAt,
+                syncStatus = debt.syncStatus.value.toLong()
+            )
+        }
     }
 
     override suspend fun getModifiedDebts(): List<Debt> = withContext(Dispatchers.Default) {
@@ -106,75 +117,7 @@ class DebtLocalDataSourceImpl(db: FinTrackDatabase) : DebtLocalDataSource {
         queries.markDebtAsSynced(id)
     }
 
-    private fun com.kazemieh.database.ObserveAllDebts.toDebtWithRelations(): DebtWithRelations {
-        return DebtWithRelations(
-            debt = Debt(
-                id = id,
-                personId = personId,
-                amount = amount,
-                date = date,
-                dueDate = dueDate,
-                sourceId = sourceId,
-                description = description,
-                type = DebtType.fromInt(type.toInt()),
-                isSettled = isSettled == 1L
-            ),
-            person = Person(
-                id = personId,
-                name = personName,
-                description = personDescription
-            ),
-            source = sourceId?.let {
-                Source(
-                    id = it,
-                    name = sourceName ?: "",
-                    colorId = sourceColorId?.toInt() ?: 0,
-                    iconId = sourceIconId?.toInt() ?: 0
-                )
-            }
-        )
-    }
-
-    private fun com.kazemieh.database.ObserveDebtsByPerson.toDebtWithRelations(): DebtWithRelations {
-        return DebtWithRelations(
-            debt = Debt(
-                id = id,
-                personId = personId,
-                amount = amount,
-                date = date,
-                dueDate = dueDate,
-                sourceId = sourceId,
-                description = description,
-                type = DebtType.fromInt(type.toInt()),
-                isSettled = isSettled == 1L
-            ),
-            person = Person(
-                id = personId,
-                name = personName,
-                description = personDescription
-            ),
-            source = sourceId?.let {
-                Source(
-                    id = it,
-                    name = sourceName ?: "",
-                    colorId = sourceColorId?.toInt() ?: 0,
-                    iconId = sourceIconId?.toInt() ?: 0
-                )
-            }
-        )
-    }
-
-    private fun com.kazemieh.database.Debt.toDebt(): Debt {
-        return Debt(
-            id = id,
-            personId = personId,
-            amount = amount,
-            date = date,
-            dueDate = dueDate,
-            sourceId = sourceId,
-            description = description,
-            type = DebtType.fromInt(type.toInt()),
-            isSettled = isSettled == 1L
-        )
+    override suspend fun physicallyDeleteDebt(id: Long) {
+        queries.physicallyDeleteDebt(id)
     }
 }

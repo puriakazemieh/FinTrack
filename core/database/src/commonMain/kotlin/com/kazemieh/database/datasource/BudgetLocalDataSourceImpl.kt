@@ -1,20 +1,23 @@
 package com.kazemieh.database.datasource
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOne
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
 import com.kazemieh.common.model.Budget
 import com.kazemieh.common.model.BudgetPeriod
 import com.kazemieh.common.model.BudgetWithProgress
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.common.model.SyncStatus
 import com.kazemieh.data_contract.datasource.BudgetLocalDataSource
 import com.kazemieh.database.FinTrackDatabase
 import com.kazemieh.database.ObserveBudgets
-import kotlinx.datetime.Clock
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToList
+import kotlinx.coroutines.withContext
+import kotlin.time.Clock
 
 class BudgetLocalDataSourceImpl(
     private val db: FinTrackDatabase
@@ -24,7 +27,7 @@ class BudgetLocalDataSourceImpl(
     private val transactionQueries = db.transactionQueries
 
     override fun observeBudgetsWithProgress(): Flow<List<BudgetWithProgress>> {
-        return queries.observeBudgets().asFlow().mapToList(Dispatchers.IO).map { list ->
+        return queries.observeBudgets().asFlow().mapToList(Dispatchers.Default).map { list ->
             list.map { item ->
                 val spent = getSpentAmount(item.categoryId, item.period, item.startAt)
                 item.toBudgetWithProgress(spent)
@@ -33,28 +36,28 @@ class BudgetLocalDataSourceImpl(
     }
 
     private fun getSpentAmount(categoryId: Long, periodStr: String, startAt: Long): Long {
-        val period = BudgetPeriod.valueOf(periodStr)
         // This is a simplified calculation of the range.
-        // In a real app, you'd use JalaliCalendar to find the start and end of the current period.
-        val from = startAt // Placeholder
-        val to = Long.MAX_VALUE // Placeholder
+        val from = startAt 
+        val to = Long.MAX_VALUE 
         return transactionQueries.getSpentAmountByCategory(categoryId, from, to).executeAsOne().SUM ?: 0L
     }
 
-    override suspend fun getBudgetByCategoryId(categoryId: Long): Budget? {
-        return queries.getBudgetByCategoryId(categoryId).executeAsOneOrNull()?.let {
+    override suspend fun getBudgetByCategoryId(categoryId: Long): Budget? = withContext(Dispatchers.Default) {
+        queries.getBudgetByCategoryId(categoryId).executeAsOneOrNull()?.let {
             Budget(
                 id = it.id,
                 categoryId = it.categoryId,
                 amount = it.amount,
                 period = BudgetPeriod.valueOf(it.period),
                 startAt = it.startAt,
-                isAlertEnabled = it.isAlertEnabled == 1L
+                isAlertEnabled = it.isAlertEnabled == 1L,
+                updatedAt = it.updatedAt,
+                syncStatus = SyncStatus.fromInt(it.syncStatus.toInt())
             )
         }
     }
 
-    override suspend fun addBudget(budget: Budget): Long {
+    override suspend fun addBudget(budget: Budget): Long = withContext(Dispatchers.Default) {
         val now = Clock.System.now().toEpochMilliseconds()
         queries.insertBudget(
             categoryId = budget.categoryId,
@@ -65,10 +68,10 @@ class BudgetLocalDataSourceImpl(
             updatedAt = now,
             syncStatus = 1
         )
-        return queries.getBudgetByCategoryId(budget.categoryId).executeAsOne().id
+        queries.getBudgetByCategoryId(budget.categoryId).executeAsOne().id
     }
 
-    override suspend fun updateBudget(budget: Budget): Int {
+    override suspend fun updateBudget(budget: Budget): Int = withContext(Dispatchers.Default) {
         val now = Clock.System.now().toEpochMilliseconds()
         queries.updateBudget(
             id = budget.id!!,
@@ -80,12 +83,14 @@ class BudgetLocalDataSourceImpl(
             updatedAt = now,
             syncStatus = 1
         )
-        return 1
+        1
     }
 
     override suspend fun deleteBudget(id: Long) {
-        val now = Clock.System.now().toEpochMilliseconds()
-        queries.deleteBudget(now, id)
+        withContext(Dispatchers.Default) {
+            val now = Clock.System.now().toEpochMilliseconds()
+            queries.deleteBudget(now, id)
+        }
     }
 
     override suspend fun getSpentAmountByCategory(categoryId: Long, from: Long, to: Long): Long {
@@ -102,22 +107,24 @@ class BudgetLocalDataSourceImpl(
                 startAt = it.startAt,
                 isAlertEnabled = it.isAlertEnabled == 1L,
                 updatedAt = it.updatedAt,
-                syncStatus = com.kazemieh.common.model.SyncStatus.fromInt(it.syncStatus.toInt())
+                syncStatus = SyncStatus.fromInt(it.syncStatus.toInt())
             )
         }
     }
 
-    override suspend fun insertFullBudget(budget: Budget) = withContext(Dispatchers.Default) {
-        queries.insertFullBudget(
-            id = budget.id ?: 0,
-            categoryId = budget.categoryId,
-            amount = budget.amount,
-            period = budget.period.name,
-            startAt = budget.startAt,
-            isAlertEnabled = if (budget.isAlertEnabled) 1L else 0L,
-            updatedAt = budget.updatedAt,
-            syncStatus = budget.syncStatus.value.toLong()
-        )
+    override suspend fun insertFullBudget(budget: Budget) {
+        withContext(Dispatchers.Default) {
+            queries.insertFullBudget(
+                id = budget.id ?: 0,
+                categoryId = budget.categoryId,
+                amount = budget.amount,
+                period = budget.period.name,
+                startAt = budget.startAt,
+                isAlertEnabled = if (budget.isAlertEnabled) 1L else 0L,
+                updatedAt = budget.updatedAt,
+                syncStatus = budget.syncStatus.value.toLong()
+            )
+        }
     }
 
     override suspend fun getModifiedBudgets(): List<Budget> = withContext(Dispatchers.Default) {
@@ -130,13 +137,17 @@ class BudgetLocalDataSourceImpl(
                 startAt = it.startAt,
                 isAlertEnabled = it.isAlertEnabled == 1L,
                 updatedAt = it.updatedAt,
-                syncStatus = com.kazemieh.common.model.SyncStatus.fromInt(it.syncStatus.toInt())
+                syncStatus = SyncStatus.fromInt(it.syncStatus.toInt())
             )
         }
     }
 
     override suspend fun markBudgetAsSynced(id: Long) {
         queries.markBudgetAsSynced(id)
+    }
+
+    override suspend fun physicallyDeleteBudget(id: Long) {
+        queries.physicallyDeleteBudget(id)
     }
 
     private fun ObserveBudgets.toBudgetWithProgress(spent: Long): BudgetWithProgress {

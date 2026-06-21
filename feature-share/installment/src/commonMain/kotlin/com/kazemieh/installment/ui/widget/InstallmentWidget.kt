@@ -30,7 +30,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun InstallmentWidget(
     viewModel: InstallmentViewModel = koinViewModel(),
-    onMoreClick: () -> Unit,
+    onMore: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -43,7 +43,7 @@ fun InstallmentWidget(
 
     WidgetCard(
         title = stringResource(Res.string.installment_widget_title),
-        onMore = onMoreClick,
+        onMore = onMore,
         modifier = modifier
     ) {
         val displayItems = (state.overdue + state.upcoming).take(3)

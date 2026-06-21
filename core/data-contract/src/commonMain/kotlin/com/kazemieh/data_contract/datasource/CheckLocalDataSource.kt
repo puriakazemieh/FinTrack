@@ -16,4 +16,5 @@ interface CheckLocalDataSource {
     suspend fun insertFullCheck(check: Check)
     suspend fun getModifiedChecks(): List<Check>
     suspend fun markCheckAsSynced(id: Long)
+    suspend fun physicallyDeleteCheck(id: Long)
 }

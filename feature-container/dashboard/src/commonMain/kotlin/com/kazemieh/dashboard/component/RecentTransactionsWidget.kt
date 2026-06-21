@@ -21,7 +21,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun RecentTransactionsWidget(
     viewModel: TransactionViewModel = koinViewModel(),
-    onMoreClick: () -> Unit,
+    onMore: () -> Unit,
     onEdit: (TransactionWithRelations) -> Unit = {},
     onDelete: (TransactionWithRelations) -> Unit = {},
     modifier: Modifier = Modifier
@@ -34,7 +34,7 @@ fun RecentTransactionsWidget(
 
     WidgetCard(
         title = stringResource(Res.string.recent_transactions),
-        onMore = onMoreClick,
+        onMore = onMore,
         modifier = modifier
     ) {
         state.items.take(5).forEach { item ->

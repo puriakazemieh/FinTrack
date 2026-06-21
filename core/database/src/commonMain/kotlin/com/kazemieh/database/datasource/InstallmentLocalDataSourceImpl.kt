@@ -1,5 +1,6 @@
 package com.kazemieh.database.datasource
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
@@ -10,11 +11,11 @@ import com.kazemieh.data_contract.datasource.InstallmentLocalDataSource
 import com.kazemieh.database.FinTrackDatabase
 import com.kazemieh.database.mapper.toInstallment
 import com.kazemieh.database.mapper.toInstallmentWithRelations
-import kotlinx.datetime.Clock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlin.time.Clock
 
 class InstallmentLocalDataSourceImpl(
     private val db: FinTrackDatabase
@@ -107,6 +108,7 @@ class InstallmentLocalDataSourceImpl(
             updatedAt = installment.updatedAt,
             syncStatus = installment.syncStatus.value.toLong()
         )
+        Unit
     }
 
     override suspend fun getModifiedInstallments(): List<Installment> = withContext(Dispatchers.Default) {
@@ -115,5 +117,9 @@ class InstallmentLocalDataSourceImpl(
 
     override suspend fun markInstallmentAsSynced(id: Long) {
         installmentQueries.markInstallmentAsSynced(id)
+    }
+
+    override suspend fun physicallyDeleteInstallment(id: Long) {
+        installmentQueries.physicallyDeleteInstallment(id)
     }
 }

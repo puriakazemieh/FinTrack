@@ -7,8 +7,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Cloud
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.Restore
+import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,9 +28,9 @@ import com.kazemieh.common.util.DateUtils
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.GlassTone
 import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.component.model.UiText
-import com.kazemieh.designsystem.theme.LocalSpacing
 import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.stringResource
@@ -44,7 +49,7 @@ fun BackupRestoreScreen(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is SyncEffect.ShowMessage -> {
-                    SnackbarController.showSnackbar(UiText.DynamicString(effect.message))
+                    SnackbarController.showMessage(UiText.DynamicString(effect.message))
                 }
             }
         }
@@ -54,7 +59,7 @@ fun BackupRestoreScreen(
         topBar = {
             ScreenHeader(
                 title = stringResource(Res.string.backup_restore_title),
-                subtitle = stringResource(Res.string.backup_restore_subtitle),
+                sub = stringResource(Res.string.backup_restore_subtitle),
                 onBack = onBackClick
             )
         },
@@ -174,7 +179,7 @@ fun ActiveStatusCard(
     
     GlassCard(
         modifier = Modifier.fillMaxWidth(),
-        tone = "strong"
+        tone = GlassTone.Strong
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -212,7 +217,7 @@ fun ActiveStatusCard(
                 }
             }
             
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier.padding(vertical = 14.dp),
                 color = glassColors.glassHairline,
                 thickness = 1.dp

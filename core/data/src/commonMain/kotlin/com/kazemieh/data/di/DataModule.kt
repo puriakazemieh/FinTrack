@@ -40,7 +40,6 @@ val dataModule = module {
 
     single<BackupRepository> {
         BackupRepositoryImpl(
-            db = get(),
             transactionLocalDataSource = get(),
             assetLocalDataSource = get(),
             budgetLocalDataSource = get(),
@@ -49,7 +48,8 @@ val dataModule = module {
             fixedExpenseLocalDataSource = get(),
             installmentLocalDataSource = get(),
             noteLocalDataSource = get(),
-            shoppingLocalDataSource = get()
+            shoppingLocalDataSource = get(),
+            syncHistoryLocalDataSource = get()
         )
     }
 

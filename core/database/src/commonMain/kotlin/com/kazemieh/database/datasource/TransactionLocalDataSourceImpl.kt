@@ -26,11 +26,11 @@ import com.kazemieh.database.mapper.toSource
 import com.kazemieh.database.mapper.toTag
 import com.kazemieh.database.mapper.toTransaction
 import com.kazemieh.database.mapper.toTransactionWithRelations
-import kotlinx.datetime.Clock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlin.time.Clock
 
 class TransactionLocalDataSourceImpl(
     private val db: FinTrackDatabase
@@ -66,8 +66,8 @@ class TransactionLocalDataSourceImpl(
             personIdsSize = if (transactionFilterParams.isAllPersons) 0 else personIds.size.toLong().coerceAtLeast(1),
             fromTimestamp = transactionFilterParams.fromTimestamp,
             toTimestamp = transactionFilterParams.toTimestamp,
-            minAmount = transactionFilterParams.minAmount,
-            maxAmount = transactionFilterParams.maxAmount,
+            minAmount = transactionFilterParams.minAmount?.toLong(),
+            maxAmount = transactionFilterParams.maxAmount?.toLong(),
             query = transactionFilterParams.query,
             limit = request.limit.toLong(),
             offset = request.offset.toLong()
@@ -100,8 +100,8 @@ class TransactionLocalDataSourceImpl(
             personIdsSize = if (transactionFilterParams.isAllPersons) 0 else personIds.size.toLong().coerceAtLeast(1),
             fromTimestamp = transactionFilterParams.fromTimestamp,
             toTimestamp = transactionFilterParams.toTimestamp,
-            minAmount = transactionFilterParams.minAmount,
-            maxAmount = transactionFilterParams.maxAmount,
+            minAmount = transactionFilterParams.minAmount?.toLong(),
+            maxAmount = transactionFilterParams.maxAmount?.toLong(),
             query = transactionFilterParams.query
         )
             .asFlow()
@@ -140,15 +140,6 @@ class TransactionLocalDataSourceImpl(
                 syncStatus = 1,
                 id = category.id ?: 0
             )
-
-            // بررسی کن که واقعاً update شده
-            val updated = categoryQueries.getCategoryById(category.id ?: 0)
-                .awaitAsOneOrNull()
-
-            if (updated == null) {
-                throw IllegalStateException("Category update failed")
-            }
-
             1
         }
 
@@ -176,13 +167,6 @@ class TransactionLocalDataSourceImpl(
             syncStatus = 1,
             id = id
         )
-
-        // بررسی موفقیت
-        val updated = sourceQueries.getSourceById(id).awaitAsOneOrNull()
-        if (updated == null) {
-            throw IllegalStateException("Source update failed")
-        }
-
         1
     }
 
@@ -230,10 +214,8 @@ class TransactionLocalDataSourceImpl(
                     )
                 }
 
-                // اگر کتگوری انتقال وجود نداشت، بساز
-                categoryQueries.insertTransferCategoryIfMissing(now, 1)
+                categoryQueries.insertTransferCategoryIfMissing(now)
 
-                // حالا کتگوری رو به عنوان حذف شده علامت بزن
                 categoryQueries.deleteCategory(now, fromId)
             }
         }
@@ -440,7 +422,7 @@ class TransactionLocalDataSourceImpl(
         return categoryQueries.getMostUsedCategories(type?.count?.toLong(), limit)
             .asFlow()
             .mapToList(Dispatchers.Default)
-            .map { it.map { c -> c.toCategory() } }
+            .map { list -> list.map { it.toCategory() } }
     }
 
     override fun observeMostUsedSources(limit: Long): Flow<List<Source>> {
@@ -518,104 +500,114 @@ class TransactionLocalDataSourceImpl(
     }
 
     override suspend fun getAllTransactions(): List<Transaction> = withContext(Dispatchers.Default) {
-        transactionQueries.getAllTransactionsFiltered(null, emptyList(), 0, emptyList(), 0, emptyList(), 0, emptyList(), 0, null, null, null, null, null, 1000000, 0)
+        transactionQueries.getAllTransactions()
             .awaitAsList()
             .map { it.toTransaction() }
     }
 
-    override suspend fun insertFullTransaction(transaction: Transaction) = withContext(Dispatchers.Default) {
-        transactionQueries.insertFullTransaction(
-            id = transaction.id,
-            amount = transaction.amount.toLong(),
-            amountTransfer = transaction.amountTransfer.toLong(),
-            categoryId = transaction.categoryId,
-            sourceId = transaction.sourceId,
-            sourceEndId = transaction.sourceEndId,
-            description = transaction.description,
-            photoPath = transaction.photoPath,
-            timeStamp = transaction.timeStamp,
-            type = transaction.type.count.toLong(),
-            updatedAt = transaction.updatedAt,
-            syncStatus = transaction.syncStatus.value.toLong()
-        )
+    override suspend fun insertFullTransaction(transaction: Transaction) {
+        withContext(Dispatchers.Default) {
+            transactionQueries.insertFullTransaction(
+                id = transaction.id,
+                amount = transaction.amount.toLong(),
+                amountTransfer = transaction.amountTransfer.toLong(),
+                categoryId = transaction.categoryId,
+                sourceId = transaction.sourceId,
+                sourceEndId = transaction.sourceEndId,
+                description = transaction.description,
+                photoPath = transaction.photoPath,
+                timeStamp = transaction.timeStamp,
+                type = transaction.type.count.toLong(),
+                updatedAt = transaction.updatedAt,
+                syncStatus = transaction.syncStatus.value.toLong()
+            )
+        }
     }
 
     override suspend fun getAllCategories(): List<Category> = withContext(Dispatchers.Default) {
         categoryQueries.observeCategoriesFlat(null).awaitAsList().map { it.toCategory() }
     }
 
-    override suspend fun insertFullCategory(category: Category) = withContext(Dispatchers.Default) {
-        categoryQueries.insertFullCategory(
-            id = category.id ?: 0,
-            name = category.name,
-            description = category.description,
-            type = category.type.count.toLong(),
-            colorId = category.colorId.toLong(),
-            iconId = category.iconId.toLong(),
-            position = category.position.toLong(),
-            parentId = category.parentId,
-            updatedAt = category.updatedAt,
-            syncStatus = category.syncStatus.value.toLong()
-        )
+    override suspend fun insertFullCategory(category: Category) {
+        withContext(Dispatchers.Default) {
+            categoryQueries.insertFullCategory(
+                id = category.id ?: 0,
+                name = category.name,
+                description = category.description,
+                type = category.type.count.toLong(),
+                colorId = category.colorId.toLong(),
+                iconId = category.iconId.toLong(),
+                position = category.position.toLong(),
+                parentId = category.parentId,
+                updatedAt = category.updatedAt,
+                syncStatus = category.syncStatus.value.toLong()
+            )
+        }
     }
 
     override suspend fun getAllSources(): List<Source> = withContext(Dispatchers.Default) {
         sourceQueries.observeSources().awaitAsList().map { it.toSource() }
     }
 
-    override suspend fun insertFullSource(source: Source) = withContext(Dispatchers.Default) {
-        sourceQueries.insertFullSource(
-            id = source.id ?: 0,
-            name = source.name,
-            balance = source.balance.toLong(),
-            cardNumber = source.cardNumber,
-            description = source.description,
-            type = source.type.toLong(),
-            colorId = source.colorId.toLong(),
-            iconId = source.iconId.toLong(),
-            shabaNumber = source.shabaNumber,
-            accountNumber = source.accountNumber,
-            cvv2 = source.cvv2,
-            expirationMonth = source.expirationMonth,
-            expirationYear = source.expirationYear,
-            branchCode = source.branchCode,
-            branchName = source.branchName,
-            position = source.position.toLong(),
-            updatedAt = source.updatedAt,
-            syncStatus = source.syncStatus.value.toLong()
-        )
+    override suspend fun insertFullSource(source: Source) {
+        withContext(Dispatchers.Default) {
+            sourceQueries.insertFullSource(
+                id = source.id ?: 0,
+                name = source.name,
+                balance = source.balance.toLong(),
+                cardNumber = source.cardNumber,
+                description = source.description,
+                type = source.type.toLong(),
+                colorId = source.colorId.toLong(),
+                iconId = source.iconId.toLong(),
+                shabaNumber = source.shabaNumber,
+                accountNumber = source.accountNumber,
+                cvv2 = source.cvv2,
+                expirationMonth = source.expirationMonth,
+                expirationYear = source.expirationYear,
+                branchCode = source.branchCode,
+                branchName = source.branchName,
+                position = source.position.toLong(),
+                updatedAt = source.updatedAt,
+                syncStatus = source.syncStatus.value.toLong()
+            )
+        }
     }
 
     override suspend fun getAllTags(): List<Tag> = withContext(Dispatchers.Default) {
         tagQueries.observeTags().awaitAsList().map { it.toTag() }
     }
 
-    override suspend fun insertFullTag(tag: Tag) = withContext(Dispatchers.Default) {
-        tagQueries.insertFullTag(
-            id = tag.id ?: 0,
-            name = tag.name,
-            description = tag.description,
-            colorId = tag.colorId.toLong(),
-            iconId = tag.iconId.toLong(),
-            position = tag.position.toLong(),
-            updatedAt = tag.updatedAt,
-            syncStatus = tag.syncStatus.value.toLong()
-        )
+    override suspend fun insertFullTag(tag: Tag) {
+        withContext(Dispatchers.Default) {
+            tagQueries.insertFullTag(
+                id = tag.id ?: 0,
+                name = tag.name,
+                description = tag.description,
+                colorId = tag.colorId.toLong(),
+                iconId = tag.iconId.toLong(),
+                position = tag.position.toLong(),
+                updatedAt = tag.updatedAt,
+                syncStatus = tag.syncStatus.value.toLong()
+            )
+        }
     }
 
     override suspend fun getAllPersons(): List<Person> = withContext(Dispatchers.Default) {
         personQueries.observePersons().awaitAsList().map { it.toPerson() }
     }
 
-    override suspend fun insertFullPerson(person: Person) = withContext(Dispatchers.Default) {
-        personQueries.insertFullPerson(
-            id = person.id ?: 0,
-            name = person.name,
-            description = person.description,
-            position = person.position.toLong(),
-            updatedAt = person.updatedAt,
-            syncStatus = person.syncStatus.value.toLong()
-        )
+    override suspend fun insertFullPerson(person: Person) {
+        withContext(Dispatchers.Default) {
+            personQueries.insertFullPerson(
+                id = person.id ?: 0,
+                name = person.name,
+                description = person.description,
+                position = person.position.toLong(),
+                updatedAt = person.updatedAt,
+                syncStatus = person.syncStatus.value.toLong()
+            )
+        }
     }
 
     override suspend fun addTransactionWithBalance(
@@ -757,5 +749,25 @@ class TransactionLocalDataSourceImpl(
 
     override suspend fun markPersonAsSynced(id: Long) {
         personQueries.markPersonAsSynced(id)
+    }
+
+    override suspend fun physicallyDeleteTransaction(id: Long) {
+        transactionQueries.physicallyDeleteTransaction(id)
+    }
+
+    override suspend fun physicallyDeleteCategory(id: Long) {
+        categoryQueries.physicallyDeleteCategory(id)
+    }
+
+    override suspend fun physicallyDeleteSource(id: Long) {
+        sourceQueries.physicallyDeleteSource(id)
+    }
+
+    override suspend fun physicallyDeleteTag(id: Long) {
+        tagQueries.physicallyDeleteTag(id)
+    }
+
+    override suspend fun physicallyDeletePerson(id: Long) {
+        personQueries.physicallyDeletePerson(id)
     }
 }

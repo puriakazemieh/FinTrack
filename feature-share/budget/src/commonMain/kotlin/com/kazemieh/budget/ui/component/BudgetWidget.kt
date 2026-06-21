@@ -21,7 +21,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun BudgetWidget(
     viewModel: BudgetViewModel = koinViewModel(),
-    onMoreClick: () -> Unit,
+    onMore: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -32,7 +32,7 @@ fun BudgetWidget(
 
     WidgetCard(
         title = stringResource(Res.string.label_budgets),
-        onMore = onMoreClick,
+        onMore = onMore,
         modifier = modifier
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -58,7 +58,7 @@ fun BudgetWidget(
                 state.budgets.take(2).forEach { budgetProgress ->
                     BudgetRow(
                         budgetProgress = budgetProgress,
-                        onEdit = onMoreClick
+                        onEdit = onMore
                     )
                 }
             }

@@ -3,36 +3,17 @@ package com.kazemieh.database.di
 import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.db.SqlDriver
 import com.kazemieh.common.model.AssetType
-import com.kazemieh.data_contract.datasource.AssetLocalDataSource
-import com.kazemieh.data_contract.datasource.BudgetLocalDataSource
-import com.kazemieh.data_contract.datasource.CheckLocalDataSource
-import com.kazemieh.data_contract.datasource.DebtLocalDataSource
-import com.kazemieh.data_contract.datasource.FixedExpenseLocalDataSource
-import com.kazemieh.data_contract.datasource.InstallmentLocalDataSource
-import com.kazemieh.data_contract.datasource.NoteLocalDataSource
-import com.kazemieh.data_contract.datasource.ShoppingLocalDataSource
-import com.kazemieh.data_contract.datasource.SyncLocalDataSource
-import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
+import com.kazemieh.data_contract.datasource.*
 import com.kazemieh.database.Asset as AssetDb
 import com.kazemieh.database.DatabaseInitializer
 import com.kazemieh.database.FinTrackDatabase
 import com.kazemieh.database.createDriver
-import com.kazemieh.database.datasource.AssetLocalDataSourceImpl
-import com.kazemieh.database.datasource.BudgetLocalDataSourceImpl
-import com.kazemieh.database.datasource.CheckLocalDataSourceImpl
-import com.kazemieh.database.datasource.DebtLocalDataSourceImpl
-import com.kazemieh.database.datasource.FixedExpenseLocalDataSourceImpl
-import com.kazemieh.database.datasource.InstallmentLocalDataSourceImpl
-import com.kazemieh.database.datasource.NoteLocalDataSourceImpl
-import com.kazemieh.database.datasource.ShoppingLocalDataSourceImpl
-import com.kazemieh.database.datasource.SyncLocalDataSourceImpl
-import com.kazemieh.database.datasource.TransactionLocalDataSourceImpl
+import com.kazemieh.database.datasource.*
 import org.koin.dsl.module
 
 val databaseModule = module {
 
     single<SqlDriver> { createDriver() }
-
 
     single {
         FinTrackDatabase(
@@ -79,6 +60,10 @@ val databaseModule = module {
 
     single<NoteLocalDataSource> {
         NoteLocalDataSourceImpl(db = get())
+    }
+
+    single<SyncHistoryLocalDataSource> {
+        SyncHistoryLocalDataSourceImpl(db = get())
     }
 
     single<SyncLocalDataSource> {

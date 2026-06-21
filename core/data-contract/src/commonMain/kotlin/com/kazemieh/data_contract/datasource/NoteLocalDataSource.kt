@@ -16,4 +16,5 @@ interface NoteLocalDataSource {
     suspend fun insertFullNote(note: Note)
     suspend fun getModifiedNotes(): List<Note>
     suspend fun markNoteAsSynced(id: Long)
+    suspend fun physicallyDeleteNote(id: Long)
 }

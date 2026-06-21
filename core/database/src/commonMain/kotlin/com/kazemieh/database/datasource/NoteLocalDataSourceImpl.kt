@@ -2,19 +2,18 @@ package com.kazemieh.database.datasource
 
 import com.kazemieh.common.model.Note
 import com.kazemieh.data_contract.datasource.NoteLocalDataSource
-import com.kazemieh.database.FinTrackDb
+import com.kazemieh.database.FinTrackDatabase
 import com.kazemieh.database.mapper.toNote
 import com.kazemieh.database.mapper.toTag
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import kotlinx.datetime.Clock
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlin.time.Clock
 
 class NoteLocalDataSourceImpl(
-    private val db: FinTrackDb
+    private val db: FinTrackDatabase
 ) : NoteLocalDataSource {
 
     private val noteQueries = db.noteQueries
@@ -23,7 +22,7 @@ class NoteLocalDataSourceImpl(
     override fun observeNotes(): Flow<List<Note>> {
         return noteQueries.observeNotes()
             .asFlow()
-            .mapToList(Dispatchers.IO)
+            .mapToList(Dispatchers.Default)
             .map { list ->
                 list.map { noteDb ->
                     val tags = noteTagQueries.getTagsForNote(noteDb.id).executeAsList().map { it.toTag() }
@@ -52,7 +51,7 @@ class NoteLocalDataSourceImpl(
             )
             val noteId = noteQueries.lastInsertRowId().executeAsOne()
             note.tags.forEach { tag ->
-                noteTagQueries.insertNoteTagCrossRef(noteId, tag.id)
+                noteTagQueries.insertNoteTagCrossRef(noteId, tag.id ?: 0)
             }
             noteId
         }
@@ -73,7 +72,7 @@ class NoteLocalDataSourceImpl(
             )
             noteTagQueries.deleteAllTagRefsForNote(note.id)
             note.tags.forEach { tag ->
-                noteTagQueries.insertNoteTagCrossRef(note.id, tag.id)
+                noteTagQueries.insertNoteTagCrossRef(note.id, tag.id ?: 0)
             }
         }
     }
@@ -114,7 +113,7 @@ class NoteLocalDataSourceImpl(
             )
             noteTagQueries.deleteAllTagRefsForNote(note.id)
             note.tags.forEach { tag ->
-                noteTagQueries.insertNoteTagCrossRef(note.id, tag.id)
+                noteTagQueries.insertNoteTagCrossRef(note.id, tag.id ?: 0)
             }
         }
     }
@@ -128,5 +127,9 @@ class NoteLocalDataSourceImpl(
 
     override suspend fun markNoteAsSynced(id: Long) {
         noteQueries.markNoteAsSynced(id)
+    }
+
+    override suspend fun physicallyDeleteNote(id: Long) {
+        noteQueries.physicallyDeleteNote(id)
     }
 }

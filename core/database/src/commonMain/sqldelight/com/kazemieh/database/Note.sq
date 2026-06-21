@@ -1,8 +1,10 @@
-CREATE TABLE IF NOT EXISTS note (
+import kotlin.Boolean;
+
+CREATE TABLE IF NOT EXISTS note_table (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
-    color INTEGER NOT NULL DEFAULT -1, -- 0xFFFFFFFF
+    color INTEGER NOT NULL DEFAULT -1,
     isPinned INTEGER AS Boolean NOT NULL DEFAULT 0,
     isLocked INTEGER AS Boolean NOT NULL DEFAULT 0,
     updatedAt INTEGER NOT NULL DEFAULT 0,
@@ -10,41 +12,41 @@ CREATE TABLE IF NOT EXISTS note (
 );
 
 observeNotes:
-SELECT * FROM note WHERE syncStatus != 2 ORDER BY isPinned DESC, updatedAt DESC;
+SELECT * FROM note_table WHERE syncStatus != 2 ORDER BY isPinned DESC, updatedAt DESC;
 
 getNoteById:
-SELECT * FROM note WHERE id = ? AND syncStatus != 2;
+SELECT * FROM note_table WHERE id = ? AND syncStatus != 2;
 
 addNote:
-INSERT INTO note(title, content, color, isPinned, isLocked, updatedAt, syncStatus)
+INSERT INTO note_table(title, content, color, isPinned, isLocked, updatedAt, syncStatus)
 VALUES (?, ?, ?, ?, ?, ?, ?);
 
 updateNote:
-UPDATE note
+UPDATE note_table
 SET title = ?, content = ?, color = ?, isPinned = ?, isLocked = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 deleteNote:
-UPDATE note SET syncStatus = 2, updatedAt = ? WHERE id = ?;
+UPDATE note_table SET syncStatus = 2, updatedAt = ? WHERE id = ?;
 
 physicallyDeleteNote:
-DELETE FROM note WHERE id = ?;
+DELETE FROM note_table WHERE id = ?;
 
 updatePin:
-UPDATE note SET isPinned = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
+UPDATE note_table SET isPinned = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
 
 updateLock:
-UPDATE note SET isLocked = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
+UPDATE note_table SET isLocked = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertFullNote:
-INSERT OR REPLACE INTO note(id, title, content, color, isPinned, isLocked, updatedAt, syncStatus)
+INSERT OR REPLACE INTO note_table(id, title, content, color, isPinned, isLocked, updatedAt, syncStatus)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
 getModifiedNotes:
-SELECT * FROM note WHERE syncStatus = 1;
+SELECT * FROM note_table WHERE syncStatus = 1;
 
 markNoteAsSynced:
-UPDATE note SET syncStatus = 0 WHERE id = ?;
+UPDATE note_table SET syncStatus = 0 WHERE id = ?;

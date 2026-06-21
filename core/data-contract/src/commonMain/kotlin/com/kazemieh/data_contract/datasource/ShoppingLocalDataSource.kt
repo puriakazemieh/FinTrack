@@ -15,4 +15,5 @@ interface ShoppingLocalDataSource {
     suspend fun insertFullShoppingItem(item: ShoppingItem)
     suspend fun getModifiedShoppingItems(): List<ShoppingItem>
     suspend fun markShoppingItemAsSynced(id: Long)
+    suspend fun physicallyDeleteShoppingItem(id: Long)
 }

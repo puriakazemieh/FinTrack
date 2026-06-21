@@ -4,12 +4,14 @@ CREATE TABLE IF NOT EXISTS sync_history (
     type TEXT NOT NULL, -- 'AUTO_DRIVE', 'AUTO_SERVER', 'MANUAL'
     status TEXT NOT NULL, -- 'SUCCESS', 'FAILED'
     recordCount INTEGER NOT NULL,
+    insertedCount INTEGER NOT NULL DEFAULT 0,
+    updatedCount INTEGER NOT NULL DEFAULT 0,
     errorMessage TEXT
 );
 
 insertSyncHistory:
-INSERT INTO sync_history(timestamp, type, status, recordCount, errorMessage)
-VALUES (?, ?, ?, ?, ?);
+INSERT INTO sync_history(timestamp, type, status, recordCount, insertedCount, updatedCount, errorMessage)
+VALUES (?, ?, ?, ?, ?, ?, ?);
 
 getLatestSyncHistory:
 SELECT * FROM sync_history ORDER BY timestamp DESC LIMIT :limit;

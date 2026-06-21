@@ -21,7 +21,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun CheckWidget(
-    onMoreClick: () -> Unit,
+    onMore: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CheckListViewModel = koinViewModel()
 ) {
@@ -31,7 +31,7 @@ fun CheckWidget(
     if (pendingChecks.isNotEmpty()) {
         WidgetCard(
             title = stringResource(Res.string.title_ongoing_checks_label),
-            onMore = onMoreClick,
+            onMore = onMore,
             modifier = modifier
         ) {
             Column {

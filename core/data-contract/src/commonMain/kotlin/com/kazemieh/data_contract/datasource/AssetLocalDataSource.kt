@@ -18,4 +18,5 @@ interface AssetLocalDataSource {
     suspend fun insertFullAssetHistory(history: AssetHistory)
     suspend fun getModifiedAssets(): List<Asset>
     suspend fun markAssetAsSynced(id: Long)
+    suspend fun physicallyDeleteAsset(id: Long)
 }

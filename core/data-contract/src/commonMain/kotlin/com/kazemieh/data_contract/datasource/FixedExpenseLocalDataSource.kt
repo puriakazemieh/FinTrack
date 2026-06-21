@@ -15,4 +15,5 @@ interface FixedExpenseLocalDataSource {
     suspend fun insertFullFixedExpense(expense: FixedExpense)
     suspend fun getModifiedFixedExpenses(): List<FixedExpense>
     suspend fun markFixedExpenseAsSynced(id: Long)
+    suspend fun physicallyDeleteFixedExpense(id: Long)
 }

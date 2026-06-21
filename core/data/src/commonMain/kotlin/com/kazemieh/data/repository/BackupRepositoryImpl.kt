@@ -5,12 +5,9 @@ import com.kazemieh.domain.repository.BackupData
 import com.kazemieh.domain.repository.BackupStats
 import com.kazemieh.data_contract.datasource.*
 import com.kazemieh.common.model.*
-import com.kazemieh.database.FinTrackDatabase
-import com.kazemieh.database.mapper.toSyncHistory
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 class BackupRepositoryImpl(
-    private val db: FinTrackDatabase,
     private val transactionLocalDataSource: TransactionLocalDataSource,
     private val assetLocalDataSource: AssetLocalDataSource,
     private val budgetLocalDataSource: BudgetLocalDataSource,
@@ -19,10 +16,9 @@ class BackupRepositoryImpl(
     private val fixedExpenseLocalDataSource: FixedExpenseLocalDataSource,
     private val installmentLocalDataSource: InstallmentLocalDataSource,
     private val noteLocalDataSource: NoteLocalDataSource,
-    private val shoppingLocalDataSource: ShoppingLocalDataSource
+    private val shoppingLocalDataSource: ShoppingLocalDataSource,
+    private val syncHistoryLocalDataSource: SyncHistoryLocalDataSource
 ) : BackupRepository {
-
-    private val syncQueries = db.syncHistoryQueries
 
     override suspend fun getBackupData(fromTimestamp: Long?, toTimestamp: Long?): BackupData {
         val allTransactions = transactionLocalDataSource.getAllTransactions()
@@ -70,13 +66,11 @@ class BackupRepositoryImpl(
     }
 
     override suspend fun restoreBackupData(data: BackupData): Pair<Int, Int> {
-        var inserted = 0
-        var updated = 0
+        val inserted = 0
+        val updated = 0
         
-        // Deletion handling logic
         handleRemoteDeletions(data)
 
-        // Restore active/modified items
         data.categories.filter { it.syncStatus != SyncStatus.DELETED }.forEach { transactionLocalDataSource.insertFullCategory(it) }
         data.sources.filter { it.syncStatus != SyncStatus.DELETED }.forEach { transactionLocalDataSource.insertFullSource(it) }
         data.tags.filter { it.syncStatus != SyncStatus.DELETED }.forEach { transactionLocalDataSource.insertFullTag(it) }
@@ -95,17 +89,45 @@ class BackupRepositoryImpl(
     }
 
     private suspend fun handleRemoteDeletions(data: BackupData) {
-        // If a remote item is marked as DELETED (status 2), physically remove it locally if found
         data.transactions.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
-            db.transactionQueries.physicallyDeleteTransaction(it.id)
+            transactionLocalDataSource.physicallyDeleteTransaction(it.id)
         }
         data.categories.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
-            db.categoryQueries.physicallyDeleteCategory(it.id ?: 0)
+            transactionLocalDataSource.physicallyDeleteCategory(it.id ?: 0)
         }
         data.sources.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
-            db.sourceQueries.physicallyDeleteSource(it.id ?: 0)
+            transactionLocalDataSource.physicallyDeleteSource(it.id ?: 0)
         }
-        // ... continue for other entities
+        data.tags.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
+            transactionLocalDataSource.physicallyDeleteTag(it.id ?: 0)
+        }
+        data.persons.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
+            transactionLocalDataSource.physicallyDeletePerson(it.id ?: 0)
+        }
+        data.assets.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
+            assetLocalDataSource.physicallyDeleteAsset(it.id ?: 0)
+        }
+        data.budgets.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
+            budgetLocalDataSource.physicallyDeleteBudget(it.id ?: 0)
+        }
+        data.checks.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
+            checkLocalDataSource.physicallyDeleteCheck(it.id)
+        }
+        data.debts.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
+            debtLocalDataSource.physicallyDeleteDebt(it.id ?: 0)
+        }
+        data.fixedExpenses.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
+            fixedExpenseLocalDataSource.physicallyDeleteFixedExpense(it.id ?: 0)
+        }
+        data.installments.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
+            installmentLocalDataSource.physicallyDeleteInstallment(it.id ?: 0)
+        }
+        data.notes.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
+            noteLocalDataSource.physicallyDeleteNote(it.id ?: 0)
+        }
+        data.shoppingItems.filter { it.syncStatus == SyncStatus.DELETED }.forEach { 
+            shoppingLocalDataSource.physicallyDeleteShoppingItem(it.id ?: 0)
+        }
     }
 
     override suspend fun getBackupStats(): BackupStats {
@@ -126,16 +148,10 @@ class BackupRepositoryImpl(
     }
 
     override suspend fun addSyncHistory(history: SyncHistory) {
-        syncQueries.insertSyncHistory(
-            timestamp = history.timestamp,
-            type = history.type.name,
-            status = history.status.name,
-            recordCount = history.recordCount.toLong(),
-            errorMessage = history.errorMessage
-        )
+        syncHistoryLocalDataSource.addSyncHistory(history)
     }
 
     override suspend fun getSyncHistory(limit: Long): List<SyncHistory> {
-        return syncQueries.getLatestSyncHistory(limit).executeAsList().map { it.toSyncHistory() }
+        return syncHistoryLocalDataSource.getSyncHistory(limit)
     }
 }

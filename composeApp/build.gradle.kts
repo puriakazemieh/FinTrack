@@ -102,6 +102,8 @@ kotlin {
             implementation(project(":feature-container:profile"))
             implementation(project(":feature-container:tools"))
             implementation(project(":feature-share:budget"))
+            implementation(project(":feature-share:shopping"))
+            implementation(project(":feature-share:sync"))
 
 
         }
