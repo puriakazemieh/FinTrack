@@ -19,7 +19,7 @@ import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.HeaderAction
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.category
-import fintrack.core.designsystem.generated.resources.edit
+import fintrack.core.designsystem.generated.resources.move
 import fintrack.core.designsystem.generated.resources.title_category_management
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -40,6 +40,7 @@ fun CategoriesScreen(
     }
 
     val state by viewModel.state.collectAsState()
+    var reorderedList by remember(state.categories) { mutableStateOf(state.categories) }
 
     FintrackScreen(
         title = stringResource(Res.string.category),
@@ -50,7 +51,13 @@ fun CategoriesScreen(
                 HeaderAction(
                     icon = rememberVectorPainter(Icons.Default.Check),
                     label = "Done",
-                    onClick = { viewModel.onIntent(CategoryIntent.OnToggleReorder) },
+                    onClick = {
+                        val positions = reorderedList.mapIndexed { index, category ->
+                            category.id!! to index
+                        }.toMap()
+                        viewModel.onIntent(CategoryIntent.UpdatePositions(positions))
+                        viewModel.onIntent(CategoryIntent.OnToggleReorder)
+                    },
                     color = com.kazemieh.designsystem.GlassGreen
                 )
             )
@@ -69,7 +76,7 @@ fun CategoriesScreen(
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.edit)) },
+                            text = { Text(stringResource(Res.string.move)) },
                             onClick = {
                                 viewModel.onIntent(CategoryIntent.OnToggleReorder)
                                 showMenu = false
@@ -94,8 +101,8 @@ fun CategoriesScreen(
             )
 
             val entityItems =
-                remember(state.categories, state.expandedCategoryIds, state.allCategories) {
-                    state.categories.map {
+                remember(reorderedList, state.expandedCategoryIds, state.allCategories) {
+                    reorderedList.map {
                         val hasChildren =
                             state.allCategories.any { child -> child.parentId == it.id }
                         val isExpanded = state.expandedCategoryIds.contains(it.id)
@@ -120,12 +127,9 @@ fun CategoriesScreen(
                 isReorderMode = state.isReorderShow,
                 indentSubCategories = true,
                 onMove = { from, to ->
-                    val list = state.categories.toMutableList()
-                    list.add(to, list.removeAt(from))
-                    val positions = list.mapIndexed { index, category ->
-                        category.id!! to index
-                    }.toMap()
-                    viewModel.onIntent(CategoryIntent.UpdatePositions(positions))
+                    reorderedList = reorderedList.toMutableList().apply {
+                        add(to, removeAt(from))
+                    }
                 },
                 onFilterClick = onNavigateToTransactions?.let { callback ->
                     { item ->

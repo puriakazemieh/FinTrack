@@ -29,6 +29,7 @@ fun SourcesScreen(
 ) {
     LaunchedEffect(Unit) { viewModel.onIntent(SourceIntent.LoadAllSource) }
     val state by viewModel.state.collectAsState()
+    var reorderedList by remember(state.sources) { mutableStateOf(state.sources) }
 
     FintrackScreen(
         title = stringResource(Res.string.source),
@@ -39,7 +40,13 @@ fun SourcesScreen(
                 HeaderAction(
                     icon = rememberVectorPainter(Icons.Default.Check),
                     label = "Done",
-                    onClick = { viewModel.onIntent(SourceIntent.OnToggleReorder) },
+                    onClick = {
+                        val positions = reorderedList.mapIndexed { index, source ->
+                            source.id!! to index
+                        }.toMap()
+                        viewModel.onIntent(SourceIntent.UpdatePositions(positions))
+                        viewModel.onIntent(SourceIntent.OnToggleReorder)
+                    },
                     color = com.kazemieh.designsystem.GlassGreen
                 )
             )
@@ -58,7 +65,7 @@ fun SourcesScreen(
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.edit)) },
+                            text = { Text(stringResource(Res.string.move)) },
                             onClick = {
                                 viewModel.onIntent(SourceIntent.OnToggleReorder)
                                 showMenu = false
@@ -77,14 +84,14 @@ fun SourcesScreen(
                 showActions = !state.isReorderShow,
                 isReorderMode = state.isReorderShow,
                 onMove = { from, to ->
-                    val list = state.sources.toMutableList()
-                    list.add(to, list.removeAt(from))
-                    val positions = list.mapIndexed { index, source ->
-                        source.id!! to index
-                    }.toMap()
-                    viewModel.onIntent(SourceIntent.UpdatePositions(positions))
+                    reorderedList = reorderedList.toMutableList().apply {
+                        add(to, removeAt(from))
+                    }
                 },
-                items = state.filteredSources.map { source ->
+                items = reorderedList.filter {
+                    it.name.contains(state.searchQuery, ignoreCase = true) ||
+                            it.description?.contains(state.searchQuery, ignoreCase = true) == true
+                }.map { source ->
                     EntityItem(
                         id = source.id ?: 0L,
                         name = source.name,

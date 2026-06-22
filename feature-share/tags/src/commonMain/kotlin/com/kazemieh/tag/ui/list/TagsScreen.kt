@@ -32,6 +32,7 @@ fun TagsScreen(
     }
 
     val state by viewModel.state.collectAsState()
+    var reorderedList by remember(state.tags) { mutableStateOf(state.tags) }
 
     FintrackScreen(
         title = stringResource(Res.string.tags),
@@ -42,7 +43,13 @@ fun TagsScreen(
                 HeaderAction(
                     icon = rememberVectorPainter(Icons.Default.Check),
                     label = "Done",
-                    onClick = { viewModel.onIntent(TagIntent.OnToggleReorder) },
+                    onClick = {
+                        val positions = reorderedList.mapIndexed { index, tag ->
+                            tag.id!! to index
+                        }.toMap()
+                        viewModel.onIntent(TagIntent.UpdatePositions(positions))
+                        viewModel.onIntent(TagIntent.OnToggleReorder)
+                    },
                     color = com.kazemieh.designsystem.GlassGreen
                 )
             )
@@ -61,7 +68,7 @@ fun TagsScreen(
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.edit)) },
+                            text = { Text(stringResource(Res.string.move)) },
                             onClick = {
                                 viewModel.onIntent(TagIntent.OnToggleReorder)
                                 showMenu = false
@@ -81,19 +88,19 @@ fun TagsScreen(
                 showActions = !state.isReorderShow,
                 isReorderMode = state.isReorderShow,
                 onMove = { from, to ->
-                    val list = state.tags.toMutableList()
-                    list.add(to, list.removeAt(from))
-                    val positions = list.mapIndexed { index, tag ->
-                        tag.id!! to index
-                    }.toMap()
-                    viewModel.onIntent(TagIntent.UpdatePositions(positions))
+                    reorderedList = reorderedList.toMutableList().apply {
+                        add(to, removeAt(from))
+                    }
                 },
                 onFilterClick = onNavigateToTransactions?.let { callback ->
                     { item ->
                         state.tags.find { it.id == item.id }?.let { callback(it) }
                     }
                 },
-                items = state.filteredTags.map {
+                items = reorderedList.filter {
+                    it.name.contains(state.searchQuery, ignoreCase = true) ||
+                            it.description?.contains(state.searchQuery, ignoreCase = true) == true
+                }.map {
                     EntityItem(
                         id = it.id ?: 0,
                         name = it.name,

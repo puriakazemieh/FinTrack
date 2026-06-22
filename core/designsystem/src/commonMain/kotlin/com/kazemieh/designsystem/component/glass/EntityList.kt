@@ -88,6 +88,7 @@ fun EntityList(
     showActions: Boolean = true,
     isReorderMode: Boolean = false,
     onMove: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> },
+    onReorderCommit: () -> Unit = {},
     indentSubCategories: Boolean = false,
     parentId: Long? = null
 ) {

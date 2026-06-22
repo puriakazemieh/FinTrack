@@ -29,6 +29,7 @@ fun PersonsScreen(
     viewModel: PersonViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    var reorderedList by remember(state.persons) { mutableStateOf(state.persons) }
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(PersonIntent.GetAllPerson)
@@ -43,7 +44,13 @@ fun PersonsScreen(
                 HeaderAction(
                     icon = rememberVectorPainter(Icons.Default.Check),
                     label = "Done",
-                    onClick = { viewModel.onIntent(PersonIntent.OnToggleReorder) },
+                    onClick = {
+                        val positions = reorderedList.mapIndexed { index, person ->
+                            person.id!! to index
+                        }.toMap()
+                        viewModel.onIntent(PersonIntent.UpdatePositions(positions))
+                        viewModel.onIntent(PersonIntent.OnToggleReorder)
+                    },
                     color = com.kazemieh.designsystem.GlassGreen
                 )
             )
@@ -62,7 +69,7 @@ fun PersonsScreen(
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.edit)) },
+                            text = { Text(stringResource(Res.string.move)) },
                             onClick = {
                                 viewModel.onIntent(PersonIntent.OnToggleReorder)
                                 showMenu = false
@@ -79,8 +86,22 @@ fun PersonsScreen(
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(PersonIntent.UpdateSearchQuery(it)) },
                 onAddClick = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
-                showActions = true,
-                items = state.filteredPersons.map {
+                showActions = !state.isReorderShow,
+                isReorderMode = state.isReorderShow,
+                onMove = { from, to ->
+                    reorderedList = reorderedList.toMutableList().apply {
+                        add(to, removeAt(from))
+                    }
+                },
+                onFilterClick = onNavigateToTransactions?.let { callback ->
+                    { item ->
+                        state.persons.find { it.id == item.id }?.let { callback(it) }
+                    }
+                },
+                items = reorderedList.filter {
+                    it.name.contains(state.searchQuery, ignoreCase = true) ||
+                            it.description?.contains(state.searchQuery, ignoreCase = true) == true
+                }.map {
                     EntityItem(
                         id = it.id ?: 0,
                         name = it.name,
@@ -102,20 +123,6 @@ fun PersonsScreen(
                 onItemClick = { item ->
                     state.persons.find { it.id == item.id }?.let { onNavigateToDetail(it) }
                 },
-                onFilterClick = onNavigateToTransactions?.let { callback ->
-                    { item ->
-                        state.persons.find { it.id == item.id }?.let { callback(it) }
-                    }
-                },
-                onMove = { from, to ->
-                    val list = state.persons.toMutableList()
-                    list.add(to, list.removeAt(from))
-                    val positions = list.mapIndexed { index, person ->
-                        person.id!! to index
-                    }.toMap()
-                    viewModel.onIntent(PersonIntent.UpdatePositions(positions))
-                },
-                isReorderMode = state.isReorderShow
             )
         }
 

@@ -28,3 +28,5 @@ kotlin-js-store
 reference
 /reference
 /vibe_images
+build/
+**/build/
