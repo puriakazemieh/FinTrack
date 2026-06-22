@@ -27,6 +27,8 @@ class FinTrackPreferences(private val settings: Settings) {
     companion object {
         const val PREF_USER_NAME = "pref_user_name"
         const val PREF_USER_FAMILY = "pref_user_family"
+        const val PREF_USER_NICKNAME = "pref_user_nickname"
+        const val PREF_USER_GENDER = "pref_user_gender"
         const val PREF_USER_EMAIL = "pref_user_email"
         const val PREF_USER_PHONE = "pref_user_phone"
         const val PREF_USER_BIRTHDAY = "pref_user_birthday"
@@ -39,9 +41,11 @@ class FinTrackPreferences(private val settings: Settings) {
         const val PREF_LOCK_ENABLED = "pref_lock_enabled"
         const val PREF_BIOMETRIC_ENABLED = "pref_biometric_enabled"
         const val PREF_HASHED_PIN = "pref_hashed_pin"
+        const val PREF_HIDE_BALANCE = "pref_hide_balance"
 
         const val PREF_THEME = "pref_theme"
         const val PREF_THEME_MODE = "pref_theme_mode"
+        const val PREF_FOLLOW_SYSTEM_THEME = "pref_follow_system_theme"
         const val PREF_THEME_START_TIME = "pref_theme_start_time"
         const val PREF_THEME_END_TIME = "pref_theme_end_time"
         const val PREF_CURRENCY = "pref_currency"
@@ -49,6 +53,9 @@ class FinTrackPreferences(private val settings: Settings) {
         const val PREF_BACKUP = "pref_backup"
         const val PREF_PUSH_NOTIF = "pref_push_notif"
         const val PREF_TX_ALERTS = "pref_tx_alerts"
+
+        const val PREF_LAST_SYNC_TIME = "pref_last_sync_time"
+        const val PREF_SYNC_ENABLED = "pref_sync_enabled"
 
         const val PREF_NOTIF_BUDGET_ENABLED = "pref_notif_budget_enabled"
         const val PREF_NOTIF_INSTALLMENT_ENABLED = "pref_notif_installment_enabled"

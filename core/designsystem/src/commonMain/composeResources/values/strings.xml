@@ -968,4 +968,42 @@
     <string name="related_persons">افراد مرتبط</string>
     <string name="attachment">تصویر پیوست</string>
     <string name="reorder_list">جابه‌جایی</string>
+
+    <string name="profile_sync_active">همگام‌سازی ابری فعال</string>
+    <string name="profile_sync_time">آخرین همگام‌سازی: %1$s</string>
+    <string name="profile_sync_now">سینک الان</string>
+    <string name="profile_stats_transactions">تراکنش</string>
+    <string name="profile_stats_active_days">روز فعال</string>
+    <string name="profile_stats_tools">ابزار فعال</string>
+    <string name="label_language">زبان</string>
+    <string name="label_calendar_fa">تقویم</string>
+    <string name="label_text_size">اندازه‌ی متن</string>
+    <string name="setting_hide_balance">پنهان‌سازی موجودی</string>
+    <string name="setting_hide_balance_desc">پیش‌فرض موجودی مخفی باشد</string>
+    <string name="section_support">پشتیبانی و راهنما</string>
+    <string name="section_about">درباره</string>
+    <string name="label_faq">سوالات متداول</string>
+    <string name="label_contact_us">ارتباط با ما</string>
+    <string name="label_whats_new">چه چیزی جدید است</string>
+    <string name="label_rate_app">امتیاز به اپ</string>
+    <string name="label_terms">شرایط استفاده</string>
+    <string name="label_privacy">حریم خصوصی</string>
+    <string name="label_version_history">نسخه‌ها و تاریخچه</string>
+    <string name="footer_made_with_love">FinTrack · ساخته‌شده با ❤ در ایران</string>
+
+    <string name="label_follow_system">پیروی از تم سیستم</string>
+    <string name="label_follow_system_desc">بین روشن و تیره خودکار جابه‌جا شود</string>
+    <string name="label_auto_convert">تبدیل خودکار</string>
+    <string name="label_auto_convert_desc">تراکنش‌های قبلی به واحد پول جدید با نرخ روز تبدیل می‌شوند.</string>
+
+    <string name="label_nickname">نام مستعار</string>
+    <string name="hint_enter_nickname">نام مستعار (برای نمایش در ویجت‌ها)</string>
+    <string name="label_gender">جنسیت</string>
+    <string name="label_gender_male">مرد</string>
+    <string name="label_gender_female">زن</string>
+    <string name="label_gender_other">سایر</string>
+    <string name="profile_completion_tip">با تکمیل پروفایل، پیشنهادهای دقیق‌تری از هوش مصنوعی دریافت کن.</string>
+
+    <string name="title_display_currency">نمایش و واحد پول</string>
+    <string name="sub_display_currency">ظاهر اپ و پول رایج</string>
 </resources>

@@ -8,7 +8,8 @@ data class PreferenceUseCases(
     val setBooleanPreference: SetBooleanPreferenceUseCase,
     val getStringPreference: GetStringPreferenceUseCase,
     val setStringPreference: SetStringPreferenceUseCase,
-    val getStringFlow: GetStringFlowUseCase
+    val getStringFlow: GetStringFlowUseCase,
+    val clearPreferences: ClearPreferencesUseCase
 )
 
 class GetBooleanPreferenceUseCase(private val repository: PreferenceRepository) {
@@ -29,4 +30,8 @@ class SetStringPreferenceUseCase(private val repository: PreferenceRepository) {
 
 class GetStringFlowUseCase(private val repository: PreferenceRepository) {
     operator fun invoke(key: String, defaultValue: String): Flow<String> = repository.getStringFlow(key, defaultValue)
+}
+
+class ClearPreferencesUseCase(private val repository: PreferenceRepository) {
+    operator fun invoke() = repository.clear()
 }

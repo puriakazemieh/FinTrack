@@ -34,6 +34,8 @@ class ProfileEditViewModel(
             it.copy(
                 firstName = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_NAME, ""),
                 lastName = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_FAMILY, ""),
+                nickname = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_NICKNAME, ""),
+                gender = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_GENDER, ""),
                 email = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_EMAIL, ""),
                 phone = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_PHONE, ""),
                 birthday = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_BIRTHDAY, ""),
@@ -42,7 +44,13 @@ class ProfileEditViewModel(
                 jobTitle = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_JOB, ""),
                 financialGoal = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_GOAL, ""),
                 avatar = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_USER_AVATAR, "").let { base64 ->
-                    if (base64.isNotEmpty()) Base64.decode(base64) else null
+                    if (base64.isNotEmpty()) {
+                        try {
+                            Base64.decode(base64)
+                        } catch (e: Exception) {
+                            null
+                        }
+                    } else null
                 }
             )
         }
@@ -57,6 +65,14 @@ class ProfileEditViewModel(
             }
             is ProfileEditIntent.UpdateLastName -> {
                 _state.update { it.copy(lastName = intent.family) }
+                calculateCompletion()
+            }
+            is ProfileEditIntent.UpdateNickname -> {
+                _state.update { it.copy(nickname = intent.nickname) }
+                calculateCompletion()
+            }
+            is ProfileEditIntent.UpdateGender -> {
+                _state.update { it.copy(gender = intent.gender) }
                 calculateCompletion()
             }
             is ProfileEditIntent.UpdateEmail -> {
@@ -104,6 +120,8 @@ class ProfileEditViewModel(
         val currentState = _state.value
         preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_USER_NAME, currentState.firstName)
         preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_USER_FAMILY, currentState.lastName)
+        preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_USER_NICKNAME, currentState.nickname)
+        preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_USER_GENDER, currentState.gender)
         preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_USER_EMAIL, currentState.email)
         preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_USER_PHONE, currentState.phone)
         preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_USER_BIRTHDAY, currentState.birthday)
@@ -126,6 +144,8 @@ class ProfileEditViewModel(
         val fields = listOf(
             _state.value.firstName,
             _state.value.lastName,
+            _state.value.nickname,
+            _state.value.gender,
             _state.value.email,
             _state.value.phone,
             _state.value.birthday,

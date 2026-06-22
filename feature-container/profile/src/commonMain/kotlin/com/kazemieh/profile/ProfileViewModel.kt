@@ -54,6 +54,10 @@ class ProfileViewModel(
                     FinTrackPreferences.PREF_USER_FAMILY,
                     ""
                 ),
+                nickname = preferenceUseCases.getStringPreference(
+                    FinTrackPreferences.PREF_USER_NICKNAME,
+                    ""
+                ),
                 email = preferenceUseCases.getStringPreference(
                     FinTrackPreferences.PREF_USER_EMAIL,
                     ""
@@ -111,6 +115,14 @@ class ProfileViewModel(
                 isTransactionAlertsEnabled = preferenceUseCases.getBooleanPreference(
                     FinTrackPreferences.PREF_TX_ALERTS,
                     true
+                ),
+                isSyncEnabled = preferenceUseCases.getBooleanPreference(
+                    FinTrackPreferences.PREF_SYNC_ENABLED,
+                    true
+                ),
+                lastSyncTime = preferenceUseCases.getStringPreference(
+                    FinTrackPreferences.PREF_LAST_SYNC_TIME,
+                    "---"
                 ),
                 selectedCurrency = preferenceUseCases.getStringPreference(PREF_CURRENCY, "")
                     .let { json ->
@@ -249,6 +261,17 @@ class ProfileViewModel(
                 loadProfile()
             }
 
+            is ProfileIntent.SyncNow -> {
+                // Mock sync
+                _state.update { it.copy(isLoading = true) }
+                viewModelScope.launch {
+                    kotlinx.coroutines.delay(1000)
+                    val now = "۲ دقیقه پیش" // Should format actual date
+                    preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_LAST_SYNC_TIME, now)
+                    _state.update { it.copy(isLoading = false, lastSyncTime = now) }
+                }
+            }
+
             is ProfileIntent.ShowPremiumInfo -> {
                 viewModelScope.launch {
                     SnackbarController.showMessage(UiText.StringResourceText(Res.string.premium_all_features_free))
@@ -272,7 +295,9 @@ class ProfileViewModel(
             }
 
             ProfileIntent.Logout -> {
-                // Handle logout logic
+                // Mock logout
+                preferenceUseCases.clearPreferences()
+                // Should navigate to onboarding/login
             }
         }
     }
@@ -281,6 +306,7 @@ class ProfileViewModel(
 data class ProfileState(
     val firstName: String = "",
     val lastName: String = "",
+    val nickname: String = "",
     val email: String = "",
     val phone: String = "",
     val avatar: ByteArray? = null,
@@ -290,12 +316,18 @@ data class ProfileState(
     val isBackupEnabled: Boolean = true,
     val isPushNotificationsEnabled: Boolean = true,
     val isTransactionAlertsEnabled: Boolean = true,
+    val isSyncEnabled: Boolean = true,
+    val lastSyncTime: String = "---",
     val selectedCurrency: Currency = Currency.TOMAN,
+    val transactionCount: Int = 412, // Mock
+    val activeDays: Int = 87, // Mock
+    val toolCount: Int = 12, // Mock
     val isLoading: Boolean = false
 )
 
 sealed interface ProfileIntent {
     data object Refresh : ProfileIntent
+    data object SyncNow : ProfileIntent
     data object ShowPremiumInfo : ProfileIntent
     data object ToggleDarkMode : ProfileIntent
     data object ToggleFingerprint : ProfileIntent

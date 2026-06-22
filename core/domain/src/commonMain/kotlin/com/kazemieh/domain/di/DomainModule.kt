@@ -88,6 +88,7 @@ import com.kazemieh.domain.usecase.UpdateTransactionUseCase
 import com.kazemieh.domain.usecase.AssetUseCases
 import com.kazemieh.domain.usecase.AddBudgetUseCase as AddBudgetUseCaseAlias
 import com.kazemieh.domain.usecase.AddAssetUseCase
+import com.kazemieh.domain.usecase.ClearPreferencesUseCase
 import com.kazemieh.domain.usecase.DeleteAssetUseCase
 import com.kazemieh.domain.usecase.ObserveAssetHistoryUseCase
 import com.kazemieh.domain.usecase.ObserveAssetsUseCase
@@ -179,6 +180,7 @@ val domainModule = module {
     factory { GetStringPreferenceUseCase(get()) }
     factory { SetStringPreferenceUseCase(get()) }
     factory { GetStringFlowUseCase(get()) }
+    factory { ClearPreferencesUseCase(get()) }
 
     factory { SearchCategoriesUseCase(get()) }
     factory { SearchSourcesUseCase(get()) }
@@ -220,7 +222,8 @@ val domainModule = module {
             setBooleanPreference = get(),
             getStringPreference = get(),
             setStringPreference = get(),
-            getStringFlow = get()
+            getStringFlow = get(),
+            clearPreferences = get()
         )
     }
     single {

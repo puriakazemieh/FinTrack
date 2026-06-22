@@ -5,6 +5,8 @@ import com.kazemieh.designsystem.component.model.UiText
 data class ProfileEditState(
     val firstName: String = "",
     val lastName: String = "",
+    val nickname: String = "",
+    val gender: String = "",
     val email: String = "",
     val phone: String = "",
     val birthday: String = "",
@@ -20,6 +22,8 @@ data class ProfileEditState(
 sealed interface ProfileEditIntent {
     data class UpdateFirstName(val name: String) : ProfileEditIntent
     data class UpdateLastName(val family: String) : ProfileEditIntent
+    data class UpdateNickname(val nickname: String) : ProfileEditIntent
+    data class UpdateGender(val gender: String) : ProfileEditIntent
     data class UpdateEmail(val email: String) : ProfileEditIntent
     data class UpdatePhone(val phone: String) : ProfileEditIntent
     data class UpdateBirthday(val birthday: String) : ProfileEditIntent

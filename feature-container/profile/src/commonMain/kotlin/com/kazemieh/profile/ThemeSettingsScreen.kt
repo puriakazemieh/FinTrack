@@ -1,6 +1,7 @@
 package com.kazemieh.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +14,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Icon
@@ -21,13 +24,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.toPersianDigits
@@ -60,22 +68,22 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ThemeSettingsScreen(
     onBack: () -> Unit,
-    viewModel: ThemeAndCurrencyViewModel = koinViewModel()
+    viewModel: ThemeSettingsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
 
-    val showTimePicker = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
-    var pickingStartTime by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(true) }
+    val showTimePicker = remember { mutableStateOf(false) }
+    var pickingStartTime by remember { mutableStateOf(true) }
 
     FintrackTimePickerBottomSheet(
         openSheet = showTimePicker,
         initialTime = if (pickingStartTime) state.startTime else state.endTime,
         onConfirm = { time ->
             if (pickingStartTime) {
-                viewModel.onIntent(ThemeAndCurrencyIntent.SetStartTime(time))
+                viewModel.onIntent(ThemeSettingsIntent.SetStartTime(time))
             } else {
-                viewModel.onIntent(ThemeAndCurrencyIntent.SetEndTime(time))
+                viewModel.onIntent(ThemeSettingsIntent.SetEndTime(time))
             }
         }
     )
@@ -90,14 +98,11 @@ fun ThemeSettingsScreen(
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
             item {
-                WidgetCard(
-                    title = stringResource(Res.string.label_theme)
-                ) {
-                    ThemeGrid(
-                        selectedTheme = state.selectedTheme,
-                        onThemeSelected = { viewModel.onIntent(ThemeAndCurrencyIntent.SelectTheme(it)) }
-                    )
-                }
+                Spacer(modifier = Modifier.height(space.medium))
+                ThemeGrid(
+                    selectedTheme = state.selectedTheme,
+                    onThemeSelected = { viewModel.onIntent(ThemeSettingsIntent.SelectTheme(it)) }
+                )
             }
 
             item {
@@ -106,7 +111,7 @@ fun ThemeSettingsScreen(
                 ) {
                     ThemeModeSection(
                         selectedMode = state.selectedMode,
-                        onModeSelected = { viewModel.onIntent(ThemeAndCurrencyIntent.SelectMode(it)) }
+                        onModeSelected = { viewModel.onIntent(ThemeSettingsIntent.SelectMode(it)) }
                     )
 
                     if (state.selectedMode == ThemeMode.CUSTOM_TIME) {
@@ -169,26 +174,28 @@ fun ThemeModeItem(
     onClick: () -> Unit
 ) {
     val space = LocalSpacing.current
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = space.medium, vertical = space.small),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        FintrackBodyLargeText(
-            text = label,
-            modifier = Modifier.weight(1f),
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-        )
-        RadioButton(
-            selected = isSelected,
-            onClick = onClick,
-            colors = RadioButtonDefaults.colors(
-                selectedColor = MaterialTheme.colorScheme.primary
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = space.medium, vertical = space.small),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            FintrackBodyLargeText(
+                text = label,
+                modifier = Modifier.weight(1f),
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
             )
-        )
+            RadioButton(
+                selected = isSelected,
+                onClick = onClick,
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
     }
 }
 
@@ -199,22 +206,24 @@ fun TimePickerItem(
     onClick: () -> Unit
 ) {
     val space = LocalSpacing.current
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(horizontal = space.medium, vertical = space.medium),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        FintrackBodyLargeText(
-            text = title,
-            modifier = Modifier.weight(1f)
-        )
-        FintrackBodyLargeText(
-            text = time.toPersianDigits(),
-            color = LocalGlassColors.current.text,
-            fontWeight = FontWeight.Bold
-        )
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onClick() }
+                .padding(horizontal = space.medium, vertical = space.medium),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            FintrackBodyLargeText(
+                text = title,
+                modifier = Modifier.weight(1f)
+            )
+            FintrackBodyLargeText(
+                text = time.toPersianDigits(),
+                color = LocalGlassColors.current.text,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 
@@ -230,23 +239,22 @@ fun ThemeGrid(
         AppTheme.PLAIN_LIGHT to Res.string.theme_plain_light
     )
 
-    Column(
-        modifier = Modifier.padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         themes.chunked(2).forEach { rowThemes ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                rowThemes.forEach { (theme, labelRes) ->
-                    ThemeItem(
-                        modifier = Modifier.weight(1f),
-                        label = stringResource(labelRes),
-                        isSelected = theme == selectedTheme,
-                        onClick = { onThemeSelected(theme) },
-                        theme = theme
-                    )
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    rowThemes.forEach { (theme, labelRes) ->
+                        ThemeItem(
+                            modifier = Modifier.weight(1f),
+                            label = stringResource(labelRes),
+                            isSelected = theme == selectedTheme,
+                            onClick = { onThemeSelected(theme) },
+                            theme = theme
+                        )
+                    }
                 }
             }
         }
@@ -261,55 +269,126 @@ fun ThemeItem(
     onClick: () -> Unit,
     theme: AppTheme
 ) {
-    val space = LocalSpacing.current
     val primaryColor = MaterialTheme.colorScheme.primary
+    val isDark = theme.isDark
 
     Column(
         modifier = modifier
-            .clip(MaterialTheme.shapes.medium)
+            .clip(MaterialTheme.shapes.large)
+            .background(if (isSelected) primaryColor.copy(alpha = 0.1f) else Color.Transparent)
+            .border(
+                2.dp,
+                if (isSelected) primaryColor else Color.Transparent,
+                MaterialTheme.shapes.large
+            )
             .clickable(onClick = onClick)
-            .padding(space.small),
+            .padding(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Theme preview box
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
+                .height(100.dp)
                 .clip(MaterialTheme.shapes.medium)
-                .background(getThemePreviewColor(theme))
+                .background(getThemePreviewGradient(theme))
         ) {
+            // Mock UI inside preview
+            Box(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxWidth()
+                    .height(38.dp)
+                    .clip(MaterialTheme.shapes.small)
+                    .background(
+                        if (isDark) Color.White.copy(alpha = 0.06f) else Color.Black.copy(
+                            alpha = 0.04f
+                        )
+                    )
+                    .border(
+                        0.5.dp,
+                        if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.06f),
+                        MaterialTheme.shapes.small
+                    )
+            )
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(10.dp)
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .background(if (isDark) primaryColor else MaterialTheme.colorScheme.primaryContainer)
+            )
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 14.dp, end = 10.dp)
+                    .width(60.dp)
+                    .height(6.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (isDark) Color.White.copy(alpha = 0.2f) else Color.Black.copy(
+                            alpha = 0.15f
+                        )
+                    )
+            )
+        }
+
+        Row(
+            modifier = Modifier.padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            FintrackLabelMediumText(
+                text = label,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                color = if (isSelected) primaryColor else MaterialTheme.colorScheme.onSurfaceVariant
+            )
             if (isSelected) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(primaryColor.copy(alpha = 0.2f))
-                )
                 Icon(
-                    imageVector = Icons.Default.CheckCircle,
-                    contentDescription = null,
-                    tint = primaryColor,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(space.small)
-                        .size(20.dp)
+                    Icons.Default.CheckCircle,
+                    null,
+                    modifier = Modifier.size(12.dp),
+                    tint = primaryColor
                 )
             }
         }
-        Spacer(modifier = Modifier.height(space.small))
-        FintrackLabelMediumText(
-            text = label,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = if (isSelected) primaryColor else MaterialTheme.colorScheme.onSurface
-        )
     }
 }
 
-fun getThemePreviewColor(theme: AppTheme): Color {
+fun getThemePreviewGradient(theme: AppTheme): androidx.compose.ui.graphics.Brush {
     return when (theme) {
-        AppTheme.GLASS_DARK -> Color(0xFF06100E)
-        AppTheme.GLASS_LIGHT -> Color(0xFFF0F4F3)
-        AppTheme.PLAIN_DARK -> Color(0xFF1A1C18)
-        AppTheme.PLAIN_LIGHT -> Color(0xFFFCFDF6)
+        AppTheme.GLASS_DARK -> androidx.compose.ui.graphics.Brush.linearGradient(
+            listOf(
+                Color(
+                    0xFF0A1714
+                ), Color(0xFF06100E)
+            )
+        )
+
+        AppTheme.GLASS_LIGHT -> androidx.compose.ui.graphics.Brush.linearGradient(
+            listOf(
+                Color(
+                    0xFFFDFBF7
+                ), Color(0xFFE7E2D9)
+            )
+        )
+
+        AppTheme.PLAIN_DARK -> androidx.compose.ui.graphics.Brush.linearGradient(
+            listOf(
+                Color(
+                    0xFF1C1C1E
+                ), Color(0xFF0C0C0E)
+            )
+        )
+
+        AppTheme.PLAIN_LIGHT -> androidx.compose.ui.graphics.Brush.linearGradient(
+            listOf(
+                Color(
+                    0xFFF7F7F8
+                ), Color(0xFFE8E8EB)
+            )
+        )
     }
 }

@@ -2,8 +2,10 @@ package com.kazemieh.profile
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,38 +15,39 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
-import com.kazemieh.designsystem.component.FintrackButton
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
-import com.kazemieh.designsystem.component.glass.Switch
 import com.kazemieh.money.Currency
-import com.kazemieh.money.CurrencyType
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -57,16 +60,10 @@ fun CurrencySettingsScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
-    var showAddDialog by remember { mutableStateOf(false) }
 
     FintrackScreen(
         title = stringResource(Res.string.label_currency),
-        onBack = onBack,
-        floatingActionButton = {
-            FAB(
-                onClick = { showAddDialog = true }
-            )
-        }
+        onBack = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             FintrackOutlinedTextField(
@@ -121,18 +118,12 @@ fun CurrencySettingsScreen(
                         )
                     }
                 }
+
+                item {
+                    AutoConvertCard()
+                }
             }
         }
-    }
-
-    if (showAddDialog) {
-        AddCurrencyBottomSheet(
-            onDismiss = { showAddDialog = false },
-            onConfirm = { currency ->
-                viewModel.onIntent(CurrencySettingsIntent.AddCustomCurrency(currency))
-                showAddDialog = false
-            }
-        )
     }
 }
 
@@ -156,10 +147,45 @@ fun CurrencyListItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val space = LocalSpacing.current
-    var displayName by remember { mutableStateOf("") }
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val displayName = getCurrencyDisplayName(currency)
 
-    displayName = when (currency.displayName) {
+    Surface(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        color = if (isSelected) primaryColor.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
+        border = androidx.compose.foundation.BorderStroke(1.dp, if (isSelected) primaryColor.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Surface(
+                modifier = Modifier.size(38.dp),
+                shape = MaterialTheme.shapes.medium,
+                color = if (isSelected) primaryColor else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    FintrackLabelMediumText(text = currency.code, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                }
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                FintrackBodyLargeText(text = displayName, fontWeight = FontWeight.SemiBold)
+                FintrackLabelMediumText(text = if (currency.code == "IRT") "پیش‌فرض" else currency.symbol, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            if (isSelected) {
+                Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(18.dp), tint = primaryColor)
+            }
+        }
+    }
+}
+
+@Composable
+fun getCurrencyDisplayName(currency: Currency): String {
+    return when (currency.displayName) {
         "currency_name_irr" -> stringResource(Res.string.currency_name_irr)
         "currency_name_irt" -> stringResource(Res.string.currency_name_irt)
         "currency_name_usd" -> stringResource(Res.string.currency_name_usd)
@@ -366,124 +392,45 @@ fun CurrencyListItem(
         "crypto_name_bgb" -> stringResource(Res.string.crypto_name_bgb)
         else -> currency.displayName
     }
-
-    GlassCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(space.medium),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                FintrackBodyLargeText(
-                    text = currency.code,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                )
-                FintrackBodyLargeText(
-                    text = displayName,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            FintrackTitleLargeText(
-                text = currency.symbol,
-                modifier = Modifier.padding(horizontal = space.medium),
-                color = MaterialTheme.colorScheme.primary
-            )
-            RadioButton(
-                selected = isSelected,
-                onClick = onClick,
-                colors = RadioButtonDefaults.colors(
-                    selectedColor = MaterialTheme.colorScheme.primary
-                )
-            )
-        }
-    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddCurrencyBottomSheet(
-    onDismiss: () -> Unit,
-    onConfirm: (Currency) -> Unit
-) {
-    val space = LocalSpacing.current
-    var code by remember { mutableStateOf("") }
-    var symbol by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
-    var isCrypto by remember { mutableStateOf(false) }
-
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val title = stringResource(Res.string.add_custom_currency)
-    val cryptoLabel = stringResource(Res.string.currency_type_crypto)
-    val fiatLabel = stringResource(Res.string.currency_type_fiat)
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        dragHandle = null,
-        containerColor = MaterialTheme.colorScheme.background
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(space.large),
-            verticalArrangement = Arrangement.spacedBy(space.medium)
+fun AutoConvertCard() {
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        GlassCard(
+            modifier = Modifier.padding(top = 8.dp),
+            padding = 14.dp
         ) {
-            FintrackTitleLargeText(
-                text = title,
-                modifier = Modifier.padding(bottom = space.medium)
-            )
-            
-            FintrackOutlinedTextField(
-                value = code,
-                onValueChange = { code = it },
-                label = { FintrackBodyLargeText(stringResource(Res.string.currency_code_label)) }
-            )
-            FintrackOutlinedTextField(
-                value = symbol,
-                onValueChange = { symbol = it },
-                label = { FintrackBodyLargeText(stringResource(Res.string.currency_symbol_label)) }
-            )
-            FintrackOutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { FintrackBodyLargeText(stringResource(Res.string.currency_name_label_input)) }
-            )
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                FintrackBodyLargeText(
-                    text = if (isCrypto) cryptoLabel else fiatLabel,
-                    modifier = Modifier.weight(1f)
-                )
-                Switch(on = isCrypto, onToggle = { isCrypto = it })
-            }
-
-            FintrackButton(
-                text = stringResource(Res.string.confirm),
-                onClick = {
-                    if (code.isNotEmpty() && symbol.isNotEmpty() && name.isNotEmpty()) {
-                        onConfirm(
-                            Currency(
-                                code = code.uppercase(),
-                                symbol = symbol,
-                                displayName = name,
-                                type = if (isCrypto) CurrencyType.CRYPTO else CurrencyType.FIAT
-                            )
+                Surface(
+                    modifier = Modifier.size(28.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            Icons.Default.Public,
+                            null,
+                            modifier = Modifier.size(14.dp),
+                            tint = MaterialTheme.colorScheme.secondary
                         )
                     }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = code.isNotEmpty() && symbol.isNotEmpty() && name.isNotEmpty()
-            )
-            Spacer(modifier = Modifier.height(space.large))
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    FintrackBodyLargeText(
+                        text = stringResource(Res.string.label_auto_convert),
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    FintrackBodyMediumText(
+                        text = stringResource(Res.string.label_auto_convert_desc),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
     }
 }

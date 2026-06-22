@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.money.Currency
 import com.kazemieh.money.CurrencyProvider
-import com.kazemieh.money.CurrencyType
 import com.kazemieh.preferences.FinTrackPreferences.Companion.PREF_CURRENCY
 import com.kazemieh.preferences.FinTrackPreferences.Companion.PREF_CUSTOM_CURRENCIES
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +22,7 @@ class CurrencySettingsViewModel(
     init {
         loadSettings()
         loadCustomCurrencies()
-        filterCurrencies()
+        filterCurrencies("")
     }
 
     private fun loadCustomCurrencies() {
@@ -48,54 +47,49 @@ class CurrencySettingsViewModel(
             } catch (e: Exception) {
                 Currency.TOMAN
             }
-        } else {
-            Currency.TOMAN
-        }
-
-        _state.update {
-            it.copy(selectedCurrency = selectedCurrency)
-        }
-    }
-
-    private fun filterCurrencies() {
-        val query = _state.value.searchQuery.lowercase()
-        val all = CurrencyProvider.allCurrencies + _state.value.customCurrencies
-        val filtered = if (query.isEmpty()) {
-            all
-        } else {
-            all.filter {
-                it.code.lowercase().contains(query) ||
-                        it.displayName.lowercase().contains(query)
-            }
-        }
-
-        _state.update {
-            it.copy(
-                fiatCurrencies = filtered.filter { c -> c.type == CurrencyType.FIAT },
-                cryptoCurrencies = filtered.filter { c -> c.type == CurrencyType.CRYPTO }
-            )
-        }
+        } else Currency.TOMAN
+        
+        _state.update { it.copy(selectedCurrency = selectedCurrency) }
     }
 
     fun onIntent(intent: CurrencySettingsIntent) {
         when (intent) {
             is CurrencySettingsIntent.SelectCurrency -> {
-                val currencyJson = Json.encodeToString(intent.currency)
-                preferenceUseCases.setStringPreference(PREF_CURRENCY, currencyJson)
+                val json = Json.encodeToString(intent.currency)
+                preferenceUseCases.setStringPreference(PREF_CURRENCY, json)
                 _state.update { it.copy(selectedCurrency = intent.currency) }
             }
             is CurrencySettingsIntent.UpdateSearchQuery -> {
                 _state.update { it.copy(searchQuery = intent.query) }
-                filterCurrencies()
+                filterCurrencies(intent.query)
             }
-            is CurrencySettingsIntent.AddCustomCurrency -> {
-                val newList = _state.value.customCurrencies + intent.currency
-                val json = Json.encodeToString(newList)
-                preferenceUseCases.setStringPreference(PREF_CUSTOM_CURRENCIES, json)
-                _state.update { it.copy(customCurrencies = newList) }
-                filterCurrencies()
-                onIntent(CurrencySettingsIntent.SelectCurrency(intent.currency))
+        }
+    }
+
+    private fun filterCurrencies(query: String) {
+        val fiat = if (query.isEmpty()) {
+            CurrencyProvider.fiatCurrencies
+        } else {
+            CurrencyProvider.fiatCurrencies.filter { 
+                it.code.contains(query, ignoreCase = true) || 
+                it.displayName.contains(query, ignoreCase = true)
             }
+        }
+
+        val crypto = if (query.isEmpty()) {
+            CurrencyProvider.cryptocurrencies
+        } else {
+            CurrencyProvider.cryptocurrencies.filter { 
+                it.code.contains(query, ignoreCase = true) || 
+                it.displayName.contains(query, ignoreCase = true)
+            }
+        }
+
+        _state.update { 
+            it.copy(
+                fiatCurrencies = fiat,
+                cryptoCurrencies = crypto
+            ) 
         }
     }
 }
@@ -111,5 +105,4 @@ data class CurrencySettingsState(
 sealed interface CurrencySettingsIntent {
     data class SelectCurrency(val currency: Currency) : CurrencySettingsIntent
     data class UpdateSearchQuery(val query: String) : CurrencySettingsIntent
-    data class AddCustomCurrency(val currency: Currency) : CurrencySettingsIntent
 }
