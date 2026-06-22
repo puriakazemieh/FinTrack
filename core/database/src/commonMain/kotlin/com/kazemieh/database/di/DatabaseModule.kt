@@ -62,6 +62,10 @@ val databaseModule = module {
         NoteLocalDataSourceImpl(db = get())
     }
 
+    single<SmsDraftLocalDataSource> {
+        SmsDraftLocalDataSourceImpl(db = get())
+    }
+
     single<SyncHistoryLocalDataSource> {
         SyncHistoryLocalDataSourceImpl(db = get())
     }

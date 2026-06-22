@@ -18,5 +18,7 @@ data class TransactionUseCaseGroup(
     val observeTagsUseCase: ObserveTagsUseCase,
     val observePersonsUseCase: ObservePersonsUseCase,
     val observeCategoriesUseCase: ObserveCategoriesUseCase,
-    val getTransactionAmountRangeUseCase: GetTransactionAmountRangeUseCase
+    val getTransactionAmountRangeUseCase: GetTransactionAmountRangeUseCase,
+    val getSourceByIdentifierUseCase: GetSourceByIdentifierUseCase,
+    val observeSourceUseCase: ObserveSourceUseCase
 )

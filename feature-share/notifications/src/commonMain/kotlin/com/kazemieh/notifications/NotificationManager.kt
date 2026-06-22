@@ -6,6 +6,7 @@ interface NotificationManager {
     fun showNotification(id: Int, title: String, message: String, channelId: String)
     fun hasPermission(): Boolean
     fun openSettings()
+    fun showStickyNotification(id: Int, title: String, message: String)
 
     companion object {
         const val CHANNEL_BUDGET = "budget_reminders"
@@ -13,5 +14,6 @@ interface NotificationManager {
         const val CHANNEL_CHEQUE = "cheque_reminders"
         const val CHANNEL_SHOPPING = "shopping_reminders"
         const val CHANNEL_NOTE = "note_reminders"
+        const val CHANNEL_SMS = "sms_detection"
     }
 }

@@ -1,8 +1,0 @@
-{
-  "buildPath": ":",
-  "projectPath": ":feature-share:notes",
-  "moduleId": {
-    "groupId": "FinTrack.feature-share",
-    "moduleId": "notes"
-  }
-}

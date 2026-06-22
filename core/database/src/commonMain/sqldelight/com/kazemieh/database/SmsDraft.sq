@@ -1,0 +1,33 @@
+CREATE TABLE IF NOT EXISTS sms_draft (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    sender TEXT NOT NULL,
+    body TEXT NOT NULL,
+    amount INTEGER NOT NULL,
+    bankName TEXT NOT NULL,
+    type INTEGER NOT NULL,
+    sourceId INTEGER,
+    sourceIdentifier TEXT,
+    timeStamp INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    isUsed INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (sourceId) REFERENCES source(id) ON DELETE SET NULL
+);
+
+insertSmsDraft:
+INSERT INTO sms_draft(sender, body, amount, bankName, type, sourceId, sourceIdentifier, timeStamp, date, isUsed)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+observeUnusedSmsDrafts:
+SELECT * FROM sms_draft WHERE isUsed = 0 ORDER BY timeStamp DESC;
+
+markSmsDraftAsUsed:
+UPDATE sms_draft SET isUsed = 1 WHERE id = ?;
+
+deleteSmsDraft:
+DELETE FROM sms_draft WHERE id = ?;
+
+getSmsDraftById:
+SELECT * FROM sms_draft WHERE id = ?;
+
+lastInsertRowId:
+SELECT last_insert_rowid();

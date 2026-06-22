@@ -68,6 +68,7 @@ interface TransactionRepository {
     suspend fun deleteSource(from: Source, to: Source?)
     fun observeSources(): Flow<List<Source>>
     fun observeSource(sourceId: Long): Flow<Source?>
+    suspend fun getSourceByIdentifier(identifier: String): Source?
     suspend fun getDefaultSource(): Source?
 
     fun observeMostUsedCategories(type: TransactionType?, limit: Long): Flow<List<Category>>

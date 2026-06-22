@@ -168,6 +168,10 @@ class TransactionRepositoryImpl(
         return localDataSource.getTransferCategory()
     }
 
+    override suspend fun getSourceByIdentifier(identifier: String): Source? {
+        return localDataSource.getSourceByIdentifier(identifier)
+    }
+
     override suspend fun getDefaultSource(): Source? {
         return localDataSource.getDefaultSource()
     }

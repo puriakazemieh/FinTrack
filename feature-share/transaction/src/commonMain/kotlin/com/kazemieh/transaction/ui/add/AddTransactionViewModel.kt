@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.SmsDraft
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.Transaction
@@ -13,6 +14,7 @@ import com.kazemieh.common.toPersianDigits
 import com.kazemieh.common.ImageStorage
 import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
+import com.kazemieh.domain.repository.SmsDraftRepository
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import com.kazemieh.jalali.JalaliCalendar
 import fintrack.core.designsystem.generated.resources.Res
@@ -23,6 +25,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -34,6 +37,7 @@ import kotlinx.coroutines.launch
 class AddTransactionViewModel(
     private val transactionUseCaseGroup: TransactionUseCaseGroup,
     private val imageStorage: ImageStorage,
+    private val smsDraftRepository: SmsDraftRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddTransactionState())
@@ -141,7 +145,10 @@ class AddTransactionViewModel(
                 }
             }
 
-            is AddTransactionIntent.FetchDefaultData -> fetchDefaultData(intent.transactionWithRelations)
+            is AddTransactionIntent.FetchDefaultData -> fetchDefaultData(
+                intent.transactionWithRelations,
+                intent.smsDraft
+            )
             AddTransactionIntent.OnDismiss -> viewModelScope.launch {
                 _effect.send(
                     AddTransactionEffect.OnDismiss
@@ -167,7 +174,10 @@ class AddTransactionViewModel(
         }
     }
 
-    private fun fetchDefaultData(transactionWithRelations: TransactionWithRelations?) {
+    private fun fetchDefaultData(
+        transactionWithRelations: TransactionWithRelations?,
+        smsDraft: SmsDraft? = null
+    ) {
         if (transactionWithRelations == null) {
             val today = JalaliCalendar()
             _state.value = AddTransactionState(
@@ -176,15 +186,26 @@ class AddTransactionViewModel(
                 mostUsedCategories = _state.value.mostUsedCategories,
                 mostUsedSources = _state.value.mostUsedSources,
                 mostUsedTags = _state.value.mostUsedTags,
-                mostUsedPersons = _state.value.mostUsedPersons
+                mostUsedPersons = _state.value.mostUsedPersons,
+                smsDraft = smsDraft,
+                amount = smsDraft?.amount?.toString() ?: "",
+                transactionType = smsDraft?.type ?: TransactionType.EXPENSE
             ) // Full reset first with today's date
             viewModelScope.launch {
                 val defaultSource = transactionUseCaseGroup.getDefaultFinancialSourceUseCase()
+                val detectedSource = if (smsDraft?.sourceId != null) {
+                    transactionUseCaseGroup.observeSourceUseCase(smsDraft.sourceId!!).firstOrNull()
+                } else {
+                    smsDraft?.sourceIdentifier?.let { 
+                        transactionUseCaseGroup.getSourceByIdentifierUseCase(it)
+                    }
+                }
+                
                 val defaultCategory =
                     transactionUseCaseGroup.getDefaultCategoryUseCase(_state.value.transactionType)
                 _state.update {
                     it.copy(
-                        source = defaultSource,
+                        source = detectedSource ?: defaultSource,
                         category = defaultCategory
                     )
                 }
@@ -270,6 +291,9 @@ class AddTransactionViewModel(
             }
             _state.update { it.copy(isLoading = false) }
             if (id > 0) {
+                current.smsDraft?.let { draft ->
+                    smsDraftRepository.markSmsDraftAsUsed(draft.id)
+                }
                 _effect.send(AddTransactionEffect.AddedTransaction)
             } else {
                 SnackbarController.showMessage(UiText.StringResourceText(Res.string.transaction_failed))
@@ -345,6 +369,7 @@ data class AddTransactionState(
     val isLoading: Boolean = false,
     val sheetStack: List<AddTransactionSheet> = emptyList(),
     val oldTransaction: Transaction? = null,
+    val smsDraft: SmsDraft? = null,
     val listTransactionType: List<TransactionType> = TransactionType.entries,
     val mostUsedCategories: List<Category> = emptyList(),
     val mostUsedSources: List<Source> = emptyList(),
@@ -367,8 +392,10 @@ sealed interface AddTransactionIntent {
     data class SetDescription(val description: String) : AddTransactionIntent
     data class SetPhoto(val bytes: ByteArray?) : AddTransactionIntent
     data object Submit : AddTransactionIntent
-    data class FetchDefaultData(val transactionWithRelations: TransactionWithRelations?) :
-        AddTransactionIntent
+    data class FetchDefaultData(
+        val transactionWithRelations: TransactionWithRelations?,
+        val smsDraft: SmsDraft? = null
+    ) : AddTransactionIntent
 
     data object OnDismiss : AddTransactionIntent
     data class SelectedType(val selectedTransactionType: TransactionType) : AddTransactionIntent

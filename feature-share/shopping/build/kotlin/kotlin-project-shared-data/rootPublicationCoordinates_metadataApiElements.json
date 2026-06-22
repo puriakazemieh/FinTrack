@@ -1,8 +1,0 @@
-{
-  "buildPath": ":",
-  "projectPath": ":feature-share:shopping",
-  "moduleId": {
-    "groupId": "FinTrack.feature-share",
-    "moduleId": "shopping"
-  }
-}

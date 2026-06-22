@@ -18,7 +18,8 @@ val addTransactionPresentationModule = module {
     viewModel {
         AddTransactionViewModel(
             transactionUseCaseGroup = get(),
-            imageStorage = get()
+            imageStorage = get(),
+            smsDraftRepository = get()
         )
     }
 }

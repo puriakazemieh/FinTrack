@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Message
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -54,6 +55,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.list.CategoryPickerBottomSheet
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.SmsDraft
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
@@ -124,6 +126,7 @@ fun AddTransactionBottomSheet(
     viewModel: AddTransactionViewModel = koinViewModel(),
     transactionWithRelations: TransactionWithRelations? = null,
     initialType: TransactionType? = null,
+    smsDraft: SmsDraft? = null,
     snackbarHostState: SnackbarHostState,
     onDismiss: () -> Unit,
     transactionAdded: () -> Unit
@@ -141,8 +144,8 @@ fun AddTransactionBottomSheet(
         }
     }
 
-    LaunchedEffect(transactionWithRelations, initialType) {
-        viewModel.onIntent(AddTransactionIntent.FetchDefaultData(transactionWithRelations))
+    LaunchedEffect(transactionWithRelations, initialType, smsDraft) {
+        viewModel.onIntent(AddTransactionIntent.FetchDefaultData(transactionWithRelations, smsDraft))
         initialType?.let { viewModel.onIntent(AddTransactionIntent.SelectedType(it)) }
     }
 
@@ -372,6 +375,15 @@ fun AddTransactionContent(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = PaddingValues(bottom = 100.dp)
     ) {
+        state.smsDraft?.let { draft ->
+            item {
+                SmsReferenceBanner(
+                    draft = draft,
+                    modifier = Modifier.padding(bottom = 6.dp)
+                )
+            }
+        }
+
         item {
             GlassSegmentedSelector(
                 selectedType = state.transactionType,

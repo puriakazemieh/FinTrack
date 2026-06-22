@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Message
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kazemieh.common.model.SmsDraft
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassGreen
@@ -59,7 +61,54 @@ import fintrack.core.designsystem.generated.resources.label_required_marker
 import fintrack.core.designsystem.generated.resources.type_expense
 import fintrack.core.designsystem.generated.resources.type_income
 import fintrack.core.designsystem.generated.resources.type_transfer
+import fintrack.core.designsystem.generated.resources.sms_ref_label
 import org.jetbrains.compose.resources.stringResource
+
+@Composable
+fun SmsReferenceBanner(
+    draft: SmsDraft,
+    modifier: Modifier = Modifier
+) {
+    val glassColors = LocalGlassColors.current
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .border(1.dp, GlassBlue.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+            .background(GlassBlue.copy(alpha = 0.05f))
+            .padding(12.dp)
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Message,
+                        contentDescription = null,
+                        tint = GlassBlue,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    FintrackLabelSmallText(
+                        text = stringResource(Res.string.sms_ref_label, draft.bankName),
+                        color = GlassBlue,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            FintrackLabelSmallText(
+                text = draft.body,
+                color = glassColors.text.copy(alpha = 0.7f)
+            )
+        }
+    }
+}
 
 @Composable
 fun GlassSegmentedSelector(

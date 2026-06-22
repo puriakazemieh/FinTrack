@@ -61,6 +61,7 @@ interface TransactionLocalDataSource {
     suspend fun adjustSourceBalance(id: Long, delta: Int)
     suspend fun getDefaultCategory(type: TransactionType): Category
     suspend fun getTransferCategory(): Category
+    suspend fun getSourceByIdentifier(identifier: String): Source?
     suspend fun getDefaultSource(): Source?
 
 

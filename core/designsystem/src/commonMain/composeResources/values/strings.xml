@@ -941,4 +941,19 @@
     <string name="export_csv_title">CSV ساده</string>
     <string name="export_csv_desc">برای نرم‌افزارهای دیگر</string>
     <string name="export_range_label">بازه‌ی خروجی</string>
+
+    <!-- SMS Reader -->
+    <string name="sms_detection_title">پیامک بانکی شناسایی شد</string>
+    <string name="sms_detection_desc">یک تراکنش مربوط به بانک %1$s شناسایی شد.</string>
+    <string name="sms_banner_text">%1$s پیامک بانکی جدید شناسایی شد</string>
+    <string name="sms_sheet_title">پیامک‌های شناسایی شده</string>
+    <string name="sms_sheet_sub">انتخاب برای ثبت تراکنش</string>
+    <string name="sms_ref_label">پیش‌نویس از پیامک بانکی · %1$s</string>
+    <string name="notif_channel_sms">شناسایی پیامک</string>
+    <string name="notif_action_register">ثبت سریع</string>
+    <string name="notif_action_ignore">نادیده گرفتن</string>
+    <string name="bank_label">بانک %1$s</string>
+    <string name="amount_rial_label">%1$s ریال</string>
+    <string name="sms_banner_desc">شما %1$s تراکنش ثبت نشده از پیامک‌های بانکی دارید.</string>
+    <string name="card_suffix_label">کارت: ...%1$s · </string>
 </resources>

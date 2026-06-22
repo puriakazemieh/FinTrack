@@ -106,6 +106,7 @@ kotlin {
             implementation(project(":feature-share:sync"))
             implementation(project(":feature-share:backup-export"))
             implementation(project(":feature-share:notes"))
+            implementation(project(":feature-share:sms-reader"))
 
 
         }

@@ -32,6 +32,7 @@ import com.kazemieh.domain.usecase.GetCategoryUseCase
 import com.kazemieh.domain.usecase.GetDefaultCategoryUseCase
 import com.kazemieh.domain.usecase.GetDefaultFinancialSourceUseCase
 import com.kazemieh.domain.usecase.GetRecentSearchesUseCase
+import com.kazemieh.domain.usecase.GetSourceByIdentifierUseCase
 import com.kazemieh.domain.usecase.GetTransferCategoryUseCase
 import com.kazemieh.domain.usecase.GetTransactionAmountRangeUseCase
 import com.kazemieh.domain.usecase.DebtUseCaseGroup
@@ -131,6 +132,7 @@ val domainModule = module {
     factory { UpdateTagPositionsUseCase(get()) }
     factory { UpdatePersonPositionsUseCase(get()) }
     factory { GetTransactionAmountRangeUseCase(get()) }
+    factory { GetSourceByIdentifierUseCase(get()) }
     factory { SeedDataUseCase(get(), get()) }
 
     factory { ObserveBudgetsWithProgressUseCase(get()) }
@@ -272,7 +274,9 @@ val domainModule = module {
             observeTagsUseCase = get(),
             observePersonsUseCase = get(),
             observeCategoriesUseCase = get(),
-            getTransactionAmountRangeUseCase = get()
+            getTransactionAmountRangeUseCase = get(),
+            getSourceByIdentifierUseCase = get(),
+            observeSourceUseCase = get()
         )
     }
 

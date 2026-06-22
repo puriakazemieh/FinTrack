@@ -511,3 +511,17 @@ fun NoteDb.toNote(tags: List<Tag> = emptyList()) = Note(
     syncStatus = SyncStatus.fromInt(syncStatus.toInt()),
     tags = tags
 )
+
+fun Sms_draft.toSmsDraft() = SmsDraft(
+    id = id,
+    sender = sender,
+    body = body,
+    amount = amount.toInt(),
+    bankName = bankName,
+    type = TransactionType.fromInt(type.toInt()),
+    sourceId = sourceId,
+    sourceIdentifier = sourceIdentifier,
+    timeStamp = timeStamp,
+    date = date,
+    isUsed = isUsed == 1L
+)

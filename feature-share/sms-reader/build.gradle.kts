@@ -4,20 +4,17 @@ plugins {
     alias(libs.plugins.android.lint)
     alias(libs.plugins.composeMultiplatformPlugin)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlinxSerialization)
 }
 
 kotlin {
     androidLibrary {
-        namespace = "com.kazemieh.dashboard"
-        compileSdk {
-            version = release(36)
-        }
+        namespace = "com.kazemieh.sms_reader"
+        compileSdk = 35
         minSdk = 24
     }
 
-    val xcfName = "core:dashboardKit"
+    val xcfName = "core:financialsourceKit"
 
     iosX64 {
         binaries.framework {
@@ -49,58 +46,30 @@ kotlin {
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.kotlinx.datetime)
                 implementation(project(":core:common"))
-                implementation(project(":feature-share:transaction"))
-                implementation(project(":feature-share:source"))
-                implementation(project(":feature-share:budget"))
-                implementation(project(":feature-share:installment"))
-                implementation(project(":feature-share:asset"))
-                implementation(project(":feature-share:shopping"))
-                implementation(project(":feature-share:notes"))
-                implementation(project(":feature-share:sms-reader"))
-                implementation(project(":feature-share:check"))
-                implementation(project(":feature-share:fixed-expense"))
-
-                implementation(project(":core:designsystem"))
                 implementation(project(":core:domain"))
-                implementation(project(":core:preferences"))
-
+                implementation(project(":core:designsystem"))
+                
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)
                 implementation(libs.compose.ui)
-                implementation(libs.compose.material.icons.core)
-                implementation(libs.compose.material.icons.extended)
                 implementation(libs.compose.components.resources)
-                implementation(libs.compose.uiToolingPreview)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
-                implementation(libs.kotlinx.datetime)
+                implementation(compose.components.resources)
 
                 implementation(libs.koin.compose)
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose.viewmodel)
+
+                implementation(libs.compose.material.icons.core)
+                implementation(libs.compose.material.icons.extended)
             }
         }
-
 
         androidMain {
             dependencies {
-            }
-        }
-
-        iosMain {
-            dependencies {
-            }
-        }
-
-        jsMain {
-            dependencies {
-            }
-        }
-
-        jvmMain {
-            dependencies {
+                implementation(project(":feature-share:notifications"))
             }
         }
     }
-
 }

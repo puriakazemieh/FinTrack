@@ -52,6 +52,8 @@ import com.kazemieh.fixed_expense.ui.widget.FixedExpenseWidget
 import com.kazemieh.installment.ui.widget.InstallmentWidget
 import com.kazemieh.shopping.ui.ShoppingWidget
 import com.kazemieh.notes.ui.list.NotesWidget
+import com.kazemieh.sms_reader.ui.SmsBanner
+import com.kazemieh.sms_reader.ui.SmsDetectionSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.BalanceHero
@@ -110,6 +112,17 @@ fun DashboardScreen(
                     },
                     modifier = Modifier.padding(horizontal = space.large)
                 )
+            }
+
+            if (state.smsDrafts.isNotEmpty()) {
+                item {
+                    SmsBanner(
+                        count = state.smsDrafts.size,
+                        onClick = { viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet) },
+                        onClose = { /* Optionally hide for session */ },
+                        modifier = Modifier.padding(horizontal = space.large, vertical = space.small)
+                    )
+                }
             }
 
             item { Spacer(Modifier.height(space.large)) }
@@ -218,9 +231,27 @@ fun DashboardScreen(
             AddTransactionBottomSheet(
                 transactionWithRelations = state.transactionWithRelations,
                 initialType = state.initialTransactionType,
+                smsDraft = state.smsDraft,
                 snackbarHostState = snackbarHostState,
                 onDismiss = { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) },
                 transactionAdded = { viewModel.onIntent(DashboardIntent.AnimationEnabled) },
+            )
+        }
+
+        if (state.showSmsDetection) {
+            SmsDetectionSheet(
+                drafts = state.smsDrafts,
+                onDraftClick = { draft ->
+                    viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet)
+                    viewModel.onIntent(
+                        DashboardIntent.ShowTransactionBottomSheet(
+                            smsDraft = draft,
+                            type = draft.type
+                        )
+                    )
+                },
+                onIgnore = { viewModel.onIntent(DashboardIntent.IgnoreSmsDraft(it)) },
+                onDismiss = { viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet) }
             )
         }
 

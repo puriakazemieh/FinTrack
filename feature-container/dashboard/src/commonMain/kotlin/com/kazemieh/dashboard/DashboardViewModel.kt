@@ -2,9 +2,11 @@ package com.kazemieh.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.model.SmsDraft
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.domain.repository.SmsDraftRepository
 import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.preferences.FinTrackPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,10 +16,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 
 class DashboardViewModel(
-    private val preferenceUseCases: PreferenceUseCases
+    private val preferenceUseCases: PreferenceUseCases,
+    private val smsDraftRepository: SmsDraftRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DashboardState())
@@ -25,6 +29,14 @@ class DashboardViewModel(
 
     init {
         observeUserName()
+        observeSmsDrafts()
+    }
+
+    private fun observeSmsDrafts() {
+        smsDraftRepository.observeUnusedSmsDrafts()
+            .onEach { drafts ->
+                _state.update { it.copy(smsDrafts = drafts) }
+            }.launchIn(viewModelScope)
     }
 
     private fun observeUserName() {
@@ -51,7 +63,8 @@ class DashboardViewModel(
                 it.copy(
                     showAddTransaction = !_state.value.showAddTransaction,
                     transactionWithRelations = intent.transactionWithRelations,
-                    initialTransactionType = intent.type
+                    initialTransactionType = intent.type,
+                    smsDraft = intent.smsDraft
                 )
             }
 
@@ -73,12 +86,21 @@ class DashboardViewModel(
                 it.copy(
                     enableAnimationChart = !_state.value.enableAnimationChart,
                     showAddTransaction = false,
-                    transactionWithRelations = null
+                    transactionWithRelations = null,
+                    smsDraft = null
                 )
             }
 
             DashboardIntent.ToggleBalanceVisibility -> _state.update {
                 it.copy(isBalanceVisible = !it.isBalanceVisible)
+            }
+
+            DashboardIntent.ToggleSmsDetectionSheet -> _state.update {
+                it.copy(showSmsDetection = !it.showSmsDetection)
+            }
+
+            is DashboardIntent.IgnoreSmsDraft -> viewModelScope.launch {
+                smsDraftRepository.markSmsDraftAsUsed(intent.draft.id)
             }
         }
     }
@@ -95,14 +117,18 @@ data class DashboardState(
     val isBalanceVisible: Boolean = true,
     val growthPercentage: String = "+2.5%", // Placeholder
     val userName: String = "کاربر",
-    val userInitial: String = "پ"
+    val userInitial: String = "پ",
+    val smsDrafts: List<SmsDraft> = emptyList(),
+    val showSmsDetection: Boolean = false,
+    val smsDraft: SmsDraft? = null
 )
 
 
 sealed interface DashboardIntent {
     data class ShowTransactionBottomSheet(
         val transactionWithRelations: TransactionWithRelations? = null,
-        val type: TransactionType? = null
+        val type: TransactionType? = null,
+        val smsDraft: SmsDraft? = null
     ) : DashboardIntent
 
     data class DeleteTransactionBottomSheet(val transactionWithRelations: TransactionWithRelations? = null) :
@@ -111,4 +137,6 @@ sealed interface DashboardIntent {
     data object AnimationEnabled : DashboardIntent
     data class ShowAddSource(val source: Source? = null) : DashboardIntent
     data object ToggleBalanceVisibility : DashboardIntent
+    data object ToggleSmsDetectionSheet : DashboardIntent
+    data class IgnoreSmsDraft(val draft: SmsDraft) : DashboardIntent
 }

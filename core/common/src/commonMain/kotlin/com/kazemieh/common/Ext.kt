@@ -13,6 +13,20 @@ fun Long.toPersianDigits(): String = toString().toPersianDigits()
 fun Int.toPersianDigits(): String = toLong().toPersianDigits()
 
 /**
+ * Converts Persian/Arabic digits to English digits.
+ */
+fun String.toEnglishDigits(): String {
+    var result = this
+    val persianDigits = arrayOf('۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹')
+    val arabicDigits = arrayOf('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩')
+    for (i in 0..9) {
+        result = result.replace(persianDigits[i], '0' + i)
+        result = result.replace(arabicDigits[i], '0' + i)
+    }
+    return result
+}
+
+/**
  * Formats a number with comma separators every 3 digits.
  * Example: 1250000 -> 1,250,000
  */

@@ -57,6 +57,12 @@ SELECT last_insert_rowid();
 getSourceById:
 SELECT * FROM source WHERE id = ?;
 
+getSourceByIdentifier:
+SELECT * FROM source
+WHERE (cardNumber LIKE ('%' || :identifier) OR accountNumber LIKE ('%' || :identifier))
+AND syncStatus != 2
+LIMIT 1;
+
 insertFullSource:
 INSERT OR REPLACE INTO source(id, name, balance, cardNumber, description, type, colorId, iconId, shabaNumber, accountNumber, cvv2, expirationMonth, expirationYear, branchCode, branchName, position, updatedAt, syncStatus)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);

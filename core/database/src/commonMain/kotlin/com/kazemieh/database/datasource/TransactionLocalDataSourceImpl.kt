@@ -391,6 +391,12 @@ class TransactionLocalDataSourceImpl(
             }
         }
 
+    override suspend fun getSourceByIdentifier(identifier: String): Source? = withContext(Dispatchers.Default) {
+        sourceQueries.getSourceByIdentifier(identifier)
+            .awaitAsOneOrNull()
+            ?.toSource()
+    }
+
     override suspend fun getDefaultSource(): Source? =
         withContext(Dispatchers.Default) {
             sourceQueries.getDefaultSource()
