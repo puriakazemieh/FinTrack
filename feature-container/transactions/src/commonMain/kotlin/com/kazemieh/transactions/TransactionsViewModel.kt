@@ -341,6 +341,8 @@ class TransactionsViewModel(
                             selectedPerson = persons,
                             isAllPersonSelected = persons.isEmpty(),
                             selectedTransactionType = intent.transactionType ?: (if (categories.isNotEmpty()) categories.first().type else it.selectedTransactionType),
+                            searchQuery = intent.query ?: it.searchQuery,
+                            isSearchActive = intent.query != null || it.isSearchActive,
                             enableAnimationChart = !it.enableAnimationChart
                         )
                     }
@@ -473,6 +475,7 @@ data class TransactionsState(
     val selectedMaxAmount: Float = 1_000_000f,
 
     val isSearchActive: Boolean = false,
+    val searchQuery: String = "",
     val isFilterActive: Boolean = false,
     val isFilterSheetVisible: Boolean = false,
 
@@ -528,7 +531,8 @@ sealed interface TransactionsIntent {
         val sourceId: Long? = null,
         val tagId: Long? = null,
         val personId: Long? = null,
-        val transactionType: TransactionType? = null
+        val transactionType: TransactionType? = null,
+        val query: String? = null
     ) : TransactionsIntent
 
     data class OnDateSheetSubmit(

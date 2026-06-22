@@ -39,7 +39,7 @@ fun FixedExpenseListScreen(
     FintrackScreen(
         title = stringResource(Res.string.title_fixed_expense_management),
         sub = stringResource(Res.string.sub_fixed_expense_management),
-        onClose = onBack
+        onBack = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             EntityList(

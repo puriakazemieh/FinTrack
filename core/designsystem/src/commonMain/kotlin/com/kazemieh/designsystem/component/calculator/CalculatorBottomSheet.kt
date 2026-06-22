@@ -51,6 +51,8 @@ import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -128,43 +130,27 @@ fun CalculatorBottomSheet(
                             .padding(horizontal = 24.dp, vertical = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        listOf("+5%", "+10%", "+15%", "+20%").forEach { percent ->
+                        val helpers = listOf(
+                            "+9" to "+۹٪ مالیات",
+                            "-10" to "−۱۰٪ تخفیف",
+                            "/2" to "÷ ۲",
+                            "*3" to "× ۳"
+                        )
+                        helpers.forEach { (value, label) ->
                             Chip(
-                                color = GlassGreen,
+                                color = if (value.startsWith("+")) GlassGreen else if (value.startsWith("-")) GlassRed else glassColors.text2,
                                 onClick = {
                                     if (expression.isNotEmpty() && expression.last().isDigit()) {
-                                        expression += percent
+                                        val op = value.take(1).replace("*", "×").replace("/", "÷")
+                                        val num = value.drop(1)
+                                        expression += if (op == "+" || op == "-") "$op$num%" else "$op$num"
                                         updateResult()
                                     }
                                 }
                             ) {
                                 FintrackLabelMediumText(
-                                    text = percent.toPersianDigits(),
-                                    color = GlassGreen
-                                )
-                            }
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        listOf("-5%", "-10%", "-15%", "-20%").forEach { percent ->
-                            Chip(
-                                color = GlassRed,
-                                onClick = {
-                                    if (expression.isNotEmpty() && expression.last().isDigit()) {
-                                        expression += percent
-                                        updateResult()
-                                    }
-                                }
-                            ) {
-                                FintrackLabelMediumText(
-                                    text = percent.toPersianDigits(),
-                                    color = GlassRed
+                                    text = label.toPersianDigits(),
+                                    color = if (value.startsWith("+")) GlassGreen else if (value.startsWith("-")) GlassRed else glassColors.text2
                                 )
                             }
                         }
@@ -172,11 +158,11 @@ fun CalculatorBottomSheet(
 
                     // Keypad
                     val keys = listOf(
-                        "AC", "÷", "×", "DEL",
+                        "C", "÷", "×", "⌫",
                         "7", "8", "9", "-",
                         "4", "5", "6", "+",
                         "1", "2", "3", "=",
-                        "%", "0", ".", "OK"
+                        "0", "000", ".", "OK"
                     )
 
                     LazyVerticalGrid(
@@ -192,11 +178,11 @@ fun CalculatorBottomSheet(
                                 key = key,
                                 onClick = {
                                     when (key) {
-                                        "AC" -> {
+                                        "C" -> {
                                             expression = ""
                                             resultPreview = ""
                                         }
-                                        "DEL" -> {
+                                        "⌫" -> {
                                             if (expression.isNotEmpty()) {
                                                 expression = expression.dropLast(1)
                                                 updateResult()
@@ -247,7 +233,7 @@ fun KeyButton(
     onClick: () -> Unit
 ) {
     val glassColors = LocalGlassColors.current
-    val isAction = key in listOf("AC", "DEL", "OK", "=")
+    val isAction = key in listOf("C", "⌫", "OK", "=")
     val isOperator = key in listOf("+", "-", "×", "÷", "%")
     
     val containerColor = when {
@@ -258,7 +244,7 @@ fun KeyButton(
     
     val textColor = when {
         key == "OK" -> Color.White
-        key == "AC" || key == "DEL" -> GlassRed
+        key == "C" || key == "⌫" -> GlassRed
         isOperator -> GlassGreen
         else -> glassColors.text
     }
@@ -275,7 +261,7 @@ fun KeyButton(
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        if (key == "DEL") {
+        if (key == "⌫") {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Backspace,
                 contentDescription = null,

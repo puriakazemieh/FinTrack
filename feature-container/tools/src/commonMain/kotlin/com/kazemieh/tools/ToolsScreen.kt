@@ -3,6 +3,7 @@ package com.kazemieh.tools
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -127,7 +128,7 @@ fun ToolsScreen(
         sub = stringResource(Res.string.title_tools_management)
     ) {
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Fixed(3),
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(space.large),
             horizontalArrangement = Arrangement.spacedBy(space.medium),
@@ -160,7 +161,7 @@ private fun ToolCard(tool: ToolItem) {
                 modifier = Modifier.size(32.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
-            androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(12.dp))
+            Spacer(modifier = Modifier.size(8.dp))
             FintrackLabelMediumText(
                 text = tool.label,
                 fontWeight = FontWeight.Bold,

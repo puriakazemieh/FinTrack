@@ -45,6 +45,7 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
             is Tag -> Screen.Transactions(tagId = data.id)
             is Person -> Screen.Transactions(personId = data.id)
             is com.kazemieh.common.model.TransactionType -> Screen.Transactions(transactionType = data)
+            is String -> Screen.Transactions(query = data)
             is Boolean -> Screen.Transactions(resetFilters = data)
             else -> Screen.Transactions()
         }
@@ -130,7 +131,12 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
         }
 
         composable<Screen.Budget> {
-            BudgetScreen(onBack = { navController.popBackStack() })
+            BudgetScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToTransactions = { category ->
+                    navigateToTransactions(category)
+                }
+            )
         }
 
         composable<Screen.Installment> {
@@ -144,7 +150,10 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onNavigateToDetail = { person ->
                     navController.navigate(Screen.PersonDetail(person.id ?: 0L))
                 },
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onNavigateToTransactions = { person ->
+                    navigateToTransactions(person)
+                }
             )
         }
 
@@ -187,7 +196,10 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
         composable<Screen.Assets> {
             AssetsListScreen(
                 onAddAsset = { navController.navigate(Screen.AddAsset) },
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onNavigateToTransactions = { query ->
+                    navigateToTransactions(query)
+                }
             )
         }
 

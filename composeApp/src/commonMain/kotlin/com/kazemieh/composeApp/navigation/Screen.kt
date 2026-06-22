@@ -15,7 +15,8 @@ sealed class Screen {
         val sourceId: Long? = null,
         val tagId: Long? = null,
         val personId: Long? = null,
-        val transactionType: com.kazemieh.common.model.TransactionType? = null
+        val transactionType: com.kazemieh.common.model.TransactionType? = null,
+        val query: String? = null
     ) : Screen()
 
     @Serializable

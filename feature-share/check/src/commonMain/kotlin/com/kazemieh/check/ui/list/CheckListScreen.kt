@@ -65,7 +65,7 @@ fun CheckListScreen(
     FintrackScreen(
         title = stringResource(Res.string.title_check_management),
         sub = stringResource(Res.string.sub_check_list_management_desc),
-        onClose = onBack
+        onBack = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Tabs(

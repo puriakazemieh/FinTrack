@@ -57,7 +57,7 @@ fun InstallmentsScreen(
 
     FintrackScreen(
         title = stringResource(Res.string.navigation_installment),
-        onClose = onBack
+        onBack = onBack
     ) {
         Column(
             modifier = Modifier.fillMaxSize()

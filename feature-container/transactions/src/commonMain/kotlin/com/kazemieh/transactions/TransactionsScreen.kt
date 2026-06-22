@@ -45,6 +45,7 @@ fun TransactionsScreen(
     tagId: Long? = null,
     personId: Long? = null,
     transactionType: TransactionType? = null,
+    query: String? = null,
     onNavigateToSearch: () -> Unit = {},
     viewModel: TransactionsViewModel = koinViewModel()
 ) {
@@ -57,20 +58,22 @@ fun TransactionsScreen(
         sourceId,
         tagId,
         personId,
-        transactionType
+        transactionType,
+        query
     ) {
         if (resetFilters && !state.resetFiltersHandled) {
             viewModel.onIntent(TransactionsIntent.ResetFilters)
         }
 
-        if (categoryId != null || sourceId != null || tagId != null || personId != null || transactionType != null) {
+        if (categoryId != null || sourceId != null || tagId != null || personId != null || transactionType != null || query != null) {
             viewModel.onIntent(
                 TransactionsIntent.ApplyFilter(
                     categoryId = categoryId,
                     sourceId = sourceId,
                     tagId = tagId,
                     personId = personId,
-                    transactionType = transactionType
+                    transactionType = transactionType,
+                    query = query
                 )
             )
         }

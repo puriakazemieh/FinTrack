@@ -1,22 +1,23 @@
 package com.kazemieh.financialsource.ui.list
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.FintrackScreen
+import com.kazemieh.designsystem.component.glass.HeaderAction
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.financialsource.ui.delete.DeleteSourceBottomSheet
-import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.currency_toman
-import fintrack.core.designsystem.generated.resources.source
-import fintrack.core.designsystem.generated.resources.title_source_management
+import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -32,7 +33,41 @@ fun SourcesScreen(
     FintrackScreen(
         title = stringResource(Res.string.source),
         sub = stringResource(Res.string.title_source_management),
-        onClose = onBack
+        onBack = onBack,
+        actions = if (state.isReorderShow) {
+            listOf(
+                HeaderAction(
+                    icon = rememberVectorPainter(Icons.Default.Check),
+                    label = "Done",
+                    onClick = { viewModel.onIntent(SourceIntent.OnToggleReorder) },
+                    color = com.kazemieh.designsystem.GlassGreen
+                )
+            )
+        } else {
+            emptyList()
+        },
+        trailingContent = {
+            if (!state.isReorderShow) {
+                var showMenu by remember { mutableStateOf(false) }
+                Box {
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = null)
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(Res.string.edit)) },
+                            onClick = {
+                                viewModel.onIntent(SourceIntent.OnToggleReorder)
+                                showMenu = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             EntityList(

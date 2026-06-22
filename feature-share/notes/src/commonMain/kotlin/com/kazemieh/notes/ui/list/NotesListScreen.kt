@@ -27,7 +27,7 @@ fun NotesListScreen(
 
     FintrackScreen(
         title = stringResource(Res.string.notes),
-        onClose = onBack
+        onBack = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             EntityList(

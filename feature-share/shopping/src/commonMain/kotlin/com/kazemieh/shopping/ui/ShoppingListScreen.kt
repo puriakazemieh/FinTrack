@@ -51,7 +51,7 @@ fun ShoppingListScreen(
 
     FintrackScreen(
         title = stringResource(Res.string.shopping_list),
-        onClose = onBack
+        onBack = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             val total = state.items.sumOf { it.estimatedPrice }

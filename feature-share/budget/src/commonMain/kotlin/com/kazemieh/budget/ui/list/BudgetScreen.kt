@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.common.model.Category
 import com.kazemieh.budget.ui.add.AddBudgetBottomSheet
 import com.kazemieh.common.toPersianPrice
 import com.kazemieh.designsystem.GlassGreen
@@ -29,7 +30,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun BudgetScreen(
     viewModel: BudgetViewModel = koinViewModel(),
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onNavigateToTransactions: ((Category) -> Unit)? = null
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
@@ -46,7 +48,7 @@ fun BudgetScreen(
     FintrackScreen(
         title = stringResource(Res.string.title_my_budgets),
         sub = currentMonthYear,
-        onClose = onBack
+        onBack = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             EntityList(
@@ -89,6 +91,11 @@ fun BudgetScreen(
                 onEditClick = { item ->
                     state.budgets.find { it.budget.id == item.id }?.let {
                         viewModel.onIntent(BudgetIntent.ShowAddBudget(it))
+                    }
+                },
+                onFilterClick = onNavigateToTransactions?.let { callback ->
+                    { item ->
+                        state.budgets.find { it.budget.id == item.id }?.category?.let { callback(it) }
                     }
                 },
                 onDeleteClick = { viewModel.onIntent(BudgetIntent.DeleteBudget(it.id)) },

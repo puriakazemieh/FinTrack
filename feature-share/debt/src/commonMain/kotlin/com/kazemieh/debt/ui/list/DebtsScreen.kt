@@ -56,7 +56,7 @@ fun DebtsScreen(
     FintrackScreen(
         title = stringResource(Res.string.navigation_debts),
         sub = stringResource(Res.string.title_debts_management),
-        onClose = onBack
+        onBack = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             EntityList(

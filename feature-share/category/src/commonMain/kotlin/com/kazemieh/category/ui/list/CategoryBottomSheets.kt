@@ -177,8 +177,12 @@ fun CategoryPickerBottomSheet(
                         viewModel.onIntent(CategoryIntent.ToggleExpand(item.id))
                     },
                     onItemClick = { item ->
-                        state.categories.find { it.id == item.id }?.let { category ->
-                            viewModel.onIntent(CategoryIntent.SelectedCategory(category))
+                        val category = state.categories.find { it.id == item.id }
+                        val hasChildren = state.allCategories.any { it.parentId == item.id }
+                        if (hasChildren && category?.parentId == null) {
+                            viewModel.onIntent(CategoryIntent.ToggleExpand(item.id))
+                        } else if (category != null) {
+                            onCategoryClick(category)
                         }
                     }
                 )
@@ -326,7 +330,11 @@ fun CategoryManageBottomSheet(
                         viewModel.onIntent(CategoryIntent.ToggleExpand(item.id))
                     },
                     onItemClick = { item ->
-                        state.categories.find { it.id == item.id }?.let { category ->
+                        val category = state.categories.find { it.id == item.id }
+                        val hasChildren = state.allCategories.any { it.parentId == item.id }
+                        if (hasChildren && category?.parentId == null) {
+                            viewModel.onIntent(CategoryIntent.ToggleExpand(item.id))
+                        } else if (category != null) {
                             viewModel.onIntent(CategoryIntent.SelectedCategory(category))
                         }
                     }

@@ -42,6 +42,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AssetsListScreen(
     onAddAsset: () -> Unit,
     onBack: () -> Unit,
+    onNavigateToTransactions: ((String) -> Unit)? = null,
     viewModel: AssetViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -58,7 +59,7 @@ fun AssetsListScreen(
                 )
             }
         },
-        onClose = onBack
+        onBack = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             EntityList(
@@ -86,6 +87,11 @@ fun AssetsListScreen(
                 },
                 onItemClick = { item ->
                     selectedAssetForActions = state.assets.find { it.id == item.id }
+                },
+                onFilterClick = onNavigateToTransactions?.let { callback ->
+                    { item ->
+                        state.assets.find { it.id == item.id }?.let { callback(it.name) }
+                    }
                 },
                 onEditClick = { /* TODO */ },
                 onDeleteClick = { /* TODO */ },

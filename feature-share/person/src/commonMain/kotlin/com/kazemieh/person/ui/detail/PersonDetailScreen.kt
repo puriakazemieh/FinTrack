@@ -19,7 +19,7 @@ import com.kazemieh.designsystem.component.glass.EntitySummary
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.model.UiText
 import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.balance
+import fintrack.core.designsystem.generated.resources.balance_total
 import fintrack.core.designsystem.generated.resources.currency_toman
 import fintrack.core.designsystem.generated.resources.debt_settled
 import fintrack.core.designsystem.generated.resources.description
@@ -73,7 +73,7 @@ fun PersonDetailScreen(
                         color = MaterialTheme.colorScheme.error
                     ),
                     EntitySummary(
-                        label = UiText.StringResourceText(Res.string.balance),
+                        label = UiText.StringResourceText(Res.string.balance_total),
                         value = state.balance.toPersianPrice(),
                         unit = stringResource(Res.string.currency_toman),
                         color = if (state.balance >= 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error

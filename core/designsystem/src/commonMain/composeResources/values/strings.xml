@@ -18,6 +18,7 @@
     <string name="app_name">FinTrack</string>
     <string name="add_transaction">افزودن تراکنش</string>
     <string name="add_source">افزودن منبع</string>
+    <string name="label_balance">موجودی</string>
     <string name="balance">موجودی: %1$s</string>
     <string name="navigation_home">صفحه نخست</string>
     <string name="navigation_report">تراکنش‌ها</string>
@@ -147,7 +148,11 @@
 
     <string name="test_ok">OK</string>
 
-    <string name="percentage_format">%1$d%%</string>
+    <string name="percentage_format">%1$s%%</string>
+    <string name="calc_tax">+%1$s%% مالیات</string>
+    <string name="calc_discount">-%1$s%% تخفیف</string>
+    <string name="calc_divide">÷ %1$s</string>
+    <string name="calc_multiply">× %1$s</string>
     <string name="optional_wrapper">(%1$s)</string>
     <string name="label_more_count"> (+%1$d)</string>
     <string name="mock_date">۱۴۰۲/۰۳/%1$d</string>
@@ -956,4 +961,9 @@
     <string name="amount_rial_label">%1$s ریال</string>
     <string name="sms_banner_desc">شما %1$s تراکنش ثبت نشده از پیامک‌های بانکی دارید.</string>
     <string name="card_suffix_label">کارت: ...%1$s · </string>
+
+    <string name="transaction_detail">جزئیات تراکنش</string>
+    <string name="related_tags">برچسب‌ها</string>
+    <string name="related_persons">افراد مرتبط</string>
+    <string name="attachment">تصویر پیوست</string>
 </resources>
