@@ -88,11 +88,10 @@ fun EntityList(
     showActions: Boolean = true,
     isReorderMode: Boolean = false,
     onMove: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> },
-    onReorderCommit: () -> Unit = {},
     indentSubCategories: Boolean = false,
     parentId: Long? = null
 ) {
-    var internalItems by remember(items) { mutableStateOf(items) }
+    var internalItems by remember(items.map { it.id }) { mutableStateOf(items) }
 
     Box(modifier = modifier.fillMaxSize()) {
         if (isReorderMode) {
@@ -100,8 +99,8 @@ fun EntityList(
             val state = rememberReorderableLazyListState(
                 lazyListState = lazyListState,
                 onMove = { from, to ->
-                    val fromIdx = from.index - 2 // Adjust for summary and search bar
-                    val toIdx = to.index - 2
+                    val fromIdx = from.index
+                    val toIdx = to.index
                     if (fromIdx >= 0 && toIdx >= 0 && fromIdx < internalItems.size && toIdx < internalItems.size) {
                         internalItems = internalItems.toMutableList().apply {
                             add(toIdx, removeAt(fromIdx))

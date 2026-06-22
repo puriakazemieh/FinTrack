@@ -69,7 +69,7 @@ fun PersonsScreen(
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.move)) },
+                            text = { Text(stringResource(Res.string.reorder_list)) },
                             onClick = {
                                 viewModel.onIntent(PersonIntent.OnToggleReorder)
                                 showMenu = false

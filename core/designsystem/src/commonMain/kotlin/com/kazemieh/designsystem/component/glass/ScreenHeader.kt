@@ -46,7 +46,7 @@ fun ScreenHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 14.dp, vertical = 12.dp),
+            .padding(horizontal = 4.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (onBack != null) {
@@ -66,24 +66,28 @@ fun ScreenHeader(
                 )
             }
         } else if (!center) {
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(12.dp))
         }
 
         Column(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 8.dp),
             horizontalAlignment = if (center) Alignment.CenterHorizontally else Alignment.Start
         ) {
             FintrackHeadlineSmallText(
                 text = title,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.W700,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground,
+                maxLines = 1
             )
             sub?.let {
                 FintrackLabelSmallText(
                     text = it,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 11.sp
+                    fontSize = 11.sp,
+                    maxLines = 1
                 )
             }
         }
@@ -91,7 +95,10 @@ fun ScreenHeader(
         trailingContent()
 
         if (actions.isNotEmpty()) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.padding(end = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 actions.forEach { action ->
                     Box {
                         IconButton(onClick = action.onClick) {
@@ -113,8 +120,9 @@ fun ScreenHeader(
                     }
                 }
             }
-        } else if (onBack != null && !center) {
-            Spacer(modifier = Modifier.width(48.dp)) // Mirror back button width
+        } else if (onBack != null && center) {
+            // Only add mirror spacer if centered and we need to balance the back button
+            Spacer(modifier = Modifier.width(48.dp))
         }
     }
 }

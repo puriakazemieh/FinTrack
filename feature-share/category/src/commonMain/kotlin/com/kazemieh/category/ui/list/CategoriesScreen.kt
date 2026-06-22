@@ -19,7 +19,7 @@ import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.HeaderAction
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.category
-import fintrack.core.designsystem.generated.resources.move
+import fintrack.core.designsystem.generated.resources.reorder_list
 import fintrack.core.designsystem.generated.resources.title_category_management
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -76,7 +76,7 @@ fun CategoriesScreen(
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.move)) },
+                            text = { Text(stringResource(Res.string.reorder_list)) },
                             onClick = {
                                 viewModel.onIntent(CategoryIntent.OnToggleReorder)
                                 showMenu = false

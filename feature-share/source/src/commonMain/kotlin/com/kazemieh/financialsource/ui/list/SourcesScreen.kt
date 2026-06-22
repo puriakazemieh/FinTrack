@@ -65,7 +65,7 @@ fun SourcesScreen(
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.move)) },
+                            text = { Text(stringResource(Res.string.reorder_list)) },
                             onClick = {
                                 viewModel.onIntent(SourceIntent.OnToggleReorder)
                                 showMenu = false

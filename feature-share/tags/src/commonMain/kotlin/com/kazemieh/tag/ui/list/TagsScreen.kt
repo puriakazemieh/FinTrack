@@ -68,7 +68,7 @@ fun TagsScreen(
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.move)) },
+                            text = { Text(stringResource(Res.string.reorder_list)) },
                             onClick = {
                                 viewModel.onIntent(TagIntent.OnToggleReorder)
                                 showMenu = false
