@@ -90,7 +90,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun AddSourceBottomSheet(
     viewModel: AddSourceViewModel = koinViewModel(),
-    snackbarHostState: SnackbarHostState,
     selectedSource: Source? = null,
     onDismiss: () -> Unit,
     onNavigateToTransactions: ((Source) -> Unit)? = null,

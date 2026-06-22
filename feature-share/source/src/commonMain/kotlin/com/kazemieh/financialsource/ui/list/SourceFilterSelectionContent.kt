@@ -28,7 +28,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun SourceFilterSelectionContent(
     viewModel: SourceViewModel = koinViewModel(key = "SourceFilterSelectionContent"),
-    snackbarHostState: SnackbarHostState,
     selectedSources: Set<Source>,
     isAllSelected: Boolean,
     onSelectionChanged: (Set<Source>, Boolean) -> Unit
@@ -103,7 +102,6 @@ fun SourceFilterSelectionContent(
 
     if (state.isAddShow) {
         AddSourceBottomSheet(
-            snackbarHostState = snackbarHostState,
             selectedSource = state.selectedSources,
             onDismiss = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
             setSource = { viewModel.onIntent(SourceIntent.OnAddSourceClick) }
@@ -112,7 +110,6 @@ fun SourceFilterSelectionContent(
 
     if (state.isDeleteShow && state.selectedSources != null) {
         DeleteSourceBottomSheet(
-            snackbarHostState = snackbarHostState,
             source = state.selectedSources!!,
             onDismiss = { viewModel.onIntent(SourceIntent.OnDeleteClick()) },
             deleted = { viewModel.onIntent(SourceIntent.OnDeleteClick()) }

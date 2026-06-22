@@ -60,7 +60,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel = koinViewModel(),
-    snackbarHostState: androidx.compose.material3.SnackbarHostState,
     onBack: () -> Unit,
     onNavigateToCategory: (Category) -> Unit = {},
     onNavigateToSource: (Source) -> Unit = {},
@@ -169,7 +168,6 @@ fun SearchScreen(
         if (state.showAddTransaction) {
             AddTransactionBottomSheet(
                 transactionWithRelations = state.transactionWithRelations,
-                snackbarHostState = snackbarHostState,
                 onDismiss = { viewModel.onIntent(SearchIntent.ShowTransactionBottomSheet()) },
                 transactionAdded = { viewModel.onIntent(SearchIntent.ShowTransactionBottomSheet()) },
             )

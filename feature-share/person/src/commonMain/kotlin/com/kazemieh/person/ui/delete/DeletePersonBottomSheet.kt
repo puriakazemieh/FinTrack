@@ -23,7 +23,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun DeletePersonBottomSheet(
     viewModel: DeletePersonViewModel = koinViewModel(),
-    snackbarHostState: SnackbarHostState,
     person: Person,
     onDismiss: () -> Unit,
     deleted: () -> Unit
@@ -42,14 +41,6 @@ fun DeletePersonBottomSheet(
                 is DeletePersonEffect.DeletedTransaction -> {
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) deleted()
-                    }
-                }
-                is DeletePersonEffect.ShowMessage -> {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = effect.message.resolveString(),
-                            duration = SnackbarDuration.Short
-                        )
                     }
                 }
                 DeletePersonEffect.OnDismiss -> onDismiss()
@@ -78,7 +69,6 @@ fun DeletePersonBottomSheet(
 
     if (state.isPersonListShow) {
         PersonPickerSingleBottomSheet(
-            snackbarHostState = snackbarHostState,
             onPersonClick = { viewModel.onIntent(DeletePersonIntent.SetMovePerson(it)) },
             onDismiss = { viewModel.onIntent(DeletePersonIntent.ShowAllPersonList) }
         )

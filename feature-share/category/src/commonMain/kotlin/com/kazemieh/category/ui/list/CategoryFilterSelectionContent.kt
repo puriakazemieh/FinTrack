@@ -37,7 +37,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun CategoryFilterSelectionContent(
     viewModel: CategoryViewModel = koinViewModel(key = "CategoryFilterSelectionContent"),
-    snackbarHostState: SnackbarHostState,
     selectedCategories: Set<Category>,
     selectedTransactionType: TransactionType,
     isAllSelected: Boolean,
@@ -164,7 +163,6 @@ fun CategoryFilterSelectionContent(
 
     if (state.isAddShow) {
         AddCategoryBottomSheet(
-            snackbarHostState = snackbarHostState,
             transactionType = if (state.type == TransactionType.ALL) TransactionType.EXPENSE else state.type,
             selectedCategory = state.selectedCategory,
             onDismiss = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
@@ -174,7 +172,6 @@ fun CategoryFilterSelectionContent(
 
     if (state.isDeleteShow && state.selectedCategory != null) {
         DeleteCategoryBottomSheet(
-            snackbarHostState = snackbarHostState,
             category = state.selectedCategory!!,
             onDismiss = { viewModel.onIntent(CategoryIntent.OnDeleteClick()) },
             deleted = { viewModel.onIntent(CategoryIntent.OnDeleteClick()) },

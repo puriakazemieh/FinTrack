@@ -22,7 +22,6 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun PersonsScreen(
-    snackbarHostState: SnackbarHostState,
     onNavigateToDetail: (Person) -> Unit,
     onBack: () -> Unit,
     viewModel: PersonViewModel = koinViewModel()
@@ -81,7 +80,6 @@ fun PersonsScreen(
 
         if (state.showAddPerson) {
             AddPersonBottomSheet(
-                snackbarHostState = snackbarHostState,
                 selectedPerson = state.selectedPerson,
                 onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
                 setPerson = { viewModel.onIntent(PersonIntent.SetSelectedPerson(it)) }
@@ -90,7 +88,6 @@ fun PersonsScreen(
 
         if (state.isDeleteShow && state.selectedPerson != null) {
             DeletePersonBottomSheet(
-                snackbarHostState = snackbarHostState,
                 person = state.selectedPerson!!,
                 onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
                 deleted = { viewModel.onIntent(PersonIntent.ResetFlags) }

@@ -67,10 +67,10 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel = koinViewModel(),
-    snackbarHostState: SnackbarHostState,
     onNavigateToTransactions: (Any?) -> Unit = {},
     onNavigateToSearch: () -> Unit = {},
     onNavigateToBudget: () -> Unit = {},
+    onNavigateToInstallment: () -> Unit = {},
     onNavigateToCheck: () -> Unit = {},
     onNavigateToFixedExpense: () -> Unit = {},
     onNavigateToAssets: () -> Unit = {},
@@ -162,7 +162,7 @@ fun DashboardScreen(
 
             item {
                 BudgetWidget(
-                    onMore = onNavigateToBudget,
+                    onMore = { onNavigateToBudget() },
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }
@@ -171,7 +171,7 @@ fun DashboardScreen(
 
             item {
                 InstallmentWidget(
-                    onMore = { /* Navigate to installments */ },
+                    onMore = { onNavigateToInstallment() },
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }
@@ -232,7 +232,6 @@ fun DashboardScreen(
                 transactionWithRelations = state.transactionWithRelations,
                 initialType = state.initialTransactionType,
                 smsDraft = state.smsDraft,
-                snackbarHostState = snackbarHostState,
                 onDismiss = { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) },
                 transactionAdded = { viewModel.onIntent(DashboardIntent.AnimationEnabled) },
             )
@@ -257,7 +256,6 @@ fun DashboardScreen(
 
         if (state.showDeleteTransaction) {
             DeleteTransactionBottomSheet(
-                snackbarHostState = snackbarHostState,
                 transactionWithRelations = state.transactionWithRelations,
                 onDismiss = { viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet()) },
                 transactionDeleted = { viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet()) },
@@ -267,7 +265,6 @@ fun DashboardScreen(
         if (state.showAddSource) {
             AddSourceBottomSheet(
                 selectedSource = state.selectedSource,
-                snackbarHostState = snackbarHostState,
                 onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddSource()) },
                 onNavigateToTransactions = { source ->
                     viewModel.onIntent(DashboardIntent.ShowAddSource())

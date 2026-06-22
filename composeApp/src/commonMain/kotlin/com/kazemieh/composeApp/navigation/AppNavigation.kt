@@ -18,7 +18,6 @@ import com.kazemieh.sync.ui.BackupRestoreScreen
 fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    snackbarHostState: SnackbarHostState,
     startDestination: Screen = Screen.BottomBarGraph
 ) {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -41,7 +40,7 @@ fun AppNavHost(
                     onBackClick = { navController.popBackStack() }
                 )
             }
-            bottomBarNavGraph(navController, snackbarHostState) { }
+            bottomBarNavGraph(navController)
         }
     }
 }

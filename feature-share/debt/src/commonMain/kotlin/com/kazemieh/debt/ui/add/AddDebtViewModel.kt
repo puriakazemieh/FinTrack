@@ -31,6 +31,8 @@ class AddDebtViewModel(
 
     fun onIntent(intent: AddDebtIntent) {
         when (intent) {
+            is AddDebtIntent.LoadDebt -> loadDebt(intent.id)
+            is AddDebtIntent.SetPersonById -> loadPerson(intent.id)
             is AddDebtIntent.SetPerson -> _state.update { it.copy(person = intent.person) }
             is AddDebtIntent.SetAmount -> _state.update { it.copy(amount = intent.amount) }
             is AddDebtIntent.SetType -> _state.update { it.copy(type = intent.type) }
@@ -43,6 +45,34 @@ class AddDebtViewModel(
         }
     }
 
+    private fun loadPerson(id: Long) {
+        viewModelScope.launch {
+            val person = debtUseCases.getPersonByIdUseCase(id)
+            _state.update { it.copy(person = person) }
+        }
+    }
+
+    private fun loadDebt(id: Long) {
+        viewModelScope.launch {
+            val debt = debtUseCases.getDebtByIdUseCase(id) ?: return@launch
+            val person = debtUseCases.getPersonByIdUseCase(debt.personId)
+            val source = debt.sourceId?.let { debtUseCases.getSourceByIdUseCase(it) }
+            
+            _state.update {
+                it.copy(
+                    debtId = id,
+                    person = person,
+                    amount = debt.amount.toString(),
+                    type = debt.type,
+                    date = debt.date,
+                    dueDate = debt.dueDate,
+                    source = source,
+                    description = debt.description ?: ""
+                )
+            }
+        }
+    }
+
     private fun submit() {
         val currentState = _state.value
         val amountValue = currentState.amount.toLongOrNull()
@@ -52,7 +82,7 @@ class AddDebtViewModel(
 
         viewModelScope.launch {
             val debt = Debt(
-                id = 0,
+                id = currentState.debtId ?: 0,
                 personId = currentState.person.id ?: 0L,
                 amount = amountValue,
                 date = currentState.date,
@@ -62,13 +92,19 @@ class AddDebtViewModel(
                 type = currentState.type,
                 isSettled = false
             )
-            debtUseCases.addDebtUseCase(debt)
+            
+            if (currentState.debtId == null) {
+                debtUseCases.addDebtUseCase(debt)
+            } else {
+                debtUseCases.updateDebtUseCase(debt)
+            }
             _effect.send(AddDebtEffect.Saved)
         }
     }
 }
 
 data class AddDebtState(
+    val debtId: Long? = null,
     val person: Person? = null,
     val amount: String = "",
     val type: DebtType = DebtType.OWED_BY_ME,
@@ -80,6 +116,8 @@ data class AddDebtState(
 )
 
 sealed interface AddDebtIntent {
+    data class LoadDebt(val id: Long) : AddDebtIntent
+    data class SetPersonById(val id: Long) : AddDebtIntent
     data class SetPerson(val person: Person?) : AddDebtIntent
     data class SetAmount(val amount: String) : AddDebtIntent
     data class SetType(val type: DebtType) : AddDebtIntent

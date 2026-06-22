@@ -146,6 +146,30 @@ fun CalculatorBottomSheet(
                         }
                     }
 
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        listOf("-5%", "-10%", "-15%", "-20%").forEach { percent ->
+                            Chip(
+                                color = GlassRed,
+                                onClick = {
+                                    if (expression.isNotEmpty() && expression.last().isDigit()) {
+                                        expression += percent
+                                        updateResult()
+                                    }
+                                }
+                            ) {
+                                FintrackLabelMediumText(
+                                    text = percent.toPersianDigits(),
+                                    color = GlassRed
+                                )
+                            }
+                        }
+                    }
+
                     // Keypad
                     val keys = listOf(
                         "AC", "÷", "×", "DEL",

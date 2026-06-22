@@ -152,12 +152,20 @@ class TransactionRepositoryImpl(
         return localDataSource.observeSource(sourceId)
     }
 
+    override suspend fun getSourceById(id: Long): Source? {
+        return localDataSource.getSourceById(id)
+    }
+
     override fun observeTags(): Flow<List<Tag>> {
         return localDataSource.observeTags()
     }
 
     override fun observePersons(): Flow<List<Person>> {
         return localDataSource.observePersons()
+    }
+
+    override suspend fun getPersonById(id: Long): Person? {
+        return localDataSource.getPersonById(id)
     }
 
     override suspend fun getDefaultCategory(type: TransactionType): Category {

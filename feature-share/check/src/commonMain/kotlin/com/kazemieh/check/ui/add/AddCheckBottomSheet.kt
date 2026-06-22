@@ -195,7 +195,6 @@ fun AddCheckBottomSheet(
 
     if (showPersonPicker) {
         PersonPickerSingleBottomSheet(
-            snackbarHostState = remember { SnackbarHostState() },
             onPersonClick = {
                 viewModel.onIntent(AddCheckIntent.SetPerson(it))
                 showPersonPicker = false

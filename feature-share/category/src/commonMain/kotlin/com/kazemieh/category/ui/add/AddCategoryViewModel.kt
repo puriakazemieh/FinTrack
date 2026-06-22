@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.AddCategoryUseCase
 import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
@@ -117,7 +118,7 @@ class AddCategoryViewModel(
         viewModelScope.launch {
             val name = draft.name.trim()
             if (name.isBlank()) {
-                _effect.send(AddCategoryEffect.ShowMessage(UiText.StringResourceText(Res.string.check_name_category_source)))
+                SnackbarController.showMessage(UiText.StringResourceText(Res.string.check_name_category_source))
                 return@launch
             }
 
@@ -203,7 +204,6 @@ sealed interface AddCategoryIntent {
 }
 
 sealed interface AddCategoryEffect {
-    data class ShowMessage(val message: UiText) : AddCategoryEffect
     data class SavedCategory(val category: Category) : AddCategoryEffect
     data object OnDismiss : AddCategoryEffect
 }

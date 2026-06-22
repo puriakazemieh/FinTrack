@@ -4,6 +4,7 @@ package com.kazemieh.transaction.ui.delete
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import fintrack.core.designsystem.generated.resources.*
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
@@ -47,7 +48,7 @@ class DeleteTransactionViewModel(
         viewModelScope.launch {
             val tx = _state.value.transactionWithRelations?.transaction
             if (tx == null) {
-                _effect.send(DeleteTransactionEffect.ShowMessage(UiText.StringResourceText(Res.string.transaction_failed)))
+                SnackbarController.showMessage(UiText.StringResourceText(Res.string.transaction_failed))
                 _effect.send(DeleteTransactionEffect.OnDismiss)
                 return@launch
             }
@@ -63,7 +64,7 @@ class DeleteTransactionViewModel(
                 _state.update { DeleteTransactionState() }
             } else {
                 _state.update { it.copy(isLoading = false) }
-                _effect.send(DeleteTransactionEffect.ShowMessage(UiText.StringResourceText(Res.string.transaction_delete_failed)))
+                SnackbarController.showMessage(UiText.StringResourceText(Res.string.transaction_delete_failed))
             }
         }
     }
@@ -85,6 +86,5 @@ data class DeleteTransactionState(
 
 sealed interface DeleteTransactionEffect {
     object DeletedTransaction : DeleteTransactionEffect
-    data class ShowMessage(val message: UiText) : DeleteTransactionEffect
     data object OnDismiss : DeleteTransactionEffect
 }

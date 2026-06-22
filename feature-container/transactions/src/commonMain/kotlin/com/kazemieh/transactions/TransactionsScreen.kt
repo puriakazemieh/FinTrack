@@ -39,7 +39,6 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun TransactionsScreen(
-    snackbarHostState: SnackbarHostState,
     resetFilters: Boolean = true,
     categoryId: Long? = null,
     sourceId: Long? = null,
@@ -396,7 +395,6 @@ fun TransactionsScreen(
 
         if (state.showAddTransaction) {
             AddTransactionBottomSheet(
-                snackbarHostState = snackbarHostState,
                 transactionWithRelations = state.transactionWithRelations,
                 onDismiss = { viewModel.onIntent(TransactionsIntent.ShowTransactionBottomSheet()) },
                 transactionAdded = { viewModel.onIntent(TransactionsIntent.ShowTransactionBottomSheet()) },
@@ -405,7 +403,6 @@ fun TransactionsScreen(
 
         if (state.showDeleteTransaction) {
             DeleteTransactionBottomSheet(
-                snackbarHostState = snackbarHostState,
                 transactionWithRelations = state.transactionWithRelations,
                 onDismiss = { viewModel.onIntent(TransactionsIntent.DeleteTransactionBottomSheet()) },
                 transactionDeleted = { viewModel.onIntent(TransactionsIntent.DeleteTransactionBottomSheet()) },
@@ -415,7 +412,6 @@ fun TransactionsScreen(
         if (state.isFilterSheetVisible) {
             TransactionFilterBottomSheet(
                 state = state,
-                snackbarHostState = snackbarHostState,
                 onIntent = viewModel::onIntent,
                 onDismiss = { viewModel.onIntent(TransactionsIntent.OnToggleFilterSheet) }
             )

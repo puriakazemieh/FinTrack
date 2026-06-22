@@ -23,7 +23,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun DeleteTagBottomSheet(
     viewModel: DeleteTagViewModel = koinViewModel(),
-    snackbarHostState: SnackbarHostState,
     tag: Tag,
     onDismiss: () -> Unit,
     deleted: () -> Unit
@@ -49,15 +48,6 @@ fun DeleteTagBottomSheet(
                         if (!sheetState.isVisible) {
                             deleted()
                         }
-                    }
-                }
-
-                is DeleteTagEffect.ShowMessage -> {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = effect.message.resolveString(),
-                            duration = SnackbarDuration.Short
-                        )
                     }
                 }
 
@@ -89,7 +79,6 @@ fun DeleteTagBottomSheet(
 
     if (state.isTagListShow) {
         TagPickerSingleBottomSheet(
-            snackbarHostState = snackbarHostState,
             onTagClick = { viewModel.onIntent(DeleteTagIntent.SetMoveTag(it)) },
             onDismiss = { viewModel.onIntent(DeleteTagIntent.ShowAllTagList) }
         )

@@ -28,7 +28,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun PersonFilterSelectionContent(
     viewModel: PersonViewModel = koinViewModel(key = "PersonFilterSelectionContent"),
-    snackbarHostState: SnackbarHostState,
     selectedPersons: Set<Person>,
     isAllSelected: Boolean,
     onSelectionChanged: (Set<Person>, Boolean) -> Unit
@@ -102,7 +101,6 @@ fun PersonFilterSelectionContent(
 
     if (state.showAddPerson) {
         AddPersonBottomSheet(
-            snackbarHostState = snackbarHostState,
             selectedPerson = state.selectedPerson,
             onDismiss = { viewModel.onIntent(PersonIntent.ShowAddPerson) },
             setPerson = { viewModel.onIntent(PersonIntent.SetSelectedPerson(it)) }
@@ -111,7 +109,6 @@ fun PersonFilterSelectionContent(
 
     if (state.isDeleteShow && state.selectedPerson != null) {
         DeletePersonBottomSheet(
-            snackbarHostState = snackbarHostState,
             person = state.selectedPerson!!,
             onDismiss = { viewModel.onIntent(PersonIntent.OnDeleteClick()) },
             deleted = { viewModel.onIntent(PersonIntent.OnDeleteClick()) }

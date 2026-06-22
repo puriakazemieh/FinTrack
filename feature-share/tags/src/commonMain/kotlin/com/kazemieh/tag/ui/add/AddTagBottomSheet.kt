@@ -54,7 +54,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun AddTagBottomSheet(
     viewModel: AddTagViewModel = koinViewModel(),
-    snackbarHostState: SnackbarHostState,
     selectedTag: Tag? = null,
     onDismiss: () -> Unit,
     onNavigateToTransactions: ((Tag) -> Unit)? = null,

@@ -1,7 +1,6 @@
 package com.kazemieh.transaction.ui.add
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,28 +8,21 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Message
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -61,18 +53,23 @@ import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toPersianDigits
-import com.kazemieh.designsystem.*
-import com.kazemieh.designsystem.component.*
-import com.kazemieh.designsystem.component.SnackbarController
+import com.kazemieh.designsystem.GlassBlue
+import com.kazemieh.designsystem.GlassBlueSoft
+import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.GlassGreenDark
+import com.kazemieh.designsystem.GlassGreenSoft
+import com.kazemieh.designsystem.GlassRedSoft
+import com.kazemieh.designsystem.LocalGlassColors
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet
+import com.kazemieh.designsystem.component.calculator.CalculatorBottomSheet
 import com.kazemieh.designsystem.component.glass.AddFrame
 import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.Field
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.PhotoDrop
-import com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet
-import com.kazemieh.designsystem.component.calculator.CalculatorBottomSheet
 import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
-import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import com.kazemieh.designsystem.picker.PickableColor
@@ -92,13 +89,9 @@ import fintrack.core.designsystem.generated.resources.edit
 import fintrack.core.designsystem.generated.resources.hint_transaction_description
 import fintrack.core.designsystem.generated.resources.ic_1
 import fintrack.core.designsystem.generated.resources.ic_cat_transfer
-import fintrack.core.designsystem.generated.resources.label_attachment_fa
-import fintrack.core.designsystem.generated.resources.label_camera_fa
 import fintrack.core.designsystem.generated.resources.label_char_count_limit
-import fintrack.core.designsystem.generated.resources.label_gallery_fa
 import fintrack.core.designsystem.generated.resources.label_most_used
 import fintrack.core.designsystem.generated.resources.label_note
-import fintrack.core.designsystem.generated.resources.label_optional_fa
 import fintrack.core.designsystem.generated.resources.label_related_persons
 import fintrack.core.designsystem.generated.resources.label_tag_prefix
 import fintrack.core.designsystem.generated.resources.select_category
@@ -112,7 +105,6 @@ import fintrack.core.designsystem.generated.resources.title_person_management
 import fintrack.core.designsystem.generated.resources.title_tag_management
 import fintrack.core.designsystem.generated.resources.title_transaction_management
 import fintrack.core.designsystem.generated.resources.transaction
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.decodeToImageBitmap
 import org.jetbrains.compose.resources.painterResource
@@ -127,7 +119,6 @@ fun AddTransactionBottomSheet(
     transactionWithRelations: TransactionWithRelations? = null,
     initialType: TransactionType? = null,
     smsDraft: SmsDraft? = null,
-    snackbarHostState: SnackbarHostState,
     onDismiss: () -> Unit,
     transactionAdded: () -> Unit
 ) {
@@ -145,7 +136,12 @@ fun AddTransactionBottomSheet(
     }
 
     LaunchedEffect(transactionWithRelations, initialType, smsDraft) {
-        viewModel.onIntent(AddTransactionIntent.FetchDefaultData(transactionWithRelations, smsDraft))
+        viewModel.onIntent(
+            AddTransactionIntent.FetchDefaultData(
+                transactionWithRelations,
+                smsDraft
+            )
+        )
         initialType?.let { viewModel.onIntent(AddTransactionIntent.SelectedType(it)) }
     }
 
@@ -181,13 +177,6 @@ private fun BottomSheetContent(
     onIntent: (intent: AddTransactionIntent) -> Unit,
     sheetState: SheetState,
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(Unit) {
-        SnackbarController.events.collectLatest { event ->
-            snackbarHostState.showSnackbar(event.message.resolveString())
-        }
-    }
 
     val glassColors = LocalGlassColors.current
 
@@ -246,29 +235,21 @@ private fun BottomSheetContent(
             showHero = false,
             backgroundBrush = backgroundBrush
         ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                AddTransactionContent(
-                    state = state,
-                    onIntent = onIntent,
-                    keyboardActions = KeyboardActions(onDone = {
-                        focusManager.clearFocus()
-                        keyboardController?.hide()
-                        onIntent(AddTransactionIntent.Submit)
-                    })
-                )
-
-                SnackbarHost(
-                    hostState = snackbarHostState,
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                )
-            }
+            AddTransactionContent(
+                state = state,
+                onIntent = onIntent,
+                keyboardActions = KeyboardActions(onDone = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                    onIntent(AddTransactionIntent.Submit)
+                })
+            )
         }
     }
 
     when (state.topSheet) {
         AddTransactionSheet.SourcePicker -> {
             SourcePickerBottomSheet(
-                snackbarHostState = snackbarHostState,
                 onSourceClick = { onIntent(AddTransactionIntent.SetSource(it)) },
                 onDismiss = { onIntent(AddTransactionIntent.PopSheet) }
             )
@@ -276,7 +257,6 @@ private fun BottomSheetContent(
 
         AddTransactionSheet.SourceEndPicker -> {
             SourcePickerBottomSheet(
-                snackbarHostState = snackbarHostState,
                 onSourceClick = { onIntent(AddTransactionIntent.SetSourceEnd(it)) },
                 onDismiss = { onIntent(AddTransactionIntent.PopSheet) }
             )
@@ -285,7 +265,6 @@ private fun BottomSheetContent(
         AddTransactionSheet.CategoryPicker -> {
             CategoryPickerBottomSheet(
                 transactionType = state.transactionType,
-                snackbarHostState = snackbarHostState,
                 onCategoryClick = {
                     onIntent(AddTransactionIntent.SetCategory(it))
                     onIntent(AddTransactionIntent.PopSheet)
@@ -296,7 +275,6 @@ private fun BottomSheetContent(
 
         AddTransactionSheet.TagPicker -> {
             TagPickerBottomSheet(
-                snackbarHostState = snackbarHostState,
                 selectedTags = state.tags,
                 onSubmitClick = { onIntent(AddTransactionIntent.SetTags(it)) },
                 onDismiss = { onIntent(AddTransactionIntent.PopSheet) }
@@ -305,7 +283,6 @@ private fun BottomSheetContent(
 
         AddTransactionSheet.PersonPicker -> {
             PersonPickerBottomSheet(
-                snackbarHostState = snackbarHostState,
                 selectedPersons = state.persons,
                 onSubmitClick = { onIntent(AddTransactionIntent.SetPerson(it)) },
                 onDismiss = { onIntent(AddTransactionIntent.PopSheet) }
@@ -609,16 +586,16 @@ fun AddTransactionContent(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                FintrackLabelSmallText(
-                    text = stringResource(Res.string.label_note)
-                )
-                FintrackLabelSmallText(
-                    text = stringResource(
-                        Res.string.label_char_count_limit,
-                        state.description.length.toLong().toPersianDigits(),
-                        250.toLong().toPersianDigits()
-                    )
-                )
+                        FintrackLabelSmallText(
+                            text = stringResource(Res.string.label_note)
+                        )
+                        FintrackLabelSmallText(
+                            text = stringResource(
+                                Res.string.label_char_count_limit,
+                                state.description.length.toLong().toPersianDigits(),
+                                250.toLong().toPersianDigits()
+                            )
+                        )
                     }
                     BasicTextField(
                         value = state.description,
@@ -634,11 +611,11 @@ fun AddTransactionContent(
                         modifier = Modifier.fillMaxWidth(),
                         decorationBox = @Composable { innerTextField ->
                             Box {
-                        if (state.description.isEmpty()) {
-                            FintrackBodyMediumText(
-                                text = stringResource(Res.string.hint_transaction_description)
-                            )
-                        }
+                                if (state.description.isEmpty()) {
+                                    FintrackBodyMediumText(
+                                        text = stringResource(Res.string.hint_transaction_description)
+                                    )
+                                }
                                 innerTextField()
                             }
                         }

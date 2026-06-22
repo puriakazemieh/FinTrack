@@ -3,10 +3,12 @@ package com.kazemieh.person.ui.detail
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.kazemieh.common.model.DebtType
 import com.kazemieh.common.toPersianPrice
@@ -33,12 +35,15 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun PersonDetailScreen(
     personId: Long,
-    snackbarHostState: SnackbarHostState,
     onBack: () -> Unit,
+    addDebtSheet: @Composable (personId: Long, debtId: Long?, onDismiss: () -> Unit) -> Unit,
     viewModel: PersonDetailViewModel = koinViewModel { parametersOf(personId) }
 ) {
     val state by viewModel.state.collectAsState()
     val space = LocalSpacing.current
+
+    var showAddDebt by remember { mutableStateOf(false) }
+    var selectedDebtId by remember { mutableStateOf<Long?>(null) }
 
     FintrackScreen(
         title = state.person?.name ?: stringResource(Res.string.person_name),
@@ -48,9 +53,12 @@ fun PersonDetailScreen(
         Column(modifier = Modifier.fillMaxSize()) {
             EntityList(
                 title = stringResource(Res.string.navigation_debts),
-                query = "",
-                onQueryChange = {},
-                onAddClick = { /* Show Add Debt with pre-selected person? */ },
+                query = state.searchQuery,
+                onQueryChange = { viewModel.onIntent(PersonDetailIntent.UpdateSearchQuery(it)) },
+                onAddClick = {
+                    selectedDebtId = null
+                    showAddDebt = true
+                },
                 summary = listOf(
                     EntitySummary(
                         label = UiText.StringResourceText(Res.string.total_credits),
@@ -71,7 +79,7 @@ fun PersonDetailScreen(
                         color = if (state.balance >= 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                     )
                 ),
-                items = state.debts.map {
+                items = state.filteredDebts.map {
                     EntityItem(
                         id = it.debt.id,
                         name = it.debt.description ?: stringResource(Res.string.description),
@@ -84,9 +92,16 @@ fun PersonDetailScreen(
                 },
                 onItemClick = { /* Debt detail? */ },
                 onDeleteClick = { viewModel.onIntent(PersonDetailIntent.DeleteDebt(it.id)) },
-                onEditClick = { /* TODO */ },
+                onEditClick = { item ->
+                    selectedDebtId = item.id
+                    showAddDebt = true
+                },
                 showActions = true
             )
+        }
+
+        if (showAddDebt) {
+            addDebtSheet(personId, selectedDebtId) { showAddDebt = false }
         }
     }
 }

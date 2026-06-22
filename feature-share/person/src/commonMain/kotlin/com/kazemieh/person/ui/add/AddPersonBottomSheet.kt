@@ -45,7 +45,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun AddPersonBottomSheet(
     viewModel: AddPersonViewModel = koinViewModel(),
-    snackbarHostState: SnackbarHostState,
     selectedPerson: Person? = null,
     onDismiss: () -> Unit,
     onNavigateToTransactions: ((Person) -> Unit)? = null,
@@ -66,14 +65,6 @@ fun AddPersonBottomSheet(
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is AddPersonEffect.ShowMessage -> {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = effect.message.resolveString(),
-                            duration = SnackbarDuration.Short
-                        )
-                    }
-                }
 
                 is AddPersonEffect.SavedPerson -> {
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {

@@ -1,6 +1,5 @@
 package com.kazemieh.composeApp.navigation.navigationBar
 
-import androidx.compose.material3.SnackbarHostState
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -10,19 +9,20 @@ import androidx.navigation.toRoute
 import com.kazemieh.asset.ui.add.AddAssetScreen
 import com.kazemieh.asset.ui.list.AssetsListScreen
 import com.kazemieh.budget.ui.list.BudgetScreen
+import com.kazemieh.category.ui.list.CategoriesScreen
+import com.kazemieh.check.ui.list.CheckListScreen
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
-import com.kazemieh.notes.ui.edit.NoteEditScreen
-import com.kazemieh.notes.ui.list.NotesListScreen
-import com.kazemieh.shopping.ui.ShoppingListScreen
 import com.kazemieh.composeApp.navigation.Screen
-import com.kazemieh.check.ui.list.CheckListScreen
 import com.kazemieh.dashboard.DashboardScreen
 import com.kazemieh.debt.ui.list.DebtsScreen
+import com.kazemieh.financialsource.ui.list.SourcesScreen
 import com.kazemieh.fixed_expense.ui.list.FixedExpenseListScreen
 import com.kazemieh.installment.ui.list.InstallmentsScreen
+import com.kazemieh.notes.ui.edit.NoteEditScreen
+import com.kazemieh.notes.ui.list.NotesListScreen
 import com.kazemieh.notifications.ui.NotificationSettingsScreen
 import com.kazemieh.person.ui.detail.PersonDetailScreen
 import com.kazemieh.person.ui.list.PersonsScreen
@@ -31,14 +31,12 @@ import com.kazemieh.profile.ProfileEditScreen
 import com.kazemieh.profile.ProfileScreen
 import com.kazemieh.profile.ThemeSettingsScreen
 import com.kazemieh.search.ui.SearchScreen
+import com.kazemieh.shopping.ui.ShoppingListScreen
+import com.kazemieh.tag.ui.list.TagsScreen
 import com.kazemieh.tools.ToolsScreen
 import com.kazemieh.transactions.TransactionsScreen
 
-fun NavGraphBuilder.bottomBarNavGraph(
-    navController: NavHostController,
-    snackbarHostState: SnackbarHostState,
-    onBackPressed: () -> Unit
-) {
+fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
     val navigateToTransactions: (Any?) -> Unit = { data ->
         navController.popBackStack()
         val route = when (data) {
@@ -62,7 +60,6 @@ fun NavGraphBuilder.bottomBarNavGraph(
 
         composable<Screen.Dashboard> { backStackEntry ->
             DashboardScreen(
-                snackbarHostState = snackbarHostState,
                 onNavigateToTransactions = navigateToTransactions,
                 onNavigateToSearch = { navController.navigate(Screen.Search) },
                 onNavigateToBudget = { navController.navigate(Screen.Budget) },
@@ -78,7 +75,6 @@ fun NavGraphBuilder.bottomBarNavGraph(
         composable<Screen.Transactions> { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.Transactions>()
             TransactionsScreen(
-                snackbarHostState = snackbarHostState,
                 resetFilters = args.resetFilters,
                 categoryId = args.categoryId,
                 sourceId = args.sourceId,
@@ -91,7 +87,6 @@ fun NavGraphBuilder.bottomBarNavGraph(
 
         composable<Screen.Tools> { backStackEntry ->
             ToolsScreen(
-                snackbarHostState = snackbarHostState,
                 onNavigateToBudget = { navController.navigate(Screen.Budget) },
                 onNavigateToInstallment = { navController.navigate(Screen.Installment) },
                 onNavigateToPerson = { navController.navigate(Screen.Person) },
@@ -100,7 +95,37 @@ fun NavGraphBuilder.bottomBarNavGraph(
                 onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) },
                 onNavigateToAssets = { navController.navigate(Screen.Assets) },
                 onNavigateToShopping = { navController.navigate(Screen.Shopping) },
-                onNavigateToNotes = { navController.navigate(Screen.Notes) }
+                onNavigateToNotes = { navController.navigate(Screen.Notes) },
+                onNavigateToSource = { navController.navigate(Screen.Sources) },
+                onNavigateToCategory = { navController.navigate(Screen.Categories) },
+                onNavigateToTag = { navController.navigate(Screen.Tags) }
+            )
+        }
+
+        composable<Screen.Sources> {
+            SourcesScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToTransactions = { source ->
+                    navigateToTransactions(source)
+                }
+            )
+        }
+
+        composable<Screen.Categories> {
+            CategoriesScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToTransactions = { category ->
+                    navigateToTransactions(category)
+                }
+            )
+        }
+
+        composable<Screen.Tags> {
+            TagsScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToTransactions = { tag ->
+                    navigateToTransactions(tag)
+                }
             )
         }
 
@@ -110,13 +135,12 @@ fun NavGraphBuilder.bottomBarNavGraph(
 
         composable<Screen.Installment> {
             InstallmentsScreen(
-                onAddInstallment = { /* I'll handle showing the bottom sheet in InstallmentsScreen */ }
+                onBack = { navController.popBackStack() }
             )
         }
 
         composable<Screen.Person> {
             PersonsScreen(
-                snackbarHostState = snackbarHostState,
                 onNavigateToDetail = { person ->
                     navController.navigate(Screen.PersonDetail(person.id ?: 0L))
                 },
@@ -128,15 +152,23 @@ fun NavGraphBuilder.bottomBarNavGraph(
             val args = backStackEntry.toRoute<Screen.PersonDetail>()
             PersonDetailScreen(
                 personId = args.personId,
-                snackbarHostState = snackbarHostState,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                addDebtSheet = { personId, debtId, onDismiss ->
+                    com.kazemieh.debt.ui.add.AddDebtBottomSheet(
+                        onDismiss = onDismiss,
+                        personId = personId,
+                        debtId = debtId
+                    )
+                }
             )
         }
 
         composable<Screen.Debt> {
             DebtsScreen(
-                snackbarHostState = snackbarHostState,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onNavigateToPersonDetail = { personId ->
+                    navController.navigate(Screen.PersonDetail(personId))
+                }
             )
         }
 
@@ -154,7 +186,8 @@ fun NavGraphBuilder.bottomBarNavGraph(
 
         composable<Screen.Assets> {
             AssetsListScreen(
-                onAddAsset = { navController.navigate(Screen.AddAsset) }
+                onAddAsset = { navController.navigate(Screen.AddAsset) },
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -221,7 +254,6 @@ fun NavGraphBuilder.bottomBarNavGraph(
 
         composable<Screen.Search> {
             SearchScreen(
-                snackbarHostState = snackbarHostState,
                 onBack = { navController.popBackStack() },
                 onNavigateToCategory = { cat -> navigateToTransactions(cat) },
                 onNavigateToSource = { src -> navigateToTransactions(src) },

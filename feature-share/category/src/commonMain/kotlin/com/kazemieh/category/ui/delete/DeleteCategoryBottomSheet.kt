@@ -25,7 +25,6 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun DeleteCategoryBottomSheet(
     viewModel: DeleteCategoryViewModel = koinViewModel(),
-    snackbarHostState: SnackbarHostState,
     category: Category,
     onDismiss: () -> Unit,
     deleted: () -> Unit
@@ -44,15 +43,6 @@ fun DeleteCategoryBottomSheet(
                 is DeleteCategoryEffect.DeletedTransaction -> {
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) deleted()
-                    }
-                }
-
-                is DeleteCategoryEffect.ShowMessage -> {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = effect.message.resolveString(),
-                            duration = SnackbarDuration.Short
-                        )
                     }
                 }
 
@@ -83,7 +73,6 @@ fun DeleteCategoryBottomSheet(
     if (state.isCategoryListShow) {
         CategoryPickerBottomSheet(
             transactionType = category.type,
-            snackbarHostState = snackbarHostState,
             onCategoryClick = { viewModel.onIntent(DeleteCategoryIntent.SetMoveCategory(it)) },
             onDismiss = { viewModel.onIntent(DeleteCategoryIntent.ShowAllCategoryList) }
         )

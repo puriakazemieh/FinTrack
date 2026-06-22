@@ -57,6 +57,7 @@ interface TransactionLocalDataSource {
     suspend fun getCategoryById(id: Long): Category?
     fun observeSources(): Flow<List<Source>>
     fun observeSource(sourceId: Long): Flow<Source?>
+    suspend fun getSourceById(id: Long): Source?
     fun observeTags(): Flow<List<Tag>>
     suspend fun adjustSourceBalance(id: Long, delta: Int)
     suspend fun getDefaultCategory(type: TransactionType): Category
@@ -67,6 +68,7 @@ interface TransactionLocalDataSource {
 
     suspend fun addPerson(person: Person): Long
     fun observePersons(): Flow<List<Person>>
+    suspend fun getPersonById(id: Long): Person?
 
     fun observeMostUsedCategories(type: TransactionType?, limit: Long): Flow<List<Category>>
     fun observeMostUsedSources(limit: Long): Flow<List<Source>>

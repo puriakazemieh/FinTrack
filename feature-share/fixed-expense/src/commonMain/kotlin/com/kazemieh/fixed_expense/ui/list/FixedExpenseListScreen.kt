@@ -44,8 +44,8 @@ fun FixedExpenseListScreen(
         Column(modifier = Modifier.fillMaxSize()) {
             EntityList(
                 title = stringResource(Res.string.title_fixed_expense_management),
-                query = "",
-                onQueryChange = {},
+                query = state.searchQuery,
+                onQueryChange = { viewModel.onIntent(FixedExpenseListIntent.UpdateSearchQuery(it)) },
                 onAddClick = { showAddExpense = true },
                 summary = listOf(
                     EntitySummary(
@@ -55,7 +55,7 @@ fun FixedExpenseListScreen(
                         color = MaterialTheme.colorScheme.primary
                     )
                 ),
-                items = state.expenses.map {
+                items = state.filteredExpenses.map {
                     EntityItem(
                         id = it.id,
                         name = it.categoryName ?: stringResource(Res.string.label_unknown_person),

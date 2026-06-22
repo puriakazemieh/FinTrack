@@ -16,8 +16,15 @@ data class DebtUseCaseGroup(
     val observeDebtsByPersonUseCase: ObserveDebtsByPersonUseCase,
     val settleDebtUseCase: SettleDebtUseCase,
     val deleteDebtUseCase: DeleteDebtUseCase,
-    val updateDebtUseCase: UpdateDebtUseCase
+    val updateDebtUseCase: UpdateDebtUseCase,
+    val getDebtByIdUseCase: GetDebtByIdUseCase,
+    val getPersonByIdUseCase: GetPersonByIdUseCase,
+    val getSourceByIdUseCase: GetSourceByIdUseCase
 )
+
+class GetDebtByIdUseCase(private val repository: DebtRepository) {
+    suspend operator fun invoke(id: Long) = repository.getDebtById(id)
+}
 
 class AddDebtUseCase(private val repository: DebtRepository) {
     suspend operator fun invoke(debt: Debt): Long = repository.insertDebt(debt)

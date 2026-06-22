@@ -28,7 +28,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun TagFilterSelectionContent(
     viewModel: TagViewModel = koinViewModel(key = "TagFilterSelectionContent"),
-    snackbarHostState: SnackbarHostState,
     selectedTags: Set<Tag>,
     isAllSelected: Boolean,
     onSelectionChanged: (Set<Tag>, Boolean) -> Unit
@@ -102,7 +101,6 @@ fun TagFilterSelectionContent(
 
     if (state.showAddTag) {
         AddTagBottomSheet(
-            snackbarHostState = snackbarHostState,
             selectedTag = state.selectedTag,
             onDismiss = { viewModel.onIntent(TagIntent.ShowAddTag) },
             setTag = { viewModel.onIntent(TagIntent.SetSelectedTag(it)) }
@@ -111,7 +109,6 @@ fun TagFilterSelectionContent(
 
     if (state.isDeleteShow && state.selectedTag != null) {
         DeleteTagBottomSheet(
-            snackbarHostState = snackbarHostState,
             tag = state.selectedTag!!,
             onDismiss = { viewModel.onIntent(TagIntent.OnDeleteClick()) },
             deleted = { viewModel.onIntent(TagIntent.OnDeleteClick()) }

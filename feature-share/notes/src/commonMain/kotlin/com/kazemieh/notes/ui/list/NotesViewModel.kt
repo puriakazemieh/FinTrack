@@ -14,10 +14,12 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 data class NotesState(
     val notes: List<Note> = emptyList(),
+    val filteredNotes: List<Note> = emptyList(),
     val isLoading: Boolean = false,
     val searchQuery: String = ""
 )
@@ -46,11 +48,27 @@ class NotesViewModel(
     private val _effect = Channel<NotesEffect>()
     val effect = _effect.receiveAsFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+
     init {
         _state.update { it.copy(isLoading = true) }
         observeNotes()
-            .onEach { notes ->
-                _state.update { it.copy(notes = notes, isLoading = false) }
+            .combine(_searchQuery) { notes, query ->
+                val filtered = notes.filter {
+                    it.title.contains(query, ignoreCase = true) ||
+                            it.content.contains(query, ignoreCase = true)
+                }
+                notes to filtered
+            }
+            .onEach { (all, filtered) ->
+                _state.update {
+                    it.copy(
+                        notes = all,
+                        filteredNotes = filtered,
+                        isLoading = false,
+                        searchQuery = _searchQuery.value
+                    )
+                }
             }
             .launchIn(viewModelScope)
     }
@@ -58,7 +76,7 @@ class NotesViewModel(
     fun onIntent(intent: NotesIntent) {
         when (intent) {
             is NotesIntent.OnSearchQueryChanged -> {
-                _state.update { it.copy(searchQuery = intent.query) }
+                _searchQuery.value = intent.query
             }
             is NotesIntent.OnTogglePin -> {
                 viewModelScope.launch {

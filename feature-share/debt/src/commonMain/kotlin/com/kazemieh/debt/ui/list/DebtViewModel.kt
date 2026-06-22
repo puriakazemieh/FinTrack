@@ -7,6 +7,7 @@ import com.kazemieh.domain.usecase.DebtUseCaseGroup
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -17,9 +18,12 @@ class DebtViewModel(
     private val _state = MutableStateFlow(DebtState())
     val state: StateFlow<DebtState> = _state.asStateFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+
     fun onIntent(intent: DebtIntent) {
         when (intent) {
             is DebtIntent.ObserveAllDebts -> observeAllDebts()
+            is DebtIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
             is DebtIntent.ObserveDebtsByPerson -> observeDebtsByPerson(intent.personId)
             is DebtIntent.SettleDebt -> settleDebt(intent.debtId, intent.description)
             is DebtIntent.DeleteDebt -> deleteDebt(intent.debtId)
@@ -28,9 +32,23 @@ class DebtViewModel(
 
     private fun observeAllDebts() {
         viewModelScope.launch {
-            debtUseCases.observeDebtsUseCase().collect { debts ->
-                _state.update { it.copy(debts = debts) }
-            }
+            debtUseCases.observeDebtsUseCase()
+                .combine(_searchQuery) { debts, query ->
+                    val filtered = debts.filter {
+                        it.person.name.contains(query, ignoreCase = true) ||
+                                it.debt.description?.contains(query, ignoreCase = true) == true
+                    }
+                    debts to filtered
+                }
+                .collect { (all, filtered) ->
+                    _state.update {
+                        it.copy(
+                            debts = all,
+                            filteredDebts = filtered,
+                            searchQuery = _searchQuery.value
+                        )
+                    }
+                }
         }
     }
 
@@ -57,11 +75,14 @@ class DebtViewModel(
 
 data class DebtState(
     val debts: List<DebtWithRelations> = emptyList(),
-    val isLoading: Boolean = false
+    val filteredDebts: List<DebtWithRelations> = emptyList(),
+    val isLoading: Boolean = false,
+    val searchQuery: String = ""
 )
 
 sealed interface DebtIntent {
     data object ObserveAllDebts : DebtIntent
+    data class UpdateSearchQuery(val query: String) : DebtIntent
     data class ObserveDebtsByPerson(val personId: Long) : DebtIntent
     data class SettleDebt(val debtId: Long, val description: String) : DebtIntent
     data class DeleteDebt(val debtId: Long) : DebtIntent

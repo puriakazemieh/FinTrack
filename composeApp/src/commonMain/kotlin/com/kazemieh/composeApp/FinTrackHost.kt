@@ -73,7 +73,6 @@ fun FinTrackHost(
                 AppNavHost(
                     navController = navController,
                     modifier = Modifier.fillMaxSize(),
-                    snackbarHostState = snackbarHostState,
                     startDestination = startDestination
                 )
 

@@ -18,7 +18,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun DeleteTransactionBottomSheet(
     viewModel: DeleteTransactionViewModel = koinViewModel(),
-    snackbarHostState: SnackbarHostState,
     transactionWithRelations: TransactionWithRelations? = null,
     onDismiss: () -> Unit,
     transactionDeleted: () -> Unit
@@ -35,13 +34,6 @@ fun DeleteTransactionBottomSheet(
                 DeleteTransactionEffect.DeletedTransaction -> {
                     sheetState.hide()
                     transactionDeleted()
-                }
-
-                is DeleteTransactionEffect.ShowMessage -> {
-                    snackbarHostState.showSnackbar(
-                        message = effect.message.resolveString(),
-                        duration = SnackbarDuration.Short
-                    )
                 }
 
                 DeleteTransactionEffect.OnDismiss -> {

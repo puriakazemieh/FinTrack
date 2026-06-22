@@ -25,7 +25,10 @@ import com.kazemieh.domain.usecase.DeleteTransactionUseCase
 import com.kazemieh.domain.usecase.FixedExpenseUseCaseGroup
 import com.kazemieh.domain.usecase.GetBooleanPreferenceUseCase
 import com.kazemieh.domain.usecase.GetCheckByIdUseCase
+import com.kazemieh.domain.usecase.GetDebtByIdUseCase
 import com.kazemieh.domain.usecase.GetFixedExpenseByIdUseCase
+import com.kazemieh.domain.usecase.GetPersonByIdUseCase
+import com.kazemieh.domain.usecase.GetSourceByIdUseCase
 import com.kazemieh.domain.usecase.GetStringFlowUseCase
 import com.kazemieh.domain.usecase.GetStringPreferenceUseCase
 import com.kazemieh.domain.usecase.GetCategoryUseCase
@@ -165,6 +168,9 @@ val domainModule = module {
     factory { UpdateFixedExpenseUseCase(get()) }
     factory { DeleteFixedExpenseUseCase(get()) }
     factory { GetFixedExpenseByIdUseCase(get()) }
+    factory { GetDebtByIdUseCase(get()) }
+    factory { GetPersonByIdUseCase(get()) }
+    factory { GetSourceByIdUseCase(get()) }
     factory { ObserveAllFixedExpensesUseCase(get()) }
     factory { UpdateNextDueDateUseCase(get()) }
 
@@ -232,7 +238,10 @@ val domainModule = module {
             deleteDebtUseCase = get(),
             observeDebtsUseCase = get(),
             observeDebtsByPersonUseCase = get(),
-            settleDebtUseCase = get()
+            settleDebtUseCase = get(),
+            getDebtByIdUseCase = get(),
+            getPersonByIdUseCase = get(),
+            getSourceByIdUseCase = get()
         )
     }
     single {

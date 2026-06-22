@@ -338,6 +338,12 @@ class TransactionLocalDataSourceImpl(
             ?.toCategory()
     }
 
+    override suspend fun getPersonById(id: Long): Person? = withContext(Dispatchers.Default) {
+        personQueries.getPersonById(id)
+            .awaitAsOneOrNull()
+            ?.toPerson()
+    }
+
     override fun observeSources(): Flow<List<Source>> {
         return sourceQueries.observeSources()
             .asFlow()
@@ -350,6 +356,12 @@ class TransactionLocalDataSourceImpl(
             .asFlow()
             .mapToOneOrNull(Dispatchers.Default)
             .map { it?.toSource() }
+    }
+
+    override suspend fun getSourceById(id: Long): Source? = withContext(Dispatchers.Default) {
+        sourceQueries.getSourceById(id)
+            .awaitAsOneOrNull()
+            ?.toSource()
     }
 
     override fun observeTags(): Flow<List<Tag>> {

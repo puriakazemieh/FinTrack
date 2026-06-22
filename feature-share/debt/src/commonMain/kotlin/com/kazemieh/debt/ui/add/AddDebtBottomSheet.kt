@@ -60,6 +60,7 @@ import fintrack.core.designsystem.generated.resources.debt_amount
 import fintrack.core.designsystem.generated.resources.debt_owed_by_me
 import fintrack.core.designsystem.generated.resources.debt_owed_to_me
 import fintrack.core.designsystem.generated.resources.description
+import fintrack.core.designsystem.generated.resources.edit
 import fintrack.core.designsystem.generated.resources.person_choose
 import fintrack.core.designsystem.generated.resources.person_name
 import fintrack.core.designsystem.generated.resources.save_
@@ -74,18 +75,18 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun AddDebtBottomSheet(
     onDismiss: () -> Unit,
+    debtId: Long? = null,
+    personId: Long? = null,
     viewModel: AddDebtViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
 
-    LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
-            when (effect) {
-                AddDebtEffect.Saved -> onDismiss()
-                AddDebtEffect.OnDismiss -> onDismiss()
-                is AddDebtEffect.ShowMessage -> {}
-            }
+    LaunchedEffect(debtId, personId) {
+        if (debtId != null) {
+            viewModel.onIntent(AddDebtIntent.LoadDebt(debtId))
+        } else if (personId != null) {
+            viewModel.onIntent(AddDebtIntent.SetPersonById(personId))
         }
     }
 
@@ -109,7 +110,7 @@ fun AddDebtBottomSheet(
                     .fillMaxSize()
             ) {
                 ScreenHeader(
-                    title = stringResource(Res.string.add_debt),
+                    title = if (state.debtId == null) stringResource(Res.string.add_debt) else stringResource(Res.string.edit),
                     onClose = onDismiss
                 )
 
@@ -198,7 +199,6 @@ fun AddDebtBottomSheet(
 
     if (showPersonPicker) {
         PersonPickerSingleBottomSheet(
-            snackbarHostState = remember { SnackbarHostState() },
             onPersonClick = {
                 viewModel.onIntent(AddDebtIntent.SetPerson(it))
                 showPersonPicker = false
@@ -209,7 +209,6 @@ fun AddDebtBottomSheet(
 
     if (showSourcePicker) {
         SourcePickerBottomSheet(
-            snackbarHostState = remember { SnackbarHostState() },
             onSourceClick = {
                 viewModel.onIntent(AddDebtIntent.SetSource(it))
                 showSourcePicker = false

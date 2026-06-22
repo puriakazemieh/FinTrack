@@ -10,17 +10,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 data class BudgetState(
     val budgets: List<BudgetWithProgress> = emptyList(),
+    val filteredBudgets: List<BudgetWithProgress> = emptyList(),
     val isLoading: Boolean = false,
     val isAddBudgetShow: Boolean = false,
-    val selectedBudget: BudgetWithProgress? = null
+    val selectedBudget: BudgetWithProgress? = null,
+    val searchQuery: String = ""
 )
 
 sealed interface BudgetIntent {
     data object LoadBudgets : BudgetIntent
+    data class UpdateSearchQuery(val query: String) : BudgetIntent
     data class DeleteBudget(val id: Long) : BudgetIntent
     data class ShowAddBudget(val budget: BudgetWithProgress? = null) : BudgetIntent
 }
@@ -40,6 +44,8 @@ class BudgetViewModel(
     private val _effect = Channel<BudgetEffect>()
     val effect = _effect.receiveAsFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+
     init {
         onIntent(BudgetIntent.LoadBudgets)
     }
@@ -47,6 +53,7 @@ class BudgetViewModel(
     fun onIntent(intent: BudgetIntent) {
         when (intent) {
             BudgetIntent.LoadBudgets -> observeBudgets()
+            is BudgetIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
             is BudgetIntent.DeleteBudget -> deleteBudget(intent.id)
             is BudgetIntent.ShowAddBudget -> {
                 _state.update { it.copy(isAddBudgetShow = !it.isAddBudgetShow, selectedBudget = intent.budget) }
@@ -57,9 +64,23 @@ class BudgetViewModel(
     private fun observeBudgets() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            observeBudgetsWithProgressUseCase().collect { budgets ->
-                _state.update { it.copy(budgets = budgets, isLoading = false) }
-            }
+            observeBudgetsWithProgressUseCase()
+                .combine(_searchQuery) { budgets, query ->
+                    val filtered = budgets.filter {
+                        it.category?.name?.contains(query, ignoreCase = true) == true
+                    }
+                    budgets to filtered
+                }
+                .collect { (all, filtered) ->
+                    _state.update {
+                        it.copy(
+                            budgets = all,
+                            filteredBudgets = filtered,
+                            isLoading = false,
+                            searchQuery = _searchQuery.value
+                        )
+                    }
+                }
         }
     }
 

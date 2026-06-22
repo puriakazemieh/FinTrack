@@ -59,7 +59,7 @@ fun CheckListScreen(
         else -> CheckStatus.CANCELLED
     }
 
-    val filteredChecks = state.checks.filter { it.status == currentStatus }
+    val filteredChecks = state.filteredChecks.filter { it.status == currentStatus }
     val totalAmount = filteredChecks.sumOf { it.amount }
 
     FintrackScreen(
@@ -83,8 +83,8 @@ fun CheckListScreen(
 
             EntityList(
                 title = stringResource(Res.string.title_check_management),
-                query = "",
-                onQueryChange = {},
+                query = state.searchQuery,
+                onQueryChange = { viewModel.onIntent(CheckListIntent.UpdateSearchQuery(it)) },
                 onAddClick = { showAddCheck = true },
                 summary = listOf(
                     EntitySummary(

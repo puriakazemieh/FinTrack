@@ -4,6 +4,7 @@ package com.kazemieh.category.ui.delete
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Category
+import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.DeleteCategoryUseCase
 import fintrack.core.designsystem.generated.resources.Res
@@ -66,7 +67,7 @@ class DeleteCategoryViewModel(
             val isError = !_state.value.isDeleteAllData && _state.value.moveCategory == null
             if (isError) {
                 _state.update { it.copy(isCategoryError = true) }
-                _effect.send(DeleteCategoryEffect.ShowMessage(UiText.StringResourceText(Res.string.category_choose)))
+                SnackbarController.showMessage(UiText.StringResourceText(Res.string.category_choose))
                 return@launch
             }
             _state.value.category?.let { deleteCategory ->
@@ -97,7 +98,6 @@ data class DeleteCategoryState(
 )
 
 sealed interface DeleteCategoryEffect {
-    data class ShowMessage(val message: UiText) : DeleteCategoryEffect
     object DeletedTransaction : DeleteCategoryEffect
     data object OnDismiss : DeleteCategoryEffect
 }

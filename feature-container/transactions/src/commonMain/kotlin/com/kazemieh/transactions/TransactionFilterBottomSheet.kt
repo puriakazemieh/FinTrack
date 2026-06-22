@@ -61,7 +61,6 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun TransactionFilterBottomSheet(
     state: TransactionsState,
-    snackbarHostState: SnackbarHostState,
     onIntent: (TransactionsIntent) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -209,7 +208,6 @@ fun TransactionFilterBottomSheet(
                 SourceFilterSelectionContent(
                     selectedSources = state.selectedSources,
                     isAllSelected = state.isAllSourceSelected,
-                    snackbarHostState = snackbarHostState,
                     onSelectionChanged = { sources, isAll ->
                         onIntent(TransactionsIntent.OnSourcesSelected(sources, isAll))
                     }
@@ -221,7 +219,6 @@ fun TransactionFilterBottomSheet(
                     selectedCategories = state.selectedCategories,
                     selectedTransactionType = state.selectedTransactionType,
                     isAllSelected = state.isAllCategorySelected,
-                    snackbarHostState = snackbarHostState,
                     onSelectionChanged = { categories, isAll ->
                         onIntent(TransactionsIntent.OnCategoriesSelected(categories, isAll))
                     }
@@ -233,7 +230,6 @@ fun TransactionFilterBottomSheet(
                 PersonFilterSelectionContent(
                     selectedPersons = state.selectedPerson,
                     isAllSelected = state.isAllPersonSelected,
-                    snackbarHostState = snackbarHostState,
                     onSelectionChanged = { persons, isAll ->
                         onIntent(TransactionsIntent.OnPersonSelected(persons, isAll))
                     }
@@ -245,7 +241,6 @@ fun TransactionFilterBottomSheet(
                 TagFilterSelectionContent(
                     selectedTags = state.selectedTag,
                     isAllSelected = state.isAllTAgSelected,
-                    snackbarHostState = snackbarHostState,
                     onSelectionChanged = { tags, isAll ->
                         onIntent(TransactionsIntent.OnTagSelected(tags, isAll))
                     }

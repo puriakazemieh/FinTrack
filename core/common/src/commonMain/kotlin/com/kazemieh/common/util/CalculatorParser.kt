@@ -3,18 +3,21 @@ package com.kazemieh.common.util
 import kotlin.math.roundToLong
 
 object CalculatorParser {
+    private const val ERROR_MSG = "Error"
 
     fun evaluate(expression: String): String {
         if (expression.isEmpty()) return "0"
         return try {
             val result = calculate(expression)
+            if (result.isInfinite() || result.isNaN()) return ERROR_MSG
             if (result % 1.0 == 0.0) {
                 result.toLong().toString()
             } else {
-                result.toString()
+                // Limit decimals
+                ((result * 100.0).roundToLong() / 100.0).toString()
             }
         } catch (e: Exception) {
-            "Error"
+            ERROR_MSG
         }
     }
 

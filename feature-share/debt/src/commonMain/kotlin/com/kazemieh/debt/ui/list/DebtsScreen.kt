@@ -32,8 +32,8 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun DebtsScreen(
-    snackbarHostState: SnackbarHostState,
     onBack: () -> Unit,
+    onNavigateToPersonDetail: (Long) -> Unit,
     viewModel: DebtViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -43,6 +43,7 @@ fun DebtsScreen(
         viewModel.onIntent(DebtIntent.ObserveAllDebts)
     }
 
+    var selectedDebtForEdit by remember { mutableStateOf<Long?>(null) }
     var showAddDebt by remember { mutableStateOf(false) }
 
     val totalCredits =
@@ -60,9 +61,12 @@ fun DebtsScreen(
         Column(modifier = Modifier.fillMaxSize()) {
             EntityList(
                 title = stringResource(Res.string.navigation_debts),
-                query = "",
-                onQueryChange = {},
-                onAddClick = { showAddDebt = true },
+                query = state.searchQuery,
+                onQueryChange = { viewModel.onIntent(DebtIntent.UpdateSearchQuery(it)) },
+                onAddClick = {
+                    selectedDebtForEdit = null
+                    showAddDebt = true
+                },
                 summary = listOf(
                     EntitySummary(
                         label = UiText.StringResourceText(Res.string.total_credits),
@@ -77,7 +81,7 @@ fun DebtsScreen(
                         color = MaterialTheme.colorScheme.error
                     )
                 ),
-                items = state.debts.map {
+                items = state.filteredDebts.map {
                     EntityItem(
                         id = it.debt.id,
                         name = it.person.name,
@@ -86,15 +90,23 @@ fun DebtsScreen(
                         color = if (it.debt.type == DebtType.OWED_TO_ME) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                     )
                 },
-                onItemClick = { /* Navigate to detail? */ },
+                onItemClick = { item ->
+                    state.debts.find { it.debt.id == item.id }?.let {
+                        onNavigateToPersonDetail(it.person.id ?: 0L)
+                    }
+                },
                 onDeleteClick = { viewModel.onIntent(DebtIntent.DeleteDebt(it.id)) },
-                onEditClick = { /* TODO */ },
+                onEditClick = { item ->
+                    selectedDebtForEdit = item.id
+                    showAddDebt = true
+                },
                 showActions = true
             )
         }
 
         if (showAddDebt) {
             AddDebtBottomSheet(
+                debtId = selectedDebtForEdit,
                 onDismiss = { showAddDebt = false }
             )
         }

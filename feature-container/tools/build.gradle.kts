@@ -51,6 +51,9 @@ kotlin {
                 implementation(project(":core:common"))
                 implementation(project(":core:designsystem"))
                 implementation(project(":feature-share:asset"))
+                implementation(project(":feature-share:source"))
+                implementation(project(":feature-share:category"))
+                implementation(project(":feature-share:tags"))
 
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)

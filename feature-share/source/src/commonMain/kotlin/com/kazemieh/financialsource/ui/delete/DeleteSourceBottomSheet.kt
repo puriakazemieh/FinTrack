@@ -22,7 +22,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun DeleteSourceBottomSheet(
     viewModel: DeleteSourceViewModel = koinViewModel(),
-    snackbarHostState: SnackbarHostState,
     source: Source,
     onDismiss: () -> Unit,
     deleted: () -> Unit
@@ -41,15 +40,6 @@ fun DeleteSourceBottomSheet(
                 is DeleteSourceEffect.DeletedTransaction -> {
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) deleted()
-                    }
-                }
-
-                is DeleteSourceEffect.ShowMessage -> {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = effect.message.resolveString(),
-                            duration = SnackbarDuration.Short
-                        )
                     }
                 }
 
@@ -79,7 +69,6 @@ fun DeleteSourceBottomSheet(
 
     if (state.isSourceListShow) {
         SourcePickerBottomSheet(
-            snackbarHostState = snackbarHostState,
             onSourceClick = { viewModel.onIntent(DeleteSourceIntent.SetMoveSource(it)) },
             onDismiss = { viewModel.onIntent(DeleteSourceIntent.ShowAllSourceList) }
         )

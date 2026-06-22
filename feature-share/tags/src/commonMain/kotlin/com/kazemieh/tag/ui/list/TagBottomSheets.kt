@@ -37,7 +37,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun TagPickerBottomSheet(
     viewModel: TagViewModel = koinViewModel(key = "TagPickerBottomSheet"),
-    snackbarHostState: SnackbarHostState,
     selectedTags: Set<Tag>?,
     onSubmitClick: (Set<Tag>?) -> Unit,
     onDismiss: () -> Unit,
@@ -74,7 +73,6 @@ fun TagPickerBottomSheet(
 
     if (state.showAddTag) {
         AddTagBottomSheet(
-            snackbarHostState = snackbarHostState,
             selectedTag = state.selectedTag,
             onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
             onNavigateToTransactions = null,
@@ -84,7 +82,6 @@ fun TagPickerBottomSheet(
 
     if (state.isDeleteShow && state.selectedTag != null) {
         DeleteTagBottomSheet(
-            snackbarHostState = snackbarHostState,
             tag = state.selectedTag!!,
             onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
             deleted = { viewModel.onIntent(TagIntent.ResetFlags) }
@@ -96,7 +93,6 @@ fun TagPickerBottomSheet(
 @Composable
 fun TagPickerSingleBottomSheet(
     viewModel: TagViewModel = koinViewModel(key = "TagPickerSingleBottomSheet"),
-    snackbarHostState: SnackbarHostState,
     onTagClick: (Tag) -> Unit,
     onDismiss: () -> Unit,
     onNavigateToTransactions: ((Tag) -> Unit)? = null,
@@ -214,7 +210,6 @@ fun TagPickerSingleBottomSheet(
 
     if (state.showAddTag) {
         AddTagBottomSheet(
-            snackbarHostState = snackbarHostState,
             selectedTag = state.selectedTag,
             onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
             onNavigateToTransactions = onNavigateToTransactions?.let { navCallback ->
@@ -229,7 +224,6 @@ fun TagPickerSingleBottomSheet(
 
     if (state.isDeleteShow && state.selectedTag != null) {
         DeleteTagBottomSheet(
-            snackbarHostState = snackbarHostState,
             tag = state.selectedTag!!,
             onDismiss = { viewModel.onIntent(TagIntent.ResetFlags) },
             deleted = { viewModel.onIntent(TagIntent.ResetFlags) }
@@ -242,7 +236,6 @@ fun TagPickerSingleBottomSheet(
 fun TagManageBottomSheet(
     keyViewmodel: String = "TagManageBottomSheet",
     viewModel: TagViewModel = koinViewModel(key = keyViewmodel),
-    snackbarHostState: SnackbarHostState,
     isDeleteShow: Boolean = true,
     isEditShow: Boolean = true,
     clickable: Boolean = false,
@@ -251,7 +244,6 @@ fun TagManageBottomSheet(
     onNavigateToTransactions: ((Tag) -> Unit)? = null
 ) = TagPickerSingleBottomSheet(
     viewModel = viewModel,
-    snackbarHostState = snackbarHostState,
     onTagClick = onTagClick,
     onDismiss = onDismiss,
     onNavigateToTransactions = onNavigateToTransactions,

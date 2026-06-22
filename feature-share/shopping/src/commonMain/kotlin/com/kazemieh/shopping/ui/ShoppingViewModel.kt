@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -27,13 +28,16 @@ import org.jetbrains.compose.resources.getString
 
 data class ShoppingState(
     val items: List<ShoppingItem> = emptyList(),
+    val filteredItems: List<ShoppingItem> = emptyList(),
     val isLoading: Boolean = false,
     val newItemName: String = "",
     val newItemEstimatedPrice: String = "",
-    val newItemPriority: Int = 0
+    val newItemPriority: Int = 0,
+    val searchQuery: String = ""
 )
 
 sealed interface ShoppingIntent {
+    data class UpdateSearchQuery(val query: String) : ShoppingIntent
     data class OnNewItemNameChanged(val name: String) : ShoppingIntent
     data class OnNewItemPriceChanged(val price: String) : ShoppingIntent
     data class OnNewItemPriorityChanged(val priority: Int) : ShoppingIntent
@@ -62,17 +66,33 @@ class ShoppingViewModel(
     private val _effect = Channel<ShoppingEffect>()
     val effect = _effect.receiveAsFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+
     init {
         _state.update { it.copy(isLoading = true) }
         observeShoppingItems()
-            .onEach { items ->
-                _state.update { it.copy(items = items, isLoading = false) }
+            .combine(_searchQuery) { items, query ->
+                val filtered = items.filter {
+                    it.name.contains(query, ignoreCase = true)
+                }
+                items to filtered
+            }
+            .onEach { (all, filtered) ->
+                _state.update {
+                    it.copy(
+                        items = all,
+                        filteredItems = filtered,
+                        isLoading = false,
+                        searchQuery = _searchQuery.value
+                    )
+                }
             }
             .launchIn(viewModelScope)
     }
 
     fun onIntent(intent: ShoppingIntent) {
         when (intent) {
+            is ShoppingIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
             is ShoppingIntent.OnNewItemNameChanged -> {
                 _state.update { it.copy(newItemName = intent.name) }
             }

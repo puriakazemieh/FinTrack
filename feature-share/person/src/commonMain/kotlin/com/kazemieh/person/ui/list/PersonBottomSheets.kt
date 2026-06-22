@@ -49,7 +49,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun PersonPickerBottomSheet(
     viewModel: PersonViewModel = koinViewModel(key = "PersonPickerBottomSheet"),
-    snackbarHostState: SnackbarHostState,
     selectedPersons: Set<Person>?,
     onSubmitClick: (Set<Person>?) -> Unit,
     onDismiss: () -> Unit,
@@ -93,7 +92,6 @@ fun PersonPickerBottomSheet(
 
     if (state.showAddPerson) {
         AddPersonBottomSheet(
-            snackbarHostState = snackbarHostState,
             selectedPerson = state.selectedPerson,
             onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
             onNavigateToTransactions = null, // Picker usually doesn't need filter navigation
@@ -103,7 +101,6 @@ fun PersonPickerBottomSheet(
 
     if (state.isDeleteShow && state.selectedPerson != null) {
         DeletePersonBottomSheet(
-            snackbarHostState = snackbarHostState,
             person = state.selectedPerson!!,
             onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
             deleted = { viewModel.onIntent(PersonIntent.ResetFlags) }
@@ -115,7 +112,6 @@ fun PersonPickerBottomSheet(
 @Composable
 fun PersonPickerSingleBottomSheet(
     viewModel: PersonViewModel = koinViewModel(key = "PersonPickerSingleBottomSheet"),
-    snackbarHostState: SnackbarHostState,
     onPersonClick: (Person) -> Unit,
     onDismiss: () -> Unit,
     onNavigateToTransactions: ((Person) -> Unit)? = null,
@@ -234,7 +230,6 @@ fun PersonPickerSingleBottomSheet(
 
     if (state.showAddPerson) {
         AddPersonBottomSheet(
-            snackbarHostState = snackbarHostState,
             selectedPerson = state.selectedPerson,
             onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
             onNavigateToTransactions = onNavigateToTransactions?.let { navCallback ->
@@ -249,7 +244,6 @@ fun PersonPickerSingleBottomSheet(
 
     if (state.isDeleteShow && state.selectedPerson != null) {
         DeletePersonBottomSheet(
-            snackbarHostState = snackbarHostState,
             person = state.selectedPerson!!,
             onDismiss = { viewModel.onIntent(PersonIntent.ResetFlags) },
             deleted = { viewModel.onIntent(PersonIntent.ResetFlags) }
@@ -262,7 +256,6 @@ fun PersonPickerSingleBottomSheet(
 fun PersonManageBottomSheet(
     keyViewmodel: String = "PersonManageBottomSheet",
     viewModel: PersonViewModel = koinViewModel(key = keyViewmodel),
-    snackbarHostState: SnackbarHostState,
     isDeleteShow: Boolean = true,
     isEditShow: Boolean = true,
     clickable: Boolean = false,
@@ -271,7 +264,6 @@ fun PersonManageBottomSheet(
     onNavigateToTransactions: ((Person) -> Unit)? = null
 ) = PersonPickerSingleBottomSheet(
     viewModel = viewModel,
-    snackbarHostState = snackbarHostState,
     onPersonClick = onPersonClick,
     onDismiss = onDismiss,
     onNavigateToTransactions = onNavigateToTransactions,

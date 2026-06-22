@@ -63,7 +63,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun CategoryPickerBottomSheet(
     viewModel: CategoryViewModel = koinViewModel(key = "CategoryPickerBottomSheet"),
-    snackbarHostState: SnackbarHostState,
     transactionType: TransactionType,
     onCategoryClick: (Category) -> Unit,
     onDismiss: () -> Unit,
@@ -189,7 +188,6 @@ fun CategoryPickerBottomSheet(
 
     if (state.isAddShow) {
         AddCategoryBottomSheet(
-            snackbarHostState = snackbarHostState,
             transactionType = transactionType,
             selectedCategory = state.selectedCategory,
             onDismiss = { viewModel.onIntent(CategoryIntent.ResetFlags) },
@@ -202,7 +200,6 @@ fun CategoryPickerBottomSheet(
 
     if (state.isDeleteShow && state.selectedCategory != null) {
         DeleteCategoryBottomSheet(
-            snackbarHostState = snackbarHostState,
             category = state.selectedCategory!!,
             onDismiss = { viewModel.onIntent(CategoryIntent.ResetFlags) },
             deleted = { viewModel.onIntent(CategoryIntent.ResetFlags) },
@@ -214,7 +211,6 @@ fun CategoryPickerBottomSheet(
 @Composable
 fun CategoryManageBottomSheet(
     viewModel: CategoryViewModel = koinViewModel(key = "CategoryManageBottomSheet"),
-    snackbarHostState: SnackbarHostState,
     onDismiss: () -> Unit,
     onNavigateToTransactions: ((Category) -> Unit)? = null
 ) {
@@ -341,7 +337,6 @@ fun CategoryManageBottomSheet(
 
     if (state.isAddShow) {
         AddCategoryBottomSheet(
-            snackbarHostState = snackbarHostState,
             transactionType = if (state.type == TransactionType.ALL) TransactionType.EXPENSE else state.type,
             selectedCategory = state.selectedCategory,
             onDismiss = { viewModel.onIntent(CategoryIntent.OnAddCategoryClick) },
@@ -357,7 +352,6 @@ fun CategoryManageBottomSheet(
 
     if (state.isDeleteShow && state.selectedCategory != null) {
         DeleteCategoryBottomSheet(
-            snackbarHostState = snackbarHostState,
             category = state.selectedCategory!!,
             onDismiss = { viewModel.onIntent(CategoryIntent.OnDeleteClick()) },
             deleted = { viewModel.onIntent(CategoryIntent.OnDeleteClick()) },
@@ -366,7 +360,7 @@ fun CategoryManageBottomSheet(
 }
 
 @Composable
-private fun TypeSwitcher(
+fun TypeSwitcher(
     selectedType: TransactionType,
     onTypeSelected: (TransactionType) -> Unit
 ) {

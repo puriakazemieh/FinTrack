@@ -61,6 +61,7 @@ interface TransactionRepository {
     suspend fun updatePerson(person: Person): Int
     suspend fun deletePerson(from: Person, to: Person?)
     fun observePersons(): Flow<List<Person>>
+    suspend fun getPersonById(id: Long): Person?
 
 
     suspend fun addSource(source: Source): Long
@@ -68,6 +69,7 @@ interface TransactionRepository {
     suspend fun deleteSource(from: Source, to: Source?)
     fun observeSources(): Flow<List<Source>>
     fun observeSource(sourceId: Long): Flow<Source?>
+    suspend fun getSourceById(id: Long): Source?
     suspend fun getSourceByIdentifier(identifier: String): Source?
     suspend fun getDefaultSource(): Source?
 

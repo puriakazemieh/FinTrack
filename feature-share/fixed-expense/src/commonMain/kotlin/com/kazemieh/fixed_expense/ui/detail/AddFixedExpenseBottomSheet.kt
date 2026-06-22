@@ -224,7 +224,6 @@ fun AddFixedExpenseBottomSheet(
 
     if (showCategoryPicker) {
         CategoryPickerBottomSheet(
-            snackbarHostState = remember { SnackbarHostState() },
             transactionType = TransactionType.EXPENSE,
             onCategoryClick = {
                 viewModel.onIntent(AddFixedExpenseIntent.SetCategory(it))
@@ -236,7 +235,6 @@ fun AddFixedExpenseBottomSheet(
 
     if (showSourcePicker) {
         SourcePickerBottomSheet(
-            snackbarHostState = remember { SnackbarHostState() },
             onSourceClick = {
                 viewModel.onIntent(AddFixedExpenseIntent.SetSource(it))
                 showSourcePicker = false

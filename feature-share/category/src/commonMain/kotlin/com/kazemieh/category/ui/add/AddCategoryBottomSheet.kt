@@ -37,7 +37,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun AddCategoryBottomSheet(
     viewModel: AddCategoryViewModel = koinViewModel(),
-    snackbarHostState: SnackbarHostState,
     transactionType: TransactionType,
     selectedCategory: Category? = null,
     onDismiss: () -> Unit,
@@ -59,15 +58,6 @@ fun AddCategoryBottomSheet(
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is AddCategoryEffect.ShowMessage -> {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = effect.message.resolveString(),
-                            duration = SnackbarDuration.Short
-                        )
-                    }
-                }
-
                 is AddCategoryEffect.SavedCategory -> {
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {

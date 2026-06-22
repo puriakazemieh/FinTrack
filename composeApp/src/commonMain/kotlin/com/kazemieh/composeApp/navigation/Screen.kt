@@ -46,6 +46,15 @@ sealed class Screen {
     data object Installment : Screen()
 
     @Serializable
+    data object Categories : Screen()
+
+    @Serializable
+    data object Sources : Screen()
+
+    @Serializable
+    data object Tags : Screen()
+
+    @Serializable
     data object Person : Screen()
 
     @Serializable

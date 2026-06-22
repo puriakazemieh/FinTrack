@@ -68,7 +68,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 private fun SourceBottomSheetCore(
     keyViewmodel: String,
-    snackbarHostState: SnackbarHostState,
     isDeleteShow: Boolean,
     isEditShow: Boolean,
     clickable: Boolean,
@@ -196,7 +195,6 @@ private fun SourceBottomSheetCore(
 
     if (state.isAddShow) {
         AddSourceBottomSheet(
-            snackbarHostState = snackbarHostState,
             selectedSource = state.selectedSources,
             onDismiss = { viewModel.onIntent(SourceIntent.ResetFlags) },
             onNavigateToTransactions = onNavigateToTransactions?.let { navCallback ->
@@ -211,7 +209,6 @@ private fun SourceBottomSheetCore(
 
     if (state.isDeleteShow && state.selectedSources != null) {
         DeleteSourceBottomSheet(
-            snackbarHostState = snackbarHostState,
             source = state.selectedSources!!,
             onDismiss = { viewModel.onIntent(SourceIntent.ResetFlags) },
             deleted = { viewModel.onIntent(SourceIntent.ResetFlags) }
@@ -221,13 +218,11 @@ private fun SourceBottomSheetCore(
 
 @Composable
 fun SourceManageBottomSheet(
-    snackbarHostState: SnackbarHostState,
     onDismiss: () -> Unit,
     onSourceClick: (Source) -> Unit = {},
     onNavigateToTransactions: ((Source) -> Unit)? = null,
 ) = SourceBottomSheetCore(
     keyViewmodel = "SourceManageBottomSheet",
-    snackbarHostState = snackbarHostState,
     isDeleteShow = true,
     isEditShow = true,
     clickable = false,
@@ -239,13 +234,11 @@ fun SourceManageBottomSheet(
 
 @Composable
 fun SourcePickerBottomSheet(
-    snackbarHostState: SnackbarHostState,
     onDismiss: () -> Unit,
     onSourceClick: (Source) -> Unit = {},
     onNavigateToTransactions: ((Source) -> Unit)? = null,
 ) = SourceBottomSheetCore(
     keyViewmodel = "SourcePickerBottomSheet",
-    snackbarHostState = snackbarHostState,
     isDeleteShow = false,
     isEditShow = false,
     clickable = true,

@@ -351,7 +351,17 @@ private fun EntityRow(
                         maxLines = 1
                     )
                 }
+                item.sub2?.let {
+                    FintrackBodySmallText(
+                        text = it,
+                        color = color.copy(alpha = 0.8f),
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1
+                    )
+                }
             }
+
+            item.trailingContent?.let { it() }
 
             if (isReorderMode) {
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -419,9 +429,11 @@ data class EntityItem(
     val id: Long,
     val name: String,
     val sub: String? = null,
+    val sub2: String? = null,
     val badge: String? = null,
     val iconId: Int? = null,
     val colorId: Int? = null,
     val color: Color? = null,
-    val parentId: Long? = null
+    val parentId: Long? = null,
+    val trailingContent: (@Composable () -> Unit)? = null
 )

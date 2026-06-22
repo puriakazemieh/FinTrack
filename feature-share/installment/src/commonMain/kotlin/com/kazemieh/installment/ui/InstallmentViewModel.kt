@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 import org.jetbrains.compose.resources.getString
@@ -23,6 +24,7 @@ import kotlin.time.Clock
 
 sealed interface InstallmentIntent {
     data object Init : InstallmentIntent
+    data class UpdateSearchQuery(val query: String) : InstallmentIntent
     data class MarkAsPaid(
         val installmentId: Long,
         val transactionDescription: String,
@@ -40,7 +42,11 @@ data class InstallmentState(
     val upcoming: List<InstallmentWithRelations> = emptyList(),
     val overdue: List<InstallmentWithRelations> = emptyList(),
     val completed: List<InstallmentWithRelations> = emptyList(),
-    val isLoading: Boolean = false
+    val filteredUpcoming: List<InstallmentWithRelations> = emptyList(),
+    val filteredOverdue: List<InstallmentWithRelations> = emptyList(),
+    val filteredCompleted: List<InstallmentWithRelations> = emptyList(),
+    val isLoading: Boolean = false,
+    val searchQuery: String = ""
 )
 
 class InstallmentViewModel(
@@ -53,9 +59,12 @@ class InstallmentViewModel(
     private val _effects = Channel<InstallmentEffect>(capacity = Channel.BUFFERED)
     val effects: Flow<InstallmentEffect> = _effects.receiveAsFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+
     fun onIntent(intent: InstallmentIntent) {
         when (intent) {
             InstallmentIntent.Init -> observeInstallments()
+            is InstallmentIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
             is InstallmentIntent.MarkAsPaid -> markAsPaid(intent)
             is InstallmentIntent.Delete -> deleteInstallment(intent.installmentId)
         }
@@ -64,31 +73,51 @@ class InstallmentViewModel(
     private fun observeInstallments() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            useCases.observeInstallmentsUseCase().collectLatest { installments ->
-                val now = Clock.System.now().toEpochMilliseconds()
-                val upcoming = mutableListOf<InstallmentWithRelations>()
-                val overdue = mutableListOf<InstallmentWithRelations>()
-                val completed = mutableListOf<InstallmentWithRelations>()
+            useCases.observeInstallmentsUseCase()
+                .combine(_searchQuery) { installments, query ->
+                    val now = Clock.System.now().toEpochMilliseconds()
+                    val upcoming = mutableListOf<InstallmentWithRelations>()
+                    val overdue = mutableListOf<InstallmentWithRelations>()
+                    val completed = mutableListOf<InstallmentWithRelations>()
 
-                installments.forEach { item ->
-                    if (item.installment.isCompleted) {
-                        completed.add(item)
-                    } else if (item.installment.nextDueDate < now) {
-                        overdue.add(item)
-                    } else {
-                        upcoming.add(item)
+                    installments.forEach { item ->
+                        if (item.installment.isCompleted) {
+                            completed.add(item)
+                        } else if (item.installment.nextDueDate < now) {
+                            overdue.add(item)
+                        } else {
+                            upcoming.add(item)
+                        }
                     }
-                }
 
-                _state.update {
-                    it.copy(
+                    fun List<InstallmentWithRelations>.filterByQuery(q: String) = filter {
+                        it.installment.title.contains(q, ignoreCase = true) ||
+                                it.installment.description?.contains(q, ignoreCase = true) == true
+                    }
+
+                    InstallmentData(
                         upcoming = upcoming,
                         overdue = overdue,
                         completed = completed,
-                        isLoading = false
+                        filteredUpcoming = upcoming.filterByQuery(query),
+                        filteredOverdue = overdue.filterByQuery(query),
+                        filteredCompleted = completed.filterByQuery(query)
                     )
                 }
-            }
+                .collectLatest { data ->
+                    _state.update {
+                        it.copy(
+                            upcoming = data.upcoming,
+                            overdue = data.overdue,
+                            completed = data.completed,
+                            filteredUpcoming = data.filteredUpcoming,
+                            filteredOverdue = data.filteredOverdue,
+                            filteredCompleted = data.filteredCompleted,
+                            isLoading = false,
+                            searchQuery = _searchQuery.value
+                        )
+                    }
+                }
         }
     }
 
@@ -119,3 +148,12 @@ class InstallmentViewModel(
         }
     }
 }
+
+private data class InstallmentData(
+    val upcoming: List<InstallmentWithRelations>,
+    val overdue: List<InstallmentWithRelations>,
+    val completed: List<InstallmentWithRelations>,
+    val filteredUpcoming: List<InstallmentWithRelations>,
+    val filteredOverdue: List<InstallmentWithRelations>,
+    val filteredCompleted: List<InstallmentWithRelations>
+)

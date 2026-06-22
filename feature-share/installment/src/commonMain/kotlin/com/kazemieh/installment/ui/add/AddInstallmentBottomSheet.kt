@@ -233,7 +233,6 @@ fun AddInstallmentBottomSheet(
         if (showCategoryPicker) {
             CategoryPickerBottomSheet(
                 transactionType = TransactionType.EXPENSE,
-                snackbarHostState = SnackbarHostState(),
                 onCategoryClick = {
                     viewModel.onIntent(AddInstallmentIntent.SetCategory(it))
                     showCategoryPicker = false
@@ -244,7 +243,6 @@ fun AddInstallmentBottomSheet(
 
         if (showSourcePicker) {
             SourcePickerBottomSheet(
-                snackbarHostState = SnackbarHostState(),
                 onSourceClick = {
                     viewModel.onIntent(AddInstallmentIntent.SetSource(it))
                     showSourcePicker = false

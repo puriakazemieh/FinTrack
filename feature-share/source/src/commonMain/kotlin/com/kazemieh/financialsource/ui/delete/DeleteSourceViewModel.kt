@@ -4,6 +4,7 @@ package com.kazemieh.financialsource.ui.delete
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Source
+import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.DeleteSourceUseCase
 import com.kazemieh.domain.usecase.ObserveSourceUseCase
@@ -79,7 +80,7 @@ class DeleteSourceViewModel(
             val isError = !_state.value.isDeleteAllData && _state.value.moveSource == null
             if (isError) {
                 _state.update { it.copy(isSourceError = true) }
-                _effect.send(DeleteSourceEffect.ShowMessage(UiText.StringResourceText(Res.string.source_choose)))
+                SnackbarController.showMessage(UiText.StringResourceText(Res.string.source_choose))
                 return@launch
             }
             _state.value.source?.let { deleteSource ->
@@ -111,7 +112,6 @@ data class DeleteSourceState(
 )
 
 sealed interface DeleteSourceEffect {
-    data class ShowMessage(val message: UiText) : DeleteSourceEffect
     object DeletedTransaction : DeleteSourceEffect
     data object OnDismiss : DeleteSourceEffect
 }

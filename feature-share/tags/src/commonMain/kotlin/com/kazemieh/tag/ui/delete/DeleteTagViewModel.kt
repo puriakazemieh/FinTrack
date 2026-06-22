@@ -4,10 +4,12 @@ package com.kazemieh.tag.ui.delete
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Tag
+import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.DeleteTagUseCase
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.tag_choose
+import fintrack.core.designsystem.generated.resources.transaction_delete_failed
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -66,7 +68,7 @@ class DeleteTagViewModel(
             val isError = !_state.value.isDeleteAllData && _state.value.moveTag == null
             if (isError) {
                 _state.update { it.copy(isTagError = true) }
-                _effect.send(DeleteTagEffect.ShowMessage(UiText.StringResourceText(Res.string.tag_choose)))
+                SnackbarController.showMessage(UiText.StringResourceText(Res.string.tag_choose))
                 return@launch
             }
             _state.value.tag?.let { deleteTag ->
@@ -97,7 +99,6 @@ data class DeleteTagState(
 )
 
 sealed interface DeleteTagEffect {
-    data class ShowMessage(val message: UiText) : DeleteTagEffect
     object DeletedTransaction : DeleteTagEffect
     data object OnDismiss : DeleteTagEffect
 }
