@@ -41,6 +41,7 @@ import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.LeadingIconStyle
+import com.kazemieh.designsystem.component.glass.EntityChip
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import fintrack.core.designsystem.generated.resources.Res

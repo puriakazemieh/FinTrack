@@ -33,6 +33,8 @@ data class ShoppingState(
     val newItemName: String = "",
     val newItemEstimatedPrice: String = "",
     val newItemPriority: Int = 0,
+    val newItemReminderTime: Long? = null,
+    val editingItem: ShoppingItem? = null,
     val searchQuery: String = ""
 )
 
@@ -41,7 +43,10 @@ sealed interface ShoppingIntent {
     data class OnNewItemNameChanged(val name: String) : ShoppingIntent
     data class OnNewItemPriceChanged(val price: String) : ShoppingIntent
     data class OnNewItemPriorityChanged(val priority: Int) : ShoppingIntent
+    data class OnNewItemReminderChanged(val time: Long?) : ShoppingIntent
     data object OnAddItem : ShoppingIntent
+    data class OnEditItem(val item: ShoppingItem?) : ShoppingIntent
+    data class OnUpdateItem(val item: ShoppingItem) : ShoppingIntent
     data class OnToggleItem(val item: ShoppingItem) : ShoppingIntent
     data class OnDeleteItem(val id: Long) : ShoppingIntent
     data class OnReorder(val from: Int, val to: Int) : ShoppingIntent
@@ -102,7 +107,14 @@ class ShoppingViewModel(
             is ShoppingIntent.OnNewItemPriorityChanged -> {
                 _state.update { it.copy(newItemPriority = intent.priority) }
             }
+            is ShoppingIntent.OnNewItemReminderChanged -> {
+                _state.update { it.copy(newItemReminderTime = intent.time) }
+            }
             ShoppingIntent.OnAddItem -> addItem()
+            is ShoppingIntent.OnEditItem -> {
+                _state.update { it.copy(editingItem = intent.item) }
+            }
+            is ShoppingIntent.OnUpdateItem -> updateItem(intent.item)
             is ShoppingIntent.OnToggleItem -> toggleItem(intent.item)
             is ShoppingIntent.OnDeleteItem -> deleteItem(intent.id)
             is ShoppingIntent.OnReorder -> reorderItems(intent.from, intent.to)
@@ -118,6 +130,7 @@ class ShoppingViewModel(
                 name = name,
                 estimatedPrice = _state.value.newItemEstimatedPrice.toDoubleOrNull() ?: 0.0,
                 priority = _state.value.newItemPriority,
+                reminderTime = _state.value.newItemReminderTime,
                 position = (_state.value.items.maxOfOrNull { it.position } ?: -1) + 1
             )
             val id = addShoppingItem(newItem)
@@ -130,7 +143,23 @@ class ShoppingViewModel(
                     channelId = NotificationManager.CHANNEL_SHOPPING
                 )
             }
-            _state.update { it.copy(newItemName = "", newItemEstimatedPrice = "", newItemPriority = 0) }
+            _state.update { it.copy(newItemName = "", newItemEstimatedPrice = "", newItemPriority = 0, newItemReminderTime = null) }
+        }
+    }
+
+    private fun updateItem(item: ShoppingItem) {
+        viewModelScope.launch {
+            updateShoppingItem(item)
+            item.reminderTime?.let { reminderTime ->
+                notificationScheduler.scheduleReminder(
+                    id = "shopping_${item.id}",
+                    title = getString(Res.string.shopping_list),
+                    message = item.name,
+                    scheduledTime = Instant.fromEpochMilliseconds(reminderTime).toLocalDateTime(TimeZone.currentSystemDefault()),
+                    channelId = NotificationManager.CHANNEL_SHOPPING
+                )
+            }
+            _state.update { it.copy(editingItem = null) }
         }
     }
 

@@ -10,9 +10,11 @@ data class SmsDraft(
     val amount: Int,
     val bankName: String,
     val type: TransactionType,
+    val categoryId: Long? = null,
     val sourceId: Long? = null,
     val sourceIdentifier: String? = null,
     val timeStamp: Long,
     val date: String,
+    val confidence: Int = 100,
     val isUsed: Boolean = false
 )

@@ -31,6 +31,7 @@ kotlin {
                 implementation(libs.kotlinx.datetime)
                 implementation(project(":core:common"))
                 implementation(project(":core:domain"))
+                implementation(project(":core:jalali"))
                 implementation(project(":core:designsystem"))
                 implementation(project(":feature-share:category"))
                 implementation(project(":feature-share:notifications"))

@@ -1,4 +1,4 @@
-package com.kazemieh.notes.ui.list
+package com.kazemieh.notes.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

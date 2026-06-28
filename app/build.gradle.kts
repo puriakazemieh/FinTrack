@@ -50,6 +50,7 @@ android {
 dependencies {
     implementation(project(":composeApp"))
     implementation(project(":core:designsystem"))
+    implementation(project(":core:domain"))
     implementation(project(":feature-share:notifications"))
     implementation(project(":feature-share:sync"))
     implementation(project(":feature-share:fixed-expense"))

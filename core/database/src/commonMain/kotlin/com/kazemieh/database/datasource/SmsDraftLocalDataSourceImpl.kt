@@ -30,9 +30,29 @@ class SmsDraftLocalDataSourceImpl(
             sourceIdentifier = smsDraft.sourceIdentifier,
             timeStamp = smsDraft.timeStamp,
             date = smsDraft.date,
+            categoryId = smsDraft.categoryId,
+            confidence = smsDraft.confidence.toLong(),
             isUsed = if (smsDraft.isUsed) 1L else 0L
         )
         smsDraftQueries.lastInsertRowId().awaitAsOne()
+    }
+
+    override suspend fun updateSmsDraft(smsDraft: SmsDraft): Unit  = withContext(Dispatchers.Default) {
+        smsDraftQueries.updateSmsDraft(
+            sender = smsDraft.sender,
+            body = smsDraft.body,
+            amount = smsDraft.amount.toLong(),
+            bankName = smsDraft.bankName,
+            type = smsDraft.type.count.toLong(),
+            sourceId = smsDraft.sourceId,
+            sourceIdentifier = smsDraft.sourceIdentifier,
+            timeStamp = smsDraft.timeStamp,
+            date = smsDraft.date,
+            categoryId = smsDraft.categoryId,
+            confidence = smsDraft.confidence.toLong(),
+            isUsed = if (smsDraft.isUsed) 1L else 0L,
+            id = smsDraft.id
+        )
     }
 
     override fun observeUnusedSmsDrafts(): Flow<List<SmsDraft>> {

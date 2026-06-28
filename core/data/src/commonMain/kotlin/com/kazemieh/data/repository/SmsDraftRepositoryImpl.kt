@@ -27,4 +27,8 @@ class SmsDraftRepositoryImpl(
     override suspend fun getSmsDraftById(id: Long): SmsDraft? {
         return localDataSource.getSmsDraftById(id)
     }
+
+    override suspend fun updateSmsDraft(smsDraft: SmsDraft) {
+        localDataSource.updateSmsDraft(smsDraft)
+    }
 }

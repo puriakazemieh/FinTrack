@@ -3,6 +3,7 @@ package com.kazemieh.asset.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Asset
+import com.kazemieh.common.model.AssetHistory
 import com.kazemieh.common.model.AssetType
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.AssetUseCases
@@ -18,6 +19,8 @@ import kotlinx.coroutines.launch
 data class AssetState(
     val assets: List<Asset> = emptyList(),
     val filteredAssets: List<Asset> = emptyList(),
+    val selectedAsset: Asset? = null,
+    val history: List<AssetHistory> = emptyList(),
     val isLoading: Boolean = false,
     val totalValue: Long = 0,
     val composition: Map<AssetType, Double> = emptyMap(),
@@ -26,10 +29,12 @@ data class AssetState(
 
 sealed interface AssetIntent {
     data object LoadAssets : AssetIntent
+    data class LoadAsset(val id: Long) : AssetIntent
     data class UpdateSearchQuery(val query: String) : AssetIntent
     data class AddAsset(val asset: Asset) : AssetIntent
     data class DeleteAsset(val id: Long) : AssetIntent
     data class UpdateAsset(val asset: Asset) : AssetIntent
+    data class LoadHistory(val id: Long) : AssetIntent
     data object SyncRates : AssetIntent
 }
 
@@ -56,11 +61,26 @@ class AssetViewModel(
     fun onIntent(intent: AssetIntent) {
         when (intent) {
             AssetIntent.LoadAssets -> observeAssets()
+            is AssetIntent.LoadAsset -> loadAsset(intent.id)
             is AssetIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
             is AssetIntent.AddAsset -> addAsset(intent.asset)
             is AssetIntent.DeleteAsset -> deleteAsset(intent.id)
             is AssetIntent.UpdateAsset -> updateAsset(intent.asset)
+            is AssetIntent.LoadHistory -> loadHistory(intent.id)
             AssetIntent.SyncRates -> syncRates()
+        }
+    }
+
+    private fun loadAsset(id: Long) {
+        val asset = _state.value.assets.find { it.id == id }
+        _state.update { it.copy(selectedAsset = asset) }
+    }
+
+    private fun loadHistory(id: Long) {
+        viewModelScope.launch {
+            assetUseCases.observeAssetHistory(id).collect { history ->
+                _state.update { it.copy(history = history) }
+            }
         }
     }
 

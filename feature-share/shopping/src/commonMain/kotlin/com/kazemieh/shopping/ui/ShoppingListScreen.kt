@@ -1,44 +1,21 @@
 package com.kazemieh.shopping.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.toPersianPrice
-import com.kazemieh.designsystem.component.FintrackBodyLargeText
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackLabelSmallText
-import com.kazemieh.designsystem.component.FintrackOutlinedTextField
-import com.kazemieh.designsystem.component.FintrackLabelMediumText
-import com.kazemieh.designsystem.component.glass.EntityItem
-import com.kazemieh.designsystem.component.glass.EntityList
-import com.kazemieh.designsystem.component.glass.EntitySummary
-import com.kazemieh.designsystem.component.glass.FintrackScreen
-import com.kazemieh.designsystem.component.glass.GlassCard
-import com.kazemieh.designsystem.component.glass.ItemSelected
+import com.kazemieh.designsystem.component.*
+import com.kazemieh.designsystem.component.glass.*
+import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.component.model.UiText
-import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.add_to_shopping_list
-import fintrack.core.designsystem.generated.resources.currency_toman
-import fintrack.core.designsystem.generated.resources.estimated_price
-import fintrack.core.designsystem.generated.resources.priority_high
-import fintrack.core.designsystem.generated.resources.priority_normal
-import fintrack.core.designsystem.generated.resources.shopping_list
-import fintrack.core.designsystem.generated.resources.total_sum
+import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -48,6 +25,7 @@ fun ShoppingListScreen(
     onBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    val showDatePicker = remember { mutableStateOf(false) }
 
     FintrackScreen(
         title = stringResource(Res.string.shopping_list),
@@ -83,7 +61,11 @@ fun ShoppingListScreen(
                         viewModel.onIntent(ShoppingIntent.OnToggleItem(it))
                     }
                 },
-                onEditClick = { /* TODO */ },
+                onEditClick = { item ->
+                    state.items.find { it.id == item.id }?.let {
+                        viewModel.onIntent(ShoppingIntent.OnEditItem(it))
+                    }
+                },
                 onDeleteClick = { viewModel.onIntent(ShoppingIntent.OnDeleteItem(it.id)) },
                 showActions = true,
                 modifier = Modifier.weight(1f)
@@ -96,9 +78,27 @@ fun ShoppingListScreen(
                 onNameChange = { viewModel.onIntent(ShoppingIntent.OnNewItemNameChanged(it)) },
                 onPriceChange = { viewModel.onIntent(ShoppingIntent.OnNewItemPriceChanged(it)) },
                 onPriorityChange = { viewModel.onIntent(ShoppingIntent.OnNewItemPriorityChanged(it)) },
+                onReminderClick = { showDatePicker.value = true },
                 onAdd = { viewModel.onIntent(ShoppingIntent.OnAddItem) }
             )
         }
+    }
+
+    JalaliDatePickerBottomSheet(
+        openSheet = showDatePicker,
+        onConfirm = { calendar ->
+            viewModel.onIntent(ShoppingIntent.OnNewItemReminderChanged(calendar.toTimestamp()))
+        }
+    )
+
+    state.editingItem?.let { item ->
+        EditShoppingItemSheet(
+            item = item,
+            onDismiss = { viewModel.onIntent(ShoppingIntent.OnEditItem(null)) },
+            onConfirm = { updated ->
+                viewModel.onIntent(ShoppingIntent.OnUpdateItem(updated))
+            }
+        )
     }
 }
 
@@ -110,6 +110,7 @@ private fun QuickAddBar(
     onNameChange: (String) -> Unit,
     onPriceChange: (String) -> Unit,
     onPriorityChange: (Int) -> Unit,
+    onReminderClick: () -> Unit,
     onAdd: () -> Unit
 ) {
     GlassCard(
@@ -123,13 +124,20 @@ private fun QuickAddBar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    FintrackLabelMediumText(text = stringResource(Res.string.shopping_list))
                     FintrackOutlinedTextField(
                         value = name,
                         onValueChange = onNameChange,
                         placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.add_to_shopping_list)) },
                         label = { FintrackLabelSmallText(text = stringResource(Res.string.shopping_list)) },
                         modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                IconButton(onClick = onReminderClick) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -148,7 +156,6 @@ private fun QuickAddBar(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Column(modifier = Modifier.weight(0.5f)) {
-                    FintrackLabelMediumText(text = stringResource(Res.string.estimated_price))
                     FintrackOutlinedTextField(
                         value = price,
                         onValueChange = onPriceChange,
@@ -174,4 +181,81 @@ private fun QuickAddBar(
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EditShoppingItemSheet(
+    item: com.kazemieh.common.model.ShoppingItem,
+    onDismiss: () -> Unit,
+    onConfirm: (com.kazemieh.common.model.ShoppingItem) -> Unit
+) {
+    var name by remember { mutableStateOf(item.name) }
+    var price by remember { mutableStateOf(item.estimatedPrice.toString()) }
+    var priority by remember { mutableStateOf(item.priority) }
+    val showDatePicker = remember { mutableStateOf(false) }
+    var reminderTime by remember { mutableStateOf(item.reminderTime) }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = null
+    ) {
+        AddFrame(
+            title = stringResource(Res.string.edit),
+            primaryLabel = stringResource(Res.string.save_),
+            onPrimaryClick = {
+                onConfirm(item.copy(name = name, estimatedPrice = price.toDoubleOrNull() ?: 0.0, priority = priority, reminderTime = reminderTime))
+            },
+            onClose = onDismiss,
+            showHero = false
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                FintrackOutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { FintrackBodyMediumText(stringResource(Res.string.shopping_list)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                FintrackOutlinedTextField(
+                    value = price,
+                    onValueChange = { price = it },
+                    label = { FintrackBodyMediumText(stringResource(Res.string.estimated_price)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    ItemSelected(
+                        isSelected = priority == 1,
+                        item = ItemUi(
+                            id = priority.toLong(),
+                            title = UiText.DynamicString(if (priority == 1) stringResource(Res.string.priority_high) else stringResource(Res.string.priority_normal))
+                        ),
+                        onToggle = { priority = if (priority == 1) 0 else 1 }
+                    )
+                    
+                    Spacer(modifier = Modifier.width(16.dp))
+                    
+                    IconButton(onClick = { showDatePicker.value = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Notifications,
+                            contentDescription = null,
+                            tint = if (reminderTime != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    JalaliDatePickerBottomSheet(
+        openSheet = showDatePicker,
+        onConfirm = { calendar ->
+            reminderTime = calendar.toTimestamp()
+        }
+    )
 }

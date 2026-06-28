@@ -5,6 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.asset.ui.AssetIntent
 import com.kazemieh.asset.ui.AssetViewModel
 import com.kazemieh.asset.ui.component.CustomAssetSheet
@@ -19,9 +20,12 @@ import org.koin.compose.viewmodel.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddAssetScreen(
+    assetId: Long? = null,
     onBack: () -> Unit,
     viewModel: AssetViewModel = koinViewModel()
 ) {
+    val assetState by viewModel.state.collectAsStateWithLifecycle()
+
     var name by remember { mutableStateOf("") }
     var type by remember { mutableStateOf(AssetType.GOLD) }
     var quantity by remember { mutableStateOf("") }
@@ -29,8 +33,24 @@ fun AddAssetScreen(
     var description by remember { mutableStateOf("") }
     var showCustomSheet by remember { mutableStateOf(false) }
 
+    LaunchedEffect(assetId) {
+        if (assetId != null) {
+            viewModel.onIntent(AssetIntent.LoadAsset(assetId))
+        }
+    }
+
+    LaunchedEffect(assetState.selectedAsset) {
+        assetState.selectedAsset?.let { asset ->
+            name = asset.name
+            type = asset.type
+            quantity = asset.quantity.toString()
+            purchasePrice = asset.purchasePrice.toString()
+            description = asset.description ?: ""
+        }
+    }
+
     FintrackScreen(
-        title = stringResource(Res.string.title_add_asset),
+        title = stringResource(if (assetId == null) Res.string.title_add_asset else Res.string.title_edit_asset),
         onBack = onBack
     ) {
         Column(
@@ -92,6 +112,7 @@ fun AddAssetScreen(
                 text = stringResource(Res.string.save_),
                 onClick = {
                     val asset = Asset(
+                        id = assetId,
                         name = name,
                         type = type,
                         quantity = quantity.toDoubleOrNull() ?: 0.0,
@@ -100,7 +121,11 @@ fun AddAssetScreen(
                         colorId = 1,
                         iconId = 1
                     )
-                    viewModel.onIntent(AssetIntent.AddAsset(asset))
+                    if (assetId == null) {
+                        viewModel.onIntent(AssetIntent.AddAsset(asset))
+                    } else {
+                        viewModel.onIntent(AssetIntent.UpdateAsset(asset))
+                    }
                     onBack()
                 },
                 modifier = Modifier.fillMaxWidth()

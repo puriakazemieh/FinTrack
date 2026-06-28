@@ -28,13 +28,23 @@ class TgjuService(private val client: HttpClient) {
         
         val gold18kRegex = """<tr data-market-row="gold_18k">.*?<td class="info-price">.*?<span class="value">(.*?)</span>""".toRegex(RegexOption.DOT_MATCHES_ALL)
         val usdRegex = """<tr data-market-row="price_dollar_rl">.*?<td class="info-price">.*?<span class="value">(.*?)</span>""".toRegex(RegexOption.DOT_MATCHES_ALL)
+        val eurRegex = """<tr data-market-row="price_eur">.*?<td class="info-price">.*?<span class="value">(.*?)</span>""".toRegex(RegexOption.DOT_MATCHES_ALL)
+        val aedRegex = """<tr data-market-row="price_aed">.*?<td class="info-price">.*?<span class="value">(.*?)</span>""".toRegex(RegexOption.DOT_MATCHES_ALL)
         
         gold18kRegex.find(html)?.groupValues?.get(1)?.let { priceStr ->
             rates.add(AssetRate(AssetType.GOLD, "gold_18k", "طلای ۱۸ عیار", cleanPrice(priceStr), now))
         }
 
         usdRegex.find(html)?.groupValues?.get(1)?.let { priceStr ->
-            rates.add(AssetRate(AssetType.FX, "usd", "دلار", cleanPrice(priceStr), now))
+            rates.add(AssetRate(AssetType.FX, "usd", "دلار آمریکا", cleanPrice(priceStr), now))
+        }
+
+        eurRegex.find(html)?.groupValues?.get(1)?.let { priceStr ->
+            rates.add(AssetRate(AssetType.FX, "eur", "یورو", cleanPrice(priceStr), now))
+        }
+
+        aedRegex.find(html)?.groupValues?.get(1)?.let { priceStr ->
+            rates.add(AssetRate(AssetType.FX, "aed", "درهم امارات", cleanPrice(priceStr), now))
         }
 
         return rates

@@ -1,5 +1,6 @@
 package com.kazemieh.notes.ui.edit
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.kazemieh.common.util.DateUtils
 import com.kazemieh.designsystem.component.glass.ColorSwatches
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.Fab
@@ -42,6 +44,7 @@ import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.Field
+import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
@@ -65,6 +68,7 @@ fun NoteEditScreen(
 ) {
     val state by viewModel.state.collectAsState()
     var showTagSheet by remember { mutableStateOf(false) }
+    val showDatePicker = remember { mutableStateOf(false) }
 
     LaunchedEffect(noteId) {
         viewModel.onIntent(NoteEditIntent.LoadNote(noteId))
@@ -161,10 +165,20 @@ fun NoteEditScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Notifications, contentDescription = null, modifier = Modifier.size(20.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable { showDatePicker.value = true }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Notifications,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = if (state.reminderTime != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Spacer(modifier = Modifier.padding(4.dp))
-                FintrackBodyLargeText(text = stringResource(Res.string.reminder))
+                FintrackBodyLargeText(
+                    text = state.reminderTime?.let { DateUtils.formatTimestamp(it) } ?: stringResource(Res.string.reminder)
+                )
             }
         }
 
@@ -183,6 +197,13 @@ fun NoteEditScreen(
                 onAddClick = { /* Handle add tag */ }
             )
         }
+
+        JalaliDatePickerBottomSheet(
+            openSheet = showDatePicker,
+            onConfirm = { calendar ->
+                viewModel.onIntent(NoteEditIntent.OnReminderChanged(calendar.toTimestamp()))
+            }
+        )
     }
 }
 

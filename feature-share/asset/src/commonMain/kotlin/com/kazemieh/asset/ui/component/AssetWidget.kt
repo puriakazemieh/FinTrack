@@ -6,10 +6,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.asset.ui.AssetViewModel
+import com.kazemieh.common.model.AssetType
+import com.kazemieh.designsystem.GlassAmber
+import com.kazemieh.designsystem.GlassBlue
+import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.GlassPurple
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.MoneyText
@@ -47,17 +53,19 @@ fun AssetWidget(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(8.dp)
+                    .height(6.dp)
+                    .clip(androidx.compose.foundation.shape.CircleShape)
                     .background(LocalGlassColors.current.text.copy(alpha = 0.05f))
             ) {
-                state.composition.forEach { (type, percentage) ->
-                    Box(
-                        modifier = Modifier
-                            .weight(percentage.toFloat().coerceAtLeast(0.01f))
-                            .fillMaxHeight()
-                            .background(Color((type.hashCode() * 0xFFFFFF) or 0xFF000000.toInt()))
-                    )
-                }
+                val gold = state.composition[AssetType.GOLD] ?: 0.0
+                val fx = state.composition[AssetType.FX] ?: 0.0
+                val stock = state.composition[AssetType.STOCK] ?: 0.0
+                val custom = state.composition[AssetType.CUSTOM] ?: 0.0
+
+                if (gold > 0) Box(Modifier.weight(gold.toFloat()).fillMaxHeight().background(GlassAmber))
+                if (fx > 0) Box(Modifier.weight(fx.toFloat()).fillMaxHeight().background(GlassGreen))
+                if (stock > 0) Box(Modifier.weight(stock.toFloat()).fillMaxHeight().background(GlassBlue))
+                if (custom > 0) Box(Modifier.weight(custom.toFloat()).fillMaxHeight().background(GlassPurple))
             }
 
             Row(
@@ -67,20 +75,25 @@ fun AssetWidget(
                 state.composition.entries.toList().take(3).forEach { entry ->
                     val type = entry.key
                     val percentage = entry.value
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .background(Color((type.hashCode() * 0xFFFFFF) or 0xFF000000.toInt()))
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        FintrackLabelSmallText(
-                            text = stringResource(
-                                Res.string.label_percentage_suffix,
-                                type.name,
-                                (percentage * 100).toInt()
+                    if (percentage > 0) {
+                        val color = when (type) {
+                            AssetType.GOLD -> GlassAmber
+                            AssetType.FX -> GlassGreen
+                            AssetType.STOCK -> GlassBlue
+                            AssetType.CUSTOM -> GlassPurple
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .clip(androidx.compose.foundation.shape.CircleShape)
+                                    .background(color)
                             )
-                        )
+                            Spacer(Modifier.width(4.dp))
+                            FintrackLabelSmallText(
+                                text = "${(percentage * 100).toInt()}%"
+                            )
+                        }
                     }
                 }
             }

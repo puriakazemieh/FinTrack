@@ -74,7 +74,7 @@ sealed class Screen {
     data object Assets : Screen()
 
     @Serializable
-    data object AddAsset : Screen()
+    data class AddAsset(val assetId: Long? = null) : Screen()
 
     @Serializable
     data object Shopping : Screen()

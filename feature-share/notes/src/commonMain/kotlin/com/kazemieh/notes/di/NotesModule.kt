@@ -1,7 +1,7 @@
 package com.kazemieh.notes.di
 
 import com.kazemieh.notes.ui.edit.NoteEditViewModel
-import com.kazemieh.notes.ui.list.NotesViewModel
+import com.kazemieh.notes.ui.NotesViewModel
 import com.kazemieh.domain.usecase.AddNoteUseCase
 import com.kazemieh.domain.usecase.DeleteNoteUseCase
 import com.kazemieh.domain.usecase.GetNoteByIdUseCase

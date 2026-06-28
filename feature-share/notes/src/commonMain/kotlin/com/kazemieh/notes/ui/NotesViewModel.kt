@@ -1,4 +1,4 @@
-package com.kazemieh.notes.ui.list
+package com.kazemieh.notes.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

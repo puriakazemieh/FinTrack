@@ -27,7 +27,8 @@ abstract class BaseBankParser : BankParser {
         amount: Int,
         type: TransactionType,
         bankName: String? = null,
-        sourceIdentifier: String? = null
+        sourceIdentifier: String? = null,
+        confidence: Int = 100
     ): SmsDraft {
         return SmsDraft(
             sender = sender,
@@ -37,7 +38,8 @@ abstract class BaseBankParser : BankParser {
             type = type,
             sourceIdentifier = sourceIdentifier,
             timeStamp = Clock.System.now().toEpochMilliseconds(),
-            date = ""
+            date = "",
+            confidence = confidence
         )
     }
 }
@@ -68,7 +70,7 @@ class GenericBankParser : BaseBankParser() {
         // Extracting bank name from sender name if possible
         val bankDisplayName = sender.replace("Bank", "").replace("bank", "").trim()
 
-        return createDraft(sender, body, amount, type, bankDisplayName, sourceIdentifier)
+        return createDraft(sender, body, amount, type, bankDisplayName, sourceIdentifier, confidence = 80)
     }
 }
 

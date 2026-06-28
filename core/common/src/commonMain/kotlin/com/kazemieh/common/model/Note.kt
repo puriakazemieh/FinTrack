@@ -10,7 +10,7 @@ data class Note(
     val id: Long = 0,
     val title: String,
     val content: String,
-    val color: Long = 0xFFFFFFFF, // پیش‌فرض سفید
+    val color: Long = 0L, // 0 means default theme color
     val isPinned: Boolean = false,
     val isLocked: Boolean = false,
     override val updatedAt: Long = 0,

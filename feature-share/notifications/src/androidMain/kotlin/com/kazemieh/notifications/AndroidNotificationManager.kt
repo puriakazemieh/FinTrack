@@ -23,6 +23,8 @@ import fintrack.core.designsystem.generated.resources.notif_channel_budget
 import fintrack.core.designsystem.generated.resources.notif_channel_cheque
 import fintrack.core.designsystem.generated.resources.notif_channel_desc
 import fintrack.core.designsystem.generated.resources.notif_channel_installment
+import fintrack.core.designsystem.generated.resources.notif_channel_note
+import fintrack.core.designsystem.generated.resources.notif_channel_shopping
 import fintrack.core.designsystem.generated.resources.notif_channel_sms
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
@@ -48,6 +50,14 @@ class AndroidNotificationManager(private val context: Context) : NotificationMan
             createChannel(
                 NotificationManager.CHANNEL_SMS,
                 getString(Res.string.notif_channel_sms)
+            )
+            createChannel(
+                NotificationManager.CHANNEL_SHOPPING,
+                getString(Res.string.notif_channel_shopping)
+            )
+            createChannel(
+                NotificationManager.CHANNEL_NOTE,
+                getString(Res.string.notif_channel_note)
             )
         }
     }

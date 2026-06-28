@@ -1,4 +1,4 @@
-package com.kazemieh.transaction.ui.component
+package com.kazemieh.designsystem.component.glass
 
 
 import androidx.compose.foundation.layout.Row
@@ -23,10 +23,12 @@ fun EntityChip(
     name: String,
     iconRes: DrawableResource?,
     tint: Color,
+    onClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier,
+        onClick = onClick,
         shape = RoundedCornerShape(100),
         color = tint.copy(alpha = 0.10f),
         tonalElevation = 0.dp

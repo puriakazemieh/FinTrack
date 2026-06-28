@@ -369,6 +369,10 @@
 
     <!-- Assets -->
     <string name="title_add_asset">افزودن دارایی</string>
+    <string name="asset_type_gold">طلا</string>
+    <string name="asset_type_fx">ارز</string>
+    <string name="asset_type_stock">بورس</string>
+    <string name="asset_type_custom">سفارشی</string>
     <string name="label_asset_name_hint">نام دارایی (مثلاً دلار یا طلای ۱۸)</string>
     <string name="label_quantity">مقدار / تعداد</string>
     <string name="label_purchase_price">قیمت خرید هر واحد</string>
@@ -992,6 +996,8 @@
     <string name="sms_sheet_sub">انتخاب برای ثبت تراکنش</string>
     <string name="sms_ref_label">پیش‌نویس از پیامک بانکی · %1$s</string>
     <string name="notif_channel_sms">شناسایی پیامک</string>
+    <string name="notif_channel_shopping">یادآور خرید</string>
+    <string name="notif_channel_note">یادآور یادداشت</string>
     <string name="notif_channel_budget">یادآور بودجه</string>
     <string name="notif_channel_installment">یادآور اقساط</string>
     <string name="notif_channel_cheque">یادآور چک‌ها</string>

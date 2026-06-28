@@ -9,13 +9,21 @@ CREATE TABLE IF NOT EXISTS sms_draft (
     sourceIdentifier TEXT,
     timeStamp INTEGER NOT NULL,
     date TEXT NOT NULL,
+    categoryId INTEGER,
+    confidence INTEGER NOT NULL DEFAULT 100,
     isUsed INTEGER NOT NULL DEFAULT 0,
-    FOREIGN KEY (sourceId) REFERENCES source(id) ON DELETE SET NULL
+    FOREIGN KEY (sourceId) REFERENCES source(id) ON DELETE SET NULL,
+    FOREIGN KEY (categoryId) REFERENCES category(id) ON DELETE SET NULL
 );
 
 insertSmsDraft:
-INSERT INTO sms_draft(sender, body, amount, bankName, type, sourceId, sourceIdentifier, timeStamp, date, isUsed)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO sms_draft(sender, body, amount, bankName, type, sourceId, sourceIdentifier, timeStamp, date, categoryId, confidence, isUsed)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateSmsDraft:
+UPDATE sms_draft
+SET sender = ?, body = ?, amount = ?, bankName = ?, type = ?, sourceId = ?, sourceIdentifier = ?, timeStamp = ?, date = ?, categoryId = ?, confidence = ?, isUsed = ?
+WHERE id = ?;
 
 observeUnusedSmsDrafts:
 SELECT * FROM sms_draft WHERE isUsed = 0 ORDER BY timeStamp DESC;

@@ -51,7 +51,7 @@ import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.fixed_expense.ui.widget.FixedExpenseWidget
 import com.kazemieh.installment.ui.widget.InstallmentWidget
 import com.kazemieh.shopping.ui.ShoppingWidget
-import com.kazemieh.notes.ui.list.NotesWidget
+import com.kazemieh.notes.ui.NotesWidget
 import com.kazemieh.sms_reader.ui.SmsBanner
 import com.kazemieh.sms_reader.ui.SmsDetectionSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
@@ -240,6 +240,8 @@ fun DashboardScreen(
         if (state.showSmsDetection) {
             SmsDetectionSheet(
                 drafts = state.smsDrafts,
+                categories = state.categories,
+                sources = state.sources,
                 onDraftClick = { draft ->
                     viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet)
                     viewModel.onIntent(
@@ -250,6 +252,7 @@ fun DashboardScreen(
                     )
                 },
                 onIgnore = { viewModel.onIntent(DashboardIntent.IgnoreSmsDraft(it)) },
+                onUpdateDraft = { viewModel.onIntent(DashboardIntent.UpdateSmsDraft(it)) },
                 onDismiss = { viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet) }
             )
         }

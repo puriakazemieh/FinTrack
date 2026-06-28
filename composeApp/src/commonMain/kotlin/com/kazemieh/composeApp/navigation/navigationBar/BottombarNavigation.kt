@@ -1,5 +1,6 @@
 package com.kazemieh.composeApp.navigation.navigationBar
 
+import com.kazemieh.notes.ui.NotesListScreen
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -22,7 +23,6 @@ import com.kazemieh.financialsource.ui.list.SourcesScreen
 import com.kazemieh.fixed_expense.ui.list.FixedExpenseListScreen
 import com.kazemieh.installment.ui.list.InstallmentsScreen
 import com.kazemieh.notes.ui.edit.NoteEditScreen
-import com.kazemieh.notes.ui.list.NotesListScreen
 import com.kazemieh.notifications.ui.NotificationSettingsScreen
 import com.kazemieh.person.ui.detail.PersonDetailScreen
 import com.kazemieh.person.ui.list.PersonsScreen
@@ -195,16 +195,18 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
 
         composable<Screen.Assets> {
             AssetsListScreen(
-                onAddAsset = { navController.navigate(Screen.AddAsset) },
+                onAddAsset = { id: Long? -> navController.navigate(Screen.AddAsset(id)) },
                 onBack = { navController.popBackStack() },
-                onNavigateToTransactions = { query ->
+                onNavigateToTransactions = { query: String ->
                     navigateToTransactions(query)
                 }
             )
         }
 
-        composable<Screen.AddAsset> {
+        composable<Screen.AddAsset> { backStackEntry ->
+            val args = backStackEntry.toRoute<Screen.AddAsset>()
             AddAssetScreen(
+                assetId = args.assetId,
                 onBack = { navController.popBackStack() }
             )
         }
@@ -218,7 +220,7 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
         composable<Screen.Notes> {
             NotesListScreen(
                 onAddNote = { navController.navigate(Screen.NoteEdit(0L)) },
-                onEditNote = { id -> navController.navigate(Screen.NoteEdit(id)) },
+                onEditNote = { id: Long -> navController.navigate(Screen.NoteEdit(id)) },
                 onBack = { navController.popBackStack() }
             )
         }

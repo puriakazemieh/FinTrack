@@ -2,11 +2,14 @@ package com.kazemieh.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.SmsDraft
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.domain.repository.SmsDraftRepository
+import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
+import com.kazemieh.domain.usecase.ObserveSourcesUseCase
 import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.preferences.FinTrackPreferences
 import fintrack.core.designsystem.generated.resources.Res
@@ -25,7 +28,9 @@ import org.jetbrains.compose.resources.getString
 
 class DashboardViewModel(
     private val preferenceUseCases: PreferenceUseCases,
-    private val smsDraftRepository: SmsDraftRepository
+    private val smsDraftRepository: SmsDraftRepository,
+    private val observeCategories: ObserveCategoriesUseCase,
+    private val observeSources: ObserveSourcesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DashboardState())
@@ -34,6 +39,24 @@ class DashboardViewModel(
     init {
         observeUserName()
         observeSmsDrafts()
+        loadCategories()
+        loadSources()
+    }
+
+    private fun loadCategories() {
+        viewModelScope.launch {
+            observeCategories().collect { categories ->
+                _state.update { it.copy(categories = categories) }
+            }
+        }
+    }
+
+    private fun loadSources() {
+        viewModelScope.launch {
+            observeSources().collect { sources ->
+                _state.update { it.copy(sources = sources) }
+            }
+        }
     }
 
     private fun observeSmsDrafts() {
@@ -106,6 +129,10 @@ class DashboardViewModel(
             is DashboardIntent.IgnoreSmsDraft -> viewModelScope.launch {
                 smsDraftRepository.markSmsDraftAsUsed(intent.draft.id)
             }
+
+            is DashboardIntent.UpdateSmsDraft -> viewModelScope.launch {
+                smsDraftRepository.updateSmsDraft(intent.draft)
+            }
         }
     }
 }
@@ -123,6 +150,8 @@ data class DashboardState(
     val userName: String = "",
     val userInitial: String = "",
     val smsDrafts: List<SmsDraft> = emptyList(),
+    val categories: List<Category> = emptyList(),
+    val sources: List<Source> = emptyList(),
     val showSmsDetection: Boolean = false,
     val smsDraft: SmsDraft? = null
 )
@@ -143,4 +172,5 @@ sealed interface DashboardIntent {
     data object ToggleBalanceVisibility : DashboardIntent
     data object ToggleSmsDetectionSheet : DashboardIntent
     data class IgnoreSmsDraft(val draft: SmsDraft) : DashboardIntent
+    data class UpdateSmsDraft(val draft: SmsDraft) : DashboardIntent
 }

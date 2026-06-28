@@ -8,9 +8,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.kazemieh.asset.ui.AssetIntent
 import com.kazemieh.asset.ui.AssetViewModel
 import com.kazemieh.common.model.Asset
 import com.kazemieh.common.toSignedPersianPrice
+import com.kazemieh.common.util.DateUtils
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import fintrack.core.designsystem.generated.resources.*
@@ -24,8 +26,14 @@ fun AssetHistorySheet(
     onDismiss: () -> Unit,
     viewModel: AssetViewModel = koinViewModel()
 ) {
-    // In a real app, we'd fetch history for this specific asset
-    // For now, it's a placeholder for history view
+    val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(asset.id) {
+        asset.id?.let {
+            viewModel.onIntent(AssetIntent.LoadHistory(it))
+        }
+    }
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.background,
@@ -44,18 +52,26 @@ fun AssetHistorySheet(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth().height(300.dp)
+                    modifier = Modifier.fillMaxWidth().height(400.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Mock history data
-                    items(5) { i ->
+                    items(state.history) { historyItem ->
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            FintrackBodyMediumText(stringResource(Res.string.mock_date, 10 + i))
-                            FintrackBodyMediumText(asset.purchasePrice.toSignedPersianPrice())
+                            FintrackBodyMediumText(DateUtils.formatTimestamp(historyItem.date.toEpochMilliseconds()))
+                            FintrackBodyMediumText(historyItem.price.toSignedPersianPrice())
                         }
-                        HorizontalDivider()
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                    }
+                    
+                    if (state.history.isEmpty()) {
+                        item {
+                            Box(Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                                FintrackBodyMediumText(stringResource(Res.string.msg_empty_list))
+                            }
+                        }
                     }
                 }
             }

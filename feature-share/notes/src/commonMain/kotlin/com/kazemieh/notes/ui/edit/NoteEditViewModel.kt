@@ -32,7 +32,7 @@ data class NoteEditState(
     val id: Long = 0,
     val title: String = "",
     val content: String = "",
-    val color: Long = 0xFFFFFFFF,
+    val color: Long = 0L, // 0 means default theme color
     val isPinned: Boolean = false,
     val isLocked: Boolean = false,
     val reminderTime: Long? = null,
@@ -90,22 +90,8 @@ class NoteEditViewModel(
             is NoteEditIntent.OnColorChanged -> _state.update { it.copy(color = intent.color) }
             is NoteEditIntent.OnTagsChanged -> _state.update { it.copy(selectedTags = intent.tags) }
             is NoteEditIntent.OnReminderChanged -> _state.update { it.copy(reminderTime = intent.time) }
-            NoteEditIntent.OnTogglePin -> {
-                _state.update { it.copy(isPinned = !it.isPinned) }
-                if (_state.value.id != 0L) {
-                    viewModelScope.launch {
-                        togglePinUseCase(_state.value.id, _state.value.isPinned)
-                    }
-                }
-            }
-            NoteEditIntent.OnToggleLock -> {
-                _state.update { it.copy(isLocked = !it.isLocked) }
-                if (_state.value.id != 0L) {
-                    viewModelScope.launch {
-                        toggleLockUseCase(_state.value.id, _state.value.isLocked)
-                    }
-                }
-            }
+            NoteEditIntent.OnTogglePin -> togglePin()
+            NoteEditIntent.OnToggleLock -> toggleLock()
             NoteEditIntent.OnSave -> saveNote()
         }
     }
@@ -129,8 +115,28 @@ class NoteEditViewModel(
                     )
                 }
             } else {
-                _state.update { it.copy(isLoading = false) }
                 _effect.send(NoteEditEffect.ShowError(getString(Res.string.note_not_found)))
+                _state.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    private fun togglePin() {
+        val current = _state.value.isPinned
+        _state.update { it.copy(isPinned = !current) }
+        if (_state.value.id != 0L) {
+            viewModelScope.launch {
+                togglePinUseCase(_state.value.id, !current)
+            }
+        }
+    }
+
+    private fun toggleLock() {
+        val current = _state.value.isLocked
+        _state.update { it.copy(isLocked = !current) }
+        if (_state.value.id != 0L) {
+            viewModelScope.launch {
+                toggleLockUseCase(_state.value.id, !current)
             }
         }
     }
@@ -144,33 +150,14 @@ class NoteEditViewModel(
                 color = _state.value.color,
                 isPinned = _state.value.isPinned,
                 isLocked = _state.value.isLocked,
-                updatedAt = 0L, // Placeholder
                 tags = _state.value.selectedTags
             )
-
             if (note.id == 0L) {
-                val newId = addNote(note)
-                scheduleReminder(newId, note)
+                addNote(note)
             } else {
                 updateNote(note)
-                scheduleReminder(note.id, note)
             }
             _effect.send(NoteEditEffect.SaveSuccess)
-        }
-    }
-
-    private fun scheduleReminder(id: Long, note: Note) {
-        _state.value.reminderTime?.let { reminderTime ->
-            viewModelScope.launch {
-                val scheduledTime = Instant.fromEpochMilliseconds(reminderTime).toLocalDateTime(TimeZone.currentSystemDefault())
-                notificationScheduler.scheduleReminder(
-                    id = "note_$id",
-                    title = note.title.ifBlank { getString(Res.string.notes) },
-                    message = note.content.take(50),
-                    scheduledTime = scheduledTime,
-                    channelId = NotificationManager.CHANNEL_NOTE
-                )
-            }
         }
     }
 }

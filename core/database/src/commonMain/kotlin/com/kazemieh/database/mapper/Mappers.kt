@@ -523,5 +523,7 @@ fun Sms_draft.toSmsDraft() = SmsDraft(
     sourceIdentifier = sourceIdentifier,
     timeStamp = timeStamp,
     date = date,
+    categoryId = categoryId,
+    confidence = confidence.toInt(),
     isUsed = isUsed == 1L
 )
