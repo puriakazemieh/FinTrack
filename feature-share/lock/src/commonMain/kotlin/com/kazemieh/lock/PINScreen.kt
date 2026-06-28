@@ -17,8 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material.icons.filled.Fingerprint
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -28,21 +27,12 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.FintrackBodyLargeText
-import com.kazemieh.designsystem.component.FintrackHeadlineMediumText
-import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.model.asString
-import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.biometric_failed
-import fintrack.core.designsystem.generated.resources.lock_confirm_pin
-import fintrack.core.designsystem.generated.resources.lock_create_pin
-import fintrack.core.designsystem.generated.resources.lock_enter_pin
-import fintrack.core.designsystem.generated.resources.lock_error_mismatch
-import fintrack.core.designsystem.generated.resources.lock_error_pin
-import fintrack.core.designsystem.generated.resources.lock_verify_to_disable
-import fintrack.core.designsystem.generated.resources.lock_welcome
+import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -96,7 +86,11 @@ fun PINScreen(
                                     .clip(CircleShape)
                                     .background(
                                         if (isFilled) MaterialTheme.colorScheme.primary
-                                        else MaterialTheme.colorScheme.surfaceVariant
+                                        else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                    )
+                                    .then(
+                                        if (isFilled) Modifier.background(MaterialTheme.colorScheme.primary)
+                                        else Modifier
                                     )
                             )
                         }
@@ -110,6 +104,7 @@ fun PINScreen(
                             "lock_error_pin" -> stringResource(Res.string.lock_error_pin)
                             "lock_error_mismatch" -> stringResource(Res.string.lock_error_mismatch)
                             "biometric_failed" -> stringResource(Res.string.biometric_failed)
+                            "lock_error_wrong_answer" -> stringResource(Res.string.lock_error_wrong_answer)
                             else -> state.error
                         },
                         color = MaterialTheme.colorScheme.error
@@ -176,7 +171,7 @@ fun PINScreen(
                                         )
 
                                         else -> FintrackHeadlineSmallText(
-                                            text = key.toString(),
+                                            text = key.toString().toPersianDigits(),
                                             fontWeight = FontWeight.Medium,
                                             color = if (isEnabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(
                                                 alpha = 0.3f
@@ -189,6 +184,49 @@ fun PINScreen(
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(space.medium))
+
+            FintrackLabelLargeText(
+                text = stringResource(Res.string.lock_forgot_password),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.clickable { onIntent(LockIntent.ForgotPasswordClicked) }
+            )
+        }
+
+        if (state.showResetDialog) {
+            AlertDialog(
+                onDismissRequest = { onIntent(LockIntent.DismissResetDialog) },
+                title = { FintrackHeadlineSmallText(stringResource(Res.string.lock_reset_pin_title)) },
+                text = {
+                    Column {
+                        FintrackBodyMediumText(stringResource(Res.string.lock_reset_pin_desc))
+                        Spacer(modifier = Modifier.height(space.medium))
+                        FintrackBodyLargeText(
+                            text = state.securityQuestion,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.height(space.medium))
+                        OutlinedTextField(
+                            value = state.resetAnswer,
+                            onValueChange = { onIntent(LockIntent.SecurityAnswerChanged(it)) },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { FintrackBodyMediumText(stringResource(Res.string.onboarding_setup_security_answer)) }
+                        )
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { onIntent(LockIntent.ResetPIN) }) {
+                        FintrackLabelLargeText(stringResource(Res.string.confirm))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { onIntent(LockIntent.DismissResetDialog) }) {
+                        FintrackLabelLargeText(stringResource(Res.string.cancell_))
+                    }
+                }
+            )
         }
     }
 }

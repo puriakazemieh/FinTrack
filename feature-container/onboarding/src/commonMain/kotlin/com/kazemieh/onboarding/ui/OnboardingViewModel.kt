@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 import com.kazemieh.common.model.Source
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.getString
 
 class OnboardingViewModel(
     private val seedDataUseCase: SeedDataUseCase
@@ -39,6 +41,9 @@ class OnboardingViewModel(
             is OnboardingIntent.UpdateSourceDetails -> {
                 _state.update { it.copy(sourceName = intent.name, sourceBalance = intent.balance) }
             }
+            is OnboardingIntent.UpdateSecurityDetails -> {
+                _state.update { it.copy(securityQuestion = intent.question, securityAnswer = intent.answer) }
+            }
             OnboardingIntent.Skip -> finishOnboarding(useDefault = true)
             OnboardingIntent.Finish -> finishOnboarding()
         }
@@ -58,7 +63,31 @@ class OnboardingViewModel(
                         iconId = 22
                     )
                 }
-                seedDataUseCase(customSource)
+                val localizedNames = mapOf(
+                    "source_cash" to getString(Res.string.seed_source_cash),
+                    "source_cash_desc" to getString(Res.string.seed_source_cash_desc),
+                    "cat_salary" to getString(Res.string.seed_cat_salary),
+                    "cat_bonus" to getString(Res.string.seed_cat_bonus),
+                    "cat_interest" to getString(Res.string.seed_cat_interest),
+                    "cat_gift" to getString(Res.string.seed_cat_gift),
+                    "cat_other_income" to getString(Res.string.seed_cat_other_income),
+                    "cat_food" to getString(Res.string.seed_cat_food),
+                    "cat_transport" to getString(Res.string.seed_cat_transport),
+                    "cat_rent" to getString(Res.string.seed_cat_rent),
+                    "cat_bills" to getString(Res.string.seed_cat_bills),
+                    "cat_shopping" to getString(Res.string.seed_cat_shopping),
+                    "cat_health" to getString(Res.string.seed_cat_health),
+                    "cat_education" to getString(Res.string.seed_cat_education),
+                    "cat_entertainment" to getString(Res.string.seed_cat_entertainment),
+                    "cat_other_expense" to getString(Res.string.seed_cat_other_expense),
+                    "cat_transfer" to getString(Res.string.seed_cat_transfer)
+                )
+                seedDataUseCase(
+                    customSource = customSource,
+                    securityQuestion = _state.value.securityQuestion,
+                    securityAnswer = _state.value.securityAnswer,
+                    localizedNames = localizedNames
+                )
                 _effect.send(OnboardingEffect.NavigateToDashboard)
             } catch (e: Exception) {
                 // Handle error
@@ -73,7 +102,9 @@ data class OnboardingState(
     val currentStep: Int = 1,
     val isLoading: Boolean = false,
     val sourceName: String = "",
-    val sourceBalance: String = ""
+    val sourceBalance: String = "",
+    val securityQuestion: String = "",
+    val securityAnswer: String = ""
 )
 
 sealed interface OnboardingIntent {
@@ -82,6 +113,7 @@ sealed interface OnboardingIntent {
     data object Skip : OnboardingIntent
     data object Finish : OnboardingIntent
     data class UpdateSourceDetails(val name: String, val balance: String) : OnboardingIntent
+    data class UpdateSecurityDetails(val question: String, val answer: String) : OnboardingIntent
 }
 
 sealed interface OnboardingEffect {

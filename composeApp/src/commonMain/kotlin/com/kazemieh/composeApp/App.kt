@@ -39,6 +39,7 @@ import com.kazemieh.lock.LockGate
 import com.kazemieh.lock.di.lockModule
 import com.kazemieh.money.Currency
 import com.kazemieh.network.di.networkModule
+import com.kazemieh.notifications.NotificationManager
 import com.kazemieh.person.di.transactionAddPersonModule
 import com.kazemieh.person.di.transactionDeletePersonModule
 import com.kazemieh.person.di.transactionPersonModule
@@ -73,6 +74,7 @@ import kotlin.time.Clock
 fun App() {
     val initializer = koinInject<DatabaseInitializer>()
     val preferenceUseCases = koinInject<PreferenceUseCases>()
+    val notificationManager = koinInject<NotificationManager>()
 
     var isReady by remember { mutableStateOf(false) }
 
@@ -130,6 +132,7 @@ fun App() {
 
     LaunchedEffect(Unit) {
         initializer.initialize()
+        notificationManager.createChannels()
         isReady = true
     }
 

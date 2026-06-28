@@ -41,6 +41,8 @@ class FinTrackPreferences(private val settings: Settings) {
         const val PREF_LOCK_ENABLED = "pref_lock_enabled"
         const val PREF_BIOMETRIC_ENABLED = "pref_biometric_enabled"
         const val PREF_HASHED_PIN = "pref_hashed_pin"
+        const val PREF_SECURITY_QUESTION = "pref_security_question"
+        const val PREF_SECURITY_ANSWER = "pref_security_answer"
         const val PREF_HIDE_BALANCE = "pref_hide_balance"
 
         const val PREF_THEME = "pref_theme"

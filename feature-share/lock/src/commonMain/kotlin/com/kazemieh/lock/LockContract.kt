@@ -11,7 +11,10 @@ data class LockState(
     val isLockEnabled: Boolean = false,
     val mode: LockMode = LockMode.UNLOCK,
     val subtitle: UiText? = null,
-    val isInitialized: Boolean = false
+    val isInitialized: Boolean = false,
+    val securityQuestion: String = "",
+    val showResetDialog: Boolean = false,
+    val resetAnswer: String = ""
 )
 
 enum class LockMode {
@@ -46,6 +49,10 @@ sealed interface LockIntent {
     data class KeyPressed(val key: KeypadKey) : LockIntent
     data object AuthenticateBiometric : LockIntent
     data class Init(val mode: LockMode, val subtitle: UiText? = null) : LockIntent
+    data object ForgotPasswordClicked : LockIntent
+    data class SecurityAnswerChanged(val answer: String) : LockIntent
+    data object ResetPIN : LockIntent
+    data object DismissResetDialog : LockIntent
 }
 
 sealed interface LockEffect {

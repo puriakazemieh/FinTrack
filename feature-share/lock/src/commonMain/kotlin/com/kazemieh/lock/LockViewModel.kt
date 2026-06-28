@@ -23,12 +23,14 @@ class LockViewModel(
     init {
         val isLockEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, false)
         val isBiometricEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_BIOMETRIC_ENABLED, false)
+        val securityQuestion = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_SECURITY_QUESTION, "")
         _state.update { 
             it.copy(
                 isLockEnabled = isLockEnabled, 
                 isBiometricEnabled = isBiometricEnabled,
                 isLocked = isLockEnabled,
-                isInitialized = true
+                isInitialized = true,
+                securityQuestion = securityQuestion
             ) 
         }
     }
@@ -53,6 +55,31 @@ class LockViewModel(
                     _effect.send(LockEffect.TriggerBiometric)
                 }
             }
+            LockIntent.ForgotPasswordClicked -> {
+                _state.update { it.copy(showResetDialog = true, resetAnswer = "", error = null) }
+            }
+            is LockIntent.SecurityAnswerChanged -> {
+                _state.update { it.copy(resetAnswer = intent.answer, error = null) }
+            }
+            LockIntent.ResetPIN -> {
+                verifySecurityAnswer()
+            }
+            LockIntent.DismissResetDialog -> {
+                _state.update { it.copy(showResetDialog = false) }
+            }
+        }
+    }
+
+    private fun verifySecurityAnswer() {
+        val savedHashedAnswer = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_SECURITY_ANSWER, "")
+        if (hashPin(_state.value.resetAnswer) == savedHashedAnswer) {
+            // Reset PIN: Disable lock and clear PIN
+            preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, false)
+            preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_HASHED_PIN, "")
+            _state.update { it.copy(isLockEnabled = false, isLocked = false, showResetDialog = false, pin = "") }
+            viewModelScope.launch { _effect.send(LockEffect.Success) }
+        } else {
+            _state.update { it.copy(error = "lock_error_wrong_answer") }
         }
     }
 

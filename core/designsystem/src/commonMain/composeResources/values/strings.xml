@@ -573,6 +573,41 @@
     <string name="onboarding_setup_source_name">نام منبع (مثلاً نقدی یا بانک ملی)</string>
     <string name="onboarding_setup_balance">موجودی اولیه</string>
     <string name="onboarding_loading">در حال آماده‌سازی دیتای اولیه...</string>
+    <string name="onboarding_feature_sms_title">خواندن خودکار پیامک بانکی</string>
+    <string name="onboarding_feature_budget_title">بودجه‌بندی و یادآور</string>
+    <string name="onboarding_feature_sync_title">سینک ابری در همه‌ی دستگاه‌ها</string>
+    <string name="onboarding_perm_sms_title">خواندن پیامک بانکی</string>
+    <string name="onboarding_perm_sms_desc">تراکنش‌های بانکی به‌صورت خودکار پیش‌نویس می‌شوند.</string>
+    <string name="onboarding_perm_notif_title">اعلان‌ها و یادآور</string>
+    <string name="onboarding_perm_notif_desc">سررسید قسط، بودجه‌ی مصرف‌شده و چک‌های نزدیک.</string>
+    <string name="onboarding_perm_biometric_title">اثر انگشت برای قفل اپ</string>
+    <string name="onboarding_perm_biometric_desc">ورود سریع و امن به اپ. رمز ۴ رقمی هم به‌عنوان پشتیبان.</string>
+    <string name="onboarding_setup_security_question">سوال امنیتی (برای بازیابی رمز)</string>
+    <string name="onboarding_setup_security_answer">پاسخ سوال امنیتی</string>
+    <string name="onboarding_setup_security_hint">مثلاً نام اولین مدرسه یا شهر تولد</string>
+
+    <string name="lock_forgot_password">رمزت رو فراموش کرده‌ای؟</string>
+    <string name="lock_reset_pin_title">بازیابی رمز عبور</string>
+    <string name="lock_reset_pin_desc">لطفاً به سوال امنیتی که هنگام ثبت‌نام تنظیم کرده‌اید پاسخ دهید.</string>
+    <string name="lock_error_wrong_answer">پاسخ اشتباه است</string>
+
+    <string name="seed_source_cash">نقد</string>
+    <string name="seed_source_cash_desc">کیف پول یا پول نقد</string>
+    <string name="seed_cat_salary">حقوق</string>
+    <string name="seed_cat_bonus">پاداش</string>
+    <string name="seed_cat_interest">سود بانکی</string>
+    <string name="seed_cat_gift">هدیه</string>
+    <string name="seed_cat_other_income">سایر درآمدها</string>
+    <string name="seed_cat_food">خوراک</string>
+    <string name="seed_cat_transport">حمل‌ونقل</string>
+    <string name="seed_cat_rent">اجاره / وام</string>
+    <string name="seed_cat_bills">قبوض</string>
+    <string name="seed_cat_shopping">خرید</string>
+    <string name="seed_cat_health">سلامت</string>
+    <string name="seed_cat_education">آموزش</string>
+    <string name="seed_cat_entertainment">سرگرمی</string>
+    <string name="seed_cat_other_expense">سایر هزینه‌ها</string>
+    <string name="seed_cat_transfer">انتقال</string>
 
     <!-- Notifications Settings -->
     <string name="title_notification_settings">تنظیمات اعلان</string>
@@ -956,6 +991,10 @@
     <string name="sms_sheet_sub">انتخاب برای ثبت تراکنش</string>
     <string name="sms_ref_label">پیش‌نویس از پیامک بانکی · %1$s</string>
     <string name="notif_channel_sms">شناسایی پیامک</string>
+    <string name="notif_channel_budget">یادآور بودجه</string>
+    <string name="notif_channel_installment">یادآور اقساط</string>
+    <string name="notif_channel_cheque">یادآور چک‌ها</string>
+    <string name="notif_channel_desc">اعلان‌های برنامه فین‌تراک</string>
     <string name="notif_action_register">ثبت سریع</string>
     <string name="notif_action_ignore">نادیده گرفتن</string>
     <string name="bank_label">بانک %1$s</string>

@@ -16,6 +16,10 @@ import androidx.core.content.ContextCompat
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.notif_action_ignore
 import fintrack.core.designsystem.generated.resources.notif_action_register
+import fintrack.core.designsystem.generated.resources.notif_channel_budget
+import fintrack.core.designsystem.generated.resources.notif_channel_cheque
+import fintrack.core.designsystem.generated.resources.notif_channel_desc
+import fintrack.core.designsystem.generated.resources.notif_channel_installment
 import fintrack.core.designsystem.generated.resources.notif_channel_sms
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
@@ -25,16 +29,31 @@ class AndroidNotificationManager(private val context: Context) : NotificationMan
     private val notificationManagerCompat = NotificationManagerCompat.from(context)
 
     override fun createChannels() {
-        createChannel(NotificationManager.CHANNEL_BUDGET, "Budget Reminders")
-        createChannel(NotificationManager.CHANNEL_INSTALLMENT, "Installment Reminders")
-        createChannel(NotificationManager.CHANNEL_CHEQUE, "Cheque Reminders")
-        createChannel(NotificationManager.CHANNEL_SMS, "SMS Detection")
+        runBlocking {
+            createChannel(
+                NotificationManager.CHANNEL_BUDGET,
+                getString(Res.string.notif_channel_budget)
+            )
+            createChannel(
+                NotificationManager.CHANNEL_INSTALLMENT,
+                getString(Res.string.notif_channel_installment)
+            )
+            createChannel(
+                NotificationManager.CHANNEL_CHEQUE,
+                getString(Res.string.notif_channel_cheque)
+            )
+            createChannel(
+                NotificationManager.CHANNEL_SMS,
+                getString(Res.string.notif_channel_sms)
+            )
+        }
     }
 
     override fun createChannel(id: String, name: String, importance: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val desc = runBlocking { getString(Res.string.notif_channel_desc) }
             val channel = NotificationChannel(id, name, importance).apply {
-                description = "FinTrack Notifications"
+                description = desc
             }
             val androidManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as AndroidNotificationManagerSystem
             androidManager.createNotificationChannel(channel)
