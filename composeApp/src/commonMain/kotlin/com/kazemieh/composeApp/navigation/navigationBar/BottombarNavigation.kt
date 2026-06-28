@@ -21,6 +21,7 @@ import com.kazemieh.dashboard.DashboardScreen
 import com.kazemieh.debt.ui.list.DebtsScreen
 import com.kazemieh.financialsource.ui.list.SourcesScreen
 import com.kazemieh.fixed_expense.ui.list.FixedExpenseListScreen
+import com.kazemieh.ai_insights.ui.AIAdvisorScreen
 import com.kazemieh.installment.ui.list.InstallmentsScreen
 import com.kazemieh.notes.ui.edit.NoteEditScreen
 import com.kazemieh.notifications.ui.NotificationSettingsScreen
@@ -57,15 +58,18 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
         }
     }
 
-    navigation<Screen.BottomBarGraph>(startDestination = Screen.Dashboard) {
+    navigation<Screen.BottomBarGraph>(startDestination = Screen.Dashboard()) {
 
         composable<Screen.Dashboard> { backStackEntry ->
+            val args = backStackEntry.toRoute<Screen.Dashboard>()
             DashboardScreen(
+                showAddTransaction = args.showAddTransaction,
                 onNavigateToTransactions = navigateToTransactions,
                 onNavigateToSearch = { navController.navigate(Screen.Search) },
                 onNavigateToBudget = { navController.navigate(Screen.Budget) },
                 onNavigateToCheck = { navController.navigate(Screen.Check) },
                 onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) },
+                onNavigateToAIAdvisor = { navController.navigate(Screen.AIAdvisor) },
                 onNavigateToAssets = { navController.navigate(Screen.Assets) },
                 onNavigateToShopping = { navController.navigate(Screen.Shopping) },
                 onNavigateToNotes = { navController.navigate(Screen.Notes) },
@@ -99,7 +103,22 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onNavigateToNotes = { navController.navigate(Screen.Notes) },
                 onNavigateToSource = { navController.navigate(Screen.Sources) },
                 onNavigateToCategory = { navController.navigate(Screen.Categories) },
-                onNavigateToTag = { navController.navigate(Screen.Tags) }
+                onNavigateToTag = { navController.navigate(Screen.Tags) },
+                onNavigateToAIAdvisor = { navController.navigate(Screen.AIAdvisor) }
+            )
+        }
+
+        composable<Screen.AIAdvisor> {
+            AIAdvisorScreen(
+                onBack = { navController.popBackStack() },
+                onAddTransaction = {
+                    navController.navigate(Screen.Dashboard(showAddTransaction = true)) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 

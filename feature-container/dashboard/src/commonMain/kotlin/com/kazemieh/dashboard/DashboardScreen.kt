@@ -49,6 +49,7 @@ import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.fixed_expense.ui.widget.FixedExpenseWidget
+import com.kazemieh.ai_insights.ui.AIAdvisorWidget
 import com.kazemieh.installment.ui.widget.InstallmentWidget
 import com.kazemieh.shopping.ui.ShoppingWidget
 import com.kazemieh.notes.ui.NotesWidget
@@ -66,6 +67,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun DashboardScreen(
+    showAddTransaction: Boolean = false,
     viewModel: DashboardViewModel = koinViewModel(),
     onNavigateToTransactions: (Any?) -> Unit = {},
     onNavigateToSearch: () -> Unit = {},
@@ -73,6 +75,7 @@ fun DashboardScreen(
     onNavigateToInstallment: () -> Unit = {},
     onNavigateToCheck: () -> Unit = {},
     onNavigateToFixedExpense: () -> Unit = {},
+    onNavigateToAIAdvisor: () -> Unit = {},
     onNavigateToAssets: () -> Unit = {},
     onNavigateToShopping: () -> Unit = {},
     onNavigateToNotes: () -> Unit = {},
@@ -81,6 +84,12 @@ fun DashboardScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
     val listState = rememberLazyListState()
+
+    androidx.compose.runtime.LaunchedEffect(showAddTransaction) {
+        if (showAddTransaction) {
+            viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet())
+        }
+    }
 
 
     FintrackScreen {
@@ -190,6 +199,15 @@ fun DashboardScreen(
             item {
                 FixedExpenseWidget(
                     onMore = onNavigateToFixedExpense,
+                    modifier = Modifier.padding(horizontal = space.large)
+                )
+            }
+
+            item { Spacer(Modifier.height(space.large)) }
+
+            item {
+                AIAdvisorWidget(
+                    onMore = onNavigateToAIAdvisor,
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }

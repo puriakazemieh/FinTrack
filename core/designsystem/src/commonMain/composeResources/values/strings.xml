@@ -1064,4 +1064,44 @@
     <string name="msg_notif_fixed_expense_due">سررسید هزینه ثابت: %1$s</string>
     <string name="msg_auto_posted_fixed_expense">ثبت خودکار هزینه ثابت</string>
     <string name="label_done">تمام</string>
+
+    <!-- AI Advisor -->
+    <string name="ai_advisor_title">مشاور هوشمند</string>
+    <string name="ai_advisor_sub">پیشنهاد سرمایه‌گذاری بر اساس الگوی شما</string>
+    <string name="ai_analysis_title">تحلیل ماهانه</string>
+    <string name="ai_analysis_days">بر اساس %1$d روز فعالیت شما</string>
+    <string name="ai_analysis_body">با توجه به الگوی خرج و درآمد، حدود %1$s از درآمد ماهانه قابل پس‌انداز است (تقریباً %2$s تومان).</string>
+    <string name="ai_suggestions_count">پیشنهادهای فعال · %1$d</string>
+    <string name="ai_suggestion_risk">ریسک: %1$s</string>
+    <string name="ai_suggestion_return">بازدهی: %1$s</string>
+    <string name="ai_saving_potential_label">پتانسیل پس‌انداز ماهانه</string>
+
+    <string name="ai_suggestion_gold_title">تخصیص ۵۰٪ به طلای ۱۸ عیار</string>
+    <string name="ai_suggestion_gold_body">با توجه به ثبات اقتصاد و الگوی پس‌انداز شما، خرید ماهانه طلا منطقی است.</string>
+    <string name="ai_suggestion_gold_return">+۸-۱۲٪ سال</string>
+    <string name="ai_suggestion_gold_detail">سرمایه‌گذاری در طلا یک روش سنتی و امن برای حفظ ارزش دارایی‌هاست. پیشنهاد می‌شود نیمی از مبلغ پس‌انداز ماهانه خود را صرف خرید طلای کم‌اجرت یا صندوق‌های طلا کنید.</string>
+
+    <string name="ai_suggestion_bank_title">افتتاح حساب سرمایه‌گذاری بانک</string>
+    <string name="ai_suggestion_bank_body">سود تضمینی + امکان برداشت در صورت نیاز.</string>
+    <string name="ai_suggestion_bank_return">+۲۲٪ سال</string>
+    <string name="ai_suggestion_bank_detail">اگر نیاز به نقدشوندگی بالا دارید، سپرده‌های کوتاه مدت یا بلندمدت بانکی گزینه‌ی مناسبی هستند. این روش ریسک بسیار کمی دارد و سود آن به‌صورت ماهانه پرداخت می‌شود.</string>
+
+    <string name="ai_suggestion_fund_title">۲۰٪ به صندوق درآمد ثابت</string>
+    <string name="ai_suggestion_fund_body">تنوع بیشتر · کاهش ریسک نسبت به نگه‌داری همه در یک‌جا.</string>
+    <string name="ai_suggestion_fund_return">+۲۵-۳۰٪ سال</string>
+    <string name="ai_suggestion_fund_detail">صندوق‌های درآمد ثابت معمولاً بازدهی بالاتری از سپرده بانکی دارند. اختصاص بخشی از سرمایه به این صندوق‌ها می‌تواند توازن خوبی بین ریسک و بازدهی در سبد شما ایجاد کند.</string>
+
+    <string name="ai_detail_title">جزئیات پیشنهاد</string>
+    <string name="ai_chart_income">درآمد</string>
+    <string name="ai_chart_expense">مخارج</string>
+    <string name="ai_chart_potential">پس‌انداز</string>
+
+
+    <string name="ai_empty_title">داده‌ای برای تحلیل وجود ندارد</string>
+    <string name="ai_empty_desc">برای دریافت پیشنهادهای هوشمند، ابتدا چند تراکنش ثبت کنید.</string>
+    <string name="ai_active_suggestions_label">پیشنهادهای فعال</string>
+
+    <string name="risk_low">کم</string>
+    <string name="risk_medium">متوسط</string>
+    <string name="risk_high">زیاد</string>
 </resources>

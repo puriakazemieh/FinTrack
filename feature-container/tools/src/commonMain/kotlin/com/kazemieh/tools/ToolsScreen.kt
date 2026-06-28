@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Note
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Description
@@ -68,7 +69,8 @@ fun ToolsScreen(
     onNavigateToNotes: () -> Unit,
     onNavigateToSource: () -> Unit,
     onNavigateToCategory: () -> Unit,
-    onNavigateToTag: () -> Unit
+    onNavigateToTag: () -> Unit,
+    onNavigateToAIAdvisor: () -> Unit
 ) {
     val space = LocalSpacing.current
 
@@ -105,6 +107,11 @@ fun ToolsScreen(
             stringResource(Res.string.title_fixed_expense_management),
             Icons.Default.Autorenew,
             onNavigateToFixedExpense
+        ),
+        ToolItem(
+            stringResource(Res.string.ai_advisor_title),
+            Icons.Default.AutoAwesome,
+            onNavigateToAIAdvisor
         ),
         ToolItem(
             stringResource(Res.string.title_assets_management),

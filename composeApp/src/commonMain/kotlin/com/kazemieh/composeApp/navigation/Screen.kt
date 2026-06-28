@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 sealed class Screen {
 
     @Serializable
-    data object Dashboard : Screen()
+    data class Dashboard(val showAddTransaction: Boolean = false) : Screen()
 
     @Serializable
     data class Transactions(
@@ -72,6 +72,9 @@ sealed class Screen {
 
     @Serializable
     data object Assets : Screen()
+
+    @Serializable
+    data object AIAdvisor : Screen()
 
     @Serializable
     data class AddAsset(val assetId: Long? = null) : Screen()

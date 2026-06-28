@@ -15,7 +15,7 @@ enum class Destinations(
     DASHBOARD(
         Res.drawable.ic_navigation_home,
         Res.string.navigation_home,
-        Screen.Dashboard
+        Screen.Dashboard()
     ),
 
     TRANSACTIONS(
