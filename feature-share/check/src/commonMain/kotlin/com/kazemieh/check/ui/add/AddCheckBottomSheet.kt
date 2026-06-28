@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.common.model.CheckStatus
 import com.kazemieh.common.persiandatetime.extensions.toDateString
 import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
 import com.kazemieh.designsystem.LocalSpacing
@@ -47,14 +48,23 @@ import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelLargeText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
+import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.PhotoDrop
 import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
+import com.kazemieh.jalali.JalaliCalendar
 import com.kazemieh.person.ui.list.PersonPickerSingleBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.description
 import fintrack.core.designsystem.generated.resources.label_check_amount
+import fintrack.core.designsystem.generated.resources.label_check_status_cancelled
+import fintrack.core.designsystem.generated.resources.label_check_status_ongoing
+import fintrack.core.designsystem.generated.resources.label_check_status_passed
+import fintrack.core.designsystem.generated.resources.label_check_status_returned
 import fintrack.core.designsystem.generated.resources.label_counterparty
 import fintrack.core.designsystem.generated.resources.label_due_date
 import fintrack.core.designsystem.generated.resources.label_incoming_check
@@ -63,8 +73,10 @@ import fintrack.core.designsystem.generated.resources.label_outgoing_check
 import fintrack.core.designsystem.generated.resources.not_choose
 import fintrack.core.designsystem.generated.resources.save_
 import fintrack.core.designsystem.generated.resources.title_add_check
+import fintrack.core.designsystem.generated.resources.*
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import org.jetbrains.compose.resources.decodeToImageBitmap
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -153,13 +165,16 @@ fun AddCheckBottomSheet(
                         onClick = { showPersonPicker = true }
                     )
 
+                    var showIssueDatePicker by remember { mutableStateOf(false) }
+                    var showDueDatePicker by remember { mutableStateOf(false) }
+
                     // Date Picker (Issued Date)
                     PickerField(
                         label = stringResource(Res.string.label_issue_date),
                         value = Instant.fromEpochMilliseconds(state.date)
                             .toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
                         icon = Icons.Default.CalendarMonth,
-                        onClick = { /* TODO: Date Picker */ }
+                        onClick = { showIssueDatePicker = true }
                     )
 
                     // Due Date Picker
@@ -168,8 +183,34 @@ fun AddCheckBottomSheet(
                         value = Instant.fromEpochMilliseconds(state.dueDate)
                             .toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
                         icon = Icons.Default.CalendarMonth,
-                        onClick = { /* TODO: Date Picker */ }
+                        onClick = { showDueDatePicker = true }
                     )
+
+                    if (showIssueDatePicker) {
+                        val open = remember { mutableStateOf(true) }
+                        LaunchedEffect(open.value) { if (!open.value) showIssueDatePicker = false }
+                        JalaliDatePickerBottomSheet(
+                            openSheet = open,
+                            initialDate = JalaliCalendar.fromTimestamp(state.date),
+                            onConfirm = {
+                                viewModel.onIntent(AddCheckIntent.SetDate(it.toTimestamp()))
+                                showIssueDatePicker = false
+                            }
+                        )
+                    }
+
+                    if (showDueDatePicker) {
+                        val open = remember { mutableStateOf(true) }
+                        LaunchedEffect(open.value) { if (!open.value) showDueDatePicker = false }
+                        JalaliDatePickerBottomSheet(
+                            openSheet = open,
+                            initialDate = JalaliCalendar.fromTimestamp(state.dueDate),
+                            onConfirm = {
+                                viewModel.onIntent(AddCheckIntent.SetDueDate(it.toTimestamp()))
+                                showDueDatePicker = false
+                            }
+                        )
+                    }
 
                     // Description
                     FintrackOutlinedTextField(
@@ -177,6 +218,39 @@ fun AddCheckBottomSheet(
                         onValueChange = { viewModel.onIntent(AddCheckIntent.SetDescription(it)) },
                         label = { FintrackBodyMediumText(stringResource(Res.string.description)) },
                         modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Status Chips
+                    FintrackLabelMediumText(text = stringResource(Res.string.label_check_status_title), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        CheckStatus.entries.forEach { status ->
+                            val labelRes = when (status) {
+                                CheckStatus.PENDING -> Res.string.label_check_status_ongoing
+                                CheckStatus.PASSED -> Res.string.label_check_status_passed
+                                CheckStatus.REJECTED -> Res.string.label_check_status_returned
+                                CheckStatus.CANCELLED -> Res.string.label_check_status_cancelled
+                            }
+                            Chip(
+                                active = state.status == status,
+                                onClick = { viewModel.onIntent(AddCheckIntent.SetStatus(status)) },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                FintrackLabelSmallText(text = stringResource(labelRes))
+                            }
+                        }
+                    }
+
+                    val photoBitmap = remember(state.photoBytes) {
+                        state.photoBytes?.decodeToImageBitmap()
+                    }
+
+                    PhotoDrop(
+                        photoBitmap = photoBitmap,
+                        onImagePicked = { viewModel.onIntent(AddCheckIntent.SetPhoto(it)) },
+                        onRemove = { viewModel.onIntent(AddCheckIntent.SetPhoto(null)) }
                     )
 
                     Spacer(modifier = Modifier.height(space.medium))

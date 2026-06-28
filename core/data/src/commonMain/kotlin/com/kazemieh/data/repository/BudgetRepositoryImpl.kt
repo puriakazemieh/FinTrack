@@ -13,6 +13,10 @@ class BudgetRepositoryImpl(
         return localDataSource.observeBudgetsWithProgress()
     }
 
+    override suspend fun getBudgetWithProgressByCategory(categoryId: Long): BudgetWithProgress? {
+        return localDataSource.getBudgetWithProgressByCategory(categoryId)
+    }
+
     override suspend fun getBudgetByCategoryId(categoryId: Long): Budget? {
         return localDataSource.getBudgetByCategoryId(categoryId)
     }

@@ -84,18 +84,19 @@ fun AddBudgetBottomSheet(
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         val amountOptions = listOf(
-                            Res.string.label_500k to "500000",
-                            Res.string.label_1m to "1000000",
-                            Res.string.label_2m to "2000000",
-                            Res.string.label_3m to "3000000",
-                            Res.string.label_5m to "5000000"
+                            PresetAmount(Res.string.label_500k, "500000"),
+                            PresetAmount(Res.string.label_1m, "1000000"),
+                            PresetAmount(Res.string.label_2m, "2000000"),
+                            PresetAmount(Res.string.label_3m, "3000000"),
+                            PresetAmount(Res.string.label_5m, "5000000"),
+                            PresetAmount(Res.string.label_10m, "10000000")
                         )
-                        amountOptions.forEach { (labelRes, amount) ->
+                        amountOptions.forEach { option ->
                             Chip(
-                                active = state.amount == amount,
-                                onClick = { viewModel.onIntent(AddBudgetIntent.UpdateAmount(amount)) }
+                                active = state.amount == option.value,
+                                onClick = { viewModel.onIntent(AddBudgetIntent.UpdateAmount(option.value)) }
                             ) {
-                                FintrackLabelSmallText(text = stringResource(labelRes))
+                                FintrackLabelSmallText(text = stringResource(option.labelRes))
                             }
                         }
                     }
@@ -147,4 +148,9 @@ private fun com.kazemieh.common.model.Category.toItemUi() = ItemUi(
     title = com.kazemieh.designsystem.component.model.UiText.DynamicString(name),
     iconId = iconId,
     colorId = colorId
+)
+
+private data class PresetAmount(
+    val labelRes: org.jetbrains.compose.resources.StringResource,
+    val value: String
 )

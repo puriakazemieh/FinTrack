@@ -52,6 +52,7 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":feature-share:notifications"))
     implementation(project(":feature-share:sync"))
+    implementation(project(":feature-share:fixed-expense"))
 
 
     implementation(libs.androidx.activity.compose)

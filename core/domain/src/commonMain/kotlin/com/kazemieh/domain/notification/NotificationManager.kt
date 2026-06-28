@@ -1,4 +1,4 @@
-package com.kazemieh.notifications
+package com.kazemieh.domain.notification
 
 interface NotificationManager {
     fun createChannels()
@@ -7,6 +7,7 @@ interface NotificationManager {
     fun hasPermission(): Boolean
     fun openSettings()
     fun showStickyNotification(id: Int, title: String, message: String)
+    fun showBudgetAlert(categoryId: Int, categoryName: String, progressPercentage: Int)
 
     companion object {
         const val CHANNEL_BUDGET = "budget_reminders"

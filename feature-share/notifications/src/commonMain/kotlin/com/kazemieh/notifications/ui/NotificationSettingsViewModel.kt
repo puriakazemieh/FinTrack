@@ -3,7 +3,7 @@ package com.kazemieh.notifications.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.PreferenceUseCases
-import com.kazemieh.notifications.NotificationManager
+import com.kazemieh.domain.notification.NotificationManager
 import com.kazemieh.preferences.FinTrackPreferences
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*

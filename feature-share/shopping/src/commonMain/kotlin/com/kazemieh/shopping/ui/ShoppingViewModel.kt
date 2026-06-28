@@ -9,7 +9,7 @@ import com.kazemieh.domain.usecase.ObserveShoppingItemsUseCase
 import com.kazemieh.domain.usecase.UpdateShoppingItemUseCase
 import com.kazemieh.domain.usecase.UpdateShoppingPositionsUseCase
 import com.kazemieh.domain.notification.NotificationScheduler
-import com.kazemieh.notifications.NotificationManager
+import com.kazemieh.domain.notification.NotificationManager
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.shopping_list
 import kotlinx.coroutines.channels.Channel

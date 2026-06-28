@@ -9,6 +9,9 @@ import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.domain.repository.SmsDraftRepository
 import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.preferences.FinTrackPreferences
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.placeholder_user_initial
+import fintrack.core.designsystem.generated.resources.placeholder_user_name
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 
 
 class DashboardViewModel(
@@ -45,8 +49,8 @@ class DashboardViewModel(
             preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_USER_FAMILY, "")
         ) { name, family ->
             val fullName = listOf(name, family).filter { it.isNotBlank() }.joinToString(" ")
-            val displayName = if (fullName.isBlank()) "کاربر" else fullName
-            val displayInitial = if (fullName.isBlank()) "پ" else fullName.first().toString()
+            val displayName = fullName.ifBlank { getString(Res.string.placeholder_user_name) }
+            val displayInitial = fullName.ifBlank { getString(Res.string.placeholder_user_initial) }.first().toString()
 
             _state.update {
                 it.copy(
@@ -116,8 +120,8 @@ data class DashboardState(
     val initialTransactionType: TransactionType? = null,
     val isBalanceVisible: Boolean = true,
     val growthPercentage: String = "+2.5%", // Placeholder
-    val userName: String = "کاربر",
-    val userInitial: String = "پ",
+    val userName: String = "",
+    val userInitial: String = "",
     val smsDrafts: List<SmsDraft> = emptyList(),
     val showSmsDetection: Boolean = false,
     val smsDraft: SmsDraft? = null

@@ -100,7 +100,7 @@ import com.kazemieh.domain.usecase.GetBudgetSpentAmountUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
-    factory { AddTransactionUseCase(get()) }
+    factory { AddTransactionUseCase(get(), get(), get()) }
     factory { DeleteTransactionUseCase(get()) }
     factory { UpdateTransactionUseCase(get()) }
     factory { ObserveTransactionsUseCase(get()) }
@@ -158,16 +158,16 @@ val domainModule = module {
     factory { ObserveDebtsByPersonUseCase(get()) }
     factory { SettleDebtUseCase(get(), get()) }
 
-    factory { AddCheckUseCase(get()) }
+    factory { AddCheckUseCase(get(), get()) }
     factory { UpdateCheckUseCase(get()) }
-    factory { DeleteCheckUseCase(get()) }
+    factory { DeleteCheckUseCase(get(), get()) }
     factory { GetCheckByIdUseCase(get()) }
     factory { ObserveAllChecksUseCase(get()) }
     factory { ObserveChecksByStatusUseCase(get()) }
 
-    factory { AddFixedExpenseUseCase(get()) }
+    factory { AddFixedExpenseUseCase(get(), get()) }
     factory { UpdateFixedExpenseUseCase(get()) }
-    factory { DeleteFixedExpenseUseCase(get()) }
+    factory { DeleteFixedExpenseUseCase(get(), get()) }
     factory { GetFixedExpenseByIdUseCase(get()) }
     factory { GetDebtByIdUseCase(get()) }
     factory { GetPersonByIdUseCase(get()) }

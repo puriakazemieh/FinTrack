@@ -1,7 +1,18 @@
 package com.kazemieh.installment.ui.list
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
@@ -11,11 +22,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.glass.EntityItem
@@ -30,6 +45,9 @@ import fintrack.core.designsystem.generated.resources.installment_overdue
 import fintrack.core.designsystem.generated.resources.installment_paid
 import fintrack.core.designsystem.generated.resources.installment_upcoming
 import fintrack.core.designsystem.generated.resources.navigation_installment
+import fintrack.core.designsystem.generated.resources.notif_installment_title
+import fintrack.core.designsystem.generated.resources.notif_installment_desc
+import fintrack.core.designsystem.generated.resources.payment_for
 import fintrack.core.designsystem.generated.resources.remaining_installments
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -99,6 +117,10 @@ fun InstallmentsScreen(
                             1f
                         )
                     val percentage = (progress * 100).toInt()
+                    val paymentDesc = stringResource(Res.string.payment_for, item.installment.title)
+                    val reminderTitle = stringResource(Res.string.notif_installment_title)
+                    val reminderMsg = stringResource(Res.string.notif_installment_desc, item.installment.title)
+
                     EntityItem(
                         id = item.installment.id,
                         name = item.installment.title,
@@ -109,7 +131,35 @@ fun InstallmentsScreen(
                         badge = "$percentage%",
                         color = if (item.installment.isCompleted) GlassGreen else MaterialTheme.colorScheme.primary,
                         sub2 = item.installment.installmentAmount.toInt()
-                            .toSignedPersianPrice() + " " + stringResource(Res.string.currency_toman)
+                            .toSignedPersianPrice() + " " + stringResource(Res.string.currency_toman),
+                        trailingContent = {
+                            if (!item.installment.isCompleted) {
+                                val glassColors = LocalGlassColors.current
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .clip(RoundedCornerShape(9.dp))
+                                        .background(glassColors.glass)
+                                        .border(1.dp, glassColors.glassEdge, RoundedCornerShape(9.dp))
+                                        .clickable {
+                                            viewModel.onIntent(InstallmentIntent.MarkAsPaid(
+                                                installmentId = item.installment.id,
+                                                transactionDescription = paymentDesc,
+                                                reminderTitle = reminderTitle,
+                                                reminderMessage = reminderMsg
+                                            ))
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null,
+                                        tint = GlassGreen,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                }
+                            }
+                        }
                     )
                 },
                 onEditClick = { /* Edit logic? */ },

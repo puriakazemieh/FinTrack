@@ -11,7 +11,7 @@ import com.kazemieh.domain.usecase.ObserveTagsUseCase
 import com.kazemieh.domain.usecase.ToggleNotePinUseCase
 import com.kazemieh.domain.usecase.ToggleNoteLockUseCase
 import com.kazemieh.domain.notification.NotificationScheduler
-import com.kazemieh.notifications.NotificationManager
+import com.kazemieh.domain.notification.NotificationManager
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.note_not_found
 import fintrack.core.designsystem.generated.resources.notes

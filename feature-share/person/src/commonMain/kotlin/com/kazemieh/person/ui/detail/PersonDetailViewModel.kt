@@ -4,16 +4,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.DebtType
 import com.kazemieh.common.model.DebtWithRelations
+import com.kazemieh.common.model.PageRequest
 import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.TransactionFilterParams
+import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.domain.usecase.DebtUseCaseGroup
 import com.kazemieh.domain.usecase.ObservePersonsUseCase
+import com.kazemieh.domain.usecase.ObserveTransactionsUseCase
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.settle_debt_desc
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 
 class PersonDetailViewModel(
     private val personId: Long,
     private val observePersonsUseCase: ObservePersonsUseCase,
-    private val debtUseCases: DebtUseCaseGroup
+    private val debtUseCases: DebtUseCaseGroup,
+    private val observeTransactionsUseCase: ObserveTransactionsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PersonDetailState())
@@ -59,6 +67,17 @@ class PersonDetailViewModel(
                     }
                 }
         }
+
+        viewModelScope.launch {
+            val filter = TransactionFilterParams(
+                persons = setOf(Person(id = personId, name = "")),
+                isAllPersons = false
+            )
+            observeTransactionsUseCase(filter, PageRequest(1, 100))
+                .collect { page ->
+                    _state.update { it.copy(transactions = page.items) }
+                }
+        }
     }
 
     fun onIntent(intent: PersonDetailIntent) {
@@ -71,7 +90,8 @@ class PersonDetailViewModel(
 
     private fun settleDebt(debtId: Long, description: String) {
         viewModelScope.launch {
-            debtUseCases.settleDebtUseCase(debtId, description)
+            val finalDesc = description.ifEmpty { getString(Res.string.settle_debt_desc, state.value.person?.name ?: "") }
+            debtUseCases.settleDebtUseCase(debtId, finalDesc)
         }
     }
 
@@ -86,6 +106,7 @@ data class PersonDetailState(
     val person: Person? = null,
     val debts: List<DebtWithRelations> = emptyList(),
     val filteredDebts: List<DebtWithRelations> = emptyList(),
+    val transactions: List<TransactionWithRelations> = emptyList(),
     val totalCredits: Long = 0,
     val totalDebts: Long = 0,
     val balance: Long = 0,

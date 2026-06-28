@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Check
 import com.kazemieh.common.model.CheckStatus
 import com.kazemieh.common.model.Person
+import com.kazemieh.common.ImageStorage
 import com.kazemieh.domain.usecase.CheckUseCaseGroup
+import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,10 +16,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 import kotlin.time.Clock
 
 class AddCheckViewModel(
-    private val checkUseCases: CheckUseCaseGroup
+    private val checkUseCases: CheckUseCaseGroup,
+    private val imageStorage: ImageStorage
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddCheckState())
@@ -33,7 +37,7 @@ class AddCheckViewModel(
             is AddCheckIntent.SetDueDate -> _state.update { it.copy(dueDate = intent.dueDate) }
             is AddCheckIntent.SetPerson -> _state.update { it.copy(person = intent.person) }
             is AddCheckIntent.SetStatus -> _state.update { it.copy(status = intent.status) }
-            is AddCheckIntent.SetPhoto -> _state.update { it.copy(photoPath = intent.photoPath) }
+            is AddCheckIntent.SetPhoto -> _state.update { it.copy(photoBytes = intent.bytes) }
             is AddCheckIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
             is AddCheckIntent.SetIsIncoming -> _state.update { it.copy(isIncoming = intent.isIncoming) }
             AddCheckIntent.Submit -> submit()
@@ -46,17 +50,27 @@ class AddCheckViewModel(
         if (amountValue == null || currentState.person == null) return
 
         viewModelScope.launch {
+            val photoPath = currentState.photoBytes?.let { bytes ->
+                imageStorage.saveImage(bytes)
+            }
+
             val check = Check(
                 amount = amountValue,
                 date = currentState.date,
                 dueDate = currentState.dueDate,
                 status = currentState.status,
                 personId = currentState.person.id ?: 0L,
-                photoPath = currentState.photoPath,
+                photoPath = photoPath,
                 description = currentState.description,
                 isIncoming = currentState.isIncoming
             )
-            checkUseCases.addCheckUseCase(check)
+            val reminderTitle = getString(Res.string.notif_cheque_label)
+            val reminderMessage = if (currentState.isIncoming) {
+                getString(Res.string.msg_notif_check_received, currentState.person.name)
+            } else {
+                getString(Res.string.msg_notif_check_paid, currentState.person.name)
+            }
+            checkUseCases.addCheckUseCase(check, reminderTitle, reminderMessage)
             _effect.send(AddCheckEffect.Saved)
         }
     }
@@ -68,7 +82,7 @@ data class AddCheckState(
     val dueDate: Long = Clock.System.now().toEpochMilliseconds(),
     val person: Person? = null,
     val status: CheckStatus = CheckStatus.PENDING,
-    val photoPath: String? = null,
+    val photoBytes: ByteArray? = null,
     val description: String = "",
     val isIncoming: Boolean = false
 )
@@ -79,7 +93,7 @@ sealed interface AddCheckIntent {
     data class SetDueDate(val dueDate: Long) : AddCheckIntent
     data class SetPerson(val person: Person?) : AddCheckIntent
     data class SetStatus(val status: CheckStatus) : AddCheckIntent
-    data class SetPhoto(val photoPath: String?) : AddCheckIntent
+    data class SetPhoto(val bytes: ByteArray?) : AddCheckIntent
     data class SetDescription(val description: String) : AddCheckIntent
     data class SetIsIncoming(val isIncoming: Boolean) : AddCheckIntent
     data object Submit : AddCheckIntent

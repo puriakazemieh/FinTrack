@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface BudgetRepository {
     fun observeBudgetsWithProgress(): Flow<List<BudgetWithProgress>>
+    suspend fun getBudgetWithProgressByCategory(categoryId: Long): BudgetWithProgress?
     suspend fun getBudgetByCategoryId(categoryId: Long): Budget?
     suspend fun addBudget(budget: Budget): Long
     suspend fun updateBudget(budget: Budget): Int

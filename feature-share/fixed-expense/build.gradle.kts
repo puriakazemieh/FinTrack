@@ -53,6 +53,7 @@ kotlin {
                 implementation(project(":feature-share:category"))
                 implementation(project(":feature-share:source"))
                 implementation(project(":core:designsystem"))
+                implementation(project(":core:jalali"))
 
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
@@ -67,6 +68,12 @@ kotlin {
                 implementation(libs.koin.compose)
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose.viewmodel)
+            }
+        }
+
+        androidMain {
+            dependencies {
+                implementation(libs.androidx.work.runtime.ktx)
             }
         }
     }

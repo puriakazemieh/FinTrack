@@ -7,6 +7,7 @@ import com.kazemieh.common.model.FixedExpense
 import com.kazemieh.common.model.RecurrenceType
 import com.kazemieh.common.model.Source
 import com.kazemieh.domain.usecase.FixedExpenseUseCaseGroup
+import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 import kotlin.time.Clock
 
 class AddFixedExpenseViewModel(
@@ -56,7 +58,9 @@ class AddFixedExpenseViewModel(
                 isAutoPostEnabled = currentState.isAutoPostEnabled,
                 description = currentState.description
             )
-            fixedExpenseUseCases.addFixedExpenseUseCase(expense)
+            val reminderTitle = getString(Res.string.notif_installment_label)
+            val reminderMessage = getString(Res.string.msg_notif_fixed_expense_due, currentState.category.name)
+            fixedExpenseUseCases.addFixedExpenseUseCase(expense, reminderTitle, reminderMessage)
             _effect.send(AddFixedExpenseEffect.Saved)
         }
     }

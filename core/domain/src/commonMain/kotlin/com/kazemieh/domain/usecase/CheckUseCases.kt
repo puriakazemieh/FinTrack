@@ -2,19 +2,47 @@ package com.kazemieh.domain.usecase
 
 import com.kazemieh.common.model.Check
 import com.kazemieh.common.model.CheckStatus
+import com.kazemieh.domain.notification.NotificationManager
+import com.kazemieh.domain.notification.NotificationScheduler
 import com.kazemieh.domain.repository.CheckRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
-class AddCheckUseCase(private val repository: CheckRepository) {
-    suspend operator fun invoke(check: Check) = repository.insertCheck(check)
+class AddCheckUseCase(
+    private val repository: CheckRepository,
+    private val notificationScheduler: NotificationScheduler
+) {
+    suspend operator fun invoke(check: Check, reminderTitle: String, reminderMessage: String) {
+        val id = repository.insertCheck(check)
+        scheduleReminder(check.copy(id = id), reminderTitle, reminderMessage)
+    }
+
+    private fun scheduleReminder(check: Check, title: String, message: String) {
+        val dueInstant = Instant.fromEpochMilliseconds(check.dueDate)
+        notificationScheduler.scheduleReminder(
+            id = "check_${check.id}",
+            title = title,
+            message = message,
+            scheduledTime = dueInstant.toLocalDateTime(TimeZone.currentSystemDefault()),
+            channelId = NotificationManager.CHANNEL_CHEQUE
+        )
+    }
 }
 
 class UpdateCheckUseCase(private val repository: CheckRepository) {
     suspend operator fun invoke(check: Check) = repository.updateCheck(check)
 }
 
-class DeleteCheckUseCase(private val repository: CheckRepository) {
-    suspend operator fun invoke(id: Long) = repository.deleteCheck(id)
+class DeleteCheckUseCase(
+    private val repository: CheckRepository,
+    private val notificationScheduler: NotificationScheduler
+) {
+    suspend operator fun invoke(id: Long) {
+        repository.deleteCheck(id)
+        notificationScheduler.cancelReminder("check_$id")
+    }
 }
 
 class GetCheckByIdUseCase(private val repository: CheckRepository) {

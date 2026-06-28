@@ -31,14 +31,24 @@ import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
+import androidx.compose.runtime.remember
+import com.kazemieh.common.persiandatetime.extensions.dayOfWeekIndex
+import com.kazemieh.common.persiandatetime.extensions.isLeapYear
+import com.kazemieh.common.persiandatetime.extensions.monthLength
+import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
+import kotlinx.datetime.TimeZone
+import kotlin.time.Clock
+
 @Composable
 fun BudgetHero(
     totalBudget: Long,
     usedBudget: Long,
+    period: BudgetPeriod,
     modifier: Modifier = Modifier
 ) {
     val progress = if (totalBudget > 0) usedBudget.toFloat() / totalBudget else 0f
     val remaining = (totalBudget - usedBudget).coerceAtLeast(0)
+    val daysRemaining = remember(period) { calculateDaysRemaining(period) }
 
     GlassCard(
         modifier = modifier.fillMaxWidth(),
@@ -70,10 +80,40 @@ fun BudgetHero(
                 
                 Spacer(modifier = Modifier.height(6.dp))
                 FintrackLabelSmallText(
-                    text = stringResource(Res.string.label_days_remaining, 12), // Should be dynamic
+                    text = stringResource(Res.string.label_days_remaining, daysRemaining),
                     color = GlassAmber
                 )
             }
+        }
+    }
+}
+
+private fun calculateDaysRemaining(period: BudgetPeriod): Int {
+    val now = Clock.System.now()
+    val timeZone = TimeZone.currentSystemDefault()
+    val pNow = now.toPersianDateTime(timeZone)
+
+    return when (period) {
+        BudgetPeriod.DAILY -> 1
+        BudgetPeriod.WEEKLY -> {
+            val daysToSaturday = (pNow.dayOfWeekIndex) % 7
+            7 - daysToSaturday
+        }
+        BudgetPeriod.MONTHLY -> {
+            pNow.monthLength() - pNow.day + 1
+        }
+        BudgetPeriod.YEARLY -> {
+            // Simplified: calculate days until end of year
+            val daysInMonths = if (pNow.isLeapYear()) {
+                listOf(31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 30)
+            } else {
+                listOf(31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29)
+            }
+            var remaining = daysInMonths[pNow.month - 1] - pNow.day + 1
+            for (m in pNow.month until 12) {
+                remaining += daysInMonths[m]
+            }
+            remaining
         }
     }
 }

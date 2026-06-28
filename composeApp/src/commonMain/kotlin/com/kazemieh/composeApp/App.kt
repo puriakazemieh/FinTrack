@@ -39,7 +39,7 @@ import com.kazemieh.lock.LockGate
 import com.kazemieh.lock.di.lockModule
 import com.kazemieh.money.Currency
 import com.kazemieh.network.di.networkModule
-import com.kazemieh.notifications.NotificationManager
+import com.kazemieh.domain.notification.NotificationManager
 import com.kazemieh.person.di.transactionAddPersonModule
 import com.kazemieh.person.di.transactionDeletePersonModule
 import com.kazemieh.person.di.transactionPersonModule

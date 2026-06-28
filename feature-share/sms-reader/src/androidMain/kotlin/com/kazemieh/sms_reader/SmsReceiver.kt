@@ -6,7 +6,7 @@ import android.content.Intent
 import android.provider.Telephony
 import com.kazemieh.domain.repository.SmsDraftRepository
 import com.kazemieh.domain.repository.TransactionRepository
-import com.kazemieh.notifications.NotificationManager
+import com.kazemieh.domain.notification.NotificationManager
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.sms_detection_desc
 import fintrack.core.designsystem.generated.resources.sms_detection_title

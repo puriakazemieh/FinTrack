@@ -51,6 +51,9 @@ import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
+import com.kazemieh.designsystem.component.jalali.DatePickerField
+import com.kazemieh.jalali.JalaliCalendar
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import com.kazemieh.person.ui.list.PersonPickerSingleBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
@@ -158,14 +161,28 @@ fun AddDebtBottomSheet(
                         onClick = { showPersonPicker = true }
                     )
 
-                    // Date Picker (Simplified for now, using text field or existing date logic)
+                    // Date Picker
+                    var showDatePicker by remember { mutableStateOf(false) }
                     PickerField(
                         label = stringResource(Res.string.date),
                         value = Instant.fromEpochMilliseconds(state.date)
                             .toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
                         icon = Icons.Default.CalendarMonth,
-                        onClick = { /* TODO: Date Picker */ }
+                        onClick = { showDatePicker = true }
                     )
+
+                    if (showDatePicker) {
+                        val open = remember { mutableStateOf(true) }
+                        LaunchedEffect(open.value) { if (!open.value) showDatePicker = false }
+                        JalaliDatePickerBottomSheet(
+                            openSheet = open,
+                            initialDate = JalaliCalendar.fromTimestamp(state.date),
+                            onConfirm = {
+                                viewModel.onIntent(AddDebtIntent.SetDate(it.toTimestamp()))
+                                showDatePicker = false
+                            }
+                        )
+                    }
 
                     // Source Picker (Optional for settlement)
                     PickerField(

@@ -18,7 +18,8 @@ val transactionPersonModule = module {
         PersonDetailViewModel(
             personId = personId,
             observePersonsUseCase = get(),
-            debtUseCases = get()
+            debtUseCases = get(),
+            observeTransactionsUseCase = get()
         )
     }
 }

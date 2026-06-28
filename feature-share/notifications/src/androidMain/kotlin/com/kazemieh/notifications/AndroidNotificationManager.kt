@@ -1,6 +1,7 @@
 package com.kazemieh.notifications
 
 import android.Manifest
+import com.kazemieh.domain.notification.NotificationManager
 import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager as AndroidNotificationManagerSystem
@@ -16,6 +17,8 @@ import androidx.core.content.ContextCompat
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.notif_action_ignore
 import fintrack.core.designsystem.generated.resources.notif_action_register
+import fintrack.core.designsystem.generated.resources.notif_budget_exceeded_desc
+import fintrack.core.designsystem.generated.resources.notif_budget_exceeded_title
 import fintrack.core.designsystem.generated.resources.notif_channel_budget
 import fintrack.core.designsystem.generated.resources.notif_channel_cheque
 import fintrack.core.designsystem.generated.resources.notif_channel_desc
@@ -122,6 +125,14 @@ class AndroidNotificationManager(private val context: Context) : NotificationMan
             .build()
 
         notificationManagerCompat.notify(id, notification)
+    }
+
+    override fun showBudgetAlert(categoryId: Int, categoryName: String, progressPercentage: Int) {
+        runBlocking {
+            val title = getString(Res.string.notif_budget_exceeded_title)
+            val message = getString(Res.string.notif_budget_exceeded_desc, categoryName, progressPercentage)
+            showNotification(categoryId, title, message, NotificationManager.CHANNEL_BUDGET)
+        }
     }
 
     override fun hasPermission(): Boolean {

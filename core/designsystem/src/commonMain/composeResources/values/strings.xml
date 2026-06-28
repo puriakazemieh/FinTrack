@@ -645,6 +645,7 @@
     <string name="label_2m">۲م</string>
     <string name="label_3m">۳م</string>
     <string name="label_5m">۵م</string>
+    <string name="label_10m">۱۰م</string>
 
     <!-- Installment -->
     <string name="navigation_installment">اقساط</string>
@@ -1045,4 +1046,16 @@
 
     <string name="title_display_currency">نمایش و واحد پول</string>
     <string name="sub_display_currency">ظاهر اپ و پول رایج</string>
+    <string name="notif_budget_exceeded_title">هشدار بودجه</string>
+    <string name="notif_budget_exceeded_desc">شما %2$d درصد از بودجه دسته %1$s را مصرف کرده‌اید.</string>
+    <string name="payment_for">پرداخت قسط %1$s</string>
+    <string name="notif_installment_title">سررسید قسط</string>
+    <string name="notif_installment_desc">زمان پرداخت قسط %1$s فرا رسیده است.</string>
+    <string name="settle_debt_desc">تسویه بدهی %1$s</string>
+    <string name="label_check_status_title">وضعیت چک</string>
+    <string name="msg_notif_check_received">دریافت چک از %1$s</string>
+    <string name="msg_notif_check_paid">پرداخت چک به %1$s</string>
+    <string name="msg_notif_fixed_expense_due">سررسید هزینه ثابت: %1$s</string>
+    <string name="msg_auto_posted_fixed_expense">ثبت خودکار هزینه ثابت</string>
+    <string name="label_done">تمام</string>
 </resources>

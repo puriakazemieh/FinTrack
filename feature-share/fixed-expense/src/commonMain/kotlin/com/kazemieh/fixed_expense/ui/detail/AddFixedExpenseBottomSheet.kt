@@ -52,11 +52,15 @@ import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.ScreenHeader
+import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
+import com.kazemieh.jalali.JalaliCalendar
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.category
@@ -157,20 +161,54 @@ fun AddFixedExpenseBottomSheet(
                         onClick = { showSourcePicker = true }
                     )
 
-                    // Recurrence Picker
-                    PickerField(
-                        label = stringResource(Res.string.installment_frequency),
-                        value = when (state.recurrence) {
-                            RecurrenceType.DAILY -> stringResource(Res.string.frequency_daily)
-                            RecurrenceType.WEEKLY -> stringResource(Res.string.frequency_weekly)
-                            RecurrenceType.MONTHLY -> stringResource(Res.string.frequency_monthly)
-                            RecurrenceType.YEARLY -> stringResource(Res.string.frequency_yearly)
-                            RecurrenceType.CUSTOM -> stringResource(Res.string.custom_date)
-                            RecurrenceType.ONCE -> stringResource(Res.string.dp_today) // TODO: Better string for ONCE
-                        },
-                        icon = Icons.Default.Repeat,
-                        onClick = { showRecurrencePicker = true }
-                    )
+                    // Recurrence Selector
+                    FintrackLabelMediumText(text = stringResource(Res.string.installment_frequency), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    GlassCard(padding = 10.dp) {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                listOf(RecurrenceType.DAILY, RecurrenceType.WEEKLY, RecurrenceType.MONTHLY).forEach { type ->
+                                    val labelRes = when (type) {
+                                        RecurrenceType.DAILY -> Res.string.frequency_daily
+                                        RecurrenceType.WEEKLY -> Res.string.frequency_weekly
+                                        RecurrenceType.MONTHLY -> Res.string.frequency_monthly
+                                        else -> Res.string.custom_date
+                                    }
+                                    Chip(
+                                        active = state.recurrence == type,
+                                        onClick = { viewModel.onIntent(AddFixedExpenseIntent.SetRecurrence(type)) },
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        FintrackLabelSmallText(text = stringResource(labelRes))
+                                    }
+                                }
+                            }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                listOf(RecurrenceType.YEARLY, RecurrenceType.CUSTOM, RecurrenceType.ONCE).forEach { type ->
+                                    val labelRes = when (type) {
+                                        RecurrenceType.YEARLY -> Res.string.frequency_yearly
+                                        RecurrenceType.CUSTOM -> Res.string.custom_date
+                                        RecurrenceType.ONCE -> Res.string.dp_today
+                                        else -> Res.string.custom_date
+                                    }
+                                    Chip(
+                                        active = state.recurrence == type,
+                                        onClick = { viewModel.onIntent(AddFixedExpenseIntent.SetRecurrence(type)) },
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        FintrackLabelSmallText(text = stringResource(labelRes))
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    var showStartDatePicker by remember { mutableStateOf(false) }
 
                     // Start Date Picker
                     PickerField(
@@ -178,8 +216,21 @@ fun AddFixedExpenseBottomSheet(
                         value = Instant.fromEpochMilliseconds(state.startDate)
                             .toPersianDateTime(TimeZone.currentSystemDefault()).toDateString(),
                         icon = Icons.Default.CalendarMonth,
-                        onClick = { /* TODO: Date Picker */ }
+                        onClick = { showStartDatePicker = true }
                     )
+
+                    if (showStartDatePicker) {
+                        val open = remember { mutableStateOf(true) }
+                        LaunchedEffect(open.value) { if (!open.value) showStartDatePicker = false }
+                        JalaliDatePickerBottomSheet(
+                            openSheet = open,
+                            initialDate = JalaliCalendar.fromTimestamp(state.startDate),
+                            onConfirm = {
+                                viewModel.onIntent(AddFixedExpenseIntent.SetStartDate(it.toTimestamp()))
+                                showStartDatePicker = false
+                            }
+                        )
+                    }
 
                     // Auto Post Toggle
                     Row(

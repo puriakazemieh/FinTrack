@@ -10,13 +10,22 @@ import com.kazemieh.common.model.BudgetWithProgress
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.SyncStatus
+import com.kazemieh.common.persiandatetime.domain.PersianDateTime
+import com.kazemieh.common.persiandatetime.extensions.toEpochMilliseconds
+import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
+import com.kazemieh.common.persiandatetime.extensions.plus
+import com.kazemieh.common.persiandatetime.extensions.minus
+import com.kazemieh.common.persiandatetime.extensions.dayOfWeekIndex
 import com.kazemieh.data_contract.datasource.BudgetLocalDataSource
 import com.kazemieh.database.FinTrackDatabase
 import com.kazemieh.database.ObserveBudgets
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 
 class BudgetLocalDataSourceImpl(
@@ -27,8 +36,11 @@ class BudgetLocalDataSourceImpl(
     private val transactionQueries = db.transactionQueries
 
     override fun observeBudgetsWithProgress(): Flow<List<BudgetWithProgress>> {
-        return queries.observeBudgets().asFlow().mapToList(Dispatchers.Default).map { list ->
-            list.map { item ->
+        val budgetsFlow: Flow<List<ObserveBudgets>> = queries.observeBudgets().asFlow().mapToList(Dispatchers.Default)
+        val transactionsFlow: Flow<List<com.kazemieh.database.Transactions>> = transactionQueries.getAllTransactions().asFlow().mapToList(Dispatchers.Default)
+        
+        return budgetsFlow.combine(transactionsFlow) { budgets, _ ->
+            budgets.map { item ->
                 val spent = getSpentAmount(item.categoryId, item.period, item.startAt)
                 item.toBudgetWithProgress(spent)
             }
@@ -36,10 +48,52 @@ class BudgetLocalDataSourceImpl(
     }
 
     private fun getSpentAmount(categoryId: Long, periodStr: String, startAt: Long): Long {
-        // This is a simplified calculation of the range.
-        val from = startAt 
-        val to = Long.MAX_VALUE 
+        val period = try {
+            BudgetPeriod.valueOf(periodStr)
+        } catch (e: Exception) {
+            BudgetPeriod.MONTHLY
+        }
+        val now = Clock.System.now()
+        val timeZone = TimeZone.currentSystemDefault()
+        val pNow = now.toPersianDateTime(timeZone)
+
+        val from: Long
+        val to: Long
+
+        when (period) {
+            BudgetPeriod.DAILY -> {
+                from = pNow.copy(hour = 0, minute = 0, second = 0).toEpochMilliseconds(timeZone)
+                to = pNow.plus(1, DateTimeUnit.DAY).copy(hour = 0, minute = 0, second = 0).toEpochMilliseconds(timeZone)
+            }
+            BudgetPeriod.WEEKLY -> {
+                val daysToSaturday = pNow.dayOfWeekIndex
+                val saturday = pNow.minus(daysToSaturday, DateTimeUnit.DAY).copy(hour = 0, minute = 0, second = 0)
+                from = saturday.toEpochMilliseconds(timeZone)
+                to = saturday.plus(7, DateTimeUnit.DAY).toEpochMilliseconds(timeZone)
+            }
+            BudgetPeriod.MONTHLY -> {
+                from = pNow.copy(day = 1, hour = 0, minute = 0, second = 0).toEpochMilliseconds(timeZone)
+                val nextMonth = if (pNow.month == 12) {
+                    PersianDateTime(pNow.year + 1, 1, 1, 0, 0, 0)
+                } else {
+                    PersianDateTime(pNow.year, pNow.month + 1, 1, 0, 0, 0)
+                }
+                to = nextMonth.toEpochMilliseconds(timeZone)
+            }
+            BudgetPeriod.YEARLY -> {
+                from = pNow.copy(month = 1, day = 1, hour = 0, minute = 0, second = 0).toEpochMilliseconds(timeZone)
+                to = PersianDateTime(pNow.year + 1, 1, 1, 0, 0, 0).toEpochMilliseconds(timeZone)
+            }
+        }
+
         return transactionQueries.getSpentAmountByCategory(categoryId, from, to).executeAsOne().SUM ?: 0L
+    }
+
+    override suspend fun getBudgetWithProgressByCategory(categoryId: Long): BudgetWithProgress? = withContext(Dispatchers.Default) {
+        queries.observeBudgets().awaitAsList().find { it.categoryId == categoryId }?.let { item ->
+            val spent = getSpentAmount(item.categoryId, item.period, item.startAt)
+            item.toBudgetWithProgress(spent)
+        }
     }
 
     override suspend fun getBudgetByCategoryId(categoryId: Long): Budget? = withContext(Dispatchers.Default) {

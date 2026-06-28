@@ -1,7 +1,9 @@
 package com.kazemieh.installment.ui.add
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -28,7 +30,9 @@ import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.LocalGlassColors
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.AddFrame
+import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.Field
 import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
 import com.kazemieh.designsystem.picker.FinTrackIcons
@@ -212,19 +216,28 @@ fun AddInstallmentBottomSheet(
                 item {
                     Field(
                         label = stringResource(Res.string.installment_frequency),
-                        required = true,
-                        onClick = { /* Toggle frequency? */ }
+                        required = true
                     ) {
-                        val freqLabel = when (state.frequency) {
-                            InstallmentFrequency.DAILY -> stringResource(Res.string.frequency_daily)
-                            InstallmentFrequency.WEEKLY -> stringResource(Res.string.frequency_weekly)
-                            InstallmentFrequency.MONTHLY -> stringResource(Res.string.frequency_monthly)
-                            InstallmentFrequency.YEARLY -> stringResource(Res.string.frequency_yearly)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            InstallmentFrequency.entries.forEach { freq ->
+                                val labelRes = when (freq) {
+                                    InstallmentFrequency.DAILY -> Res.string.frequency_daily
+                                    InstallmentFrequency.WEEKLY -> Res.string.frequency_weekly
+                                    InstallmentFrequency.MONTHLY -> Res.string.frequency_monthly
+                                    InstallmentFrequency.YEARLY -> Res.string.frequency_yearly
+                                }
+                                Chip(
+                                    active = state.frequency == freq,
+                                    onClick = { viewModel.onIntent(AddInstallmentIntent.SetFrequency(freq)) },
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    FintrackLabelSmallText(text = stringResource(labelRes))
+                                }
+                            }
                         }
-                        PickerValue(
-                            label = freqLabel,
-                            color = glassColors.text
-                        )
                     }
                 }
             }
