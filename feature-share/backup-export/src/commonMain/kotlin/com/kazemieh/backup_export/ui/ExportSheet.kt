@@ -115,22 +115,15 @@ fun ExportSheet(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                val ranges = listOf(
-                    stringResource(Res.string.this_month),
-                    "۳ ماه",
-                    "۶ ماه",
-                    stringResource(Res.string.label_this_year),
-                    stringResource(Res.string.all),
-                    stringResource(Res.string.custom_range)
-                )
-                ranges.forEach { range ->
+                DateRange.entries.forEach { range ->
+                    val label = stringResource(range.labelRes)
                     Chip(
                         active = state.selectedRange == range,
                         color = GlassGreen,
                         onClick = { viewModel.onIntent(BackupExportIntent.ChangeRange(range)) }
                     ) {
                         Text(
-                            text = range,
+                            text = label,
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = if (state.selectedRange == range) FontWeight.Bold else FontWeight.Medium,
                                 color = if (state.selectedRange == range) GlassGreen else colors.text3

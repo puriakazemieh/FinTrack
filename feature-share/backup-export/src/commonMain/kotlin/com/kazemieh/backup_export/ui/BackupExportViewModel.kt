@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import kotlin.time.Clock
 
 data class BackupExportState(
-    val selectedRange: String = "همه",
+    val selectedRange: DateRange = DateRange.ALL,
     val isLoading: Boolean = false,
     val transactionCount: Int = 0,
     val dateRange: Pair<String, String> = "" to ""
@@ -25,7 +25,7 @@ sealed interface BackupExportEffect {
 }
 
 sealed interface BackupExportIntent {
-    data class ChangeRange(val range: String) : BackupExportIntent
+    data class ChangeRange(val range: DateRange) : BackupExportIntent
     data object ExportJson : BackupExportIntent
     data object ExportCsv : BackupExportIntent
     data object ExportExcel : BackupExportIntent
@@ -132,15 +132,15 @@ class BackupExportViewModel(
         }
     }
 
-    private fun getTimestampsFromRange(range: String): Pair<Long?, Long?> {
+    private fun getTimestampsFromRange(range: DateRange): Pair<Long?, Long?> {
         val now = Clock.System.now().toEpochMilliseconds()
         val oneDay = 24 * 60 * 60 * 1000L
         return when (range) {
-            "این ماه" -> (now - 30 * oneDay) to now
-            "۳ ماه" -> (now - 90 * oneDay) to now
-            "۶ ماه" -> (now - 180 * oneDay) to now
-            "امسال" -> (now - 365 * oneDay) to now
-            else -> null to null
+            DateRange.THIS_MONTH -> (now - 30 * oneDay) to now
+            DateRange.THREE_MONTHS -> (now - 90 * oneDay) to now
+            DateRange.SIX_MONTHS -> (now - 180 * oneDay) to now
+            DateRange.THIS_YEAR -> (now - 365 * oneDay) to now
+            DateRange.ALL -> null to null
         }
     }
 }

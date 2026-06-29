@@ -9,13 +9,11 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "com.kazemieh.ai_insights"
-        compileSdk {
-            version = release(36)
-        }
+        namespace = "com.kazemieh.gamification"
+        compileSdk = 36
         minSdk = 24
     }
-    val xcfName = "core:ai_insightsKit"
+    val xcfName = "core:gamificationKit"
 
     iosX64 {
         binaries.framework {
@@ -40,6 +38,7 @@ kotlin {
     }
 
     jvm()
+
     sourceSets {
         commonMain {
             dependencies {
@@ -48,18 +47,17 @@ kotlin {
                 implementation(project(":core:common"))
                 implementation(project(":core:domain"))
                 implementation(project(":core:designsystem"))
-                implementation(project(":core:money"))
-
-                implementation(libs.compose.material.icons.core)
-                implementation(libs.compose.material.icons.extended)
 
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)
                 implementation(libs.compose.ui)
+                implementation(libs.compose.material.icons.core)
+                implementation(libs.compose.material.icons.extended)
                 implementation(libs.compose.components.resources)
+                implementation(libs.compose.uiToolingPreview)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
-                
+
                 implementation(libs.koin.compose)
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose.viewmodel)

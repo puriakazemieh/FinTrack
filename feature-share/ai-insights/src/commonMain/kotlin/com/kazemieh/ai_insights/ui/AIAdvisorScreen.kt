@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,8 +32,8 @@ import com.kazemieh.designsystem.component.EmptyList
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import com.kazemieh.common.Ext.toPersianNumber
-import com.kazemieh.common.Ext.toPriceFormat
+import com.kazemieh.common.toPersianDigits
+import com.kazemieh.common.toPersianPrice
 import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.designsystem.component.PieChart
 import com.kazemieh.designsystem.component.PieChartItem
@@ -57,8 +58,9 @@ fun AIAdvisorScreen(
                 onBack = onBack,
                 actions = listOf(
                     HeaderAction(
-                        icon = Icons.Default.Refresh,
-                        color = glassColors.tertiary,
+                        icon = rememberVectorPainter(Icons.Filled.Refresh),
+                        label = stringResource(Res.string.label_retry),
+                        color = MaterialTheme.colorScheme.tertiary,
                         onClick = { viewModel.onIntent(AIAdvisorIntent.Refresh) }
                     )
                 )
@@ -69,13 +71,12 @@ fun AIAdvisorScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             if (state.isLoading) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = glassColors.tertiary)
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.tertiary)
                 }
             } else if (state.isEmpty) {
                 EmptyList(
                     modifier = Modifier.padding(padding),
-                    title = stringResource(Res.string.ai_empty_title),
-                    description = stringResource(Res.string.ai_empty_desc)
+                    title = stringResource(Res.string.ai_empty_title)
                 )
             } else {
                 LazyColumn(
@@ -91,7 +92,7 @@ fun AIAdvisorScreen(
 
                     item {
                         Text(
-                            text = stringResource(Res.string.ai_active_suggestions_label) + " · " + state.suggestions.size.toPersianNumber(),
+                            text = stringResource(Res.string.ai_active_suggestions_label) + " · " + state.suggestions.size.toPersianDigits(),
                             style = MaterialTheme.typography.labelMedium,
                             color = glassColors.text2,
                             modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
@@ -111,7 +112,6 @@ fun AIAdvisorScreen(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 32.dp),
-                label = stringResource(Res.string.add_transaction),
                 onClick = onAddTransaction
             )
 
@@ -146,7 +146,7 @@ private fun AnalysisCard(state: AIAdvisorState) {
                 .fillMaxWidth()
                 .background(
                     Brush.linearGradient(
-                        0f to glassColors.tertiary.copy(alpha = 0.16f),
+                        0f to MaterialTheme.colorScheme.tertiary.copy(alpha = 0.16f),
                         0.7f to Color.Transparent
                     )
                 )
@@ -163,7 +163,7 @@ private fun AnalysisCard(state: AIAdvisorState) {
                             .clip(RoundedCornerShape(14.dp))
                             .background(
                                 Brush.linearGradient(
-                                    listOf(glassColors.tertiary, glassColors.tertiary.copy(alpha = 0.8f))
+                                    listOf(MaterialTheme.colorScheme.tertiary, MaterialTheme.colorScheme.tertiary.copy(alpha = 0.8f))
                                 )
                             ),
                         contentAlignment = Alignment.Center
@@ -184,7 +184,7 @@ private fun AnalysisCard(state: AIAdvisorState) {
                             color = glassColors.text
                         )
                         Text(
-                            text = stringResource(Res.string.ai_analysis_days, state.activeDays.toPersianNumber()),
+                            text = stringResource(Res.string.ai_analysis_days, state.activeDays.toPersianDigits()),
                             style = MaterialTheme.typography.labelSmall,
                             color = glassColors.text2
                         )
@@ -197,7 +197,7 @@ private fun AnalysisCard(state: AIAdvisorState) {
                                 PieChartItem(
                                     label = "",
                                     value = state.savingPotentialPercentage.toLong(),
-                                    color = glassColors.tertiary
+                                    color = MaterialTheme.colorScheme.tertiary
                                 ),
                                 PieChartItem(
                                     label = "",
@@ -212,10 +212,10 @@ private fun AnalysisCard(state: AIAdvisorState) {
                             enableAnimation = true
                         )
                         Text(
-                            text = "٪${animatedPercentage.value.toInt().toPersianNumber()}",
+                            text = "٪${animatedPercentage.value.toInt().toPersianDigits()}",
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = glassColors.tertiary
+                            color = MaterialTheme.colorScheme.tertiary
                         )
                     }
                 }
@@ -225,12 +225,11 @@ private fun AnalysisCard(state: AIAdvisorState) {
                 Text(
                     text = stringResource(
                         Res.string.ai_analysis_body,
-                        "٪${state.savingPotentialPercentage.toPersianNumber()}",
-                        state.savingPotentialAmount.toPriceFormat().toPersianNumber()
+                        "٪${state.savingPotentialPercentage.toPersianDigits()}",
+                        state.savingPotentialAmount.toPersianPrice()
                     ),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = glassColors.text,
-                    lineHeight = 24.sp
+                    color = glassColors.text
                 )
             }
         }
@@ -290,13 +289,12 @@ private fun SuggestionCard(
                         Text(
                             text = stringResource(suggestion.body),
                             style = MaterialTheme.typography.labelSmall,
-                            color = glassColors.text2,
-                            lineHeight = 18.sp
+                            color = glassColors.text2
                         )
                     }
 
                     Icon(
-                        imageVector = Icons.Default.Info,
+                        imageVector = Icons.Filled.Info,
                         contentDescription = null,
                         tint = glassColors.text3,
                         modifier = Modifier.size(16.dp)
@@ -313,7 +311,7 @@ private fun SuggestionCard(
                         color = color
                     )
                     InfoChip(
-                        label = stringResource(Res.string.ai_suggestion_return, stringResource(suggestion.returnRate).toPersianNumber()),
+                        label = stringResource(Res.string.ai_suggestion_return, stringResource(suggestion.returnRate).toPersianDigits()),
                         color = color
                     )
                 }
@@ -333,7 +331,7 @@ private fun DetailBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = glassColors.surface,
+        containerColor = glassColors.bg0,
         scrimColor = Color.Black.copy(alpha = 0.32f),
         dragHandle = { BottomSheetDefaults.DragHandle(color = glassColors.glassHairline) }
     ) {
@@ -373,7 +371,7 @@ private fun DetailBottomSheet(
                     color = color
                 )
                 InfoChip(
-                    label = stringResource(Res.string.ai_suggestion_return, stringResource(suggestion.returnRate).toPersianNumber()),
+                    label = stringResource(Res.string.ai_suggestion_return, stringResource(suggestion.returnRate).toPersianDigits()),
                     color = color
                 )
             }
@@ -384,7 +382,6 @@ private fun DetailBottomSheet(
                 text = stringResource(suggestion.detail),
                 style = MaterialTheme.typography.bodyLarge,
                 color = glassColors.text,
-                lineHeight = 28.sp,
                 modifier = Modifier.fillMaxWidth()
             )
 

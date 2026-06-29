@@ -1,0 +1,42 @@
+CREATE TABLE IF NOT EXISTS achievement (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    type TEXT NOT NULL UNIQUE,
+    isUnlocked INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0,
+    unlockTime INTEGER,
+    progress INTEGER NOT NULL DEFAULT 0,
+    target INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS streak (
+    id INTEGER PRIMARY KEY NOT NULL DEFAULT 1,
+    currentStreak INTEGER NOT NULL DEFAULT 0,
+    bestStreak INTEGER NOT NULL DEFAULT 0,
+    lastTransactionDate INTEGER,
+    xp INTEGER NOT NULL DEFAULT 0,
+    level INTEGER NOT NULL DEFAULT 1
+);
+
+-- Achievements
+getAchievements:
+SELECT * FROM achievement;
+
+getAchievementByType:
+SELECT * FROM achievement WHERE type = ?;
+
+insertAchievement:
+INSERT OR IGNORE INTO achievement(type, target)
+VALUES (?, ?);
+
+updateAchievementProgress:
+UPDATE achievement SET progress = ?, isUnlocked = ?, unlockTime = ? WHERE type = ?;
+
+unlockAchievement:
+UPDATE achievement SET isUnlocked = 1, unlockTime = ? WHERE type = ?;
+
+-- Streak
+getStreak:
+SELECT * FROM streak WHERE id = 1;
+
+updateStreak:
+INSERT OR REPLACE INTO streak(id, currentStreak, bestStreak, lastTransactionDate, xp, level)
+VALUES (1, ?, ?, ?, ?, ?);

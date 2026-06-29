@@ -53,6 +53,7 @@ kotlin {
                 implementation(project(":feature-share:asset"))
                 implementation(project(":feature-share:source"))
                 implementation(project(":feature-share:category"))
+                implementation(project(":feature-share:ai-insights"))
                 implementation(project(":feature-share:tags"))
 
                 implementation(libs.compose.runtime)

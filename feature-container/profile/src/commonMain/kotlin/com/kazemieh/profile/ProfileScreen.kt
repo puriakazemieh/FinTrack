@@ -48,6 +48,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import org.jetbrains.compose.resources.decodeToImageBitmap
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -93,48 +94,9 @@ import com.kazemieh.lock.LockMode
 import com.kazemieh.lock.LockViewModel
 import com.kazemieh.lock.PINScreen
 import com.kazemieh.money.Currency
-import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.action_logout
-import fintrack.core.designsystem.generated.resources.currency_rial_full
-import fintrack.core.designsystem.generated.resources.currency_toman_full
-import fintrack.core.designsystem.generated.resources.footer_made_with_love
-import fintrack.core.designsystem.generated.resources.label_app_lock
-import fintrack.core.designsystem.generated.resources.label_calendar_fa
-import fintrack.core.designsystem.generated.resources.label_contact_us
-import fintrack.core.designsystem.generated.resources.label_currency
-import fintrack.core.designsystem.generated.resources.label_faq
-import fintrack.core.designsystem.generated.resources.label_language
-import fintrack.core.designsystem.generated.resources.label_privacy
-import fintrack.core.designsystem.generated.resources.label_rate_app
-import fintrack.core.designsystem.generated.resources.label_terms
-import fintrack.core.designsystem.generated.resources.label_text_size
-import fintrack.core.designsystem.generated.resources.label_theme
-import fintrack.core.designsystem.generated.resources.label_version_history
-import fintrack.core.designsystem.generated.resources.label_whats_new
-import fintrack.core.designsystem.generated.resources.lock_biometric_backup_pin
-import fintrack.core.designsystem.generated.resources.profile_premium_desc
-import fintrack.core.designsystem.generated.resources.profile_premium_title
-import fintrack.core.designsystem.generated.resources.profile_stats_active_days
-import fintrack.core.designsystem.generated.resources.profile_stats_tools
-import fintrack.core.designsystem.generated.resources.profile_stats_transactions
-import fintrack.core.designsystem.generated.resources.profile_sync_active
-import fintrack.core.designsystem.generated.resources.profile_sync_now
-import fintrack.core.designsystem.generated.resources.profile_sync_time
-import fintrack.core.designsystem.generated.resources.section_about
-import fintrack.core.designsystem.generated.resources.section_display
-import fintrack.core.designsystem.generated.resources.section_notifications
-import fintrack.core.designsystem.generated.resources.section_security
-import fintrack.core.designsystem.generated.resources.section_support
-import fintrack.core.designsystem.generated.resources.setting_dark_mode
-import fintrack.core.designsystem.generated.resources.setting_fingerprint
-import fintrack.core.designsystem.generated.resources.setting_hide_balance
-import fintrack.core.designsystem.generated.resources.setting_hide_balance_desc
-import fintrack.core.designsystem.generated.resources.setting_push_notifications
-import fintrack.core.designsystem.generated.resources.title_notification_settings
-import fintrack.core.designsystem.generated.resources.user_email_default
-import fintrack.core.designsystem.generated.resources.user_name_default
-import org.jetbrains.compose.resources.decodeToImageBitmap
+import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
+import com.kazemieh.common.toPersianDigits
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.compose.viewmodel.koinViewModel as lockKoinViewModel
 
@@ -250,19 +212,19 @@ fun ProfileScreen(
                     SettingItem(
                         title = stringResource(Res.string.label_language),
                         icon = Icons.Default.Language,
-                        value = "فارسی",
+                        value = stringResource(Res.string.label_persian),
                         onClick = {}
                     )
                     SettingItem(
                         title = stringResource(Res.string.label_calendar_fa),
                         icon = Icons.Default.CalendarMonth,
-                        value = "جلالی",
+                        value = stringResource(Res.string.label_jalali),
                         onClick = {}
                     )
                     SettingItem(
                         title = stringResource(Res.string.label_text_size),
                         icon = Icons.Default.TextFormat,
-                        value = "متوسط",
+                        value = stringResource(Res.string.label_medium),
                         onClick = {}
                     )
                 }
@@ -459,7 +421,7 @@ fun ProfileHero(
                                 horizontalArrangement = Arrangement.spacedBy(3.dp)
                             ) {
                                 Icon(Icons.Default.Star, null, modifier = Modifier.size(10.dp), tint = Color(0xFFFFD700))
-                                FintrackLabelSmallText("پریمیوم", color = Color(0xFFFFD700), fontWeight = FontWeight.Bold)
+                                FintrackLabelSmallText(stringResource(Res.string.label_premium), color = Color(0xFFFFD700), fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -570,8 +532,8 @@ fun SyncCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(Color(0xFF22C55E)))
-                FintrackLabelSmallText(text = "Google Drive · پشتیبان روزانه", modifier = Modifier.weight(1f))
-                FintrackLabelSmallText(text = "۲۳ مگابایت", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                FintrackLabelSmallText(text = stringResource(Res.string.label_google_drive_backup), modifier = Modifier.weight(1f))
+                FintrackLabelSmallText(text = stringResource(Res.string.label_backup_size, "۲۳".toPersianDigits()), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
@@ -606,8 +568,8 @@ fun PremiumStatusCard(onRenewClick: () -> Unit) {
                     }
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    FintrackLabelLargeText(text = "اشتراک پریمیوم", fontWeight = FontWeight.Bold)
-                    FintrackLabelSmallText(text = "تا ۱۴۰۵/۱۲/۲۹ · ۹ ماه باقی‌مانده", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    FintrackLabelLargeText(text = stringResource(Res.string.profile_premium_title), fontWeight = FontWeight.Bold)
+                    FintrackLabelSmallText(text = stringResource(Res.string.label_premium_status_summary, "۱۴۰۵/۱۲/۲۹".toPersianDigits(), 9), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 Surface(
                     shape = MaterialTheme.shapes.medium,
@@ -615,7 +577,7 @@ fun PremiumStatusCard(onRenewClick: () -> Unit) {
                     onClick = onRenewClick
                 ) {
                     FintrackLabelMediumText(
-                        text = "تمدید",
+                        text = stringResource(Res.string.label_renew),
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         color = Color.White,
                         fontWeight = FontWeight.Bold

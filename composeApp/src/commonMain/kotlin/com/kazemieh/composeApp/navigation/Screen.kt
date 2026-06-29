@@ -77,6 +77,9 @@ sealed class Screen {
     data object AIAdvisor : Screen()
 
     @Serializable
+    data object Achievements : Screen()
+
+    @Serializable
     data class AddAsset(val assetId: Long? = null) : Screen()
 
     @Serializable

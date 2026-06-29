@@ -243,4 +243,8 @@ class TransactionRepositoryImpl(
     override suspend fun getTransactionAmountRange(): Pair<Long, Long> {
         return localDataSource.getTransactionAmountRange()
     }
+
+    override suspend fun getAllTransactions(): List<Transaction> {
+        return localDataSource.getAllTransactions()
+    }
 }

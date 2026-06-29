@@ -21,6 +21,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.offset
+import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
@@ -33,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kazemieh.common.toPersianDigits
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.asset.ui.component.AssetWidget
 import com.kazemieh.budget.ui.component.BudgetWidget
@@ -49,6 +54,7 @@ import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.fixed_expense.ui.widget.FixedExpenseWidget
+import com.kazemieh.gamification.ui.AchievementWidget
 import com.kazemieh.ai_insights.ui.AIAdvisorWidget
 import com.kazemieh.installment.ui.widget.InstallmentWidget
 import com.kazemieh.shopping.ui.ShoppingWidget
@@ -79,6 +85,7 @@ fun DashboardScreen(
     onNavigateToAssets: () -> Unit = {},
     onNavigateToShopping: () -> Unit = {},
     onNavigateToNotes: () -> Unit = {},
+    onNavigateToAchievements: () -> Unit = {},
     onNavigateToProfileEdit: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -102,6 +109,7 @@ fun DashboardScreen(
                 DashboardHeader(
                     userName = state.userName,
                     userInitial = state.userInitial,
+                    level = state.streak.level,
                     onNavigateToSearch = onNavigateToSearch,
                     onProfileClick = onNavigateToProfileEdit,
                     modifier = Modifier.padding(
@@ -163,6 +171,17 @@ fun DashboardScreen(
                             DashboardIntent.DeleteTransactionBottomSheet(transactionWithRelations)
                         )
                     },
+                    modifier = Modifier.padding(horizontal = space.large)
+                )
+            }
+
+            item { Spacer(Modifier.height(space.large)) }
+
+            item {
+                AchievementWidget(
+                    streak = state.streak,
+                    achievements = state.achievements,
+                    onMore = onNavigateToAchievements,
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }
@@ -302,6 +321,7 @@ private fun DashboardHeader(
     modifier: Modifier = Modifier,
     userName: String,
     userInitial: String,
+    level: Int = 1,
     onNavigateToSearch: () -> Unit = {},
     onProfileClick: () -> Unit = {}
 ) {
@@ -334,6 +354,24 @@ private fun DashboardHeader(
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp
                 )
+                
+                // Level small badge
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .offset(x = 4.dp, y = 4.dp)
+                        .size(16.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = level.toString().toPersianDigits(),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
             Column {
                 FintrackLabelSmallText(

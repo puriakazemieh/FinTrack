@@ -80,7 +80,27 @@ class OnboardingViewModel(
                     "cat_education" to getString(Res.string.seed_cat_education),
                     "cat_entertainment" to getString(Res.string.seed_cat_entertainment),
                     "cat_other_expense" to getString(Res.string.seed_cat_other_expense),
-                    "cat_transfer" to getString(Res.string.seed_cat_transfer)
+                    "cat_transfer" to getString(Res.string.seed_cat_transfer),
+                    "tag_work" to getString(Res.string.seed_tag_work),
+                    "tag_fun" to getString(Res.string.seed_tag_fun),
+                    "tag_shopping" to getString(Res.string.seed_tag_shopping),
+                    "tag_food" to getString(Res.string.seed_tag_food),
+                    "tag_travel" to getString(Res.string.seed_tag_travel),
+                    "tag_health" to getString(Res.string.seed_tag_health),
+                    "tag_education" to getString(Res.string.seed_tag_education),
+                    "tag_investment" to getString(Res.string.seed_tag_investment),
+                    "tag_transport" to getString(Res.string.seed_tag_transport),
+                    "tag_gift" to getString(Res.string.seed_tag_gift),
+                    "tag_work_desc" to getString(Res.string.seed_tag_work_desc),
+                    "tag_fun_desc" to getString(Res.string.seed_tag_fun_desc),
+                    "tag_shopping_desc" to getString(Res.string.seed_tag_shopping_desc),
+                    "tag_food_desc" to getString(Res.string.seed_tag_food_desc),
+                    "tag_travel_desc" to getString(Res.string.seed_tag_travel_desc),
+                    "tag_health_desc" to getString(Res.string.seed_tag_health_desc),
+                    "tag_education_desc" to getString(Res.string.seed_tag_education_desc),
+                    "tag_investment_desc" to getString(Res.string.seed_tag_investment_desc),
+                    "tag_transport_desc" to getString(Res.string.seed_tag_transport_desc),
+                    "tag_gift_desc" to getString(Res.string.seed_tag_gift_desc)
                 )
                 seedDataUseCase(
                     customSource = customSource,

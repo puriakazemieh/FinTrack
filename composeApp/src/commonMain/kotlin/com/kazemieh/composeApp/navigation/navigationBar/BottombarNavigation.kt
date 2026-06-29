@@ -21,6 +21,7 @@ import com.kazemieh.dashboard.DashboardScreen
 import com.kazemieh.debt.ui.list.DebtsScreen
 import com.kazemieh.financialsource.ui.list.SourcesScreen
 import com.kazemieh.fixed_expense.ui.list.FixedExpenseListScreen
+import com.kazemieh.gamification.ui.AchievementsScreen
 import com.kazemieh.ai_insights.ui.AIAdvisorScreen
 import com.kazemieh.installment.ui.list.InstallmentsScreen
 import com.kazemieh.notes.ui.edit.NoteEditScreen
@@ -71,6 +72,7 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) },
                 onNavigateToAIAdvisor = { navController.navigate(Screen.AIAdvisor) },
                 onNavigateToAssets = { navController.navigate(Screen.Assets) },
+                onNavigateToAchievements = { navController.navigate(Screen.Achievements) },
                 onNavigateToShopping = { navController.navigate(Screen.Shopping) },
                 onNavigateToNotes = { navController.navigate(Screen.Notes) },
                 onNavigateToProfileEdit = { navController.navigate(Screen.EditProfile) }
@@ -99,6 +101,7 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onNavigateToCheck = { navController.navigate(Screen.Check) },
                 onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) },
                 onNavigateToAssets = { navController.navigate(Screen.Assets) },
+                onNavigateToAchievements = { navController.navigate(Screen.Achievements) },
                 onNavigateToShopping = { navController.navigate(Screen.Shopping) },
                 onNavigateToNotes = { navController.navigate(Screen.Notes) },
                 onNavigateToSource = { navController.navigate(Screen.Sources) },
@@ -119,6 +122,12 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                         launchSingleTop = true
                     }
                 }
+            )
+        }
+
+        composable<Screen.Achievements> {
+            AchievementsScreen(
+                onBack = { navController.popBackStack() }
             )
         }
 

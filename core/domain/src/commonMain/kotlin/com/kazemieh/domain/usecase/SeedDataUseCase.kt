@@ -72,16 +72,16 @@ class SeedDataUseCase(
 
         // 3. Seed Tags
         val defaultTags = listOf(
-            Quartuple("کار", "تراکنش‌های مرتبط با محل کار یا پروژه‌ها", 21, 31),
-            Quartuple("تفریح", "هزینه‌های مربوط به سرگرمی و تفریح", 18, 32),
-            Quartuple("خرید", "خرید کالا و خدمات عمومی", 4, 33),
-            Quartuple("خوراک", "هزینه‌های غذا و رستوران", 11, 34),
-            Quartuple("مسافرت", "هزینه‌های سفر و جابجایی", 20, 35),
-            Quartuple("سلامت", "هزینه‌های پزشکی و سلامت", 16, 36),
-            Quartuple("آموزش", "هزینه‌های دوره‌ها، کتاب و آموزش", 17, 37),
-            Quartuple("سرمایه‌گذاری", "سرمایه‌گذاری‌ها و پس‌اندازها", 7, 38),
-            Quartuple("حمل و نقل", "سوخت، تاکسی، حمل و نقل عمومی", 12, 39),
-            Quartuple("هدیه", "هدیه‌ها و کمک‌های مالی به دیگران", 9, 40)
+            Quartuple(localizedNames["tag_work"] ?: "کار", localizedNames["tag_work_desc"] ?: "تراکنش‌های مرتبط با محل کار یا پروژه‌ها", 21, 31),
+            Quartuple(localizedNames["tag_fun"] ?: "تفریح", localizedNames["tag_fun_desc"] ?: "هزینه‌های مربوط به سرگرمی و تفریح", 18, 32),
+            Quartuple(localizedNames["tag_shopping"] ?: "خرید", localizedNames["tag_shopping_desc"] ?: "خرید کالا و خدمات عمومی", 4, 33),
+            Quartuple(localizedNames["tag_food"] ?: "خوراک", localizedNames["tag_food_desc"] ?: "هزینه‌های غذا و رستوران", 11, 34),
+            Quartuple(localizedNames["tag_travel"] ?: "مسافرت", localizedNames["tag_travel_desc"] ?: "هزینه‌های سفر و جابجایی", 20, 35),
+            Quartuple(localizedNames["tag_health"] ?: "سلامت", localizedNames["tag_health_desc"] ?: "هزینه‌های پزشکی و سلامت", 16, 36),
+            Quartuple(localizedNames["tag_education"] ?: "آموزش", localizedNames["tag_education_desc"] ?: "هزینه‌های دوره‌ها، کتاب و آموزش", 17, 37),
+            Quartuple(localizedNames["tag_investment"] ?: "سرمایه‌گذاری", localizedNames["tag_investment_desc"] ?: "سرمایه‌گذاری‌ها و پس‌اندازها", 7, 38),
+            Quartuple(localizedNames["tag_transport"] ?: "حمل و نقل", localizedNames["tag_transport_desc"] ?: "سوخت، تاکسی، حمل و نقل عمومی", 12, 39),
+            Quartuple(localizedNames["tag_gift"] ?: "هدیه", localizedNames["tag_gift_desc"] ?: "هدیه‌ها و کمک‌های مالی به دیگران", 9, 40)
         )
 
         defaultTags.forEach { (name, description, iconId, colorId) ->

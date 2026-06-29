@@ -56,6 +56,8 @@ kotlin {
                 implementation(project(":feature-share:asset"))
                 implementation(project(":feature-share:shopping"))
                 implementation(project(":feature-share:notes"))
+                implementation(project(":feature-share:gamification"))
+                implementation(project(":feature-share:ai-insights"))
                 implementation(project(":feature-share:sms-reader"))
                 implementation(project(":feature-share:check"))
                 implementation(project(":feature-share:fixed-expense"))

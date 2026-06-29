@@ -16,7 +16,7 @@ import com.kazemieh.designsystem.component.glass.WidgetCard
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import com.kazemieh.common.Ext.toPersianNumber
+import com.kazemieh.common.toPersianDigits
 
 @Composable
 fun AIAdvisorWidget(
@@ -64,10 +64,10 @@ fun AIAdvisorWidget(
                     contentAlignment = Alignment.Center
                 ) {
                     androidx.compose.material3.Text(
-                        text = "٪${state.savingPotentialPercentage.toPersianNumber()}",
+                        text = "٪${state.savingPotentialPercentage.toPersianDigits()}",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = glassColors.tertiary
+                        color = MaterialTheme.colorScheme.tertiary
                     )
                 }
             }

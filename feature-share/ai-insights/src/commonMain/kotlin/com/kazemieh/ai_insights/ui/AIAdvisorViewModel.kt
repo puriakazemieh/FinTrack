@@ -2,6 +2,7 @@ package com.kazemieh.ai_insights.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.model.SyncStatus
 import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.domain.usecase.ObserveCategorySumsUseCase
@@ -13,8 +14,6 @@ import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassAmber
 import androidx.compose.ui.graphics.toArgb
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -45,9 +44,9 @@ class AIAdvisorViewModel(
 
             // Calculate active days
             val allTransactions = transactionRepository.getAllTransactions()
-            val earliestDate = allTransactions.filter { it.syncStatus != 2 }.minOfOrNull { it.timeStamp }
+            val earliestDate = allTransactions.filter { it.syncStatus != SyncStatus.DELETED }.minOfOrNull { it.timeStamp }
             val activeDays = if (earliestDate != null) {
-                val now = Clock.System.now().toEpochMilliseconds()
+                val now = kotlin.time.Clock.System.now().toEpochMilliseconds()
                 val diff = now - earliestDate
                 (diff / (1000 * 60 * 60 * 24)).toInt().coerceAtLeast(1)
             } else 0
@@ -58,7 +57,7 @@ class AIAdvisorViewModel(
             }
 
             // Monthly Analysis: filter for last 30 days
-            val now = Clock.System.now().toEpochMilliseconds()
+            val now = kotlin.time.Clock.System.now().toEpochMilliseconds()
             val thirtyDaysAgo = now - (30L * 24 * 60 * 60 * 1000)
 
             val filter = TransactionFilterParams(

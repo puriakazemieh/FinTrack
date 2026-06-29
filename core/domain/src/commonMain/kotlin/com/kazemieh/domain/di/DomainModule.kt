@@ -10,6 +10,7 @@ import com.kazemieh.domain.usecase.AddPersonUseCase
 import com.kazemieh.domain.usecase.AddSourceUseCase
 import com.kazemieh.domain.usecase.AddTagUseCase
 import com.kazemieh.domain.usecase.AddTransactionUseCase
+import com.kazemieh.domain.usecase.CheckAchievementsUseCase
 import com.kazemieh.domain.usecase.CheckUseCaseGroup
 import com.kazemieh.domain.usecase.DeleteBudgetUseCase
 import com.kazemieh.domain.usecase.DeleteCategoryUseCase
@@ -57,6 +58,7 @@ import com.kazemieh.domain.usecase.ObserveMostUsedSourcesUseCase
 import com.kazemieh.domain.usecase.ObserveMostUsedTagsUseCase
 import com.kazemieh.domain.usecase.ObservePersonsUseCase
 import com.kazemieh.domain.usecase.ObserveSourceUseCase
+import com.kazemieh.domain.usecase.ObserveStreakUseCase
 import com.kazemieh.domain.usecase.ObserveSourcesUseCase
 import com.kazemieh.domain.usecase.ObserveTagsUseCase
 import com.kazemieh.domain.usecase.ObserveTransactionsUseCase
@@ -82,6 +84,8 @@ import com.kazemieh.domain.usecase.UpdatePersonPositionsUseCase
 import com.kazemieh.domain.usecase.UpdatePersonUseCase
 import com.kazemieh.domain.usecase.UpdateSourcePositionsUseCase
 import com.kazemieh.domain.usecase.UpdateSourceUseCase
+import com.kazemieh.domain.usecase.UpdateXPUseCase
+import com.kazemieh.domain.usecase.UpdateStreakUseCase
 import com.kazemieh.domain.usecase.UpdateTagPositionsUseCase
 import com.kazemieh.domain.usecase.UpdateTagUseCase
 import com.kazemieh.domain.usecase.UpdateTransactionUseCase
@@ -91,6 +95,7 @@ import com.kazemieh.domain.usecase.AddAssetUseCase
 import com.kazemieh.domain.usecase.ClearPreferencesUseCase
 import com.kazemieh.domain.usecase.DeleteAssetUseCase
 import com.kazemieh.domain.usecase.ObserveAssetHistoryUseCase
+import com.kazemieh.domain.usecase.ObserveAchievementsUseCase
 import com.kazemieh.domain.usecase.ObserveAssetsUseCase
 import com.kazemieh.domain.usecase.SyncAssetRatesUseCase
 import com.kazemieh.domain.usecase.UpdateAssetUseCase
@@ -100,7 +105,7 @@ import com.kazemieh.domain.usecase.GetBudgetSpentAmountUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
-    factory { AddTransactionUseCase(get(), get(), get()) }
+    factory { AddTransactionUseCase(get(), get(), get(), get(),get(),get()) }
     factory { DeleteTransactionUseCase(get()) }
     factory { UpdateTransactionUseCase(get()) }
     factory { ObserveTransactionsUseCase(get()) }
@@ -138,6 +143,12 @@ val domainModule = module {
     factory { GetTransactionAmountRangeUseCase(get()) }
     factory { GetSourceByIdentifierUseCase(get()) }
     factory { SeedDataUseCase(get(), get()) }
+
+    factory { ObserveStreakUseCase(get()) }
+    factory { ObserveAchievementsUseCase(get()) }
+    factory { UpdateStreakUseCase(get()) }
+    factory { UpdateXPUseCase(get()) }
+    factory { CheckAchievementsUseCase(get(), get(), get(), get()) }
 
     factory { ObserveBudgetsWithProgressUseCase(get()) }
     factory { AddBudgetUseCase(get()) }

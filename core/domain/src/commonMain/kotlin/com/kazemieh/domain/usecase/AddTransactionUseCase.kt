@@ -10,7 +10,10 @@ import com.kazemieh.domain.util.balanceImpact
 class AddTransactionUseCase(
     private val repository: TransactionRepository,
     private val budgetRepository: BudgetRepository,
-    private val notificationManager: NotificationManager
+    private val notificationManager: NotificationManager,
+    private val updateStreak: UpdateStreakUseCase,
+    private val checkAchievements: CheckAchievementsUseCase,
+    private val updateXP: UpdateXPUseCase
 ) {
     suspend operator fun invoke(
         transaction: Transaction,
@@ -24,6 +27,11 @@ class AddTransactionUseCase(
         if (transaction.type == TransactionType.EXPENSE) {
             checkBudgetThreshold(transaction.categoryId)
         }
+
+        // Gamification
+        updateStreak()
+        updateXP(10) // Basic XP for adding transaction
+        checkAchievements()
 
         return resultId
     }

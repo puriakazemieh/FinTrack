@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Note
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Autorenew
@@ -39,15 +40,7 @@ import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
-import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.category
-import fintrack.core.designsystem.generated.resources.financial_sources
-import fintrack.core.designsystem.generated.resources.label_budgets
-import fintrack.core.designsystem.generated.resources.navigation_debts
-import fintrack.core.designsystem.generated.resources.navigation_installment
-import fintrack.core.designsystem.generated.resources.navigation_tools
-import fintrack.core.designsystem.generated.resources.notes
-import fintrack.core.designsystem.generated.resources.persons
+import fintrack.core.designsystem.generated.resources.*
 import fintrack.core.designsystem.generated.resources.shopping_list
 import fintrack.core.designsystem.generated.resources.tags
 import fintrack.core.designsystem.generated.resources.title_assets_management
@@ -70,7 +63,8 @@ fun ToolsScreen(
     onNavigateToSource: () -> Unit,
     onNavigateToCategory: () -> Unit,
     onNavigateToTag: () -> Unit,
-    onNavigateToAIAdvisor: () -> Unit
+    onNavigateToAIAdvisor: () -> Unit,
+    onNavigateToAchievements: () -> Unit
 ) {
     val space = LocalSpacing.current
 
@@ -112,6 +106,11 @@ fun ToolsScreen(
             stringResource(Res.string.ai_advisor_title),
             Icons.Default.AutoAwesome,
             onNavigateToAIAdvisor
+        ),
+        ToolItem(
+            stringResource(Res.string.achievements_title),
+            Icons.Default.EmojiEvents,
+            onNavigateToAchievements
         ),
         ToolItem(
             stringResource(Res.string.title_assets_management),

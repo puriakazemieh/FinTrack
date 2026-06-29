@@ -5,5 +5,5 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val aiInsightsModule = module {
-    viewModel { AIAdvisorViewModel(get(), get()) }
+    viewModelOf(::AIAdvisorViewModel)
 }

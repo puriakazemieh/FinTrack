@@ -24,10 +24,7 @@ import com.kazemieh.domain.usecase.ObservePersonsUseCase
 import com.kazemieh.domain.usecase.ObserveSourcesUseCase
 import com.kazemieh.domain.usecase.ObserveTagsUseCase
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
-import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.custom_range
-import fintrack.core.designsystem.generated.resources.label_period_range_summary
-import fintrack.core.designsystem.generated.resources.label_this_year
+import fintrack.core.designsystem.generated.resources.*
 import fintrack.core.designsystem.generated.resources.label_year_short
 import fintrack.core.designsystem.generated.resources.last_month
 import fintrack.core.designsystem.generated.resources.last_week
@@ -406,30 +403,33 @@ class TransactionsViewModel(
         val startPersian = DateFilterHelper.persianDateFromMillis(range.start, timeZone)
         val endPersian = DateFilterHelper.persianDateFromMillis(range.end, timeZone)
         
-        val isSameDay = startPersian.year == endPersian.year && 
-                        startPersian.month == endPersian.month && 
-                        startPersian.day == endPersian.day
+        if (startPersian.year == endPersian.year && startPersian.month == endPersian.month && startPersian.day == endPersian.day) {
+            return UiText.DynamicString("")
+        }
         
-        val rangeStr = when {
-            isSameDay -> DateFilterHelper.getDateText(range.start, timeZone)
-            startPersian.year == endPersian.year && startPersian.month == endPersian.month -> {
-                "${startPersian.day.toPersianDigits()} — ${endPersian.day.toPersianDigits()} ${startPersian.persianMonth().displayName}"
-            }
-            startPersian.year == endPersian.year -> {
-                val startP = "${startPersian.day.toPersianDigits()} ${startPersian.persianMonth().displayName}"
-                val endP = "${endPersian.day.toPersianDigits()} ${endPersian.persianMonth().displayName} ${endPersian.year.toPersianDigits()}"
-                "$startP تا $endP"
-            }
-            else -> {
-                val startP = DateFilterHelper.getDateText(range.start, timeZone)
-                val endP = DateFilterHelper.getDateText(range.end, timeZone)
-                "$startP تا $endP"
-            }
+        if (startPersian.year == endPersian.year && startPersian.month == endPersian.month) {
+             val rangeStr = "${startPersian.day.toPersianDigits()} — ${endPersian.day.toPersianDigits()} ${startPersian.persianMonth().displayName}"
+             return UiText.StringResourceText(
+                Res.string.label_period_range_summary,
+                listOf(rangeStr, daysBetween.toPersianDigits())
+            )
+        }
+        
+        val startP = if (startPersian.year == endPersian.year) {
+            "${startPersian.day.toPersianDigits()} ${startPersian.persianMonth().displayName}"
+        } else {
+            DateFilterHelper.getDateText(range.start, timeZone)
+        }
+        
+        val endP = if (startPersian.year == endPersian.year) {
+            "${endPersian.day.toPersianDigits()} ${endPersian.persianMonth().displayName} ${endPersian.year.toPersianDigits()}"
+        } else {
+            DateFilterHelper.getDateText(range.end, timeZone)
         }
 
         return UiText.StringResourceText(
-            Res.string.label_period_range_summary,
-            listOf(rangeStr, daysBetween.toPersianDigits())
+            Res.string.label_range_days_summary,
+            listOf(startP, endP, daysBetween.toPersianDigits())
         )
     }
 

@@ -1,5 +1,6 @@
 package com.kazemieh.data.di
 
+import com.kazemieh.data.repository.AchievementRepositoryImpl
 import com.kazemieh.data.repository.AssetRepositoryImpl
 import com.kazemieh.data.repository.BackupRepositoryImpl
 import com.kazemieh.data.repository.BudgetRepositoryImpl
@@ -13,6 +14,7 @@ import com.kazemieh.data.repository.SmsDraftRepositoryImpl
 import com.kazemieh.data.repository.ShoppingRepositoryImpl
 import com.kazemieh.data.repository.SyncRepositoryImpl
 import com.kazemieh.data.repository.TransactionRepositoryImpl
+import com.kazemieh.domain.repository.AchievementRepository
 import com.kazemieh.domain.repository.AssetRepository
 import com.kazemieh.domain.repository.BackupRepository
 import com.kazemieh.domain.repository.BudgetRepository
@@ -40,6 +42,7 @@ val dataModule = module {
     single<ShoppingRepository> { ShoppingRepositoryImpl(get()) }
     single<NoteRepository> { NoteRepositoryImpl(get()) }
     single<SmsDraftRepository> { SmsDraftRepositoryImpl(get()) }
+    single<AchievementRepository> { AchievementRepositoryImpl(get()) }
 
     single<BackupRepository> {
         BackupRepositoryImpl(

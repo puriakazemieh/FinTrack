@@ -83,4 +83,8 @@ val databaseModule = module {
             shoppingLocalDataSource = get()
         )
     }
+
+    single<AchievementLocalDataSource> {
+        AchievementLocalDataSourceImpl(db = get())
+    }
 }

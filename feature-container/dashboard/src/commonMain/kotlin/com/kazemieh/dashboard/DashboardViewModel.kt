@@ -2,14 +2,18 @@ package com.kazemieh.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.model.Achievement
+import com.kazemieh.common.model.Streak
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.SmsDraft
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.domain.repository.SmsDraftRepository
+import com.kazemieh.domain.usecase.ObserveAchievementsUseCase
 import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
 import com.kazemieh.domain.usecase.ObserveSourcesUseCase
+import com.kazemieh.domain.usecase.ObserveStreakUseCase
 import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.preferences.FinTrackPreferences
 import fintrack.core.designsystem.generated.resources.Res
@@ -30,7 +34,9 @@ class DashboardViewModel(
     private val preferenceUseCases: PreferenceUseCases,
     private val smsDraftRepository: SmsDraftRepository,
     private val observeCategories: ObserveCategoriesUseCase,
-    private val observeSources: ObserveSourcesUseCase
+    private val observeSources: ObserveSourcesUseCase,
+    private val observeAchievements: ObserveAchievementsUseCase,
+    private val observeStreak: ObserveStreakUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DashboardState())
@@ -41,6 +47,24 @@ class DashboardViewModel(
         observeSmsDrafts()
         loadCategories()
         loadSources()
+        loadAchievements()
+        loadStreak()
+    }
+
+    private fun loadStreak() {
+        viewModelScope.launch {
+            observeStreak().collect { streak ->
+                _state.update { it.copy(streak = streak) }
+            }
+        }
+    }
+
+    private fun loadAchievements() {
+        viewModelScope.launch {
+            observeAchievements().collect { achievements ->
+                _state.update { it.copy(achievements = achievements) }
+            }
+        }
     }
 
     private fun loadCategories() {
@@ -152,6 +176,8 @@ data class DashboardState(
     val smsDrafts: List<SmsDraft> = emptyList(),
     val categories: List<Category> = emptyList(),
     val sources: List<Source> = emptyList(),
+    val achievements: List<Achievement> = emptyList(),
+    val streak: Streak = Streak(),
     val showSmsDetection: Boolean = false,
     val smsDraft: SmsDraft? = null
 )

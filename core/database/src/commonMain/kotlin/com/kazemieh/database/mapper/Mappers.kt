@@ -4,6 +4,8 @@ import com.kazemieh.common.model.*
 import com.kazemieh.common.persiandatetime.domain.PersianDateTime
 import com.kazemieh.common.persiandatetime.extensions.persianMonth
 import com.kazemieh.common.toPersianDigits
+import com.kazemieh.database.Achievement as AchievementDb
+import com.kazemieh.database.Streak as StreakDb
 import com.kazemieh.database.*
 import com.kazemieh.database.transaction.ObserveCategorySumsByFilter
 import com.kazemieh.database.Asset as AssetDb
@@ -526,4 +528,21 @@ fun Sms_draft.toSmsDraft() = SmsDraft(
     categoryId = categoryId,
     confidence = confidence.toInt(),
     isUsed = isUsed == 1L
+)
+
+fun AchievementDb.toAchievement() = Achievement(
+    id = id,
+    type = AchievementType.entries.find { it.key == type } ?: AchievementType.FIRST_TRANSACTION,
+    isUnlocked = isUnlocked,
+    unlockTime = unlockTime,
+    progress = progress.toInt(),
+    target = target.toInt()
+)
+
+fun StreakDb.toStreak() = Streak(
+    currentStreak = currentStreak.toInt(),
+    bestStreak = bestStreak.toInt(),
+    lastTransactionDate = lastTransactionDate,
+    xp = xp.toInt(),
+    level = level.toInt()
 )

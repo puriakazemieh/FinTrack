@@ -50,6 +50,7 @@ import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.money.Currency
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
+import com.kazemieh.common.toPersianDigits
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -174,7 +175,7 @@ fun CurrencyListItem(
             }
             Column(modifier = Modifier.weight(1f)) {
                 FintrackBodyLargeText(text = displayName, fontWeight = FontWeight.SemiBold)
-                FintrackLabelMediumText(text = if (currency.code == "IRT") "پیش‌فرض" else currency.symbol, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                FintrackLabelMediumText(text = if (currency.code == "IRT") stringResource(Res.string.label_default) else currency.symbol, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             if (isSelected) {
                 Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(18.dp), tint = primaryColor)
