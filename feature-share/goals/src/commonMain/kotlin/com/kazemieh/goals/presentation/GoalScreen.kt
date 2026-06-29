@@ -21,6 +21,7 @@ import fintrack.core.designsystem.generated.resources.label_active_goals
 import fintrack.core.designsystem.generated.resources.label_goal_summary
 import fintrack.core.designsystem.generated.resources.label_monthly_target
 import fintrack.core.designsystem.generated.resources.label_total_saved
+import fintrack.core.designsystem.generated.resources.label_until_with_dot
 import fintrack.core.designsystem.generated.resources.title_savings_goals
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -68,7 +69,7 @@ fun GoalScreen(
                         sub = stringResource(
                             Res.string.label_monthly_target,
                             goal.monthlyTarget.toPersianPrice()
-                        ) + (goal.endDate?.let { " · تا $it" } ?: ""),
+                        ) + (goal.endDate?.let { stringResource(Res.string.label_until_with_dot, it) } ?: ""),
                         badge = "${goal.percent}%",
                         colorId = goal.colorId,
                         iconId = goal.iconId,

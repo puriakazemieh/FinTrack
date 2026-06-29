@@ -731,6 +731,8 @@
     <string name="label_comma">، </string>
     <string name="label_dash"> — </string>
     <string name="label_until"> تا </string>
+    <string name="label_until_with_dot"> · تا %1$s</string>
+    <string name="placeholder_zero">۰</string>
     <string name="currency_fiat">واحد های پولی (فیات)</string>
     <string name="currency_crypto">رمز ارزها</string>
 

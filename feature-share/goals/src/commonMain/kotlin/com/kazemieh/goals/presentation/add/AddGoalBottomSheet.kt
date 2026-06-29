@@ -2,6 +2,7 @@ package com.kazemieh.goals.presentation.add
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +18,7 @@ import com.kazemieh.common.model.Goal
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.*
+import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import fintrack.core.designsystem.generated.resources.*
@@ -76,6 +78,8 @@ fun AddGoalContent(
         FinTrackIcons.icons.indexOfFirst { it.id == state.iconId }.coerceAtLeast(0)
     }
 
+    val openDatePicker = remember { mutableStateOf(false) }
+
     AddFrame(
         title = if (state.id == 0L) stringResource(Res.string.label_new_goal) else stringResource(Res.string.edit),
         sub = stringResource(Res.string.title_savings_goals),
@@ -115,48 +119,92 @@ fun AddGoalContent(
             }
 
             item {
-                Field(label = stringResource(Res.string.label_target_amount), required = true) {
-                    TextField(
-                        value = state.targetAmount,
-                        onValueChange = { onIntent(AddGoalIntent.UpdateTargetAmount(it)) },
-                        placeholder = { FintrackBodyMediumText(text = "0", color = glassColors.text3) },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = GlassGreen
-                        ),
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = glassColors.text, fontWeight = FontWeight.SemiBold),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(glassColors.bg1)
-                            .border(1.dp, glassColors.glassEdge, RoundedCornerShape(10.dp))
-                    )
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(space.medium)) {
+                    Field(label = stringResource(Res.string.label_target_amount), required = true, modifier = Modifier.weight(1f)) {
+                        TextField(
+                            value = state.targetAmount,
+                            onValueChange = { onIntent(AddGoalIntent.UpdateTargetAmount(it)) },
+                            placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.placeholder_zero), color = glassColors.text3) },
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                cursorColor = GlassGreen
+                            ),
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(color = glassColors.text, fontWeight = FontWeight.SemiBold),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(glassColors.bg1)
+                                .border(1.dp, glassColors.glassEdge, RoundedCornerShape(10.dp))
+                        )
+                    }
+
+                    Field(label = stringResource(Res.string.label_saved_amount), modifier = Modifier.weight(1f)) {
+                        TextField(
+                            value = state.savedAmount,
+                            onValueChange = { onIntent(AddGoalIntent.UpdateSavedAmount(it)) },
+                            placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.placeholder_zero), color = glassColors.text3) },
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                cursorColor = GlassGreen
+                            ),
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(color = glassColors.text, fontWeight = FontWeight.SemiBold),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(glassColors.bg1)
+                                .border(1.dp, glassColors.glassEdge, RoundedCornerShape(10.dp))
+                        )
+                    }
                 }
             }
 
             item {
-                Field(label = stringResource(Res.string.label_saved_amount)) {
-                    TextField(
-                        value = state.savedAmount,
-                        onValueChange = { onIntent(AddGoalIntent.UpdateSavedAmount(it)) },
-                        placeholder = { FintrackBodyMediumText(text = "0", color = glassColors.text3) },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = GlassGreen
-                        ),
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = glassColors.text, fontWeight = FontWeight.SemiBold),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(glassColors.bg1)
-                            .border(1.dp, glassColors.glassEdge, RoundedCornerShape(10.dp))
-                    )
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(space.medium)) {
+                    Field(label = stringResource(Res.string.label_monthly_target), modifier = Modifier.weight(1f)) {
+                        TextField(
+                            value = state.monthlyTarget,
+                            onValueChange = { onIntent(AddGoalIntent.UpdateMonthlyTarget(it)) },
+                            placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.placeholder_zero), color = glassColors.text3) },
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                cursorColor = GlassGreen
+                            ),
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(color = glassColors.text, fontWeight = FontWeight.SemiBold),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(glassColors.bg1)
+                                .border(1.dp, glassColors.glassEdge, RoundedCornerShape(10.dp))
+                        )
+                    }
+
+                    Field(label = stringResource(Res.string.label_end_date), modifier = Modifier.weight(1f)) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(glassColors.bg1)
+                                .border(1.dp, glassColors.glassEdge, RoundedCornerShape(10.dp))
+                                .clickable { openDatePicker.value = true }
+                                .padding(horizontal = 12.dp),
+                            contentAlignment = androidx.compose.ui.Alignment.CenterStart
+                        ) {
+                            FintrackBodyMediumText(
+                                text = state.endDate.ifBlank { stringResource(Res.string.action_select_date) },
+                                color = if (state.endDate.isNotBlank()) glassColors.text else glassColors.text3
+                            )
+                        }
+                    }
                 }
             }
 
@@ -188,4 +236,9 @@ fun AddGoalContent(
             }
         }
     }
+
+    JalaliDatePickerBottomSheet(
+        openSheet = openDatePicker,
+        onConfirm = { onIntent(AddGoalIntent.UpdateEndDate(it.toString())) }
+    )
 }
