@@ -51,6 +51,7 @@ kotlin {
                 implementation(project(":core:common"))
                 implementation(project(":feature-share:transaction"))
                 implementation(project(":feature-share:source"))
+                implementation(project(":feature-share:goals"))
                 implementation(project(":feature-share:budget"))
                 implementation(project(":feature-share:installment"))
                 implementation(project(":feature-share:asset"))

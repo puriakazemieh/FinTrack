@@ -1163,4 +1163,19 @@
     <string name="range_6_months">۶ ماه</string>
     <string name="range_this_year">امسال</string>
     <string name="range_all">همه</string>
+
+    <!-- Goals -->
+    <string name="title_savings_goals">اهداف پس‌انداز</string>
+    <string name="label_active_goals">%1$d هدف فعال</string>
+    <string name="label_total_saved">مجموع پس‌انداز شده</string>
+    <string name="label_goal_summary">از هدف کل %1$s تومان · ٪%2$d</string>
+    <string name="label_monthly_target">ماهانه %1$s ت</string>
+    <string name="label_new_goal">هدف جدید</string>
+    <string name="label_add_to_goal">افزودن به این هدف</string>
+    <string name="hint_enter_goal_name">نام هدف (مثلاً خرید خانه)</string>
+    <string name="label_target_amount">مبلغ هدف</string>
+    <string name="label_saved_amount">مبلغ ذخیره شده</string>
+    <string name="label_end_date">تاریخ پایان</string>
+    <string name="btn_save_goal">ذخیره هدف</string>
+    <string name="goal_deleted">هدف حذف شد</string>
 </resources>

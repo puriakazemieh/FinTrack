@@ -7,6 +7,7 @@ import com.kazemieh.data.repository.BudgetRepositoryImpl
 import com.kazemieh.data.repository.CheckRepositoryImpl
 import com.kazemieh.data.repository.DebtRepositoryImpl
 import com.kazemieh.data.repository.FixedExpenseRepositoryImpl
+import com.kazemieh.data.repository.GoalRepositoryImpl
 import com.kazemieh.data.repository.InstallmentRepositoryImpl
 import com.kazemieh.data.repository.NoteRepositoryImpl
 import com.kazemieh.data.repository.PreferenceRepositoryImpl
@@ -21,6 +22,7 @@ import com.kazemieh.domain.repository.BudgetRepository
 import com.kazemieh.domain.repository.CheckRepository
 import com.kazemieh.domain.repository.DebtRepository
 import com.kazemieh.domain.repository.FixedExpenseRepository
+import com.kazemieh.domain.repository.GoalRepository
 import com.kazemieh.domain.repository.InstallmentRepository
 import com.kazemieh.domain.repository.NoteRepository
 import com.kazemieh.domain.repository.PreferenceRepository
@@ -43,6 +45,7 @@ val dataModule = module {
     single<NoteRepository> { NoteRepositoryImpl(get()) }
     single<SmsDraftRepository> { SmsDraftRepositoryImpl(get()) }
     single<AchievementRepository> { AchievementRepositoryImpl(get()) }
+    single<GoalRepository> { GoalRepositoryImpl(get()) }
 
     single<BackupRepository> {
         BackupRepositoryImpl(

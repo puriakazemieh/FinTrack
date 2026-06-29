@@ -87,4 +87,8 @@ val databaseModule = module {
     single<AchievementLocalDataSource> {
         AchievementLocalDataSourceImpl(db = get())
     }
+
+    single<GoalLocalDataSource> {
+        GoalLocalDataSourceImpl(db = get())
+    }
 }

@@ -54,6 +54,7 @@ import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.fixed_expense.ui.widget.FixedExpenseWidget
+import com.kazemieh.goals.presentation.component.GoalWidget
 import com.kazemieh.gamification.ui.AchievementWidget
 import com.kazemieh.ai_insights.ui.AIAdvisorWidget
 import com.kazemieh.installment.ui.widget.InstallmentWidget
@@ -78,6 +79,7 @@ fun DashboardScreen(
     onNavigateToTransactions: (Any?) -> Unit = {},
     onNavigateToSearch: () -> Unit = {},
     onNavigateToBudget: () -> Unit = {},
+    onNavigateToGoal: () -> Unit = {},
     onNavigateToInstallment: () -> Unit = {},
     onNavigateToCheck: () -> Unit = {},
     onNavigateToFixedExpense: () -> Unit = {},
@@ -191,6 +193,15 @@ fun DashboardScreen(
             item {
                 BudgetWidget(
                     onMore = { onNavigateToBudget() },
+                    modifier = Modifier.padding(horizontal = space.large)
+                )
+            }
+
+            item { Spacer(Modifier.height(space.large)) }
+
+            item {
+                GoalWidget(
+                    onMore = { onNavigateToGoal() },
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }

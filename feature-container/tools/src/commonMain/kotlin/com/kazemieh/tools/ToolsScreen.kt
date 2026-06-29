@@ -52,6 +52,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun ToolsScreen(
     onNavigateToBudget: () -> Unit,
+    onNavigateToGoal: () -> Unit,
     onNavigateToInstallment: () -> Unit,
     onNavigateToPerson: () -> Unit,
     onNavigateToDebt: () -> Unit,
@@ -81,6 +82,11 @@ fun ToolsScreen(
             stringResource(Res.string.label_budgets),
             Icons.Default.PieChart,
             onNavigateToBudget
+        ),
+        ToolItem(
+            stringResource(Res.string.title_savings_goals),
+            Icons.Default.TrackChanges,
+            onNavigateToGoal
         ),
         ToolItem(
             stringResource(Res.string.navigation_installment),

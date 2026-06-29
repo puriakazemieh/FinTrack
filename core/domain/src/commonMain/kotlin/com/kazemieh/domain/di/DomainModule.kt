@@ -35,6 +35,7 @@ import com.kazemieh.domain.usecase.GetStringPreferenceUseCase
 import com.kazemieh.domain.usecase.GetCategoryUseCase
 import com.kazemieh.domain.usecase.GetDefaultCategoryUseCase
 import com.kazemieh.domain.usecase.GetDefaultFinancialSourceUseCase
+import com.kazemieh.domain.usecase.GetGoalByIdUseCase
 import com.kazemieh.domain.usecase.GetRecentSearchesUseCase
 import com.kazemieh.domain.usecase.GetSourceByIdentifierUseCase
 import com.kazemieh.domain.usecase.GetTransferCategoryUseCase
@@ -42,6 +43,7 @@ import com.kazemieh.domain.usecase.GetTransactionAmountRangeUseCase
 import com.kazemieh.domain.usecase.DebtUseCaseGroup
 import com.kazemieh.domain.usecase.InstallmentUseCaseGroup
 import com.kazemieh.domain.usecase.MarkInstallmentAsPaidUseCase
+import com.kazemieh.domain.usecase.ObserveGoalsUseCase
 import com.kazemieh.domain.usecase.ObserveAllChecksUseCase
 import com.kazemieh.domain.usecase.ObserveAllFixedExpensesUseCase
 import com.kazemieh.domain.usecase.ObserveChecksByStatusUseCase
@@ -85,6 +87,7 @@ import com.kazemieh.domain.usecase.UpdatePersonUseCase
 import com.kazemieh.domain.usecase.UpdateSourcePositionsUseCase
 import com.kazemieh.domain.usecase.UpdateSourceUseCase
 import com.kazemieh.domain.usecase.UpdateXPUseCase
+import com.kazemieh.domain.usecase.UpdateGoalUseCase
 import com.kazemieh.domain.usecase.UpdateStreakUseCase
 import com.kazemieh.domain.usecase.UpdateTagPositionsUseCase
 import com.kazemieh.domain.usecase.UpdateTagUseCase
@@ -92,8 +95,10 @@ import com.kazemieh.domain.usecase.UpdateTransactionUseCase
 import com.kazemieh.domain.usecase.AssetUseCases
 import com.kazemieh.domain.usecase.AddBudgetUseCase as AddBudgetUseCaseAlias
 import com.kazemieh.domain.usecase.AddAssetUseCase
+import com.kazemieh.domain.usecase.AddGoalUseCase
 import com.kazemieh.domain.usecase.ClearPreferencesUseCase
 import com.kazemieh.domain.usecase.DeleteAssetUseCase
+import com.kazemieh.domain.usecase.DeleteGoalUseCase
 import com.kazemieh.domain.usecase.ObserveAssetHistoryUseCase
 import com.kazemieh.domain.usecase.ObserveAchievementsUseCase
 import com.kazemieh.domain.usecase.ObserveAssetsUseCase
@@ -154,6 +159,12 @@ val domainModule = module {
     factory { AddBudgetUseCase(get()) }
     factory { UpdateBudgetUseCase(get()) }
     factory { DeleteBudgetUseCase(get()) }
+
+    factory { ObserveGoalsUseCase(get()) }
+    factory { AddGoalUseCase(get()) }
+    factory { UpdateGoalUseCase(get()) }
+    factory { DeleteGoalUseCase(get()) }
+    factory { GetGoalByIdUseCase(get()) }
 
     factory { AddInstallmentUseCase(get(), get()) }
     factory { ObserveInstallmentsUseCase(get()) }
@@ -276,6 +287,15 @@ val domainModule = module {
             getFixedExpenseByIdUseCase = get(),
             observeAllFixedExpensesUseCase = get(),
             updateNextDueDateUseCase = get()
+        )
+    }
+    single {
+        com.kazemieh.domain.usecase.GoalUseCases(
+            observeGoals = get(),
+            addGoal = get(),
+            updateGoal = get(),
+            deleteGoal = get(),
+            getGoalById = get()
         )
     }
     single {

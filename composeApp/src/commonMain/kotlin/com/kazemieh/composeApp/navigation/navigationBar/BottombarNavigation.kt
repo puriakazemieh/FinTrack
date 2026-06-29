@@ -21,6 +21,7 @@ import com.kazemieh.dashboard.DashboardScreen
 import com.kazemieh.debt.ui.list.DebtsScreen
 import com.kazemieh.financialsource.ui.list.SourcesScreen
 import com.kazemieh.fixed_expense.ui.list.FixedExpenseListScreen
+import com.kazemieh.goals.presentation.GoalScreen
 import com.kazemieh.gamification.ui.AchievementsScreen
 import com.kazemieh.ai_insights.ui.AIAdvisorScreen
 import com.kazemieh.installment.ui.list.InstallmentsScreen
@@ -68,6 +69,7 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onNavigateToTransactions = navigateToTransactions,
                 onNavigateToSearch = { navController.navigate(Screen.Search) },
                 onNavigateToBudget = { navController.navigate(Screen.Budget) },
+                onNavigateToGoal = { navController.navigate(Screen.Goal) },
                 onNavigateToCheck = { navController.navigate(Screen.Check) },
                 onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) },
                 onNavigateToAIAdvisor = { navController.navigate(Screen.AIAdvisor) },
@@ -95,6 +97,7 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
         composable<Screen.Tools> { backStackEntry ->
             ToolsScreen(
                 onNavigateToBudget = { navController.navigate(Screen.Budget) },
+                onNavigateToGoal = { navController.navigate(Screen.Goal) },
                 onNavigateToInstallment = { navController.navigate(Screen.Installment) },
                 onNavigateToPerson = { navController.navigate(Screen.Person) },
                 onNavigateToDebt = { navController.navigate(Screen.Debt) },
@@ -164,6 +167,12 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onNavigateToTransactions = { category ->
                     navigateToTransactions(category)
                 }
+            )
+        }
+
+        composable<Screen.Goal> {
+            GoalScreen(
+                onBack = { navController.popBackStack() }
             )
         }
 

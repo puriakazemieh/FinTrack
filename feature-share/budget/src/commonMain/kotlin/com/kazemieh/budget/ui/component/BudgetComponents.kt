@@ -119,24 +119,6 @@ private fun calculateDaysRemaining(period: BudgetPeriod): Int {
 }
 
 @Composable
-fun CircularProgress(progress: Float) {
-    val glassColors = LocalGlassColors.current
-    Canvas(modifier = Modifier.size(116.dp)) {
-        drawCircle(
-            color = glassColors.text.copy(alpha = 0.1f),
-            style = Stroke(width = 4.dp.toPx())
-        )
-        drawArc(
-            color = GlassGreen,
-            startAngle = -90f,
-            sweepAngle = progress * 360f,
-            useCenter = false,
-            style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round)
-        )
-    }
-}
-
-@Composable
 fun BudgetPeriodSelector(
     selectedPeriod: BudgetPeriod,
     onPeriodSelected: (BudgetPeriod) -> Unit,
