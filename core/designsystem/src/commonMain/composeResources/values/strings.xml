@@ -1180,4 +1180,52 @@
     <string name="label_end_date">تاریخ پایان</string>
     <string name="btn_save_goal">ذخیره هدف</string>
     <string name="goal_deleted">هدف حذف شد</string>
+
+    <!-- Utilities -->
+    <string name="title_fx_rates">نرخ ارز و طلا</string>
+    <string name="sub_fx_rates">آخرین قیمت‌های بازار</string>
+    <string name="title_currency_converter">تبدیل ارز</string>
+    <string name="sub_currency_converter">ماشین‌حساب هوشمند تبدیل</string>
+    <string name="title_news">اخبار و آموزش</string>
+    <string name="sub_news">تازه‌های دنیای اقتصاد و فین‌تراک</string>
+    <string name="title_faq">سوالات متداول</string>
+    <string name="sub_faq">پاسخ به پرسش‌های رایج شما</string>
+    <string name="title_support">پشتیبانی</string>
+    <string name="sub_support">ارتباط با تیم فین‌تراک</string>
+    <string name="title_events">رویدادهای مالی</string>
+    <string name="sub_events">تقویم اقتصادی و مناسبت‌های مهم</string>
+    <string name="label_read_time">%1$d دقیقه مطالعه</string>
+    <string name="label_article">مقاله</string>
+    <string name="support_description">تیم ما آماده پاسخگویی به سوالات و مشکلات شماست. از طریق روش‌های زیر می‌توانید با ما در ارتباط باشید.</string>
+    <string name="support_phone">تماس تلفنی</string>
+    <string name="support_phone_sub">شنبه تا چهارشنبه · ۹ تا ۱۷</string>
+    <string name="support_chat">چت آنلاین</string>
+    <string name="support_chat_sub">در تلگرام و واتس‌اپ</string>
+    <string name="support_email">ارسال ایمیل</string>
+    <string name="support_email_val">support@fintrack.app</string>
+
+    <string name="news_title_1">افزایش نرخ طلا در بازارهای جهانی</string>
+    <string name="news_summary_1">قیمت طلا به دلیل تغییرات در سیاست‌های پولی فدرال رزرو افزایش یافت.</string>
+    <string name="news_content_1">متن کامل مقاله در مورد افزایش قیمت طلا و تاثیر آن بر بازار ایران. در هفته‌های اخیر، بازار طلا نوسانات زیادی را تجربه کرده است...</string>
+    <string name="news_cat_market">بازار</string>
+    <string name="news_src_eco">اخبار اقتصادی</string>
+    <string name="news_title_2">راهنمای جدید مالیات بر عایدی سرمایه</string>
+    <string name="news_summary_2">جزئیات جدید از نحوه محاسبه مالیات بر خرید و فروش طلا و خودرو منتشر شد.</string>
+    <string name="news_content_2">در این راهنما به بررسی دقیق قوانین جدید مالیاتی می‌پردازیم. طبق بخشنامه جدید، تمامی تراکنش‌های بالای حد نصاب...</string>
+    <string name="news_cat_edu">آموزش</string>
+    <string name="news_src_app">فین‌تراک</string>
+
+    <string name="faq_q_1">چگونه تراکنش‌های خود را همگام‌سازی کنم؟</string>
+    <string name="faq_a_1">در بخش تنظیمات، گزینه همگام‌سازی ابری را فعال کنید. داده‌های شما به صورت خودکار در Google Drive ذخیره می‌شوند.</string>
+    <string name="faq_cat_gen">عمومی</string>
+    <string name="faq_q_2">آیا فین‌تراک دسترسی به حساب بانکی دارد؟</string>
+    <string name="faq_a_2">خیر، فین‌تراک فقط از طریق خواندن پیامک‌های بانکی (با اجازه شما) یا وارد کردن دستی، تراکنش‌ها را ثبت می‌کند.</string>
+    <string name="faq_cat_sec">امنیت</string>
+
+    <string name="event_title_1">اعلام نرخ تورم ماهانه</string>
+    <string name="event_desc_1">مرکز آمار نرخ تورم نقطه به نقطه را اعلام خواهد کرد.</string>
+    <string name="event_title_2">سررسید تسلیم اظهارنامه مالیاتی</string>
+    <string name="event_desc_2">آخرین مهلت برای صاحبان مشاغل جهت ارسال اظهارنامه.</string>
+
+    <string name="label_select_currency">انتخاب واحد پولی</string>
 </resources>

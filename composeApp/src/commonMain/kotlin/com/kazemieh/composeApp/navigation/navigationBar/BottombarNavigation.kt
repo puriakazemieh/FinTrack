@@ -38,6 +38,13 @@ import com.kazemieh.shopping.ui.ShoppingListScreen
 import com.kazemieh.tag.ui.list.TagsScreen
 import com.kazemieh.tools.ToolsScreen
 import com.kazemieh.transactions.TransactionsScreen
+import com.kazemieh.utilities.ui.converter.CurrencyConverterScreen
+import com.kazemieh.utilities.ui.events.EventsScreen
+import com.kazemieh.utilities.ui.faq.FAQScreen
+import com.kazemieh.utilities.ui.fx.FxRatesScreen
+import com.kazemieh.utilities.ui.news.ArticleReaderScreen
+import com.kazemieh.utilities.ui.news.NewsListScreen
+import com.kazemieh.utilities.ui.support.SupportScreen
 
 fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
     val navigateToTransactions: (Any?) -> Unit = { data ->
@@ -110,7 +117,58 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onNavigateToSource = { navController.navigate(Screen.Sources) },
                 onNavigateToCategory = { navController.navigate(Screen.Categories) },
                 onNavigateToTag = { navController.navigate(Screen.Tags) },
-                onNavigateToAIAdvisor = { navController.navigate(Screen.AIAdvisor) }
+                onNavigateToAIAdvisor = { navController.navigate(Screen.AIAdvisor) },
+                onNavigateToFxRates = { navController.navigate(Screen.FxRates) },
+                onNavigateToCurrencyConverter = { navController.navigate(Screen.CurrencyConverter) },
+                onNavigateToNews = { navController.navigate(Screen.News) },
+                onNavigateToFAQ = { navController.navigate(Screen.FAQ) },
+                onNavigateToSupport = { navController.navigate(Screen.Support) },
+                onNavigateToEvents = { navController.navigate(Screen.Events) }
+            )
+        }
+
+        composable<Screen.FxRates> {
+            FxRatesScreen(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.CurrencyConverter> {
+            CurrencyConverterScreen(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.News> {
+            NewsListScreen(
+                onArticleClick = { id -> navController.navigate(Screen.ArticleReader(id)) },
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.ArticleReader> { backStackEntry ->
+            val args = backStackEntry.toRoute<Screen.ArticleReader>()
+            ArticleReaderScreen(
+                articleId = args.articleId,
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.FAQ> {
+            FAQScreen(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.Support> {
+            SupportScreen(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.Events> {
+            EventsScreen(
+                onBackClick = { navController.popBackStack() }
             )
         }
 

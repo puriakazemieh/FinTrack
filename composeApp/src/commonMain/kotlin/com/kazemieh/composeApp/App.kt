@@ -63,6 +63,7 @@ import com.kazemieh.backup_export.di.backupExportModule
 import com.kazemieh.sms_reader.di.smsReaderModule
 import com.kazemieh.sync.di.syncModule
 import com.kazemieh.gamification.di.gamificationModule
+import com.kazemieh.utilities.di.utilitiesModule
 import com.kazemieh.composeApp.navigation.Screen
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
@@ -222,7 +223,8 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         assetModule,
         gamificationModule,
         backupExportModule,
-        syncModule
+        syncModule,
+        utilitiesModule
     )
     startKoin {
         config?.invoke(this)

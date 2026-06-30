@@ -101,6 +101,27 @@ sealed class Screen {
     data object BackupRestore : Screen()
 
     @Serializable
+    data object FxRates : Screen()
+
+    @Serializable
+    data object CurrencyConverter : Screen()
+
+    @Serializable
+    data object News : Screen()
+
+    @Serializable
+    data class ArticleReader(val articleId: String) : Screen()
+
+    @Serializable
+    data object FAQ : Screen()
+
+    @Serializable
+    data object Support : Screen()
+
+    @Serializable
+    data object Events : Screen()
+
+    @Serializable
     data object BottomBarGraph : Screen()
 
 }

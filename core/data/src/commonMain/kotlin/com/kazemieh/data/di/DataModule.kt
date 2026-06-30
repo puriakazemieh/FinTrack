@@ -15,6 +15,7 @@ import com.kazemieh.data.repository.SmsDraftRepositoryImpl
 import com.kazemieh.data.repository.ShoppingRepositoryImpl
 import com.kazemieh.data.repository.SyncRepositoryImpl
 import com.kazemieh.data.repository.TransactionRepositoryImpl
+import com.kazemieh.data.repository.UtilitiesRepositoryImpl
 import com.kazemieh.domain.repository.AchievementRepository
 import com.kazemieh.domain.repository.AssetRepository
 import com.kazemieh.domain.repository.BackupRepository
@@ -30,6 +31,7 @@ import com.kazemieh.domain.repository.SmsDraftRepository
 import com.kazemieh.domain.repository.ShoppingRepository
 import com.kazemieh.domain.repository.SyncRepository
 import com.kazemieh.domain.repository.TransactionRepository
+import com.kazemieh.domain.repository.UtilitiesRepository
 import org.koin.dsl.module
 
 val dataModule = module {
@@ -46,6 +48,7 @@ val dataModule = module {
     single<SmsDraftRepository> { SmsDraftRepositoryImpl(get()) }
     single<AchievementRepository> { AchievementRepositoryImpl(get()) }
     single<GoalRepository> { GoalRepositoryImpl(get()) }
+    single<UtilitiesRepository> { UtilitiesRepositoryImpl() }
 
     single<BackupRepository> {
         BackupRepositoryImpl(

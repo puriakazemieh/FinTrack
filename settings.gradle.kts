@@ -74,6 +74,7 @@ include(":feature-share:notes")
 include(":feature-share:sms-reader")
 include(":feature-share:backup-export")
 include(":feature-share:sync")
+include(":feature-share:utilities")
 include(":server")
 
 include(":feature-container:transactions")

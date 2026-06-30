@@ -65,7 +65,13 @@ fun ToolsScreen(
     onNavigateToCategory: () -> Unit,
     onNavigateToTag: () -> Unit,
     onNavigateToAIAdvisor: () -> Unit,
-    onNavigateToAchievements: () -> Unit
+    onNavigateToAchievements: () -> Unit,
+    onNavigateToFxRates: () -> Unit,
+    onNavigateToCurrencyConverter: () -> Unit,
+    onNavigateToNews: () -> Unit,
+    onNavigateToFAQ: () -> Unit,
+    onNavigateToSupport: () -> Unit,
+    onNavigateToEvents: () -> Unit
 ) {
     val space = LocalSpacing.current
 
@@ -132,6 +138,36 @@ fun ToolsScreen(
             stringResource(Res.string.notes),
             Icons.AutoMirrored.Filled.Note,
             onNavigateToNotes
+        ),
+        ToolItem(
+            stringResource(Res.string.title_fx_rates),
+            Icons.Default.Language,
+            onNavigateToFxRates
+        ),
+        ToolItem(
+            stringResource(Res.string.title_currency_converter),
+            Icons.Default.Transform,
+            onNavigateToCurrencyConverter
+        ),
+        ToolItem(
+            stringResource(Res.string.title_news),
+            Icons.Default.Newspaper,
+            onNavigateToNews
+        ),
+        ToolItem(
+            stringResource(Res.string.title_faq),
+            Icons.Default.Quiz,
+            onNavigateToFAQ
+        ),
+        ToolItem(
+            stringResource(Res.string.title_support),
+            Icons.Default.SupportAgent,
+            onNavigateToSupport
+        ),
+        ToolItem(
+            stringResource(Res.string.title_events),
+            Icons.Default.Event,
+            onNavigateToEvents
         )
     )
 
