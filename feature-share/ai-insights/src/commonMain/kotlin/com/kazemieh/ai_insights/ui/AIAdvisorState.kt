@@ -26,7 +26,9 @@ sealed interface AIAdvisorEffect {
 
 data class InvestmentSuggestion(
     val title: StringResource,
+    val titleArgs: List<String> = emptyList(),
     val body: StringResource,
+    val bodyArgs: List<String> = emptyList(),
     val detail: StringResource,
     val icon: DrawableResource,
     val colorHex: Long,

@@ -81,6 +81,26 @@ fun AchievementWidget(
                 color = glassColors.text2
             )
 
+            Spacer(modifier = Modifier.height(spacing.mediumSmall))
+
+            // Streak Info Row
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    painter = org.jetbrains.compose.resources.painterResource(Res.drawable.ic_94), // trophy icon
+                    contentDescription = null,
+                    tint = com.kazemieh.designsystem.GlassAmber,
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = stringResource(Res.string.streak_days_label, streak.currentStreak.toString().toPersianDigits()) + " " + stringResource(Res.string.streak_desc),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = glassColors.text
+                )
+            }
+
             Spacer(modifier = Modifier.height(spacing.medium))
 
             // Show top 3 badges or progress bar

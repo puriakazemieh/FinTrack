@@ -15,7 +15,7 @@ class UtilitiesRepositoryImpl : UtilitiesRepository {
         listOf(
             NewsItem(
                 id = "news_1",
-                title = "", // Handled in UI via ID
+                title = "",
                 summary = "",
                 content = "",
                 date = Clock.System.now(),
@@ -32,6 +32,16 @@ class UtilitiesRepositoryImpl : UtilitiesRepository {
                 category = "edu",
                 readTimeMinutes = 8,
                 source = "app"
+            ),
+            NewsItem(
+                id = "news_3",
+                title = "",
+                summary = "",
+                content = "",
+                date = Clock.System.now().minus(3.days),
+                category = "market",
+                readTimeMinutes = 4,
+                source = "eco"
             )
         )
     )
@@ -39,7 +49,8 @@ class UtilitiesRepositoryImpl : UtilitiesRepository {
     override fun observeFAQs(): Flow<List<FAQItem>> = flowOf(
         listOf(
             FAQItem(id = "faq_1", question = "", answer = "", category = "gen"),
-            FAQItem(id = "faq_2", question = "", answer = "", category = "sec")
+            FAQItem(id = "faq_2", question = "", answer = "", category = "sec"),
+            FAQItem(id = "faq_3", question = "", answer = "", category = "gen")
         )
     )
 
@@ -58,6 +69,13 @@ class UtilitiesRepositoryImpl : UtilitiesRepository {
                 description = "",
                 date = Clock.System.now().plus(15.days),
                 isMajor = false
+            ),
+            FinancialEvent(
+                id = "event_3",
+                title = "",
+                description = "",
+                date = Clock.System.now().plus(7.days),
+                isMajor = true
             )
         )
     )

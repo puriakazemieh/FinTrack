@@ -8,18 +8,21 @@ object NewsStringMapper {
     fun getTitle(id: String): StringResource = when(id) {
         "news_1" -> Res.string.news_title_1
         "news_2" -> Res.string.news_title_2
+        "news_3" -> Res.string.news_title_3
         else -> Res.string.app_name
     }
 
     fun getSummary(id: String): StringResource = when(id) {
         "news_1" -> Res.string.news_summary_1
         "news_2" -> Res.string.news_summary_2
+        "news_3" -> Res.string.news_summary_3
         else -> Res.string.app_name
     }
 
     fun getContent(id: String): StringResource = when(id) {
         "news_1" -> Res.string.news_content_1
         "news_2" -> Res.string.news_content_2
+        "news_3" -> Res.string.news_content_3
         else -> Res.string.app_name
     }
 

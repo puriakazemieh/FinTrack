@@ -150,6 +150,9 @@ LIMIT :limit OFFSET :offset;
 getTransactionAmountRange:
 SELECT MIN(amount), MAX(amount) FROM transactions;
 
+getTransactionCount:
+SELECT COUNT(*) FROM transactions WHERE syncStatus != 2;
+
 lastInsertRowId:
 SELECT last_insert_rowid();
 

@@ -131,9 +131,18 @@ class CheckAchievementsUseCase(
     }
 
     private suspend fun checkTransactionCount() {
-        // This might be expensive to count every time, but for now it's okay if transactions are not thousands
-        val count = transactionRepository.getTransactionAmountRange()
-            .let { 100 } // Mock for now or actually count
-        // Need a count method in repository. For now let's assume it's triggered.
+        val count = transactionRepository.getTransactionCount()
+        val achievement = achievementRepository.getAchievement(AchievementType.HUNDRED_TRANSACTIONS)
+        if (achievement != null && !achievement.isUnlocked) {
+            if (count >= achievement.target) {
+                unlockWithXP(AchievementType.HUNDRED_TRANSACTIONS)
+            } else {
+                achievementRepository.updateAchievementProgress(
+                    AchievementType.HUNDRED_TRANSACTIONS,
+                    count.toInt(),
+                    false
+                )
+            }
+        }
     }
 }

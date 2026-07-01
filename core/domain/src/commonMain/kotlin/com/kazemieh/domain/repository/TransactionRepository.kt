@@ -94,5 +94,7 @@ interface TransactionRepository {
 
     suspend fun getTransactionAmountRange(): Pair<Long, Long>
 
+    suspend fun getTransactionCount(): Long
+
     suspend fun getAllTransactions(): List<Transaction>
 }

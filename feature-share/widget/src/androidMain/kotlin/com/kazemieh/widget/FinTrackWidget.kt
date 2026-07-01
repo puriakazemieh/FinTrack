@@ -14,7 +14,7 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.ImageProvider
-import androidx.glance.action.actionStartActivity
+import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.action.actionRunCallback
@@ -53,6 +53,9 @@ import kotlinx.datetime.toLocalDateTime
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.time.Clock
+
+import android.content.Intent
+import android.net.Uri
 
 class FinTrackWidget : GlanceAppWidget(), KoinComponent {
 
@@ -221,7 +224,13 @@ class FinTrackWidget : GlanceAppWidget(), KoinComponent {
             Button(
                 text = context.getString(quickAddId),
                 onClick = actionStartActivity(
-                    ComponentName(context.packageName, "com.kazemieh.fintrack.MainActivity")
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("fintrack://dashboard?showAddTransaction=true")
+                    ).apply {
+                        `package` = context.packageName
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
                 ),
                 modifier = GlanceModifier.fillMaxWidth()
             )

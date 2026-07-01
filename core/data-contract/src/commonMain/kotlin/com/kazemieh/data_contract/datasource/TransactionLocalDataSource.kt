@@ -87,6 +87,8 @@ interface TransactionLocalDataSource {
 
     suspend fun getTransactionAmountRange(): Pair<Long, Long>
 
+    suspend fun getTransactionCount(): Long
+
     suspend fun getAllTransactions(): List<Transaction>
     suspend fun insertFullTransaction(transaction: Transaction)
     suspend fun getAllCategories(): List<Category>

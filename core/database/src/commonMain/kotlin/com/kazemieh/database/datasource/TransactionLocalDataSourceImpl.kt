@@ -517,6 +517,10 @@ class TransactionLocalDataSourceImpl(
         Pair(row.MIN ?: 0L, row.MAX ?: 1_000_000L)
     }
 
+    override suspend fun getTransactionCount(): Long = withContext(Dispatchers.Default) {
+        transactionQueries.getTransactionCount().awaitAsOne()
+    }
+
     override suspend fun getAllTransactions(): List<Transaction> = withContext(Dispatchers.Default) {
         transactionQueries.getAllTransactions()
             .awaitAsList()

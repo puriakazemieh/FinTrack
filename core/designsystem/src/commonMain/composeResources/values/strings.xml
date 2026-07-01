@@ -1210,8 +1210,11 @@
     <string name="news_cat_market">بازار</string>
     <string name="news_src_eco">اخبار اقتصادی</string>
     <string name="news_title_2">راهنمای جدید مالیات بر عایدی سرمایه</string>
-    <string name="news_summary_2">جزئیات جدید از نحوه محاسبه مالیات بر خرید و فروش طلا و خودرو منتشر شد.</string>
+    <string name="news_summary_2">جزئیات جدید از نبوه محاسبه مالیات بر خرید و فروش طلا و خودرو منتشر شد.</string>
     <string name="news_content_2">در این راهنما به بررسی دقیق قوانین جدید مالیاتی می‌پردازیم. طبق بخشنامه جدید، تمامی تراکنش‌های بالای حد نصاب...</string>
+    <string name="news_title_3">نسخه‌ی جدید فین‌تراک منتشر شد</string>
+    <string name="news_summary_3">ویژگی‌های جدید از جمله تحلیل هوشمند الگوی خرج‌کرد اضافه شد.</string>
+    <string name="news_content_3">در این نسخه، ما بر روی هوش مصنوعی تمرکز کرده‌ایم تا به شما کمک کنیم بهتر پس‌انداز کنید. همچنین ویجت‌های جدید برای دسترسی سریع‌تر اضافه شده‌اند.</string>
     <string name="news_cat_edu">آموزش</string>
     <string name="news_src_app">فین‌تراک</string>
 
@@ -1220,12 +1223,16 @@
     <string name="faq_cat_gen">عمومی</string>
     <string name="faq_q_2">آیا فین‌تراک دسترسی به حساب بانکی دارد؟</string>
     <string name="faq_a_2">خیر، فین‌تراک فقط از طریق خواندن پیامک‌های بانکی (با اجازه شما) یا وارد کردن دستی، تراکنش‌ها را ثبت می‌کند.</string>
+    <string name="faq_q_3">چگونه یک هدف پس‌انداز ایجاد کنم؟</string>
+    <string name="faq_a_3">به بخش ابزارها رفته و گزینه اهداف پس‌انداز را انتخاب کنید. سپس با دکمه + می‌توانید هدف جدیدی با مبلغ و تاریخ مشخص تعریف کنید.</string>
     <string name="faq_cat_sec">امنیت</string>
 
     <string name="event_title_1">اعلام نرخ تورم ماهانه</string>
     <string name="event_desc_1">مرکز آمار نرخ تورم نقطه به نقطه را اعلام خواهد کرد.</string>
     <string name="event_title_2">سررسید تسلیم اظهارنامه مالیاتی</string>
     <string name="event_desc_2">آخرین مهلت برای صاحبان مشاغل جهت ارسال اظهارنامه.</string>
+    <string name="event_title_3">جلسه شورای عالی کار</string>
+    <string name="event_desc_3">تصمیم‌گیری در خصوص حداقل دستمزد سال آینده.</string>
 
     <string name="label_select_currency">انتخاب واحد پولی</string>
 
@@ -1236,4 +1243,13 @@
     <string name="quick_add">افزودن سریع</string>
     <string name="income_widget">درآمد</string>
     <string name="expense_widget">هزینه</string>
+    <string name="ai_ask_question_title">سوال خود را بپرس</string>
+    <string name="ai_ask_question_sub">پاسخ شخصی‌سازی‌شده با هوش مصنوعی</string>
+    <string name="ai_suggestion_budget_title">ایجاد بودجه برای دسته %1$s</string>
+    <string name="ai_suggestion_budget_body">هزینه‌های شما در این دسته ٪%2$d رشد داشته است. با تعیین بودجه می‌توانید آن را کنترل کنید.</string>
+
+    <!-- Goals refinement -->
+    <string name="label_add_amount">افزودن مبلغ</string>
+    <string name="label_goal_eta">تا %1$s</string>
+    <string name="label_monthly_target_with_val">ماهانه %1$s ت</string>
 </resources>

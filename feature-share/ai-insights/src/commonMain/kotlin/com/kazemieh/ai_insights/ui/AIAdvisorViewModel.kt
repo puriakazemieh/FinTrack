@@ -6,6 +6,7 @@ import com.kazemieh.common.model.SyncStatus
 import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.domain.usecase.ObserveCategorySumsUseCase
+import com.kazemieh.domain.usecase.ObserveSpendingPatternUseCase
 import com.kazemieh.domain.repository.TransactionRepository
 import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.flow.*
@@ -18,7 +19,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 class AIAdvisorViewModel(
-    private val observeCategorySumsUseCase: ObserveCategorySumsUseCase,
+    private val observeSpendingPatternUseCase: ObserveSpendingPatternUseCase,
     private val transactionRepository: TransactionRepository
 ) : ViewModel() {
 
@@ -56,39 +57,79 @@ class AIAdvisorViewModel(
                 return@launch
             }
 
-            // Monthly Analysis: filter for last 30 days
-            val now = kotlin.time.Clock.System.now().toEpochMilliseconds()
-            val thirtyDaysAgo = now - (30L * 24 * 60 * 60 * 1000)
-
-            val filter = TransactionFilterParams(
-                fromTimestamp = thirtyDaysAgo,
-                toTimestamp = now
-            )
-
-            observeCategorySumsUseCase(filter)
+            observeSpendingPatternUseCase()
                 .take(1)
-                .collect { sums ->
-                    val income = sums.filter { it.type == TransactionType.INCOME }.sumOf { it.totalAmount }
-                    val expense = sums.filter { it.type == TransactionType.EXPENSE }.sumOf { it.totalAmount }
-                    
-                    val potential = if (income > 0) {
-                        ((income - expense).coerceAtLeast(0) * 100 / income).toInt()
-                    } else 0
-                    
-                    val potentialAmount = (income - expense).coerceAtLeast(0)
-
+                .collect { pattern ->
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            isEmpty = income == 0L && expense == 0L,
+                            isEmpty = pattern.totalIncome == 0L && pattern.totalExpense == 0L,
                             activeDays = activeDays,
-                            savingPotentialPercentage = potential,
-                            savingPotentialAmount = potentialAmount,
-                            suggestions = getMockSuggestions()
+                            savingPotentialPercentage = pattern.savingPotentialPercentage,
+                            savingPotentialAmount = pattern.savingPotentialAmount,
+                            suggestions = generateDynamicSuggestions(pattern)
                         )
                     }
                 }
         }
+    }
+
+    private fun generateDynamicSuggestions(pattern: com.kazemieh.domain.usecase.SpendingPattern): List<InvestmentSuggestion> {
+        val suggestions = mutableListOf<InvestmentSuggestion>()
+
+        // 1. Budgeting suggestion based on top category growth
+        if (pattern.growthPercentage > 10 && pattern.growthCategoryName != null) {
+            suggestions.add(
+                InvestmentSuggestion(
+                    title = Res.string.ai_suggestion_budget_title,
+                    titleArgs = listOf(pattern.growthCategoryName!!),
+                    body = Res.string.ai_suggestion_budget_body,
+                    bodyArgs = listOf(pattern.growthCategoryName!!, pattern.growthPercentage.toString()),
+                    detail = Res.string.ai_suggestion_gold_detail, // Fallback detail
+                    icon = Res.drawable.ic_cat_shopping,
+                    colorHex = 0xFFEF4444, // GlassRed
+                    risk = RiskLevel.Low,
+                    returnRate = Res.string.label_zero // Not applicable
+                )
+            )
+        }
+
+        // 2. High potential saving -> Investment
+        if (pattern.savingPotentialPercentage > 15) {
+            suggestions.add(
+                InvestmentSuggestion(
+                    title = Res.string.ai_suggestion_gold_title,
+                    body = Res.string.ai_suggestion_gold_body,
+                    detail = Res.string.ai_suggestion_gold_detail,
+                    icon = Res.drawable.ic_cat_investment,
+                    colorHex = 0xFFF59E0B, // GlassAmber
+                    risk = RiskLevel.Low,
+                    returnRate = Res.string.ai_suggestion_gold_return
+                )
+            )
+        }
+
+        // 3. Low potential saving -> Income increase or debt reduction
+        if (pattern.savingPotentialPercentage < 5) {
+             suggestions.add(
+                InvestmentSuggestion(
+                    title = Res.string.ai_suggestion_bank_title,
+                    body = Res.string.ai_suggestion_bank_body,
+                    detail = Res.string.ai_suggestion_bank_detail,
+                    icon = Res.drawable.ic_cat_bank,
+                    colorHex = 0xFF22C55E, // GlassGreen
+                    risk = RiskLevel.Low,
+                    returnRate = Res.string.ai_suggestion_bank_return
+                )
+            )
+        }
+
+        // Add one fallback if empty
+        if (suggestions.isEmpty()) {
+            suggestions.addAll(getMockSuggestions())
+        }
+
+        return suggestions
     }
 
     private fun getMockSuggestions() = listOf(

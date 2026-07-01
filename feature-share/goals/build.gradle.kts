@@ -52,6 +52,9 @@ kotlin {
                 implementation(project(":core:designsystem"))
                 implementation(project(":core:money"))
 
+                implementation(libs.compose.material.icons.core)
+                implementation(libs.compose.material.icons.extended)
+
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)
