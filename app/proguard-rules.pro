@@ -5,21 +5,27 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
-
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-renamesourcefileattribute SourceFile
 
-# Keep type-safe Navigation routes + generated serializers (kotlinx.serialization)
--keep @kotlinx.serialization.Serializable class com.kazemieh.fintrack.navigation.** { *; }
--keepclassmembers class com.kazemieh.fintrack.navigation.**$$serializer { *; }
+# Kotlinx Serialization
+-keep @kotlinx.serialization.Serializable class ** { *; }
+-keepclassmembers class ** {
+    @kotlinx.serialization.SerialName <fields>;
+}
+
+# Koin
+-keep class org.koin.** { *; }
+
+# SQLDelight
+-keep class com.kazemieh.database.** { *; }
+-keep class app.cash.sqldelight.** { *; }
+
+# Glance
+-keep class androidx.glance.** { *; }
+-keep class com.kazemieh.widget.** { *; }

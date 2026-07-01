@@ -16,10 +16,21 @@ android {
         versionName = "2.5.0"
     }
 
+    signingConfigs {
+        create("release") {
+            // این مقادیر باید در gradle.properties یا محیط CI تعریف شوند
+            storeFile = file("keystore.jks")
+            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "dummy_password"
+            keyAlias = System.getenv("KEY_ALIAS") ?: "dummy_alias"
+            keyPassword = System.getenv("KEY_PASSWORD") ?: "dummy_password"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -28,6 +39,19 @@ android {
         debug {
             isMinifyEnabled = false
             isDebuggable = true
+            signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("play") {
+            dimension = "distribution"
+            // می‌توان تنظیمات خاص گوگل پلی را اینجا اضافه کرد
+        }
+        create("direct") {
+            dimension = "distribution"
+            versionNameSuffix = "-direct"
         }
     }
 
@@ -52,6 +76,7 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:domain"))
     implementation(project(":feature-share:notifications"))
+    implementation(project(":feature-share:widget"))
     implementation(project(":feature-share:sync"))
     implementation(project(":feature-share:fixed-expense"))
 

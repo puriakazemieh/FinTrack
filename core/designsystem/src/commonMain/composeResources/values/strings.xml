@@ -1228,4 +1228,12 @@
     <string name="event_desc_2">آخرین مهلت برای صاحبان مشاغل جهت ارسال اظهارنامه.</string>
 
     <string name="label_select_currency">انتخاب واحد پولی</string>
+
+    <!-- Widget -->
+    <string name="widget_description">خلاصه امروز و افزودن سریع فین‌تراک</string>
+    <string name="widget_title">ویجت فین‌تراک</string>
+    <string name="today_summary">خلاصه امروز</string>
+    <string name="quick_add">افزودن سریع</string>
+    <string name="income_widget">درآمد</string>
+    <string name="expense_widget">هزینه</string>
 </resources>

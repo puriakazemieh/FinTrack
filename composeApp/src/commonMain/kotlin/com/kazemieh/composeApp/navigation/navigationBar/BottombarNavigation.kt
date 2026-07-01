@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import androidx.navigation.navDeepLink
 import com.kazemieh.asset.ui.add.AddAssetScreen
 import com.kazemieh.asset.ui.list.AssetsListScreen
 import com.kazemieh.budget.ui.list.BudgetScreen
@@ -69,7 +70,11 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
 
     navigation<Screen.BottomBarGraph>(startDestination = Screen.Dashboard()) {
 
-        composable<Screen.Dashboard> { backStackEntry ->
+        composable<Screen.Dashboard>(
+            deepLinks = listOf(
+                navDeepLink { uriPattern = "fintrack://dashboard?showAddTransaction={showAddTransaction}" }
+            )
+        ) { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.Dashboard>()
             DashboardScreen(
                 showAddTransaction = args.showAddTransaction,
