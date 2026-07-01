@@ -59,6 +59,11 @@ class FinTrackWidget : GlanceAppWidget(), KoinComponent {
     private val repository: TransactionRepository by inject()
     private val preferenceUseCases: PreferenceUseCases by inject()
 
+    // Helper to get resource ID without relying on R class
+    private fun getResId(context: Context, name: String, type: String, pkg: String = context.packageName): Int {
+        return context.resources.getIdentifier(name, type, pkg)
+    }
+
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         
         val now = Clock.System.nowPersianDate(TimeZone.currentSystemDefault())
@@ -157,10 +162,16 @@ class FinTrackWidget : GlanceAppWidget(), KoinComponent {
 
     @Composable
     private fun WidgetContent(context: Context, income: Long, expense: Long) {
+        val bgId = getResId(context, "widget_background", "drawable")
+        val todaySummaryId = getResId(context, "today_summary", "string", "com.kazemieh.designsystem")
+        val incomeId = getResId(context, "income_widget", "string", "com.kazemieh.designsystem")
+        val expenseId = getResId(context, "expense_widget", "string", "com.kazemieh.designsystem")
+        val quickAddId = getResId(context, "quick_add", "string", "com.kazemieh.designsystem")
+
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(ImageProvider(com.kazemieh.widget.R.drawable.widget_background))
+                .background(ImageProvider(bgId))
                 .padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalAlignment = Alignment.CenterVertically
@@ -170,13 +181,13 @@ class FinTrackWidget : GlanceAppWidget(), KoinComponent {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = context.getString(com.kazemieh.designsystem.R.string.today_summary),
+                    text = context.getString(todaySummaryId),
                     style = TextStyle(
                         color = GlanceTheme.colors.onBackground,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     ),
-                    modifier = GlanceModifier.fillMaxWidth().weight(1f)
+                    modifier = GlanceModifier.fillMaxWidth()
                 )
                 
                 Text(
@@ -193,13 +204,13 @@ class FinTrackWidget : GlanceAppWidget(), KoinComponent {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SummaryItem(
-                    label = context.getString(com.kazemieh.designsystem.R.string.income_widget),
+                    label = context.getString(incomeId),
                     amount = income,
                     color = GlanceTheme.colors.primary
                 )
                 Spacer(modifier = GlanceModifier.width(12.dp))
                 SummaryItem(
-                    label = context.getString(com.kazemieh.designsystem.R.string.expense_widget),
+                    label = context.getString(expenseId),
                     amount = expense,
                     color = GlanceTheme.colors.error
                 )
@@ -208,7 +219,7 @@ class FinTrackWidget : GlanceAppWidget(), KoinComponent {
             Spacer(modifier = GlanceModifier.padding(12.dp))
             
             Button(
-                text = context.getString(com.kazemieh.designsystem.R.string.quick_add),
+                text = context.getString(quickAddId),
                 onClick = actionStartActivity(
                     ComponentName(context.packageName, "com.kazemieh.fintrack.MainActivity")
                 ),
@@ -219,11 +230,13 @@ class FinTrackWidget : GlanceAppWidget(), KoinComponent {
 
     @Composable
     private fun SummaryItem(label: String, amount: Long, color: ColorProvider) {
+        val context = androidx.glance.LocalContext.current
+        val itemBgId = getResId(context, "widget_item_background", "drawable")
+        
         Column(
             modifier = GlanceModifier
                 .fillMaxWidth()
-                .weight(1f)
-                .background(ImageProvider(com.kazemieh.widget.R.drawable.widget_item_background))
+                .background(ImageProvider(itemBgId))
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
