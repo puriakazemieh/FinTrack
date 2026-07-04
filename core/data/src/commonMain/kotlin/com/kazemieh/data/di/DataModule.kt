@@ -65,5 +65,5 @@ val dataModule = module {
         )
     }
 
-    single<SyncRepository> { SyncRepositoryImpl(get()) }
+    single<SyncRepository> { SyncRepositoryImpl(get(), get(), get()) }
 }

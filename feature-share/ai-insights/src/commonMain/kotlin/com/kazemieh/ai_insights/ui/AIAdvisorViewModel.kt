@@ -124,41 +124,8 @@ class AIAdvisorViewModel(
             )
         }
 
-        // Add one fallback if empty
-        if (suggestions.isEmpty()) {
-            suggestions.addAll(getMockSuggestions())
-        }
-
+        // No fabricated fallback: when no rule fires we return an empty list so the
+        // screen shows an honest "no suggestions yet" state instead of demo data.
         return suggestions
     }
-
-    private fun getMockSuggestions() = listOf(
-        InvestmentSuggestion(
-            title = Res.string.ai_suggestion_gold_title,
-            body = Res.string.ai_suggestion_gold_body,
-            detail = Res.string.ai_suggestion_gold_detail,
-            icon = Res.drawable.ic_cat_investment,
-            colorHex = 0xFFF59E0B, // GlassAmber
-            risk = RiskLevel.Low,
-            returnRate = Res.string.ai_suggestion_gold_return
-        ),
-        InvestmentSuggestion(
-            title = Res.string.ai_suggestion_bank_title,
-            body = Res.string.ai_suggestion_bank_body,
-            detail = Res.string.ai_suggestion_bank_detail,
-            icon = Res.drawable.ic_cat_bank,
-            colorHex = 0xFF22C55E, // GlassGreen
-            risk = RiskLevel.Low,
-            returnRate = Res.string.ai_suggestion_bank_return
-        ),
-        InvestmentSuggestion(
-            title = Res.string.ai_suggestion_fund_title,
-            body = Res.string.ai_suggestion_fund_body,
-            detail = Res.string.ai_suggestion_fund_detail,
-            icon = Res.drawable.ic_93,
-            colorHex = 0xFF60A5FA, // GlassBlue
-            risk = RiskLevel.Medium,
-            returnRate = Res.string.ai_suggestion_fund_return
-        )
-    )
 }

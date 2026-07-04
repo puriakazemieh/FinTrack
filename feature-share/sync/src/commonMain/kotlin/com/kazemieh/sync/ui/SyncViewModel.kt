@@ -21,8 +21,11 @@ data class SyncState(
     val lastSyncTimestamp: Long = 0L,
     val stats: BackupStats? = null,
     val history: List<SyncHistory> = emptyList(),
-    val isGoogleDriveEnabled: Boolean = true,
-    val isServerSyncEnabled: Boolean = false,
+    // Server sync is the real, in-repo path (Ktor client <-> server module). Google
+    // Drive stays off until OAuth credentials are wired up, so we never report a
+    // fake success for it.
+    val isGoogleDriveEnabled: Boolean = false,
+    val isServerSyncEnabled: Boolean = true,
     val isLoading: Boolean = false
 )
 
@@ -84,17 +87,27 @@ class SyncViewModel(
             try {
                 var totalInserted = 0
                 var totalUpdated = 0
+                var ranAnyProvider = false
 
                 if (_state.value.isGoogleDriveEnabled) {
                     googleDriveSyncManager.syncWithDrive()
+                    ranAnyProvider = true
                 }
-                
+
                 if (_state.value.isServerSyncEnabled) {
                     val (inserted, updated) = serverSyncManager.syncWithServer(_state.value.lastSyncTimestamp)
                     totalInserted += inserted
                     totalUpdated += updated
+                    ranAnyProvider = true
                 }
-                
+
+                if (!ranAnyProvider) {
+                    // Nothing actually happened — don't record a fake successful backup.
+                    _effect.send(SyncEffect.ShowMessage("No sync provider is enabled"))
+                    _state.update { it.copy(isLoading = false) }
+                    return@launch
+                }
+
                 backupRepository.addSyncHistory(SyncHistory(
                     timestamp = Clock.System.now().toEpochMilliseconds(),
                     type = SyncType.MANUAL,
@@ -124,7 +137,17 @@ class SyncViewModel(
 
     private fun restoreBackup(time: Long) {
         viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
             _effect.send(SyncEffect.ShowMessage("Restoring backup..."))
+            try {
+                val (inserted, updated) = serverSyncManager.restoreFromServer()
+                _effect.send(SyncEffect.ShowMessage("Restored $inserted new / $updated updated records"))
+                loadData()
+            } catch (e: Exception) {
+                _effect.send(SyncEffect.ShowMessage("Restore failed: ${e.message}"))
+            } finally {
+                _state.update { it.copy(isLoading = false) }
+            }
         }
     }
 }

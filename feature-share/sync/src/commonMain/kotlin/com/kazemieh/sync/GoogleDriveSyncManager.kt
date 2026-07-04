@@ -66,10 +66,14 @@ class GoogleDriveSyncManager(
         }
     }
 
-    private suspend fun fetchFromDrive(fileName: String): String? {
-        return null 
-    }
+    // Google Drive transport requires an OAuth access token obtained via platform
+    // sign-in, which is not configured in this build. Rather than silently no-op
+    // (and let the caller report a false success), these fail explicitly so the UI
+    // surfaces an honest error until Drive credentials are wired up.
+    private fun driveNotConfigured(): Nothing =
+        throw UnsupportedOperationException("Google Drive sync is not configured")
 
-    private suspend fun uploadToDrive(fileName: String, data: String) {
-    }
+    private suspend fun fetchFromDrive(fileName: String): String? = driveNotConfigured()
+
+    private suspend fun uploadToDrive(fileName: String, data: String): Unit = driveNotConfigured()
 }
