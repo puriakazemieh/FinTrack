@@ -1,20 +1,14 @@
 package com.kazemieh.financialsource.ui.list
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
-import com.kazemieh.designsystem.component.glass.FintrackScreen
-import com.kazemieh.designsystem.component.glass.HeaderAction
+import com.kazemieh.designsystem.component.glass.ReorderableEntityScaffold
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.financialsource.ui.delete.DeleteSourceBottomSheet
 import fintrack.core.designsystem.generated.resources.*
@@ -31,49 +25,18 @@ fun SourcesScreen(
     val state by viewModel.state.collectAsState()
     var reorderedList by remember(state.sources) { mutableStateOf(state.sources) }
 
-    FintrackScreen(
+    ReorderableEntityScaffold(
         title = stringResource(Res.string.source),
         sub = stringResource(Res.string.title_source_management),
         onBack = onBack,
-        actions = if (state.isReorderShow) {
-            listOf(
-                HeaderAction(
-                    icon = rememberVectorPainter(Icons.Default.Check),
-                    label = stringResource(Res.string.label_done),
-                    onClick = {
-                        val positions = reorderedList.mapIndexed { index, source ->
-                            source.id!! to index
-                        }.toMap()
-                        viewModel.onIntent(SourceIntent.UpdatePositions(positions))
-                        viewModel.onIntent(SourceIntent.OnToggleReorder)
-                    },
-                    color = com.kazemieh.designsystem.GlassGreen
-                )
-            )
-        } else {
-            emptyList()
-        },
-        trailingContent = {
-            if (!state.isReorderShow) {
-                var showMenu by remember { mutableStateOf(false) }
-                Box {
-                    IconButton(onClick = { showMenu = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = null)
-                    }
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.reorder_list)) },
-                            onClick = {
-                                viewModel.onIntent(SourceIntent.OnToggleReorder)
-                                showMenu = false
-                            }
-                        )
-                    }
-                }
-            }
+        isReorderMode = state.isReorderShow,
+        onStartReorder = { viewModel.onIntent(SourceIntent.OnToggleReorder) },
+        onConfirmReorder = {
+            val positions = reorderedList.mapIndexed { index, source ->
+                source.id!! to index
+            }.toMap()
+            viewModel.onIntent(SourceIntent.UpdatePositions(positions))
+            viewModel.onIntent(SourceIntent.OnToggleReorder)
         }
     ) {
         Column(modifier = Modifier.fillMaxSize()) {

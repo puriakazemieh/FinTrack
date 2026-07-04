@@ -1,25 +1,18 @@
 package com.kazemieh.category.ui.list
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import com.kazemieh.category.ui.add.AddCategoryBottomSheet
 import com.kazemieh.category.ui.delete.DeleteCategoryBottomSheet
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
-import com.kazemieh.designsystem.component.glass.FintrackScreen
-import com.kazemieh.designsystem.component.glass.HeaderAction
+import com.kazemieh.designsystem.component.glass.ReorderableEntityScaffold
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.category
-import fintrack.core.designsystem.generated.resources.reorder_list
 import fintrack.core.designsystem.generated.resources.title_category_management
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -42,49 +35,18 @@ fun CategoriesScreen(
     val state by viewModel.state.collectAsState()
     var reorderedList by remember(state.categories) { mutableStateOf(state.categories) }
 
-    FintrackScreen(
+    ReorderableEntityScaffold(
         title = stringResource(Res.string.category),
         sub = stringResource(Res.string.title_category_management),
         onBack = onBack,
-        actions = if (state.isReorderShow) {
-            listOf(
-                HeaderAction(
-                    icon = rememberVectorPainter(Icons.Default.Check),
-                    label = stringResource(Res.string.label_done),
-                    onClick = {
-                        val positions = reorderedList.mapIndexed { index, category ->
-                            category.id!! to index
-                        }.toMap()
-                        viewModel.onIntent(CategoryIntent.UpdatePositions(positions))
-                        viewModel.onIntent(CategoryIntent.OnToggleReorder)
-                    },
-                    color = com.kazemieh.designsystem.GlassGreen
-                )
-            )
-        } else {
-            emptyList()
-        },
-        trailingContent = {
-            if (!state.isReorderShow) {
-                var showMenu by remember { mutableStateOf(false) }
-                Box {
-                    IconButton(onClick = { showMenu = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = null)
-                    }
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.reorder_list)) },
-                            onClick = {
-                                viewModel.onIntent(CategoryIntent.OnToggleReorder)
-                                showMenu = false
-                            }
-                        )
-                    }
-                }
-            }
+        isReorderMode = state.isReorderShow,
+        onStartReorder = { viewModel.onIntent(CategoryIntent.OnToggleReorder) },
+        onConfirmReorder = {
+            val positions = reorderedList.mapIndexed { index, category ->
+                category.id!! to index
+            }.toMap()
+            viewModel.onIntent(CategoryIntent.UpdatePositions(positions))
+            viewModel.onIntent(CategoryIntent.OnToggleReorder)
         }
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
