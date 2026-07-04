@@ -14,8 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SecondaryTabRow
-import androidx.compose.material3.Tab
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,17 +23,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.FintrackScreen
+import com.kazemieh.designsystem.component.glass.Tabs
 import com.kazemieh.installment.ui.InstallmentIntent
 import com.kazemieh.installment.ui.InstallmentViewModel
 import com.kazemieh.installment.ui.add.AddInstallmentBottomSheet
@@ -81,24 +78,17 @@ fun InstallmentsScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            SecondaryTabRow(
-                selectedTabIndex = selectedTabIndex,
-                containerColor = Color.Transparent,
-                divider = {}
-            ) {
-                tabs.forEachIndexed { index, title ->
-                    Tab(
-                        selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
-                        text = {
-                            FintrackLabelMediumText(
-                                text = title,
-                                color = if (selectedTabIndex == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    )
-                }
-            }
+            Tabs(
+                tabs = tabs,
+                active = selectedTabIndex,
+                onChange = { selectedTabIndex = it },
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                counts = listOf(
+                    state.upcoming.size,
+                    state.overdue.size,
+                    state.completed.size
+                )
+            )
 
             val items = when (selectedTabIndex) {
                 0 -> state.filteredUpcoming

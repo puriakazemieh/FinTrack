@@ -33,7 +33,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.border
 import com.kazemieh.common.model.Note
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
@@ -97,8 +99,9 @@ private fun NoteCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val glassColors = LocalGlassColors.current
     // Handling both ARGB (lower 32 bits) and Packed ULong (upper 32 bits) for backward compatibility
-    val cardColor = if (note.color != 0L) {
+    val accentColor = if (note.color != 0L) {
         val colorULong = note.color.toULong()
         if (colorULong <= 0xFFFFFFFFuL) {
             Color(note.color.toInt())
@@ -106,21 +109,18 @@ private fun NoteCard(
             Color(colorULong)
         }
     } else {
-        MaterialTheme.colorScheme.surfaceVariant
+        glassColors.text3
     }
 
-    val onCardColor = if (note.color != 0L) {
-        // Simple heuristic to determine if color is dark or light for text contrast
-        // For notes, we often use black text on pastel backgrounds
-        Color.Black
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    }
+    // Consistent with the app-wide dark glass surfaces: a low-alpha tint of the
+    // chosen accent over the dark background, with light glass text on top.
+    val onCardColor = glassColors.text
 
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
-            .background(cardColor.copy(alpha = 0.8f))
+            .background(accentColor.copy(alpha = 0.14f))
+            .border(0.5.dp, accentColor.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
             .clickable(onClick = onClick)
             .padding(12.dp)
     ) {

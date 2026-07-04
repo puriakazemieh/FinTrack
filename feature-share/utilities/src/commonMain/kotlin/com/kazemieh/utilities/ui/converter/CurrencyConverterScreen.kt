@@ -216,10 +216,11 @@ private fun CurrencyPickerSheet(
     onSelect: (AssetRate) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val glassColors = LocalGlassColors.current
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = glassColors.bg0,
         dragHandle = null
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
