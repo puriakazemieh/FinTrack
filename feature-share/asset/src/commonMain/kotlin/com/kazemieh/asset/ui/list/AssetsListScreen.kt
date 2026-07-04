@@ -25,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kazemieh.asset.ui.AssetIntent
 import com.kazemieh.asset.ui.AssetViewModel
@@ -48,6 +47,7 @@ import com.kazemieh.designsystem.GlassAmber
 import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassPurple
+import com.kazemieh.designsystem.GlassRed
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.currency_toman
 import fintrack.core.designsystem.generated.resources.label_percentage_value
@@ -110,7 +110,7 @@ fun AssetsListScreen(
                         name = asset.name,
                         sub = stringResource(Res.string.label_units_count, asset.quantity.toString()),
                         badge = stringResource(Res.string.label_percentage_value, asset.profitOrLossPercentage),
-                        color = if (asset.profitOrLoss >= 0) Color.Green else Color.Red,
+                        color = if (asset.profitOrLoss >= 0) GlassGreen else GlassRed,
                         sub2 = asset.totalCurrentValue.toSignedPersianPrice() + " " + stringResource(Res.string.currency_toman)
                     )
                 },

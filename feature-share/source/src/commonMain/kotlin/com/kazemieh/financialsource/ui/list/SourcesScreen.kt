@@ -39,7 +39,7 @@ fun SourcesScreen(
             listOf(
                 HeaderAction(
                     icon = rememberVectorPainter(Icons.Default.Check),
-                    label = "Done",
+                    label = stringResource(Res.string.label_done),
                     onClick = {
                         val positions = reorderedList.mapIndexed { index, source ->
                             source.id!! to index

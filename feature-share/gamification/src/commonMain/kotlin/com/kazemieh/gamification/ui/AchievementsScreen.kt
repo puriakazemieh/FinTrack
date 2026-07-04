@@ -22,6 +22,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Achievement
 import com.kazemieh.common.model.AchievementType
 import com.kazemieh.common.toPersianDigits
+import com.kazemieh.designsystem.GlassAmber
+import com.kazemieh.designsystem.GlassBlue
+import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackLabelLargeText
@@ -178,14 +181,14 @@ private fun AchievementBadge(achievement: Achievement) {
 
 private fun getAchievementDisplay(type: AchievementType): Triple<StringResource, androidx.compose.ui.graphics.vector.ImageVector, Color> {
     return when (type) {
-        AchievementType.FIRST_TRANSACTION -> Triple(Res.string.achievement_first_transaction, Icons.Default.Check, Color(0xFF22C55E))
-        AchievementType.ONE_WEEK_STREAK -> Triple(Res.string.achievement_one_week_streak, Icons.Default.Flag, Color(0xFF22C55E))
-        AchievementType.FIRST_BUDGET -> Triple(Res.string.achievement_first_budget, Icons.Default.AccountBalanceWallet, Color(0xFF22C55E))
-        AchievementType.SAVER -> Triple(Res.string.achievement_saver, Icons.Default.AdsClick, Color(0xFFF59E0B))
-        AchievementType.HUNDRED_TRANSACTIONS -> Triple(Res.string.achievement_hundred_transactions, Icons.Default.EmojiEvents, Color(0xFFF59E0B))
-        AchievementType.NO_EXTRA_EXPENSE -> Triple(Res.string.achievement_no_extra_expense, Icons.Default.Shield, Color(0xFF3B82F6))
-        AchievementType.SIX_MONTHS_ACTIVE -> Triple(Res.string.achievement_six_months_active, Icons.Default.Star, Color(0xFFF59E0B))
-        AchievementType.ZERO_DEBT -> Triple(Res.string.achievement_zero_debt, Icons.Default.SentimentSatisfied, Color(0xFF22C55E))
-        AchievementType.BUDGET_MASTER -> Triple(Res.string.achievement_budget_master, Icons.Default.MilitaryTech, Color(0xFFF59E0B))
+        AchievementType.FIRST_TRANSACTION -> Triple(Res.string.achievement_first_transaction, Icons.Default.Check, GlassGreen)
+        AchievementType.ONE_WEEK_STREAK -> Triple(Res.string.achievement_one_week_streak, Icons.Default.Flag, GlassGreen)
+        AchievementType.FIRST_BUDGET -> Triple(Res.string.achievement_first_budget, Icons.Default.AccountBalanceWallet, GlassGreen)
+        AchievementType.SAVER -> Triple(Res.string.achievement_saver, Icons.Default.AdsClick, GlassAmber)
+        AchievementType.HUNDRED_TRANSACTIONS -> Triple(Res.string.achievement_hundred_transactions, Icons.Default.EmojiEvents, GlassAmber)
+        AchievementType.NO_EXTRA_EXPENSE -> Triple(Res.string.achievement_no_extra_expense, Icons.Default.Shield, GlassBlue)
+        AchievementType.SIX_MONTHS_ACTIVE -> Triple(Res.string.achievement_six_months_active, Icons.Default.Star, GlassAmber)
+        AchievementType.ZERO_DEBT -> Triple(Res.string.achievement_zero_debt, Icons.Default.SentimentSatisfied, GlassGreen)
+        AchievementType.BUDGET_MASTER -> Triple(Res.string.achievement_budget_master, Icons.Default.MilitaryTech, GlassAmber)
     }
 }

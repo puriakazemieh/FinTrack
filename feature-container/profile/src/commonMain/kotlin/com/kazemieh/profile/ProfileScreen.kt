@@ -63,7 +63,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -75,6 +74,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.toPersianDigits
+import com.kazemieh.designsystem.GlassGold
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -396,9 +396,7 @@ fun ProfileHero(
                             Image(
                                 bitmap = bitmap,
                                 contentDescription = null,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .rotate(-90f),
+                                modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop
                             )
                         } else {
@@ -419,16 +417,16 @@ fun ProfileHero(
                         )
                         Surface(
                             shape = MaterialTheme.shapes.extraSmall,
-                            color = Color(0xFFFFD700).copy(alpha = 0.2f),
-                            border = border(0.5.dp, Color(0xFFFFD700).copy(alpha = 0.5f), MaterialTheme.shapes.extraSmall)
+                            color = GlassGold.copy(alpha = 0.2f),
+                            border = border(0.5.dp, GlassGold.copy(alpha = 0.5f), MaterialTheme.shapes.extraSmall)
                         ) {
                             Row(
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(3.dp)
                             ) {
-                                Icon(Icons.Default.Star, null, modifier = Modifier.size(10.dp), tint = Color(0xFFFFD700))
-                                FintrackLabelSmallText(stringResource(Res.string.label_premium), color = Color(0xFFFFD700), fontWeight = FontWeight.Bold)
+                                Icon(Icons.Default.Star, null, modifier = Modifier.size(10.dp), tint = GlassGold)
+                                FintrackLabelSmallText(stringResource(Res.string.label_premium), color = GlassGold, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -555,7 +553,7 @@ fun PremiumStatusCard(onRenewClick: () -> Unit) {
                     .matchParentSize()
                     .background(
                         Brush.linearGradient(
-                            listOf(Color(0xFFFFD700).copy(alpha = 0.1f), Color.Transparent)
+                            listOf(GlassGold.copy(alpha = 0.1f), Color.Transparent)
                         )
                     )
             )

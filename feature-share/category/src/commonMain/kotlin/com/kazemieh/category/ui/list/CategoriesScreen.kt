@@ -50,7 +50,7 @@ fun CategoriesScreen(
             listOf(
                 HeaderAction(
                     icon = rememberVectorPainter(Icons.Default.Check),
-                    label = stringResource(Res.string.confirm),
+                    label = stringResource(Res.string.label_done),
                     onClick = {
                         val positions = reorderedList.mapIndexed { index, category ->
                             category.id!! to index
