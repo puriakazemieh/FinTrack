@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -101,7 +100,6 @@ private fun ThumbnailCard(
 ) {
     Box(
         modifier = modifier
-            .rotate(-90f)
             .size(100.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(GlassColor)

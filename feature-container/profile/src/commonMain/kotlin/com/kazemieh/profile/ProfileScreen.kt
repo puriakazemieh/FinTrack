@@ -74,7 +74,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.toPersianDigits
+import com.kazemieh.designsystem.GlassAmber
 import com.kazemieh.designsystem.GlassGold
+import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -436,7 +438,7 @@ fun ProfileHero(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
-                        Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(Color(0xFF22C55E)))
+                        Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(GlassGreen))
                         FintrackLabelSmallText(
                             text = stringResource(Res.string.profile_sync_time, state.lastSyncTime),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -496,11 +498,11 @@ fun SyncCard(
                 Surface(
                     modifier = Modifier.size(36.dp),
                     shape = MaterialTheme.shapes.medium,
-                    color = Color(0xFF22C55E).copy(alpha = 0.1f),
-                    border = border(1.dp, Color(0xFF22C55E).copy(alpha = 0.2f), MaterialTheme.shapes.medium)
+                    color = GlassGreen.copy(alpha = 0.1f),
+                    border = border(1.dp, GlassGreen.copy(alpha = 0.2f), MaterialTheme.shapes.medium)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.Public, null, modifier = Modifier.size(17.dp), tint = Color(0xFF22C55E))
+                        Icon(Icons.Default.Public, null, modifier = Modifier.size(17.dp), tint = GlassGreen)
                     }
                 }
                 Column(modifier = Modifier.weight(1f)) {
@@ -509,8 +511,8 @@ fun SyncCard(
                 }
                 Surface(
                     shape = MaterialTheme.shapes.medium,
-                    color = Color(0xFF22C55E).copy(alpha = 0.1f),
-                    border = border(1.dp, Color(0xFF22C55E).copy(alpha = 0.2f), MaterialTheme.shapes.medium),
+                    color = GlassGreen.copy(alpha = 0.1f),
+                    border = border(1.dp, GlassGreen.copy(alpha = 0.2f), MaterialTheme.shapes.medium),
                     onClick = onSyncClick
                 ) {
                     Row(
@@ -519,9 +521,9 @@ fun SyncCard(
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         if (isLoading) {
-                            androidx.compose.material3.CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp, color = Color(0xFF22C55E))
+                            androidx.compose.material3.CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp, color = GlassGreen)
                         }
-                        FintrackLabelMediumText(text = stringResource(Res.string.profile_sync_now), color = Color(0xFF22C55E), fontWeight = FontWeight.Bold)
+                        FintrackLabelMediumText(text = stringResource(Res.string.profile_sync_now), color = GlassGreen, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -536,7 +538,7 @@ fun SyncCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(Color(0xFF22C55E)))
+                Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(GlassGreen))
                 FintrackLabelSmallText(text = stringResource(Res.string.label_google_drive_backup), modifier = Modifier.weight(1f))
                 FintrackLabelSmallText(text = stringResource(Res.string.label_backup_size, "—"), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
@@ -566,7 +568,7 @@ fun PremiumStatusCard(onRenewClick: () -> Unit) {
                 Surface(
                     modifier = Modifier.size(38.dp),
                     shape = MaterialTheme.shapes.medium,
-                    color = Color(0xFFF59E0B)
+                    color = GlassAmber
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(Icons.Default.Star, null, modifier = Modifier.size(18.dp), tint = Color.White)
@@ -578,7 +580,7 @@ fun PremiumStatusCard(onRenewClick: () -> Unit) {
                 }
                 Surface(
                     shape = MaterialTheme.shapes.medium,
-                    color = Color(0xFFF59E0B),
+                    color = GlassAmber,
                     onClick = onRenewClick
                 ) {
                     FintrackLabelMediumText(
