@@ -540,7 +540,7 @@ fun SyncCard(
             ) {
                 Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(Color(0xFF22C55E)))
                 FintrackLabelSmallText(text = stringResource(Res.string.label_google_drive_backup), modifier = Modifier.weight(1f))
-                FintrackLabelSmallText(text = stringResource(Res.string.label_backup_size, "۲۳".toPersianDigits()), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                FintrackLabelSmallText(text = stringResource(Res.string.label_backup_size, "—"), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }

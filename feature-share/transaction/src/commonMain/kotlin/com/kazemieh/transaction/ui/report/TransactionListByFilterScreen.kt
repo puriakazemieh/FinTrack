@@ -2,6 +2,7 @@ package com.kazemieh.transaction.ui.report
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -109,6 +110,7 @@ fun TransactionListByFilterScreen(
         onDelete = onDelete,
         onEdit = onEdit,
         onLoadMore = { viewModel.onIntent(TransactionReportIntent.LoadNextPage) },
+        onRetry = { viewModel.onIntent(TransactionReportIntent.RetryRefresh) },
     )
 }
 
@@ -121,6 +123,7 @@ fun TransactionListByFilterContent(
     onDelete: (TransactionWithRelations) -> Unit = {},
     onEdit: (TransactionWithRelations) -> Unit = {},
     onLoadMore: () -> Unit,
+    onRetry: () -> Unit = {},
 ) {
 
     LaunchedEffect(state.items.size, state.endReached, state.isAppending, state.isRefreshing) {
@@ -149,7 +152,29 @@ fun TransactionListByFilterContent(
             Spacer(Modifier.height(24.dp))
         }
 
-        if (state.isRefreshing && state.items.isEmpty()) {
+        if (state.refreshError != null && state.items.isEmpty()) {
+            item {
+                Box(modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
+                    androidx.compose.foundation.layout.Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        FintrackBodyMediumText(
+                            text = stringResource(Res.string.msg_no_transaction_found),
+                            color = LocalGlassColors.current.text3
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        FintrackBodyMediumText(
+                            text = stringResource(Res.string.btn_retry),
+                            color = GlassGreen,
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .clickable { onRetry() }
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        )
+                    }
+                }
+            }
+        } else if (state.isRefreshing && state.items.isEmpty()) {
             item {
                 Box(modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = GlassGreen)

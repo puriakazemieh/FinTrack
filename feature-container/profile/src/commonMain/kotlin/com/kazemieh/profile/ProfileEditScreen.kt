@@ -356,7 +356,8 @@ fun ProfileField(
             },
             keyboardOptions = keyboardOptions,
             modifier = Modifier.fillMaxWidth().clickable(enabled = readOnly, onClick = onClick),
-            enabled = !readOnly || onClick != {},
+            // Editable only when not read-only; read-only fields are tapped via the clickable overlay above.
+            enabled = !readOnly,
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
