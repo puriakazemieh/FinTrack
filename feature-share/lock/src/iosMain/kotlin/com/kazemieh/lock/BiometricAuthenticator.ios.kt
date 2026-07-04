@@ -2,17 +2,46 @@ package com.kazemieh.lock
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import platform.Foundation.NSError
+import platform.LocalAuthentication.LAContext
+import platform.LocalAuthentication.LAPolicyDeviceOwnerAuthenticationWithBiometrics
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
 
 class IosBiometricAuthenticator : BiometricAuthenticator {
-    override fun isBiometricAvailable(): Boolean = false // TODO: Implement using LocalAuthentication
+
+    override fun isBiometricAvailable(): Boolean {
+        val context = LAContext()
+        return context.canEvaluatePolicy(
+            LAPolicyDeviceOwnerAuthenticationWithBiometrics,
+            error = null
+        )
+    }
+
     override fun authenticate(
         title: String,
         subtitle: String,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        // TODO: Implement using LocalAuthentication
-        onError("Not implemented on iOS yet")
+        val context = LAContext()
+        if (!context.canEvaluatePolicy(LAPolicyDeviceOwnerAuthenticationWithBiometrics, error = null)) {
+            onError("Biometric authentication is not available")
+            return
+        }
+        context.evaluatePolicy(
+            LAPolicyDeviceOwnerAuthenticationWithBiometrics,
+            localizedReason = subtitle.ifEmpty { title }
+        ) { success: Boolean, error: NSError? ->
+            // The reply runs on a private queue; hop back to main for UI/state updates.
+            dispatch_async(dispatch_get_main_queue()) {
+                if (success) {
+                    onSuccess()
+                } else {
+                    onError(error?.localizedDescription ?: "Authentication failed")
+                }
+            }
+        }
     }
 }
 
