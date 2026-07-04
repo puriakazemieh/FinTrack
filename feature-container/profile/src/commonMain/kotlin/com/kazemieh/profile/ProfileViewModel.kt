@@ -292,17 +292,6 @@ class ProfileViewModel(
                 loadProfile()
             }
 
-            is ProfileIntent.SyncNow -> {
-                // Mock sync
-                _state.update { it.copy(isLoading = true) }
-                viewModelScope.launch {
-                    kotlinx.coroutines.delay(1000)
-                    val now = "۲ دقیقه پیش" // Should format actual date
-                    preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_LAST_SYNC_TIME, now)
-                    _state.update { it.copy(isLoading = false, lastSyncTime = now) }
-                }
-            }
-
             is ProfileIntent.ShowPremiumInfo -> {
                 viewModelScope.launch {
                     SnackbarController.showMessage(UiText.StringResourceText(Res.string.premium_all_features_free))
@@ -365,7 +354,6 @@ data class ProfileState(
 
 sealed interface ProfileIntent {
     data object Refresh : ProfileIntent
-    data object SyncNow : ProfileIntent
     data object ShowPremiumInfo : ProfileIntent
     data object ToggleDarkMode : ProfileIntent
     data object ToggleFingerprint : ProfileIntent

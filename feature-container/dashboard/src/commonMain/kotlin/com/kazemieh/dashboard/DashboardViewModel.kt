@@ -170,7 +170,6 @@ data class DashboardState(
     val transactionWithRelations: TransactionWithRelations? = null,
     val initialTransactionType: TransactionType? = null,
     val isBalanceVisible: Boolean = true,
-    val growthPercentage: String = "+2.5%", // Placeholder
     val userName: String = "",
     val userInitial: String = "",
     val smsDrafts: List<SmsDraft> = emptyList(),
