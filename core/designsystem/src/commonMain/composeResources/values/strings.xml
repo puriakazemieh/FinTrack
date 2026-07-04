@@ -1252,4 +1252,14 @@
     <string name="label_add_amount">افزودن مبلغ</string>
     <string name="label_goal_eta">تا %1$s</string>
     <string name="label_monthly_target_with_val">ماهانه %1$s ت</string>
+
+    <!-- Tools hub grouping -->
+    <string name="tools_group_favorites">پرکاربردها</string>
+    <string name="tools_group_money">مدیریت پول</string>
+    <string name="tools_group_debt">بدهی و تعهد</string>
+    <string name="tools_group_assets">دارایی و ارز</string>
+    <string name="tools_group_insights">هوش و دستاورد</string>
+    <string name="tools_group_support">پشتیبانی و اطلاعات</string>
+    <string name="tools_search_placeholder">جست‌وجوی ابزار…</string>
+    <string name="tools_no_results">ابزاری یافت نشد</string>
 </resources>
