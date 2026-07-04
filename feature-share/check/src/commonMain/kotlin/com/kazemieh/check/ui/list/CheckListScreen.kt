@@ -44,6 +44,7 @@ fun CheckListScreen(
     val state by viewModel.state.collectAsState()
     var selectedTab by remember { mutableStateOf(0) }
     var showAddCheck by remember { mutableStateOf(false) }
+    var selectedCheckId by remember { mutableStateOf<Long?>(null) }
 
     val tabs = listOf(
         stringResource(Res.string.label_check_status_ongoing),
@@ -85,7 +86,7 @@ fun CheckListScreen(
                 title = stringResource(Res.string.title_check_management),
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(CheckListIntent.UpdateSearchQuery(it)) },
-                onAddClick = { showAddCheck = true },
+                onAddClick = { selectedCheckId = null; showAddCheck = true },
                 summary = listOf(
                     EntitySummary(
                         label = UiText.StringResourceText(Res.string.label_total_amount),
@@ -103,7 +104,7 @@ fun CheckListScreen(
                         color = if (it.isIncoming) GlassGreen else GlassRed
                     )
                 },
-                onEditClick = { /* TODO */ },
+                onEditClick = { selectedCheckId = it.id; showAddCheck = true },
                 onDeleteClick = { viewModel.onIntent(CheckListIntent.DeleteCheck(it.id)) },
                 showActions = true
             )
@@ -111,7 +112,8 @@ fun CheckListScreen(
 
         if (showAddCheck) {
             AddCheckBottomSheet(
-                onDismiss = { showAddCheck = false }
+                checkId = selectedCheckId,
+                onDismiss = { showAddCheck = false; selectedCheckId = null }
             )
         }
     }

@@ -22,8 +22,39 @@ data class InstallmentUseCaseGroup(
     val addInstallmentUseCase: AddInstallmentUseCase,
     val observeInstallmentsUseCase: ObserveInstallmentsUseCase,
     val markInstallmentAsPaidUseCase: MarkInstallmentAsPaidUseCase,
-    val deleteInstallmentUseCase: DeleteInstallmentUseCase
+    val deleteInstallmentUseCase: DeleteInstallmentUseCase,
+    val getInstallmentByIdUseCase: GetInstallmentByIdUseCase,
+    val updateInstallmentUseCase: UpdateInstallmentUseCase
 )
+
+class GetInstallmentByIdUseCase(private val repository: InstallmentRepository) {
+    suspend operator fun invoke(id: Long): Installment? = repository.getInstallmentById(id)
+}
+
+class UpdateInstallmentUseCase(
+    private val repository: InstallmentRepository,
+    private val notificationScheduler: NotificationScheduler
+) {
+    suspend operator fun invoke(
+        installment: Installment,
+        reminderTitle: String,
+        reminderMessage: String
+    ) {
+        repository.updateInstallment(installment)
+        if (!installment.isCompleted && installment.reminderEnabled) {
+            val nextDueInstant = Instant.fromEpochMilliseconds(installment.nextDueDate)
+            notificationScheduler.scheduleReminder(
+                id = "installment_${installment.id}",
+                title = reminderTitle,
+                message = reminderMessage,
+                scheduledTime = nextDueInstant.toLocalDateTime(TimeZone.currentSystemDefault()),
+                channelId = "installment_reminders"
+            )
+        } else {
+            notificationScheduler.cancelReminder("installment_${installment.id}")
+        }
+    }
+}
 
 class AddInstallmentUseCase(
     private val repository: InstallmentRepository,

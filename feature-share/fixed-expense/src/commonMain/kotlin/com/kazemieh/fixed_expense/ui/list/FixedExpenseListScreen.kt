@@ -33,6 +33,7 @@ fun FixedExpenseListScreen(
 ) {
     val state by viewModel.state.collectAsState()
     var showAddExpense by remember { mutableStateOf(false) }
+    var selectedExpenseId by remember { mutableStateOf<Long?>(null) }
 
     val totalMonthlyAmount = state.expenses.filter { it.isActive }.sumOf { it.amount }
 
@@ -46,7 +47,7 @@ fun FixedExpenseListScreen(
                 title = stringResource(Res.string.title_fixed_expense_management),
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(FixedExpenseListIntent.UpdateSearchQuery(it)) },
-                onAddClick = { showAddExpense = true },
+                onAddClick = { selectedExpenseId = null; showAddExpense = true },
                 summary = listOf(
                     EntitySummary(
                         label = UiText.StringResourceText(Res.string.label_approx_monthly_total),
@@ -64,7 +65,7 @@ fun FixedExpenseListScreen(
                         color = if (it.isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
                     )
                 },
-                onEditClick = { /* TODO */ },
+                onEditClick = { selectedExpenseId = it.id; showAddExpense = true },
                 onDeleteClick = { viewModel.onIntent(FixedExpenseListIntent.DeleteExpense(it.id)) },
                 showActions = true
             )
@@ -72,7 +73,8 @@ fun FixedExpenseListScreen(
 
         if (showAddExpense) {
             AddFixedExpenseBottomSheet(
-                onDismiss = { showAddExpense = false }
+                expenseId = selectedExpenseId,
+                onDismiss = { showAddExpense = false; selectedExpenseId = null }
             )
         }
     }

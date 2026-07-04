@@ -7,6 +7,8 @@ import com.kazemieh.common.model.FixedExpense
 import com.kazemieh.common.model.RecurrenceType
 import com.kazemieh.common.model.Source
 import com.kazemieh.domain.usecase.FixedExpenseUseCaseGroup
+import com.kazemieh.domain.usecase.GetCategoryUseCase
+import com.kazemieh.domain.usecase.GetSourceByIdUseCase
 import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +22,9 @@ import org.jetbrains.compose.resources.getString
 import kotlin.time.Clock
 
 class AddFixedExpenseViewModel(
-    private val fixedExpenseUseCases: FixedExpenseUseCaseGroup
+    private val fixedExpenseUseCases: FixedExpenseUseCaseGroup,
+    private val getCategoryUseCase: GetCategoryUseCase,
+    private val getSourceByIdUseCase: GetSourceByIdUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddFixedExpenseState())
@@ -38,7 +42,30 @@ class AddFixedExpenseViewModel(
             is AddFixedExpenseIntent.SetStartDate -> _state.update { it.copy(startDate = intent.startDate) }
             is AddFixedExpenseIntent.SetAutoPost -> _state.update { it.copy(isAutoPostEnabled = intent.enabled) }
             is AddFixedExpenseIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
+            is AddFixedExpenseIntent.LoadExpense -> loadExpense(intent.expenseId)
             AddFixedExpenseIntent.Submit -> submit()
+        }
+    }
+
+    private fun loadExpense(expenseId: Long) {
+        viewModelScope.launch {
+            val expense = fixedExpenseUseCases.getFixedExpenseByIdUseCase(expenseId) ?: return@launch
+            val category = getCategoryUseCase(expense.categoryId)
+            val source = getSourceByIdUseCase(expense.sourceId)
+            _state.update {
+                it.copy(
+                    expenseId = expense.id,
+                    amount = expense.amount.toString(),
+                    category = category,
+                    source = source,
+                    recurrence = expense.recurrence,
+                    startDate = expense.startDate,
+                    nextDueDate = expense.nextDueDate,
+                    isAutoPostEnabled = expense.isAutoPostEnabled,
+                    isActive = expense.isActive,
+                    description = expense.description ?: ""
+                )
+            }
         }
     }
 
@@ -49,30 +76,40 @@ class AddFixedExpenseViewModel(
 
         viewModelScope.launch {
             val expense = FixedExpense(
+                id = currentState.expenseId ?: 0L,
                 amount = amountValue,
                 categoryId = currentState.category.id ?: 0L,
                 sourceId = currentState.source.id ?: 0L,
                 recurrence = currentState.recurrence,
                 startDate = currentState.startDate,
-                nextDueDate = currentState.startDate, // Initial next due date is start date
+                // Keep the existing next due date when editing; a new expense starts at start date.
+                nextDueDate = if (currentState.expenseId != null) currentState.nextDueDate else currentState.startDate,
                 isAutoPostEnabled = currentState.isAutoPostEnabled,
+                isActive = currentState.isActive,
                 description = currentState.description
             )
             val reminderTitle = getString(Res.string.notif_installment_label)
             val reminderMessage = getString(Res.string.msg_notif_fixed_expense_due, currentState.category.name)
-            fixedExpenseUseCases.addFixedExpenseUseCase(expense, reminderTitle, reminderMessage)
+            if (currentState.expenseId != null) {
+                fixedExpenseUseCases.updateFixedExpenseUseCase(expense)
+            } else {
+                fixedExpenseUseCases.addFixedExpenseUseCase(expense, reminderTitle, reminderMessage)
+            }
             _effect.send(AddFixedExpenseEffect.Saved)
         }
     }
 }
 
 data class AddFixedExpenseState(
+    val expenseId: Long? = null,
     val amount: String = "",
     val category: Category? = null,
     val source: Source? = null,
     val recurrence: RecurrenceType = RecurrenceType.MONTHLY,
     val startDate: Long = Clock.System.now().toEpochMilliseconds(),
+    val nextDueDate: Long = Clock.System.now().toEpochMilliseconds(),
     val isAutoPostEnabled: Boolean = false,
+    val isActive: Boolean = true,
     val description: String = ""
 )
 
@@ -84,6 +121,7 @@ sealed interface AddFixedExpenseIntent {
     data class SetStartDate(val startDate: Long) : AddFixedExpenseIntent
     data class SetAutoPost(val enabled: Boolean) : AddFixedExpenseIntent
     data class SetDescription(val description: String) : AddFixedExpenseIntent
+    data class LoadExpense(val expenseId: Long) : AddFixedExpenseIntent
     data object Submit : AddFixedExpenseIntent
 }
 

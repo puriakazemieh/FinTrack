@@ -39,11 +39,13 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun BackupRestoreScreen(
     viewModel: SyncViewModel = koinViewModel(),
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    exportSheet: @Composable (onDismiss: () -> Unit) -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
     val spacing = LocalSpacing.current
     val colors = LocalGlassColors.current
+    var showExport by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
@@ -147,7 +149,7 @@ fun BackupRestoreScreen(
                         text = stringResource(Res.string.backup_export_json),
                         icon = Icons.Default.Backup,
                         modifier = Modifier.weight(1f),
-                        onClick = { }
+                        onClick = { showExport = true }
                     )
                     ManualActionButton(
                         text = stringResource(Res.string.backup_import_file),
@@ -164,6 +166,10 @@ fun BackupRestoreScreen(
             
             item { Spacer(modifier = Modifier.height(spacing.large)) }
         }
+    }
+
+    if (showExport) {
+        exportSheet { showExport = false }
     }
 }
 

@@ -108,7 +108,7 @@ fun ProfileEditScreen(
             when (effect) {
                 ProfileEditEffect.ProfileSaved -> onBack()
                 is ProfileEditEffect.ShowError -> {
-                    // Handle error show
+                    com.kazemieh.designsystem.component.SnackbarController.showMessage(effect.message)
                 }
             }
         }

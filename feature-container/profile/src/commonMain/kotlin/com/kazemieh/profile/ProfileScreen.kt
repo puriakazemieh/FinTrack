@@ -40,6 +40,7 @@ import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.SupportAgent
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.TextFormat
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -67,6 +68,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -107,10 +109,15 @@ fun ProfileScreen(
     onNavigateToCurrencySettings: () -> Unit,
     onNavigateToProfileEdit: () -> Unit,
     onNavigateToNotifications: () -> Unit,
+    onNavigateToFAQ: () -> Unit = {},
+    onNavigateToSupport: () -> Unit = {},
+    onNavigateToBackupRestore: () -> Unit = {},
+    onLoggedOut: () -> Unit = {},
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
+    val uriHandler = LocalUriHandler.current
 
     var showLockSheet by remember { mutableStateOf(false) }
     var lockDialogMode by remember { mutableStateOf(LockMode.CREATE) }
@@ -133,6 +140,8 @@ fun ProfileScreen(
                     lockViewModel.onIntent(LockIntent.Init(effect.mode, subtitle))
                     showLockSheet = true
                 }
+
+                ProfileEffect.NavigateToOnboarding -> onLoggedOut()
             }
         }
     }
@@ -192,7 +201,7 @@ fun ProfileScreen(
             item {
                 SyncCard(
                     lastSyncTime = state.lastSyncTime,
-                    onSyncClick = { viewModel.onIntent(ProfileIntent.SyncNow) },
+                    onSyncClick = onNavigateToBackupRestore,
                     isLoading = state.isLoading
                 )
             }
@@ -209,23 +218,22 @@ fun ProfileScreen(
                         icon = Icons.Default.Payments,
                         onClick = onNavigateToCurrencySettings
                     )
+                    // Single-option display info rows (no navigation target yet) — shown as
+                    // non-interactive value rows rather than dead clickable items.
                     SettingItem(
                         title = stringResource(Res.string.label_language),
                         icon = Icons.Default.Language,
-                        value = stringResource(Res.string.label_persian),
-                        onClick = {}
+                        value = stringResource(Res.string.label_persian)
                     )
                     SettingItem(
                         title = stringResource(Res.string.label_calendar_fa),
                         icon = Icons.Default.CalendarMonth,
-                        value = stringResource(Res.string.label_jalali),
-                        onClick = {}
+                        value = stringResource(Res.string.label_jalali)
                     )
                     SettingItem(
                         title = stringResource(Res.string.label_text_size),
                         icon = Icons.Default.TextFormat,
-                        value = stringResource(Res.string.label_medium),
-                        onClick = {}
+                        value = stringResource(Res.string.label_medium)
                     )
                 }
             }
@@ -251,8 +259,8 @@ fun ProfileScreen(
                     SettingItem(
                         title = stringResource(Res.string.setting_hide_balance),
                         icon = Icons.Default.VisibilityOff,
-                        on = false, // Mock
-                        onToggle = { }
+                        on = state.isBalanceHidden,
+                        onToggle = { viewModel.onIntent(ProfileIntent.ToggleHideBalance) }
                     )
                 }
             }
@@ -282,22 +290,22 @@ fun ProfileScreen(
                     SettingItem(
                         title = stringResource(Res.string.label_faq),
                         icon = Icons.Default.QuestionMark,
-                        onClick = {}
+                        onClick = onNavigateToFAQ
                     )
                     SettingItem(
                         title = stringResource(Res.string.label_contact_us),
-                        icon = Icons.Default.Language, // Placeholder for contact
-                        onClick = {}
+                        icon = Icons.Default.SupportAgent,
+                        onClick = onNavigateToSupport
                     )
                     SettingItem(
                         title = stringResource(Res.string.label_whats_new),
                         icon = Icons.Default.Info,
-                        onClick = {}
+                        onClick = { uriHandler.openUri(ProfileLinks.RELEASES) }
                     )
                     SettingItem(
                         title = stringResource(Res.string.label_rate_app),
                         icon = Icons.Default.Star,
-                        onClick = {}
+                        onClick = { uriHandler.openUri(ProfileLinks.RATE) }
                     )
                 }
             }
@@ -307,18 +315,17 @@ fun ProfileScreen(
                     SettingItem(
                         title = stringResource(Res.string.label_terms),
                         icon = Icons.Default.Info,
-                        onClick = {}
+                        onClick = { uriHandler.openUri(ProfileLinks.TERMS) }
                     )
                     SettingItem(
                         title = stringResource(Res.string.label_privacy),
                         icon = Icons.Default.Security,
-                        onClick = {}
+                        onClick = { uriHandler.openUri(ProfileLinks.PRIVACY) }
                     )
                     SettingItem(
                         title = stringResource(Res.string.label_version_history),
                         icon = Icons.Default.CalendarMonth,
-                        value = "۲.۱.۰",
-                        onClick = {}
+                        value = ProfileLinks.APP_VERSION
                     )
                 }
             }
@@ -676,3 +683,13 @@ fun LogoutButton(onClick: () -> Unit) {
 
 private fun border(width: androidx.compose.ui.unit.Dp, color: Color, shape: androidx.compose.ui.graphics.Shape) =
     androidx.compose.foundation.BorderStroke(width, color)
+
+/** External links and app metadata surfaced from the profile screen. */
+private object ProfileLinks {
+    const val REPO = "https://github.com/puriakazemieh/FinTrack"
+    const val RELEASES = "$REPO/releases"
+    const val TERMS = "$REPO/blob/develop/README.md"
+    const val PRIVACY = "$REPO/blob/develop/README.md"
+    const val RATE = "https://play.google.com/store/apps/details?id=com.kazemieh.fintrack"
+    const val APP_VERSION = "۲.۱.۰"
+}

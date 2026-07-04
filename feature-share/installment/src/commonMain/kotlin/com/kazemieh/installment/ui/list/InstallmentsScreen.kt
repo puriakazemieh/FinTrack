@@ -62,6 +62,7 @@ fun InstallmentsScreen(
 
     var selectedTabIndex by remember { mutableStateOf(0) }
     var showAddInstallment by remember { mutableStateOf(false) }
+    var selectedInstallmentId by remember { mutableStateOf<Long?>(null) }
 
     val tabs = listOf(
         stringResource(Res.string.installment_upcoming),
@@ -109,7 +110,7 @@ fun InstallmentsScreen(
                 title = tabs[selectedTabIndex],
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(InstallmentIntent.UpdateSearchQuery(it)) },
-                onAddClick = { showAddInstallment = true },
+                onAddClick = { selectedInstallmentId = null; showAddInstallment = true },
                 items = items.map { item ->
                     val progress =
                         (item.installment.paidInstallments.toFloat() / item.installment.totalInstallments).coerceIn(
@@ -162,7 +163,7 @@ fun InstallmentsScreen(
                         }
                     )
                 },
-                onEditClick = { /* Edit logic? */ },
+                onEditClick = { selectedInstallmentId = it.id; showAddInstallment = true },
                 onDeleteClick = { viewModel.onIntent(InstallmentIntent.Delete(it.id)) },
                 showActions = true
             )
@@ -170,7 +171,8 @@ fun InstallmentsScreen(
 
         if (showAddInstallment) {
             AddInstallmentBottomSheet(
-                onDismiss = { showAddInstallment = false },
+                installmentId = selectedInstallmentId,
+                onDismiss = { showAddInstallment = false; selectedInstallmentId = null },
                 onSuccess = { viewModel.onIntent(InstallmentIntent.Init) }
             )
         }

@@ -42,6 +42,8 @@ import com.kazemieh.domain.usecase.GetTransferCategoryUseCase
 import com.kazemieh.domain.usecase.GetTransactionAmountRangeUseCase
 import com.kazemieh.domain.usecase.DebtUseCaseGroup
 import com.kazemieh.domain.usecase.InstallmentUseCaseGroup
+import com.kazemieh.domain.usecase.GetInstallmentByIdUseCase
+import com.kazemieh.domain.usecase.UpdateInstallmentUseCase
 import com.kazemieh.domain.usecase.MarkInstallmentAsPaidUseCase
 import com.kazemieh.domain.usecase.ObserveGoalsUseCase
 import com.kazemieh.domain.usecase.ObserveAllChecksUseCase
@@ -172,6 +174,8 @@ val domainModule = module {
     factory { ObserveInstallmentsUseCase(get()) }
     factory { DeleteInstallmentUseCase(get(), get()) }
     factory { MarkInstallmentAsPaidUseCase(get(), get(), get()) }
+    factory { GetInstallmentByIdUseCase(get()) }
+    factory { UpdateInstallmentUseCase(get(), get()) }
     factory { GetBudgetByCategoryIdUseCase(get()) }
     factory { GetBudgetSpentAmountUseCase(get()) }
 
@@ -255,7 +259,9 @@ val domainModule = module {
             addInstallmentUseCase = get(),
             observeInstallmentsUseCase = get(),
             markInstallmentAsPaidUseCase = get(),
-            deleteInstallmentUseCase = get()
+            deleteInstallmentUseCase = get(),
+            getInstallmentByIdUseCase = get(),
+            updateInstallmentUseCase = get()
         )
     }
     single {

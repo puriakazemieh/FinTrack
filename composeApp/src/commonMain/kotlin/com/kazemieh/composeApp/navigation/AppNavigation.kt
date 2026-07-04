@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.kazemieh.composeApp.navigation.navigationBar.bottomBarNavGraph
+import com.kazemieh.backup_export.ui.ExportSheet
 import com.kazemieh.onboarding.ui.OnboardingScreen
 import com.kazemieh.sync.ui.BackupRestoreScreen
 
@@ -37,7 +38,8 @@ fun AppNavHost(
             }
             composable<Screen.BackupRestore> {
                 BackupRestoreScreen(
-                    onBackClick = { navController.popBackStack() }
+                    onBackClick = { navController.popBackStack() },
+                    exportSheet = { onDismiss -> ExportSheet(onClose = onDismiss) }
                 )
             }
             bottomBarNavGraph(navController)

@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.designsystem.LocalCurrency
+import com.kazemieh.designsystem.LocalHideBalance
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.money.Currency
 import com.kazemieh.money.MoneyFormatter
@@ -31,12 +32,13 @@ fun MoneyText(
     weight: FontWeight = FontWeight.W500,
     color: Color = MaterialTheme.colorScheme.onSurface
 ) {
+    val hidden = LocalHideBalance.current
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.Bottom
     ) {
         FintrackTitleMediumText(
-            text = MoneyFormatter.format(amount, currency, false),
+            text = if (hidden) "••••••" else MoneyFormatter.format(amount, currency, false),
             fontSize = size.sp,
             fontWeight = weight,
             color = color

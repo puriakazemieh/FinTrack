@@ -7,6 +7,8 @@ import com.kazemieh.designsystem.ThemeMode
 import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.PreferenceUseCases
+import com.kazemieh.domain.usecase.ObserveStreakUseCase
+import com.kazemieh.domain.repository.TransactionRepository
 import com.kazemieh.lock.LockMode
 import com.kazemieh.money.Currency
 import com.kazemieh.preferences.FinTrackPreferences
@@ -27,6 +29,8 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 class ProfileViewModel(
     private val preferenceUseCases: PreferenceUseCases,
+    private val transactionRepository: TransactionRepository,
+    private val observeStreakUseCase: ObserveStreakUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())
@@ -38,8 +42,21 @@ class ProfileViewModel(
     init {
         loadSettings()
         loadProfile()
+        loadStats()
         observeThemeChanges()
         observeCurrencyChanges()
+    }
+
+    private fun loadStats() {
+        viewModelScope.launch {
+            val count = transactionRepository.getTransactionCount()
+            _state.update { it.copy(transactionCount = count.toInt()) }
+        }
+        observeStreakUseCase()
+            .onEach { streak ->
+                _state.update { it.copy(activeDays = streak.currentStreak) }
+            }
+            .launchIn(viewModelScope)
     }
 
     @OptIn(ExperimentalEncodingApi::class)
@@ -120,6 +137,10 @@ class ProfileViewModel(
                     FinTrackPreferences.PREF_SYNC_ENABLED,
                     true
                 ),
+                isBalanceHidden = preferenceUseCases.getStringPreference(
+                    FinTrackPreferences.PREF_HIDE_BALANCE,
+                    "false"
+                ).toBoolean(),
                 lastSyncTime = preferenceUseCases.getStringPreference(
                     FinTrackPreferences.PREF_LAST_SYNC_TIME,
                     "---"
@@ -225,6 +246,16 @@ class ProfileViewModel(
                 _state.update { it.copy(isBackupEnabled = newValue) }
             }
 
+            is ProfileIntent.ToggleHideBalance -> {
+                val newValue = !_state.value.isBalanceHidden
+                // Stored as a string so the app root can observe it reactively via getStringFlow.
+                preferenceUseCases.setStringPreference(
+                    FinTrackPreferences.PREF_HIDE_BALANCE,
+                    newValue.toString()
+                )
+                _state.update { it.copy(isBalanceHidden = newValue) }
+            }
+
             is ProfileIntent.TogglePushNotifications -> {
                 val newValue = !_state.value.isPushNotificationsEnabled
                 preferenceUseCases.setBooleanPreference(
@@ -295,9 +326,10 @@ class ProfileViewModel(
             }
 
             ProfileIntent.Logout -> {
-                // Mock logout
                 preferenceUseCases.clearPreferences()
-                // Should navigate to onboarding/login
+                viewModelScope.launch {
+                    _effect.send(ProfileEffect.NavigateToOnboarding)
+                }
             }
         }
     }
@@ -317,13 +349,19 @@ data class ProfileState(
     val isPushNotificationsEnabled: Boolean = true,
     val isTransactionAlertsEnabled: Boolean = true,
     val isSyncEnabled: Boolean = true,
+    val isBalanceHidden: Boolean = false,
     val lastSyncTime: String = "---",
     val selectedCurrency: Currency = Currency.TOMAN,
-    val transactionCount: Int = 412, // Mock
-    val activeDays: Int = 87, // Mock
-    val toolCount: Int = 12, // Mock
+    val transactionCount: Int = 0,
+    val activeDays: Int = 0,
+    val toolCount: Int = TOOL_COUNT,
     val isLoading: Boolean = false
-)
+) {
+    companion object {
+        // Number of tools exposed on the Tools screen (feature-container/tools/ToolsScreen).
+        const val TOOL_COUNT = 21
+    }
+}
 
 sealed interface ProfileIntent {
     data object Refresh : ProfileIntent
@@ -333,6 +371,7 @@ sealed interface ProfileIntent {
     data object ToggleFingerprint : ProfileIntent
     data object ToggleBackup : ProfileIntent
     data object TogglePushNotifications : ProfileIntent
+    data object ToggleHideBalance : ProfileIntent
     data object ToggleTransactionAlerts : ProfileIntent
     data class SelectCurrency(val currency: Currency) : ProfileIntent
     data object ToggleLock : ProfileIntent
@@ -342,4 +381,5 @@ sealed interface ProfileIntent {
 
 sealed interface ProfileEffect {
     data class ShowLockPIN(val mode: LockMode, val triggerFingerprint: Boolean) : ProfileEffect
+    data object NavigateToOnboarding : ProfileEffect
 }

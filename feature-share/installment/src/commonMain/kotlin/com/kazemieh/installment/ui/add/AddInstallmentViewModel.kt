@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -32,6 +33,7 @@ sealed interface AddInstallmentIntent {
     data class SetSource(val source: Source) : AddInstallmentIntent
     data class SetStartDate(val timeStamp: Long) : AddInstallmentIntent
     data class SetFrequency(val frequency: InstallmentFrequency) : AddInstallmentIntent
+    data class LoadInstallment(val installmentId: Long) : AddInstallmentIntent
     data class Submit(
         val reminderTitle: String,
         val reminderMessage: String
@@ -44,6 +46,7 @@ sealed interface AddInstallmentEffect {
 }
 
 data class AddInstallmentState(
+    val installmentId: Long? = null,
     val title: String = "",
     val totalAmount: String = "",
     val installmentAmount: String = "",
@@ -52,6 +55,9 @@ data class AddInstallmentState(
     val category: Category? = null,
     val source: Source? = null,
     val startDate: Long = Clock.System.now().toEpochMilliseconds(),
+    val nextDueDate: Long = Clock.System.now().toEpochMilliseconds(),
+    val isCompleted: Boolean = false,
+    val reminderEnabled: Boolean = true,
     val frequency: InstallmentFrequency = InstallmentFrequency.MONTHLY,
     val isLoading: Boolean = false
 )
@@ -78,7 +84,33 @@ class AddInstallmentViewModel(
             is AddInstallmentIntent.SetSource -> _state.update { it.copy(source = intent.source) }
             is AddInstallmentIntent.SetStartDate -> _state.update { it.copy(startDate = intent.timeStamp) }
             is AddInstallmentIntent.SetFrequency -> _state.update { it.copy(frequency = intent.frequency) }
+            is AddInstallmentIntent.LoadInstallment -> loadInstallment(intent.installmentId)
             is AddInstallmentIntent.Submit -> submit(intent)
+        }
+    }
+
+    private fun loadInstallment(installmentId: Long) {
+        viewModelScope.launch {
+            val installment = installmentUseCases.getInstallmentByIdUseCase(installmentId) ?: return@launch
+            val category = transactionUseCaseGroup.getCategoryUseCase(installment.categoryId)
+            val source = transactionUseCaseGroup.observeSourceUseCase(installment.sourceId).firstOrNull()
+            _state.update {
+                it.copy(
+                    installmentId = installment.id,
+                    title = installment.title,
+                    totalAmount = installment.totalAmount.toString(),
+                    installmentAmount = installment.installmentAmount.toString(),
+                    totalInstallments = installment.totalInstallments.toString(),
+                    paidInstallments = installment.paidInstallments.toString(),
+                    category = category,
+                    source = source,
+                    startDate = installment.startDate,
+                    nextDueDate = installment.nextDueDate,
+                    isCompleted = installment.isCompleted,
+                    reminderEnabled = installment.reminderEnabled,
+                    frequency = installment.frequency
+                )
+            }
         }
     }
 
@@ -93,7 +125,7 @@ class AddInstallmentViewModel(
             _state.update { it.copy(isLoading = true) }
             try {
                 val installment = Installment(
-                    id = 0,
+                    id = s.installmentId ?: 0,
                     title = s.title,
                     totalAmount = s.totalAmount.toLongOrNull() ?: 0,
                     installmentAmount = s.installmentAmount.toLongOrNull() ?: 0,
@@ -102,14 +134,25 @@ class AddInstallmentViewModel(
                     categoryId = s.category.id!!,
                     sourceId = s.source.id!!,
                     startDate = s.startDate,
-                    nextDueDate = s.startDate, // Initial next due date is start date
+                    // Keep the existing next due date when editing; a new plan starts at start date.
+                    nextDueDate = if (s.installmentId != null) s.nextDueDate else s.startDate,
+                    isCompleted = s.isCompleted,
+                    reminderEnabled = s.reminderEnabled,
                     frequency = s.frequency
                 )
-                installmentUseCases.addInstallmentUseCase(
-                    installment = installment,
-                    reminderTitle = intent.reminderTitle,
-                    reminderMessage = intent.reminderMessage
-                )
+                if (s.installmentId != null) {
+                    installmentUseCases.updateInstallmentUseCase(
+                        installment = installment,
+                        reminderTitle = intent.reminderTitle,
+                        reminderMessage = intent.reminderMessage
+                    )
+                } else {
+                    installmentUseCases.addInstallmentUseCase(
+                        installment = installment,
+                        reminderTitle = intent.reminderTitle,
+                        reminderMessage = intent.reminderMessage
+                    )
+                }
                 _effects.send(AddInstallmentEffect.Success)
             } catch (e: Exception) {
                 _effects.send(AddInstallmentEffect.Error(getString(Res.string.transaction_failed)))

@@ -30,6 +30,7 @@ import com.kazemieh.database.di.databaseModule
 import com.kazemieh.designsystem.AppTheme
 import com.kazemieh.designsystem.FintrackTheme
 import com.kazemieh.designsystem.LocalCurrency
+import com.kazemieh.designsystem.LocalHideBalance
 import com.kazemieh.designsystem.ThemeMode
 import com.kazemieh.domain.di.domainModule
 import com.kazemieh.domain.usecase.PreferenceUseCases
@@ -107,6 +108,11 @@ fun App() {
         ""
     ).collectAsState("")
 
+    val hideBalance by preferenceUseCases.getStringFlow(
+        FinTrackPreferences.PREF_HIDE_BALANCE,
+        "false"
+    ).collectAsState("false")
+
     val isSystemDark = isSystemInDarkTheme()
 
     val calculatedTheme = remember(currentTheme, themeMode, isSystemDark, themeStartTime, themeEndTime) {
@@ -147,7 +153,10 @@ fun App() {
         )
         val startDestination = if (isFirstRun) Screen.Onboarding else Screen.BottomBarGraph
 
-        CompositionLocalProvider(LocalCurrency provides Currency.valueOf(currentCurrency)) {
+        CompositionLocalProvider(
+            LocalCurrency provides Currency.valueOf(currentCurrency),
+            LocalHideBalance provides hideBalance.toBoolean()
+        ) {
             FintrackTheme(theme = calculatedTheme) {
                 LockGate {
                     FinTrackHost(startDestination = startDestination)

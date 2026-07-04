@@ -90,7 +90,8 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onNavigateToAchievements = { navController.navigate(Screen.Achievements) },
                 onNavigateToShopping = { navController.navigate(Screen.Shopping) },
                 onNavigateToNotes = { navController.navigate(Screen.Notes) },
-                onNavigateToProfileEdit = { navController.navigate(Screen.EditProfile) }
+                onNavigateToProfileEdit = { navController.navigate(Screen.EditProfile) },
+                onNavigateToNotifications = { navController.navigate(Screen.NotificationSettings) }
             )
         }
 
@@ -339,7 +340,16 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onNavigateToThemeSettings = { navController.navigate(Screen.ThemeSettings) },
                 onNavigateToCurrencySettings = { navController.navigate(Screen.CurrencySettings) },
                 onNavigateToProfileEdit = { navController.navigate(Screen.EditProfile) },
-                onNavigateToNotifications = { navController.navigate(Screen.NotificationSettings) }
+                onNavigateToNotifications = { navController.navigate(Screen.NotificationSettings) },
+                onNavigateToFAQ = { navController.navigate(Screen.FAQ) },
+                onNavigateToSupport = { navController.navigate(Screen.Support) },
+                onNavigateToBackupRestore = { navController.navigate(Screen.BackupRestore) },
+                onLoggedOut = {
+                    navController.navigate(Screen.Onboarding) {
+                        popUpTo(Screen.BottomBarGraph) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 

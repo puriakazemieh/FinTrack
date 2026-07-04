@@ -84,10 +84,15 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun AddCheckBottomSheet(
     onDismiss: () -> Unit,
+    checkId: Long? = null,
     viewModel: AddCheckViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
+
+    LaunchedEffect(checkId) {
+        if (checkId != null) viewModel.onIntent(AddCheckIntent.LoadCheck(checkId))
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -116,7 +121,7 @@ fun AddCheckBottomSheet(
                     .fillMaxSize()
             ) {
                 ScreenHeader(
-                    title = stringResource(Res.string.title_add_check),
+                    title = if (state.checkId == null) stringResource(Res.string.title_add_check) else stringResource(Res.string.edit),
                     onClose = onDismiss
                 )
 

@@ -88,11 +88,13 @@ fun DashboardScreen(
     onNavigateToShopping: () -> Unit = {},
     onNavigateToNotes: () -> Unit = {},
     onNavigateToAchievements: () -> Unit = {},
-    onNavigateToProfileEdit: () -> Unit = {}
+    onNavigateToProfileEdit: () -> Unit = {},
+    onNavigateToNotifications: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
     val listState = rememberLazyListState()
+    var smsBannerDismissed by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
 
     androidx.compose.runtime.LaunchedEffect(showAddTransaction) {
         if (showAddTransaction) {
@@ -113,6 +115,7 @@ fun DashboardScreen(
                     userInitial = state.userInitial,
                     level = state.streak.level,
                     onNavigateToSearch = onNavigateToSearch,
+                    onNotificationsClick = onNavigateToNotifications,
                     onProfileClick = onNavigateToProfileEdit,
                     modifier = Modifier.padding(
                         horizontal = space.large,
@@ -133,12 +136,12 @@ fun DashboardScreen(
                 )
             }
 
-            if (state.smsDrafts.isNotEmpty()) {
+            if (state.smsDrafts.isNotEmpty() && !smsBannerDismissed) {
                 item {
                     SmsBanner(
                         count = state.smsDrafts.size,
                         onClick = { viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet) },
-                        onClose = { /* Optionally hide for session */ },
+                        onClose = { smsBannerDismissed = true },
                         modifier = Modifier.padding(horizontal = space.large, vertical = space.small)
                     )
                 }
@@ -334,6 +337,7 @@ private fun DashboardHeader(
     userInitial: String,
     level: Int = 1,
     onNavigateToSearch: () -> Unit = {},
+    onNotificationsClick: () -> Unit = {},
     onProfileClick: () -> Unit = {}
 ) {
     Row(
@@ -396,7 +400,7 @@ private fun DashboardHeader(
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            HeaderIconButton(icon = Icons.Default.Notifications) { /* Notification action */ }
+            HeaderIconButton(icon = Icons.Default.Notifications, onClick = onNotificationsClick)
             HeaderIconButton(icon = Icons.Default.Search, onClick = onNavigateToSearch)
         }
     }

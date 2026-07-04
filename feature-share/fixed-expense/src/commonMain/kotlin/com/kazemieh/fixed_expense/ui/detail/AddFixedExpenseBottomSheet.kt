@@ -90,10 +90,15 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun AddFixedExpenseBottomSheet(
     onDismiss: () -> Unit,
+    expenseId: Long? = null,
     viewModel: AddFixedExpenseViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
+
+    LaunchedEffect(expenseId) {
+        if (expenseId != null) viewModel.onIntent(AddFixedExpenseIntent.LoadExpense(expenseId))
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -124,7 +129,7 @@ fun AddFixedExpenseBottomSheet(
                     .fillMaxSize()
             ) {
                 ScreenHeader(
-                    title = stringResource(Res.string.title_add_fixed_expense),
+                    title = if (state.expenseId == null) stringResource(Res.string.title_add_fixed_expense) else stringResource(Res.string.edit),
                     onClose = onDismiss
                 )
 

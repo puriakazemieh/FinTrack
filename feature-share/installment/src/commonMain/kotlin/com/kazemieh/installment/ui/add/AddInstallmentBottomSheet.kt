@@ -66,10 +66,15 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AddInstallmentBottomSheet(
     viewModel: AddInstallmentViewModel = koinViewModel(),
     onDismiss: () -> Unit,
-    onSuccess: () -> Unit
+    onSuccess: () -> Unit,
+    installmentId: Long? = null
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    LaunchedEffect(installmentId) {
+        if (installmentId != null) viewModel.onIntent(AddInstallmentIntent.LoadInstallment(installmentId))
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
@@ -99,7 +104,7 @@ fun AddInstallmentBottomSheet(
         var showDatePicker by remember { mutableStateOf(false) }
 
         AddFrame(
-            title = stringResource(Res.string.add_installment),
+            title = if (state.installmentId == null) stringResource(Res.string.add_installment) else stringResource(Res.string.edit),
             sub = stringResource(Res.string.installment_title),
             primaryLabel = stringResource(Res.string.save_),
             onPrimaryClick = {
