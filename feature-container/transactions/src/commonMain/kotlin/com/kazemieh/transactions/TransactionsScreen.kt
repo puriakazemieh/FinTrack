@@ -305,6 +305,7 @@ fun TransactionsScreen(
                 toTimestamp = state.endDateTimeStamp,
                 minAmount = state.selectedMinAmount.toLong(),
                 maxAmount = state.selectedMaxAmount.toLong(),
+                query = state.searchQuery.ifBlank { null },
                 onEdit = { transactionWithRelations ->
                     viewModel.onIntent(
                         TransactionsIntent.ShowTransactionBottomSheet(transactionWithRelations)

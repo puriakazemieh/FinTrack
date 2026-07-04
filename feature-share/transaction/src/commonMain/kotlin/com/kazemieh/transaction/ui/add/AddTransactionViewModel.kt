@@ -262,10 +262,20 @@ class AddTransactionViewModel(
                 null
             }
 
+            val amountValue = current.amount.toIntOrNull() ?: 0
+            // For a transfer, the destination amount mirrors the source amount unless the
+            // user explicitly entered a different one; otherwise it would stay 0 and the
+            // per-day net / detail math would treat the transfer as having no value.
+            val amountTransferValue = if (current.transactionType == TransactionType.TRANSFER) {
+                current.amountTransfer?.toIntOrNull()?.takeIf { it > 0 } ?: amountValue
+            } else {
+                current.amountTransfer?.toIntOrNull() ?: 0
+            }
+
             val transaction = Transaction(
                 id = current.oldTransaction?.id ?: 0,
-                amount = current.amount.toIntOrNull() ?: 0,
-                amountTransfer = current.amountTransfer?.toIntOrNull() ?: 0,
+                amount = amountValue,
+                amountTransfer = amountTransferValue,
                 categoryId = current.category?.id ?: 0,
                 sourceId = current.source?.id ?: 0,
                 sourceEndId = current.sourceEnd?.id,
@@ -315,7 +325,10 @@ class AddTransactionViewModel(
 
     private fun validateAndUpdateErrors(): Boolean {
         val current = _state.value
-        val isAmountError = current.amount.toLongOrNull() == null || current.amount.toLong() <= 0
+        // Amount is stored as Int; reject values that don't fit so they aren't silently
+        // truncated to 0 on save (toIntOrNull returns null for out-of-range values).
+        val amountInt = current.amount.toIntOrNull()
+        val isAmountError = amountInt == null || amountInt <= 0
         val isCategoryError =
             current.transactionType != TransactionType.TRANSFER && current.category == null
         val isSourceError = current.source == null

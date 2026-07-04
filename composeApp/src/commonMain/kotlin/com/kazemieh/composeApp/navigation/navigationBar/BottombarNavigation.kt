@@ -84,6 +84,7 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onNavigateToGoal = { navController.navigate(Screen.Goal) },
                 onNavigateToCheck = { navController.navigate(Screen.Check) },
                 onNavigateToFixedExpense = { navController.navigate(Screen.FixedExpense) },
+                onNavigateToInstallment = { navController.navigate(Screen.Installment) },
                 onNavigateToAIAdvisor = { navController.navigate(Screen.AIAdvisor) },
                 onNavigateToAssets = { navController.navigate(Screen.Assets) },
                 onNavigateToAchievements = { navController.navigate(Screen.Achievements) },

@@ -69,6 +69,7 @@ fun TransactionListByFilterScreen(
     toTimestamp: Long? = null,
     minAmount: Long? = null,
     maxAmount: Long? = null,
+    query: String? = null,
     onDelete: (TransactionWithRelations) -> Unit = {},
     onEdit: (TransactionWithRelations) -> Unit = {},
     viewModel: TransactionReportViewModel = koinViewModel()
@@ -76,7 +77,8 @@ fun TransactionListByFilterScreen(
     LaunchedEffect(
         selectedSources, isAllSources, selectedCategories, isAllCategories,
         selectedTags, isAllTags, selectedPersons, isAllPersons,
-        selectedTransactionType, fromTimestamp, toTimestamp
+        selectedTransactionType, fromTimestamp, toTimestamp,
+        minAmount, maxAmount, query
     ) {
         viewModel.onIntent(
             TransactionReportIntent.SetFilters(
@@ -89,6 +91,7 @@ fun TransactionListByFilterScreen(
                 persons = selectedPersons,
                 isAllPersons = isAllPersons,
                 type = selectedTransactionType,
+                query = query,
                 fromTimestamp = fromTimestamp,
                 toTimestamp = toTimestamp,
                 minAmount = minAmount,

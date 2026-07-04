@@ -73,7 +73,7 @@ class PersonDetailViewModel(
                 persons = setOf(Person(id = personId, name = "")),
                 isAllPersons = false
             )
-            observeTransactionsUseCase(filter, PageRequest(1, 100))
+            observeTransactionsUseCase(filter, PageRequest(limit = 100, offset = 0))
                 .collect { page ->
                     _state.update { it.copy(transactions = page.items) }
                 }

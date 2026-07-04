@@ -50,6 +50,7 @@ class TransactionReportViewModel(
             val type = if (s.filterParams.type == 0) null else s.filterParams.type
             TransactionFilterParams(
                 type = type,
+                query = s.filterParams.query,
                 categories = s.filterParams.categories,
                 // If type is TRANSFER, we ignore category filtering because transfers don't have user categories
                 isAllCategories = s.filterParams.isAllCategories || type == TransactionType.TRANSFER.count,
@@ -142,6 +143,7 @@ class TransactionReportViewModel(
                             persons = intent.persons,
                             isAllPersons = intent.isAllPersons,
                             type = intent.type.count,
+                            query = intent.query,
                             fromTimestamp = intent.fromTimestamp,
                             toTimestamp = intent.toTimestamp,
                             minAmount = intent.minAmount,
@@ -322,6 +324,7 @@ sealed interface TransactionReportIntent {
         val persons: Set<Person>,
         val isAllPersons: Boolean = true,
         val type: TransactionType,
+        val query: String? = null,
         val fromTimestamp: Long?,
         val toTimestamp: Long?,
         val minAmount: Long? = null,
@@ -335,6 +338,7 @@ sealed interface TransactionReportIntent {
 
 data class TransactionFilterParamsState(
     val type: Int? = null,
+    val query: String? = null,
     val sources: Set<Source> = emptySet(),
     val isAllSources: Boolean = true,
     val categories: Set<Category> = emptySet(),
