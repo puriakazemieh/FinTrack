@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,11 +16,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.foundation.border
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.common.toPersianPrice
+import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.LeadingIconStyle
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
@@ -86,23 +89,7 @@ fun GoalScreen(
             }
         }
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            FloatingActionButton(
-                onClick = { viewModel.onIntent(GoalIntent.ShowAddGoal()) },
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(space.large),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                shape = RoundedCornerShape(99.dp)
-            ) {
-                Row(modifier = Modifier.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Add, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(Res.string.label_new_goal), fontWeight = FontWeight.Bold)
-                }
-            }
-        }
+        FAB(onClick = { viewModel.onIntent(GoalIntent.ShowAddGoal()) })
 
         if (state.isAddGoalShow) {
             AddGoalBottomSheet(
@@ -285,6 +272,7 @@ private fun GoalCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddAmountDialog(
     onDismiss: () -> Unit,
@@ -292,27 +280,85 @@ private fun AddAmountDialog(
     amountValue: String,
     onAmountChange: (String) -> Unit
 ) {
-    AlertDialog(
+    val glassColors = LocalGlassColors.current
+    val space = LocalSpacing.current
+    ModalBottomSheet(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(Res.string.label_add_to_goal)) },
-        text = {
-            OutlinedTextField(
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = glassColors.bg0,
+        dragHandle = null
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(space.large),
+            verticalArrangement = Arrangement.spacedBy(space.medium)
+        ) {
+            FintrackTitleMediumText(
+                text = stringResource(Res.string.label_add_to_goal),
+                fontWeight = FontWeight.Bold,
+                color = glassColors.text
+            )
+
+            TextField(
                 value = amountValue,
                 onValueChange = onAmountChange,
-                label = { Text(stringResource(Res.string.amount)) },
-                modifier = Modifier.padding(top = 8.dp),
-                shape = RoundedCornerShape(12.dp)
+                placeholder = {
+                    FintrackBodyMediumText(
+                        text = stringResource(Res.string.amount),
+                        color = glassColors.text3
+                    )
+                },
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                ),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    cursorColor = GlassGreen
+                ),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                    color = glassColors.text,
+                    fontWeight = FontWeight.SemiBold
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(glassColors.bg1)
+                    .border(1.dp, glassColors.glassEdge, RoundedCornerShape(10.dp))
             )
-        },
-        confirmButton = {
-            Button(onClick = onConfirm) {
-                Text(stringResource(Res.string.confirm))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(space.medium)
+            ) {
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = glassColors.glass,
+                        contentColor = glassColors.text
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(stringResource(Res.string.cancell_), fontWeight = FontWeight.Bold)
+                }
+                Button(
+                    onClick = onConfirm,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(stringResource(Res.string.confirm), fontWeight = FontWeight.Bold)
+                }
             }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(Res.string.cancell_))
-            }
+
+            Spacer(Modifier.height(space.medium))
         }
-    )
+    }
 }
