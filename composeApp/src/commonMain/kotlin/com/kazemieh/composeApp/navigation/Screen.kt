@@ -122,6 +122,9 @@ sealed class Screen {
     data object Events : Screen()
 
     @Serializable
+    data object FinancialCalendar : Screen()
+
+    @Serializable
     data object BottomBarGraph : Screen()
 
 }

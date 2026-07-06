@@ -539,6 +539,13 @@
     <string name="bottombar_selected_tabs">تب‌های انتخاب‌شده</string>
     <string name="bottombar_available_tabs">ابزارهای دیگر</string>
 
+    <!-- Financial calendar -->
+    <string name="financial_calendar_title">تقویم مالی</string>
+    <string name="financial_calendar_hint">هر روز را برای دیدن تراکنش‌هایش لمس کنید</string>
+    <string name="financial_calendar_income">درآمد ماه</string>
+    <string name="financial_calendar_expense">هزینه ماه</string>
+    <string name="financial_calendar_day_empty">تراکنشی در این روز ثبت نشده</string>
+
     <string name="currency_toman_full">تومان</string>
     <string name="currency_rial_full">ریال</string>
 

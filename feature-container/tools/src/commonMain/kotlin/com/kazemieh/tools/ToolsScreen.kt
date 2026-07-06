@@ -73,7 +73,8 @@ fun ToolsScreen(
     onNavigateToNews: () -> Unit,
     onNavigateToFAQ: () -> Unit,
     onNavigateToSupport: () -> Unit,
-    onNavigateToEvents: () -> Unit
+    onNavigateToEvents: () -> Unit,
+    onNavigateToFinancialCalendar: () -> Unit
 ) {
     val space = LocalSpacing.current
     val glassColors = LocalGlassColors.current
@@ -102,6 +103,7 @@ fun ToolsScreen(
     val aiAdvisor = ToolEntry(stringResource(Res.string.ai_advisor_title), Icons.Default.AutoAwesome, onNavigateToAIAdvisor)
     val achievements = ToolEntry(stringResource(Res.string.achievements_title), Icons.Default.EmojiEvents, onNavigateToAchievements)
     val events = ToolEntry(stringResource(Res.string.title_events), Icons.Default.Event, onNavigateToEvents)
+    val financialCalendar = ToolEntry(stringResource(Res.string.financial_calendar_title), Icons.Default.CalendarMonth, onNavigateToFinancialCalendar)
 
     val faq = ToolEntry(stringResource(Res.string.title_faq), Icons.Default.Quiz, onNavigateToFAQ)
     val support = ToolEntry(stringResource(Res.string.title_support), Icons.Default.SupportAgent, onNavigateToSupport)
@@ -130,7 +132,7 @@ fun ToolsScreen(
         ToolGroup(
             title = stringResource(Res.string.tools_group_insights),
             accent = GlassPurple,
-            items = listOf(aiAdvisor, achievements, events)
+            items = listOf(aiAdvisor, achievements, events, financialCalendar)
         ),
         ToolGroup(
             title = stringResource(Res.string.tools_group_support),

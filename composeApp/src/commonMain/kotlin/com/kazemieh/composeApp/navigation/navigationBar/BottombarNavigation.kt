@@ -40,6 +40,7 @@ import com.kazemieh.tag.ui.list.TagsScreen
 import com.kazemieh.tools.ToolsScreen
 import com.kazemieh.transactions.TransactionsScreen
 import com.kazemieh.utilities.ui.converter.CurrencyConverterScreen
+import com.kazemieh.utilities.ui.calendar.FinancialCalendarScreen
 import com.kazemieh.utilities.ui.events.EventsScreen
 import com.kazemieh.utilities.ui.faq.FAQScreen
 import com.kazemieh.utilities.ui.fx.FxRatesScreen
@@ -130,7 +131,8 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onNavigateToNews = { navController.navigate(Screen.News) },
                 onNavigateToFAQ = { navController.navigate(Screen.FAQ) },
                 onNavigateToSupport = { navController.navigate(Screen.Support) },
-                onNavigateToEvents = { navController.navigate(Screen.Events) }
+                onNavigateToEvents = { navController.navigate(Screen.Events) },
+                onNavigateToFinancialCalendar = { navController.navigate(Screen.FinancialCalendar) }
             )
         }
 
@@ -176,6 +178,12 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
         composable<Screen.Events> {
             EventsScreen(
                 onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.FinancialCalendar> {
+            FinancialCalendarScreen(
+                onBack = { navController.popBackStack() }
             )
         }
 
