@@ -2,6 +2,7 @@ package com.kazemieh.ai_insights.ui
 
 import androidx.compose.runtime.Immutable
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.domain.usecase.DetectedSubscription
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 
@@ -13,7 +14,8 @@ data class AIAdvisorState(
     val savingPotentialPercentage: Int = 12,
     val savingPotentialAmount: Long = 3000000,
     val activeDays: Int = 87,
-    val suggestions: List<InvestmentSuggestion> = emptyList()
+    val suggestions: List<InvestmentSuggestion> = emptyList(),
+    val subscriptions: List<DetectedSubscription> = emptyList()
 )
 
 sealed interface AIAdvisorIntent {

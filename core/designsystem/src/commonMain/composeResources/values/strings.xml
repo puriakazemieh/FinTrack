@@ -1159,6 +1159,11 @@
     <string name="ai_empty_desc">برای دریافت پیشنهادهای هوشمند، ابتدا چند تراکنش ثبت کنید.</string>
     <string name="ai_active_suggestions_label">پیشنهادهای فعال</string>
 
+    <!-- Subscription detection -->
+    <string name="ai_subscriptions_label">اشتراک‌های شناسایی‌شده</string>
+    <string name="ai_subscription_next_payment">پرداخت بعدی · %1$s</string>
+    <string name="ai_subscription_occurrences">%1$d بار تکرار شده</string>
+
     <string name="risk_low">کم</string>
     <string name="risk_medium">متوسط</string>
     <string name="risk_high">زیاد</string>

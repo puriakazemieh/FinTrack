@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.SyncStatus
 import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.domain.usecase.DetectSubscriptionsUseCase
 import com.kazemieh.domain.usecase.ObserveCategorySumsUseCase
 import com.kazemieh.domain.usecase.ObserveSpendingPatternUseCase
 import com.kazemieh.domain.repository.TransactionRepository
@@ -20,7 +21,8 @@ import kotlinx.datetime.toLocalDateTime
 
 class AIAdvisorViewModel(
     private val observeSpendingPatternUseCase: ObserveSpendingPatternUseCase,
-    private val transactionRepository: TransactionRepository
+    private val transactionRepository: TransactionRepository,
+    private val detectSubscriptionsUseCase: DetectSubscriptionsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AIAdvisorState())
@@ -57,6 +59,8 @@ class AIAdvisorViewModel(
                 return@launch
             }
 
+            val subscriptions = detectSubscriptionsUseCase()
+
             observeSpendingPatternUseCase()
                 .take(1)
                 .collect { pattern ->
@@ -67,7 +71,8 @@ class AIAdvisorViewModel(
                             activeDays = activeDays,
                             savingPotentialPercentage = pattern.savingPotentialPercentage,
                             savingPotentialAmount = pattern.savingPotentialAmount,
-                            suggestions = generateDynamicSuggestions(pattern)
+                            suggestions = generateDynamicSuggestions(pattern),
+                            subscriptions = subscriptions
                         )
                     }
                 }

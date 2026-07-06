@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -35,9 +36,13 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.common.toPersianPrice
+import com.kazemieh.common.persiandatetime.domain.PersianDateTime
+import com.kazemieh.common.persiandatetime.extensions.toDateString
+import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.designsystem.component.PieChart
 import com.kazemieh.designsystem.component.PieChartItem
+import com.kazemieh.domain.usecase.DetectedSubscription
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,6 +94,21 @@ fun AIAdvisorScreen(
                 ) {
                     item {
                         AnalysisCard(state)
+                    }
+
+                    if (state.subscriptions.isNotEmpty()) {
+                        item {
+                            Text(
+                                text = stringResource(Res.string.ai_subscriptions_label) + " · " + state.subscriptions.size.toPersianDigits(),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = glassColors.text2,
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
+                            )
+                        }
+
+                        items(state.subscriptions) { subscription ->
+                            SubscriptionCard(subscription)
+                        }
                     }
 
                     item {
@@ -305,6 +325,65 @@ private fun AnalysisCard(state: AIAdvisorState) {
                     color = glassColors.text
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun SubscriptionCard(subscription: DetectedSubscription) {
+    val glassColors = LocalGlassColors.current
+    val nextDate = remember(subscription.nextEstimatedTimestamp) {
+        PersianDateTime.parse(subscription.nextEstimatedTimestamp).toDateString()
+    }
+
+    GlassCard(padding = 0.dp) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(11.dp))
+                    .background(GlassBlue.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Autorenew,
+                    contentDescription = null,
+                    tint = GlassBlue,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = subscription.categoryName,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = glassColors.text
+                )
+                Text(
+                    text = stringResource(Res.string.ai_subscription_next_payment, nextDate.toPersianDigits()),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = glassColors.text2
+                )
+                Text(
+                    text = stringResource(Res.string.ai_subscription_occurrences, subscription.occurrences),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = glassColors.text3
+                )
+            }
+
+            Text(
+                text = subscription.amount.toPersianPrice(),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = GlassBlue
+            )
         }
     }
 }
