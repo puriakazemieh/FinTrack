@@ -49,6 +49,14 @@ class DashboardViewModel(
         loadSources()
         loadAchievements()
         loadStreak()
+        observeWidgetLayout()
+    }
+
+    private fun observeWidgetLayout() {
+        preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_DASHBOARD_WIDGETS, "")
+            .onEach { csv ->
+                _state.update { it.copy(dashboardWidgets = DashboardWidget.parse(csv)) }
+            }.launchIn(viewModelScope)
     }
 
     private fun loadStreak() {
@@ -157,6 +165,19 @@ class DashboardViewModel(
             is DashboardIntent.UpdateSmsDraft -> viewModelScope.launch {
                 smsDraftRepository.updateSmsDraft(intent.draft)
             }
+
+            DashboardIntent.ToggleCustomizeSheet -> _state.update {
+                it.copy(showCustomizeSheet = !it.showCustomizeSheet)
+            }
+
+            is DashboardIntent.SetWidgetLayout -> {
+                preferenceUseCases.setStringPreference(
+                    FinTrackPreferences.PREF_DASHBOARD_WIDGETS,
+                    DashboardWidget.serialize(intent.items)
+                )
+                // Optimistic update; the pref flow will re-emit the same value.
+                _state.update { it.copy(dashboardWidgets = intent.items) }
+            }
         }
     }
 }
@@ -178,7 +199,9 @@ data class DashboardState(
     val achievements: List<Achievement> = emptyList(),
     val streak: Streak = Streak(),
     val showSmsDetection: Boolean = false,
-    val smsDraft: SmsDraft? = null
+    val smsDraft: SmsDraft? = null,
+    val dashboardWidgets: List<DashboardWidgetItem> = DashboardWidget.defaultConfig(),
+    val showCustomizeSheet: Boolean = false
 )
 
 
@@ -198,4 +221,6 @@ sealed interface DashboardIntent {
     data object ToggleSmsDetectionSheet : DashboardIntent
     data class IgnoreSmsDraft(val draft: SmsDraft) : DashboardIntent
     data class UpdateSmsDraft(val draft: SmsDraft) : DashboardIntent
+    data object ToggleCustomizeSheet : DashboardIntent
+    data class SetWidgetLayout(val items: List<DashboardWidgetItem>) : DashboardIntent
 }

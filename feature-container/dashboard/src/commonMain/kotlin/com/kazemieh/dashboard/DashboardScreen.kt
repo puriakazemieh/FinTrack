@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.offset
@@ -117,6 +118,7 @@ fun DashboardScreen(
                     onNavigateToSearch = onNavigateToSearch,
                     onNotificationsClick = onNavigateToNotifications,
                     onProfileClick = onNavigateToProfileEdit,
+                    onCustomizeClick = { viewModel.onIntent(DashboardIntent.ToggleCustomizeSheet) },
                     modifier = Modifier.padding(
                         horizontal = space.large,
                         vertical = space.mediumSmall
@@ -163,117 +165,33 @@ fun DashboardScreen(
 
             item { Spacer(Modifier.height(space.large)) }
 
-            item {
-                RecentTransactionsWidget(
-                    onMore = { onNavigateToTransactions(true) },
-                    onEdit = { transactionWithRelations ->
-                        viewModel.onIntent(
-                            DashboardIntent.ShowTransactionBottomSheet(transactionWithRelations)
-                        )
-                    },
-                    onDelete = { transactionWithRelations ->
-                        viewModel.onIntent(
-                            DashboardIntent.DeleteTransactionBottomSheet(transactionWithRelations)
-                        )
-                    },
-                    modifier = Modifier.padding(horizontal = space.large)
-                )
+            state.dashboardWidgets.forEach { cfg ->
+                if (!cfg.visible) return@forEach
+                item(key = cfg.widget.name) {
+                    DashboardWidgetContent(
+                        widget = cfg.widget,
+                        state = state,
+                        onEditTransaction = { twr ->
+                            viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet(twr))
+                        },
+                        onDeleteTransaction = { twr ->
+                            viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet(twr))
+                        },
+                        onNavigateToTransactions = onNavigateToTransactions,
+                        onNavigateToBudget = onNavigateToBudget,
+                        onNavigateToGoal = onNavigateToGoal,
+                        onNavigateToInstallment = onNavigateToInstallment,
+                        onNavigateToCheck = onNavigateToCheck,
+                        onNavigateToFixedExpense = onNavigateToFixedExpense,
+                        onNavigateToAIAdvisor = onNavigateToAIAdvisor,
+                        onNavigateToAssets = onNavigateToAssets,
+                        onNavigateToShopping = onNavigateToShopping,
+                        onNavigateToNotes = onNavigateToNotes,
+                        onNavigateToAchievements = onNavigateToAchievements
+                    )
+                    Spacer(Modifier.height(space.large))
+                }
             }
-
-            item { Spacer(Modifier.height(space.large)) }
-
-            item {
-                AchievementWidget(
-                    streak = state.streak,
-                    achievements = state.achievements,
-                    onMore = onNavigateToAchievements,
-                    modifier = Modifier.padding(horizontal = space.large)
-                )
-            }
-
-            item { Spacer(Modifier.height(space.large)) }
-
-            item {
-                BudgetWidget(
-                    onMore = { onNavigateToBudget() },
-                    modifier = Modifier.padding(horizontal = space.large)
-                )
-            }
-
-            item { Spacer(Modifier.height(space.large)) }
-
-            item {
-                GoalWidget(
-                    onMore = { onNavigateToGoal() },
-                    modifier = Modifier.padding(horizontal = space.large)
-                )
-            }
-
-            item { Spacer(Modifier.height(space.large)) }
-
-            item {
-                InstallmentWidget(
-                    onMore = { onNavigateToInstallment() },
-                    modifier = Modifier.padding(horizontal = space.large)
-                )
-            }
-
-            item { Spacer(Modifier.height(space.large)) }
-
-            item {
-                CheckWidget(
-                    onMore = onNavigateToCheck,
-                    modifier = Modifier.padding(horizontal = space.large)
-                )
-            }
-
-            item { Spacer(Modifier.height(space.large)) }
-
-            item {
-                FixedExpenseWidget(
-                    onMore = onNavigateToFixedExpense,
-                    modifier = Modifier.padding(horizontal = space.large)
-                )
-            }
-
-            item { Spacer(Modifier.height(space.large)) }
-
-            item {
-                AIAdvisorWidget(
-                    onMore = onNavigateToAIAdvisor,
-                    modifier = Modifier.padding(horizontal = space.large)
-                )
-            }
-
-            item { Spacer(Modifier.height(space.large)) }
-
-            item {
-                AssetWidget(
-                    onMore = onNavigateToAssets,
-                    modifier = Modifier.padding(horizontal = space.large)
-                )
-            }
-
-            item { Spacer(Modifier.height(space.large)) }
-
-            item {
-                ShoppingWidget(
-                    onMore = onNavigateToShopping,
-                    modifier = Modifier.padding(horizontal = space.large)
-                )
-            }
-
-            item { Spacer(Modifier.height(space.large)) }
-
-            item {
-                NotesWidget(
-                    onMore = onNavigateToNotes,
-                    modifier = Modifier.padding(horizontal = space.large)
-                )
-            }
-
-            item { Spacer(Modifier.height(space.large)) }
-
         }
 
         FAB(modifier = Modifier.padding(bottom = 60.dp)) { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) }
@@ -316,6 +234,14 @@ fun DashboardScreen(
             )
         }
 
+        if (state.showCustomizeSheet) {
+            DashboardCustomizeSheet(
+                items = state.dashboardWidgets,
+                onApply = { viewModel.onIntent(DashboardIntent.SetWidgetLayout(it)) },
+                onDismiss = { viewModel.onIntent(DashboardIntent.ToggleCustomizeSheet) }
+            )
+        }
+
         if (state.showAddSource) {
             AddSourceBottomSheet(
                 selectedSource = state.selectedSource,
@@ -331,6 +257,52 @@ fun DashboardScreen(
 }
 
 @Composable
+private fun DashboardWidgetContent(
+    widget: DashboardWidget,
+    state: DashboardState,
+    onEditTransaction: (com.kazemieh.common.model.TransactionWithRelations) -> Unit,
+    onDeleteTransaction: (com.kazemieh.common.model.TransactionWithRelations) -> Unit,
+    onNavigateToTransactions: (Any?) -> Unit,
+    onNavigateToBudget: () -> Unit,
+    onNavigateToGoal: () -> Unit,
+    onNavigateToInstallment: () -> Unit,
+    onNavigateToCheck: () -> Unit,
+    onNavigateToFixedExpense: () -> Unit,
+    onNavigateToAIAdvisor: () -> Unit,
+    onNavigateToAssets: () -> Unit,
+    onNavigateToShopping: () -> Unit,
+    onNavigateToNotes: () -> Unit,
+    onNavigateToAchievements: () -> Unit
+) {
+    val padding = Modifier.padding(horizontal = LocalSpacing.current.large)
+    when (widget) {
+        DashboardWidget.RECENT_TRANSACTIONS -> RecentTransactionsWidget(
+            onMore = { onNavigateToTransactions(true) },
+            onEdit = onEditTransaction,
+            onDelete = onDeleteTransaction,
+            modifier = padding
+        )
+
+        DashboardWidget.ACHIEVEMENTS -> AchievementWidget(
+            streak = state.streak,
+            achievements = state.achievements,
+            onMore = onNavigateToAchievements,
+            modifier = padding
+        )
+
+        DashboardWidget.BUDGET -> BudgetWidget(onMore = onNavigateToBudget, modifier = padding)
+        DashboardWidget.GOAL -> GoalWidget(onMore = onNavigateToGoal, modifier = padding)
+        DashboardWidget.INSTALLMENT -> InstallmentWidget(onMore = onNavigateToInstallment, modifier = padding)
+        DashboardWidget.CHECK -> CheckWidget(onMore = onNavigateToCheck, modifier = padding)
+        DashboardWidget.FIXED_EXPENSE -> FixedExpenseWidget(onMore = onNavigateToFixedExpense, modifier = padding)
+        DashboardWidget.AI_ADVISOR -> AIAdvisorWidget(onMore = onNavigateToAIAdvisor, modifier = padding)
+        DashboardWidget.ASSET -> AssetWidget(onMore = onNavigateToAssets, modifier = padding)
+        DashboardWidget.SHOPPING -> ShoppingWidget(onMore = onNavigateToShopping, modifier = padding)
+        DashboardWidget.NOTES -> NotesWidget(onMore = onNavigateToNotes, modifier = padding)
+    }
+}
+
+@Composable
 private fun DashboardHeader(
     modifier: Modifier = Modifier,
     userName: String,
@@ -338,7 +310,8 @@ private fun DashboardHeader(
     level: Int = 1,
     onNavigateToSearch: () -> Unit = {},
     onNotificationsClick: () -> Unit = {},
-    onProfileClick: () -> Unit = {}
+    onProfileClick: () -> Unit = {},
+    onCustomizeClick: () -> Unit = {}
 ) {
     Row(
         modifier = modifier
@@ -400,6 +373,7 @@ private fun DashboardHeader(
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            HeaderIconButton(icon = Icons.Default.Tune, onClick = onCustomizeClick)
             HeaderIconButton(icon = Icons.Default.Notifications, onClick = onNotificationsClick)
             HeaderIconButton(icon = Icons.Default.Search, onClick = onNavigateToSearch)
         }

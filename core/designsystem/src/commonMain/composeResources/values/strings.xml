@@ -529,6 +529,10 @@
     <string name="accent_rose">رز</string>
     <string name="accent_gold">طلایی</string>
 
+    <!-- Dashboard customization -->
+    <string name="dashboard_customize_title">چیدمان داشبورد</string>
+    <string name="dashboard_customize_hint">ویجت‌ها را جابه‌جا یا پنهان کنید</string>
+
     <string name="currency_toman_full">تومان</string>
     <string name="currency_rial_full">ریال</string>
 
