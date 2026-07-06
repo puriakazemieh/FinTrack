@@ -26,6 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -33,18 +35,19 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.kazemieh.composeApp.navigation.Destinations
 import com.kazemieh.designsystem.component.glass.glassBlur
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun FintrackNavigationBar(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    onFabClick: () -> Unit = {}
+    tabs: List<Destinations> = Destinations.Defaults,
+    onFabClick: () -> Unit = {},
+    onCustomize: () -> Unit = {}
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-    val selectedDestination by remember(navBackStackEntry) {
+    val selectedDestination by remember(navBackStackEntry, tabs) {
         derivedStateOf {
             val currentRoute = navBackStackEntry?.destination?.route.toString()
             val isSearchOpen = currentRoute.contains("Search", ignoreCase = true)
@@ -55,17 +58,9 @@ fun FintrackNavigationBar(
                 currentRoute
             }
 
-            when {
-                routeToAnalyze.contains("Dashboard", ignoreCase = true) -> Destinations.DASHBOARD
-                routeToAnalyze.contains(
-                    "Transactions",
-                    ignoreCase = true
-                ) -> Destinations.TRANSACTIONS
-
-                routeToAnalyze.contains("Tools", ignoreCase = true) -> Destinations.TOOLS
-                routeToAnalyze.contains("Profile", ignoreCase = true) -> Destinations.PROFILE
-                else -> Destinations.DASHBOARD
-            }
+            tabs.firstOrNull { routeToAnalyze.contains(it.matchKey, ignoreCase = true) }
+                ?: tabs.firstOrNull()
+                ?: Destinations.DASHBOARD
         }
     }
 
@@ -92,6 +87,9 @@ fun FintrackNavigationBar(
                     CircleShape
                 )
                 .glassBlur(20.dp)
+                .pointerInput(Unit) {
+                    detectTapGestures(onLongPress = { onCustomize() })
+                }
         )
 
         // 2. Content Layer (Icons Row)
@@ -103,7 +101,7 @@ fun FintrackNavigationBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Destinations.entries.forEachIndexed { index, destination ->
+            tabs.forEachIndexed { index, destination ->
                 // Center slot for FAB
                 if (index == 2) {
                     Spacer(modifier = Modifier.weight(1.3f))
@@ -151,7 +149,7 @@ fun FintrackNavigationBar(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Icon(
-                            painter = painterResource(destination.icon),
+                            imageVector = destination.icon,
                             contentDescription = stringResource(destination.label),
                             tint = color,
                             modifier = Modifier.size(22.dp) // Slightly smaller icons

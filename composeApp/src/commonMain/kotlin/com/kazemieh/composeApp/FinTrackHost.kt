@@ -16,7 +16,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -26,10 +30,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.composeApp.navigation.AppNavHost
+import com.kazemieh.composeApp.navigation.Destinations
 import com.kazemieh.composeApp.navigation.Screen
+import com.kazemieh.composeApp.navigation.navigationBar.BottomBarCustomizeSheet
 import com.kazemieh.composeApp.navigation.navigationBar.FintrackNavigationBar
 import com.kazemieh.designsystem.component.model.resolveString
+import com.kazemieh.domain.usecase.PreferenceUseCases
+import com.kazemieh.preferences.FinTrackPreferences
 import kotlinx.coroutines.flow.collectLatest
+import org.koin.compose.koinInject
 
 
 @Composable
@@ -38,17 +47,20 @@ fun FinTrackHost(
 ) {
 
     val navController = rememberNavController()
+    val preferenceUseCases = koinInject<PreferenceUseCases>()
+
+    val tabsCsv by preferenceUseCases.getStringFlow(
+        FinTrackPreferences.PREF_BOTTOM_BAR_TABS,
+        ""
+    ).collectAsState("")
+    val tabs = remember(tabsCsv) { Destinations.parseTabs(tabsCsv) }
+
+    var showBottomBarCustomize by remember { mutableStateOf(false) }
 
     val currentRoute =
         navController.currentBackStackEntryAsState().value?.destination?.route.orEmpty()
-    val showBottomBar = remember(currentRoute) {
-        val topLevelScreens = listOf(
-            Screen.Dashboard::class.qualifiedName,
-            Screen.Tools::class.qualifiedName,
-            Screen.Transactions::class.qualifiedName,
-            Screen.Profile::class.qualifiedName
-        )
-        topLevelScreens.any { currentRoute.contains(it ?: "") }
+    val showBottomBar = remember(currentRoute, tabs) {
+        tabs.any { currentRoute.contains(it.matchKey) }
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -92,7 +104,22 @@ fun FinTrackHost(
                 ) {
                     FintrackNavigationBar(
                         navController = navController,
-                        onFabClick = { /* TODO: Global Add Transaction */ }
+                        tabs = tabs,
+                        onFabClick = { /* TODO: Global Add Transaction */ },
+                        onCustomize = { showBottomBarCustomize = true }
+                    )
+                }
+
+                if (showBottomBarCustomize) {
+                    BottomBarCustomizeSheet(
+                        selected = tabs,
+                        onApply = { newTabs ->
+                            preferenceUseCases.setStringPreference(
+                                FinTrackPreferences.PREF_BOTTOM_BAR_TABS,
+                                Destinations.serializeTabs(newTabs)
+                            )
+                        },
+                        onDismiss = { showBottomBarCustomize = false }
                     )
                 }
 

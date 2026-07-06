@@ -533,6 +533,12 @@
     <string name="dashboard_customize_title">چیدمان داشبورد</string>
     <string name="dashboard_customize_hint">ویجت‌ها را جابه‌جا یا پنهان کنید</string>
 
+    <!-- Bottom bar customization -->
+    <string name="bottombar_customize_title">نوار پایین</string>
+    <string name="bottombar_customize_hint">چهار تب دلخواه را انتخاب و مرتب کنید</string>
+    <string name="bottombar_selected_tabs">تب‌های انتخاب‌شده</string>
+    <string name="bottombar_available_tabs">ابزارهای دیگر</string>
+
     <string name="currency_toman_full">تومان</string>
     <string name="currency_rial_full">ریال</string>
 
