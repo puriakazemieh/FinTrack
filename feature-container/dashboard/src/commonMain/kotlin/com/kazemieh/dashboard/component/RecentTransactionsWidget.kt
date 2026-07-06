@@ -24,6 +24,7 @@ fun RecentTransactionsWidget(
     onMore: () -> Unit,
     onEdit: (TransactionWithRelations) -> Unit = {},
     onDelete: (TransactionWithRelations) -> Unit = {},
+    onRepeat: (TransactionWithRelations) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -42,7 +43,8 @@ fun RecentTransactionsWidget(
                 item = item,
                 onClick = { onEdit(item) },
                 onEdit = { onEdit(item) },
-                onDelete = { onDelete(item) }
+                onDelete = { onDelete(item) },
+                onRepeat = onRepeat
             )
             Spacer(Modifier.height(8.dp))
         }

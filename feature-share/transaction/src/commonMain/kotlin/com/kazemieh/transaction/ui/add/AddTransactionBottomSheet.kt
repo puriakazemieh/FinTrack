@@ -117,6 +117,7 @@ import androidx.compose.foundation.layout.Row as ComposeRow
 fun AddTransactionBottomSheet(
     viewModel: AddTransactionViewModel = koinViewModel(),
     transactionWithRelations: TransactionWithRelations? = null,
+    template: TransactionWithRelations? = null,
     initialType: TransactionType? = null,
     smsDraft: SmsDraft? = null,
     onDismiss: () -> Unit,
@@ -136,13 +137,17 @@ fun AddTransactionBottomSheet(
         }
     }
 
-    LaunchedEffect(transactionWithRelations, initialType, smsDraft) {
-        viewModel.onIntent(
-            AddTransactionIntent.FetchDefaultData(
-                transactionWithRelations,
-                smsDraft
+    LaunchedEffect(transactionWithRelations, template, initialType, smsDraft) {
+        if (template != null) {
+            viewModel.onIntent(AddTransactionIntent.PrefillFromTemplate(template))
+        } else {
+            viewModel.onIntent(
+                AddTransactionIntent.FetchDefaultData(
+                    transactionWithRelations,
+                    smsDraft
+                )
             )
-        )
+        }
         initialType?.let { viewModel.onIntent(AddTransactionIntent.SelectedType(it)) }
     }
 

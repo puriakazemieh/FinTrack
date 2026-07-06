@@ -96,6 +96,9 @@ fun DashboardScreen(
     val space = LocalSpacing.current
     val listState = rememberLazyListState()
     var smsBannerDismissed by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    var repeatTemplate by androidx.compose.runtime.remember {
+        androidx.compose.runtime.mutableStateOf<com.kazemieh.common.model.TransactionWithRelations?>(null)
+    }
 
     androidx.compose.runtime.LaunchedEffect(showAddTransaction) {
         if (showAddTransaction) {
@@ -177,6 +180,10 @@ fun DashboardScreen(
                         onDeleteTransaction = { twr ->
                             viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet(twr))
                         },
+                        onRepeatTransaction = { twr ->
+                            repeatTemplate = twr
+                            viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet())
+                        },
                         onNavigateToTransactions = onNavigateToTransactions,
                         onNavigateToBudget = onNavigateToBudget,
                         onNavigateToGoal = onNavigateToGoal,
@@ -199,10 +206,17 @@ fun DashboardScreen(
         if (state.showAddTransaction) {
             AddTransactionBottomSheet(
                 transactionWithRelations = state.transactionWithRelations,
+                template = repeatTemplate,
                 initialType = state.initialTransactionType,
                 smsDraft = state.smsDraft,
-                onDismiss = { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) },
-                transactionAdded = { viewModel.onIntent(DashboardIntent.AnimationEnabled) },
+                onDismiss = {
+                    repeatTemplate = null
+                    viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet())
+                },
+                transactionAdded = {
+                    repeatTemplate = null
+                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                },
             )
         }
 
@@ -262,6 +276,7 @@ private fun DashboardWidgetContent(
     state: DashboardState,
     onEditTransaction: (com.kazemieh.common.model.TransactionWithRelations) -> Unit,
     onDeleteTransaction: (com.kazemieh.common.model.TransactionWithRelations) -> Unit,
+    onRepeatTransaction: (com.kazemieh.common.model.TransactionWithRelations) -> Unit,
     onNavigateToTransactions: (Any?) -> Unit,
     onNavigateToBudget: () -> Unit,
     onNavigateToGoal: () -> Unit,
@@ -280,6 +295,7 @@ private fun DashboardWidgetContent(
             onMore = { onNavigateToTransactions(true) },
             onEdit = onEditTransaction,
             onDelete = onDeleteTransaction,
+            onRepeat = onRepeatTransaction,
             modifier = padding
         )
 

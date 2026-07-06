@@ -24,8 +24,10 @@ import fintrack.core.designsystem.generated.resources.notif_channel_cheque
 import fintrack.core.designsystem.generated.resources.notif_channel_desc
 import fintrack.core.designsystem.generated.resources.notif_channel_installment
 import fintrack.core.designsystem.generated.resources.notif_channel_note
+import fintrack.core.designsystem.generated.resources.notif_channel_quick_add
 import fintrack.core.designsystem.generated.resources.notif_channel_shopping
 import fintrack.core.designsystem.generated.resources.notif_channel_sms
+import android.net.Uri
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
@@ -58,6 +60,11 @@ class AndroidNotificationManager(private val context: Context) : NotificationMan
             createChannel(
                 NotificationManager.CHANNEL_NOTE,
                 getString(Res.string.notif_channel_note)
+            )
+            createChannel(
+                NotificationManager.CHANNEL_QUICK_ADD,
+                getString(Res.string.notif_channel_quick_add),
+                importance = AndroidNotificationManagerSystem.IMPORTANCE_LOW
             )
         }
     }
@@ -143,6 +150,39 @@ class AndroidNotificationManager(private val context: Context) : NotificationMan
             val message = getString(Res.string.notif_budget_exceeded_desc, categoryName, progressPercentage)
             showNotification(categoryId, title, message, NotificationManager.CHANNEL_BUDGET)
         }
+    }
+
+    override fun showQuickAddNotification(title: String, message: String, actionLabel: String) {
+        if (!hasPermission()) return
+
+        val id = NotificationManager.ID_QUICK_ADD
+        val deepLinkIntent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("fintrack://dashboard?showAddTransaction=true")
+        ).apply {
+            `package` = context.packageName
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            context, id, deepLinkIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val action = NotificationCompat.Action.Builder(0, actionLabel, pendingIntent).build()
+
+        val notification = NotificationCompat.Builder(context, NotificationManager.CHANNEL_QUICK_ADD)
+            .setSmallIcon(android.R.drawable.ic_input_add)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setOngoing(true)
+            .setContentIntent(pendingIntent)
+            .addAction(action)
+            .build()
+
+        notificationManagerCompat.notify(id, notification)
+    }
+
+    override fun cancelNotification(id: Int) {
+        notificationManagerCompat.cancel(id)
     }
 
     override fun hasPermission(): Boolean {

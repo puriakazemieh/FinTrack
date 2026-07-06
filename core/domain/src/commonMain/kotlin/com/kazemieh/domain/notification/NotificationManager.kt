@@ -9,6 +9,10 @@ interface NotificationManager {
     fun showStickyNotification(id: Int, title: String, message: String)
     fun showBudgetAlert(categoryId: Int, categoryName: String, progressPercentage: Int)
 
+    /** Shows a persistent one-tap "add transaction" notification, deep-linking into the add sheet. */
+    fun showQuickAddNotification(title: String, message: String, actionLabel: String)
+    fun cancelNotification(id: Int)
+
     companion object {
         const val CHANNEL_BUDGET = "budget_reminders"
         const val CHANNEL_INSTALLMENT = "installment_reminders"
@@ -16,5 +20,7 @@ interface NotificationManager {
         const val CHANNEL_SHOPPING = "shopping_reminders"
         const val CHANNEL_NOTE = "note_reminders"
         const val CHANNEL_SMS = "sms_detection"
+        const val CHANNEL_QUICK_ADD = "quick_add"
+        const val ID_QUICK_ADD = 9001
     }
 }

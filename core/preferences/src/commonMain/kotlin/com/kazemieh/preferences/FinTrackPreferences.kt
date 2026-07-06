@@ -68,5 +68,6 @@ class FinTrackPreferences(private val settings: Settings) {
         const val PREF_NOTIF_QUIET_HOURS_ENABLED = "pref_notif_quiet_hours_enabled"
         const val PREF_NOTIF_QUIET_START = "pref_notif_quiet_start"
         const val PREF_NOTIF_QUIET_END = "pref_notif_quiet_end"
+        const val PREF_QUICK_ADD_NOTIF_ENABLED = "pref_quick_add_notif_enabled"
     }
 }

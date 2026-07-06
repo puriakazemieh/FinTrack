@@ -13,6 +13,8 @@ actual fun notificationPlatformModule(): Module = module {
             override fun showNotification(id: Int, title: String, message: String, channelId: String) {}
             override fun showStickyNotification(id: Int, title: String, message: String) {}
             override fun showBudgetAlert(categoryId: Int, categoryName: String, progressPercentage: Int) {}
+            override fun showQuickAddNotification(title: String, message: String, actionLabel: String) {}
+            override fun cancelNotification(id: Int) {}
             override fun hasPermission(): Boolean = true
             override fun openSettings() {}
         }

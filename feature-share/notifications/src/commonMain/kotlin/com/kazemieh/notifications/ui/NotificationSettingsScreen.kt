@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.EventRepeat
@@ -59,6 +60,7 @@ import fintrack.core.designsystem.generated.resources.notif_permission_rationale
 import fintrack.core.designsystem.generated.resources.notif_quiet_end_label
 import fintrack.core.designsystem.generated.resources.notif_quiet_hours
 import fintrack.core.designsystem.generated.resources.notif_quiet_start_label
+import fintrack.core.designsystem.generated.resources.label_quick_add_notification
 import fintrack.core.designsystem.generated.resources.setting_push_notifications
 import fintrack.core.designsystem.generated.resources.title_notification_settings
 import org.jetbrains.compose.resources.stringResource
@@ -156,6 +158,12 @@ fun NotificationSettingsScreen(
                         icon = Icons.Default.ConfirmationNumber,
                         on = state.isChequeNotifEnabled,
                         onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleChequeNotif) }
+                    )
+                    NotificationSettingItem(
+                        title = stringResource(Res.string.label_quick_add_notification),
+                        icon = Icons.Default.AddCircle,
+                        on = state.isQuickAddNotifEnabled,
+                        onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleQuickAddNotif) }
                     )
                 }
             }

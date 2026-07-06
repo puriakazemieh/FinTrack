@@ -1,9 +1,11 @@
 package com.kazemieh.designsystem.component
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -81,12 +83,13 @@ fun SwipeableTxRowMinimal(
     onClick: () -> Unit,
     onEdit: (TransactionWithRelations) -> Unit,
     onDelete: (TransactionWithRelations) -> Unit,
+    onRepeat: (TransactionWithRelations) -> Unit = {},
 ) {
     FintrackSwipeableRow(
         onDelete = { onDelete(item) },
         onEdit = { onEdit(item) },
         backgroundContent = { progress -> TxSwipeBackground(progress) },
-        content = { TxRowMinimal(item = item, onClick = onClick) }
+        content = { TxRowMinimal(item = item, onClick = onClick, onLongClick = { onRepeat(item) }) }
     )
 }
 
@@ -118,18 +121,26 @@ private fun TxSwipeBackground(progress: Float) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TxRowMinimal(item: TransactionWithRelations, onClick: () -> Unit) {
+fun TxRowMinimal(item: TransactionWithRelations, onClick: () -> Unit, onLongClick: () -> Unit = {}) {
     val (color, bgColor) = getTransactionColors(item.transaction.type)
     val icon = FinTrackIcons.findIcon(item.category.iconId)
     val glassColors = LocalGlassColors.current
+    val haptics = androidx.compose.ui.hapticfeedback.LocalHapticFeedback.current
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .background(glassColors.glass)
-            .clickable(onClick = onClick)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = {
+                    haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                    onLongClick()
+                }
+            )
             .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),

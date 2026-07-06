@@ -1051,6 +1051,12 @@
     <string name="notif_channel_shopping">یادآور خرید</string>
     <string name="notif_channel_note">یادآور یادداشت</string>
     <string name="notif_channel_budget">یادآور بودجه</string>
+    <string name="notif_channel_quick_add">ثبت سریع تراکنش</string>
+    <string name="notif_quick_add_title">ثبت سریع تراکنش</string>
+    <string name="notif_quick_add_message">برای ثبت یک تراکنش جدید ضربه بزنید</string>
+    <string name="notif_quick_add_action">افزودن</string>
+    <string name="label_quick_add_notification">نوتیفیکیشن ثبت سریع</string>
+    <string name="label_quick_add_notification_desc">نوتیفیکیشن دائمی با دکمه‌ی افزودن تراکنش</string>
     <string name="notif_channel_installment">یادآور اقساط</string>
     <string name="notif_channel_cheque">یادآور چک‌ها</string>
     <string name="notif_channel_desc">اعلان‌های برنامه فین‌تراک</string>

@@ -5,9 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.domain.notification.NotificationManager
 import com.kazemieh.preferences.FinTrackPreferences
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.notif_quick_add_action
+import fintrack.core.designsystem.generated.resources.notif_quick_add_message
+import fintrack.core.designsystem.generated.resources.notif_quick_add_title
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 
 class NotificationSettingsViewModel(
     private val preferenceUseCases: PreferenceUseCases,
@@ -31,6 +36,7 @@ class NotificationSettingsViewModel(
                 isBudgetNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_BUDGET_ENABLED, true),
                 isInstallmentNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_INSTALLMENT_ENABLED, true),
                 isChequeNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_CHEQUE_ENABLED, true),
+                isQuickAddNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_QUICK_ADD_NOTIF_ENABLED, false),
                 isQuietHoursEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_QUIET_HOURS_ENABLED, false),
                 quietStart = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_NOTIF_QUIET_START, "22:00"),
                 quietEnd = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_NOTIF_QUIET_END, "08:00")
@@ -71,6 +77,26 @@ class NotificationSettingsViewModel(
                     val newValue = !_state.value.isChequeNotifEnabled
                     preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_CHEQUE_ENABLED, newValue)
                     _state.update { it.copy(isChequeNotifEnabled = newValue) }
+                } else {
+                    _state.update { it.copy(triggerSystemPermissionRequest = true) }
+                }
+            }
+            NotificationSettingsIntent.ToggleQuickAddNotif -> {
+                if (notificationManager.hasPermission()) {
+                    val newValue = !_state.value.isQuickAddNotifEnabled
+                    preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_QUICK_ADD_NOTIF_ENABLED, newValue)
+                    _state.update { it.copy(isQuickAddNotifEnabled = newValue) }
+                    if (newValue) {
+                        viewModelScope.launch {
+                            notificationManager.showQuickAddNotification(
+                                title = getString(Res.string.notif_quick_add_title),
+                                message = getString(Res.string.notif_quick_add_message),
+                                actionLabel = getString(Res.string.notif_quick_add_action)
+                            )
+                        }
+                    } else {
+                        notificationManager.cancelNotification(NotificationManager.ID_QUICK_ADD)
+                    }
                 } else {
                     _state.update { it.copy(triggerSystemPermissionRequest = true) }
                 }

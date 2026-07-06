@@ -149,6 +149,17 @@ fun App() {
     LaunchedEffect(Unit) {
         initializer.initialize()
         notificationManager.createChannels()
+        val quickAddEnabled = preferenceUseCases.getBooleanPreference(
+            FinTrackPreferences.PREF_QUICK_ADD_NOTIF_ENABLED,
+            false
+        )
+        if (quickAddEnabled && notificationManager.hasPermission()) {
+            notificationManager.showQuickAddNotification(
+                title = org.jetbrains.compose.resources.getString(fintrack.core.designsystem.generated.resources.Res.string.notif_quick_add_title),
+                message = org.jetbrains.compose.resources.getString(fintrack.core.designsystem.generated.resources.Res.string.notif_quick_add_message),
+                actionLabel = org.jetbrains.compose.resources.getString(fintrack.core.designsystem.generated.resources.Res.string.notif_quick_add_action)
+            )
+        }
         isReady = true
     }
 

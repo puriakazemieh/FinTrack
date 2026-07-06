@@ -149,6 +149,7 @@ class AddTransactionViewModel(
                 intent.transactionWithRelations,
                 intent.smsDraft
             )
+            is AddTransactionIntent.PrefillFromTemplate -> prefillFromTemplate(intent.template)
             AddTransactionIntent.OnDismiss -> viewModelScope.launch {
                 _effect.send(
                     AddTransactionEffect.OnDismiss
@@ -237,6 +238,30 @@ class AddTransactionViewModel(
                 _state.update { it.copy(photoBytes = bytes) }
             }
         }
+    }
+
+    /** Prefills the form from a past transaction as a starting point for a *new* entry
+     *  (today's date, no [AddTransactionState.oldTransaction]) rather than editing it. */
+    private fun prefillFromTemplate(template: TransactionWithRelations) {
+        val today = JalaliCalendar()
+        _state.value = AddTransactionState(
+            date = "${today.day.toPersianDigits()} / ${today.monthString} / ${today.year.toPersianDigits()}",
+            timeStamp = today.toTimestamp(),
+            mostUsedCategories = _state.value.mostUsedCategories,
+            mostUsedSources = _state.value.mostUsedSources,
+            mostUsedTags = _state.value.mostUsedTags,
+            mostUsedPersons = _state.value.mostUsedPersons,
+            amount = template.transaction.amount.toString(),
+            amountTransfer = template.transaction.amountTransfer.toString(),
+            description = template.transaction.description ?: "",
+            transactionType = template.transaction.type,
+            category = template.category,
+            source = template.source,
+            sourceEnd = template.sourceEnd,
+            tags = template.tags.toSet(),
+            persons = template.persons.toSet()
+        )
+        _typeFlow.value = template.transaction.type
     }
 
     private fun submitTransaction() {
@@ -409,6 +434,7 @@ sealed interface AddTransactionIntent {
         val transactionWithRelations: TransactionWithRelations?,
         val smsDraft: SmsDraft? = null
     ) : AddTransactionIntent
+    data class PrefillFromTemplate(val template: TransactionWithRelations) : AddTransactionIntent
 
     data object OnDismiss : AddTransactionIntent
     data class SelectedType(val selectedTransactionType: TransactionType) : AddTransactionIntent
