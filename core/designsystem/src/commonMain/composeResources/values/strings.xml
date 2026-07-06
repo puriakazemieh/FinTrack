@@ -1207,6 +1207,14 @@
     <string name="label_monthly_target">ماهانه %1$s ت</string>
     <string name="label_new_goal">هدف جدید</string>
     <string name="label_add_to_goal">افزودن به این هدف</string>
+    <string name="label_roundup_title">گرد کردن خودکار</string>
+    <string name="label_roundup_desc">مابه‌التفاوت هر خرج تا سقف را به یک هدف واریز کن</string>
+    <string name="label_roundup_off">خاموش</string>
+    <string name="label_roundup_no_goal">ابتدا یک هدف انتخاب کنید</string>
+    <string name="label_roundup_target_goal">هدف پس‌انداز</string>
+    <string name="label_roundup_unit">سقف گرد کردن</string>
+    <string name="label_roundup_unit_amount">تا %1$s تومان</string>
+    <string name="label_roundup_no_goals_yet">ابتدا یک هدف پس‌انداز بسازید</string>
     <string name="hint_enter_goal_name">نام هدف (مثلاً خرید خانه)</string>
     <string name="label_target_amount">مبلغ هدف</string>
     <string name="label_saved_amount">مبلغ ذخیره شده</string>

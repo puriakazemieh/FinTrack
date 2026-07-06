@@ -52,6 +52,7 @@ kotlin {
                 implementation(project(":core:storage"))
                 implementation(project(":core:domain"))
                 implementation(project(":core:jalali"))
+                implementation(project(":core:preferences"))
 
                 implementation(project(":core:designsystem"))
                 implementation(project(":feature-share:source"))

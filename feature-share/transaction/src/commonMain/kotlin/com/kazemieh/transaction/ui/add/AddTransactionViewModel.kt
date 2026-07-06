@@ -17,6 +17,7 @@ import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.repository.SmsDraftRepository
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import com.kazemieh.jalali.JalaliCalendar
+import com.kazemieh.preferences.FinTrackPreferences
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.msg_mandatory_fields_error
 import fintrack.core.designsystem.generated.resources.transaction_failed
@@ -37,7 +38,9 @@ import kotlinx.coroutines.launch
 class AddTransactionViewModel(
     private val transactionUseCaseGroup: TransactionUseCaseGroup,
     private val imageStorage: ImageStorage,
-    private val smsDraftRepository: SmsDraftRepository
+    private val smsDraftRepository: SmsDraftRepository,
+    private val goalRepository: com.kazemieh.domain.repository.GoalRepository,
+    private val preferenceUseCases: com.kazemieh.domain.usecase.PreferenceUseCases
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddTransactionState())
@@ -329,11 +332,31 @@ class AddTransactionViewModel(
                 current.smsDraft?.let { draft ->
                     smsDraftRepository.markSmsDraftAsUsed(draft.id)
                 }
+                if (current.oldTransaction == null && current.transactionType == TransactionType.EXPENSE) {
+                    applyRoundUp(amountValue.toLong())
+                }
                 _effect.send(AddTransactionEffect.AddedTransaction)
             } else {
                 SnackbarController.showMessage(UiText.StringResourceText(Res.string.transaction_failed))
             }
         }
+    }
+
+    /** Rounds a new expense up to the configured unit and deposits the difference
+     *  into the user's chosen savings goal, if round-up is enabled. */
+    private suspend fun applyRoundUp(expenseAmount: Long) {
+        val enabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_ROUNDUP_ENABLED, false)
+        if (!enabled) return
+        val goalId = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_ROUNDUP_GOAL_ID, "").toLongOrNull() ?: return
+        val unit = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_ROUNDUP_UNIT, "5000").toLongOrNull() ?: 5000L
+        if (unit <= 0 || expenseAmount <= 0) return
+
+        val remainder = expenseAmount % unit
+        if (remainder == 0L) return
+        val roundUpAmount = unit - remainder
+
+        val goal = goalRepository.getGoalById(goalId) ?: return
+        goalRepository.updateGoal(goal.copy(savedAmount = goal.savedAmount + roundUpAmount))
     }
 
     private fun toggleSheet(sheet: AddTransactionSheet) {

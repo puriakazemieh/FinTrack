@@ -51,6 +51,7 @@ kotlin {
                 implementation(project(":core:jalali"))
                 implementation(project(":core:designsystem"))
                 implementation(project(":core:money"))
+                implementation(project(":core:preferences"))
 
                 implementation(libs.compose.material.icons.core)
                 implementation(libs.compose.material.icons.extended)

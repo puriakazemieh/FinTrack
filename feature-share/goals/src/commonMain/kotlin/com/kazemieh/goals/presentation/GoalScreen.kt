@@ -67,6 +67,13 @@ fun GoalScreen(
                 }
 
                 item {
+                    RoundUpSummaryCard(
+                        state = state,
+                        onClick = { viewModel.onIntent(GoalIntent.ToggleRoundUpSettings) }
+                    )
+                }
+
+                item {
                     SearchBar(
                         query = state.searchQuery,
                         onQueryChange = { viewModel.onIntent(GoalIntent.UpdateSearchQuery(it)) },
@@ -112,6 +119,135 @@ fun GoalScreen(
                 amountValue = amountToAdd,
                 onAmountChange = { amountToAdd = it }
             )
+        }
+
+        if (state.showRoundUpSettings) {
+            RoundUpSettingsSheet(
+                state = state,
+                onDismiss = { viewModel.onIntent(GoalIntent.ToggleRoundUpSettings) },
+                onToggleEnabled = { viewModel.onIntent(GoalIntent.ToggleRoundUpEnabled) },
+                onSelectGoal = { viewModel.onIntent(GoalIntent.SetRoundUpGoal(it)) },
+                onSelectUnit = { viewModel.onIntent(GoalIntent.SetRoundUpUnit(it)) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun RoundUpSummaryCard(state: GoalState, onClick: () -> Unit) {
+    val glassColors = LocalGlassColors.current
+    val goalName = state.goals.find { it.id == state.roundUpGoalId }?.name
+    val subtitle = when {
+        !state.isRoundUpEnabled -> stringResource(Res.string.label_roundup_off)
+        goalName != null -> stringResource(Res.string.label_roundup_unit_amount, state.roundUpUnit.toString().toPersianDigits()) + " · " + goalName
+        else -> stringResource(Res.string.label_roundup_no_goal)
+    }
+
+    GlassCard(onClick = onClick) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = androidx.compose.material.icons.Icons.Default.Savings,
+                contentDescription = null,
+                tint = if (state.isRoundUpEnabled) GlassGreen else glassColors.text3
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                FintrackTitleMediumText(text = stringResource(Res.string.label_roundup_title))
+                FintrackBodyMediumText(text = subtitle, color = glassColors.text3)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RoundUpSettingsSheet(
+    state: GoalState,
+    onDismiss: () -> Unit,
+    onToggleEnabled: () -> Unit,
+    onSelectGoal: (Long) -> Unit,
+    onSelectUnit: (Long) -> Unit
+) {
+    val glassColors = LocalGlassColors.current
+    val space = LocalSpacing.current
+    val units = listOf(1_000L, 5_000L, 10_000L)
+
+    androidx.compose.material3.ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = glassColors.bg0
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = space.large)
+                .padding(bottom = space.large)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    FintrackTitleMediumText(text = stringResource(Res.string.label_roundup_title), fontWeight = FontWeight.Bold)
+                    FintrackBodyMediumText(text = stringResource(Res.string.label_roundup_desc), color = glassColors.text3)
+                }
+                com.kazemieh.designsystem.component.glass.Switch(on = state.isRoundUpEnabled, onToggle = { onToggleEnabled() })
+            }
+
+            if (state.isRoundUpEnabled) {
+                Spacer(Modifier.height(space.medium))
+                FintrackTitleMediumText(text = stringResource(Res.string.label_roundup_target_goal), fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(4.dp))
+                if (state.goals.isEmpty()) {
+                    FintrackBodyMediumText(text = stringResource(Res.string.label_roundup_no_goals_yet), color = glassColors.text3)
+                } else {
+                    state.goals.forEach { goal ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(MaterialTheme.shapes.medium)
+                                .clickable { onSelectGoal(goal.id) }
+                                .padding(vertical = 10.dp, horizontal = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            androidx.compose.material3.RadioButton(
+                                selected = state.roundUpGoalId == goal.id,
+                                onClick = { onSelectGoal(goal.id) },
+                                colors = androidx.compose.material3.RadioButtonDefaults.colors(selectedColor = GlassGreen)
+                            )
+                            FintrackBodyMediumText(text = goal.name)
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(space.medium))
+                FintrackTitleMediumText(text = stringResource(Res.string.label_roundup_unit), fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    units.forEach { unit ->
+                        val selected = state.roundUpUnit == unit
+                        Box(
+                            modifier = Modifier
+                                .clip(MaterialTheme.shapes.medium)
+                                .background(if (selected) GlassGreen.copy(alpha = 0.16f) else glassColors.glass)
+                                .border(
+                                    1.dp,
+                                    if (selected) GlassGreen else glassColors.glassEdge,
+                                    MaterialTheme.shapes.medium
+                                )
+                                .clickable { onSelectUnit(unit) }
+                                .padding(horizontal = 14.dp, vertical = 8.dp)
+                        ) {
+                            FintrackBodyMediumText(
+                                text = stringResource(Res.string.label_roundup_unit_amount, unit.toString().toPersianDigits()),
+                                color = if (selected) GlassGreen else glassColors.text2
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }

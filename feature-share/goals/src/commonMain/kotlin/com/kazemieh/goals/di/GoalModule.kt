@@ -6,6 +6,6 @@ import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val goalModule = module {
-    viewModel { GoalViewModel(get()) }
+    viewModel { GoalViewModel(get(), get()) }
     viewModel { AddGoalViewModel(get()) }
 }
