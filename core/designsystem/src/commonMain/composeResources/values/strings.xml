@@ -519,6 +519,16 @@
     <string name="theme_glass_light">شیشه‌ای روشن</string>
     <string name="theme_plain_dark">تیره ساده</string>
     <string name="theme_plain_light">روشن ساده</string>
+
+    <!-- Accent palette -->
+    <string name="label_accent_color">رنگ لهجه</string>
+    <string name="accent_emerald">زمرد</string>
+    <string name="accent_blue">آبی</string>
+    <string name="accent_purple">بنفش</string>
+    <string name="accent_amber">کهربایی</string>
+    <string name="accent_rose">رز</string>
+    <string name="accent_gold">طلایی</string>
+
     <string name="currency_toman_full">تومان</string>
     <string name="currency_rial_full">ریال</string>
 

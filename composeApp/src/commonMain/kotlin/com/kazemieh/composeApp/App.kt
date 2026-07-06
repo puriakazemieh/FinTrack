@@ -27,6 +27,7 @@ import com.kazemieh.notes.di.notesModule
 import com.kazemieh.data.di.dataModule
 import com.kazemieh.database.DatabaseInitializer
 import com.kazemieh.database.di.databaseModule
+import com.kazemieh.designsystem.AccentPalette
 import com.kazemieh.designsystem.AppTheme
 import com.kazemieh.designsystem.FintrackTheme
 import com.kazemieh.designsystem.LocalCurrency
@@ -103,6 +104,11 @@ fun App() {
         "07:00"
     ).collectAsState("07:00")
 
+    val accentName by preferenceUseCases.getStringFlow(
+        FinTrackPreferences.PREF_ACCENT,
+        AccentPalette.Default.name
+    ).collectAsState(AccentPalette.Default.name)
+
     val currentCurrency by preferenceUseCases.getStringFlow(
         FinTrackPreferences.PREF_CURRENCY,
         ""
@@ -157,7 +163,10 @@ fun App() {
             LocalCurrency provides Currency.valueOf(currentCurrency),
             LocalHideBalance provides hideBalance.toBoolean()
         ) {
-            FintrackTheme(theme = calculatedTheme) {
+            FintrackTheme(
+                theme = calculatedTheme,
+                accent = AccentPalette.fromName(accentName)
+            ) {
                 LockGate {
                     FinTrackHost(startDestination = startDestination)
                 }

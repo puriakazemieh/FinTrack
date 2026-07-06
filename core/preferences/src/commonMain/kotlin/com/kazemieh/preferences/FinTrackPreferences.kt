@@ -46,6 +46,7 @@ class FinTrackPreferences(private val settings: Settings) {
         const val PREF_HIDE_BALANCE = "pref_hide_balance"
 
         const val PREF_THEME = "pref_theme"
+        const val PREF_ACCENT = "pref_accent"
         const val PREF_THEME_MODE = "pref_theme_mode"
         const val PREF_FOLLOW_SYSTEM_THEME = "pref_follow_system_theme"
         const val PREF_THEME_START_TIME = "pref_theme_start_time"

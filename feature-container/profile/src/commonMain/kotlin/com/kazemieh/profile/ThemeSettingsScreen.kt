@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.toPersianDigits
+import com.kazemieh.designsystem.AccentPalette
 import com.kazemieh.designsystem.AppTheme
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
@@ -49,6 +50,13 @@ import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.WidgetCard
 import com.kazemieh.designsystem.component.picker.FintrackTimePickerBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.accent_amber
+import fintrack.core.designsystem.generated.resources.accent_blue
+import fintrack.core.designsystem.generated.resources.accent_emerald
+import fintrack.core.designsystem.generated.resources.accent_gold
+import fintrack.core.designsystem.generated.resources.accent_purple
+import fintrack.core.designsystem.generated.resources.accent_rose
+import fintrack.core.designsystem.generated.resources.label_accent_color
 import fintrack.core.designsystem.generated.resources.label_theme
 import fintrack.core.designsystem.generated.resources.label_theme_dark_time
 import fintrack.core.designsystem.generated.resources.label_theme_mode
@@ -103,6 +111,17 @@ fun ThemeSettingsScreen(
                     selectedTheme = state.selectedTheme,
                     onThemeSelected = { viewModel.onIntent(ThemeSettingsIntent.SelectTheme(it)) }
                 )
+            }
+
+            item {
+                WidgetCard(
+                    title = stringResource(Res.string.label_accent_color)
+                ) {
+                    AccentPaletteSection(
+                        selectedAccent = state.selectedAccent,
+                        onAccentSelected = { viewModel.onIntent(ThemeSettingsIntent.SelectAccent(it)) }
+                    )
+                }
             }
 
             item {
@@ -165,6 +184,86 @@ fun ThemeModeSection(
             )
         }
     }
+}
+
+@Composable
+fun AccentPaletteSection(
+    selectedAccent: AccentPalette,
+    onAccentSelected: (AccentPalette) -> Unit
+) {
+    val space = LocalSpacing.current
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = space.small, vertical = space.small),
+            horizontalArrangement = Arrangement.spacedBy(space.small)
+        ) {
+            AccentPalette.entries.forEach { palette ->
+                AccentSwatch(
+                    modifier = Modifier.weight(1f),
+                    palette = palette,
+                    label = stringResource(accentLabelRes(palette)),
+                    isSelected = palette == selectedAccent,
+                    onClick = { onAccentSelected(palette) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AccentSwatch(
+    modifier: Modifier = Modifier,
+    palette: AccentPalette,
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.medium)
+            .clickable(onClick = onClick)
+            .padding(vertical = 6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(palette.accent)
+                .border(
+                    2.dp,
+                    if (isSelected) LocalGlassColors.current.text else Color.Transparent,
+                    CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isSelected) {
+                Icon(
+                    Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = palette.onAccent,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
+        FintrackLabelMediumText(
+            text = label,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+            color = if (isSelected) palette.accent else MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+private fun accentLabelRes(palette: AccentPalette) = when (palette) {
+    AccentPalette.EMERALD -> Res.string.accent_emerald
+    AccentPalette.BLUE -> Res.string.accent_blue
+    AccentPalette.PURPLE -> Res.string.accent_purple
+    AccentPalette.AMBER -> Res.string.accent_amber
+    AccentPalette.ROSE -> Res.string.accent_rose
+    AccentPalette.GOLD -> Res.string.accent_gold
 }
 
 @Composable

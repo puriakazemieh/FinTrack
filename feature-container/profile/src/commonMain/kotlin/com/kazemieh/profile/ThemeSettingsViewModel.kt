@@ -1,9 +1,11 @@
 package com.kazemieh.profile
 
 import androidx.lifecycle.ViewModel
+import com.kazemieh.designsystem.AccentPalette
 import com.kazemieh.designsystem.AppTheme
 import com.kazemieh.designsystem.ThemeMode
 import com.kazemieh.domain.usecase.PreferenceUseCases
+import com.kazemieh.preferences.FinTrackPreferences.Companion.PREF_ACCENT
 import com.kazemieh.preferences.FinTrackPreferences.Companion.PREF_FOLLOW_SYSTEM_THEME
 import com.kazemieh.preferences.FinTrackPreferences.Companion.PREF_THEME
 import com.kazemieh.preferences.FinTrackPreferences.Companion.PREF_THEME_END_TIME
@@ -30,6 +32,7 @@ class ThemeSettingsViewModel(
         val startTime = preferenceUseCases.getStringPreference(PREF_THEME_START_TIME, "20:00")
         val endTime = preferenceUseCases.getStringPreference(PREF_THEME_END_TIME, "07:00")
         val followSystem = preferenceUseCases.getBooleanPreference(PREF_FOLLOW_SYSTEM_THEME, false)
+        val accentName = preferenceUseCases.getStringPreference(PREF_ACCENT, AccentPalette.Default.name)
 
         _state.update {
             it.copy(
@@ -38,6 +41,7 @@ class ThemeSettingsViewModel(
                 } catch (e: Exception) {
                     AppTheme.GLASS_DARK
                 },
+                selectedAccent = AccentPalette.fromName(accentName),
                 selectedMode = try {
                     ThemeMode.valueOf(modeName)
                 } catch (e: Exception) {
@@ -55,6 +59,11 @@ class ThemeSettingsViewModel(
             is ThemeSettingsIntent.SelectTheme -> {
                 preferenceUseCases.setStringPreference(PREF_THEME, intent.theme.name)
                 _state.update { it.copy(selectedTheme = intent.theme) }
+            }
+
+            is ThemeSettingsIntent.SelectAccent -> {
+                preferenceUseCases.setStringPreference(PREF_ACCENT, intent.accent.name)
+                _state.update { it.copy(selectedAccent = intent.accent) }
             }
 
             is ThemeSettingsIntent.SelectMode -> {
@@ -83,6 +92,7 @@ class ThemeSettingsViewModel(
 
 data class ThemeSettingsState(
     val selectedTheme: AppTheme = AppTheme.GLASS_DARK,
+    val selectedAccent: AccentPalette = AccentPalette.Default,
     val selectedMode: ThemeMode = ThemeMode.MANUAL,
     val startTime: String = "20:00",
     val endTime: String = "07:00",
@@ -91,6 +101,7 @@ data class ThemeSettingsState(
 
 sealed interface ThemeSettingsIntent {
     data class SelectTheme(val theme: AppTheme) : ThemeSettingsIntent
+    data class SelectAccent(val accent: AccentPalette) : ThemeSettingsIntent
     data class SelectMode(val mode: ThemeMode) : ThemeSettingsIntent
     data class SetStartTime(val time: String) : ThemeSettingsIntent
     data class SetEndTime(val time: String) : ThemeSettingsIntent

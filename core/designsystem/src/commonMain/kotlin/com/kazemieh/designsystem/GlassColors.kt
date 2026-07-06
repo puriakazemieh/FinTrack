@@ -55,6 +55,10 @@ data class GlassColors(
     val text: Color,
     val text2: Color,
     val text3: Color,
+    val accent: Color = GlassGreen,
+    val accentSoft: Color = GlassGreenSoft,
+    val accentDeep: Color = GlassGreenDeep,
+    val onAccent: Color = GlassGreenDark,
     val isGlass: Boolean
 )
 

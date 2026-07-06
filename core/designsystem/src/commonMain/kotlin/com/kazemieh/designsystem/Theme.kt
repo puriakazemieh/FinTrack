@@ -112,21 +112,42 @@ private val GlassLightColors = lightColorScheme(
 @Composable
 fun FintrackTheme(
     theme: AppTheme = AppTheme.GLASS_DARK,
+    accent: AccentPalette = AccentPalette.Default,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when (theme) {
+    val baseColorScheme = when (theme) {
         AppTheme.GLASS_DARK -> GlassDarkColors
         AppTheme.GLASS_LIGHT -> GlassLightColors
         AppTheme.PLAIN_DARK -> DarkColors
         AppTheme.PLAIN_LIGHT -> LightColors
     }
 
-    val glassColors = when (theme) {
+    val baseGlassColors = when (theme) {
         AppTheme.GLASS_DARK -> DarkGlassColors
         AppTheme.GLASS_LIGHT -> LightGlassColors
         AppTheme.PLAIN_DARK -> PlainDarkGlassColors
         AppTheme.PLAIN_LIGHT -> PlainLightGlassColors
     }
+
+    // Recolor the primary/accent roles from the user's chosen palette. On light
+    // themes the deeper shade keeps contrast against bright backgrounds.
+    val isLight = theme == AppTheme.GLASS_LIGHT || theme == AppTheme.PLAIN_LIGHT
+    val primaryColor = if (isLight) accent.accentDeep else accent.accent
+    val onPrimaryColor = if (isLight) Color.White else accent.onAccent
+
+    val colorScheme = baseColorScheme.copy(
+        primary = primaryColor,
+        onPrimary = onPrimaryColor,
+        primaryContainer = accent.accentSoft,
+        onPrimaryContainer = if (isLight) accent.accentDeep else accent.accent
+    )
+
+    val glassColors = baseGlassColors.copy(
+        accent = accent.accent,
+        accentSoft = accent.accentSoft,
+        accentDeep = accent.accentDeep,
+        onAccent = accent.onAccent
+    )
 
     CompositionLocalProvider(
         LocalSpacing provides Dimensions(),
