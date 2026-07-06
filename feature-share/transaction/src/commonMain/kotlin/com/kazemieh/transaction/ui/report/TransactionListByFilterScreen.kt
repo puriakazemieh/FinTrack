@@ -176,9 +176,10 @@ fun TransactionListByFilterContent(
             }
         } else if (state.isRefreshing && state.items.isEmpty()) {
             item {
-                Box(modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = GlassGreen)
-                }
+                com.kazemieh.designsystem.component.SkeletonList(
+                    modifier = Modifier.fillMaxWidth(),
+                    count = 6
+                )
             }
         } else if (state.items.isEmpty()) {
             item {

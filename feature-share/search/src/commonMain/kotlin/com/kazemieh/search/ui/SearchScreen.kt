@@ -295,6 +295,17 @@ private fun SearchResultList(
     onTagClick: (Tag) -> Unit
 ) {
     val space = LocalSpacing.current
+    val hasResults = transactions.isNotEmpty() || categories.isNotEmpty() ||
+        sources.isNotEmpty() || persons.isNotEmpty() || tags.isNotEmpty()
+
+    if (!hasResults) {
+        com.kazemieh.designsystem.component.EmptyList(
+            title = query,
+            modifier = Modifier.fillMaxSize()
+        )
+        return
+    }
+
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         if (transactions.isNotEmpty()) {
             items(transactions) { tx ->

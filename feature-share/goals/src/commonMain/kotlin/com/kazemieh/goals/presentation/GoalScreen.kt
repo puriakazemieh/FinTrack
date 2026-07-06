@@ -45,6 +45,7 @@ fun GoalScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
     val glassColors = LocalGlassColors.current
+    val haptics = androidx.compose.ui.hapticfeedback.LocalHapticFeedback.current
 
     var showAddAmountDialog by remember { mutableStateOf(false) }
     var selectedGoalId by remember { mutableLongStateOf(0L) }
@@ -104,6 +105,7 @@ fun GoalScreen(
                 onConfirm = {
                     amountToAdd.toLongOrNull()?.let {
                         viewModel.onIntent(GoalIntent.AddAmountToGoal(selectedGoalId, it))
+                        haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                     }
                     showAddAmountDialog = false
                 },

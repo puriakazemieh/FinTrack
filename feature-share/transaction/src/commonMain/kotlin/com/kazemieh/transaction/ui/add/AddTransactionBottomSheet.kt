@@ -127,6 +127,7 @@ fun AddTransactionBottomSheet(
     val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+    val haptics = androidx.compose.ui.hapticfeedback.LocalHapticFeedback.current
 
     DisposableEffect(Unit) {
         onDispose {
@@ -149,6 +150,7 @@ fun AddTransactionBottomSheet(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is AddTransactionEffect.AddedTransaction -> {
+                    haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                     focusManager.clearFocus()
                     keyboardController?.hide()
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
