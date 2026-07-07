@@ -48,6 +48,7 @@ import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.SwipeableTxRow
 import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.btn_retry
 import fintrack.core.designsystem.generated.resources.label_amount_with_unit
 import fintrack.core.designsystem.generated.resources.msg_no_transaction_found
 import fintrack.core.designsystem.generated.resources.unit_toman_short

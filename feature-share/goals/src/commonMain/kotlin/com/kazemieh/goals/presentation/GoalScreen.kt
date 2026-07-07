@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.platform.LocalHapticFeedback
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.common.toPersianPrice
 import com.kazemieh.designsystem.GlassGreen
@@ -47,7 +49,7 @@ fun GoalScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
     val glassColors = LocalGlassColors.current
-    val haptics = androidx.compose.ui.hapticfeedback.LocalHapticFeedback.current
+    val haptics = LocalHapticFeedback.current
 
     var showAddAmountDialog by remember { mutableStateOf(false) }
     var selectedGoalId by remember { mutableLongStateOf(0L) }
@@ -214,10 +216,10 @@ private fun RoundUpSettingsSheet(
                                 .padding(vertical = 10.dp, horizontal = 4.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            androidx.compose.material3.RadioButton(
+                            RadioButton(
                                 selected = state.roundUpGoalId == goal.id,
                                 onClick = { onSelectGoal(goal.id) },
-                                colors = androidx.compose.material3.RadioButtonDefaults.colors(selectedColor = GlassGreen)
+                                colors = RadioButtonDefaults.colors(selectedColor = GlassGreen)
                             )
                             FintrackBodyMediumText(text = goal.name)
                         }

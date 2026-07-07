@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -127,7 +128,7 @@ fun TxRowMinimal(item: TransactionWithRelations, onClick: () -> Unit, onLongClic
     val (color, bgColor) = getTransactionColors(item.transaction.type)
     val icon = FinTrackIcons.findIcon(item.category.iconId)
     val glassColors = LocalGlassColors.current
-    val haptics = androidx.compose.ui.hapticfeedback.LocalHapticFeedback.current
+    val haptics = LocalHapticFeedback.current
 
     Row(
         modifier = Modifier

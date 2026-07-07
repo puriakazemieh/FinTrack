@@ -67,6 +67,7 @@ import fintrack.core.designsystem.generated.resources.category
 import fintrack.core.designsystem.generated.resources.custom_date
 import fintrack.core.designsystem.generated.resources.description
 import fintrack.core.designsystem.generated.resources.dp_today
+import fintrack.core.designsystem.generated.resources.edit
 import fintrack.core.designsystem.generated.resources.frequency_daily
 import fintrack.core.designsystem.generated.resources.frequency_monthly
 import fintrack.core.designsystem.generated.resources.frequency_weekly

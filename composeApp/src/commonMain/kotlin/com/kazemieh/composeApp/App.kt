@@ -67,6 +67,9 @@ import com.kazemieh.sync.di.syncModule
 import com.kazemieh.gamification.di.gamificationModule
 import com.kazemieh.utilities.di.utilitiesModule
 import com.kazemieh.composeApp.navigation.Screen
+import fintrack.core.designsystem.generated.resources.notif_quick_add_action
+import fintrack.core.designsystem.generated.resources.notif_quick_add_message
+import fintrack.core.designsystem.generated.resources.notif_quick_add_title
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
