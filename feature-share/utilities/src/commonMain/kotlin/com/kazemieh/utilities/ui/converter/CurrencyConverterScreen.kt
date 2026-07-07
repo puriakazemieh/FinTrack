@@ -5,21 +5,28 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -47,6 +54,8 @@ import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
@@ -54,9 +63,7 @@ import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.GlassTone
 import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.label_select_currency
-import fintrack.core.designsystem.generated.resources.sub_currency_converter
-import fintrack.core.designsystem.generated.resources.title_currency_converter
+import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -78,7 +85,7 @@ fun CurrencyConverterScreen(
         onBack = onBackClick
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
         ) {
             // Display Area
             GlassCard(
@@ -99,11 +106,17 @@ fun CurrencyConverterScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        FintrackLabelMediumText(
-                            text = state.fromRate?.name ?: "",
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            FintrackLabelMediumText(
+                                text = (state.fromRate?.code?.let { getFlag(it) } ?: "") + " ",
+                                fontSize = 20.sp
+                            )
+                            FintrackLabelMediumText(
+                                text = state.fromRate?.name ?: "",
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                         FintrackHeadlineSmallText(
                             text = state.amount.toPersianDigits(),
                             fontWeight = FontWeight.Bold
@@ -138,11 +151,17 @@ fun CurrencyConverterScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        FintrackLabelMediumText(
-                            text = state.toRate?.name ?: "",
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            FintrackLabelMediumText(
+                                text = (state.toRate?.code?.let { getFlag(it) } ?: "") + " ",
+                                fontSize = 20.sp
+                            )
+                            FintrackLabelMediumText(
+                                text = state.toRate?.name ?: "",
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                         FintrackHeadlineSmallText(
                             text = state.result.toLong().toSignedPersianPrice(),
                             color = MaterialTheme.colorScheme.primary,
@@ -152,7 +171,79 @@ fun CurrencyConverterScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            // Rate Info
+            if (state.fromRate != null && state.toRate != null) {
+                val rate = state.fromRate!!.price.toDouble() / state.toRate!!.price.toDouble()
+                GlassCard(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = space.medium),
+                    padding = space.small
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(space.small),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            FintrackBodySmallText(text = "نرخ تبدیل", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            FintrackTitleMediumText(text = "۱ ${state.fromRate!!.code.uppercase()} = ${rate.toString().toPersianDigits()} ${state.toRate!!.name}", fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+
+            // Quick Amounts
+            FintrackLabelMediumText(
+                text = "مبلغ‌های پرکاربرد",
+                modifier = Modifier.padding(space.medium),
+                fontWeight = FontWeight.Bold
+            )
+            val quickAmounts = listOf("10", "50", "100", "500", "1000", "5000")
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = space.medium),
+                horizontalArrangement = Arrangement.spacedBy(space.small)
+            ) {
+                items(quickAmounts) { amount ->
+                    GlassCard(
+                        onClick = { viewModel.onIntent(CurrencyConverterIntent.SelectQuickAmount(amount)) }
+                    ) {
+                        FintrackLabelMediumText(
+                            text = amount.toPersianDigits(),
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        )
+                    }
+                }
+            }
+
+            // Favorite Pairs
+            FintrackLabelMediumText(
+                text = "جفت‌های مورد علاقه",
+                modifier = Modifier.padding(space.medium),
+                fontWeight = FontWeight.Bold
+            )
+            Column(
+                modifier = Modifier.padding(horizontal = space.medium),
+                verticalArrangement = Arrangement.spacedBy(space.small)
+            ) {
+                state.favoritePairs.forEach { pair ->
+                    GlassCard(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { viewModel.onIntent(CurrencyConverterIntent.SelectFavoritePair(pair)) }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(space.medium),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(space.small)
+                        ) {
+                            FintrackBodyMediumText(text = "${pair.fromCode.uppercase()} → ${pair.toCode.uppercase()}", fontWeight = FontWeight.Bold)
+                            FintrackBodySmallText(text = "${pair.fromName} به ${pair.toName}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Spacer(modifier = Modifier.weight(1f))
+                            Icon(Icons.Default.Star, contentDescription = null, tint = Color.Yellow, modifier = Modifier.size(16.dp))
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(space.medium))
 
             // Keypad
             val keys = listOf(
@@ -166,6 +257,7 @@ fun CurrencyConverterScreen(
                 columns = GridCells.Fixed(4),
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(300.dp) // Fixed height for keypad in scrollable view
                     .padding(space.medium),
                 horizontalArrangement = Arrangement.spacedBy(space.small),
                 verticalArrangement = Arrangement.spacedBy(space.small)
@@ -240,13 +332,29 @@ private fun CurrencyPickerSheet(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             FintrackTitleMediumText(text = rate.name)
-                            FintrackLabelMediumText(text = rate.code.uppercase())
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                FintrackLabelMediumText(text = getFlag(rate.code) + " ")
+                                FintrackLabelMediumText(text = rate.code.uppercase())
+                            }
                         }
                     }
                 }
             }
             Spacer(modifier = Modifier.height(32.dp))
         }
+    }
+}
+
+private fun getFlag(code: String): String {
+    return when (code.lowercase()) {
+        "usd" -> "🇺🇸"
+        "eur" -> "🇪🇺"
+        "gbp" -> "🇬🇧"
+        "irr" -> "🇮🇷"
+        "btc" -> "₿"
+        "eth" -> "Ξ"
+        "gold_18k" -> "🟡"
+        else -> "💰"
     }
 }
 

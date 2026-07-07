@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Message
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
@@ -25,24 +26,31 @@ import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.sub_support
-import fintrack.core.designsystem.generated.resources.support_chat
-import fintrack.core.designsystem.generated.resources.support_chat_sub
-import fintrack.core.designsystem.generated.resources.support_description
-import fintrack.core.designsystem.generated.resources.support_email
-import fintrack.core.designsystem.generated.resources.support_email_val
-import fintrack.core.designsystem.generated.resources.support_phone
-import fintrack.core.designsystem.generated.resources.support_phone_sub
-import fintrack.core.designsystem.generated.resources.title_support
+import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SupportScreen(
+    viewModel: SupportViewModel = koinViewModel(),
     onBackClick: () -> Unit
 ) {
     val space = LocalSpacing.current
     val uriHandler = LocalUriHandler.current
-    val emailValue = stringResource(Res.string.support_email_val)
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is SupportEffect.OpenUri -> {
+                    try {
+                        uriHandler.openUri(effect.uri)
+                    } catch (e: Exception) {
+                        // Handle error
+                    }
+                }
+            }
+        }
+    }
 
     FintrackScreen(
         title = stringResource(Res.string.title_support),
@@ -64,31 +72,26 @@ fun SupportScreen(
                 icon = Icons.Default.HeadsetMic,
                 title = stringResource(Res.string.support_phone),
                 desc = stringResource(Res.string.support_phone_sub),
-                onClick = { uriHandler.openUri(SupportLinks.ISSUES) }
+                onClick = { viewModel.onIntent(SupportIntent.CallPhone) }
             )
 
             SupportItem(
                 icon = Icons.Default.Message,
                 title = stringResource(Res.string.support_chat),
                 desc = stringResource(Res.string.support_chat_sub),
-                onClick = { uriHandler.openUri(SupportLinks.README) }
+                onClick = { viewModel.onIntent(SupportIntent.OpenTelegram) }
             )
 
             SupportItem(
                 icon = Icons.Default.Email,
                 title = stringResource(Res.string.support_email),
-                desc = emailValue,
-                onClick = { uriHandler.openUri("mailto:$emailValue") }
+                desc = stringResource(Res.string.support_email_val),
+                onClick = { viewModel.onIntent(SupportIntent.SendEmail) }
             )
         }
     }
 }
 
-private object SupportLinks {
-    const val REPO = "https://github.com/puriakazemieh/FinTrack"
-    const val ISSUES = "$REPO/issues/new"
-    const val README = "$REPO/blob/develop/README.md"
-}
 
 @Composable
 private fun SupportItem(

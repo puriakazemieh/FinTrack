@@ -29,3 +29,11 @@
 # Glance
 -keep class androidx.glance.** { *; }
 -keep class com.kazemieh.widget.** { *; }
+
+# Compose
+-keep class androidx.compose.** { *; }
+-dontwarn androidx.compose.**
+
+# General KMP
+-keep class kotlin.** { *; }
+-keep class kotlinx.** { *; }

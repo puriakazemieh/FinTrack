@@ -37,6 +37,11 @@ class CurrencyConverterViewModel(
                     availableRates = rates,
                     fromRate = rates.find { r -> r.code == "usd" } ?: rates.firstOrNull(),
                     toRate = rates.find { r -> r.code == "irr" } ?: rates.lastOrNull(),
+                    favoritePairs = listOf(
+                        FavoritePair("usd", "irr", "دلار", "تومان", 0.0, "🇺🇸"),
+                        FavoritePair("eur", "irr", "یورو", "تومان", 0.0, "🇪🇺"),
+                        FavoritePair("btc", "usd", "بیت‌کوین", "دلار", 0.0, "₿")
+                    ),
                     isLoading = false
                 )
             }
@@ -75,6 +80,18 @@ class CurrencyConverterViewModel(
             CurrencyConverterIntent.SwapRates -> {
                 _state.update { it.copy(fromRate = it.toRate, toRate = it.fromRate) }
                 calculate()
+            }
+            is CurrencyConverterIntent.SelectQuickAmount -> {
+                _state.update { it.copy(amount = intent.amount) }
+                calculate()
+            }
+            is CurrencyConverterIntent.SelectFavoritePair -> {
+                val from = _state.value.availableRates.find { it.code == intent.pair.fromCode }
+                val to = _state.value.availableRates.find { it.code == intent.pair.toCode }
+                if (from != null && to != null) {
+                    _state.update { it.copy(fromRate = from, toRate = to) }
+                    calculate()
+                }
             }
         }
     }
