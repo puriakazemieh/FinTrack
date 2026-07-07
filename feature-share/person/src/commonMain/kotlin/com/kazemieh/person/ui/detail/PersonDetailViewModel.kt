@@ -74,8 +74,19 @@ class PersonDetailViewModel(
                 isAllPersons = false
             )
             observeTransactionsUseCase(filter, PageRequest(limit = 100, offset = 0))
-                .collect { page ->
-                    _state.update { it.copy(transactions = page.items) }
+                .map { it.items }
+                .combine(_searchQuery) { transactions, query ->
+                    if (query.isBlank()) {
+                        transactions
+                    } else {
+                        transactions.filter {
+                            it.transaction.description?.contains(query, ignoreCase = true) == true ||
+                                it.category?.name?.contains(query, ignoreCase = true) == true
+                        }
+                    }
+                }
+                .collect { filtered ->
+                    _state.update { it.copy(transactions = filtered) }
                 }
         }
     }

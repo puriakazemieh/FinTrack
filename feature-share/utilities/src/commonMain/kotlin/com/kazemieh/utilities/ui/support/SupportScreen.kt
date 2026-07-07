@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.LocalSpacing
@@ -40,6 +41,8 @@ fun SupportScreen(
     onBackClick: () -> Unit
 ) {
     val space = LocalSpacing.current
+    val uriHandler = LocalUriHandler.current
+    val emailValue = stringResource(Res.string.support_email_val)
 
     FintrackScreen(
         title = stringResource(Res.string.title_support),
@@ -61,24 +64,30 @@ fun SupportScreen(
                 icon = Icons.Default.HeadsetMic,
                 title = stringResource(Res.string.support_phone),
                 desc = stringResource(Res.string.support_phone_sub),
-                onClick = {}
+                onClick = { uriHandler.openUri(SupportLinks.ISSUES) }
             )
 
             SupportItem(
                 icon = Icons.Default.Message,
                 title = stringResource(Res.string.support_chat),
                 desc = stringResource(Res.string.support_chat_sub),
-                onClick = {}
+                onClick = { uriHandler.openUri(SupportLinks.README) }
             )
 
             SupportItem(
                 icon = Icons.Default.Email,
                 title = stringResource(Res.string.support_email),
-                desc = stringResource(Res.string.support_email_val),
-                onClick = {}
+                desc = emailValue,
+                onClick = { uriHandler.openUri("mailto:$emailValue") }
             )
         }
     }
+}
+
+private object SupportLinks {
+    const val REPO = "https://github.com/puriakazemieh/FinTrack"
+    const val ISSUES = "$REPO/issues/new"
+    const val README = "$REPO/blob/develop/README.md"
 }
 
 @Composable

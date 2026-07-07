@@ -278,6 +278,12 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                         personId = personId,
                         debtId = debtId
                     )
+                },
+                addTransactionSheet = { onDismiss ->
+                    com.kazemieh.transaction.ui.add.AddTransactionBottomSheet(
+                        onDismiss = onDismiss,
+                        transactionAdded = onDismiss
+                    )
                 }
             )
         }

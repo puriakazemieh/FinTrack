@@ -37,6 +37,7 @@ import com.kazemieh.composeApp.navigation.navigationBar.FintrackNavigationBar
 import com.kazemieh.designsystem.component.model.resolveString
 import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.preferences.FinTrackPreferences
+import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.koinInject
 
@@ -56,6 +57,7 @@ fun FinTrackHost(
     val tabs = remember(tabsCsv) { Destinations.parseTabs(tabsCsv) }
 
     var showBottomBarCustomize by remember { mutableStateOf(false) }
+    var showGlobalAddTransaction by remember { mutableStateOf(false) }
 
     val currentRoute =
         navController.currentBackStackEntryAsState().value?.destination?.route.orEmpty()
@@ -105,7 +107,7 @@ fun FinTrackHost(
                     FintrackNavigationBar(
                         navController = navController,
                         tabs = tabs,
-                        onFabClick = { /* TODO: Global Add Transaction */ },
+                        onFabClick = { showGlobalAddTransaction = true },
                         onCustomize = { showBottomBarCustomize = true }
                     )
                 }
@@ -120,6 +122,13 @@ fun FinTrackHost(
                             )
                         },
                         onDismiss = { showBottomBarCustomize = false }
+                    )
+                }
+
+                if (showGlobalAddTransaction) {
+                    AddTransactionBottomSheet(
+                        onDismiss = { showGlobalAddTransaction = false },
+                        transactionAdded = { showGlobalAddTransaction = false }
                     )
                 }
 

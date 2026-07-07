@@ -230,6 +230,7 @@
     <string name="currency_toman">تومان</string>
     <string name="more_details">مشاهده بیشتر</string>
     <string name="search_placeholder">جستجو...</string>
+    <string name="label_search">جستجو</string>
     <string name="navigation_transactions">تراکنش‌ها</string>
     <string name="navigation_tools">ابزارها</string>
     <string name="navigation_profile">پروفایل</string>
@@ -1243,10 +1244,10 @@
     <string name="label_read_time">%1$d دقیقه مطالعه</string>
     <string name="label_article">مقاله</string>
     <string name="support_description">تیم ما آماده پاسخگویی به سوالات و مشکلات شماست. از طریق روش‌های زیر می‌توانید با ما در ارتباط باشید.</string>
-    <string name="support_phone">تماس تلفنی</string>
-    <string name="support_phone_sub">شنبه تا چهارشنبه · ۹ تا ۱۷</string>
-    <string name="support_chat">چت آنلاین</string>
-    <string name="support_chat_sub">در تلگرام و واتس‌اپ</string>
+    <string name="support_phone">گزارش مشکل</string>
+    <string name="support_phone_sub">ثبت issue در گیت‌هاب پروژه</string>
+    <string name="support_chat">مستندات و راهنما</string>
+    <string name="support_chat_sub">مشاهده‌ی README در گیت‌هاب</string>
     <string name="support_email">ارسال ایمیل</string>
     <string name="support_email_val">support@fintrack.app</string>
 
@@ -1289,8 +1290,6 @@
     <string name="quick_add">افزودن سریع</string>
     <string name="income_widget">درآمد</string>
     <string name="expense_widget">هزینه</string>
-    <string name="ai_ask_question_title">سوال خود را بپرس</string>
-    <string name="ai_ask_question_sub">پاسخ شخصی‌سازی‌شده با هوش مصنوعی</string>
     <string name="ai_suggestion_budget_title">ایجاد بودجه برای دسته %1$s</string>
     <string name="ai_suggestion_budget_body">هزینه‌های شما در این دسته ٪%2$d رشد داشته است. با تعیین بودجه می‌توانید آن را کنترل کنید.</string>
 

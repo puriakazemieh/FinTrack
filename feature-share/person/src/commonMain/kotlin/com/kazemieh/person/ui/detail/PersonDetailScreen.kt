@@ -44,6 +44,7 @@ fun PersonDetailScreen(
     personId: Long,
     onBack: () -> Unit,
     addDebtSheet: @Composable (personId: Long, debtId: Long?, onDismiss: () -> Unit) -> Unit,
+    addTransactionSheet: @Composable (onDismiss: () -> Unit) -> Unit,
     viewModel: PersonDetailViewModel = koinViewModel { parametersOf(personId) }
 ) {
     val state by viewModel.state.collectAsState()
@@ -51,6 +52,7 @@ fun PersonDetailScreen(
 
     var showAddDebt by remember { mutableStateOf(false) }
     var selectedDebtId by remember { mutableStateOf<Long?>(null) }
+    var showAddTransaction by remember { mutableStateOf(false) }
 
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabs = listOf(
@@ -151,7 +153,10 @@ fun PersonDetailScreen(
                             }
                         )
                     },
-                    onItemClick = { /* Debt detail? */ },
+                    onItemClick = { item ->
+                        selectedDebtId = item.id
+                        showAddDebt = true
+                    },
                     onDeleteClick = { viewModel.onIntent(PersonDetailIntent.DeleteDebt(it.id)) },
                     onEditClick = { item ->
                         selectedDebtId = item.id
@@ -163,8 +168,8 @@ fun PersonDetailScreen(
                 EntityList(
                     title = stringResource(Res.string.recent_transactions),
                     query = state.searchQuery,
-                    onQueryChange = { /* handled in VM */ },
-                    onAddClick = { /* Add transaction logic or navigate */ },
+                    onQueryChange = { viewModel.onIntent(PersonDetailIntent.UpdateSearchQuery(it)) },
+                    onAddClick = { showAddTransaction = true },
                     items = state.transactions.map {
                         EntityItem(
                             id = it.transaction.id,
@@ -185,6 +190,10 @@ fun PersonDetailScreen(
 
         if (showAddDebt) {
             addDebtSheet(personId, selectedDebtId) { showAddDebt = false }
+        }
+
+        if (showAddTransaction) {
+            addTransactionSheet { showAddTransaction = false }
         }
     }
 }

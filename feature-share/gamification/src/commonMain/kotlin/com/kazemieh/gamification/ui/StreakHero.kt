@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.Streak
 import com.kazemieh.common.toPersianDigits
+import com.kazemieh.designsystem.GlassAmber
+import com.kazemieh.designsystem.GlassAmberDeep
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
@@ -49,7 +51,7 @@ fun StreakHero(
                     .clip(MaterialTheme.shapes.large)
                     .background(
                         Brush.linearGradient(
-                            colors = listOf(Color(0xFFF59E0B), Color(0xFFD97706))
+                            colors = listOf(GlassAmber, GlassAmberDeep)
                         )
                     ),
                 contentAlignment = Alignment.Center

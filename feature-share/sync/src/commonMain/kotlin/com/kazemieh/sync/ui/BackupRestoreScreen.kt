@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Cloud
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Restore
@@ -343,10 +342,6 @@ fun SavedBackupItem(data: BackupItemData, onRestore: () -> Unit) {
                 Icon(Icons.Outlined.Restore, null, modifier = Modifier.size(11.dp))
                 Text(stringResource(Res.string.backup_restore_btn), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
             }
-        }
-        
-        IconButton(onClick = { }, modifier = Modifier.size(24.dp)) {
-            Icon(Icons.Default.MoreVert, null, tint = glassColors.text3, modifier = Modifier.size(14.dp))
         }
     }
 }

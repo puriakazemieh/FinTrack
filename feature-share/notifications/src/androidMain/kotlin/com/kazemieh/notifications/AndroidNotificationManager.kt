@@ -35,6 +35,9 @@ class AndroidNotificationManager(private val context: Context) : NotificationMan
 
     private val notificationManagerCompat = NotificationManagerCompat.from(context)
 
+    private val appIcon: Int
+        get() = context.applicationInfo.icon.takeIf { it != 0 } ?: android.R.drawable.ic_dialog_info
+
     override fun createChannels() {
         runBlocking {
             createChannel(
@@ -84,7 +87,7 @@ class AndroidNotificationManager(private val context: Context) : NotificationMan
         if (!hasPermission()) return
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(android.R.drawable.ic_dialog_info) // TODO: Use app icon
+            .setSmallIcon(appIcon)
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -130,7 +133,7 @@ class AndroidNotificationManager(private val context: Context) : NotificationMan
         ).build()
 
         val notification = NotificationCompat.Builder(context, NotificationManager.CHANNEL_SMS)
-            .setSmallIcon(android.R.drawable.ic_input_add)
+            .setSmallIcon(appIcon)
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -169,7 +172,7 @@ class AndroidNotificationManager(private val context: Context) : NotificationMan
         val action = NotificationCompat.Action.Builder(0, actionLabel, pendingIntent).build()
 
         val notification = NotificationCompat.Builder(context, NotificationManager.CHANNEL_QUICK_ADD)
-            .setSmallIcon(android.R.drawable.ic_input_add)
+            .setSmallIcon(appIcon)
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_LOW)

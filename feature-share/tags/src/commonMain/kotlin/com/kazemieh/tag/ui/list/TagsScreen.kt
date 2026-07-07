@@ -82,7 +82,11 @@ fun TagsScreen(
                         viewModel.onIntent(TagIntent.OnDeleteClick(it))
                     }
                 },
-                onItemClick = { /* No detail for tags? */ }
+                onItemClick = { item ->
+                    state.tags.find { it.id == item.id }?.let {
+                        viewModel.onIntent(TagIntent.OnEditClick(it))
+                    }
+                }
             )
         }
 

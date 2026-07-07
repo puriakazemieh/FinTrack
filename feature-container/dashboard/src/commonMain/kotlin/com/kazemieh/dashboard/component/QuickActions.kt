@@ -61,7 +61,7 @@ fun QuickActions(
             onClick = { onActionClick(TransactionType.TRANSFER) }
         )
         QuickActionItem(
-            label = stringResource(Res.string.search_placeholder).replace("...", ""),
+            label = stringResource(Res.string.label_search),
             icon = Icons.Default.Search,
             color = GlassPurple,
             backgroundColor = GlassPurple.copy(alpha = 0.14f),

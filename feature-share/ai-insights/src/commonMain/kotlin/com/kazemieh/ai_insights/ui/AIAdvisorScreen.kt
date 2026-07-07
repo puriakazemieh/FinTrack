@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
@@ -126,12 +125,6 @@ fun AIAdvisorScreen(
                             onClick = { selectedSuggestion = suggestion }
                         )
                     }
-
-                    item {
-                        AskQuestionCard(
-                            onClick = { /* Handle AI Chat */ }
-                        )
-                    }
                 }
             }
 
@@ -146,72 +139,6 @@ fun AIAdvisorScreen(
                 DetailBottomSheet(
                     suggestion = selectedSuggestion!!,
                     onDismiss = { selectedSuggestion = null }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun AskQuestionCard(onClick: () -> Unit) {
-    val glassColors = LocalGlassColors.current
-    val color = MaterialTheme.colorScheme.primary
-
-    GlassCard(
-        padding = 0.dp,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Brush.linearGradient(
-                        0f to color.copy(alpha = 0.12f),
-                        0.7f to Color.Transparent
-                    )
-                )
-                .padding(14.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(color.copy(alpha = 0.15f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_91), // lightbulb icon
-                        contentDescription = null,
-                        tint = color,
-                        modifier = Modifier.size(15.dp)
-                    )
-                }
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(Res.string.ai_ask_question_title),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = glassColors.text
-                    )
-                    Text(
-                        text = stringResource(Res.string.ai_ask_question_sub),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = glassColors.text3
-                    )
-                }
-
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack, // For RTL it will point correctly
-                    contentDescription = null,
-                    tint = glassColors.text3,
-                    modifier = Modifier.size(14.dp)
                 )
             }
         }

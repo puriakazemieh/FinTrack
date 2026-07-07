@@ -48,6 +48,7 @@ import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
 import com.kazemieh.designsystem.component.model.ItemUi
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
+import com.kazemieh.tag.ui.add.AddTagBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.edit_note
 import fintrack.core.designsystem.generated.resources.note_content_hint
@@ -68,6 +69,7 @@ fun NoteEditScreen(
 ) {
     val state by viewModel.state.collectAsState()
     var showTagSheet by remember { mutableStateOf(false) }
+    var showAddTagSheet by remember { mutableStateOf(false) }
     val showDatePicker = remember { mutableStateOf(false) }
 
     LaunchedEffect(noteId) {
@@ -194,7 +196,17 @@ fun NoteEditScreen(
                     showTagSheet = false
                 },
                 onDismiss = { showTagSheet = false },
-                onAddClick = { /* Handle add tag */ }
+                onAddClick = { showAddTagSheet = true }
+            )
+        }
+
+        if (showAddTagSheet) {
+            AddTagBottomSheet(
+                onDismiss = { showAddTagSheet = false },
+                setTag = { newTag ->
+                    viewModel.onIntent(NoteEditIntent.OnTagsChanged(state.selectedTags + newTag))
+                    showAddTagSheet = false
+                }
             )
         }
 
