@@ -62,6 +62,7 @@ kotlin {
                 implementation(project(":feature-share:person"))
                 implementation(project(":feature-share:transaction"))
                 implementation(project(":feature-share:lock"))
+                implementation(project(":feature-share:notifications"))
 
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)

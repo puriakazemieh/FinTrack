@@ -49,7 +49,6 @@ import com.kazemieh.dashboard.component.RecentTransactionsWidget
 import com.kazemieh.designsystem.GlassGreenDark
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
-import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
@@ -203,7 +202,8 @@ fun DashboardScreen(
             }
         }
 
-        FAB(modifier = Modifier.padding(bottom = 60.dp)) { viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet()) }
+        // The global add-transaction FAB lives in the bottom navigation bar; the dashboard
+        // no longer draws its own to avoid two overlapping add buttons.
 
         if (state.showAddTransaction) {
             AddTransactionBottomSheet(

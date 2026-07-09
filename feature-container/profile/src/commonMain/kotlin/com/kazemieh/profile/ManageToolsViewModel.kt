@@ -24,6 +24,15 @@ class ManageToolsViewModel(
             .onEach { csv ->
                 _state.update { it.copy(disabledTools = ToolFeature.parseDisabled(csv)) }
             }.launchIn(viewModelScope)
+
+        _state.update {
+            it.copy(
+                smsReadingEnabled = preferenceUseCases.getBooleanPreference(
+                    FinTrackPreferences.PREF_SMS_READING_ENABLED,
+                    false
+                )
+            )
+        }
     }
 
     fun onIntent(intent: ManageToolsIntent) {
@@ -37,14 +46,24 @@ class ManageToolsViewModel(
                 )
                 _state.update { it.copy(disabledTools = updated) }
             }
+
+            is ManageToolsIntent.SetSmsReading -> {
+                preferenceUseCases.setBooleanPreference(
+                    FinTrackPreferences.PREF_SMS_READING_ENABLED,
+                    intent.enabled
+                )
+                _state.update { it.copy(smsReadingEnabled = intent.enabled) }
+            }
         }
     }
 }
 
 data class ManageToolsState(
-    val disabledTools: Set<ToolFeature> = emptySet()
+    val disabledTools: Set<ToolFeature> = emptySet(),
+    val smsReadingEnabled: Boolean = false
 )
 
 sealed interface ManageToolsIntent {
     data class ToggleTool(val feature: ToolFeature) : ManageToolsIntent
+    data class SetSmsReading(val enabled: Boolean) : ManageToolsIntent
 }

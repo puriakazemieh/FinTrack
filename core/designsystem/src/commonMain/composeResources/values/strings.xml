@@ -1310,6 +1310,9 @@
 
     <!-- Manage tools (feature toggles) -->
     <string name="manage_tools_title">مدیریت ابزارها</string>
-    <string name="manage_tools_sub">هر ابزار را که نمی‌خواهید ببینید خاموش کنید</string>
-    <string name="label_manage_tools">مدیریت ابزارها</string>
+    <string name="manage_tools_sub">هر ابزار یا قابلیتی را که نمی‌خواهید خاموش کنید</string>
+    <string name="label_manage_tools">مدیریت ابزارها و قابلیت‌ها</string>
+    <string name="manage_capabilities_title">قابلیت‌ها</string>
+    <string name="capability_sms_title">خواندن پیامک بانکی</string>
+    <string name="capability_sms_desc">تشخیص خودکار تراکنش از روی پیامک بانک‌ها</string>
 </resources>

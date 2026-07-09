@@ -32,6 +32,7 @@ import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.Switch
 import com.kazemieh.notifications.ui.NotificationPermissionLauncher
+import com.kazemieh.notifications.ui.SmsPermissionLauncher
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -97,6 +98,9 @@ fun OnboardingScreen(
                         },
                         onUpdateSecurity = { question, answer ->
                             viewModel.onIntent(OnboardingIntent.UpdateSecurityDetails(question, answer))
+                        },
+                        onSmsReadingResult = { granted ->
+                            viewModel.onIntent(OnboardingIntent.SetSmsReading(granted))
                         },
                         modifier = Modifier.weight(1f)
                     )
@@ -215,6 +219,7 @@ fun StepContent(
     state: OnboardingState,
     onUpdateSource: (String, String) -> Unit,
     onUpdateSecurity: (String, String) -> Unit,
+    onSmsReadingResult: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     AnimatedContent(targetState = state.currentStep, modifier = modifier) { currentStep ->
@@ -225,7 +230,7 @@ fun StepContent(
         ) {
             when (currentStep) {
                 1 -> WelcomeStep()
-                2 -> PermissionsStep()
+                2 -> PermissionsStep(onSmsReadingResult = onSmsReadingResult)
                 3 -> SetupStep(
                     name = state.sourceName,
                     balance = state.sourceBalance,
@@ -296,15 +301,24 @@ fun FeatureItem(text: String, icon: ImageVector) {
 }
 
 @Composable
-fun PermissionsStep() {
+fun PermissionsStep(onSmsReadingResult: (Boolean) -> Unit = {}) {
     val glassColors = LocalGlassColors.current
     var triggerPermission by remember { mutableStateOf(false) }
+    var triggerSmsPermission by remember { mutableStateOf(false) }
 
     NotificationPermissionLauncher(
         trigger = triggerPermission,
         onResult = { granted ->
             triggerPermission = false
             // Handle result if needed
+        }
+    )
+
+    SmsPermissionLauncher(
+        trigger = triggerSmsPermission,
+        onResult = { granted ->
+            triggerSmsPermission = false
+            onSmsReadingResult(granted)
         }
     )
 
@@ -326,7 +340,10 @@ fun PermissionsStep() {
             title = stringResource(Res.string.onboarding_perm_sms_title),
             desc = stringResource(Res.string.onboarding_perm_sms_desc),
             icon = Icons.Default.Sms,
-            color = GlassGreen
+            color = GlassGreen,
+            onToggle = { enabled ->
+                if (enabled) triggerSmsPermission = true else onSmsReadingResult(false)
+            }
         )
         PermissionToggleItem(
             title = stringResource(Res.string.onboarding_perm_notif_title),

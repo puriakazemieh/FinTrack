@@ -2,7 +2,9 @@ package com.kazemieh.onboarding.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.domain.usecase.SeedDataUseCase
+import com.kazemieh.preferences.FinTrackPreferences
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +17,8 @@ import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.getString
 
 class OnboardingViewModel(
-    private val seedDataUseCase: SeedDataUseCase
+    private val seedDataUseCase: SeedDataUseCase,
+    private val preferenceUseCases: PreferenceUseCases
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(OnboardingState())
@@ -46,6 +49,12 @@ class OnboardingViewModel(
             }
             OnboardingIntent.Skip -> finishOnboarding(useDefault = true)
             OnboardingIntent.Finish -> finishOnboarding()
+            is OnboardingIntent.SetSmsReading -> {
+                preferenceUseCases.setBooleanPreference(
+                    FinTrackPreferences.PREF_SMS_READING_ENABLED,
+                    intent.enabled
+                )
+            }
         }
     }
 
@@ -134,6 +143,7 @@ sealed interface OnboardingIntent {
     data object Finish : OnboardingIntent
     data class UpdateSourceDetails(val name: String, val balance: String) : OnboardingIntent
     data class UpdateSecurityDetails(val question: String, val answer: String) : OnboardingIntent
+    data class SetSmsReading(val enabled: Boolean) : OnboardingIntent
 }
 
 sealed interface OnboardingEffect {

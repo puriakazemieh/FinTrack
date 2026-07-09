@@ -48,6 +48,7 @@ kotlin {
                 implementation(project(":core:common"))
                 implementation(project(":core:domain"))
                 implementation(project(":core:designsystem"))
+                implementation(project(":core:preferences"))
                 implementation(project(":feature-share:notifications"))
 
                 implementation(libs.compose.runtime)

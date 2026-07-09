@@ -28,15 +28,48 @@ import fintrack.core.designsystem.generated.resources.notif_channel_quick_add
 import fintrack.core.designsystem.generated.resources.notif_channel_shopping
 import fintrack.core.designsystem.generated.resources.notif_channel_sms
 import android.net.Uri
+import com.kazemieh.common.model.ToolFeature
+import com.kazemieh.domain.usecase.PreferenceUseCases
+import com.kazemieh.preferences.FinTrackPreferences
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
-class AndroidNotificationManager(private val context: Context) : NotificationManager {
+class AndroidNotificationManager(
+    private val context: Context,
+    private val preferenceUseCases: PreferenceUseCases
+) : NotificationManager {
 
     private val notificationManagerCompat = NotificationManagerCompat.from(context)
 
     private val appIcon: Int
         get() = context.applicationInfo.icon.takeIf { it != 0 } ?: android.R.drawable.ic_dialog_info
+
+    /**
+     * A notification is only shown when its owning feature is on. Disabling a tool from
+     * "Manage Tools" (or turning a channel off in notification settings, or turning SMS
+     * reading off) silences the matching notifications everywhere.
+     */
+    private fun isChannelAllowed(channelId: String): Boolean {
+        val disabledTools = ToolFeature.parseDisabled(
+            preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_DISABLED_TOOLS, "")
+        )
+        fun toolEnabled(feature: ToolFeature) = feature !in disabledTools
+        fun notifEnabled(key: String) = preferenceUseCases.getBooleanPreference(key, true)
+
+        return when (channelId) {
+            NotificationManager.CHANNEL_BUDGET ->
+                toolEnabled(ToolFeature.BUDGETS) && notifEnabled(FinTrackPreferences.PREF_NOTIF_BUDGET_ENABLED)
+            NotificationManager.CHANNEL_INSTALLMENT ->
+                toolEnabled(ToolFeature.INSTALLMENT) && notifEnabled(FinTrackPreferences.PREF_NOTIF_INSTALLMENT_ENABLED)
+            NotificationManager.CHANNEL_CHEQUE ->
+                toolEnabled(ToolFeature.CHECK) && notifEnabled(FinTrackPreferences.PREF_NOTIF_CHEQUE_ENABLED)
+            NotificationManager.CHANNEL_SHOPPING -> toolEnabled(ToolFeature.SHOPPING)
+            NotificationManager.CHANNEL_NOTE -> toolEnabled(ToolFeature.NOTES)
+            NotificationManager.CHANNEL_SMS ->
+                preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_SMS_READING_ENABLED, false)
+            else -> true
+        }
+    }
 
     override fun createChannels() {
         runBlocking {
@@ -85,6 +118,7 @@ class AndroidNotificationManager(private val context: Context) : NotificationMan
 
     override fun showNotification(id: Int, title: String, message: String, channelId: String) {
         if (!hasPermission()) return
+        if (!isChannelAllowed(channelId)) return
 
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(appIcon)
@@ -99,15 +133,19 @@ class AndroidNotificationManager(private val context: Context) : NotificationMan
 
     override fun showStickyNotification(id: Int, title: String, message: String) {
         if (!hasPermission()) return
+        if (!isChannelAllowed(NotificationManager.CHANNEL_SMS)) return
 
-        // Intent to open the app (MainActivity)
-        val activityIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
-            putExtra("sms_id", id.toLong())
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        // Deep-link straight into the add-transaction sheet so tapping the notification (or its
+        // "register" action) actually opens the sheet instead of just landing on the dashboard.
+        val deepLinkIntent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("fintrack://dashboard?showAddTransaction=true")
+        ).apply {
+            `package` = context.packageName
         }
-        
+
         val pendingIntent = PendingIntent.getActivity(
-            context, id, activityIntent,
+            context, id, deepLinkIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 

@@ -48,7 +48,8 @@ kotlin {
                 implementation(project(":core:common"))
                 implementation(project(":core:domain"))
                 implementation(project(":core:designsystem"))
-                
+                implementation(project(":core:preferences"))
+
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)
