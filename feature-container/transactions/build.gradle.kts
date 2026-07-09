@@ -53,6 +53,7 @@ kotlin {
                 implementation(project(":core:common"))
                 implementation(project(":core:jalali"))
                 implementation(project(":core:designsystem"))
+                implementation(project(":core:preferences"))
 
                 implementation(project(":feature-share:source"))
                 implementation(project(":feature-share:category"))

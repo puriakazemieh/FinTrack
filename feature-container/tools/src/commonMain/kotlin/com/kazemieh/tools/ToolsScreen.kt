@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Wallet
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.kazemieh.common.model.ToolFeature
 import com.kazemieh.designsystem.GlassAmber
 import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassGold
@@ -42,8 +44,11 @@ import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.designsystem.component.glass.ToolEntry
 import com.kazemieh.designsystem.component.glass.ToolGroupSection
+import com.kazemieh.domain.usecase.PreferenceUseCases
+import com.kazemieh.preferences.FinTrackPreferences
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 private data class ToolGroup(
     val title: String,
@@ -79,6 +84,13 @@ fun ToolsScreen(
     val space = LocalSpacing.current
     val glassColors = LocalGlassColors.current
 
+    val preferenceUseCases = koinInject<PreferenceUseCases>()
+    val disabledToolsCsv by preferenceUseCases
+        .getStringFlow(FinTrackPreferences.PREF_DISABLED_TOOLS, "")
+        .collectAsState("")
+    val disabledTools = remember(disabledToolsCsv) { ToolFeature.parseDisabled(disabledToolsCsv) }
+    fun ToolEntry.visibleIf(feature: ToolFeature): ToolEntry? = if (feature in disabledTools) null else this
+
     // Individual tools, defined once and referenced from both their category and
     // the curated "frequently used" section.
     val sources = ToolEntry(stringResource(Res.string.financial_sources), Icons.Default.Wallet, onNavigateToSource)
@@ -111,33 +123,67 @@ fun ToolsScreen(
     val favorites = ToolGroup(
         title = stringResource(Res.string.tools_group_favorites),
         accent = GlassGold,
-        items = listOf(budgets, goals, sources, aiAdvisor, converter, shopping)
+        items = listOfNotNull(
+            budgets.visibleIf(ToolFeature.BUDGETS),
+            goals.visibleIf(ToolFeature.GOALS),
+            sources.visibleIf(ToolFeature.SOURCES),
+            aiAdvisor.visibleIf(ToolFeature.AI_ADVISOR),
+            converter.visibleIf(ToolFeature.CONVERTER),
+            shopping.visibleIf(ToolFeature.SHOPPING)
+        )
     )
     val groups = listOf(
         ToolGroup(
             title = stringResource(Res.string.tools_group_money),
             accent = GlassGreen,
-            items = listOf(sources, categories, tags, persons, budgets, goals, fixedExpense, shopping, notes)
+            items = listOfNotNull(
+                sources.visibleIf(ToolFeature.SOURCES),
+                categories.visibleIf(ToolFeature.CATEGORIES),
+                tags.visibleIf(ToolFeature.TAGS),
+                persons.visibleIf(ToolFeature.PERSONS),
+                budgets.visibleIf(ToolFeature.BUDGETS),
+                goals.visibleIf(ToolFeature.GOALS),
+                fixedExpense.visibleIf(ToolFeature.FIXED_EXPENSE),
+                shopping.visibleIf(ToolFeature.SHOPPING),
+                notes.visibleIf(ToolFeature.NOTES)
+            )
         ),
         ToolGroup(
             title = stringResource(Res.string.tools_group_debt),
             accent = GlassAmber,
-            items = listOf(installment, debt, check)
+            items = listOfNotNull(
+                installment.visibleIf(ToolFeature.INSTALLMENT),
+                debt.visibleIf(ToolFeature.DEBT),
+                check.visibleIf(ToolFeature.CHECK)
+            )
         ),
         ToolGroup(
             title = stringResource(Res.string.tools_group_assets),
             accent = GlassBlue,
-            items = listOf(assets, fxRates, converter, news)
+            items = listOfNotNull(
+                assets.visibleIf(ToolFeature.ASSETS),
+                fxRates.visibleIf(ToolFeature.FX_RATES),
+                converter.visibleIf(ToolFeature.CONVERTER),
+                news.visibleIf(ToolFeature.NEWS)
+            )
         ),
         ToolGroup(
             title = stringResource(Res.string.tools_group_insights),
             accent = GlassPurple,
-            items = listOf(aiAdvisor, achievements, events, financialCalendar)
+            items = listOfNotNull(
+                aiAdvisor.visibleIf(ToolFeature.AI_ADVISOR),
+                achievements.visibleIf(ToolFeature.ACHIEVEMENTS),
+                events.visibleIf(ToolFeature.EVENTS),
+                financialCalendar.visibleIf(ToolFeature.FINANCIAL_CALENDAR)
+            )
         ),
         ToolGroup(
             title = stringResource(Res.string.tools_group_support),
             accent = glassColors.text3,
-            items = listOf(faq, support)
+            items = listOfNotNull(
+                faq.visibleIf(ToolFeature.FAQ),
+                support.visibleIf(ToolFeature.SUPPORT)
+            )
         )
     )
 

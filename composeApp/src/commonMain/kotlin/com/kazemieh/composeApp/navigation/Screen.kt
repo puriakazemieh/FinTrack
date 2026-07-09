@@ -38,6 +38,9 @@ sealed class Screen {
     data object NotificationSettings : Screen()
 
     @Serializable
+    data object ManageTools : Screen()
+
+    @Serializable
     data object Search : Screen()
 
     @Serializable

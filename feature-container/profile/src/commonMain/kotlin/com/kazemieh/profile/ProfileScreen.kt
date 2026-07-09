@@ -24,6 +24,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Face
@@ -100,7 +101,6 @@ import com.kazemieh.lock.PINScreen
 import com.kazemieh.money.Currency
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
-import com.kazemieh.common.toPersianDigits
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.compose.viewmodel.koinViewModel as lockKoinViewModel
 
@@ -114,6 +114,7 @@ fun ProfileScreen(
     onNavigateToFAQ: () -> Unit = {},
     onNavigateToSupport: () -> Unit = {},
     onNavigateToBackupRestore: () -> Unit = {},
+    onNavigateToManageTools: () -> Unit = {},
     onLoggedOut: () -> Unit = {},
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
@@ -219,6 +220,11 @@ fun ProfileScreen(
                         title = stringResource(Res.string.label_currency),
                         icon = Icons.Default.Payments,
                         onClick = onNavigateToCurrencySettings
+                    )
+                    SettingItem(
+                        title = stringResource(Res.string.label_manage_tools),
+                        icon = Icons.Default.Build,
+                        onClick = onNavigateToManageTools
                     )
                     // Single-option display info rows (no navigation target yet) — shown as
                     // non-interactive value rows rather than dead clickable items.

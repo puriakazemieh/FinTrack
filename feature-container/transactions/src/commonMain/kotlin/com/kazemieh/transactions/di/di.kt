@@ -8,7 +8,8 @@ import org.koin.dsl.module
 val transactionsViewModelModule = module {
     viewModel {
         TransactionsViewModel(
-            transactionUseCaseGroup = get()
+            transactionUseCaseGroup = get(),
+            preferenceUseCases = get()
         )
     }
 }

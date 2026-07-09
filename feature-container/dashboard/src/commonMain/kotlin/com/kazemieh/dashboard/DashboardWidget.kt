@@ -1,5 +1,6 @@
 package com.kazemieh.dashboard
 
+import com.kazemieh.common.model.ToolFeature
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.achievements_title
 import fintrack.core.designsystem.generated.resources.ai_advisor_title
@@ -59,6 +60,21 @@ enum class DashboardWidget(val label: StringResource) {
         fun serialize(items: List<DashboardWidgetItem>): String =
             items.joinToString(",") { (if (it.visible) "" else "-") + it.widget.name }
     }
+}
+
+/** The Tools-screen feature this widget mirrors, if the user can also disable it from Settings. */
+fun DashboardWidget.toolFeature(): ToolFeature? = when (this) {
+    DashboardWidget.RECENT_TRANSACTIONS -> null
+    DashboardWidget.ACHIEVEMENTS -> ToolFeature.ACHIEVEMENTS
+    DashboardWidget.BUDGET -> ToolFeature.BUDGETS
+    DashboardWidget.GOAL -> ToolFeature.GOALS
+    DashboardWidget.INSTALLMENT -> ToolFeature.INSTALLMENT
+    DashboardWidget.CHECK -> ToolFeature.CHECK
+    DashboardWidget.FIXED_EXPENSE -> ToolFeature.FIXED_EXPENSE
+    DashboardWidget.AI_ADVISOR -> ToolFeature.AI_ADVISOR
+    DashboardWidget.ASSET -> ToolFeature.ASSETS
+    DashboardWidget.SHOPPING -> ToolFeature.SHOPPING
+    DashboardWidget.NOTES -> ToolFeature.NOTES
 }
 
 /** A widget together with the user's visibility choice; order is list position. */

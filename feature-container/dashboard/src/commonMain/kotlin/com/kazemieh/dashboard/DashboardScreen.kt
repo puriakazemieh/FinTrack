@@ -171,6 +171,7 @@ fun DashboardScreen(
 
             state.dashboardWidgets.forEach { cfg ->
                 if (!cfg.visible) return@forEach
+                if (cfg.widget.toolFeature()?.let { it in state.disabledTools } == true) return@forEach
                 item(key = cfg.widget.name) {
                     DashboardWidgetContent(
                         widget = cfg.widget,

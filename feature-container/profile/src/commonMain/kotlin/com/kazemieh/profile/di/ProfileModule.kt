@@ -1,6 +1,7 @@
 package com.kazemieh.profile.di
 
 import com.kazemieh.profile.CurrencySettingsViewModel
+import com.kazemieh.profile.ManageToolsViewModel
 import com.kazemieh.profile.ProfileEditViewModel
 import com.kazemieh.profile.ProfileViewModel
 import com.kazemieh.profile.ThemeSettingsViewModel
@@ -12,4 +13,5 @@ val profileModule = module {
     viewModel { ThemeSettingsViewModel(get()) }
     viewModel { CurrencySettingsViewModel(get()) }
     viewModel { ProfileEditViewModel(get()) }
+    viewModel { ManageToolsViewModel(get()) }
 }

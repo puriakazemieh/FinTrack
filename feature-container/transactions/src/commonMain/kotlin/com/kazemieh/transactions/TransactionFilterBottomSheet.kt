@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kazemieh.category.ui.list.CategoryFilterSelectionContent
 import com.kazemieh.common.DateFilterType
+import com.kazemieh.common.model.ToolFeature
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassGreen
@@ -204,47 +205,54 @@ fun TransactionFilterBottomSheet(
                 )
             }
             // Sources Section
-            FilterSection(title = stringResource(Res.string.financial_sources)) {
-                SourceFilterSelectionContent(
-                    selectedSources = state.selectedSources,
-                    isAllSelected = state.isAllSourceSelected,
-                    onSelectionChanged = { sources, isAll ->
-                        onIntent(TransactionsIntent.OnSourcesSelected(sources, isAll))
-                    }
-                )
+            if (ToolFeature.SOURCES !in state.disabledTools) {
+                FilterSection(title = stringResource(Res.string.financial_sources)) {
+                    SourceFilterSelectionContent(
+                        selectedSources = state.selectedSources,
+                        isAllSelected = state.isAllSourceSelected,
+                        onSelectionChanged = { sources, isAll ->
+                            onIntent(TransactionsIntent.OnSourcesSelected(sources, isAll))
+                        }
+                    )
+                }
             }
             // Categories Section
-            FilterSection(title = stringResource(Res.string.category)) {
-                CategoryFilterSelectionContent(
-                    selectedCategories = state.selectedCategories,
-                    selectedTransactionType = state.selectedTransactionType,
-                    isAllSelected = state.isAllCategorySelected,
-                    onSelectionChanged = { categories, isAll ->
-                        onIntent(TransactionsIntent.OnCategoriesSelected(categories, isAll))
-                    }
-                )
+            if (ToolFeature.CATEGORIES !in state.disabledTools) {
+                FilterSection(title = stringResource(Res.string.category)) {
+                    CategoryFilterSelectionContent(
+                        selectedCategories = state.selectedCategories,
+                        selectedTransactionType = state.selectedTransactionType,
+                        isAllSelected = state.isAllCategorySelected,
+                        onSelectionChanged = { categories, isAll ->
+                            onIntent(TransactionsIntent.OnCategoriesSelected(categories, isAll))
+                        }
+                    )
+                }
             }
 
             // Persons Section
-            FilterSection(title = stringResource(Res.string.persons)) {
-                PersonFilterSelectionContent(
-                    selectedPersons = state.selectedPerson,
-                    isAllSelected = state.isAllPersonSelected,
-                    onSelectionChanged = { persons, isAll ->
-                        onIntent(TransactionsIntent.OnPersonSelected(persons, isAll))
-                    }
-                )
+            if (ToolFeature.PERSONS !in state.disabledTools) {
+                FilterSection(title = stringResource(Res.string.persons)) {
+                    PersonFilterSelectionContent(
+                        selectedPersons = state.selectedPerson,
+                        isAllSelected = state.isAllPersonSelected,
+                        onSelectionChanged = { persons, isAll ->
+                            onIntent(TransactionsIntent.OnPersonSelected(persons, isAll))
+                        }
+                    )
+                }
             }
             // Tags Section
-
-            FilterSection(title = stringResource(Res.string.tags)) {
-                TagFilterSelectionContent(
-                    selectedTags = state.selectedTag,
-                    isAllSelected = state.isAllTAgSelected,
-                    onSelectionChanged = { tags, isAll ->
-                        onIntent(TransactionsIntent.OnTagSelected(tags, isAll))
-                    }
-                )
+            if (ToolFeature.TAGS !in state.disabledTools) {
+                FilterSection(title = stringResource(Res.string.tags)) {
+                    TagFilterSelectionContent(
+                        selectedTags = state.selectedTag,
+                        isAllSelected = state.isAllTAgSelected,
+                        onSelectionChanged = { tags, isAll ->
+                            onIntent(TransactionsIntent.OnTagSelected(tags, isAll))
+                        }
+                    )
+                }
             }
         }
     }

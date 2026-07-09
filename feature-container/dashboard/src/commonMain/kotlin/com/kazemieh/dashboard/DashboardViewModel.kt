@@ -7,6 +7,7 @@ import com.kazemieh.common.model.Streak
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.SmsDraft
 import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.ToolFeature
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.domain.repository.SmsDraftRepository
@@ -50,12 +51,20 @@ class DashboardViewModel(
         loadAchievements()
         loadStreak()
         observeWidgetLayout()
+        observeDisabledTools()
     }
 
     private fun observeWidgetLayout() {
         preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_DASHBOARD_WIDGETS, "")
             .onEach { csv ->
                 _state.update { it.copy(dashboardWidgets = DashboardWidget.parse(csv)) }
+            }.launchIn(viewModelScope)
+    }
+
+    private fun observeDisabledTools() {
+        preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_DISABLED_TOOLS, "")
+            .onEach { csv ->
+                _state.update { it.copy(disabledTools = ToolFeature.parseDisabled(csv)) }
             }.launchIn(viewModelScope)
     }
 
@@ -201,7 +210,8 @@ data class DashboardState(
     val showSmsDetection: Boolean = false,
     val smsDraft: SmsDraft? = null,
     val dashboardWidgets: List<DashboardWidgetItem> = DashboardWidget.defaultConfig(),
-    val showCustomizeSheet: Boolean = false
+    val showCustomizeSheet: Boolean = false,
+    val disabledTools: Set<ToolFeature> = emptySet()
 )
 
 

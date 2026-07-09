@@ -13,6 +13,7 @@ import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
+import com.kazemieh.common.model.ToolFeature
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.persiandatetime.extensions.persianMonth
@@ -23,7 +24,9 @@ import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
 import com.kazemieh.domain.usecase.ObservePersonsUseCase
 import com.kazemieh.domain.usecase.ObserveSourcesUseCase
 import com.kazemieh.domain.usecase.ObserveTagsUseCase
+import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
+import com.kazemieh.preferences.FinTrackPreferences
 import fintrack.core.designsystem.generated.resources.*
 import fintrack.core.designsystem.generated.resources.label_year_short
 import fintrack.core.designsystem.generated.resources.last_month
@@ -40,6 +43,8 @@ import fintrack.core.designsystem.generated.resources.range_text
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
@@ -48,7 +53,8 @@ import kotlinx.datetime.toLocalDateTime
 
 
 class TransactionsViewModel(
-    private val transactionUseCaseGroup: TransactionUseCaseGroup
+    private val transactionUseCaseGroup: TransactionUseCaseGroup,
+    private val preferenceUseCases: PreferenceUseCases
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TransactionsState())
@@ -57,6 +63,14 @@ class TransactionsViewModel(
     init {
         onIntent(TransactionsIntent.OnDateRange(DateFilterType.THIS_MONTH))
         loadAmountRange()
+        observeDisabledTools()
+    }
+
+    private fun observeDisabledTools() {
+        preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_DISABLED_TOOLS, "")
+            .onEach { csv ->
+                _state.update { it.copy(disabledTools = ToolFeature.parseDisabled(csv)) }
+            }.launchIn(viewModelScope)
     }
 
     private fun loadAmountRange() {
@@ -482,7 +496,8 @@ data class TransactionsState(
     val showAddTransaction: Boolean = false,
     val showDeleteTransaction: Boolean = false,
     val transactionWithRelations: TransactionWithRelations? = null,
-    val resetFiltersHandled: Boolean = false
+    val resetFiltersHandled: Boolean = false,
+    val disabledTools: Set<ToolFeature> = emptySet()
 )
 
 sealed interface TransactionsIntent {

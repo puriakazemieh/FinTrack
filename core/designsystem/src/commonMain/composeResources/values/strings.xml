@@ -1307,4 +1307,9 @@
     <string name="tools_group_support">پشتیبانی و اطلاعات</string>
     <string name="tools_search_placeholder">جست‌وجوی ابزار…</string>
     <string name="tools_no_results">ابزاری یافت نشد</string>
+
+    <!-- Manage tools (feature toggles) -->
+    <string name="manage_tools_title">مدیریت ابزارها</string>
+    <string name="manage_tools_sub">هر ابزار را که نمی‌خواهید ببینید خاموش کنید</string>
+    <string name="label_manage_tools">مدیریت ابزارها</string>
 </resources>

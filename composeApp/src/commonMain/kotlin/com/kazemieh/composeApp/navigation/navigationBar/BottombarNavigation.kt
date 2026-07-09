@@ -31,6 +31,7 @@ import com.kazemieh.notifications.ui.NotificationSettingsScreen
 import com.kazemieh.person.ui.detail.PersonDetailScreen
 import com.kazemieh.person.ui.list.PersonsScreen
 import com.kazemieh.profile.CurrencySettingsScreen
+import com.kazemieh.profile.ManageToolsScreen
 import com.kazemieh.profile.ProfileEditScreen
 import com.kazemieh.profile.ProfileScreen
 import com.kazemieh.profile.ThemeSettingsScreen
@@ -358,6 +359,7 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onNavigateToFAQ = { navController.navigate(Screen.FAQ) },
                 onNavigateToSupport = { navController.navigate(Screen.Support) },
                 onNavigateToBackupRestore = { navController.navigate(Screen.BackupRestore) },
+                onNavigateToManageTools = { navController.navigate(Screen.ManageTools) },
                 onLoggedOut = {
                     navController.navigate(Screen.Onboarding) {
                         popUpTo(Screen.BottomBarGraph) { inclusive = true }
@@ -375,6 +377,12 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
 
         composable<Screen.NotificationSettings> {
             NotificationSettingsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.ManageTools> {
+            ManageToolsScreen(
                 onBack = { navController.popBackStack() }
             )
         }
