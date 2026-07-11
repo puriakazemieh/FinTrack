@@ -49,14 +49,14 @@ class AndroidNotificationManager(
      * "Manage Tools" (or turning a channel off in notification settings, or turning SMS
      * reading off) silences the matching notifications everywhere.
      */
-    private fun isChannelAllowed(channelId: String): Boolean {
+    private fun isChannelAllowed(channelId: String): Boolean = try {
         val disabledTools = ToolFeature.parseDisabled(
             preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_DISABLED_TOOLS, "")
         )
         fun toolEnabled(feature: ToolFeature) = feature !in disabledTools
         fun notifEnabled(key: String) = preferenceUseCases.getBooleanPreference(key, true)
 
-        return when (channelId) {
+        when (channelId) {
             NotificationManager.CHANNEL_BUDGET ->
                 toolEnabled(ToolFeature.BUDGETS) && notifEnabled(FinTrackPreferences.PREF_NOTIF_BUDGET_ENABLED)
             NotificationManager.CHANNEL_INSTALLMENT ->
@@ -69,6 +69,9 @@ class AndroidNotificationManager(
                 preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_SMS_READING_ENABLED, true)
             else -> true
         }
+    } catch (e: Exception) {
+        // Fail open: a preference/DI hiccup must never silently swallow notifications.
+        true
     }
 
     override fun createChannels() {
