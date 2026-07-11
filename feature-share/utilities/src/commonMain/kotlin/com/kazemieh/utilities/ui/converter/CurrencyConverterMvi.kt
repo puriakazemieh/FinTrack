@@ -30,6 +30,7 @@ sealed interface CurrencyConverterIntent {
     data class SelectFromRate(val rate: AssetRate) : CurrencyConverterIntent
     data class SelectToRate(val rate: AssetRate) : CurrencyConverterIntent
     data object SwapRates : CurrencyConverterIntent
+    data object RefreshRates : CurrencyConverterIntent
 }
 
 sealed interface CurrencyConverterEffect {

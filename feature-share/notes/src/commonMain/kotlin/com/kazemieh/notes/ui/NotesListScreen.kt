@@ -18,10 +18,12 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -40,6 +42,7 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
+import com.kazemieh.designsystem.component.glass.Fab
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.notes.ui.NotesViewModel
@@ -48,7 +51,6 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.search_placeholder
 import fintrack.core.designsystem.generated.resources.add_note
 import fintrack.core.designsystem.generated.resources.notes
-import fintrack.core.designsystem.generated.resources.search_placeholder
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -65,30 +67,41 @@ fun NotesListScreen(
         title = stringResource(Res.string.notes),
         onBack = onBack
     ) {
-        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-            FintrackOutlinedTextField(
-                value = state.searchQuery,
-                onValueChange = { viewModel.onIntent(NotesIntent.OnSearchQueryChanged(it)) },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                placeholder = { FintrackBodyMediumText(stringResource(Res.string.search_placeholder)) },
-                label = { FintrackLabelSmallText(stringResource(Res.string.search_placeholder)) },
-                prefix = { Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(20.dp)) }
-            )
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+                FintrackOutlinedTextField(
+                    value = state.searchQuery,
+                    onValueChange = { viewModel.onIntent(NotesIntent.OnSearchQueryChanged(it)) },
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    placeholder = { FintrackBodyMediumText(stringResource(Res.string.search_placeholder)) },
+                    label = { FintrackLabelSmallText(stringResource(Res.string.search_placeholder)) },
+                    prefix = { Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(20.dp)) }
+                )
 
-            LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(2),
-                contentPadding = PaddingValues(bottom = 80.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalItemSpacing = 8.dp,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(state.filteredNotes, key = { it.id }) { note ->
-                    NoteCard(
-                        note = note,
-                        onClick = { onEditNote(note.id) }
-                    )
+                LazyVerticalStaggeredGrid(
+                    columns = StaggeredGridCells.Fixed(2),
+                    contentPadding = PaddingValues(bottom = 90.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalItemSpacing = 8.dp,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(state.filteredNotes, key = { it.id }) { note ->
+                        NoteCard(
+                            note = note,
+                            onClick = { onEditNote(note.id) }
+                        )
+                    }
                 }
             }
+
+            Fab(
+                label = stringResource(Res.string.add_note),
+                icon = rememberVectorPainter(Icons.Default.Add),
+                onClick = onAddNote,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(14.dp)
+            )
         }
     }
 }

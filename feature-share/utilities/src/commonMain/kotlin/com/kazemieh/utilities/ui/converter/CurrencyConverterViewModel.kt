@@ -81,6 +81,7 @@ class CurrencyConverterViewModel(
                 _state.update { it.copy(fromRate = it.toRate, toRate = it.fromRate) }
                 calculate()
             }
+            CurrencyConverterIntent.RefreshRates -> loadRates()
             is CurrencyConverterIntent.SelectQuickAmount -> {
                 _state.update { it.copy(amount = intent.amount) }
                 calculate()

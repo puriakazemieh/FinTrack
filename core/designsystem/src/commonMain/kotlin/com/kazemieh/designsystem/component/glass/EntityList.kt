@@ -86,6 +86,7 @@ fun EntityList(
     onExpandClick: ((EntityItem) -> Unit)? = null,
     emptyHint: String? = null,
     showActions: Boolean = true,
+    showAddFab: Boolean = true,
     isReorderMode: Boolean = false,
     onMove: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> },
     indentSubCategories: Boolean = false,
@@ -198,7 +199,7 @@ fun EntityList(
             }
         }
 
-        if (!isReorderMode) {
+        if (!isReorderMode && showAddFab) {
             Fab(
                 label = addLabel ?: stringResource(Res.string.label_add_specific_new_entity, title.split(" ").first()),
                 icon = rememberVectorPainter(Icons.Default.Add),

@@ -1,31 +1,36 @@
 package com.kazemieh.utilities.ui.fx
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.AssetRate
 import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackButton
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
@@ -53,15 +58,52 @@ fun FxRatesScreen(
             }
         }
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(space.medium),
-            verticalArrangement = Arrangement.spacedBy(space.small)
-        ) {
-            items(state.rates) { rate ->
-                RateItem(rate)
+        when {
+            state.isLoading && state.rates.isEmpty() -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                }
+            }
+
+            state.rates.isEmpty() -> {
+                RatesUnavailable(onRetry = { viewModel.onIntent(FxRatesIntent.RefreshRates) })
+            }
+
+            else -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(space.medium),
+                    verticalArrangement = Arrangement.spacedBy(space.small)
+                ) {
+                    items(state.rates) { rate ->
+                        RateItem(rate)
+                    }
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun RatesUnavailable(onRetry: () -> Unit) {
+    val space = LocalSpacing.current
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(space.large),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        FintrackBodyMediumText(
+            text = stringResource(Res.string.msg_rates_unavailable),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(space.medium))
+        FintrackButton(
+            text = stringResource(Res.string.label_retry),
+            onClick = onRetry
+        )
     }
 }
 

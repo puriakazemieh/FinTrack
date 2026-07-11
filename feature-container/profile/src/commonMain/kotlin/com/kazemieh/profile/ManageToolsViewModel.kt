@@ -29,7 +29,7 @@ class ManageToolsViewModel(
             it.copy(
                 smsReadingEnabled = preferenceUseCases.getBooleanPreference(
                     FinTrackPreferences.PREF_SMS_READING_ENABLED,
-                    false
+                    true
                 )
             )
         }

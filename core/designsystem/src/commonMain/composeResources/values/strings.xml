@@ -1312,6 +1312,9 @@
     <string name="tools_search_placeholder">جست‌وجوی ابزار…</string>
     <string name="tools_no_results">ابزاری یافت نشد</string>
 
+    <!-- FX rates / converter -->
+    <string name="msg_rates_unavailable">قیمت‌های بازار در دسترس نیست. اتصال اینترنت را بررسی کنید و دوباره تلاش کنید.</string>
+
     <!-- Sync / backup messages -->
     <string name="sync_msg_success">پشتیبان‌گیری و همگام‌سازی با موفقیت انجام شد</string>
     <string name="sync_msg_no_provider">هیچ مقصد پشتیبانی فعال نیست</string>

@@ -66,7 +66,7 @@ class AndroidNotificationManager(
             NotificationManager.CHANNEL_SHOPPING -> toolEnabled(ToolFeature.SHOPPING)
             NotificationManager.CHANNEL_NOTE -> toolEnabled(ToolFeature.NOTES)
             NotificationManager.CHANNEL_SMS ->
-                preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_SMS_READING_ENABLED, false)
+                preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_SMS_READING_ENABLED, true)
             else -> true
         }
     }

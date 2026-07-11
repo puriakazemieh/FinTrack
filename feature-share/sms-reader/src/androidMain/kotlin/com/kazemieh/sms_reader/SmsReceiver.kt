@@ -29,9 +29,11 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
 
     override fun onReceive(context: Context, intent: Intent) {
         // Respect the user's SMS-reading toggle: when disabled we don't parse messages or notify.
+        // Defaults to enabled — the OS RECEIVE_SMS permission is the real gate, so a user who
+        // granted it keeps getting detections unless they explicitly turn this off.
         val smsReadingEnabled = preferenceUseCases.getBooleanPreference(
             FinTrackPreferences.PREF_SMS_READING_ENABLED,
-            false
+            true
         )
         if (!smsReadingEnabled) return
 

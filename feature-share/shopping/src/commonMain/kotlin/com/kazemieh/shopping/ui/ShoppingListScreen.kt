@@ -68,6 +68,9 @@ fun ShoppingListScreen(
                 },
                 onDeleteClick = { viewModel.onIntent(ShoppingIntent.OnDeleteItem(it.id)) },
                 showActions = true,
+                // The always-visible QuickAddBar below is the real add UI, so we hide the
+                // list's own add button to avoid two "add" affordances.
+                showAddFab = false,
                 modifier = Modifier.weight(1f)
             )
 

@@ -87,6 +87,34 @@ fun CurrencyConverterScreen(
         Column(
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
         ) {
+            // Live market rates come from an online source; when only the built-in Toman
+            // fallback is present, conversions aren't meaningful, so we say so and offer retry
+            // instead of showing a misleading 1:1 rate.
+            if (!state.isLoading && state.availableRates.size <= 1) {
+                GlassCard(
+                    modifier = Modifier.fillMaxWidth().padding(space.medium),
+                    onClick = { viewModel.onIntent(CurrencyConverterIntent.RefreshRates) }
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(space.medium),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        FintrackBodyMediumText(
+                            text = stringResource(Res.string.msg_rates_unavailable),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(Modifier.width(space.small))
+                        FintrackLabelMediumText(
+                            text = stringResource(Res.string.label_retry),
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
             // Display Area
             GlassCard(
                 modifier = Modifier
