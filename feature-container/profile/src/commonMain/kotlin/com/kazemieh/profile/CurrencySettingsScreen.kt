@@ -1,6 +1,5 @@
 package com.kazemieh.profile
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -47,13 +46,13 @@ import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.Tabs
 import com.kazemieh.money.Currency
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import com.kazemieh.common.toPersianDigits
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CurrencySettingsScreen(
     onBack: () -> Unit,
@@ -62,62 +61,74 @@ fun CurrencySettingsScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
 
+    val hasCustom = state.customCurrencies.isNotEmpty()
+    val searching = state.searchQuery.isNotBlank()
+    var selectedTab by remember { mutableStateOf(0) }
+
+    val tabTitles = remember(hasCustom) {
+        buildList {
+            add(TabKind.FIAT)
+            add(TabKind.CRYPTO)
+            if (hasCustom) add(TabKind.CUSTOM)
+        }
+    }
+    // Keep the index in range if the custom tab disappears, without mutating state mid-compose.
+    val safeTab = selectedTab.coerceIn(0, tabTitles.lastIndex)
+
+    val onSelect: (Currency) -> Unit = {
+        viewModel.onIntent(CurrencySettingsIntent.SelectCurrency(it))
+    }
+
+    // While searching, show everything that matches across all groups; otherwise the
+    // active tab's list — so reaching crypto is one tap, not a long scroll.
+    val visibleList: List<Currency> = when {
+        searching -> state.customCurrencies + state.fiatCurrencies + state.cryptoCurrencies
+        tabTitles[safeTab] == TabKind.FIAT -> state.fiatCurrencies
+        tabTitles[safeTab] == TabKind.CRYPTO -> state.cryptoCurrencies
+        else -> state.customCurrencies
+    }
+
     FintrackScreen(
         title = stringResource(Res.string.label_currency),
         onBack = onBack
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize().padding(horizontal = space.large)) {
             FintrackOutlinedTextField(
                 value = state.searchQuery,
                 onValueChange = { viewModel.onIntent(CurrencySettingsIntent.UpdateSearchQuery(it)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = space.large, vertical = space.medium),
+                    .padding(vertical = space.medium),
                 label = { FintrackBodyLargeText(stringResource(Res.string.search_placeholder)) }
             )
 
+            if (!searching) {
+                Tabs(
+                    tabs = tabTitles.map { stringResource(it.label) },
+                    active = safeTab,
+                    onChange = { selectedTab = it },
+                    counts = tabTitles.map {
+                        when (it) {
+                            TabKind.FIAT -> state.fiatCurrencies.size
+                            TabKind.CRYPTO -> state.cryptoCurrencies.size
+                            TabKind.CUSTOM -> state.customCurrencies.size
+                        }
+                    },
+                    modifier = Modifier.padding(bottom = space.medium)
+                )
+            }
+
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(horizontal = space.large),
-                verticalArrangement = Arrangement.spacedBy(space.medium),
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(space.small),
                 contentPadding = PaddingValues(bottom = 100.dp)
             ) {
-                if (state.customCurrencies.isNotEmpty()) {
-                    stickyHeader {
-                        SectionHeader(title = stringResource(Res.string.label_management))
-                    }
-                    items(state.customCurrencies) { currency ->
-                        CurrencyListItem(
-                            currency = currency,
-                            isSelected = currency.code == state.selectedCurrency.code,
-                            onClick = { viewModel.onIntent(CurrencySettingsIntent.SelectCurrency(currency)) }
-                        )
-                    }
-                }
-
-                if (state.fiatCurrencies.isNotEmpty()) {
-                    stickyHeader {
-                        SectionHeader(title = stringResource(Res.string.currency_fiat))
-                    }
-                    items(state.fiatCurrencies) { currency ->
-                        CurrencyListItem(
-                            currency = currency,
-                            isSelected = currency.code == state.selectedCurrency.code,
-                            onClick = { viewModel.onIntent(CurrencySettingsIntent.SelectCurrency(currency)) }
-                        )
-                    }
-                }
-
-                if (state.cryptoCurrencies.isNotEmpty()) {
-                    stickyHeader {
-                        SectionHeader(title = stringResource(Res.string.currency_crypto))
-                    }
-                    items(state.cryptoCurrencies) { currency ->
-                        CurrencyListItem(
-                            currency = currency,
-                            isSelected = currency.code == state.selectedCurrency.code,
-                            onClick = { viewModel.onIntent(CurrencySettingsIntent.SelectCurrency(currency)) }
-                        )
-                    }
+                items(visibleList) { currency ->
+                    CurrencyListItem(
+                        currency = currency,
+                        isSelected = currency.code == state.selectedCurrency.code,
+                        onClick = { onSelect(currency) }
+                    )
                 }
 
                 item {
@@ -126,6 +137,12 @@ fun CurrencySettingsScreen(
             }
         }
     }
+}
+
+private enum class TabKind(val label: org.jetbrains.compose.resources.StringResource) {
+    FIAT(Res.string.currency_fiat),
+    CRYPTO(Res.string.currency_crypto),
+    CUSTOM(Res.string.label_management)
 }
 
 @Composable
@@ -159,26 +176,31 @@ fun CurrencyListItem(
         border = androidx.compose.foundation.BorderStroke(1.dp, if (isSelected) primaryColor.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Surface(
-                modifier = Modifier.size(38.dp),
+                modifier = Modifier.size(32.dp),
                 shape = MaterialTheme.shapes.medium,
                 color = if (isSelected) primaryColor else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                 contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    FintrackLabelMediumText(text = currency.code, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                    FintrackLabelMediumText(text = currency.code, fontWeight = FontWeight.Bold, fontSize = 9.sp)
                 }
             }
-            Column(modifier = Modifier.weight(1f)) {
-                FintrackBodyLargeText(text = displayName, fontWeight = FontWeight.SemiBold)
-                FintrackLabelMediumText(text = if (currency.code == "IRT") stringResource(Res.string.label_default) else currency.symbol, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
+            FintrackBodyMediumText(
+                text = displayName,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.weight(1f)
+            )
+            FintrackLabelMediumText(
+                text = if (currency.code == "IRT") stringResource(Res.string.label_default) else currency.symbol,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             if (isSelected) {
-                Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(18.dp), tint = primaryColor)
+                Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(16.dp), tint = primaryColor)
             }
         }
     }

@@ -3,6 +3,7 @@ package com.kazemieh.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.designsystem.AppTheme
+import com.kazemieh.designsystem.TextScale
 import com.kazemieh.designsystem.ThemeMode
 import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
@@ -154,7 +155,13 @@ class ProfileViewModel(
                                 Currency.TOMAN
                             }
                         } else Currency.TOMAN
-                    }
+                    },
+                textScale = TextScale.fromName(
+                    preferenceUseCases.getStringPreference(
+                        FinTrackPreferences.PREF_TEXT_SCALE,
+                        TextScale.MEDIUM.name
+                    )
+                )
             )
         }
     }
@@ -314,6 +321,15 @@ class ProfileViewModel(
                 }
             }
 
+            ProfileIntent.CycleTextSize -> {
+                val next = _state.value.textScale.next()
+                preferenceUseCases.setStringPreference(
+                    FinTrackPreferences.PREF_TEXT_SCALE,
+                    next.name
+                )
+                _state.update { it.copy(textScale = next) }
+            }
+
             ProfileIntent.Logout -> {
                 preferenceUseCases.clearPreferences()
                 viewModelScope.launch {
@@ -341,6 +357,7 @@ data class ProfileState(
     val isBalanceHidden: Boolean = false,
     val lastSyncTime: String = "---",
     val selectedCurrency: Currency = Currency.TOMAN,
+    val textScale: TextScale = TextScale.MEDIUM,
     val transactionCount: Int = 0,
     val activeDays: Int = 0,
     val toolCount: Int = TOOL_COUNT,
@@ -355,6 +372,7 @@ data class ProfileState(
 sealed interface ProfileIntent {
     data object Refresh : ProfileIntent
     data object ShowPremiumInfo : ProfileIntent
+    data object CycleTextSize : ProfileIntent
     data object ToggleDarkMode : ProfileIntent
     data object ToggleFingerprint : ProfileIntent
     data object ToggleBackup : ProfileIntent

@@ -226,8 +226,22 @@ fun ProfileScreen(
                         icon = Icons.Default.Build,
                         onClick = onNavigateToManageTools
                     )
-                    // Single-option display info rows (no navigation target yet) — shown as
-                    // non-interactive value rows rather than dead clickable items.
+                    // Text size is a real setting: tapping cycles small → medium → large and
+                    // rescales every text in the app.
+                    SettingItem(
+                        title = stringResource(Res.string.label_text_size),
+                        icon = Icons.Default.TextFormat,
+                        value = stringResource(
+                            when (state.textScale) {
+                                com.kazemieh.designsystem.TextScale.SMALL -> Res.string.label_small
+                                com.kazemieh.designsystem.TextScale.MEDIUM -> Res.string.label_medium
+                                com.kazemieh.designsystem.TextScale.LARGE -> Res.string.label_large
+                            }
+                        ),
+                        onClick = { viewModel.onIntent(ProfileIntent.CycleTextSize) }
+                    )
+                    // Language and calendar currently ship a single option; shown as honest
+                    // non-interactive value rows until full localization / Gregorian support lands.
                     SettingItem(
                         title = stringResource(Res.string.label_language),
                         icon = Icons.Default.Language,
@@ -237,11 +251,6 @@ fun ProfileScreen(
                         title = stringResource(Res.string.label_calendar_fa),
                         icon = Icons.Default.CalendarMonth,
                         value = stringResource(Res.string.label_jalali)
-                    )
-                    SettingItem(
-                        title = stringResource(Res.string.label_text_size),
-                        icon = Icons.Default.TextFormat,
-                        value = stringResource(Res.string.label_medium)
                     )
                 }
             }

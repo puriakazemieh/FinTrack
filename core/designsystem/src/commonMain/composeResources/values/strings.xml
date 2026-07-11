@@ -1187,8 +1187,12 @@
     <string name="achievement_budget_master">استاد بودجه</string>
 
     <string name="label_persian">فارسی</string>
+    <string name="label_english">English</string>
     <string name="label_jalali">جلالی</string>
+    <string name="label_gregorian">میلادی</string>
+    <string name="label_small">کوچک</string>
     <string name="label_medium">متوسط</string>
+    <string name="label_large">بزرگ</string>
     <string name="label_premium">پریمیوم</string>
     <string name="label_renew">تمدید</string>
     <string name="label_google_drive_backup">Google Drive · پشتیبان روزانه</string>
