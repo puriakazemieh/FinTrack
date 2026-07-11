@@ -19,8 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -390,10 +388,10 @@ private fun DashboardHeader(
             }
         }
 
+        // Search lives in the Quick Actions row and notifications in Settings, so the header
+        // keeps only the dashboard-customize button.
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             HeaderIconButton(icon = Icons.Default.Tune, onClick = onCustomizeClick)
-            HeaderIconButton(icon = Icons.Default.Notifications, onClick = onNotificationsClick)
-            HeaderIconButton(icon = Icons.Default.Search, onClick = onNavigateToSearch)
         }
     }
 }

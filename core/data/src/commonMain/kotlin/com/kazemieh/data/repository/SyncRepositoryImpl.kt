@@ -29,6 +29,9 @@ class SyncRepositoryImpl(
     }
 
     override suspend fun syncAll() {
+        // Skip entirely unless a real server is configured, so the periodic background
+        // worker never hits the dev URL (which fails with a cleartext-HTTP error).
+        if (!SyncConfig.enabled) return
         uploadModifiedEntities()
         downloadUpdates()
     }

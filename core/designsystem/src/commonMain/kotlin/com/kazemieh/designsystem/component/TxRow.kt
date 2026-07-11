@@ -258,9 +258,10 @@ private fun TransactionIconBox(iconRes: DrawableResource, color: Color, bgColor:
 
 @Composable
 private fun TransactionAmountAndDate(amount: Long, date: String, color: Color) {
+    val hidden = LocalHideBalance.current
     Column(horizontalAlignment = Alignment.End) {
         FintrackTitleSmallText(
-            text = stringResource(
+            text = if (hidden) "••••••" else stringResource(
                 Res.string.label_amount_with_unit,
                 amount.toPersianPrice(),
                 stringResource(Res.string.unit_toman_short)

@@ -62,7 +62,17 @@ fun FinTrackHost(
     val currentRoute =
         navController.currentBackStackEntryAsState().value?.destination?.route.orEmpty()
     val showBottomBar = remember(currentRoute, tabs) {
-        tabs.any { currentRoute.contains(it.matchKey) }
+        // Match on the exact route class name (last path segment, args stripped) so that
+        // sub-screens like "EditProfile" don't accidentally match the "Profile" tab and
+        // keep the bar over their own bottom actions.
+        val simpleName = currentRoute
+            .substringBefore('?')
+            .substringBefore('/')
+            .substringAfterLast('.')
+        // Search keeps the bar (the bar handles it specially); every other non-tab
+        // sub-screen hides it.
+        simpleName.equals("Search", ignoreCase = true) ||
+            tabs.any { it.matchKey.equals(simpleName, ignoreCase = true) }
     }
 
     val snackbarHostState = remember { SnackbarHostState() }

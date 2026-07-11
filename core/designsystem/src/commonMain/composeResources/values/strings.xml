@@ -20,7 +20,7 @@
     <string name="add_source">افزودن منبع</string>
     <string name="label_balance">موجودی</string>
     <string name="balance">موجودی: %1$s</string>
-    <string name="navigation_home">صفحه نخست</string>
+    <string name="navigation_home">خانه</string>
     <string name="navigation_report">تراکنش‌ها</string>
     <string name="navigation_setting">تنظیمات</string>
     <string name="outcoming">خرج</string>
@@ -1307,6 +1307,15 @@
     <string name="tools_group_support">پشتیبانی و اطلاعات</string>
     <string name="tools_search_placeholder">جست‌وجوی ابزار…</string>
     <string name="tools_no_results">ابزاری یافت نشد</string>
+
+    <!-- Sync / backup messages -->
+    <string name="sync_msg_success">پشتیبان‌گیری و همگام‌سازی با موفقیت انجام شد</string>
+    <string name="sync_msg_no_provider">هیچ مقصد پشتیبانی فعال نیست</string>
+    <string name="sync_msg_failed">همگام‌سازی ناموفق بود: %1$s</string>
+    <string name="sync_msg_drive_unavailable">همگام‌سازی با گوگل‌درایو هنوز پیکربندی نشده است (نیازمند ورود به حساب گوگل)</string>
+    <string name="sync_msg_restoring">در حال بازیابی پشتیبان…</string>
+    <string name="sync_msg_restored">%1$s رکورد جدید / %2$s به‌روزشده بازیابی شد</string>
+    <string name="sync_msg_restore_failed">بازیابی ناموفق بود: %1$s</string>
 
     <!-- Manage tools (feature toggles) -->
     <string name="manage_tools_title">مدیریت ابزارها</string>

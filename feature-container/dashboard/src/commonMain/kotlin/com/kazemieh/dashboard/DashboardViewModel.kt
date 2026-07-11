@@ -52,6 +52,14 @@ class DashboardViewModel(
         loadStreak()
         observeWidgetLayout()
         observeDisabledTools()
+        observeHideBalance()
+    }
+
+    private fun observeHideBalance() {
+        preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_HIDE_BALANCE, "false")
+            .onEach { hidden ->
+                _state.update { it.copy(isBalanceVisible = !hidden.toBoolean()) }
+            }.launchIn(viewModelScope)
     }
 
     private fun observeWidgetLayout() {
@@ -159,8 +167,16 @@ class DashboardViewModel(
                 )
             }
 
-            DashboardIntent.ToggleBalanceVisibility -> _state.update {
-                it.copy(isBalanceVisible = !it.isBalanceVisible)
+            DashboardIntent.ToggleBalanceVisibility -> {
+                // Persist to the shared "hide balance" preference so every amount across the
+                // app (sources, transactions, totals) masks together and the profile toggle
+                // stays in sync.
+                val nowHidden = _state.value.isBalanceVisible
+                preferenceUseCases.setStringPreference(
+                    FinTrackPreferences.PREF_HIDE_BALANCE,
+                    nowHidden.toString()
+                )
+                _state.update { it.copy(isBalanceVisible = !nowHidden) }
             }
 
             DashboardIntent.ToggleSmsDetectionSheet -> _state.update {

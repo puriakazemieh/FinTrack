@@ -237,10 +237,10 @@ fun AddSourceContent(
                             )
                         },
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = glassColors.text3,
-                            unfocusedContainerColor = glassColors.text3,
-                            focusedIndicatorColor = glassColors.text3,
-                            unfocusedIndicatorColor = glassColors.text3,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = GlassGreen,
+                            unfocusedIndicatorColor = glassColors.glassEdge,
                             cursorColor = GlassGreen
                         ),
                         textStyle = MaterialTheme.typography.bodyLarge.copy(

@@ -122,7 +122,7 @@ private fun SourceTile(
 
             }
             FintrackTitleSmallText(
-                text = source.balance.toSignedPersianPrice(),
+                text = if (LocalHideBalance.current) "••••" else source.balance.toSignedPersianPrice(),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.W700,
                 color = color

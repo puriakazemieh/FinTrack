@@ -3,9 +3,7 @@ package com.kazemieh.dashboard
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -16,7 +14,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,13 +21,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.LocalGlassColors
-import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.glass.SheetFrame
 import com.kazemieh.designsystem.component.glass.Switch
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.dashboard_customize_hint
@@ -50,7 +44,6 @@ fun DashboardCustomizeSheet(
     onDismiss: () -> Unit
 ) {
     val glassColors = LocalGlassColors.current
-    val space = LocalSpacing.current
     var local by remember { mutableStateOf(items) }
 
     fun update(newList: List<DashboardWidgetItem>) {
@@ -67,71 +60,56 @@ fun DashboardCustomizeSheet(
         update(local.toMutableList().apply { this[index] = this[index].copy(visible = !this[index].visible) })
     }
 
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        containerColor = glassColors.bg0
+    SheetFrame(
+        title = stringResource(Res.string.dashboard_customize_title),
+        sub = stringResource(Res.string.dashboard_customize_hint),
+        onDismiss = onDismiss,
+        isFullScreen = false
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = space.large)
-                .padding(bottom = space.large)
+                .heightIn(max = 460.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 24.dp)
         ) {
-            FintrackTitleMediumText(
-                text = stringResource(Res.string.dashboard_customize_title),
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(Modifier.height(4.dp))
-            FintrackBodyMediumText(
-                text = stringResource(Res.string.dashboard_customize_hint),
-                color = glassColors.text3
-            )
-            Spacer(Modifier.height(space.medium))
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 460.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                local.forEachIndexed { index, item ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 2.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+            local.forEachIndexed { index, item ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    IconButton(
+                        onClick = { move(index, index - 1) },
+                        enabled = index > 0
                     ) {
-                        IconButton(
-                            onClick = { move(index, index - 1) },
-                            enabled = index > 0
-                        ) {
-                            Icon(
-                                Icons.Default.KeyboardArrowUp,
-                                contentDescription = null,
-                                tint = if (index > 0) glassColors.text2 else glassColors.text3.copy(alpha = 0.3f)
-                            )
-                        }
-                        IconButton(
-                            onClick = { move(index, index + 1) },
-                            enabled = index < local.size - 1
-                        ) {
-                            Icon(
-                                Icons.Default.KeyboardArrowDown,
-                                contentDescription = null,
-                                tint = if (index < local.size - 1) glassColors.text2 else glassColors.text3.copy(alpha = 0.3f)
-                            )
-                        }
-                        FintrackBodyLargeText(
-                            text = stringResource(item.widget.label),
-                            modifier = Modifier.weight(1f),
-                            color = if (item.visible) glassColors.text else glassColors.text3
-                        )
-                        Switch(
-                            on = item.visible,
-                            onToggle = { toggle(index) }
+                        Icon(
+                            Icons.Default.KeyboardArrowUp,
+                            contentDescription = null,
+                            tint = if (index > 0) glassColors.text2 else glassColors.text3.copy(alpha = 0.3f)
                         )
                     }
+                    IconButton(
+                        onClick = { move(index, index + 1) },
+                        enabled = index < local.size - 1
+                    ) {
+                        Icon(
+                            Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            tint = if (index < local.size - 1) glassColors.text2 else glassColors.text3.copy(alpha = 0.3f)
+                        )
+                    }
+                    FintrackBodyLargeText(
+                        text = stringResource(item.widget.label),
+                        modifier = Modifier.weight(1f),
+                        color = if (item.visible) glassColors.text else glassColors.text3
+                    )
+                    Switch(
+                        on = item.visible,
+                        onToggle = { toggle(index) }
+                    )
                 }
             }
         }

@@ -14,6 +14,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.sync_msg_drive_unavailable
+import fintrack.core.designsystem.generated.resources.sync_msg_failed
+import fintrack.core.designsystem.generated.resources.sync_msg_no_provider
+import fintrack.core.designsystem.generated.resources.sync_msg_restore_failed
+import fintrack.core.designsystem.generated.resources.sync_msg_restored
+import fintrack.core.designsystem.generated.resources.sync_msg_restoring
+import fintrack.core.designsystem.generated.resources.sync_msg_success
+import org.jetbrains.compose.resources.getString
 import kotlin.time.Clock
 
 data class SyncState(
@@ -25,7 +34,10 @@ data class SyncState(
     // Drive stays off until OAuth credentials are wired up, so we never report a
     // fake success for it.
     val isGoogleDriveEnabled: Boolean = false,
-    val isServerSyncEnabled: Boolean = true,
+    // No sync server is configured in this build, so server sync stays off by default —
+    // otherwise "backup now" would fail against the dev URL. The user can enable it once
+    // a real server/URL is set.
+    val isServerSyncEnabled: Boolean = false,
     val isLoading: Boolean = false
 )
 
@@ -75,7 +87,15 @@ class SyncViewModel(
         when (intent) {
             SyncIntent.BackupNow -> backupNow()
             is SyncIntent.ToggleGoogleDrive -> {
-                _state.update { it.copy(isGoogleDriveEnabled = intent.enabled) }
+                // Google Drive needs an OAuth sign-in that isn't wired up in this build, so we
+                // refuse to enable it (and say so) rather than let it fail on the next sync.
+                if (intent.enabled) {
+                    viewModelScope.launch {
+                        _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_drive_unavailable)))
+                    }
+                } else {
+                    _state.update { it.copy(isGoogleDriveEnabled = false) }
+                }
             }
             is SyncIntent.RestoreBackup -> restoreBackup(intent.timestamp)
         }
@@ -103,7 +123,7 @@ class SyncViewModel(
 
                 if (!ranAnyProvider) {
                     // Nothing actually happened — don't record a fake successful backup.
-                    _effect.send(SyncEffect.ShowMessage("No sync provider is enabled"))
+                    _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_no_provider)))
                     _state.update { it.copy(isLoading = false) }
                     return@launch
                 }
@@ -117,7 +137,7 @@ class SyncViewModel(
                     updatedCount = totalUpdated
                 ))
                 
-                _effect.send(SyncEffect.ShowMessage("Backup and sync successful"))
+                _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_success)))
                 loadData()
             } catch (e: Exception) {
                 backupRepository.addSyncHistory(SyncHistory(
@@ -127,7 +147,7 @@ class SyncViewModel(
                     recordCount = 0,
                     errorMessage = e.message
                 ))
-                _effect.send(SyncEffect.ShowMessage("Sync failed: ${e.message}"))
+                _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_failed, e.message ?: "")))
                 loadData()
             } finally {
                 _state.update { it.copy(isLoading = false) }
@@ -138,13 +158,13 @@ class SyncViewModel(
     private fun restoreBackup(time: Long) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            _effect.send(SyncEffect.ShowMessage("Restoring backup..."))
+            _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_restoring)))
             try {
                 val (inserted, updated) = serverSyncManager.restoreFromServer()
-                _effect.send(SyncEffect.ShowMessage("Restored $inserted new / $updated updated records"))
+                _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_restored, inserted.toString(), updated.toString())))
                 loadData()
             } catch (e: Exception) {
-                _effect.send(SyncEffect.ShowMessage("Restore failed: ${e.message}"))
+                _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_restore_failed, e.message ?: "")))
             } finally {
                 _state.update { it.copy(isLoading = false) }
             }
