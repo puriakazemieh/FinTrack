@@ -154,16 +154,16 @@ fun NoteEditScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Field(label = stringResource(Res.string.note_content_hint)) {
-                FintrackOutlinedTextField(
-                    value = state.content,
-                    onValueChange = { viewModel.onIntent(NoteEditIntent.OnContentChanged(it)) },
-                    placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.note_content_hint)) },
-                    label = { FintrackLabelSmallText(text = stringResource(Res.string.note_content_hint)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = false
-                )
-            }
+            FintrackLabelMediumText(
+                text = stringResource(Res.string.note_content_hint),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            MarkdownNoteField(
+                value = state.content,
+                onValueChange = { viewModel.onIntent(NoteEditIntent.OnContentChanged(it)) },
+                placeholder = stringResource(Res.string.note_content_hint),
+                modifier = Modifier.fillMaxWidth()
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 

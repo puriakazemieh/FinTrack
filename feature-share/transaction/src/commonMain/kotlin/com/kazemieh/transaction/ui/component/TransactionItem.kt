@@ -85,6 +85,13 @@ fun TransactionItem(
         if (trx.type == TransactionType.EXPENSE) MaterialTheme.colorScheme.error
         else MaterialTheme.colorScheme.secondary
 
+    // Sign accompanies the color so direction reads at a glance (transfers stay neutral).
+    val amountSign = when (trx.type) {
+        TransactionType.INCOME -> "+ "
+        TransactionType.EXPENSE -> "− "
+        else -> ""
+    }
+
     // ---------------------------
     val sourceIcon = remember(uiTransactionWithRelation.source.iconId) {
         FinTrackIcons.findIcon(uiTransactionWithRelation.source.iconId)
@@ -236,7 +243,7 @@ fun TransactionItem(
                     text = stringResource(
                         Res.string.amount_label,
                         typeLabel,
-                        trx.amount.toLong().toPersianPrice()
+                        amountSign + trx.amount.toLong().toPersianPrice()
                     ),
                     fontWeight = FontWeight.W700,
                     color = amountColor

@@ -5,9 +5,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.toPersianPrice
 import com.kazemieh.designsystem.component.*
@@ -132,7 +135,9 @@ private fun QuickAddBar(
                         onValueChange = onNameChange,
                         placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.add_to_shopping_list)) },
                         label = { FintrackLabelSmallText(text = stringResource(Res.string.shopping_list)) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = { onAdd() })
                     )
                 }
 
@@ -144,11 +149,17 @@ private fun QuickAddBar(
                     )
                 }
 
-                IconButton(onClick = onAdd) {
+                FilledIconButton(
+                    onClick = onAdd,
+                    enabled = name.isNotBlank(),
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
+                        contentDescription = stringResource(Res.string.add_to_shopping_list)
                     )
                 }
             }
