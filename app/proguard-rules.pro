@@ -37,3 +37,27 @@
 # General KMP
 -keep class kotlin.** { *; }
 -keep class kotlinx.** { *; }
+
+# WorkManager
+-keep class androidx.work.impl.WorkDatabase_Impl {
+    public <init>(...);
+}
+-keepclassmembers class * extends androidx.work.Worker {
+    public <init>(android.content.Context, androidx.work.WorkerParameters);
+}
+-keepclassmembers class * extends androidx.work.ListenableWorker {
+    public <init>(android.content.Context, androidx.work.WorkerParameters);
+}
+-keep class androidx.work.impl.** { *; }
+
+# Room (used by WorkManager)
+-keep class * extends androidx.room.RoomDatabase {
+    <init>(...);
+}
+
+# DataStore & Shaded Protobuf (WorkManager 2.10+ internal dependency)
+-keep class androidx.datastore.** { *; }
+-keep class androidx.datastore.preferences.protobuf.** { *; }
+
+# App Startup
+-keep class androidx.startup.** { *; }
