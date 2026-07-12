@@ -9,7 +9,7 @@ plugins {
 kotlin {
     androidLibrary {
         namespace = "com.kazemieh.sync"
-        compileSdk = 35
+        compileSdk = 36
         minSdk = 24
     }
     val xcfName = "core:financialsourceKit"

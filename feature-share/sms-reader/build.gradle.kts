@@ -10,7 +10,7 @@ plugins {
 kotlin {
     androidLibrary {
         namespace = "com.kazemieh.sms_reader"
-        compileSdk = 35
+        compileSdk = 36
         minSdk = 24
     }
 

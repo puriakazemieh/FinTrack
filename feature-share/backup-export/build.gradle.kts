@@ -9,7 +9,7 @@ plugins {
 kotlin {
     androidLibrary {
         namespace = "com.kazemieh.backup_export"
-        compileSdk = 35
+        compileSdk = 36
         minSdk = 24
     }
 

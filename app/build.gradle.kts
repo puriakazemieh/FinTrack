@@ -12,8 +12,8 @@ android {
         applicationId = "com.kazemieh.fintrack"
         minSdk = 24
         targetSdk = 36
-        versionCode = 5
-        versionName = "2.6.0"
+        versionCode = 6
+        versionName = "3.0.0"
     }
 
     signingConfigs {
@@ -51,7 +51,7 @@ android {
         }
         create("direct") {
             dimension = "distribution"
-            versionNameSuffix = "-direct"
+//            versionNameSuffix = "-direct"
         }
     }
 
