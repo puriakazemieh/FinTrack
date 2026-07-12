@@ -195,20 +195,7 @@ fun ProfileScreen(
             verticalArrangement = Arrangement.spacedBy(space.medium),
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
-            item {
 
-                GlassCard(
-                    modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
-                    tone = GlassTone.Strong,
-                    padding = 16.dp
-                ) {
-
-                    FintrackTitleLargeText(
-                        text = "این قسمت به زودی تکمیل خواهد شد ",
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
 // todo disable
             /* item {
                  ProfileHero(
@@ -226,10 +213,10 @@ fun ProfileScreen(
                 )
             }*/
 // todo disable
-            /*item {
+           item {
                 WidgetCard(title = stringResource(Res.string.section_display)) {
                     // todo disable
-                    *//*SettingItem(
+                   /*SettingItem(
                         title = stringResource(Res.string.label_theme),
                         icon = Icons.Default.Palette,
                         onClick = onNavigateToThemeSettings
@@ -239,18 +226,18 @@ fun ProfileScreen(
                         title = stringResource(Res.string.label_currency),
                         icon = Icons.Default.Payments,
                         onClick = onNavigateToCurrencySettings
-                    )*//*
+                    )*/
                     // todo disable feature setting
-                    *//*SettingItem(
+                    SettingItem(
                         title = stringResource(Res.string.label_manage_tools),
                         icon = Icons.Default.Build,
                         onClick = onNavigateToManageTools
-                    )*//*
+                    )
 
                     // Text size is a real setting: tapping cycles small → medium → large and
                     // rescales every text in the app.
                     // todo disable
-                    *//*SettingItem(
+                    /*SettingItem(
                         title = stringResource(Res.string.label_text_size),
                         icon = Icons.Default.TextFormat,
                         value = stringResource(
@@ -274,9 +261,9 @@ fun ProfileScreen(
                         title = stringResource(Res.string.label_calendar_fa),
                         icon = Icons.Default.CalendarMonth,
                         value = stringResource(Res.string.label_jalali)
-                    )*//*
+                    )*/
                 }
-            }*/
+            }
 
 // todo disable
             /*item {

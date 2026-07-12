@@ -76,10 +76,16 @@ class DashboardViewModel(
 //            ToolFeature.serializeDisabled(ToolFeature.entries.toSet())
             ToolFeature.serializeDisabled(
                 ToolFeature.entries.toSet() -
-                setOf(
-                    ToolFeature.SOURCES, ToolFeature.CATEGORIES,
-                    ToolFeature.PERSONS, ToolFeature.TAGS
-                )
+                        setOf(
+                            ToolFeature.SOURCES,
+                            ToolFeature.CATEGORIES,
+                            ToolFeature.PERSONS,
+                            ToolFeature.TAGS,
+                            ToolFeature.BUDGETS,
+                            ToolFeature.FIXED_EXPENSE,
+                            ToolFeature.SHOPPING,
+                            ToolFeature.NOTES,
+                        )
             )
         )
         preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_DISABLED_TOOLS, "")
