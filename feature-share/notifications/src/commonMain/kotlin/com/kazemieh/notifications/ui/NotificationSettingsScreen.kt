@@ -52,6 +52,7 @@ import com.kazemieh.designsystem.component.picker.FintrackTimePickerBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.cancell_
 import fintrack.core.designsystem.generated.resources.confirm
+import fintrack.core.designsystem.generated.resources.label_quick_add_notification
 import fintrack.core.designsystem.generated.resources.notif_budget_label
 import fintrack.core.designsystem.generated.resources.notif_channels_title
 import fintrack.core.designsystem.generated.resources.notif_cheque_label
@@ -60,7 +61,6 @@ import fintrack.core.designsystem.generated.resources.notif_permission_rationale
 import fintrack.core.designsystem.generated.resources.notif_quiet_end_label
 import fintrack.core.designsystem.generated.resources.notif_quiet_hours
 import fintrack.core.designsystem.generated.resources.notif_quiet_start_label
-import fintrack.core.designsystem.generated.resources.label_quick_add_notification
 import fintrack.core.designsystem.generated.resources.setting_push_notifications
 import fintrack.core.designsystem.generated.resources.title_notification_settings
 import org.jetbrains.compose.resources.stringResource
@@ -279,7 +279,7 @@ fun PermissionRationaleCard(
                 )
             }
             Spacer(modifier = Modifier.height(space.small))
-            FintrackBodyMediumText( //todo use this
+            FintrackBodyMediumText(
                 text = stringResource(Res.string.notif_permission_rationale),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

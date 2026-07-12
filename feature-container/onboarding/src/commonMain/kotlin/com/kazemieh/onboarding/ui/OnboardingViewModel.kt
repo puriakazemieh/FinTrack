@@ -30,11 +30,14 @@ class OnboardingViewModel(
     fun onIntent(intent: OnboardingIntent) {
         when (intent) {
             OnboardingIntent.NextStep -> {
-                if (_state.value.currentStep < 3) {
+
+                // todo disable
+               /* if (_state.value.currentStep < 3) {
                     _state.update { it.copy(currentStep = it.currentStep + 1) }
                 } else {
                     finishOnboarding()
-                }
+                }*/
+                finishOnboarding()
             }
             OnboardingIntent.PreviousStep -> {
                 if (_state.value.currentStep > 1) {

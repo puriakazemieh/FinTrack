@@ -70,6 +70,18 @@ class DashboardViewModel(
     }
 
     private fun observeDisabledTools() {
+        // todo disable feature toggle -> remove or change setStringPreference
+        preferenceUseCases.setStringPreference(
+            FinTrackPreferences.PREF_DISABLED_TOOLS,
+//            ToolFeature.serializeDisabled(ToolFeature.entries.toSet())
+            ToolFeature.serializeDisabled(
+                ToolFeature.entries.toSet() -
+                setOf(
+                    ToolFeature.SOURCES, ToolFeature.CATEGORIES,
+                    ToolFeature.PERSONS, ToolFeature.TAGS
+                )
+            )
+        )
         preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_DISABLED_TOOLS, "")
             .onEach { csv ->
                 _state.update { it.copy(disabledTools = ToolFeature.parseDisabled(csv)) }
@@ -122,7 +134,9 @@ class DashboardViewModel(
         ) { name, family ->
             val fullName = listOf(name, family).filter { it.isNotBlank() }.joinToString(" ")
             val displayName = fullName.ifBlank { getString(Res.string.placeholder_user_name) }
-            val displayInitial = fullName.ifBlank { getString(Res.string.placeholder_user_initial) }.first().toString()
+            val displayInitial =
+                fullName.ifBlank { getString(Res.string.placeholder_user_initial) }.first()
+                    .toString()
 
             _state.update {
                 it.copy(
@@ -151,7 +165,7 @@ class DashboardViewModel(
                 )
             }
 
-             is DashboardIntent.ShowAddSource -> _state.update {
+            is DashboardIntent.ShowAddSource -> _state.update {
                 it.copy(
                     showAddSource = !it.showAddSource,
                     selectedSource = intent.source

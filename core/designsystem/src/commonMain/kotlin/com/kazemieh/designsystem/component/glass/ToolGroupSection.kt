@@ -116,6 +116,7 @@ private fun ToolCard(
         ) {
             Box(
                 modifier = Modifier
+                    .padding(top = 8.dp)
                     .size(44.dp)
                     .clip(CircleShape)
                     .background(accent.copy(alpha = 0.12f)),

@@ -207,11 +207,12 @@ fun ToolsScreen(
             )
 
             if (query.isBlank()) {
-                ToolGroupSection(
+                // todo disable
+                /*ToolGroupSection(
                     title = favorites.title,
                     accent = favorites.accent,
                     items = favorites.items
-                )
+                )*/
                 groups.forEach { group ->
                     ToolGroupSection(
                         title = group.title,

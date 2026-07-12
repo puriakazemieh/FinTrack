@@ -163,7 +163,8 @@ fun ProfileScreen(
         }
     }
 
-    if (showLockSheet) {
+// todo disable feature toggle
+    /*if (showLockSheet) {
         ModalBottomSheet(
             onDismissRequest = { showLockSheet = false },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -184,7 +185,7 @@ fun ProfileScreen(
                 }
             }
         )
-    }
+    }*/
 
     FintrackScreen {
         LazyColumn(
@@ -195,40 +196,61 @@ fun ProfileScreen(
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
             item {
-                ProfileHero(
-                    state = state,
-                    onEditClick = onNavigateToProfileEdit
-                )
-            }
 
-            item {
+                GlassCard(
+                    modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
+                    tone = GlassTone.Strong,
+                    padding = 16.dp
+                ) {
+
+                    FintrackTitleLargeText(
+                        text = "این قسمت به زودی تکمیل خواهد شد ",
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+// todo disable
+            /* item {
+                 ProfileHero(
+                     state = state,
+                     onEditClick = onNavigateToProfileEdit
+                 )
+             }*/
+
+// todo disable
+            /*item {
                 SyncCard(
                     lastSyncTime = state.lastSyncTime,
                     onSyncClick = onNavigateToBackupRestore,
                     isLoading = state.isLoading
                 )
-            }
-
-            item {
+            }*/
+// todo disable
+            /*item {
                 WidgetCard(title = stringResource(Res.string.section_display)) {
-                    SettingItem(
+                    // todo disable
+                    *//*SettingItem(
                         title = stringResource(Res.string.label_theme),
                         icon = Icons.Default.Palette,
                         onClick = onNavigateToThemeSettings
-                    )
-                    SettingItem(
+                    )*//*
+                    // todo disable
+                   *//* SettingItem(
                         title = stringResource(Res.string.label_currency),
                         icon = Icons.Default.Payments,
                         onClick = onNavigateToCurrencySettings
-                    )
-                    SettingItem(
+                    )*//*
+                    // todo disable feature setting
+                    *//*SettingItem(
                         title = stringResource(Res.string.label_manage_tools),
                         icon = Icons.Default.Build,
                         onClick = onNavigateToManageTools
-                    )
+                    )*//*
+
                     // Text size is a real setting: tapping cycles small → medium → large and
                     // rescales every text in the app.
-                    SettingItem(
+                    // todo disable
+                    *//*SettingItem(
                         title = stringResource(Res.string.label_text_size),
                         icon = Icons.Default.TextFormat,
                         value = stringResource(
@@ -239,10 +261,11 @@ fun ProfileScreen(
                             }
                         ),
                         onClick = { viewModel.onIntent(ProfileIntent.CycleTextSize) }
-                    )
+                    )*//*
                     // Language and calendar currently ship a single option; shown as honest
                     // non-interactive value rows until full localization / Gregorian support lands.
-                    SettingItem(
+                    // todo disable
+                    *//*SettingItem(
                         title = stringResource(Res.string.label_language),
                         icon = Icons.Default.Language,
                         value = stringResource(Res.string.label_persian)
@@ -251,11 +274,12 @@ fun ProfileScreen(
                         title = stringResource(Res.string.label_calendar_fa),
                         icon = Icons.Default.CalendarMonth,
                         value = stringResource(Res.string.label_jalali)
-                    )
+                    )*//*
                 }
-            }
+            }*/
 
-            item {
+// todo disable
+            /*item {
                 WidgetCard(title = stringResource(Res.string.section_security)) {
                     SettingItem(
                         title = stringResource(Res.string.label_app_lock),
@@ -280,9 +304,10 @@ fun ProfileScreen(
                         onToggle = { viewModel.onIntent(ProfileIntent.ToggleHideBalance) }
                     )
                 }
-            }
+            }*/
 
-            item {
+// todo disable
+            /*item {
                 WidgetCard(title = stringResource(Res.string.section_notifications)) {
                     SettingItem(
                         title = stringResource(Res.string.title_notification_settings),
@@ -296,13 +321,15 @@ fun ProfileScreen(
                         onToggle = { viewModel.onIntent(ProfileIntent.TogglePushNotifications) }
                     )
                 }
-            }
+            }*/
 
-            item {
+// todo disable
+            /*item {
                 PremiumStatusCard(onRenewClick = { viewModel.onIntent(ProfileIntent.ShowPremiumInfo) })
-            }
+            }*/
 
-            item {
+// todo disable
+            /*item {
                 WidgetCard(title = stringResource(Res.string.section_support)) {
                     SettingItem(
                         title = stringResource(Res.string.label_faq),
@@ -325,9 +352,10 @@ fun ProfileScreen(
                         onClick = { uriHandler.openUri(ProfileLinks.RATE) }
                     )
                 }
-            }
+            }*/
 
-            item {
+// todo disable
+            /*item {
                 WidgetCard(title = stringResource(Res.string.section_about)) {
                     SettingItem(
                         title = stringResource(Res.string.label_terms),
@@ -345,9 +373,10 @@ fun ProfileScreen(
                         value = ProfileLinks.APP_VERSION
                     )
                 }
-            }
+            }*/
 
-            item {
+// todo disable
+            /*item {
                 Spacer(modifier = Modifier.height(space.medium))
                 LogoutButton(onClick = { viewModel.onIntent(ProfileIntent.Logout) })
                 Spacer(modifier = Modifier.height(space.medium))
@@ -359,7 +388,7 @@ fun ProfileScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(space.extraLarge))
-            }
+            }*/
         }
     }
 }
@@ -375,7 +404,8 @@ fun ProfileHero(
     } else {
         stringResource(Res.string.user_name_default)
     }
-    val contactInfo = state.email.ifEmpty { state.phone }.ifEmpty { stringResource(Res.string.user_email_default) }
+    val contactInfo = state.email.ifEmpty { state.phone }
+        .ifEmpty { stringResource(Res.string.user_email_default) }
 
     GlassCard(
         modifier = Modifier.fillMaxWidth(),
@@ -409,7 +439,8 @@ fun ProfileHero(
                         contentAlignment = Alignment.Center
                     ) {
                         if (state.avatar != null) {
-                            val bitmap = remember(state.avatar) { state.avatar.decodeToImageBitmap() }
+                            val bitmap =
+                                remember(state.avatar) { state.avatar.decodeToImageBitmap() }
                             Image(
                                 bitmap = bitmap,
                                 contentDescription = null,
@@ -427,7 +458,10 @@ fun ProfileHero(
                 }
 
                 Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
                         FintrackTitleMediumText(
                             text = fullName,
                             fontWeight = FontWeight.Bold
@@ -435,19 +469,35 @@ fun ProfileHero(
                         Surface(
                             shape = MaterialTheme.shapes.extraSmall,
                             color = GlassGold.copy(alpha = 0.2f),
-                            border = border(0.5.dp, GlassGold.copy(alpha = 0.5f), MaterialTheme.shapes.extraSmall)
+                            border = border(
+                                0.5.dp,
+                                GlassGold.copy(alpha = 0.5f),
+                                MaterialTheme.shapes.extraSmall
+                            )
                         ) {
                             Row(
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(3.dp)
                             ) {
-                                Icon(Icons.Default.Star, null, modifier = Modifier.size(10.dp), tint = GlassGold)
-                                FintrackLabelSmallText(stringResource(Res.string.label_premium), color = GlassGold, fontWeight = FontWeight.Bold)
+                                Icon(
+                                    Icons.Default.Star,
+                                    null,
+                                    modifier = Modifier.size(10.dp),
+                                    tint = GlassGold
+                                )
+                                FintrackLabelSmallText(
+                                    stringResource(Res.string.label_premium),
+                                    color = GlassGold,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                         }
                     }
-                    FintrackBodySmallText(text = contactInfo, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    FintrackBodySmallText(
+                        text = contactInfo,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     Row(
                         modifier = Modifier.padding(top = 6.dp),
                         verticalAlignment = Alignment.CenterVertically,
@@ -468,21 +518,46 @@ fun ProfileHero(
                     onClick = onEditClick
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowForward, null, modifier = Modifier.size(14.dp))
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowForward,
+                            null,
+                            modifier = Modifier.size(14.dp)
+                        )
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(14.dp))
-            Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)))
+            Box(
+                modifier = Modifier.fillMaxWidth().height(1.dp)
+                    .background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            )
             Spacer(modifier = Modifier.height(14.dp))
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                ProfileStatItem(value = state.transactionCount.toString().toPersianDigits(), label = stringResource(Res.string.profile_stats_transactions))
-                Box(modifier = Modifier.width(1.dp).height(30.dp).background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)))
-                ProfileStatItem(value = state.activeDays.toString().toPersianDigits(), label = stringResource(Res.string.profile_stats_active_days))
-                Box(modifier = Modifier.width(1.dp).height(30.dp).background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)))
-                ProfileStatItem(value = state.toolCount.toString().toPersianDigits(), label = stringResource(Res.string.profile_stats_tools))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                ProfileStatItem(
+                    value = state.transactionCount.toString().toPersianDigits(),
+                    label = stringResource(Res.string.profile_stats_transactions)
+                )
+                Box(
+                    modifier = Modifier.width(1.dp).height(30.dp)
+                        .background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                )
+                ProfileStatItem(
+                    value = state.activeDays.toString().toPersianDigits(),
+                    label = stringResource(Res.string.profile_stats_active_days)
+                )
+                Box(
+                    modifier = Modifier.width(1.dp).height(30.dp)
+                        .background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                )
+                ProfileStatItem(
+                    value = state.toolCount.toString().toPersianDigits(),
+                    label = stringResource(Res.string.profile_stats_tools)
+                )
             }
         }
     }
@@ -514,20 +589,41 @@ fun SyncCard(
                     modifier = Modifier.size(36.dp),
                     shape = MaterialTheme.shapes.medium,
                     color = GlassGreen.copy(alpha = 0.1f),
-                    border = border(1.dp, GlassGreen.copy(alpha = 0.2f), MaterialTheme.shapes.medium)
+                    border = border(
+                        1.dp,
+                        GlassGreen.copy(alpha = 0.2f),
+                        MaterialTheme.shapes.medium
+                    )
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.Public, null, modifier = Modifier.size(17.dp), tint = GlassGreen)
+                        Icon(
+                            Icons.Default.Public,
+                            null,
+                            modifier = Modifier.size(17.dp),
+                            tint = GlassGreen
+                        )
                     }
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    FintrackLabelLargeText(text = stringResource(Res.string.profile_sync_active), fontWeight = FontWeight.Bold)
-                    FintrackLabelSmallText(text = stringResource(Res.string.profile_sync_time, lastSyncTime), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    FintrackLabelLargeText(
+                        text = stringResource(Res.string.profile_sync_active),
+                        fontWeight = FontWeight.Bold
+                    )
+                    FintrackLabelSmallText(
+                        text = stringResource(
+                            Res.string.profile_sync_time,
+                            lastSyncTime
+                        ), color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
                 Surface(
                     shape = MaterialTheme.shapes.medium,
                     color = GlassGreen.copy(alpha = 0.1f),
-                    border = border(1.dp, GlassGreen.copy(alpha = 0.2f), MaterialTheme.shapes.medium),
+                    border = border(
+                        1.dp,
+                        GlassGreen.copy(alpha = 0.2f),
+                        MaterialTheme.shapes.medium
+                    ),
                     onClick = onSyncClick
                 ) {
                     Row(
@@ -536,9 +632,17 @@ fun SyncCard(
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         if (isLoading) {
-                            androidx.compose.material3.CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp, color = GlassGreen)
+                            androidx.compose.material3.CircularProgressIndicator(
+                                modifier = Modifier.size(
+                                    14.dp
+                                ), strokeWidth = 2.dp, color = GlassGreen
+                            )
                         }
-                        FintrackLabelMediumText(text = stringResource(Res.string.profile_sync_now), color = GlassGreen, fontWeight = FontWeight.Bold)
+                        FintrackLabelMediumText(
+                            text = stringResource(Res.string.profile_sync_now),
+                            color = GlassGreen,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
@@ -548,14 +652,24 @@ fun SyncCard(
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.medium)
                     .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-                    .border(0.5.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f), MaterialTheme.shapes.medium)
+                    .border(
+                        0.5.dp,
+                        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                        MaterialTheme.shapes.medium
+                    )
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(GlassGreen))
-                FintrackLabelSmallText(text = stringResource(Res.string.label_google_drive_backup), modifier = Modifier.weight(1f))
-                FintrackLabelSmallText(text = stringResource(Res.string.label_backup_size, "—"), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                FintrackLabelSmallText(
+                    text = stringResource(Res.string.label_google_drive_backup),
+                    modifier = Modifier.weight(1f)
+                )
+                FintrackLabelSmallText(
+                    text = stringResource(Res.string.label_backup_size, "—"),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
@@ -579,19 +693,33 @@ fun PremiumStatusCard(onRenewClick: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
 
-            ) {
+                ) {
                 Surface(
                     modifier = Modifier.size(38.dp),
                     shape = MaterialTheme.shapes.medium,
                     color = GlassAmber
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.Star, null, modifier = Modifier.size(18.dp), tint = Color.White)
+                        Icon(
+                            Icons.Default.Star,
+                            null,
+                            modifier = Modifier.size(18.dp),
+                            tint = Color.White
+                        )
                     }
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    FintrackLabelLargeText(text = stringResource(Res.string.profile_premium_title), fontWeight = FontWeight.Bold)
-                    FintrackLabelSmallText(text = stringResource(Res.string.label_premium_status_summary, "۱۴۰۵/۱۲/۲۹".toPersianDigits(), 9), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    FintrackLabelLargeText(
+                        text = stringResource(Res.string.profile_premium_title),
+                        fontWeight = FontWeight.Bold
+                    )
+                    FintrackLabelSmallText(
+                        text = stringResource(
+                            Res.string.label_premium_status_summary,
+                            "۱۴۰۵/۱۲/۲۹".toPersianDigits(),
+                            9
+                        ), color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
                 Surface(
                     shape = MaterialTheme.shapes.medium,
@@ -632,7 +760,11 @@ fun SettingItem(
             modifier = Modifier.size(32.dp),
             shape = MaterialTheme.shapes.medium,
             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
-            border = border(0.5.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f), MaterialTheme.shapes.medium)
+            border = border(
+                0.5.dp,
+                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+                MaterialTheme.shapes.medium
+            )
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
@@ -650,7 +782,11 @@ fun SettingItem(
             Surface(
                 shape = MaterialTheme.shapes.small,
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                border = border(0.5.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f), MaterialTheme.shapes.small)
+                border = border(
+                    0.5.dp,
+                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                    MaterialTheme.shapes.small
+                )
             ) {
                 FintrackLabelMediumText(
                     text = value,
@@ -679,7 +815,11 @@ fun LogoutButton(onClick: () -> Unit) {
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f),
-        border = border(0.5.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.2f), MaterialTheme.shapes.large),
+        border = border(
+            0.5.dp,
+            MaterialTheme.colorScheme.error.copy(alpha = 0.2f),
+            MaterialTheme.shapes.large
+        ),
         shape = MaterialTheme.shapes.large
     ) {
         Row(
@@ -696,7 +836,11 @@ fun LogoutButton(onClick: () -> Unit) {
     }
 }
 
-private fun border(width: androidx.compose.ui.unit.Dp, color: Color, shape: androidx.compose.ui.graphics.Shape) =
+private fun border(
+    width: androidx.compose.ui.unit.Dp,
+    color: Color,
+    shape: androidx.compose.ui.graphics.Shape
+) =
     androidx.compose.foundation.BorderStroke(width, color)
 
 /** External links and app metadata surfaced from the profile screen. */

@@ -111,7 +111,8 @@ fun DashboardScreen(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 100.dp) // Space for NavigationBar
         ) {
-            item {
+            // todo disable
+            /*item {
                 DashboardHeader(
                     userName = state.userName,
                     userInitial = state.userInitial,
@@ -125,7 +126,7 @@ fun DashboardScreen(
                         vertical = space.mediumSmall
                     )
                 )
-            }
+            }*/
 
             item {
                 BalanceHero(
@@ -138,8 +139,8 @@ fun DashboardScreen(
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }
-
-            if (state.smsDrafts.isNotEmpty() && !smsBannerDismissed) {
+// todo disable
+            /*if (state.smsDrafts.isNotEmpty() && !smsBannerDismissed) {
                 item {
                     SmsBanner(
                         count = state.smsDrafts.size,
@@ -148,7 +149,7 @@ fun DashboardScreen(
                         modifier = Modifier.padding(horizontal = space.large, vertical = space.small)
                     )
                 }
-            }
+            }*/
 
             item { Spacer(Modifier.height(space.large)) }
 
@@ -248,13 +249,14 @@ fun DashboardScreen(
             )
         }
 
-        if (state.showCustomizeSheet) {
+        // todo disable
+        /*if (state.showCustomizeSheet) {
             DashboardCustomizeSheet(
                 items = state.dashboardWidgets,
                 onApply = { viewModel.onIntent(DashboardIntent.SetWidgetLayout(it)) },
                 onDismiss = { viewModel.onIntent(DashboardIntent.ToggleCustomizeSheet) }
             )
-        }
+        }*/
 
         if (state.showAddSource) {
             AddSourceBottomSheet(

@@ -37,7 +37,7 @@ import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-private const val ONBOARDING_TOTAL_STEPS = 3
+private const val ONBOARDING_TOTAL_STEPS = 1 // todo disable change to 3
 
 @Composable
 fun OnboardingScreen(
@@ -70,7 +70,9 @@ fun OnboardingScreen(
                 }
             } else {
                 // Skip button at top right
-                TextButton(
+
+                // todo disable
+               /* TextButton(
                     onClick = { viewModel.onIntent(OnboardingIntent.Skip) },
                     modifier = Modifier.align(Alignment.TopEnd)
                 ) {
@@ -78,7 +80,7 @@ fun OnboardingScreen(
                         text = stringResource(Res.string.onboarding_skip)
                     )
                 }
-
+*/
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -228,7 +230,16 @@ fun StepContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            when (currentStep) {
+            SetupStep(
+                name = state.sourceName,
+                balance = state.sourceBalance,
+                securityQuestion = state.securityQuestion,
+                securityAnswer = state.securityAnswer,
+                onUpdate = onUpdateSource,
+                onUpdateSecurity = onUpdateSecurity
+            )
+            // todo disable
+            /*when (currentStep) {
                 1 -> WelcomeStep()
                 2 -> PermissionsStep(onSmsReadingResult = onSmsReadingResult)
                 3 -> SetupStep(
@@ -239,7 +250,7 @@ fun StepContent(
                     onUpdate = onUpdateSource,
                     onUpdateSecurity = onUpdateSecurity
                 )
-            }
+            }*/
         }
     }
 }
@@ -440,7 +451,9 @@ fun SetupStep(
     )
 
     Spacer(modifier = Modifier.height(24.dp))
-    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+
+    // todo disable
+    /*HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
     Spacer(modifier = Modifier.height(16.dp))
 
     FintrackBodyMediumText(
@@ -460,5 +473,5 @@ fun SetupStep(
         onValueChange = { onUpdateSecurity(securityQuestion, it) },
         label = { FintrackBodySmallText(stringResource(Res.string.onboarding_setup_security_answer)) },
         modifier = Modifier.fillMaxWidth()
-    )
+    )*/
 }
