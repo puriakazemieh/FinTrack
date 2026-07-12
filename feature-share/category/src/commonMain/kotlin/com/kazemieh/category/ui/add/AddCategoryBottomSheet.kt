@@ -156,19 +156,9 @@ fun AddCategoryContent(
                         value = state.draft.name,
                         onValueChange = { onIntent(AddCategoryIntent.UpdateName(it)) },
                         placeholder = { FintrackBodyMediumText(text = stringResource(Res.string.hint_enter_category_name), color = glassColors.text3) },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = GlassGreen
-                        ),
+                        colors = glassTextFieldColors(),
                         textStyle = MaterialTheme.typography.bodyLarge.copy(color = glassColors.text, fontWeight = FontWeight.SemiBold),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(glassColors.bg1)
-                            .border(1.dp, glassColors.glassEdge, RoundedCornerShape(10.dp))
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }

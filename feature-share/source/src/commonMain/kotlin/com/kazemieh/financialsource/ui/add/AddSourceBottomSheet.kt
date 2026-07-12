@@ -44,6 +44,7 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackHeadlineLargeText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.component.glassTextFieldColors
 import com.kazemieh.designsystem.component.FourDigitGroupingTransformation
 import com.kazemieh.designsystem.component.LeadingIconStyle
 import com.kazemieh.designsystem.component.NumberCommaTransformation
@@ -236,13 +237,7 @@ fun AddSourceContent(
                                 color = glassColors.text3
                             )
                         },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = GlassGreen,
-                            unfocusedIndicatorColor = glassColors.glassEdge,
-                            cursorColor = GlassGreen
-                        ),
+                        colors = glassTextFieldColors(),
                         textStyle = MaterialTheme.typography.bodyLarge.copy(
                             color = glassColors.text,
                             fontWeight = FontWeight.SemiBold
@@ -313,10 +308,7 @@ fun AddSourceContent(
                                 visualTransformation = FourDigitGroupingTransformation(),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.fillMaxWidth(),
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent
-                                )
+                                colors = glassTextFieldColors()
                             )
 
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -331,10 +323,7 @@ fun AddSourceContent(
                                     },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     modifier = Modifier.weight(1f),
-                                    colors = TextFieldDefaults.colors(
-                                        focusedContainerColor = Color.Transparent,
-                                        unfocusedContainerColor = Color.Transparent
-                                    )
+                                    colors = glassTextFieldColors()
                                 )
                                 TextField(
                                     value = state.draft.expirationMonth.orEmpty(),
@@ -353,10 +342,7 @@ fun AddSourceContent(
                                     },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     modifier = Modifier.weight(0.5f),
-                                    colors = TextFieldDefaults.colors(
-                                        focusedContainerColor = Color.Transparent,
-                                        unfocusedContainerColor = Color.Transparent
-                                    )
+                                    colors = glassTextFieldColors()
                                 )
                                 TextField(
                                     value = state.draft.expirationYear.orEmpty(),
@@ -375,10 +361,7 @@ fun AddSourceContent(
                                     },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     modifier = Modifier.weight(0.5f),
-                                    colors = TextFieldDefaults.colors(
-                                        focusedContainerColor = Color.Transparent,
-                                        unfocusedContainerColor = Color.Transparent
-                                    )
+                                    colors = glassTextFieldColors()
                                 )
                             }
                         }
@@ -406,10 +389,7 @@ fun AddSourceContent(
                                 visualTransformation = FourDigitGroupingTransformation(),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.fillMaxWidth(),
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent
-                                )
+                                colors = glassTextFieldColors()
                             )
                             TextField(
                                 value = state.draft.accountNumber.orEmpty(),
@@ -423,10 +403,7 @@ fun AddSourceContent(
                                 visualTransformation = FourDigitGroupingTransformation(),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.fillMaxWidth(),
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent
-                                )
+                                colors = glassTextFieldColors()
                             )
                         }
                     }
@@ -453,10 +430,7 @@ fun AddSourceContent(
                                     },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     modifier = Modifier.weight(1f),
-                                    colors = TextFieldDefaults.colors(
-                                        focusedContainerColor = Color.Transparent,
-                                        unfocusedContainerColor = Color.Transparent
-                                    )
+                                    colors = glassTextFieldColors()
                                 )
                                 TextField(
                                     value = state.draft.branchName.orEmpty(),
@@ -468,10 +442,7 @@ fun AddSourceContent(
                                         )
                                     },
                                     modifier = Modifier.weight(1f),
-                                    colors = TextFieldDefaults.colors(
-                                        focusedContainerColor = Color.Transparent,
-                                        unfocusedContainerColor = Color.Transparent
-                                    )
+                                    colors = glassTextFieldColors()
                                 )
                             }
                         }

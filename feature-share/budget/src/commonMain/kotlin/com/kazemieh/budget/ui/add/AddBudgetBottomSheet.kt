@@ -13,6 +13,7 @@ import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.bottomsheet.FormBottomSheetScaffold
 import com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet
+import com.kazemieh.designsystem.component.calculator.CalculatorBottomSheet
 import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.component.model.ItemUi
 import fintrack.core.designsystem.generated.resources.*
@@ -29,6 +30,7 @@ fun AddBudgetBottomSheet(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
     var showCategoryPicker by remember { mutableStateOf(false) }
+    var showCalculator by remember { mutableStateOf(false) }
 
     LaunchedEffect(budgetWithProgress) {
         viewModel.onIntent(AddBudgetIntent.InitialData(budgetWithProgress?.budget, budgetWithProgress?.category))
@@ -75,7 +77,12 @@ fun AddBudgetBottomSheet(
             GlassCard(padding = 16.dp) {
                 Column {
                     FintrackLabelSmallText(text = stringResource(Res.string.label_budget_amount), color = GlassText3)
-                    Row(modifier = Modifier.padding(top = 8.dp)) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showCalculator = true }
+                            .padding(top = 8.dp)
+                    ) {
                         MoneyText(amount = state.amount.toLongOrNull() ?: 0L, size = 28)
                     }
                     
@@ -125,6 +132,17 @@ fun AddBudgetBottomSheet(
                 }
             }
         }
+    }
+
+    if (showCalculator) {
+        CalculatorBottomSheet(
+            initialAmount = state.amount,
+            onConfirm = {
+                viewModel.onIntent(AddBudgetIntent.UpdateAmount(it))
+                showCalculator = false
+            },
+            onDismiss = { showCalculator = false }
+        )
     }
 
     if (showCategoryPicker) {

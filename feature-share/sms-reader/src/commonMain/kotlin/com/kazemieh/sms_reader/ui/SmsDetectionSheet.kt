@@ -27,7 +27,7 @@ import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.SmsDraft
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.toPersianPrice
-import com.kazemieh.designsystem.GlassBlue
+import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -168,13 +168,13 @@ fun SmsDraftItem(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(GlassBlue.copy(alpha = 0.1f)),
+                        .background(GlassGreen.copy(alpha = 0.1f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Message,
                         contentDescription = null,
-                        tint = GlassBlue,
+                        tint = GlassGreen,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -182,17 +182,20 @@ fun SmsDraftItem(
                 Column(modifier = Modifier.weight(1f)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         FintrackLabelMediumText(
                             text = stringResource(Res.string.bank_label, draft.bankName),
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            modifier = Modifier.weight(1f)
                         )
                         FintrackLabelMediumText(
                             text = stringResource(Res.string.amount_rial_label, draft.amount.toPersianPrice()),
-                            color = GlassBlue,
-                            fontWeight = FontWeight.Bold
+                            color = GlassGreen,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
                         )
                     }
                     
@@ -210,7 +213,7 @@ fun SmsDraftItem(
                         
                         FintrackLabelSmallText(
                             text = "${draft.confidence}%",
-                            color = if (draft.confidence >= 90) GlassBlue else glassColors.text3,
+                            color = if (draft.confidence >= 90) GlassGreen else glassColors.text3,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -237,7 +240,7 @@ fun SmsDraftItem(
                     EntityChip(
                         name = selectedCategory?.name ?: stringResource(Res.string.select_category),
                         iconRes = selectedCategory?.let { FinTrackIcons.findIcon(it.iconId).resource },
-                        tint = GlassBlue,
+                        tint = GlassGreen,
                         onClick = { onPick(PickerType.Category) },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -249,7 +252,7 @@ fun SmsDraftItem(
                     EntityChip(
                         name = selectedSource?.name ?: stringResource(Res.string.select_source),
                         iconRes = selectedSource?.let { FinTrackIcons.findIcon(it.iconId).resource },
-                        tint = GlassBlue,
+                        tint = GlassGreen,
                         onClick = { onPick(PickerType.Source) },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -259,7 +262,7 @@ fun SmsDraftItem(
             Button(
                 onClick = onClick,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = GlassBlue, contentColor = Color.White),
+                colors = ButtonDefaults.buttonColors(containerColor = GlassGreen, contentColor = Color.White),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 FintrackLabelMediumText(text = stringResource(Res.string.notif_action_register), color = Color.White)

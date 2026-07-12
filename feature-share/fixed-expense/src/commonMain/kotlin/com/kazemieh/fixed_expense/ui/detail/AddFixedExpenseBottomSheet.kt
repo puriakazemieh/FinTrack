@@ -30,6 +30,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
+import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,14 +50,15 @@ import com.kazemieh.common.model.RecurrenceType
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.persiandatetime.extensions.toDateString
 import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
-import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
+import com.kazemieh.designsystem.component.glassTextFieldColors
 import com.kazemieh.designsystem.component.glass.Chip
+import com.kazemieh.designsystem.component.glass.Field
 import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.ScreenHeader
@@ -96,6 +99,7 @@ fun AddFixedExpenseBottomSheet(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
+    val glassColors = LocalGlassColors.current
 
     LaunchedEffect(expenseId) {
         if (expenseId != null) viewModel.onIntent(AddFixedExpenseIntent.LoadExpense(expenseId))
@@ -142,14 +146,20 @@ fun AddFixedExpenseBottomSheet(
                     verticalArrangement = Arrangement.spacedBy(space.medium)
                 ) {
                     // Amount
-                    FintrackOutlinedTextField(
-                        value = state.amount,
-                        onValueChange = { viewModel.onIntent(AddFixedExpenseIntent.SetAmount(it)) },
-                        label = { FintrackBodyMediumText(stringResource(Res.string.label_expense_amount)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true
-                    )
+                    Field(label = stringResource(Res.string.label_expense_amount), required = true) {
+                        TextField(
+                            value = state.amount,
+                            onValueChange = { viewModel.onIntent(AddFixedExpenseIntent.SetAmount(it)) },
+                            colors = glassTextFieldColors(),
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                color = glassColors.text,
+                                fontWeight = FontWeight.SemiBold
+                            ),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
 
                     // Category Picker
                     PickerField(
@@ -258,12 +268,15 @@ fun AddFixedExpenseBottomSheet(
                     }
 
                     // Description
-                    FintrackOutlinedTextField(
-                        value = state.description,
-                        onValueChange = { viewModel.onIntent(AddFixedExpenseIntent.SetDescription(it)) },
-                        label = { FintrackBodyMediumText(stringResource(Res.string.description)) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Field(label = stringResource(Res.string.description)) {
+                        TextField(
+                            value = state.description,
+                            onValueChange = { viewModel.onIntent(AddFixedExpenseIntent.SetDescription(it)) },
+                            colors = glassTextFieldColors(),
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(color = glassColors.text),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(space.medium))
 

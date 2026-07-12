@@ -7,11 +7,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.kazemieh.designsystem.GlassText
-import com.kazemieh.designsystem.GlassText2
 import com.kazemieh.designsystem.GlassText3
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
@@ -31,6 +28,7 @@ fun ItemSelected(
     onToggle: () -> Unit
 ) {
     val space = LocalSpacing.current
+    val glassColors = com.kazemieh.designsystem.LocalGlassColors.current
 
     GlassCard(
         modifier = Modifier
@@ -67,7 +65,7 @@ fun ItemSelected(
             FintrackBodyMediumText(
                 text = item.title.asString(),
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                color = if (isSelected) Color.White else GlassText2
+                color = if (isSelected) glassColors.text else glassColors.text2
             )
         }
     }

@@ -64,7 +64,9 @@ fun SheetFrame(
                 .background(MaterialTheme.colorScheme.background)
         ) {
             FintrackBackgroundBlobs()
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = if (isFullScreen) Modifier.fillMaxSize() else Modifier.fillMaxWidth()
+            ) {
                 ScreenHeader(
                     title = title,
                     sub = sub,

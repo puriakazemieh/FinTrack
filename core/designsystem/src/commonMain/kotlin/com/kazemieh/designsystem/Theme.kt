@@ -149,6 +149,8 @@ fun FintrackTheme(
         onAccent = accent.onAccent
     )
 
+    SystemBarsAppearance(darkTheme = !isLight)
+
     CompositionLocalProvider(
         LocalSpacing provides Dimensions(),
         LocalGlassColors provides glassColors
