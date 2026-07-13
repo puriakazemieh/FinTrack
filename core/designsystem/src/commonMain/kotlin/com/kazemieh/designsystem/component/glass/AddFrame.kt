@@ -20,11 +20,17 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
@@ -54,9 +60,30 @@ fun AddFrame(
     hero: @Composable (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    // Keeps the enclosing ModalBottomSheet from being dismissed by the residual
+    // drag/fling that leaks out of the form's scrollable content when it reaches
+    // the top edge. Scrolling the form is unaffected (that delta is consumed by the
+    // list itself); only the leftover that would otherwise pull the sheet toward its
+    // Hidden state is absorbed here. The sheet can still be closed via the header
+    // button, the scrim, or the system back gesture.
+    val keepSheetOpenConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset = available.copy(x = 0f)
+
+            override suspend fun onPostFling(
+                consumed: Velocity,
+                available: Velocity
+            ): Velocity = available.copy(x = 0f)
+        }
+    }
     Box(
         modifier = modifier
             .fillMaxSize()
+            .nestedScroll(keepSheetOpenConnection)
             .then(
                 if (backgroundBrush != null)
                     Modifier.background(backgroundBrush)
