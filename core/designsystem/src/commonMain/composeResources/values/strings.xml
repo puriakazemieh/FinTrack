@@ -1331,4 +1331,7 @@
     <string name="manage_capabilities_title">قابلیت‌ها</string>
     <string name="capability_sms_title">خواندن پیامک بانکی</string>
     <string name="capability_sms_desc">تشخیص خودکار تراکنش از روی پیامک بانک‌ها</string>
+    <string name="shopping_purchased">خریداری‌شده</string>
+    <string name="shopping_title_label">عنوان</string>
+    <string name="shopping_add_title">افزودن به لیست خرید</string>
 </resources>

@@ -2,9 +2,11 @@ package com.kazemieh.shopping.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.ShoppingItem
 import com.kazemieh.domain.usecase.AddShoppingItemUseCase
 import com.kazemieh.domain.usecase.DeleteShoppingItemUseCase
+import com.kazemieh.domain.usecase.GetCategoryUseCase
 import com.kazemieh.domain.usecase.ObserveShoppingItemsUseCase
 import com.kazemieh.domain.usecase.UpdateShoppingItemUseCase
 import com.kazemieh.domain.usecase.UpdateShoppingPositionsUseCase
@@ -30,21 +32,17 @@ data class ShoppingState(
     val items: List<ShoppingItem> = emptyList(),
     val filteredItems: List<ShoppingItem> = emptyList(),
     val isLoading: Boolean = false,
-    val newItemName: String = "",
-    val newItemEstimatedPrice: String = "",
-    val newItemPriority: Int = 0,
-    val newItemReminderTime: Long? = null,
+    val searchQuery: String = "",
+    val showAddSheet: Boolean = false,
     val editingItem: ShoppingItem? = null,
-    val searchQuery: String = ""
+    val editingCategory: Category? = null
 )
 
 sealed interface ShoppingIntent {
     data class UpdateSearchQuery(val query: String) : ShoppingIntent
-    data class OnNewItemNameChanged(val name: String) : ShoppingIntent
-    data class OnNewItemPriceChanged(val price: String) : ShoppingIntent
-    data class OnNewItemPriorityChanged(val priority: Int) : ShoppingIntent
-    data class OnNewItemReminderChanged(val time: Long?) : ShoppingIntent
-    data object OnAddItem : ShoppingIntent
+    data object OnAddClick : ShoppingIntent
+    data object OnAddSheetDismiss : ShoppingIntent
+    data class OnSaveNewItem(val item: ShoppingItem) : ShoppingIntent
     data class OnEditItem(val item: ShoppingItem?) : ShoppingIntent
     data class OnUpdateItem(val item: ShoppingItem) : ShoppingIntent
     data class OnToggleItem(val item: ShoppingItem) : ShoppingIntent
@@ -62,6 +60,7 @@ class ShoppingViewModel(
     private val updateShoppingItem: UpdateShoppingItemUseCase,
     private val deleteShoppingItem: DeleteShoppingItemUseCase,
     private val updatePositions: UpdateShoppingPositionsUseCase,
+    private val getCategory: GetCategoryUseCase,
     private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
 
@@ -98,22 +97,10 @@ class ShoppingViewModel(
     fun onIntent(intent: ShoppingIntent) {
         when (intent) {
             is ShoppingIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
-            is ShoppingIntent.OnNewItemNameChanged -> {
-                _state.update { it.copy(newItemName = intent.name) }
-            }
-            is ShoppingIntent.OnNewItemPriceChanged -> {
-                _state.update { it.copy(newItemEstimatedPrice = intent.price) }
-            }
-            is ShoppingIntent.OnNewItemPriorityChanged -> {
-                _state.update { it.copy(newItemPriority = intent.priority) }
-            }
-            is ShoppingIntent.OnNewItemReminderChanged -> {
-                _state.update { it.copy(newItemReminderTime = intent.time) }
-            }
-            ShoppingIntent.OnAddItem -> addItem()
-            is ShoppingIntent.OnEditItem -> {
-                _state.update { it.copy(editingItem = intent.item) }
-            }
+            ShoppingIntent.OnAddClick -> _state.update { it.copy(showAddSheet = true) }
+            ShoppingIntent.OnAddSheetDismiss -> _state.update { it.copy(showAddSheet = false) }
+            is ShoppingIntent.OnSaveNewItem -> addItem(intent.item)
+            is ShoppingIntent.OnEditItem -> openEditor(intent.item)
             is ShoppingIntent.OnUpdateItem -> updateItem(intent.item)
             is ShoppingIntent.OnToggleItem -> toggleItem(intent.item)
             is ShoppingIntent.OnDeleteItem -> deleteItem(intent.id)
@@ -121,46 +108,49 @@ class ShoppingViewModel(
         }
     }
 
-    private fun addItem() {
-        val name = _state.value.newItemName
-        if (name.isBlank()) return
-
+    private fun openEditor(item: ShoppingItem?) {
+        if (item == null) {
+            _state.update { it.copy(editingItem = null, editingCategory = null) }
+            return
+        }
+        _state.update { it.copy(editingItem = item, editingCategory = null) }
+        val categoryId = item.categoryId ?: return
         viewModelScope.launch {
-            val newItem = ShoppingItem(
-                name = name,
-                estimatedPrice = _state.value.newItemEstimatedPrice.toDoubleOrNull() ?: 0.0,
-                priority = _state.value.newItemPriority,
-                reminderTime = _state.value.newItemReminderTime,
+            val category = getCategory(categoryId)
+            _state.update { it.copy(editingCategory = category) }
+        }
+    }
+
+    private fun addItem(item: ShoppingItem) {
+        if (item.name.isBlank()) return
+        viewModelScope.launch {
+            val newItem = item.copy(
                 position = (_state.value.items.maxOfOrNull { it.position } ?: -1) + 1
             )
             val id = addShoppingItem(newItem)
-            newItem.reminderTime?.let { reminderTime ->
-                notificationScheduler.scheduleReminder(
-                    id = "shopping_$id",
-                    title = getString(Res.string.shopping_list),
-                    message = newItem.name,
-                    scheduledTime = Instant.fromEpochMilliseconds(reminderTime).toLocalDateTime(TimeZone.currentSystemDefault()),
-                    channelId = NotificationManager.CHANNEL_SHOPPING
-                )
-            }
-            _state.update { it.copy(newItemName = "", newItemEstimatedPrice = "", newItemPriority = 0, newItemReminderTime = null) }
+            scheduleReminder(id, newItem)
+            _state.update { it.copy(showAddSheet = false) }
         }
     }
 
     private fun updateItem(item: ShoppingItem) {
         viewModelScope.launch {
             updateShoppingItem(item)
-            item.reminderTime?.let { reminderTime ->
-                notificationScheduler.scheduleReminder(
-                    id = "shopping_${item.id}",
-                    title = getString(Res.string.shopping_list),
-                    message = item.name,
-                    scheduledTime = Instant.fromEpochMilliseconds(reminderTime).toLocalDateTime(TimeZone.currentSystemDefault()),
-                    channelId = NotificationManager.CHANNEL_SHOPPING
-                )
-            }
-            _state.update { it.copy(editingItem = null) }
+            scheduleReminder(item.id, item)
+            _state.update { it.copy(editingItem = null, editingCategory = null) }
         }
+    }
+
+    private suspend fun scheduleReminder(id: Long, item: ShoppingItem) {
+        val reminderTime = item.reminderTime ?: return
+        notificationScheduler.scheduleReminder(
+            id = "shopping_$id",
+            title = getString(Res.string.shopping_list),
+            message = item.name,
+            scheduledTime = Instant.fromEpochMilliseconds(reminderTime)
+                .toLocalDateTime(TimeZone.currentSystemDefault()),
+            channelId = NotificationManager.CHANNEL_SHOPPING
+        )
     }
 
     private fun toggleItem(item: ShoppingItem) {

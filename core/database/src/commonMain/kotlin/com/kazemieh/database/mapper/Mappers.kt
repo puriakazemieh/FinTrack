@@ -488,6 +488,7 @@ fun ShoppingItemDb.toShoppingItem() = ShoppingItem(
     estimatedPrice = estimatedPrice,
     reminderTime = reminderTime,
     categoryId = categoryId,
+    note = note,
     position = position.toInt(),
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())

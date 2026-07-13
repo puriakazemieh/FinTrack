@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS shopping_item_table (
     estimatedPrice REAL NOT NULL DEFAULT 0.0,
     reminderTime INTEGER,
     categoryId INTEGER,
+    note TEXT,
     position INTEGER NOT NULL DEFAULT 0,
     updatedAt INTEGER NOT NULL DEFAULT 0,
     syncStatus INTEGER NOT NULL DEFAULT 0,
@@ -21,12 +22,12 @@ getShoppingItemById:
 SELECT * FROM shopping_item_table WHERE id = ? AND syncStatus != 2;
 
 addShoppingItem:
-INSERT INTO shopping_item_table(name, isChecked, priority, estimatedPrice, reminderTime, categoryId, position, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO shopping_item_table(name, isChecked, priority, estimatedPrice, reminderTime, categoryId, note, position, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateShoppingItem:
 UPDATE shopping_item_table
-SET name = ?, isChecked = ?, priority = ?, estimatedPrice = ?, reminderTime = ?, categoryId = ?, position = ?, updatedAt = ?, syncStatus = ?
+SET name = ?, isChecked = ?, priority = ?, estimatedPrice = ?, reminderTime = ?, categoryId = ?, note = ?, position = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 deleteShoppingItem:
@@ -42,8 +43,8 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertFullShoppingItem:
-INSERT OR REPLACE INTO shopping_item_table(id, name, isChecked, priority, estimatedPrice, reminderTime, categoryId, position, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO shopping_item_table(id, name, isChecked, priority, estimatedPrice, reminderTime, categoryId, note, position, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getModifiedShoppingItems:
 SELECT * FROM shopping_item_table WHERE syncStatus = 1;

@@ -39,6 +39,7 @@ class ShoppingLocalDataSourceImpl(
                 estimatedPrice = item.estimatedPrice,
                 reminderTime = item.reminderTime,
                 categoryId = item.categoryId,
+                note = item.note,
                 position = item.position.toLong(),
                 updatedAt = now,
                 syncStatus = 1
@@ -56,6 +57,7 @@ class ShoppingLocalDataSourceImpl(
             estimatedPrice = item.estimatedPrice,
             reminderTime = item.reminderTime,
             categoryId = item.categoryId,
+            note = item.note,
             position = item.position.toLong(),
             updatedAt = now,
             syncStatus = 1,
@@ -91,6 +93,7 @@ class ShoppingLocalDataSourceImpl(
                 estimatedPrice = item.estimatedPrice,
                 reminderTime = item.reminderTime,
                 categoryId = item.categoryId,
+                note = item.note,
                 position = item.position.toLong(),
                 updatedAt = item.updatedAt,
                 syncStatus = item.syncStatus.value.toLong()
