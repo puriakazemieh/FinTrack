@@ -110,6 +110,7 @@ class NoteEditViewModel(
                         color = note.color,
                         isPinned = note.isPinned,
                         isLocked = note.isLocked,
+                        reminderTime = note.reminderTime,
                         selectedTags = note.tags,
                         isLoading = false
                     )
@@ -143,21 +144,36 @@ class NoteEditViewModel(
 
     private fun saveNote() {
         viewModelScope.launch {
+            val current = _state.value
             val note = Note(
-                id = _state.value.id,
-                title = _state.value.title,
-                content = _state.value.content,
-                color = _state.value.color,
-                isPinned = _state.value.isPinned,
-                isLocked = _state.value.isLocked,
-                tags = _state.value.selectedTags
+                id = current.id,
+                title = current.title,
+                content = current.content,
+                color = current.color,
+                isPinned = current.isPinned,
+                isLocked = current.isLocked,
+                reminderTime = current.reminderTime,
+                tags = current.selectedTags
             )
-            if (note.id == 0L) {
-                addNote(note)
-            } else {
-                updateNote(note)
-            }
+            val noteId = if (note.id == 0L) addNote(note) else { updateNote(note); note.id }
+            syncReminder(noteId, current.reminderTime, current.title.ifBlank { current.content })
             _effect.send(NoteEditEffect.SaveSuccess)
         }
+    }
+
+    private suspend fun syncReminder(noteId: Long, reminderTime: Long?, message: String) {
+        val reminderId = "note_$noteId"
+        if (reminderTime == null) {
+            notificationScheduler.cancelReminder(reminderId)
+            return
+        }
+        notificationScheduler.scheduleReminder(
+            id = reminderId,
+            title = getString(Res.string.notes),
+            message = message,
+            scheduledTime = Instant.fromEpochMilliseconds(reminderTime)
+                .toLocalDateTime(TimeZone.currentSystemDefault()),
+            channelId = NotificationManager.CHANNEL_NOTE
+        )
     }
 }

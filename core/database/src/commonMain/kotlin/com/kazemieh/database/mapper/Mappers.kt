@@ -512,6 +512,7 @@ fun NoteDb.toNote(tags: List<Tag> = emptyList()) = Note(
     color = color,
     isPinned = isPinned,
     isLocked = isLocked,
+    reminderTime = reminderTime,
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt()),
     tags = tags

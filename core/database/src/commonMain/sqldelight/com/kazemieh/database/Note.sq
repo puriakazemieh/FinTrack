@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS note_table (
     color INTEGER NOT NULL DEFAULT -1,
     isPinned INTEGER AS Boolean NOT NULL DEFAULT 0,
     isLocked INTEGER AS Boolean NOT NULL DEFAULT 0,
+    reminderTime INTEGER,
     updatedAt INTEGER NOT NULL DEFAULT 0,
     syncStatus INTEGER NOT NULL DEFAULT 0
 );
@@ -18,12 +19,12 @@ getNoteById:
 SELECT * FROM note_table WHERE id = ? AND syncStatus != 2;
 
 addNote:
-INSERT INTO note_table(title, content, color, isPinned, isLocked, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT INTO note_table(title, content, color, isPinned, isLocked, reminderTime, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
 updateNote:
 UPDATE note_table
-SET title = ?, content = ?, color = ?, isPinned = ?, isLocked = ?, updatedAt = ?, syncStatus = ?
+SET title = ?, content = ?, color = ?, isPinned = ?, isLocked = ?, reminderTime = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 deleteNote:
@@ -42,8 +43,8 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertFullNote:
-INSERT OR REPLACE INTO note_table(id, title, content, color, isPinned, isLocked, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO note_table(id, title, content, color, isPinned, isLocked, reminderTime, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getModifiedNotes:
 SELECT * FROM note_table WHERE syncStatus = 1;

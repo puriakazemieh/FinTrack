@@ -46,6 +46,7 @@ class NoteLocalDataSourceImpl(
                 color = note.color,
                 isPinned = note.isPinned,
                 isLocked = note.isLocked,
+                reminderTime = note.reminderTime,
                 updatedAt = now,
                 syncStatus = 1
             )
@@ -66,6 +67,7 @@ class NoteLocalDataSourceImpl(
                 color = note.color,
                 isPinned = note.isPinned,
                 isLocked = note.isLocked,
+                reminderTime = note.reminderTime,
                 updatedAt = now,
                 syncStatus = 1,
                 id = note.id
@@ -108,6 +110,7 @@ class NoteLocalDataSourceImpl(
                 color = note.color,
                 isPinned = note.isPinned,
                 isLocked = note.isLocked,
+                reminderTime = note.reminderTime,
                 updatedAt = note.updatedAt,
                 syncStatus = note.syncStatus.value.toLong()
             )
