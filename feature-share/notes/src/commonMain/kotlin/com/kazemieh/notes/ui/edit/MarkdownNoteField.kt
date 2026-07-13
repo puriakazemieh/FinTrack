@@ -10,14 +10,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatItalic
 import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.FormatStrikethrough
 import androidx.compose.material.icons.filled.Title
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +37,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.glass.GlassCard
@@ -53,6 +57,7 @@ fun MarkdownNoteField(
     modifier: Modifier = Modifier
 ) {
     val glassColors = LocalGlassColors.current
+    var previewMode by remember { mutableStateOf(false) }
     var fieldValue by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
 
     // Keep in sync when the note is (re)loaded from the ViewModel.
@@ -89,44 +94,78 @@ fun MarkdownNoteField(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
                     .padding(horizontal = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                ToolbarButton(Icons.Default.Title) { prefixLine("# ") }
-                ToolbarButton(Icons.Default.FormatBold) { wrapSelection("**") }
-                ToolbarButton(Icons.Default.FormatItalic) { wrapSelection("*") }
-                ToolbarButton(Icons.Default.FormatStrikethrough) { wrapSelection("~~") }
-                ToolbarButton(Icons.Default.CheckBox) { prefixLine("- [ ] ") }
-                ToolbarButton(Icons.Default.FormatListBulleted) { prefixLine("- ") }
-                ToolbarButton(Icons.Default.FormatListNumbered) { prefixLine("1. ") }
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    ToolbarButton(Icons.Default.Title) { prefixLine("# ") }
+                    ToolbarButton(Icons.Default.FormatBold) { wrapSelection("**") }
+                    ToolbarButton(Icons.Default.FormatItalic) { wrapSelection("*") }
+                    ToolbarButton(Icons.Default.FormatStrikethrough) { wrapSelection("~~") }
+                    ToolbarButton(Icons.Default.CheckBox) { prefixLine("- [ ] ") }
+                    ToolbarButton(Icons.Default.FormatListBulleted) { prefixLine("- ") }
+                    ToolbarButton(Icons.Default.FormatListNumbered) { prefixLine("1. ") }
+                }
+                // Toggle between raw editing and the rendered ("display") view.
+                ToolbarButton(
+                    icon = if (previewMode) Icons.Default.Edit else Icons.Default.Visibility,
+                    tint = if (previewMode) GlassGreen else glassColors.text2
+                ) { previewMode = !previewMode }
             }
 
             HorizontalDivider(color = glassColors.glassHairline)
 
-            TextField(
-                value = fieldValue,
-                onValueChange = { apply(it) },
-                placeholder = { FintrackBodyMediumText(text = placeholder, color = glassColors.text3) },
-                colors = glassTextFieldColors(),
-                textStyle = MaterialTheme.typography.bodyMedium.copy(color = glassColors.text),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 160.dp),
-                shape = RoundedCornerShape(0.dp)
-            )
+            if (previewMode) {
+                Box(modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp).padding(12.dp)) {
+                    if (fieldValue.text.isBlank()) {
+                        FintrackBodyMediumText(text = placeholder, color = glassColors.text3)
+                    } else {
+                        MarkdownRenderer(
+                            text = fieldValue.text,
+                            onToggleCheckbox = { lineIndex ->
+                                apply(
+                                    TextFieldValue(
+                                        toggleCheckboxLine(fieldValue.text, lineIndex),
+                                        TextRange(fieldValue.selection.min)
+                                    )
+                                )
+                            }
+                        )
+                    }
+                }
+            } else {
+                TextField(
+                    value = fieldValue,
+                    onValueChange = { apply(it) },
+                    placeholder = { FintrackBodyMediumText(text = placeholder, color = glassColors.text3) },
+                    colors = glassTextFieldColors(),
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(color = glassColors.text),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 160.dp),
+                    shape = RoundedCornerShape(0.dp)
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun ToolbarButton(icon: ImageVector, onClick: () -> Unit) {
-    val glassColors = LocalGlassColors.current
+private fun ToolbarButton(
+    icon: ImageVector,
+    tint: androidx.compose.ui.graphics.Color = LocalGlassColors.current.text2,
+    onClick: () -> Unit
+) {
     IconButton(onClick = onClick) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = glassColors.text2,
+            tint = tint,
             modifier = Modifier.size(20.dp)
         )
     }

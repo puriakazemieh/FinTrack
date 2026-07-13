@@ -1,7 +1,8 @@
 package com.kazemieh.notes.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,34 +22,34 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.border
 import com.kazemieh.common.model.Note
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
-import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
+import com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet
 import com.kazemieh.designsystem.component.glass.Fab
 import com.kazemieh.designsystem.component.glass.FintrackScreen
-import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.notes.ui.NotesViewModel
 import com.kazemieh.notes.ui.NotesIntent
 import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.search_placeholder
+import fintrack.core.designsystem.generated.resources.hint_search_in
 import fintrack.core.designsystem.generated.resources.add_note
 import fintrack.core.designsystem.generated.resources.notes
 import org.jetbrains.compose.resources.stringResource
@@ -62,6 +63,7 @@ fun NotesListScreen(
     onBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    var noteToDelete by remember { mutableStateOf<Note?>(null) }
 
     FintrackScreen(
         title = stringResource(Res.string.notes),
@@ -69,13 +71,11 @@ fun NotesListScreen(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-                FintrackOutlinedTextField(
-                    value = state.searchQuery,
-                    onValueChange = { viewModel.onIntent(NotesIntent.OnSearchQueryChanged(it)) },
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                    placeholder = { FintrackBodyMediumText(stringResource(Res.string.search_placeholder)) },
-                    label = { FintrackLabelSmallText(stringResource(Res.string.search_placeholder)) },
-                    prefix = { Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(20.dp)) }
+                SearchBar(
+                    query = state.searchQuery,
+                    onQueryChange = { viewModel.onIntent(NotesIntent.OnSearchQueryChanged(it)) },
+                    placeholder = stringResource(Res.string.hint_search_in, stringResource(Res.string.notes)),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 )
 
                 LazyVerticalStaggeredGrid(
@@ -88,7 +88,8 @@ fun NotesListScreen(
                     items(state.filteredNotes, key = { it.id }) { note ->
                         NoteCard(
                             note = note,
-                            onClick = { onEditNote(note.id) }
+                            onClick = { onEditNote(note.id) },
+                            onLongClick = { noteToDelete = note }
                         )
                     }
                 }
@@ -104,12 +105,25 @@ fun NotesListScreen(
             )
         }
     }
+
+    noteToDelete?.let { note ->
+        DeleteBottomSheet(
+            itemName = note.title.ifEmpty { note.content.take(20) },
+            dismissClicked = { noteToDelete = null },
+            confirmClicked = {
+                viewModel.onIntent(NotesIntent.OnDeleteNote(note.id))
+                noteToDelete = null
+            }
+        )
+    }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun NoteCard(
     note: Note,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val glassColors = LocalGlassColors.current
@@ -134,7 +148,7 @@ private fun NoteCard(
             .clip(RoundedCornerShape(16.dp))
             .background(accentColor.copy(alpha = 0.14f))
             .border(0.5.dp, accentColor.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .padding(12.dp)
     ) {
         Column {
