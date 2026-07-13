@@ -5,7 +5,7 @@ import com.kazemieh.common.model.BudgetWithProgress
 import kotlinx.coroutines.flow.Flow
 
 interface BudgetLocalDataSource {
-    fun observeBudgetsWithProgress(): Flow<List<BudgetWithProgress>>
+    fun observeBudgetsWithProgress(from: Long, to: Long): Flow<List<BudgetWithProgress>>
     suspend fun getBudgetWithProgressByCategory(categoryId: Long): BudgetWithProgress?
     suspend fun getBudgetByCategoryId(categoryId: Long): Budget?
     suspend fun addBudget(budget: Budget): Long
@@ -18,4 +18,5 @@ interface BudgetLocalDataSource {
     suspend fun getModifiedBudgets(): List<Budget>
     suspend fun markBudgetAsSynced(id: Long)
     suspend fun physicallyDeleteBudget(id: Long)
+    suspend fun hasAnyBudgets(): Boolean
 }

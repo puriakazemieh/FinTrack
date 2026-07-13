@@ -198,6 +198,17 @@ WHERE categoryId = ?
 AND type = 2 -- TransactionType.EXPENSE
 AND timeStamp >= ? AND timeStamp < ?;
 
+getSpentAmountByFilter:
+SELECT SUM(t.amount)
+FROM transactions t
+WHERE t.categoryId = :categoryId
+AND t.type = 2 -- TransactionType.EXPENSE
+AND t.timeStamp >= :fromTimestamp AND t.timeStamp < :toTimestamp
+AND (:sourceId IS NULL OR t.sourceId = :sourceId)
+AND (:tagIdsSize = 0 OR EXISTS (
+    SELECT 1 FROM transaction_tag WHERE transactionId = t.id AND tagId IN :tagIds
+));
+
 insertFullTransaction:
 INSERT OR REPLACE INTO transactions(id, amount, amountTransfer, categoryId, sourceId, sourceEndId, description, photoPath, timeStamp, type, updatedAt, syncStatus)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);

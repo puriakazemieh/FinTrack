@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 class BudgetRepositoryImpl(
     private val localDataSource: BudgetLocalDataSource
 ) : BudgetRepository {
-    override fun observeBudgetsWithProgress(): Flow<List<BudgetWithProgress>> {
-        return localDataSource.observeBudgetsWithProgress()
+    override fun observeBudgetsWithProgress(from: Long, to: Long): Flow<List<BudgetWithProgress>> {
+        return localDataSource.observeBudgetsWithProgress(from, to)
     }
 
     override suspend fun getBudgetWithProgressByCategory(categoryId: Long): BudgetWithProgress? {
@@ -35,5 +35,9 @@ class BudgetRepositoryImpl(
 
     override suspend fun getSpentAmountByCategory(categoryId: Long, from: Long, to: Long): Long {
         return localDataSource.getSpentAmountByCategory(categoryId, from, to)
+    }
+
+    override suspend fun hasAnyBudgets(): Boolean {
+        return localDataSource.hasAnyBudgets()
     }
 }

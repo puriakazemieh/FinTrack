@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.list.CategorySelectionBottomSheet
+import com.kazemieh.designsystem.component.glass.PeriodNavigator
 import com.kazemieh.common.DateFilterType
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.toSignedPersianPrice
@@ -194,7 +195,7 @@ fun TransactionsScreen(
                 onFilterClick = { viewModel.onIntent(TransactionsIntent.OnToggleFilterSheet) }
             )
 
-            PeriodSelector(
+            PeriodNavigator(
                 currentPeriod = state.dateFilterType,
                 periodLabel = state.textDate.asString(),
                 periodSubLabel = state.textPeriodRange.asString().ifEmpty {

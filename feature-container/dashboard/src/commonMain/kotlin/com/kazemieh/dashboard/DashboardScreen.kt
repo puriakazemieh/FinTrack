@@ -14,19 +14,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Tune
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.layout.offset
-import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -37,11 +35,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.common.toPersianDigits
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.ai_insights.ui.AIAdvisorWidget
 import com.kazemieh.asset.ui.component.AssetWidget
 import com.kazemieh.budget.ui.component.BudgetWidget
 import com.kazemieh.check.ui.widget.CheckWidget
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.dashboard.component.QuickActions
 import com.kazemieh.dashboard.component.RecentTransactionsWidget
 import com.kazemieh.designsystem.GlassGreenDark
@@ -53,12 +52,11 @@ import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.fixed_expense.ui.widget.FixedExpenseWidget
-import com.kazemieh.goals.presentation.component.GoalWidget
 import com.kazemieh.gamification.ui.AchievementWidget
-import com.kazemieh.ai_insights.ui.AIAdvisorWidget
+import com.kazemieh.goals.presentation.component.GoalWidget
 import com.kazemieh.installment.ui.widget.InstallmentWidget
-import com.kazemieh.shopping.ui.ShoppingWidget
 import com.kazemieh.notes.ui.NotesWidget
+import com.kazemieh.shopping.ui.ShoppingWidget
 import com.kazemieh.sms_reader.ui.SmsBanner
 import com.kazemieh.sms_reader.ui.SmsDetectionSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
@@ -66,8 +64,6 @@ import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.BalanceHero
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.msg_hello
-import fintrack.core.designsystem.generated.resources.placeholder_user_initial
-import fintrack.core.designsystem.generated.resources.placeholder_user_name
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -93,9 +89,15 @@ fun DashboardScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
     val listState = rememberLazyListState()
-    var smsBannerDismissed by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    var smsBannerDismissed by androidx.compose.runtime.remember {
+        androidx.compose.runtime.mutableStateOf(
+            false
+        )
+    }
     var repeatTemplate by androidx.compose.runtime.remember {
-        androidx.compose.runtime.mutableStateOf<com.kazemieh.common.model.TransactionWithRelations?>(null)
+        androidx.compose.runtime.mutableStateOf<com.kazemieh.common.model.TransactionWithRelations?>(
+            null
+        )
     }
 
     androidx.compose.runtime.LaunchedEffect(showAddTransaction) {
@@ -139,17 +141,20 @@ fun DashboardScreen(
                     modifier = Modifier.padding(horizontal = space.large)
                 )
             }
-// todo disable
-            /*if (state.smsDrafts.isNotEmpty() && !smsBannerDismissed) {
+
+            if (state.smsDrafts.isNotEmpty() && !smsBannerDismissed) {
                 item {
                     SmsBanner(
                         count = state.smsDrafts.size,
                         onClick = { viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet) },
                         onClose = { smsBannerDismissed = true },
-                        modifier = Modifier.padding(horizontal = space.large, vertical = space.small)
+                        modifier = Modifier.padding(
+                            horizontal = space.large,
+                            vertical = space.small
+                        )
                     )
                 }
-            }*/
+            }
 
             item { Spacer(Modifier.height(space.large)) }
 
@@ -169,7 +174,9 @@ fun DashboardScreen(
 
             state.dashboardWidgets.forEach { cfg ->
                 if (!cfg.visible) return@forEach
-                if (cfg.widget.toolFeature()?.let { it in state.disabledTools } == true) return@forEach
+                if (cfg.widget.toolFeature()
+                        ?.let { it in state.disabledTools } == true
+                ) return@forEach
                 item(key = cfg.widget.name) {
                     DashboardWidgetContent(
                         widget = cfg.widget,
@@ -310,12 +317,28 @@ private fun DashboardWidgetContent(
 
         DashboardWidget.BUDGET -> BudgetWidget(onMore = onNavigateToBudget, modifier = padding)
         DashboardWidget.GOAL -> GoalWidget(onMore = onNavigateToGoal, modifier = padding)
-        DashboardWidget.INSTALLMENT -> InstallmentWidget(onMore = onNavigateToInstallment, modifier = padding)
+        DashboardWidget.INSTALLMENT -> InstallmentWidget(
+            onMore = onNavigateToInstallment,
+            modifier = padding
+        )
+
         DashboardWidget.CHECK -> CheckWidget(onMore = onNavigateToCheck, modifier = padding)
-        DashboardWidget.FIXED_EXPENSE -> FixedExpenseWidget(onMore = onNavigateToFixedExpense, modifier = padding)
-        DashboardWidget.AI_ADVISOR -> AIAdvisorWidget(onMore = onNavigateToAIAdvisor, modifier = padding)
+        DashboardWidget.FIXED_EXPENSE -> FixedExpenseWidget(
+            onMore = onNavigateToFixedExpense,
+            modifier = padding
+        )
+
+        DashboardWidget.AI_ADVISOR -> AIAdvisorWidget(
+            onMore = onNavigateToAIAdvisor,
+            modifier = padding
+        )
+
         DashboardWidget.ASSET -> AssetWidget(onMore = onNavigateToAssets, modifier = padding)
-        DashboardWidget.SHOPPING -> ShoppingWidget(onMore = onNavigateToShopping, modifier = padding)
+        DashboardWidget.SHOPPING -> ShoppingWidget(
+            onMore = onNavigateToShopping,
+            modifier = padding
+        )
+
         DashboardWidget.NOTES -> NotesWidget(onMore = onNavigateToNotes, modifier = padding)
     }
 }
@@ -360,7 +383,7 @@ private fun DashboardHeader(
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp
                 )
-                
+
                 // Level small badge
                 Box(
                     modifier = Modifier
