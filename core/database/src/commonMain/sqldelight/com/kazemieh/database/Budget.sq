@@ -4,10 +4,13 @@ CREATE TABLE IF NOT EXISTS budget (
     amount INTEGER NOT NULL,
     period TEXT NOT NULL,
     startAt INTEGER NOT NULL,
+    tagIds TEXT, -- Comma separated IDs
+    sourceId INTEGER,
     isAlertEnabled INTEGER NOT NULL DEFAULT 1,
     updatedAt INTEGER NOT NULL DEFAULT 0,
     syncStatus INTEGER NOT NULL DEFAULT 0,
-    FOREIGN KEY (categoryId) REFERENCES category(id) ON DELETE CASCADE
+    FOREIGN KEY (categoryId) REFERENCES category(id) ON DELETE CASCADE,
+    FOREIGN KEY (sourceId) REFERENCES source(id) ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_budget_category ON budget(categoryId);
@@ -23,6 +26,20 @@ FROM budget b
 LEFT JOIN category c ON b.categoryId = c.id
 WHERE b.syncStatus != 2;
 
+observeBudgetsByRange:
+SELECT
+    b.*,
+    c.name AS categoryName,
+    c.colorId AS categoryColorId,
+    c.iconId AS categoryIconId,
+    c.type AS categoryType
+FROM budget b
+LEFT JOIN category c ON b.categoryId = c.id
+WHERE b.syncStatus != 2 AND b.startAt >= :fromAt AND b.startAt <= :toAt;
+
+hasAnyBudgets:
+SELECT COUNT(*) FROM budget WHERE syncStatus != 2;
+
 getBudgetByCategoryId:
 SELECT * FROM budget WHERE categoryId = ? AND syncStatus != 2;
 
@@ -30,13 +47,13 @@ getBudgetById:
 SELECT * FROM budget WHERE id = ? AND syncStatus != 2;
 
 insertBudget:
-INSERT INTO budget(categoryId, amount, period, startAt, isAlertEnabled, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT INTO budget(categoryId, amount, period, startAt, tagIds, sourceId, isAlertEnabled, updatedAt, syncStatus)
+VALUES (:categoryId, :amount, :period, :startAt, :tagIds, :sourceId, :isAlertEnabled, :updatedAt, :syncStatus);
 
 updateBudget:
 UPDATE budget
-SET categoryId = ?, amount = ?, period = ?, startAt = ?, isAlertEnabled = ?, updatedAt = ?, syncStatus = ?
-WHERE id = ? AND syncStatus != 2;
+SET categoryId = :categoryId, amount = :amount, period = :period, startAt = :startAt, tagIds = :tagIds, sourceId = :sourceId, isAlertEnabled = :isAlertEnabled, updatedAt = :updatedAt, syncStatus = :syncStatus
+WHERE id = :id AND syncStatus != 2;
 
 deleteBudget:
 UPDATE budget SET syncStatus = 2, updatedAt = ? WHERE id = ?;
@@ -45,11 +62,14 @@ physicallyDeleteBudget:
 DELETE FROM budget WHERE id = ?;
 
 insertFullBudget:
-INSERT OR REPLACE INTO budget(id, categoryId, amount, period, startAt, isAlertEnabled, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO budget(id, categoryId, amount, period, startAt, tagIds, sourceId, isAlertEnabled, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getModifiedBudgets:
 SELECT * FROM budget WHERE syncStatus = 1;
 
 markBudgetAsSynced:
 UPDATE budget SET syncStatus = 0 WHERE id = ?;
+
+lastInsertRowId:
+SELECT last_insert_rowid();

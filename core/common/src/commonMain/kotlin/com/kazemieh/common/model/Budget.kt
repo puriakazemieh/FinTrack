@@ -9,6 +9,8 @@ data class Budget(
     val amount: Long,
     val period: BudgetPeriod,
     val startAt: Long,
+    val tagIds: List<Long>? = null,
+    val sourceId: Long? = null,
     val isAlertEnabled: Boolean = true,
     override val updatedAt: Long = 0,
     override val syncStatus: SyncStatus = SyncStatus.SYNCED

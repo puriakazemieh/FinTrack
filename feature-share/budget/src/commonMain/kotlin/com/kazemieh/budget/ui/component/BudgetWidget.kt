@@ -26,8 +26,9 @@ fun BudgetWidget(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    val totalBudget = state.budgets.sumOf { it.budget.amount }
-    val spentBudget = state.budgets.sumOf { it.spentAmount }
+    val budgets = state.dailyBudgets + state.weeklyBudgets + state.monthlyBudgets + state.yearlyBudgets
+    val totalBudget = budgets.sumOf { it.budget.amount }
+    val spentBudget = budgets.sumOf { it.spentAmount }
     val progress = if (totalBudget > 0) spentBudget.toFloat() / totalBudget else 0f
 
     WidgetCard(
@@ -54,8 +55,8 @@ fun BudgetWidget(
                 }
             }
 
-            if (state.budgets.isNotEmpty()) {
-                state.budgets.take(2).forEach { budgetProgress ->
+            if (budgets.isNotEmpty()) {
+                budgets.take(2).forEach { budgetProgress ->
                     BudgetRow(
                         budgetProgress = budgetProgress,
                         onEdit = onMore

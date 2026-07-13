@@ -9,14 +9,18 @@ val budgetModule = module {
     viewModel {
         BudgetViewModel(
             observeBudgetsWithProgressUseCase = get(),
-            deleteBudgetUseCase = get()
+            deleteBudgetUseCase = get(),
+            addBudgetUseCase = get(),
+            hasAnyBudgetsUseCase = get()
         )
     }
     viewModel {
         AddBudgetViewModel(
             addBudgetUseCase = get(),
             updateBudgetUseCase = get(),
-            observeCategoriesUseCase = get()
+            observeCategoriesUseCase = get(),
+            observeTagsUseCase = get(),
+            observeSourcesUseCase = get()
         )
     }
 }

@@ -6,7 +6,7 @@ import com.kazemieh.domain.repository.BudgetRepository
 import kotlinx.coroutines.flow.Flow
 
 class ObserveBudgetsWithProgressUseCase(private val repository: BudgetRepository) {
-    operator fun invoke(): Flow<List<BudgetWithProgress>> = repository.observeBudgetsWithProgress()
+    operator fun invoke(from: Long, to: Long): Flow<List<BudgetWithProgress>> = repository.observeBudgetsWithProgress(from, to)
 }
 
 class AddBudgetUseCase(private val repository: BudgetRepository) {
@@ -28,4 +28,8 @@ class GetBudgetByCategoryIdUseCase(private val repository: BudgetRepository) {
 class GetBudgetSpentAmountUseCase(private val repository: BudgetRepository) {
     suspend operator fun invoke(categoryId: Long, from: Long, to: Long) =
         repository.getSpentAmountByCategory(categoryId, from, to)
+}
+
+class HasAnyBudgetsUseCase(private val repository: BudgetRepository) {
+    suspend operator fun invoke() = repository.hasAnyBudgets()
 }

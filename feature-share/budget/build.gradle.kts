@@ -51,6 +51,8 @@ kotlin {
                 implementation(project(":core:jalali"))
                 implementation(project(":core:designsystem"))
                 implementation(project(":feature-share:category"))
+                implementation(project(":feature-share:source"))
+                implementation(project(":feature-share:tags"))
 
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
@@ -58,6 +60,9 @@ kotlin {
                 implementation(libs.compose.ui)
                 implementation(libs.compose.components.resources)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
+
+                implementation(libs.compose.material.icons.core)
+                implementation(libs.compose.material.icons.extended)
                 
                 implementation(libs.koin.compose)
                 implementation(libs.koin.core)

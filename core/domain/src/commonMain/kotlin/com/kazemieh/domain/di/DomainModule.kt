@@ -111,6 +111,7 @@ import com.kazemieh.domain.usecase.UpdateAssetUseCase
 import com.kazemieh.domain.usecase.UpdateBudgetUseCase
 import com.kazemieh.domain.usecase.GetBudgetByCategoryIdUseCase
 import com.kazemieh.domain.usecase.GetBudgetSpentAmountUseCase
+import com.kazemieh.domain.usecase.HasAnyBudgetsUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -180,6 +181,7 @@ val domainModule = module {
     factory { UpdateInstallmentUseCase(get(), get()) }
     factory { GetBudgetByCategoryIdUseCase(get()) }
     factory { GetBudgetSpentAmountUseCase(get()) }
+    factory { HasAnyBudgetsUseCase(get()) }
 
     factory { AddDebtUseCase(get()) }
     factory { UpdateDebtUseCase(get()) }
