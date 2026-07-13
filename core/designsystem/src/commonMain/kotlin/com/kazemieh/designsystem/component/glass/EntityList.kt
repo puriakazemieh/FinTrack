@@ -317,6 +317,14 @@ private fun EntityRow(
                 corner = 12.dp
             )
 
+            if (item.isExpandable && onExpand != null && !isReorderMode) {
+                ActionIcon(
+                    icon = if (item.isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    onClick = onExpand,
+                    color = glassColors.text2
+                )
+            }
+
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -436,5 +444,7 @@ data class EntityItem(
     val colorId: Int? = null,
     val color: Color? = null,
     val parentId: Long? = null,
+    val isExpandable: Boolean = false,
+    val isExpanded: Boolean = false,
     val trailingContent: (@Composable () -> Unit)? = null
 )

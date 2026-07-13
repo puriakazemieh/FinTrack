@@ -74,7 +74,8 @@ fun CategoriesScreen(
                             iconId = it.iconId,
                             colorId = it.colorId,
                             parentId = it.parentId,
-                            badge = if (hasChildren && it.parentId == null) (if (isExpanded) "−" else "+") else null
+                            isExpandable = hasChildren && it.parentId == null,
+                            isExpanded = isExpanded
                         )
                     }
                 }

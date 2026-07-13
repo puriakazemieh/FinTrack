@@ -1,21 +1,27 @@
 package com.kazemieh.designsystem.component.glass
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.LocalGlassColors
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.label_done
 import fintrack.core.designsystem.generated.resources.reorder_list
@@ -62,16 +68,30 @@ fun ReorderableEntityScaffold(
         trailingContent = {
             if (!isReorderMode) {
                 var showMenu by remember { mutableStateOf(false) }
+                val glassColors = LocalGlassColors.current
                 Box {
                     IconButton(onClick = { showMenu = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = null)
+                        Icon(Icons.Default.MoreVert, contentDescription = null, tint = glassColors.text2)
                     }
                     DropdownMenu(
                         expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
+                        onDismissRequest = { showMenu = false },
+                        shape = RoundedCornerShape(16.dp),
+                        containerColor = glassColors.bg1,
+                        border = BorderStroke(1.dp, glassColors.glassEdge),
+                        tonalElevation = 0.dp,
+                        shadowElevation = 12.dp
                     ) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.reorder_list)) },
+                            text = { FintrackBodyMediumText(text = stringResource(Res.string.reorder_list)) },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Reorder,
+                                    contentDescription = null,
+                                    tint = GlassGreen
+                                )
+                            },
+                            colors = MenuDefaults.itemColors(textColor = glassColors.text),
                             onClick = {
                                 onStartReorder()
                                 showMenu = false
