@@ -28,7 +28,18 @@ class FixedExpenseListViewModel(
         when (intent) {
             is FixedExpenseListIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
             is FixedExpenseListIntent.ToggleActive -> toggleActive(intent.expenseId)
-            is FixedExpenseListIntent.DeleteExpense -> deleteExpense(intent.expenseId)
+            is FixedExpenseListIntent.OnDeleteClick -> _state.update {
+                it.copy(selectedExpense = intent.expense, isDeleteShow = intent.expense != null)
+            }
+            is FixedExpenseListIntent.ConfirmDelete -> confirmDelete()
+        }
+    }
+
+    private fun confirmDelete() {
+        val expense = _state.value.selectedExpense ?: return
+        viewModelScope.launch {
+            fixedExpenseUseCases.deleteFixedExpenseUseCase(expense.id)
+            _state.update { it.copy(isDeleteShow = false, selectedExpense = null) }
         }
     }
 
@@ -63,22 +74,20 @@ class FixedExpenseListViewModel(
         }
     }
 
-    private fun deleteExpense(expenseId: Long) {
-        viewModelScope.launch {
-            fixedExpenseUseCases.deleteFixedExpenseUseCase(expenseId)
-        }
-    }
 }
 
 data class FixedExpenseListState(
     val expenses: List<FixedExpense> = emptyList(),
     val filteredExpenses: List<FixedExpense> = emptyList(),
     val isLoading: Boolean = false,
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val isDeleteShow: Boolean = false,
+    val selectedExpense: FixedExpense? = null
 )
 
 sealed interface FixedExpenseListIntent {
     data class UpdateSearchQuery(val query: String) : FixedExpenseListIntent
     data class ToggleActive(val expenseId: Long) : FixedExpenseListIntent
-    data class DeleteExpense(val expenseId: Long) : FixedExpenseListIntent
+    data class OnDeleteClick(val expense: FixedExpense? = null) : FixedExpenseListIntent
+    data object ConfirmDelete : FixedExpenseListIntent
 }

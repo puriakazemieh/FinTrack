@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.kazemieh.common.toPersianPrice
+import com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.EntitySummary
@@ -66,7 +67,11 @@ fun FixedExpenseListScreen(
                     )
                 },
                 onEditClick = { selectedExpenseId = it.id; showAddExpense = true },
-                onDeleteClick = { viewModel.onIntent(FixedExpenseListIntent.DeleteExpense(it.id)) },
+                onDeleteClick = { item ->
+                    viewModel.onIntent(
+                        FixedExpenseListIntent.OnDeleteClick(state.expenses.find { it.id == item.id })
+                    )
+                },
                 showActions = true
             )
         }
@@ -75,6 +80,15 @@ fun FixedExpenseListScreen(
             AddFixedExpenseBottomSheet(
                 expenseId = selectedExpenseId,
                 onDismiss = { showAddExpense = false; selectedExpenseId = null }
+            )
+        }
+
+        if (state.isDeleteShow && state.selectedExpense != null) {
+            DeleteBottomSheet(
+                itemName = state.selectedExpense?.categoryName
+                    ?: state.selectedExpense?.description,
+                dismissClicked = { viewModel.onIntent(FixedExpenseListIntent.OnDeleteClick(null)) },
+                confirmClicked = { viewModel.onIntent(FixedExpenseListIntent.ConfirmDelete) }
             )
         }
     }

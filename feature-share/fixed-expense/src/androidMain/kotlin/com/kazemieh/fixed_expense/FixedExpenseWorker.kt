@@ -78,10 +78,19 @@ class FixedExpenseWorker(
             RecurrenceType.WEEKLY -> currentDueDate.plus(7, DateTimeUnit.DAY)
             RecurrenceType.MONTHLY -> currentDueDate.plus(1, DateTimeUnit.MONTH)
             RecurrenceType.YEARLY -> currentDueDate.plus(1, DateTimeUnit.YEAR)
-            else -> currentDueDate // Handle CUSTOM/ONCE appropriately if needed
+            // CUSTOM repeats daily within its [startDate, endDate] range.
+            RecurrenceType.CUSTOM -> currentDueDate.plus(1, DateTimeUnit.DAY)
+            else -> currentDueDate
         }
 
-        fixedExpenseRepository.updateNextDueDate(expense.id, next.toEpochMilliseconds(timeZone))
+        val nextTimestamp = next.toEpochMilliseconds(timeZone)
+        // Stop a custom-range expense once it advances past its end date.
+        val endDate = expense.endDate
+        if (endDate != null && nextTimestamp > endDate) {
+            fixedExpenseRepository.updateFixedExpense(expense.copy(isActive = false))
+        } else {
+            fixedExpenseRepository.updateNextDueDate(expense.id, nextTimestamp)
+        }
     }
 
     companion object {

@@ -14,6 +14,8 @@ data class FixedExpense(
     val recurrence: RecurrenceType,
     val startDate: Long,
     val nextDueDate: Long,
+    // End of the custom date range (RecurrenceType.CUSTOM). Null for the other recurrences.
+    val endDate: Long? = null,
     val isAutoPostEnabled: Boolean = false,
     val isActive: Boolean = true,
     override val updatedAt: Long = 0,
