@@ -184,15 +184,16 @@ private fun SectionHeader(
     cloneLabel: String? = null,
     onClone: () -> Unit = {}
 ) {
+    val glassColors = LocalGlassColors.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f))
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .background(glassColors.bg1)
+            .padding(horizontal = 16.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        FintrackBodyLargeText(text = title, fontWeight = FontWeight.Bold)
+        FintrackBodyLargeText(text = title, fontWeight = FontWeight.Bold, color = glassColors.text)
         if (cloneLabel != null) {
             CloneChip(label = cloneLabel, onClick = onClone)
         }

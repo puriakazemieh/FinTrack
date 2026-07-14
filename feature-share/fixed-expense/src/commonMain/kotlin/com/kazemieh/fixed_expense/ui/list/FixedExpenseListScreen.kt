@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -187,8 +188,15 @@ fun FixedExpenseListScreen(
             ) {
                 SECTION_ORDER.forEach { recurrence ->
                     val expenses = state.grouped[recurrence].orEmpty()
-                    if (expenses.isNotEmpty()) {
-                        stickyHeader { SectionHeader(recurrenceLabel(recurrence)) }
+                    val showClone = recurrence == RecurrenceType.ONCE && state.canCloneOnce
+                    if (expenses.isNotEmpty() || showClone) {
+                        stickyHeader {
+                            SectionHeader(
+                                title = recurrenceLabel(recurrence),
+                                cloneLabel = if (showClone) stringResource(Res.string.fixed_expense_clone_once) else null,
+                                onClone = { viewModel.onIntent(FixedExpenseListIntent.CloneOnceFromPrevious) }
+                            )
+                        }
                         items(expenses, key = { it.id }) { expense ->
                             FixedExpenseRow(
                                 expense = expense,
@@ -268,14 +276,40 @@ private fun SummaryCard(total: Long) {
 }
 
 @Composable
-private fun SectionHeader(title: String) {
-    Box(
+private fun SectionHeader(
+    title: String,
+    cloneLabel: String? = null,
+    onClone: () -> Unit = {}
+) {
+    val glassColors = LocalGlassColors.current
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f))
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .background(glassColors.bg1)
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        FintrackBodyLargeText(text = title, fontWeight = FontWeight.Bold)
+        FintrackBodyLargeText(text = title, fontWeight = FontWeight.Bold, color = glassColors.text)
+        if (cloneLabel != null) {
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(GlassGreen.copy(alpha = 0.12f))
+                    .clickable(onClick = onClone)
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                androidx.compose.material3.Icon(
+                    imageVector = Icons.Default.ContentCopy,
+                    contentDescription = null,
+                    tint = GlassGreen,
+                    modifier = Modifier.size(13.dp)
+                )
+                FintrackLabelSmallText(text = cloneLabel, color = GlassGreen, fontWeight = FontWeight.Bold)
+            }
+        }
     }
 }
 

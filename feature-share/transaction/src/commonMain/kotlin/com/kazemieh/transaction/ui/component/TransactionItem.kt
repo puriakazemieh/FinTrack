@@ -291,12 +291,12 @@ fun TransactionItem(
                     }
                 }
 
-                // ---------- Date ----------
+                // ---------- Date & time ----------
                 Spacer(modifier = Modifier.height(space.small))
                 FintrackBodySmallText(
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.End,
-                    text = trx.date,
+                    text = trx.date + " • " + com.kazemieh.common.util.DateUtils.formatTime(trx.timeStamp),
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }

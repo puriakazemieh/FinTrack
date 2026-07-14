@@ -8,6 +8,18 @@ object DateUtils {
         val pdt = PersianDateTime.parse(timestamp)
         return "${pdt.year}/${pdt.month.toString().padStart(2, '0')}/${pdt.day.toString().padStart(2, '0')} ${pdt.hour.toString().padStart(2, '0')}:${pdt.minute.toString().padStart(2, '0')}".toPersianDigits()
     }
+
+    /** Time-of-day only, e.g. "۱۴:۳۰". */
+    fun formatTime(timestamp: Long): String {
+        val pdt = PersianDateTime.parse(timestamp)
+        return "${pdt.hour.toString().padStart(2, '0')}:${pdt.minute.toString().padStart(2, '0')}".toPersianDigits()
+    }
+
+    /** Hour/minute of a timestamp as plain (English-digit) "HH:mm" — for time pickers. */
+    fun timeOfDay(timestamp: Long): String {
+        val pdt = PersianDateTime.parse(timestamp)
+        return "${pdt.hour.toString().padStart(2, '0')}:${pdt.minute.toString().padStart(2, '0')}"
+    }
     
     fun getRelativeTime(timestamp: Long, now: Long): String {
         val diff = now - timestamp

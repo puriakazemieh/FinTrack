@@ -1336,6 +1336,9 @@
     <string name="capability_sms_title">خواندن پیامک بانکی</string>
     <string name="capability_sms_desc">تشخیص خودکار تراکنش از روی پیامک بانک‌ها</string>
     <string name="shopping_purchased">خریداری‌شده</string>
+    <string name="label_time">زمان</string>
+    <string name="recurrence_none">بدون تکرار</string>
+    <string name="fixed_expense_clone_once">کپی از قبل</string>
     <string name="budget_clone_daily">کپی از روزهای قبل</string>
     <string name="budget_clone_weekly">کپی از هفته‌های قبل</string>
     <string name="budget_clone_monthly">کپی از ماه‌های قبل</string>

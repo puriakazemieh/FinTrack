@@ -68,7 +68,29 @@ import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import com.kazemieh.jalali.JalaliCalendar
-import fintrack.core.designsystem.generated.resources.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.category
+import fintrack.core.designsystem.generated.resources.custom_date
+import fintrack.core.designsystem.generated.resources.edit
+import fintrack.core.designsystem.generated.resources.frequency_daily
+import fintrack.core.designsystem.generated.resources.frequency_monthly
+import fintrack.core.designsystem.generated.resources.frequency_weekly
+import fintrack.core.designsystem.generated.resources.frequency_yearly
+import fintrack.core.designsystem.generated.resources.recurrence_none
+import fintrack.core.designsystem.generated.resources.hint_transaction_description
+import fintrack.core.designsystem.generated.resources.ic_1
+import fintrack.core.designsystem.generated.resources.installment_frequency
+import fintrack.core.designsystem.generated.resources.label_auto_post_enabled
+import fintrack.core.designsystem.generated.resources.label_char_count_limit
+import fintrack.core.designsystem.generated.resources.label_end_date
+import fintrack.core.designsystem.generated.resources.label_most_used
+import fintrack.core.designsystem.generated.resources.label_note
+import fintrack.core.designsystem.generated.resources.save_
+import fintrack.core.designsystem.generated.resources.select_category
+import fintrack.core.designsystem.generated.resources.select_source
+import fintrack.core.designsystem.generated.resources.source
+import fintrack.core.designsystem.generated.resources.start
+import fintrack.core.designsystem.generated.resources.title_add_fixed_expense
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.getString
@@ -356,13 +378,15 @@ private fun RecurrenceSelector(
     selected: RecurrenceType,
     onSelect: (RecurrenceType) -> Unit
 ) {
+    // CUSTOM opens the range picker; ONCE is a one-off (non-recurring) expense.
     val types = listOf(
         RecurrenceType.NONE to Res.string.label_period_none,
         RecurrenceType.DAILY to Res.string.frequency_daily,
         RecurrenceType.WEEKLY to Res.string.frequency_weekly,
         RecurrenceType.MONTHLY to Res.string.frequency_monthly,
         RecurrenceType.YEARLY to Res.string.frequency_yearly,
-        RecurrenceType.CUSTOM to Res.string.custom_date
+        RecurrenceType.CUSTOM to Res.string.custom_date,
+        RecurrenceType.ONCE to Res.string.recurrence_none
     )
     Column {
         FintrackLabelMediumText(

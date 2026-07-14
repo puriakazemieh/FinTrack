@@ -18,6 +18,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -95,6 +96,7 @@ import fintrack.core.designsystem.generated.resources.hint_transaction_descripti
 import fintrack.core.designsystem.generated.resources.ic_1
 import fintrack.core.designsystem.generated.resources.ic_cat_transfer
 import fintrack.core.designsystem.generated.resources.label_char_count_limit
+import fintrack.core.designsystem.generated.resources.label_time
 import fintrack.core.designsystem.generated.resources.label_most_used
 import fintrack.core.designsystem.generated.resources.label_note
 import fintrack.core.designsystem.generated.resources.label_related_persons
@@ -321,6 +323,28 @@ private fun BottomSheetContent(
             )
         }
 
+        AddTransactionSheet.TimePicker -> {
+            val openSheet = remember { mutableStateOf(true) }
+            LaunchedEffect(openSheet.value) {
+                if (!openSheet.value) {
+                    onIntent(AddTransactionIntent.PopSheet)
+                }
+            }
+            com.kazemieh.designsystem.component.picker.FintrackTimePickerBottomSheet(
+                openSheet = openSheet,
+                initialTime = com.kazemieh.common.util.DateUtils.timeOfDay(state.timeStamp),
+                onConfirm = { time ->
+                    val parts = time.split(":")
+                    onIntent(
+                        AddTransactionIntent.SetTime(
+                            hour = parts.getOrNull(0)?.toIntOrNull() ?: 0,
+                            minute = parts.getOrNull(1)?.toIntOrNull() ?: 0
+                        )
+                    )
+                }
+            )
+        }
+
         AddTransactionSheet.DeleteConfirmation -> {
             DeleteBottomSheet(
                 itemName = state.description.ifEmpty { state.category?.name },
@@ -504,6 +528,18 @@ fun AddTransactionContent(
                 PickerValue(
                     label = state.date ?: stringResource(Res.string.dp_today),
                     icon = Icons.Default.CalendarToday
+                )
+            }
+        }
+
+        item {
+            Field(
+                label = stringResource(Res.string.label_time),
+                onClick = { onIntent(AddTransactionIntent.ToggleSheet(AddTransactionSheet.TimePicker)) }
+            ) {
+                PickerValue(
+                    label = com.kazemieh.common.util.DateUtils.formatTime(state.timeStamp),
+                    icon = Icons.Default.Schedule
                 )
             }
         }

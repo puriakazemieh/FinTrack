@@ -12,6 +12,10 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.common.ImageStorage
+import com.kazemieh.common.persiandatetime.extensions.toEpochMilliseconds
+import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
 import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.repository.SmsDraftRepository
@@ -134,6 +138,13 @@ class AddTransactionViewModel(
                     timeStamp = intent.timeStamp,
                     sheetStack = it.sheetStack.dropLast(1)
                 )
+            }
+
+            is AddTransactionIntent.SetTime -> _state.update {
+                val tz = TimeZone.currentSystemDefault()
+                val pdt = Instant.fromEpochMilliseconds(it.timeStamp).toPersianDateTime(tz)
+                val newTs = pdt.copy(hour = intent.hour, minute = intent.minute, second = 0).toEpochMilliseconds(tz)
+                it.copy(timeStamp = newTs)
             }
 
             is AddTransactionIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
@@ -450,6 +461,7 @@ sealed interface AddTransactionIntent {
     data class SetTags(val tags: Set<Tag>?) : AddTransactionIntent
     data class SetPerson(val persons: Set<Person>?) : AddTransactionIntent
     data class SetDate(val date: String, val timeStamp: Long) : AddTransactionIntent
+    data class SetTime(val hour: Int, val minute: Int) : AddTransactionIntent
     data class SetDescription(val description: String) : AddTransactionIntent
     data class SetPhoto(val bytes: ByteArray?) : AddTransactionIntent
     data object Submit : AddTransactionIntent
@@ -474,6 +486,7 @@ sealed interface AddTransactionSheet {
     data object TagPicker : AddTransactionSheet
     data object PersonPicker : AddTransactionSheet
     data object DatePicker : AddTransactionSheet
+    data object TimePicker : AddTransactionSheet
     data object DeleteConfirmation : AddTransactionSheet
     data object Calculator : AddTransactionSheet
 }
