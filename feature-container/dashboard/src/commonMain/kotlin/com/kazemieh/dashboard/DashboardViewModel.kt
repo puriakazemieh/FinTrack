@@ -85,6 +85,10 @@ class DashboardViewModel(
                             ToolFeature.FIXED_EXPENSE,
                             ToolFeature.SHOPPING,
                             ToolFeature.NOTES,
+                            ToolFeature.GOALS,
+                            ToolFeature.INSTALLMENT,
+                            ToolFeature.DEBT,
+                            ToolFeature.CHECK,
                         )
             )
         )

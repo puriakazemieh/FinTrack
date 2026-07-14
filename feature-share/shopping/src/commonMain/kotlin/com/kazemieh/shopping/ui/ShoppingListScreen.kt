@@ -82,6 +82,7 @@ import fintrack.core.designsystem.generated.resources.hint_optional_note
 import fintrack.core.designsystem.generated.resources.label_note
 import fintrack.core.designsystem.generated.resources.priority_high
 import fintrack.core.designsystem.generated.resources.priority_normal
+import fintrack.core.designsystem.generated.resources.reminder
 import fintrack.core.designsystem.generated.resources.save_
 import fintrack.core.designsystem.generated.resources.select_category
 import fintrack.core.designsystem.generated.resources.shopping_add_title

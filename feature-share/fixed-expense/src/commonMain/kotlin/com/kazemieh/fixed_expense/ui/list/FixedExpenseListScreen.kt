@@ -47,7 +47,6 @@ import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
-import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
@@ -65,8 +64,8 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.all
 import fintrack.core.designsystem.generated.resources.currency_toman
 import fintrack.core.designsystem.generated.resources.custom_date
-import fintrack.core.designsystem.generated.resources.custom_range
 import fintrack.core.designsystem.generated.resources.dp_today
+import fintrack.core.designsystem.generated.resources.fixed_expense_clone_once
 import fintrack.core.designsystem.generated.resources.frequency_daily
 import fintrack.core.designsystem.generated.resources.frequency_monthly
 import fintrack.core.designsystem.generated.resources.frequency_weekly
@@ -75,26 +74,6 @@ import fintrack.core.designsystem.generated.resources.hint_search_in
 import fintrack.core.designsystem.generated.resources.label_approx_monthly_total
 import fintrack.core.designsystem.generated.resources.label_this_year
 import fintrack.core.designsystem.generated.resources.label_unknown_person
-import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.unit.dp
-import com.kazemieh.common.DateFilterType
-import com.kazemieh.common.DateRangeLabel
-import com.kazemieh.common.model.RecurrenceType
-import com.kazemieh.designsystem.component.glass.PeriodNavigator
-import fintrack.core.designsystem.generated.resources.all
-import fintrack.core.designsystem.generated.resources.custom_date
-import fintrack.core.designsystem.generated.resources.frequency_daily
-import fintrack.core.designsystem.generated.resources.frequency_monthly
-import fintrack.core.designsystem.generated.resources.frequency_weekly
-import fintrack.core.designsystem.generated.resources.frequency_yearly
-import fintrack.core.designsystem.generated.resources.label_period_none
-import fintrack.core.designsystem.generated.resources.label_range
-import fintrack.core.designsystem.generated.resources.label_this_year
-import fintrack.core.designsystem.generated.resources.last_month
-import fintrack.core.designsystem.generated.resources.this_month
-import fintrack.core.designsystem.generated.resources.this_week
-import fintrack.core.designsystem.generated.resources.today
-import fintrack.core.designsystem.generated.resources.yesterday
 import fintrack.core.designsystem.generated.resources.last_month
 import fintrack.core.designsystem.generated.resources.this_month
 import fintrack.core.designsystem.generated.resources.this_week
@@ -114,8 +93,7 @@ private val SECTION_ORDER = listOf(
     RecurrenceType.ONCE
 )
 
-@OptIn(ExperimentalFoundationApi::class)
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun FixedExpenseListScreen(
     onBack: () -> Unit,
@@ -124,20 +102,6 @@ fun FixedExpenseListScreen(
     val state by viewModel.state.collectAsState()
     var showAddExpense by remember { mutableStateOf(false) }
     var selectedExpenseId by remember { mutableStateOf<Long?>(null) }
-
-    val displayLabel = when (val label = state.dateRange?.label) {
-        is DateRangeLabel.Filter -> when (label.type) {
-            DateFilterType.TODAY -> stringResource(Res.string.today)
-            DateFilterType.YESTERDAY -> stringResource(Res.string.yesterday)
-            DateFilterType.THIS_WEEK -> stringResource(Res.string.this_week)
-            DateFilterType.THIS_MONTH -> stringResource(Res.string.this_month)
-            DateFilterType.LAST_MONTH -> stringResource(Res.string.last_month)
-            DateFilterType.CUSTOM_RANGE -> stringResource(Res.string.custom_range)
-            else -> stringResource(Res.string.all)
-        }
-        is DateRangeLabel.Text -> label.value
-        null -> ""
-    }
 
     val displayLabel = when (val label = state.dateRange?.label) {
         is DateRangeLabel.Filter -> {
@@ -152,6 +116,7 @@ fun FixedExpenseListScreen(
                 else -> stringResource(Res.string.all)
             }
         }
+
         is DateRangeLabel.Text -> label.value
         null -> ""
     }
@@ -178,7 +143,10 @@ fun FixedExpenseListScreen(
             SearchBar(
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(FixedExpenseListIntent.UpdateSearchQuery(it)) },
-                placeholder = stringResource(Res.string.hint_search_in, stringResource(Res.string.title_fixed_expense_management)),
+                placeholder = stringResource(
+                    Res.string.hint_search_in,
+                    stringResource(Res.string.title_fixed_expense_management)
+                ),
                 modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
             )
 
@@ -201,7 +169,13 @@ fun FixedExpenseListScreen(
                             FixedExpenseRow(
                                 expense = expense,
                                 onEdit = { selectedExpenseId = expense.id; showAddExpense = true },
-                                onDelete = { viewModel.onIntent(FixedExpenseListIntent.OnDeleteClick(expense)) }
+                                onDelete = {
+                                    viewModel.onIntent(
+                                        FixedExpenseListIntent.OnDeleteClick(
+                                            expense
+                                        )
+                                    )
+                                }
                             )
                         }
                     }
@@ -227,7 +201,8 @@ fun FixedExpenseListScreen(
 
         if (state.isDeleteShow && state.selectedExpense != null) {
             DeleteBottomSheet(
-                itemName = state.selectedExpense?.categoryName ?: state.selectedExpense?.description,
+                itemName = state.selectedExpense?.categoryName
+                    ?: state.selectedExpense?.description,
                 dismissClicked = { viewModel.onIntent(FixedExpenseListIntent.OnDeleteClick(null)) },
                 confirmClicked = { viewModel.onIntent(FixedExpenseListIntent.ConfirmDelete) }
             )
@@ -243,6 +218,7 @@ private fun recurrenceLabel(recurrence: RecurrenceType): String = when (recurren
     RecurrenceType.YEARLY -> stringResource(Res.string.frequency_yearly)
     RecurrenceType.CUSTOM -> stringResource(Res.string.custom_date)
     RecurrenceType.ONCE -> stringResource(Res.string.dp_today)
+    else -> stringResource(Res.string.all)
 }
 
 @Composable
@@ -258,7 +234,10 @@ private fun SummaryCard(total: Long) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            FintrackLabelSmallText(text = stringResource(Res.string.label_approx_monthly_total), color = glassColors.text3)
+            FintrackLabelSmallText(
+                text = stringResource(Res.string.label_approx_monthly_total),
+                color = glassColors.text3
+            )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 FintrackTitleMediumText(
                     text = total.toPersianPrice(),
@@ -307,7 +286,11 @@ private fun SectionHeader(
                     tint = GlassGreen,
                     modifier = Modifier.size(13.dp)
                 )
-                FintrackLabelSmallText(text = cloneLabel, color = GlassGreen, fontWeight = FontWeight.Bold)
+                FintrackLabelSmallText(
+                    text = cloneLabel,
+                    color = GlassGreen,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
@@ -338,7 +321,10 @@ private fun FixedExpenseRow(
                 iconSize = 16.dp,
                 corner = 12.dp
             )
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(3.dp)
+            ) {
                 FintrackTitleSmallText(
                     text = expense.categoryName
                         ?: expense.description?.takeIf { it.isNotBlank() }
@@ -360,7 +346,11 @@ private fun FixedExpenseRow(
 }
 
 @Composable
-private fun RowActionIcon(icon: ImageVector, tint: androidx.compose.ui.graphics.Color, onClick: () -> Unit) {
+private fun RowActionIcon(
+    icon: ImageVector,
+    tint: androidx.compose.ui.graphics.Color,
+    onClick: () -> Unit
+) {
     val glassColors = LocalGlassColors.current
     Box(
         modifier = Modifier

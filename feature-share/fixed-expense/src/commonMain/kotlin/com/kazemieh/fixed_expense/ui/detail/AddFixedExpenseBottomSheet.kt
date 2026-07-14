@@ -72,6 +72,7 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.category
 import fintrack.core.designsystem.generated.resources.custom_date
 import fintrack.core.designsystem.generated.resources.edit
+import fintrack.core.designsystem.generated.resources.error_category_required_for_auto_post
 import fintrack.core.designsystem.generated.resources.frequency_daily
 import fintrack.core.designsystem.generated.resources.frequency_monthly
 import fintrack.core.designsystem.generated.resources.frequency_weekly
@@ -85,6 +86,8 @@ import fintrack.core.designsystem.generated.resources.label_char_count_limit
 import fintrack.core.designsystem.generated.resources.label_end_date
 import fintrack.core.designsystem.generated.resources.label_most_used
 import fintrack.core.designsystem.generated.resources.label_note
+import fintrack.core.designsystem.generated.resources.label_period_none
+import fintrack.core.designsystem.generated.resources.label_title
 import fintrack.core.designsystem.generated.resources.save_
 import fintrack.core.designsystem.generated.resources.select_category
 import fintrack.core.designsystem.generated.resources.select_source

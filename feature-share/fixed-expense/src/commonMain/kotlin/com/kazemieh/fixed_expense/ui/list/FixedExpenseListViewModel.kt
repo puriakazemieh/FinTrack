@@ -131,7 +131,6 @@ data class FixedExpenseListState(
     val canCloneOnce: Boolean = false,
     val isDeleteShow: Boolean = false,
     val selectedExpense: FixedExpense? = null,
-    val dateRange: DateRange? = DateFilterHelper.getRange(DateFilterType.THIS_MONTH)
 )
 
 sealed interface FixedExpenseListIntent {
