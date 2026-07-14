@@ -34,6 +34,7 @@ fun AddBudgetBottomSheet(
     viewModel: AddBudgetViewModel = koinViewModel(),
     budgetWithProgress: BudgetWithProgress? = null,
     defaultStartAt: Long? = null,
+    defaultRangeEnd: Long? = null,
     onDismiss: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -45,7 +46,8 @@ fun AddBudgetBottomSheet(
             AddBudgetIntent.InitialData(
                 budgetWithProgress?.budget,
                 budgetWithProgress?.category,
-                defaultStartAt
+                defaultStartAt,
+                defaultRangeEnd
             )
         )
         viewModel.onIntent(AddBudgetIntent.LoadCategories())

@@ -102,34 +102,49 @@ fun BudgetScreen(
             ) {
                 // DAILY SECTION
                 if (state.dailyBudgets.isNotEmpty() || state.canCloneDaily) {
-                    stickyHeader { SectionHeader(stringResource(Res.string.label_budget_period_daily)) }
-                    if (state.canCloneDaily) {
-                        item { ClonePrompt(BudgetPeriod.DAILY) { viewModel.onIntent(BudgetIntent.CloneFromPrevious(BudgetPeriod.DAILY)) } }
+                    stickyHeader {
+                        SectionHeader(
+                            title = stringResource(Res.string.label_budget_period_daily),
+                            cloneLabel = if (state.canCloneDaily) stringResource(Res.string.budget_clone_daily) else null,
+                            onClone = { viewModel.onIntent(BudgetIntent.CloneFromPrevious(BudgetPeriod.DAILY)) }
+                        )
                     }
                     items(state.dailyBudgets) { BudgetRow(it, viewModel, onNavigateToTransactions) }
                 }
 
                 // WEEKLY SECTION
                 if (state.weeklyBudgets.isNotEmpty() || state.canCloneWeekly) {
-                    stickyHeader { SectionHeader(stringResource(Res.string.label_budget_period_weekly)) }
-                    if (state.canCloneWeekly) {
-                        item { ClonePrompt(BudgetPeriod.WEEKLY) { viewModel.onIntent(BudgetIntent.CloneFromPrevious(BudgetPeriod.WEEKLY)) } }
+                    stickyHeader {
+                        SectionHeader(
+                            title = stringResource(Res.string.label_budget_period_weekly),
+                            cloneLabel = if (state.canCloneWeekly) stringResource(Res.string.budget_clone_weekly) else null,
+                            onClone = { viewModel.onIntent(BudgetIntent.CloneFromPrevious(BudgetPeriod.WEEKLY)) }
+                        )
                     }
                     items(state.weeklyBudgets) { BudgetRow(it, viewModel, onNavigateToTransactions) }
                 }
 
                 // MONTHLY SECTION
                 if (state.monthlyBudgets.isNotEmpty() || state.canCloneMonthly) {
-                    stickyHeader { SectionHeader(stringResource(Res.string.label_budget_period_monthly)) }
-                    if (state.canCloneMonthly) {
-                        item { ClonePrompt(BudgetPeriod.MONTHLY) { viewModel.onIntent(BudgetIntent.CloneFromPrevious(BudgetPeriod.MONTHLY)) } }
+                    stickyHeader {
+                        SectionHeader(
+                            title = stringResource(Res.string.label_budget_period_monthly),
+                            cloneLabel = if (state.canCloneMonthly) stringResource(Res.string.budget_clone_monthly) else null,
+                            onClone = { viewModel.onIntent(BudgetIntent.CloneFromPrevious(BudgetPeriod.MONTHLY)) }
+                        )
                     }
                     items(state.monthlyBudgets) { BudgetRow(it, viewModel, onNavigateToTransactions) }
                 }
 
                 // YEARLY SECTION
-                if (state.yearlyBudgets.isNotEmpty()) {
-                    stickyHeader { SectionHeader(stringResource(Res.string.label_budget_period_yearly)) }
+                if (state.yearlyBudgets.isNotEmpty() || state.canCloneYearly) {
+                    stickyHeader {
+                        SectionHeader(
+                            title = stringResource(Res.string.label_budget_period_yearly),
+                            cloneLabel = if (state.canCloneYearly) stringResource(Res.string.budget_clone_yearly) else null,
+                            onClone = { viewModel.onIntent(BudgetIntent.CloneFromPrevious(BudgetPeriod.YEARLY)) }
+                        )
+                    }
                     items(state.yearlyBudgets) { BudgetRow(it, viewModel, onNavigateToTransactions) }
                 }
             }
@@ -148,6 +163,7 @@ fun BudgetScreen(
             AddBudgetBottomSheet(
                 budgetWithProgress = state.selectedBudget,
                 defaultStartAt = state.dateRange?.start,
+                defaultRangeEnd = state.dateRange?.end,
                 onDismiss = { viewModel.onIntent(BudgetIntent.ShowAddBudget()) }
             )
         }
@@ -163,42 +179,48 @@ fun BudgetScreen(
 }
 
 @Composable
-private fun SectionHeader(title: String) {
-    Box(
+private fun SectionHeader(
+    title: String,
+    cloneLabel: String? = null,
+    onClone: () -> Unit = {}
+) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f))
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         FintrackBodyLargeText(text = title, fontWeight = FontWeight.Bold)
+        if (cloneLabel != null) {
+            CloneChip(label = cloneLabel, onClick = onClone)
+        }
     }
 }
 
 @Composable
-private fun ClonePrompt(period: BudgetPeriod, onClone: () -> Unit) {
-    GlassCard(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 4.dp),
-        onClick = onClone,
-        tone = GlassTone.Strong
+private fun CloneChip(label: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(GlassGreen.copy(alpha = 0.12f))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            androidx.compose.material3.Icon(
-                imageVector = Icons.Default.ContentCopy,
-                contentDescription = null,
-                tint = GlassGreen,
-                modifier = Modifier.size(16.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            FintrackBodyMediumText(
-                text = "کپی از دوره قبل",
-                color = GlassGreen,
-                fontWeight = FontWeight.Bold
-            )
-        }
+        androidx.compose.material3.Icon(
+            imageVector = Icons.Default.ContentCopy,
+            contentDescription = null,
+            tint = GlassGreen,
+            modifier = Modifier.size(13.dp)
+        )
+        FintrackLabelSmallText(
+            text = label,
+            color = GlassGreen,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 

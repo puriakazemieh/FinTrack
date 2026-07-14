@@ -127,23 +127,23 @@ class BudgetViewModel(
                     val monthly = filtered.filter { it.budget.period == BudgetPeriod.MONTHLY }
                     val yearly = filtered.filter { it.budget.period == BudgetPeriod.YEARLY }
 
-                    // Clone logic per section
-                    val hasGlobalBudgets = hasAnyBudgetsUseCase()
-                    
+                    // Clone logic per section: offer "copy from previous" for any period that has
+                    // no budget in the current range but has one in ANY earlier range (so the prompt
+                    // keeps appearing however far forward the user navigates).
                     var canCloneDaily = false
                     var canCloneWeekly = false
                     var canCloneMonthly = false
-                    
-                    if (hasGlobalBudgets && range != null) {
-                        val prevRange = DateFilterHelper.shiftDateRange(range.start, range.end, range.filterType, Direction.PREVIOUS)
-                        val prevBudgets = observeBudgetsWithProgressUseCase(prevRange.start, prevRange.end).first()
-                        
-                        canCloneDaily = daily.isEmpty() && prevBudgets.any { it.budget.period == BudgetPeriod.DAILY }
-                        canCloneWeekly = weekly.isEmpty() && prevBudgets.any { it.budget.period == BudgetPeriod.WEEKLY }
-                        canCloneMonthly = monthly.isEmpty() && prevBudgets.any { it.budget.period == BudgetPeriod.MONTHLY }
+                    var canCloneYearly = false
+
+                    if (range != null) {
+                        val earlier = observeBudgetsWithProgressUseCase(0L, range.start - 1).first()
+                        canCloneDaily = daily.isEmpty() && earlier.any { it.budget.period == BudgetPeriod.DAILY }
+                        canCloneWeekly = weekly.isEmpty() && earlier.any { it.budget.period == BudgetPeriod.WEEKLY }
+                        canCloneMonthly = monthly.isEmpty() && earlier.any { it.budget.period == BudgetPeriod.MONTHLY }
+                        canCloneYearly = yearly.isEmpty() && earlier.any { it.budget.period == BudgetPeriod.YEARLY }
                     }
 
-                    BudgetGroups(daily, weekly, monthly, yearly, canCloneDaily, canCloneWeekly, canCloneMonthly)
+                    BudgetGroups(daily, weekly, monthly, yearly, canCloneDaily, canCloneWeekly, canCloneMonthly, canCloneYearly)
                 }
             }.collect { groups ->
                 _state.update {
@@ -155,6 +155,7 @@ class BudgetViewModel(
                         canCloneDaily = groups.canCloneDaily,
                         canCloneWeekly = groups.canCloneWeekly,
                         canCloneMonthly = groups.canCloneMonthly,
+                        canCloneYearly = groups.canCloneYearly,
                         isLoading = false,
                         searchQuery = _searchQuery.value
                     )
@@ -170,19 +171,25 @@ class BudgetViewModel(
         val yearly: List<BudgetWithProgress>,
         val canCloneDaily: Boolean,
         val canCloneWeekly: Boolean,
-        val canCloneMonthly: Boolean
+        val canCloneMonthly: Boolean,
+        val canCloneYearly: Boolean
     )
 
     private fun cloneFromPrevious(period: BudgetPeriod?) {
         val currentRange = _dateRange.value ?: return
-        val prevRange = DateFilterHelper.shiftDateRange(currentRange.start, currentRange.end, currentRange.filterType, Direction.PREVIOUS)
-        
+
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            
-            val prevBudgets = observeBudgetsWithProgressUseCase(prevRange.start, prevRange.end).first()
-            val toClone = if (period == null) prevBudgets else prevBudgets.filter { it.budget.period == period }
-            
+
+            // Look at every earlier budget and, per period, copy only the most recent instance's
+            // budgets into the current range. This keeps working however far ahead the user is.
+            val earlier = observeBudgetsWithProgressUseCase(0L, currentRange.start - 1).first()
+            val candidates = if (period == null) earlier else earlier.filter { it.budget.period == period }
+            val toClone = candidates.groupBy { it.budget.period }.flatMap { (_, list) ->
+                val maxStart = list.maxOfOrNull { it.budget.startAt } ?: return@flatMap emptyList()
+                list.filter { it.budget.startAt == maxStart }
+            }
+
             toClone.forEach { item ->
                 val newBudget = item.budget.copy(
                     id = null,
