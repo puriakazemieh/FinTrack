@@ -20,6 +20,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,6 +53,8 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackButton
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import androidx.compose.material3.TextField
+import com.kazemieh.designsystem.component.glassTextFieldColors
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.calculator.CalculatorBottomSheet
 import com.kazemieh.designsystem.component.glass.AddFrame
@@ -64,30 +68,10 @@ import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import com.kazemieh.jalali.JalaliCalendar
-import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.category
-import fintrack.core.designsystem.generated.resources.custom_date
-import fintrack.core.designsystem.generated.resources.edit
-import fintrack.core.designsystem.generated.resources.frequency_daily
-import fintrack.core.designsystem.generated.resources.frequency_monthly
-import fintrack.core.designsystem.generated.resources.frequency_weekly
-import fintrack.core.designsystem.generated.resources.frequency_yearly
-import fintrack.core.designsystem.generated.resources.hint_transaction_description
-import fintrack.core.designsystem.generated.resources.ic_1
-import fintrack.core.designsystem.generated.resources.installment_frequency
-import fintrack.core.designsystem.generated.resources.label_auto_post_enabled
-import fintrack.core.designsystem.generated.resources.label_char_count_limit
-import fintrack.core.designsystem.generated.resources.label_end_date
-import fintrack.core.designsystem.generated.resources.label_most_used
-import fintrack.core.designsystem.generated.resources.label_note
-import fintrack.core.designsystem.generated.resources.save_
-import fintrack.core.designsystem.generated.resources.select_category
-import fintrack.core.designsystem.generated.resources.select_source
-import fintrack.core.designsystem.generated.resources.source
-import fintrack.core.designsystem.generated.resources.start
-import fintrack.core.designsystem.generated.resources.title_add_fixed_expense
+import fintrack.core.designsystem.generated.resources.*
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -101,12 +85,12 @@ fun AddFixedExpenseBottomSheet(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(expenseId) {
         if (expenseId != null) {
             viewModel.onIntent(AddFixedExpenseIntent.LoadExpense(expenseId))
         } else {
-            // Start every new "add" with an empty form (no leftover data from a previous save).
             viewModel.onIntent(AddFixedExpenseIntent.Reset)
         }
     }
@@ -115,6 +99,9 @@ fun AddFixedExpenseBottomSheet(
         viewModel.effect.collect { effect ->
             when (effect) {
                 AddFixedExpenseEffect.Saved -> onDismiss()
+                is AddFixedExpenseEffect.Error -> {
+                    snackbarHostState.showSnackbar(getString(effect.messageRes))
+                }
             }
         }
     }
@@ -131,132 +118,171 @@ fun AddFixedExpenseBottomSheet(
         containerColor = MaterialTheme.colorScheme.background,
         dragHandle = null
     ) {
-        AddFrame(
-            title = if (state.expenseId == null) stringResource(Res.string.title_add_fixed_expense)
-            else stringResource(Res.string.edit),
-            primaryLabel = stringResource(Res.string.save_),
-            onPrimaryClick = { viewModel.onIntent(AddFixedExpenseIntent.Submit) },
-            onClose = onDismiss,
-            showHero = false
-        ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = PaddingValues(bottom = 100.dp)
+        Box {
+            AddFrame(
+                title = if (state.expenseId == null) stringResource(Res.string.title_add_fixed_expense)
+                else stringResource(Res.string.edit),
+                primaryLabel = stringResource(Res.string.save_),
+                onPrimaryClick = { viewModel.onIntent(AddFixedExpenseIntent.Submit) },
+                onClose = onDismiss,
+                showHero = false
             ) {
-                item(key = "amount") {
-                    LargeAmountCard(
-                        amount = state.amount,
-                        onAmountChange = { viewModel.onIntent(AddFixedExpenseIntent.SetAmount(it)) },
-                        onCalcClick = { showCalculator = true },
-                        autoFocus = state.expenseId == null
-                    )
-                }
-
-                // Category (optional) + most used
-                item {
-                    Field(
-                        label = stringResource(Res.string.category),
-                        required = false,
-                        onClick = { showCategoryPicker = true }
-                    ) {
-                        PickerValue(
-                            label = state.category?.name ?: stringResource(Res.string.select_category),
-                            icon = FinTrackIcons.findIcon(state.category?.iconId).resource
-                        )
-                    }
-                    MostUsedCategoryChips(
-                        items = state.mostUsedCategories,
-                        onItemClick = { viewModel.onIntent(AddFixedExpenseIntent.SetCategory(it)) }
-                    )
-                }
-
-                // Source (optional) + most used
-                item {
-                    Field(
-                        label = stringResource(Res.string.source),
-                        required = false,
-                        onClick = { showSourcePicker = true }
-                    ) {
-                        PickerValue(
-                            label = state.source?.name ?: stringResource(Res.string.select_source),
-                            icon = FinTrackIcons.findIcon(state.source?.iconId).resource
-                        )
-                    }
-                    MostUsedSourceChips(
-                        items = state.mostUsedSources,
-                        onItemClick = { viewModel.onIntent(AddFixedExpenseIntent.SetSource(it)) }
-                    )
-                }
-
-                // Recurrence
-                item {
-                    RecurrenceSelector(
-                        selected = state.recurrence,
-                        onSelect = { type ->
-                            viewModel.onIntent(AddFixedExpenseIntent.SetRecurrence(type))
-                            if (type == RecurrenceType.CUSTOM) showRangePicker = true
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = PaddingValues(bottom = 100.dp)
+                ) {
+                    item(key = "title") {
+                        Field(
+                            label = stringResource(Res.string.label_title),
+                            required = true
+                        ) {
+                            TextField(
+                                value = state.title,
+                                onValueChange = { viewModel.onIntent(AddFixedExpenseIntent.SetTitle(it)) },
+                                placeholder = {
+                                    FintrackBodyMediumText(
+                                        text = stringResource(Res.string.label_title),
+                                        color = LocalGlassColors.current.text3
+                                    )
+                                },
+                                colors = glassTextFieldColors(),
+                                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                    color = LocalGlassColors.current.text,
+                                    fontWeight = FontWeight.SemiBold
+                                ),
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
-                    )
-                }
+                    }
 
-                // Start date
-                item {
-                    Field(
-                        label = stringResource(Res.string.start),
-                        onClick = { showStartDatePicker = true }
-                    ) {
-                        PickerValue(
-                            label = state.startDate.toPersianDate(),
-                            icon = Icons.Default.CalendarMonth
+                    item(key = "amount") {
+                        LargeAmountCard(
+                            amount = state.amount,
+                            onAmountChange = { viewModel.onIntent(AddFixedExpenseIntent.SetAmount(it)) },
+                            onCalcClick = { showCalculator = true },
+                            autoFocus = state.expenseId == null
                         )
                     }
-                }
 
-                // Custom range end date (only for CUSTOM)
-                if (state.recurrence == RecurrenceType.CUSTOM) {
+                    // Category (optional) + most used
                     item {
                         Field(
-                            label = stringResource(Res.string.label_end_date),
-                            onClick = { showRangePicker = true }
+                            label = stringResource(Res.string.category),
+                            required = false,
+                            onClick = { showCategoryPicker = true }
                         ) {
                             PickerValue(
-                                label = state.endDate?.toPersianDate()
-                                    ?: stringResource(Res.string.custom_date),
-                                icon = Icons.Default.DateRange
+                                label = state.category?.name ?: stringResource(Res.string.select_category),
+                                icon = FinTrackIcons.findIcon(state.category?.iconId).resource
                             )
                         }
+                        MostUsedCategoryChips(
+                            items = state.mostUsedCategories,
+                            onItemClick = { viewModel.onIntent(AddFixedExpenseIntent.SetCategory(it)) }
+                        )
                     }
-                }
 
-                // Auto post
-                item {
-                    GlassCard(padding = 14.dp) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                    // Source (optional) + most used
+                    item {
+                        Field(
+                            label = stringResource(Res.string.source),
+                            required = false,
+                            onClick = { showSourcePicker = true }
                         ) {
-                            FintrackBodyMediumText(
-                                text = stringResource(Res.string.label_auto_post_enabled),
-                                fontWeight = FontWeight.SemiBold
+                            PickerValue(
+                                label = state.source?.name ?: stringResource(Res.string.select_source),
+                                icon = FinTrackIcons.findIcon(state.source?.iconId).resource
                             )
-                            Switch(
-                                on = state.isAutoPostEnabled,
-                                onToggle = { viewModel.onIntent(AddFixedExpenseIntent.SetAutoPost(it)) }
+                        }
+                        MostUsedSourceChips(
+                            items = state.mostUsedSources,
+                            onItemClick = { viewModel.onIntent(AddFixedExpenseIntent.SetSource(it)) }
+                        )
+                    }
+
+                    // Recurrence
+                    item {
+                        RecurrenceSelector(
+                            selected = state.recurrence,
+                            onSelect = { type ->
+                                viewModel.onIntent(AddFixedExpenseIntent.SetRecurrence(type))
+                                if (type == RecurrenceType.CUSTOM) showRangePicker = true
+                            }
+                        )
+                    }
+
+                    // Start date
+                    item {
+                        Field(
+                            label = stringResource(Res.string.start),
+                            onClick = { showStartDatePicker = true }
+                        ) {
+                            PickerValue(
+                                label = state.startDate.toPersianDate(),
+                                icon = Icons.Default.CalendarMonth
                             )
                         }
                     }
-                }
 
-                // Note (same style as add-transaction)
-                item {
-                    NoteCard(
-                        value = state.description,
-                        onValueChange = { viewModel.onIntent(AddFixedExpenseIntent.SetDescription(it)) }
-                    )
+                    // Custom range end date (only for CUSTOM)
+                    if (state.recurrence == RecurrenceType.CUSTOM) {
+                        item {
+                            Field(
+                                label = stringResource(Res.string.label_end_date),
+                                onClick = { showRangePicker = true }
+                            ) {
+                                PickerValue(
+                                    label = state.endDate?.toPersianDate()
+                                        ?: stringResource(Res.string.custom_date),
+                                    icon = Icons.Default.DateRange
+                                )
+                            }
+                        }
+                    }
+
+                    // Auto post
+                    item {
+                        GlassCard(padding = 14.dp) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    FintrackBodyMediumText(
+                                        text = stringResource(Res.string.label_auto_post_enabled),
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    if (state.isAutoPostEnabled && state.category == null) {
+                                        FintrackLabelSmallText(
+                                            text = stringResource(Res.string.error_category_required_for_auto_post),
+                                            color = MaterialTheme.colorScheme.error
+                                        )
+                                    }
+                                }
+                                Switch(
+                                    on = state.isAutoPostEnabled,
+                                    onToggle = { viewModel.onIntent(AddFixedExpenseIntent.SetAutoPost(it)) }
+                                )
+                            }
+                        }
+                    }
+
+                    // Note (same style as add-transaction)
+                    item {
+                        NoteCard(
+                            value = state.description,
+                            onValueChange = { viewModel.onIntent(AddFixedExpenseIntent.SetDescription(it)) }
+                        )
+                    }
                 }
             }
+
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 80.dp)
+            )
         }
     }
 
@@ -330,8 +356,8 @@ private fun RecurrenceSelector(
     selected: RecurrenceType,
     onSelect: (RecurrenceType) -> Unit
 ) {
-    // "امروز" (ONCE) intentionally removed. CUSTOM opens the range picker.
     val types = listOf(
+        RecurrenceType.NONE to Res.string.label_period_none,
         RecurrenceType.DAILY to Res.string.frequency_daily,
         RecurrenceType.WEEKLY to Res.string.frequency_weekly,
         RecurrenceType.MONTHLY to Res.string.frequency_monthly,

@@ -404,6 +404,7 @@ fun ObserveChecksByStatus.toCheck() = Check(
 // Fixed Expense Mappers
 fun FixedExpenseDb.toFixedExpense() = FixedExpense(
     id = id,
+    title = title,
     amount = amount,
     categoryId = categoryId,
     sourceId = sourceId,
@@ -420,6 +421,7 @@ fun FixedExpenseDb.toFixedExpense() = FixedExpense(
 
 fun ObserveAllFixedExpenses.toFixedExpense() = FixedExpense(
     id = id,
+    title = title,
     amount = amount,
     categoryId = categoryId,
     categoryName = categoryName,

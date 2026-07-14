@@ -405,7 +405,11 @@
     <string name="label_check_summary">%1$s تومان - سررسید: %2$s</string>
 
     <!-- Fixed Expenses -->
-    <string name="title_add_fixed_expense">افزودن هزینه ثابت</string>
+    <string name="title_add_fixed_expense">ثبت هزینه ثابت</string>
+    <string name="label_title">عنوان</string>
+    <string name="label_period_none">بدون بازه زمانی</string>
+    <string name="error_category_required_for_auto_post">برای ثبت خودکار، انتخاب دسته‌بندی اجباری است</string>
+    <string name="error_title_required">وارد کردن عنوان اجباری است</string>
     <string name="label_expense_amount">مبلغ هزینه</string>
     <string name="label_auto_post_enabled">ثبت خودکار در سررسید</string>
     <string name="sub_fixed_expense_management">مدیریت مخارج دوره‌ای و تکرار شونده</string>

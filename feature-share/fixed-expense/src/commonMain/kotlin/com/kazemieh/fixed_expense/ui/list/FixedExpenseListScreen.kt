@@ -2,6 +2,7 @@ package com.kazemieh.fixed_expense.ui.list
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,11 +23,31 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.currency_toman
 import fintrack.core.designsystem.generated.resources.label_approx_monthly_total
 import fintrack.core.designsystem.generated.resources.label_unknown_person
-import fintrack.core.designsystem.generated.resources.sub_fixed_expense_management
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
+import com.kazemieh.common.DateFilterType
+import com.kazemieh.common.DateRangeLabel
+import com.kazemieh.common.model.RecurrenceType
+import com.kazemieh.designsystem.component.glass.PeriodNavigator
+import fintrack.core.designsystem.generated.resources.all
+import fintrack.core.designsystem.generated.resources.custom_date
+import fintrack.core.designsystem.generated.resources.frequency_daily
+import fintrack.core.designsystem.generated.resources.frequency_monthly
+import fintrack.core.designsystem.generated.resources.frequency_weekly
+import fintrack.core.designsystem.generated.resources.frequency_yearly
+import fintrack.core.designsystem.generated.resources.label_period_none
+import fintrack.core.designsystem.generated.resources.label_range
+import fintrack.core.designsystem.generated.resources.label_this_year
+import fintrack.core.designsystem.generated.resources.last_month
+import fintrack.core.designsystem.generated.resources.this_month
+import fintrack.core.designsystem.generated.resources.this_week
+import fintrack.core.designsystem.generated.resources.today
+import fintrack.core.designsystem.generated.resources.yesterday
 import fintrack.core.designsystem.generated.resources.title_fixed_expense_management
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FixedExpenseListScreen(
     onBack: () -> Unit,
@@ -38,12 +59,40 @@ fun FixedExpenseListScreen(
 
     val totalMonthlyAmount = state.expenses.filter { it.isActive }.sumOf { it.amount }
 
+    val displayLabel = when (val label = state.dateRange?.label) {
+        is DateRangeLabel.Filter -> {
+            when (label.type) {
+                DateFilterType.TODAY -> stringResource(Res.string.today)
+                DateFilterType.YESTERDAY -> stringResource(Res.string.yesterday)
+                DateFilterType.THIS_WEEK -> stringResource(Res.string.this_week)
+                DateFilterType.THIS_MONTH -> stringResource(Res.string.this_month)
+                DateFilterType.LAST_MONTH -> stringResource(Res.string.last_month)
+                DateFilterType.CUSTOM_RANGE -> stringResource(Res.string.custom_date)
+                DateFilterType.THIS_YEAR -> stringResource(Res.string.label_this_year)
+                else -> stringResource(Res.string.all)
+            }
+        }
+        is DateRangeLabel.Text -> label.value
+        null -> ""
+    }
+
     FintrackScreen(
         title = stringResource(Res.string.title_fixed_expense_management),
-        sub = stringResource(Res.string.sub_fixed_expense_management),
+        sub = displayLabel,
         onBack = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
+            PeriodNavigator(
+                currentPeriod = state.dateRange?.filterType ?: DateFilterType.THIS_MONTH,
+                periodLabel = displayLabel,
+                periodSubLabel = "",
+                onPeriodSelected = { viewModel.onIntent(FixedExpenseListIntent.ChangeFilterType(it)) },
+                onPrevClick = { viewModel.onIntent(FixedExpenseListIntent.ShiftRange(com.kazemieh.common.Direction.PREVIOUS)) },
+                onNextClick = { viewModel.onIntent(FixedExpenseListIntent.ShiftRange(com.kazemieh.common.Direction.NEXT)) },
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                excludeCustomRange = true
+            )
+
             EntityList(
                 title = stringResource(Res.string.title_fixed_expense_management),
                 query = state.searchQuery,
@@ -58,10 +107,19 @@ fun FixedExpenseListScreen(
                     )
                 ),
                 items = state.filteredExpenses.map {
+                    val recurrenceLabel = when (it.recurrence) {
+                        RecurrenceType.DAILY -> stringResource(Res.string.frequency_daily)
+                        RecurrenceType.WEEKLY -> stringResource(Res.string.frequency_weekly)
+                        RecurrenceType.MONTHLY -> stringResource(Res.string.frequency_monthly)
+                        RecurrenceType.YEARLY -> stringResource(Res.string.frequency_yearly)
+                        RecurrenceType.CUSTOM -> stringResource(Res.string.custom_date)
+                        RecurrenceType.NONE -> stringResource(Res.string.label_period_none)
+                        RecurrenceType.ONCE -> stringResource(Res.string.today)
+                    }
                     EntityItem(
                         id = it.id,
-                        name = it.categoryName ?: stringResource(Res.string.label_unknown_person),
-                        sub = "${it.recurrence.name} - ${it.description ?: ""}",
+                        name = it.title,
+                        sub = "$recurrenceLabel" + (it.categoryName?.let { cat -> " - $cat" } ?: ""),
                         badge = it.amount.toPersianPrice(),
                         color = if (it.isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
                     )

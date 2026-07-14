@@ -2,13 +2,19 @@ package com.kazemieh.fixed_expense.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.DateFilterHelper
+import com.kazemieh.common.DateFilterType
+import com.kazemieh.common.DateRange
+import com.kazemieh.common.Direction
 import com.kazemieh.common.model.FixedExpense
+import com.kazemieh.common.model.RecurrenceType
 import com.kazemieh.domain.usecase.FixedExpenseUseCaseGroup
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 class FixedExpenseListViewModel(
@@ -19,6 +25,7 @@ class FixedExpenseListViewModel(
     val state: StateFlow<FixedExpenseListState> = _state.asStateFlow()
 
     private val _searchQuery = MutableStateFlow("")
+    private val _dateRange = MutableStateFlow(_state.value.dateRange)
 
     init {
         observeExpenses()
@@ -32,6 +39,17 @@ class FixedExpenseListViewModel(
                 it.copy(selectedExpense = intent.expense, isDeleteShow = intent.expense != null)
             }
             is FixedExpenseListIntent.ConfirmDelete -> confirmDelete()
+            is FixedExpenseListIntent.ChangeFilterType -> {
+                val newRange = DateFilterHelper.getRange(intent.type)
+                _dateRange.value = newRange
+                _state.update { it.copy(dateRange = newRange) }
+            }
+            is FixedExpenseListIntent.ShiftRange -> {
+                val current = _dateRange.value ?: return
+                val newRange = DateFilterHelper.shiftDateRange(current.start, current.end, current.filterType, intent.direction)
+                _dateRange.value = newRange
+                _state.update { it.copy(dateRange = newRange) }
+            }
         }
     }
 
@@ -45,23 +63,31 @@ class FixedExpenseListViewModel(
 
     private fun observeExpenses() {
         viewModelScope.launch {
-            fixedExpenseUseCases.observeAllFixedExpensesUseCase()
-                .combine(_searchQuery) { expenses, query ->
-                    val filtered = expenses.filter {
-                        it.categoryName?.contains(query, ignoreCase = true) == true ||
+            _dateRange.flatMapLatest { range ->
+                combine(
+                    fixedExpenseUseCases.observeAllFixedExpensesUseCase(),
+                    _searchQuery
+                ) { expenses, query ->
+                    val filteredByQuery = expenses.filter {
+                        it.title.contains(query, ignoreCase = true) ||
+                                it.categoryName?.contains(query, ignoreCase = true) == true ||
                                 it.description?.contains(query, ignoreCase = true) == true
                     }
-                    expenses to filtered
-                }
-                .collect { (all, filtered) ->
-                    _state.update {
-                        it.copy(
-                            expenses = all,
-                            filteredExpenses = filtered,
-                            searchQuery = _searchQuery.value
-                        )
+
+                    val filteredByRange = filteredByQuery.filter {
+                        it.recurrence == RecurrenceType.NONE || (range != null && it.nextDueDate in range.start..range.end)
                     }
+                    expenses to filteredByRange
                 }
+            }.collect { (all, filtered) ->
+                _state.update {
+                    it.copy(
+                        expenses = all,
+                        filteredExpenses = filtered,
+                        searchQuery = _searchQuery.value
+                    )
+                }
+            }
         }
     }
 
@@ -82,7 +108,8 @@ data class FixedExpenseListState(
     val isLoading: Boolean = false,
     val searchQuery: String = "",
     val isDeleteShow: Boolean = false,
-    val selectedExpense: FixedExpense? = null
+    val selectedExpense: FixedExpense? = null,
+    val dateRange: DateRange? = DateFilterHelper.getRange(DateFilterType.THIS_MONTH)
 )
 
 sealed interface FixedExpenseListIntent {
@@ -90,4 +117,6 @@ sealed interface FixedExpenseListIntent {
     data class ToggleActive(val expenseId: Long) : FixedExpenseListIntent
     data class OnDeleteClick(val expense: FixedExpense? = null) : FixedExpenseListIntent
     data object ConfirmDelete : FixedExpenseListIntent
+    data class ChangeFilterType(val type: DateFilterType) : FixedExpenseListIntent
+    data class ShiftRange(val direction: Direction) : FixedExpenseListIntent
 }

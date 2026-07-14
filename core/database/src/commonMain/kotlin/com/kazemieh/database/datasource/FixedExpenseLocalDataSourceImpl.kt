@@ -21,6 +21,7 @@ class FixedExpenseLocalDataSourceImpl(
     override suspend fun insertFixedExpense(expense: FixedExpense): Long = withContext(Dispatchers.Default) {
         val now = Clock.System.now().toEpochMilliseconds()
         queries.insertFixedExpense(
+            title = expense.title,
             amount = expense.amount,
             categoryId = expense.categoryId,
             sourceId = expense.sourceId,
@@ -41,6 +42,7 @@ class FixedExpenseLocalDataSourceImpl(
         withContext(Dispatchers.Default) {
             val now = Clock.System.now().toEpochMilliseconds()
             queries.updateFixedExpense(
+                title = expense.title,
                 amount = expense.amount,
                 categoryId = expense.categoryId,
                 sourceId = expense.sourceId,
@@ -90,6 +92,7 @@ class FixedExpenseLocalDataSourceImpl(
         withContext(Dispatchers.Default) {
             queries.insertFullFixedExpense(
                 id = expense.id,
+                title = expense.title,
                 amount = expense.amount,
                 categoryId = expense.categoryId,
                 sourceId = expense.sourceId,

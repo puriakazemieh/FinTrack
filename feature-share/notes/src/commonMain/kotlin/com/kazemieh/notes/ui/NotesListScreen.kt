@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.border
+import androidx.compose.material3.ExperimentalMaterial3Api
 import com.kazemieh.common.model.Note
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -56,6 +57,7 @@ import fintrack.core.designsystem.generated.resources.notes
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesListScreen(
     viewModel: NotesViewModel = koinViewModel(),

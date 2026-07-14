@@ -38,7 +38,7 @@ class FixedExpenseWorker(
         val now = Clock.System.now().toEpochMilliseconds()
         val expenses = fixedExpenseRepository.observeAllFixedExpenses().first()
 
-        expenses.filter { it.isActive && it.isAutoPostEnabled && it.nextDueDate <= now }.forEach { expense ->
+        expenses.filter { it.isActive && it.isAutoPostEnabled && it.recurrence != RecurrenceType.NONE && it.nextDueDate <= now }.forEach { expense ->
             postTransaction(expense)
             if (expense.recurrence == RecurrenceType.ONCE) {
                 fixedExpenseRepository.updateFixedExpense(expense.copy(isActive = false))
@@ -56,7 +56,7 @@ class FixedExpenseWorker(
             amount = expense.amount.toInt(),
             categoryId = expense.categoryId,
             sourceId = expense.sourceId,
-            description = expense.description ?: getString(Res.string.msg_auto_posted_fixed_expense),
+            description = expense.description ?: expense.title,
             timeStamp = Clock.System.now().toEpochMilliseconds(),
             type = TransactionType.EXPENSE,
             date = ""

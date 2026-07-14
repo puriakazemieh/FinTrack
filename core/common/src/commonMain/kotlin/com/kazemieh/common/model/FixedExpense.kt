@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FixedExpense(
     val id: Long = 0,
+    val title: String,
     val amount: Long,
     val categoryId: Long,
     val categoryName: String? = null,
@@ -28,5 +29,6 @@ enum class RecurrenceType {
     MONTHLY,
     YEARLY,
     CUSTOM,
-    ONCE
+    ONCE,
+    NONE
 }

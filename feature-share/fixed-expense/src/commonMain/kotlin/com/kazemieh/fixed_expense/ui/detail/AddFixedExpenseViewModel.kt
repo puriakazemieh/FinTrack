@@ -44,6 +44,7 @@ class AddFixedExpenseViewModel(
 
     fun onIntent(intent: AddFixedExpenseIntent) {
         when (intent) {
+            is AddFixedExpenseIntent.SetTitle -> _state.update { it.copy(title = intent.title) }
             is AddFixedExpenseIntent.SetAmount -> _state.update { it.copy(amount = intent.amount) }
             is AddFixedExpenseIntent.SetCategory -> _state.update { it.copy(category = intent.category) }
             is AddFixedExpenseIntent.SetSource -> _state.update { it.copy(source = intent.source) }
@@ -88,6 +89,7 @@ class AddFixedExpenseViewModel(
             _state.update {
                 it.copy(
                     expenseId = expense.id,
+                    title = expense.title,
                     amount = expense.amount.toString(),
                     category = category,
                     source = source,
@@ -106,13 +108,24 @@ class AddFixedExpenseViewModel(
     private fun submit() {
         val currentState = _state.value
         val amountValue = currentState.amount.toLongOrNull()
-        // Only the amount is required; category and source are optional.
+        
+        if (currentState.title.isBlank()) {
+            viewModelScope.launch { _effect.send(AddFixedExpenseEffect.Error(Res.string.error_title_required)) }
+            return
+        }
+        
         if (amountValue == null) return
+
+        if (currentState.isAutoPostEnabled && currentState.category == null) {
+            viewModelScope.launch { _effect.send(AddFixedExpenseEffect.Error(Res.string.error_category_required_for_auto_post)) }
+            return
+        }
 
         viewModelScope.launch {
             val endDate = if (currentState.recurrence == RecurrenceType.CUSTOM) currentState.endDate else null
             val expense = FixedExpense(
                 id = currentState.expenseId ?: 0L,
+                title = currentState.title,
                 amount = amountValue,
                 categoryId = currentState.category?.id ?: 0L,
                 sourceId = currentState.source?.id ?: 0L,
@@ -144,10 +157,11 @@ class AddFixedExpenseViewModel(
 
 data class AddFixedExpenseState(
     val expenseId: Long? = null,
+    val title: String = "",
     val amount: String = "",
     val category: Category? = null,
     val source: Source? = null,
-    val recurrence: RecurrenceType = RecurrenceType.MONTHLY,
+    val recurrence: RecurrenceType = RecurrenceType.NONE,
     val startDate: Long = Clock.System.now().toEpochMilliseconds(),
     val endDate: Long? = null,
     val nextDueDate: Long = Clock.System.now().toEpochMilliseconds(),
@@ -159,6 +173,7 @@ data class AddFixedExpenseState(
 )
 
 sealed interface AddFixedExpenseIntent {
+    data class SetTitle(val title: String) : AddFixedExpenseIntent
     data class SetAmount(val amount: String) : AddFixedExpenseIntent
     data class SetCategory(val category: Category?) : AddFixedExpenseIntent
     data class SetSource(val source: Source?) : AddFixedExpenseIntent
@@ -174,4 +189,5 @@ sealed interface AddFixedExpenseIntent {
 
 sealed interface AddFixedExpenseEffect {
     data object Saved : AddFixedExpenseEffect
+    data class Error(val messageRes: org.jetbrains.compose.resources.StringResource) : AddFixedExpenseEffect
 }

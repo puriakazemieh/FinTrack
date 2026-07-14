@@ -1,0 +1,1 @@
+ALTER TABLE fixed_expense ADD COLUMN title TEXT NOT NULL DEFAULT '';

@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS fixed_expense (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    title TEXT NOT NULL DEFAULT '',
     amount INTEGER NOT NULL,
     categoryId INTEGER NOT NULL,
     sourceId INTEGER NOT NULL,
@@ -20,12 +21,12 @@ CREATE INDEX IF NOT EXISTS idx_fixed_expense_category ON fixed_expense(categoryI
 CREATE INDEX IF NOT EXISTS idx_fixed_expense_source ON fixed_expense(sourceId);
 
 insertFixedExpense:
-INSERT INTO fixed_expense(amount, categoryId, sourceId, description, recurrence, startDate, nextDueDate, endDate, isAutoPostEnabled, isActive, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO fixed_expense(title, amount, categoryId, sourceId, description, recurrence, startDate, nextDueDate, endDate, isAutoPostEnabled, isActive, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateFixedExpense:
 UPDATE fixed_expense
-SET amount = ?, categoryId = ?, sourceId = ?, description = ?, recurrence = ?, startDate = ?, nextDueDate = ?, endDate = ?, isAutoPostEnabled = ?, isActive = ?, updatedAt = ?, syncStatus = ?
+SET title = ?, amount = ?, categoryId = ?, sourceId = ?, description = ?, recurrence = ?, startDate = ?, nextDueDate = ?, endDate = ?, isAutoPostEnabled = ?, isActive = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 deleteFixedExpense:
@@ -55,8 +56,8 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertFullFixedExpense:
-INSERT OR REPLACE INTO fixed_expense(id, amount, categoryId, sourceId, description, recurrence, startDate, nextDueDate, endDate, isAutoPostEnabled, isActive, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO fixed_expense(id, title, amount, categoryId, sourceId, description, recurrence, startDate, nextDueDate, endDate, isAutoPostEnabled, isActive, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getModifiedFixedExpenses:
 SELECT * FROM fixed_expense WHERE syncStatus = 1;
