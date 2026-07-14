@@ -11,6 +11,7 @@ abstract class BaseBankParser : BankParser {
         return match?.groupValues?.get(1)
             ?.replace(",", "")
             ?.replace("،", "")
+            ?.replace("٬", "")
             ?.toEnglishDigits()
             ?.toIntOrNull() ?: 0
     }
@@ -63,11 +64,14 @@ class GenericBankParser : BaseBankParser() {
     )
 
     override fun parse(sender: String, body: String): SmsDraft? {
-        // Normalize Arabic yeh/kaf and Persian digits so keyword/amount matching is reliable
-        // regardless of which keyboard the bank used.
+        // Normalize Arabic yeh/kaf, Persian digits, and the Persian/Arabic thousands separators
+        // (٬ U+066C, ، U+060C) to an ASCII comma so keyword/amount matching is reliable regardless
+        // of which keyboard the bank used. Without this, "۵۰۰٬۰۰۰ ریال" fails to parse.
         val text = body.toEnglishDigits()
             .replace('ي', 'ی')
             .replace('ك', 'ک')
+            .replace('٬', ',')
+            .replace('،', ',')
 
         val isIncome = incomeKeywords.any { text.contains(it) }
         val isExpense = expenseKeywords.any { text.contains(it) }
@@ -75,13 +79,24 @@ class GenericBankParser : BaseBankParser() {
         if (!isIncome && !isExpense) return null
 
         // Collect every "<number> ریال|تومان" amount with its position in the text.
-        val amountRegex = """([\d,]{3,})\s*(?:ریال|تومان)""".toRegex()
-        val amounts = amountRegex.findAll(text)
+        val amountRegex = """([\d,]{3,})\s*(?:ریال|تومان|تومن)""".toRegex()
+        var amounts = amountRegex.findAll(text)
             .mapNotNull { m ->
                 val value = m.groupValues[1].replace(",", "").toLongOrNull()
                 if (value != null && value > 0) m.range.first to value else null
             }
             .toList()
+        // Fallback for banks that omit the currency word: a comma-grouped number (e.g. 500,000)
+        // is almost always the amount, and we already know this is a transaction message.
+        if (amounts.isEmpty()) {
+            val groupedRegex = """\d{1,3}(?:,\d{3})+""".toRegex()
+            amounts = groupedRegex.findAll(text)
+                .mapNotNull { m ->
+                    val value = m.value.replace(",", "").toLongOrNull()
+                    if (value != null && value > 0) m.range.first to value else null
+                }
+                .toList()
+        }
         if (amounts.isEmpty()) return null
 
         // The balance figure (after موجودی/مانده) must not be mistaken for the transaction amount;
@@ -118,7 +133,7 @@ class BluParser : BaseBankParser() {
 
     override fun parse(sender: String, body: String): SmsDraft? {
         if (!body.contains("بلوبانک")) return null
-        val amount = extractAmount(body, """مبلغ:\s*([\d,،۰-۹]+)""".toRegex())
+        val amount = extractAmount(body, """مبلغ:\s*([\d,،٬۰-۹]+)""".toRegex())
         val type = if (body.contains("واریز")) TransactionType.INCOME else TransactionType.EXPENSE
         val sourceIdentifier = extractSourceIdentifier(body)
         return createDraft(sender, body, amount, type, sourceIdentifier = sourceIdentifier)
@@ -131,7 +146,7 @@ class MellatParser : BaseBankParser() {
 
     override fun parse(sender: String, body: String): SmsDraft? {
         if (!body.contains("ملت")) return null
-        val amount = extractAmount(body, """مبلغ\s*([\d,،۰-۹]+)""".toRegex())
+        val amount = extractAmount(body, """مبلغ\s*([\d,،٬۰-۹]+)""".toRegex())
         val type = if (body.contains("واریز")) TransactionType.INCOME else TransactionType.EXPENSE
         val sourceIdentifier = extractSourceIdentifier(body)
         return createDraft(sender, body, amount, type, sourceIdentifier = sourceIdentifier)
@@ -144,7 +159,7 @@ class SaderatParser : BaseBankParser() {
 
     override fun parse(sender: String, body: String): SmsDraft? {
         if (!body.contains("صادرات")) return null
-        val amount = extractAmount(body, """مبلغ\s*([\d,،۰-۹]+)""".toRegex())
+        val amount = extractAmount(body, """مبلغ\s*([\d,،٬۰-۹]+)""".toRegex())
         val type = if (body.contains("واریز")) TransactionType.INCOME else TransactionType.EXPENSE
         val sourceIdentifier = extractSourceIdentifier(body)
         return createDraft(sender, body, amount, type, sourceIdentifier = sourceIdentifier)
@@ -157,7 +172,7 @@ class PasargadParser : BaseBankParser() {
 
     override fun parse(sender: String, body: String): SmsDraft? {
         if (!body.contains("پاسارگاد")) return null
-        val amount = extractAmount(body, """مبلغ:\s*([\d,،۰-۹]+)""".toRegex())
+        val amount = extractAmount(body, """مبلغ:\s*([\d,،٬۰-۹]+)""".toRegex())
         val type = if (body.contains("واریز")) TransactionType.INCOME else TransactionType.EXPENSE
         val sourceIdentifier = extractSourceIdentifier(body)
         return createDraft(sender, body, amount, type, sourceIdentifier = sourceIdentifier)
@@ -170,7 +185,7 @@ class SamanParser : BaseBankParser() {
 
     override fun parse(sender: String, body: String): SmsDraft? {
         if (!body.contains("سامان")) return null
-        val amount = extractAmount(body, """مبلغ:\s*([\d,،۰-۹]+)""".toRegex())
+        val amount = extractAmount(body, """مبلغ:\s*([\d,،٬۰-۹]+)""".toRegex())
         val type = if (body.contains("واریز")) TransactionType.INCOME else TransactionType.EXPENSE
         val sourceIdentifier = extractSourceIdentifier(body)
         return createDraft(sender, body, amount, type, sourceIdentifier = sourceIdentifier)
