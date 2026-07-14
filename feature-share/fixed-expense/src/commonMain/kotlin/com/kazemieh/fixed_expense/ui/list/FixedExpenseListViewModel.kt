@@ -49,6 +49,25 @@ class FixedExpenseListViewModel(
                 it.copy(selectedExpense = intent.expense, isDeleteShow = intent.expense != null)
             }
             is FixedExpenseListIntent.ConfirmDelete -> confirmDelete()
+            is FixedExpenseListIntent.CloneOnceFromPrevious -> cloneOnceFromPrevious()
+        }
+    }
+
+    // Non-recurring (ONCE) expenses don't auto-repeat, so offer to copy the most recent earlier
+    // one into the current period — the fixed-expense parallel to the budget clone.
+    private fun cloneOnceFromPrevious() {
+        val range = _state.value.dateRange ?: return
+        viewModelScope.launch {
+            val latest = _state.value.expenses
+                .filter { it.recurrence == RecurrenceType.ONCE && it.startDate < range.start }
+                .maxByOrNull { it.startDate } ?: return@launch
+            val clone = latest.copy(
+                id = 0L,
+                startDate = range.start,
+                nextDueDate = range.start,
+                updatedAt = 0
+            )
+            fixedExpenseUseCases.addFixedExpenseUseCase(clone, "", "")
         }
     }
 
@@ -70,11 +89,15 @@ class FixedExpenseListViewModel(
                 val total = filtered.filter { it.isActive }.sumOf { it.amount }
                 Triple(all, grouped, total)
             }.collect { (all, grouped, total) ->
+                val range = _dateRange.value
+                val canCloneOnce = grouped[RecurrenceType.ONCE].isNullOrEmpty() &&
+                        all.any { it.recurrence == RecurrenceType.ONCE && (range == null || it.startDate < range.start) }
                 _state.update {
                     it.copy(
                         expenses = all,
                         grouped = grouped,
                         totalApprox = total,
+                        canCloneOnce = canCloneOnce,
                         searchQuery = _searchQuery.value
                     )
                 }
@@ -105,6 +128,7 @@ data class FixedExpenseListState(
     val dateRange: DateRange? = DateFilterHelper.getRange(DateFilterType.THIS_MONTH),
     val searchQuery: String = "",
     val totalApprox: Long = 0,
+    val canCloneOnce: Boolean = false,
     val isDeleteShow: Boolean = false,
     val selectedExpense: FixedExpense? = null
 )
@@ -116,4 +140,5 @@ sealed interface FixedExpenseListIntent {
     data class ToggleActive(val expenseId: Long) : FixedExpenseListIntent
     data class OnDeleteClick(val expense: FixedExpense? = null) : FixedExpenseListIntent
     data object ConfirmDelete : FixedExpenseListIntent
+    data object CloneOnceFromPrevious : FixedExpenseListIntent
 }

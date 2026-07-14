@@ -72,6 +72,7 @@ import fintrack.core.designsystem.generated.resources.frequency_daily
 import fintrack.core.designsystem.generated.resources.frequency_monthly
 import fintrack.core.designsystem.generated.resources.frequency_weekly
 import fintrack.core.designsystem.generated.resources.frequency_yearly
+import fintrack.core.designsystem.generated.resources.recurrence_none
 import fintrack.core.designsystem.generated.resources.hint_transaction_description
 import fintrack.core.designsystem.generated.resources.ic_1
 import fintrack.core.designsystem.generated.resources.installment_frequency
@@ -330,13 +331,14 @@ private fun RecurrenceSelector(
     selected: RecurrenceType,
     onSelect: (RecurrenceType) -> Unit
 ) {
-    // "امروز" (ONCE) intentionally removed. CUSTOM opens the range picker.
+    // CUSTOM opens the range picker; ONCE is a one-off (non-recurring) expense.
     val types = listOf(
         RecurrenceType.DAILY to Res.string.frequency_daily,
         RecurrenceType.WEEKLY to Res.string.frequency_weekly,
         RecurrenceType.MONTHLY to Res.string.frequency_monthly,
         RecurrenceType.YEARLY to Res.string.frequency_yearly,
-        RecurrenceType.CUSTOM to Res.string.custom_date
+        RecurrenceType.CUSTOM to Res.string.custom_date,
+        RecurrenceType.ONCE to Res.string.recurrence_none
     )
     Column {
         FintrackLabelMediumText(
