@@ -237,7 +237,8 @@ private fun DayHeader(date: String, count: Int, netAmount: Long) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp, horizontal = 4.dp),
+            .background(glassColors.bg1)
+            .padding(vertical = 12.dp, horizontal = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

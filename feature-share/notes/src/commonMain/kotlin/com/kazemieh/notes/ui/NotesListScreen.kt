@@ -14,9 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -79,18 +78,17 @@ fun NotesListScreen(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 )
 
-                LazyVerticalStaggeredGrid(
-                    columns = StaggeredGridCells.Fixed(2),
+                LazyColumn(
                     contentPadding = PaddingValues(bottom = 90.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalItemSpacing = 8.dp,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(state.filteredNotes, key = { it.id }) { note ->
                         NoteCard(
                             note = note,
                             onClick = { onEditNote(note.id) },
-                            onLongClick = { noteToDelete = note }
+                            onLongClick = { noteToDelete = note },
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }

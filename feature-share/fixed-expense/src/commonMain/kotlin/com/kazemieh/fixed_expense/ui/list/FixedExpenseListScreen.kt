@@ -230,13 +230,14 @@ private fun SummaryCard(total: Long) {
 
 @Composable
 private fun SectionHeader(title: String) {
+    val glassColors = LocalGlassColors.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f))
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .background(glassColors.bg1)
+            .padding(horizontal = 16.dp, vertical = 10.dp)
     ) {
-        FintrackBodyLargeText(text = title, fontWeight = FontWeight.Bold)
+        FintrackBodyLargeText(text = title, fontWeight = FontWeight.Bold, color = glassColors.text)
     }
 }
 
