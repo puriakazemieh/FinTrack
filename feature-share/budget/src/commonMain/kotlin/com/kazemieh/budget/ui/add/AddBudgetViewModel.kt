@@ -34,6 +34,9 @@ data class AddBudgetState(
     val amount: String = "",
     val period: BudgetPeriod = BudgetPeriod.MONTHLY,
     val startAt: Long = 0,
+    // The un-snapped reference date; period snapping always derives from this so switching
+    // period re-anchors to the real date instead of the previously snapped value.
+    val baseAt: Long = 0,
     val isAlertEnabled: Boolean = true,
     val categories: List<Category> = emptyList(),
     val tags: List<Tag> = emptyList(),
@@ -64,7 +67,8 @@ sealed interface AddBudgetIntent {
     data class InitialData(
         val budget: Budget?,
         val category: Category?,
-        val defaultStartAt: Long? = null
+        val defaultStartAt: Long? = null,
+        val defaultRangeEnd: Long? = null
     ) : AddBudgetIntent
     data class ToggleSheet(val sheet: AddBudgetSheet?) : AddBudgetIntent
 }
@@ -93,7 +97,8 @@ class AddBudgetViewModel(
             is AddBudgetIntent.SelectCategory -> _state.update { it.copy(selectedCategory = intent.category) }
             is AddBudgetIntent.UpdateAmount -> _state.update { it.copy(amount = intent.amount) }
             is AddBudgetIntent.UpdatePeriod -> {
-                val adjustedStartAt = adjustStartAt(_state.value.startAt, intent.period)
+                val base = _state.value.baseAt.takeIf { it != 0L } ?: _state.value.startAt
+                val adjustedStartAt = adjustStartAt(base, intent.period)
                 _state.update { it.copy(period = intent.period, startAt = adjustedStartAt) }
             }
             is AddBudgetIntent.UpdateAlert -> _state.update { it.copy(isAlertEnabled = intent.isEnabled) }
@@ -111,18 +116,30 @@ class AddBudgetViewModel(
                             amount = intent.budget.amount.toString(),
                             period = intent.budget.period,
                             startAt = intent.budget.startAt,
+                            baseAt = intent.budget.startAt,
                             isAlertEnabled = intent.budget.isAlertEnabled
                         )
                     }
                 } else {
-                    val initialStartAt = intent.defaultStartAt ?: Clock.System.now().toEpochMilliseconds()
-                    val adjusted = adjustStartAt(initialStartAt, BudgetPeriod.MONTHLY)
+                    // Anchor to "today" when the viewed range contains it (so a daily budget starts
+                    // today, a weekly one this week, etc.); otherwise anchor to the viewed range's
+                    // start so a budget added while browsing another period lands in that period.
+                    val now = Clock.System.now().toEpochMilliseconds()
+                    val rangeStart = intent.defaultStartAt
+                    val rangeEnd = intent.defaultRangeEnd
+                    val base = if (rangeStart != null && rangeEnd != null && now in rangeStart..rangeEnd) {
+                        now
+                    } else {
+                        rangeStart ?: now
+                    }
+                    val adjusted = adjustStartAt(base, BudgetPeriod.MONTHLY)
                     _state.update {
                         AddBudgetState(
                             categories = it.categories,
                             tags = it.tags,
                             sources = it.sources,
                             startAt = adjusted,
+                            baseAt = base,
                             period = BudgetPeriod.MONTHLY
                         )
                     }
