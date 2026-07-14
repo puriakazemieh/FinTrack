@@ -422,11 +422,27 @@ private fun ShoppingItemSheet(
                                 )
                             }
                             Box(modifier = Modifier.weight(1f))
-                            RowActionIcon(
-                                icon = Icons.Default.Notifications,
-                                tint = if (reminderTime != null) GlassGreen else LocalGlassColors.current.text2,
-                                onClick = { showDatePicker.value = true }
-                            )
+                            // Reminder: shows the picked date + time, tap to (re)pick.
+                            Row(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .clickable { showDatePicker.value = true }
+                                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                androidx.compose.material3.Icon(
+                                    imageVector = Icons.Default.Notifications,
+                                    contentDescription = null,
+                                    tint = if (reminderTime != null) GlassGreen else LocalGlassColors.current.text2,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                FintrackLabelSmallText(
+                                    text = reminderTime?.let { com.kazemieh.common.util.DateUtils.formatTimestamp(it) }
+                                        ?: stringResource(Res.string.reminder),
+                                    color = if (reminderTime != null) GlassGreen else LocalGlassColors.current.text2
+                                )
+                            }
                         }
                     }
                 }
