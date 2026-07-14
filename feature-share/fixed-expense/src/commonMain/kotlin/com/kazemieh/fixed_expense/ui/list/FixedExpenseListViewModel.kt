@@ -2,13 +2,18 @@ package com.kazemieh.fixed_expense.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.DateFilterHelper
+import com.kazemieh.common.DateFilterType
+import com.kazemieh.common.DateRange
+import com.kazemieh.common.Direction
 import com.kazemieh.common.model.FixedExpense
+import com.kazemieh.common.model.RecurrenceType
 import com.kazemieh.domain.usecase.FixedExpenseUseCaseGroup
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class FixedExpenseListViewModel(
@@ -19,6 +24,7 @@ class FixedExpenseListViewModel(
     val state: StateFlow<FixedExpenseListState> = _state.asStateFlow()
 
     private val _searchQuery = MutableStateFlow("")
+    private val _dateRange = MutableStateFlow(DateFilterHelper.getRange(DateFilterType.THIS_MONTH))
 
     init {
         observeExpenses()
@@ -27,11 +33,59 @@ class FixedExpenseListViewModel(
     fun onIntent(intent: FixedExpenseListIntent) {
         when (intent) {
             is FixedExpenseListIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
+            is FixedExpenseListIntent.ChangeFilterType -> {
+                val newRange = DateFilterHelper.getRange(intent.type)
+                _dateRange.value = newRange
+                _state.update { it.copy(dateRange = newRange) }
+            }
+            is FixedExpenseListIntent.ShiftRange -> {
+                val current = _dateRange.value ?: return
+                val newRange = DateFilterHelper.shiftDateRange(current.start, current.end, current.filterType, intent.direction)
+                _dateRange.value = newRange
+                _state.update { it.copy(dateRange = newRange) }
+            }
             is FixedExpenseListIntent.ToggleActive -> toggleActive(intent.expenseId)
             is FixedExpenseListIntent.OnDeleteClick -> _state.update {
                 it.copy(selectedExpense = intent.expense, isDeleteShow = intent.expense != null)
             }
             is FixedExpenseListIntent.ConfirmDelete -> confirmDelete()
+        }
+    }
+
+    private fun observeExpenses() {
+        viewModelScope.launch {
+            combine(
+                fixedExpenseUseCases.observeAllFixedExpensesUseCase(),
+                _searchQuery,
+                _dateRange
+            ) { all, query, range ->
+                // Mirror budgets: keep only expenses whose start date falls in the selected range.
+                val inRange = all.filter { range == null || it.startDate in range.start..range.end }
+                val filtered = inRange.filter {
+                    it.categoryName?.contains(query, ignoreCase = true) == true ||
+                            it.description?.contains(query, ignoreCase = true) == true ||
+                            query.isBlank()
+                }
+                val grouped = filtered.groupBy { it.recurrence }
+                val total = filtered.filter { it.isActive }.sumOf { it.amount }
+                Triple(all, grouped, total)
+            }.collect { (all, grouped, total) ->
+                _state.update {
+                    it.copy(
+                        expenses = all,
+                        grouped = grouped,
+                        totalApprox = total,
+                        searchQuery = _searchQuery.value
+                    )
+                }
+            }
+        }
+    }
+
+    private fun toggleActive(expenseId: Long) {
+        viewModelScope.launch {
+            val expense = _state.value.grouped.values.flatten().find { it.id == expenseId } ?: return@launch
+            fixedExpenseUseCases.updateFixedExpenseUseCase(expense.copy(isActive = !expense.isActive))
         }
     }
 
@@ -42,51 +96,23 @@ class FixedExpenseListViewModel(
             _state.update { it.copy(isDeleteShow = false, selectedExpense = null) }
         }
     }
-
-    private fun observeExpenses() {
-        viewModelScope.launch {
-            fixedExpenseUseCases.observeAllFixedExpensesUseCase()
-                .combine(_searchQuery) { expenses, query ->
-                    val filtered = expenses.filter {
-                        it.categoryName?.contains(query, ignoreCase = true) == true ||
-                                it.description?.contains(query, ignoreCase = true) == true
-                    }
-                    expenses to filtered
-                }
-                .collect { (all, filtered) ->
-                    _state.update {
-                        it.copy(
-                            expenses = all,
-                            filteredExpenses = filtered,
-                            searchQuery = _searchQuery.value
-                        )
-                    }
-                }
-        }
-    }
-
-    private fun toggleActive(expenseId: Long) {
-        viewModelScope.launch {
-            val expense = _state.value.expenses.find { it.id == expenseId }
-            expense?.let {
-                fixedExpenseUseCases.updateFixedExpenseUseCase(it.copy(isActive = !it.isActive))
-            }
-        }
-    }
-
 }
 
 data class FixedExpenseListState(
+    // Full, unfiltered list (used by the dashboard widget).
     val expenses: List<FixedExpense> = emptyList(),
-    val filteredExpenses: List<FixedExpense> = emptyList(),
-    val isLoading: Boolean = false,
+    val grouped: Map<RecurrenceType, List<FixedExpense>> = emptyMap(),
+    val dateRange: DateRange? = DateFilterHelper.getRange(DateFilterType.THIS_MONTH),
     val searchQuery: String = "",
+    val totalApprox: Long = 0,
     val isDeleteShow: Boolean = false,
     val selectedExpense: FixedExpense? = null
 )
 
 sealed interface FixedExpenseListIntent {
     data class UpdateSearchQuery(val query: String) : FixedExpenseListIntent
+    data class ChangeFilterType(val type: DateFilterType) : FixedExpenseListIntent
+    data class ShiftRange(val direction: Direction) : FixedExpenseListIntent
     data class ToggleActive(val expenseId: Long) : FixedExpenseListIntent
     data class OnDeleteClick(val expense: FixedExpense? = null) : FixedExpenseListIntent
     data object ConfirmDelete : FixedExpenseListIntent

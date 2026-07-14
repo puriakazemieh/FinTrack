@@ -12,7 +12,14 @@ import com.kazemieh.domain.usecase.GetCategoryUseCase
 import com.kazemieh.domain.usecase.GetSourceByIdUseCase
 import com.kazemieh.domain.usecase.ObserveMostUsedCategoriesUseCase
 import com.kazemieh.domain.usecase.ObserveMostUsedSourcesUseCase
+import com.kazemieh.common.persiandatetime.extensions.toEpochMilliseconds
+import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
+import com.kazemieh.common.persiandatetime.extensions.minus
+import com.kazemieh.common.persiandatetime.extensions.dayOfWeekIndex
 import fintrack.core.designsystem.generated.resources.*
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,8 +54,15 @@ class AddFixedExpenseViewModel(
             is AddFixedExpenseIntent.SetAmount -> _state.update { it.copy(amount = intent.amount) }
             is AddFixedExpenseIntent.SetCategory -> _state.update { it.copy(category = intent.category) }
             is AddFixedExpenseIntent.SetSource -> _state.update { it.copy(source = intent.source) }
-            is AddFixedExpenseIntent.SetRecurrence -> _state.update { it.copy(recurrence = intent.recurrence) }
-            is AddFixedExpenseIntent.SetStartDate -> _state.update { it.copy(startDate = intent.startDate) }
+            is AddFixedExpenseIntent.SetRecurrence -> _state.update {
+                // Anchor the start date to the period start (today / this week / this month /
+                // this year) exactly like budgets when a recurring type is picked.
+                val anchored = adjustStartDate(it.baseAt.takeIf { b -> b != 0L } ?: it.startDate, intent.recurrence)
+                it.copy(recurrence = intent.recurrence, startDate = anchored)
+            }
+            is AddFixedExpenseIntent.SetStartDate -> _state.update {
+                it.copy(startDate = intent.startDate, baseAt = intent.startDate)
+            }
             is AddFixedExpenseIntent.SetEndDate -> _state.update { it.copy(endDate = intent.endDate) }
             is AddFixedExpenseIntent.SetAutoPost -> _state.update { it.copy(isAutoPostEnabled = intent.enabled) }
             is AddFixedExpenseIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
@@ -72,11 +86,30 @@ class AddFixedExpenseViewModel(
     }
 
     private fun reset() {
+        val now = Clock.System.now().toEpochMilliseconds()
         _state.update {
             AddFixedExpenseState(
+                startDate = adjustStartDate(now, RecurrenceType.MONTHLY),
+                baseAt = now,
                 mostUsedCategories = it.mostUsedCategories,
                 mostUsedSources = it.mostUsedSources
             )
+        }
+    }
+
+    // Snap the start date to the beginning of the selected period, mirroring budgets.
+    private fun adjustStartDate(time: Long, recurrence: RecurrenceType): Long {
+        val tz = TimeZone.currentSystemDefault()
+        val pdt = Instant.fromEpochMilliseconds(time).toPersianDateTime(tz)
+        return when (recurrence) {
+            RecurrenceType.DAILY -> pdt.copy(hour = 0, minute = 0, second = 0).toEpochMilliseconds(tz)
+            RecurrenceType.WEEKLY -> {
+                val daysToSaturday = pdt.dayOfWeekIndex
+                pdt.minus(daysToSaturday, DateTimeUnit.DAY).copy(hour = 0, minute = 0, second = 0).toEpochMilliseconds(tz)
+            }
+            RecurrenceType.MONTHLY -> pdt.copy(day = 1, hour = 0, minute = 0, second = 0).toEpochMilliseconds(tz)
+            RecurrenceType.YEARLY -> pdt.copy(month = 1, day = 1, hour = 0, minute = 0, second = 0).toEpochMilliseconds(tz)
+            else -> time // CUSTOM / ONCE keep the picked date
         }
     }
 
@@ -93,6 +126,7 @@ class AddFixedExpenseViewModel(
                     source = source,
                     recurrence = expense.recurrence,
                     startDate = expense.startDate,
+                    baseAt = expense.startDate,
                     endDate = expense.endDate,
                     nextDueDate = expense.nextDueDate,
                     isAutoPostEnabled = expense.isAutoPostEnabled,
@@ -149,6 +183,8 @@ data class AddFixedExpenseState(
     val source: Source? = null,
     val recurrence: RecurrenceType = RecurrenceType.MONTHLY,
     val startDate: Long = Clock.System.now().toEpochMilliseconds(),
+    // Un-snapped reference date the period anchoring derives from (mirrors budgets).
+    val baseAt: Long = 0,
     val endDate: Long? = null,
     val nextDueDate: Long = Clock.System.now().toEpochMilliseconds(),
     val isAutoPostEnabled: Boolean = false,
