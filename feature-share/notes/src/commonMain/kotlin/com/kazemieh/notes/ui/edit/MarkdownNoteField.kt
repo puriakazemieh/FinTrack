@@ -54,10 +54,11 @@ fun MarkdownNoteField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    startInPreview: Boolean = false
 ) {
     val glassColors = LocalGlassColors.current
-    var previewMode by remember { mutableStateOf(false) }
+    var previewMode by remember { mutableStateOf(startInPreview) }
     var fieldValue by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
 
     // Keep in sync when the note is (re)loaded from the ViewModel.
@@ -72,21 +73,50 @@ fun MarkdownNoteField(
         onValueChange(newValue.text)
     }
 
+    // Toggling: if the selection is already wrapped by the marker (just outside or just inside the
+    // selection) remove it, otherwise add it. Fixes repeated taps stacking "****" markers.
     fun wrapSelection(marker: String) {
         val text = fieldValue.text
         val start = fieldValue.selection.min
         val end = fieldValue.selection.max
-        val newText = text.substring(0, start) + marker + text.substring(start, end) + marker + text.substring(end)
-        val caret = if (start == end) start + marker.length else end + marker.length * 2
-        apply(TextFieldValue(newText, TextRange(caret)))
+        val len = marker.length
+
+        val markersOutside = start >= len && end + len <= text.length &&
+            text.substring(start - len, start) == marker &&
+            text.substring(end, end + len) == marker
+        if (markersOutside) {
+            val newText = text.substring(0, start - len) + text.substring(start, end) + text.substring(end + len)
+            apply(TextFieldValue(newText, TextRange(start - len, end - len)))
+            return
+        }
+
+        val selected = text.substring(start, end)
+        if (selected.length >= 2 * len && selected.startsWith(marker) && selected.endsWith(marker)) {
+            val inner = selected.substring(len, selected.length - len)
+            val newText = text.substring(0, start) + inner + text.substring(end)
+            apply(TextFieldValue(newText, TextRange(start, start + inner.length)))
+            return
+        }
+
+        val newText = text.substring(0, start) + marker + selected + marker + text.substring(end)
+        val selection = if (start == end) TextRange(start + len) else TextRange(start + len, end + len)
+        apply(TextFieldValue(newText, selection))
     }
 
     fun prefixLine(prefix: String) {
         val text = fieldValue.text
         val caret = fieldValue.selection.min
         val lineStart = if (caret == 0) 0 else text.lastIndexOf('\n', caret - 1).let { if (it == -1) 0 else it + 1 }
-        val newText = text.substring(0, lineStart) + prefix + text.substring(lineStart)
-        apply(TextFieldValue(newText, TextRange(caret + prefix.length)))
+        val lineEnd = text.indexOf('\n', lineStart).let { if (it == -1) text.length else it }
+        val currentLine = text.substring(lineStart, lineEnd)
+        if (currentLine.startsWith(prefix)) {
+            // Remove an already-applied block marker instead of stacking another one.
+            val newText = text.substring(0, lineStart) + currentLine.removePrefix(prefix) + text.substring(lineEnd)
+            apply(TextFieldValue(newText, TextRange((caret - prefix.length).coerceAtLeast(lineStart))))
+        } else {
+            val newText = text.substring(0, lineStart) + prefix + text.substring(lineStart)
+            apply(TextFieldValue(newText, TextRange(caret + prefix.length)))
+        }
     }
 
     GlassCard(padding = 0.dp, modifier = modifier.fillMaxWidth()) {
@@ -103,13 +133,14 @@ fun MarkdownNoteField(
                         .horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
-                    ToolbarButton(Icons.Default.Title) { prefixLine("# ") }
-                    ToolbarButton(Icons.Default.FormatBold) { wrapSelection("**") }
-                    ToolbarButton(Icons.Default.FormatItalic) { wrapSelection("*") }
-                    ToolbarButton(Icons.Default.FormatStrikethrough) { wrapSelection("~~") }
-                    ToolbarButton(Icons.Default.CheckBox) { prefixLine("- [ ] ") }
-                    ToolbarButton(Icons.Default.FormatListBulleted) { prefixLine("- ") }
-                    ToolbarButton(Icons.Default.FormatListNumbered) { prefixLine("1. ") }
+                    // Using a formatting action while previewing drops back to edit and applies it.
+                    ToolbarButton(Icons.Default.Title) { previewMode = false; prefixLine("# ") }
+                    ToolbarButton(Icons.Default.FormatBold) { previewMode = false; wrapSelection("**") }
+                    ToolbarButton(Icons.Default.FormatItalic) { previewMode = false; wrapSelection("*") }
+                    ToolbarButton(Icons.Default.FormatStrikethrough) { previewMode = false; wrapSelection("~~") }
+                    ToolbarButton(Icons.Default.CheckBox) { previewMode = false; prefixLine("- [ ] ") }
+                    ToolbarButton(Icons.Default.FormatListBulleted) { previewMode = false; prefixLine("- ") }
+                    ToolbarButton(Icons.Default.FormatListNumbered) { previewMode = false; prefixLine("1. ") }
                 }
                 // Toggle between raw editing and the rendered ("display") view.
                 ToolbarButton(

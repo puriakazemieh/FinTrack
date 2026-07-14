@@ -68,6 +68,10 @@ import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
+import com.kazemieh.designsystem.component.picker.FintrackTimePickerBottomSheet
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.category
 import fintrack.core.designsystem.generated.resources.currency_toman
@@ -318,6 +322,8 @@ private fun ShoppingItemSheet(
 
     var showCategoryPicker by remember { mutableStateOf(false) }
     val showDatePicker = remember { mutableStateOf(false) }
+    val showTimePicker = remember { mutableStateOf(false) }
+    var pendingReminderDate by remember { mutableStateOf<Long?>(null) }
 
     // Keep the selected category in sync once it resolves for an existing item.
     androidx.compose.runtime.LaunchedEffect(initialCategory) {
@@ -439,9 +445,33 @@ private fun ShoppingItemSheet(
         )
     }
 
+    // Reminder: pick a date, then a time, then combine both into the reminder timestamp.
     JalaliDatePickerBottomSheet(
         openSheet = showDatePicker,
-        onConfirm = { calendar -> reminderTime = calendar.toTimestamp() }
+        onConfirm = { calendar ->
+            pendingReminderDate = calendar.toTimestamp()
+            showDatePicker.value = false
+            showTimePicker.value = true
+        }
+    )
+
+    val tz = TimeZone.currentSystemDefault()
+    val initialTime = reminderTime?.let {
+        val dt = Instant.fromEpochMilliseconds(it).toLocalDateTime(tz)
+        "${dt.hour.toString().padStart(2, '0')}:${dt.minute.toString().padStart(2, '0')}"
+    } ?: "09:00"
+    FintrackTimePickerBottomSheet(
+        openSheet = showTimePicker,
+        initialTime = initialTime,
+        onConfirm = { time ->
+            val parts = time.split(":")
+            val hour = parts.getOrNull(0)?.toIntOrNull() ?: 0
+            val minute = parts.getOrNull(1)?.toIntOrNull() ?: 0
+            val base = pendingReminderDate ?: reminderTime
+            if (base != null) {
+                reminderTime = base + hour * 3_600_000L + minute * 60_000L
+            }
+        }
     )
 }
 

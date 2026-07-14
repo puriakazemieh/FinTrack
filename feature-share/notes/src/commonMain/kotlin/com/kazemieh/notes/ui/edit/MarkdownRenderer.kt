@@ -43,9 +43,13 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 fun MarkdownRenderer(
     text: String,
     onToggleCheckbox: (lineIndex: Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    interactive: Boolean = true,
+    textColor: Color? = null
 ) {
     val glassColors = LocalGlassColors.current
+    val baseColor = textColor ?: glassColors.text
+    val mutedColor = textColor?.copy(alpha = 0.6f) ?: glassColors.text3
     val lines = text.split("\n")
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -61,7 +65,7 @@ fun MarkdownRenderer(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onToggleCheckbox(index) },
+                            .then(if (interactive) Modifier.clickable { onToggleCheckbox(index) } else Modifier),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -69,7 +73,7 @@ fun MarkdownRenderer(
                         Text(
                             text = inline(content),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = if (checked) glassColors.text3 else glassColors.text
+                            color = if (checked) mutedColor else baseColor
                         )
                     }
                 }
@@ -78,17 +82,17 @@ fun MarkdownRenderer(
                     Text(
                         text = inline(line.removePrefix("# ")),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        color = glassColors.text
+                        color = baseColor
                     )
                 }
 
                 line.startsWith("- ") -> {
-                    BulletLine(bullet = "•", content = inline(line.removePrefix("- ")), color = glassColors.text)
+                    BulletLine(bullet = "•", content = inline(line.removePrefix("- ")), color = baseColor)
                 }
 
                 NUMBERED.matchEntire(line) != null -> {
                     val match = NUMBERED.matchEntire(line)!!
-                    BulletLine(bullet = "${match.groupValues[1]}.", content = inline(match.groupValues[2]), color = glassColors.text)
+                    BulletLine(bullet = "${match.groupValues[1]}.", content = inline(match.groupValues[2]), color = baseColor)
                 }
 
                 line.isBlank() -> Spacer(Modifier.size(6.dp))
@@ -97,7 +101,7 @@ fun MarkdownRenderer(
                     Text(
                         text = inline(line),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = glassColors.text
+                        color = baseColor
                     )
                 }
             }

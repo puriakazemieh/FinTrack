@@ -48,6 +48,7 @@ import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.notes.ui.NotesViewModel
 import com.kazemieh.notes.ui.NotesIntent
+import com.kazemieh.notes.ui.edit.MarkdownRenderer
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.hint_search_in
 import fintrack.core.designsystem.generated.resources.add_note
@@ -189,11 +190,21 @@ private fun NoteCard(
 
             if (note.title.isNotEmpty()) Spacer(modifier = Modifier.height(4.dp))
 
-            FintrackBodyMediumText(
-                text = if (note.isLocked) "••••••••" else note.content,
-                color = onCardColor.copy(alpha = 0.8f),
-                maxLines = 10
-            )
+            if (note.isLocked) {
+                FintrackBodyMediumText(
+                    text = "••••••••",
+                    color = onCardColor.copy(alpha = 0.8f),
+                    maxLines = 1
+                )
+            } else {
+                // Render the note body as formatted markdown instead of raw syntax.
+                MarkdownRenderer(
+                    text = note.content,
+                    onToggleCheckbox = {},
+                    interactive = false,
+                    textColor = onCardColor.copy(alpha = 0.85f)
+                )
+            }
 
             if (note.tags.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
