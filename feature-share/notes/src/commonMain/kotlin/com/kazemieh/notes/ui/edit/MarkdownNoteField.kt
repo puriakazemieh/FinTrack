@@ -1,5 +1,7 @@
 package com.kazemieh.notes.ui.edit
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,7 +34,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -40,8 +44,13 @@ import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glassTextFieldColors
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.edit
+import fintrack.core.designsystem.generated.resources.label_preview
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * A lightweight markdown editor for note bodies: a formatting toolbar that inserts markdown syntax
@@ -142,11 +151,27 @@ fun MarkdownNoteField(
                     ToolbarButton(Icons.Default.FormatListBulleted) { previewMode = false; prefixLine("- ") }
                     ToolbarButton(Icons.Default.FormatListNumbered) { previewMode = false; prefixLine("1. ") }
                 }
-                // Toggle between raw editing and the rendered ("display") view.
-                ToolbarButton(
-                    icon = if (previewMode) Icons.Default.Edit else Icons.Default.Visibility,
-                    tint = if (previewMode) GlassGreen else glassColors.text2
-                ) { previewMode = !previewMode }
+                // Clear labelled toggle between raw editing and the rendered ("display") view.
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(if (previewMode) GlassGreen.copy(alpha = 0.15f) else glassColors.glass)
+                        .clickable { previewMode = !previewMode }
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = if (previewMode) Icons.Default.Edit else Icons.Default.Visibility,
+                        contentDescription = null,
+                        tint = if (previewMode) GlassGreen else glassColors.text2,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    FintrackLabelSmallText(
+                        text = if (previewMode) stringResource(Res.string.edit) else stringResource(Res.string.label_preview),
+                        color = if (previewMode) GlassGreen else glassColors.text2
+                    )
+                }
             }
 
             HorizontalDivider(color = glassColors.glassHairline)
