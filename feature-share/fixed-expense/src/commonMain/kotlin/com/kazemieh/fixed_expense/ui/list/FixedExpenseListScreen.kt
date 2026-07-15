@@ -190,7 +190,8 @@ fun FixedExpenseListScreen(
 
         if (state.isDeleteShow && state.selectedExpense != null) {
             DeleteBottomSheet(
-                itemName = state.selectedExpense?.categoryName
+                itemName = state.selectedExpense?.title?.takeIf { it.isNotBlank() }
+                    ?: state.selectedExpense?.categoryName
                     ?: state.selectedExpense?.description,
                 dismissClicked = { viewModel.onIntent(FixedExpenseListIntent.OnDeleteClick(null)) },
                 confirmClicked = { viewModel.onIntent(FixedExpenseListIntent.ConfirmDelete) }
@@ -314,7 +315,10 @@ private fun FixedExpenseRow(
                 verticalArrangement = Arrangement.spacedBy(3.dp)
             ) {
                 FintrackTitleSmallText(
-                    text = expense.categoryName
+                    // Title is the primary user-entered name; fall back to category/description
+                    // only when it's empty (category is optional).
+                    text = expense.title.takeIf { it.isNotBlank() }
+                        ?: expense.categoryName
                         ?: expense.description?.takeIf { it.isNotBlank() }
                         ?: stringResource(Res.string.label_unknown_person),
                     fontWeight = FontWeight.SemiBold,

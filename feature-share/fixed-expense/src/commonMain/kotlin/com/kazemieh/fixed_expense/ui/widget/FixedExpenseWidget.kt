@@ -59,7 +59,9 @@ fun FixedExpenseWidget(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             FintrackTitleSmallText(
-                                text = expense.categoryName ?: stringResource(Res.string.label_unknown_person),
+                                text = expense.title.takeIf { it.isNotBlank() }
+                                    ?: expense.categoryName
+                                    ?: stringResource(Res.string.label_unknown_person),
                                 fontWeight = FontWeight.SemiBold
                             )
                             FintrackLabelSmallText(
