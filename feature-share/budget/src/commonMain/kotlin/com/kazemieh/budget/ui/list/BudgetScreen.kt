@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.budget.ui.add.AddBudgetBottomSheet
 import com.kazemieh.common.DateFilterType
-import com.kazemieh.common.DateRangeLabel
 import com.kazemieh.common.model.BudgetPeriod
 import com.kazemieh.common.model.BudgetWithProgress
 import com.kazemieh.common.model.Category
@@ -49,21 +48,7 @@ fun BudgetScreen(
     val totalSpent = (state.dailyBudgets + state.weeklyBudgets + state.monthlyBudgets + state.yearlyBudgets).sumOf { it.spentAmount }
     val totalRemaining = (totalBudget - totalSpent).coerceAtLeast(0)
 
-    val displayLabel = when (val label = state.dateRange?.label) {
-        is DateRangeLabel.Filter -> {
-            when (label.type) {
-                DateFilterType.TODAY -> stringResource(Res.string.today)
-                DateFilterType.YESTERDAY -> stringResource(Res.string.yesterday)
-                DateFilterType.THIS_WEEK -> stringResource(Res.string.this_week)
-                DateFilterType.THIS_MONTH -> stringResource(Res.string.this_month)
-                DateFilterType.LAST_MONTH -> stringResource(Res.string.last_month)
-                DateFilterType.CUSTOM_RANGE -> stringResource(Res.string.custom_range)
-                else -> stringResource(Res.string.all)
-            }
-        }
-        is DateRangeLabel.Text -> label.value
-        null -> ""
-    }
+    val displayLabel = dateRangeLabelText(state.dateRange?.label)
 
     FintrackScreen(
         title = stringResource(Res.string.title_my_budgets),
@@ -187,9 +172,8 @@ private fun SectionHeader(
     val glassColors = LocalGlassColors.current
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .background(glassColors.bg1)
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .stickyHeaderSurface()
+            .padding(horizontal = 14.dp, vertical = 9.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

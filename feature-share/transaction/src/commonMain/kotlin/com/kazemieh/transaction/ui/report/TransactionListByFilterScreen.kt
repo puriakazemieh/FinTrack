@@ -47,6 +47,7 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.SwipeableTxRow
+import com.kazemieh.designsystem.component.glass.stickyHeaderSurface
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.btn_retry
 import fintrack.core.designsystem.generated.resources.label_amount_with_unit
@@ -236,9 +237,8 @@ private fun DayHeader(date: String, count: Int, netAmount: Long) {
     val glassColors = LocalGlassColors.current
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .background(glassColors.bg1)
-            .padding(vertical = 12.dp, horizontal = 8.dp),
+            .stickyHeaderSurface()
+            .padding(vertical = 10.dp, horizontal = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

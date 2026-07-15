@@ -37,7 +37,6 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.DateFilterType
-import com.kazemieh.common.DateRangeLabel
 import com.kazemieh.common.Direction
 import com.kazemieh.common.model.FixedExpense
 import com.kazemieh.common.model.RecurrenceType
@@ -58,7 +57,9 @@ import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.GlassTone
 import com.kazemieh.designsystem.component.glass.PeriodNavigator
+import com.kazemieh.designsystem.component.glass.dateRangeLabelText
 import com.kazemieh.designsystem.component.glass.SearchBar
+import com.kazemieh.designsystem.component.glass.stickyHeaderSurface
 import com.kazemieh.fixed_expense.ui.detail.AddFixedExpenseBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.all
@@ -103,23 +104,7 @@ fun FixedExpenseListScreen(
     var showAddExpense by remember { mutableStateOf(false) }
     var selectedExpenseId by remember { mutableStateOf<Long?>(null) }
 
-    val displayLabel = when (val label = state.dateRange?.label) {
-        is DateRangeLabel.Filter -> {
-            when (label.type) {
-                DateFilterType.TODAY -> stringResource(Res.string.today)
-                DateFilterType.YESTERDAY -> stringResource(Res.string.yesterday)
-                DateFilterType.THIS_WEEK -> stringResource(Res.string.this_week)
-                DateFilterType.THIS_MONTH -> stringResource(Res.string.this_month)
-                DateFilterType.LAST_MONTH -> stringResource(Res.string.last_month)
-                DateFilterType.CUSTOM_RANGE -> stringResource(Res.string.custom_date)
-                DateFilterType.THIS_YEAR -> stringResource(Res.string.label_this_year)
-                else -> stringResource(Res.string.all)
-            }
-        }
-
-        is DateRangeLabel.Text -> label.value
-        null -> ""
-    }
+    val displayLabel = dateRangeLabelText(state.dateRange?.label)
 
     FintrackScreen(
         title = stringResource(Res.string.title_fixed_expense_management),
@@ -263,9 +248,8 @@ private fun SectionHeader(
     val glassColors = LocalGlassColors.current
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .background(glassColors.bg1)
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .stickyHeaderSurface()
+            .padding(horizontal = 14.dp, vertical = 9.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
