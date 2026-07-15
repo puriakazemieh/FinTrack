@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -41,6 +42,7 @@ import com.kazemieh.common.Direction
 import com.kazemieh.common.model.FixedExpense
 import com.kazemieh.common.model.RecurrenceType
 import com.kazemieh.common.toPersianPrice
+import com.kazemieh.common.util.DateUtils
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalGlassColors
@@ -64,6 +66,8 @@ import com.kazemieh.fixed_expense.ui.detail.AddFixedExpenseBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.all
 import fintrack.core.designsystem.generated.resources.currency_toman
+import fintrack.core.designsystem.generated.resources.label_date_range_from
+import fintrack.core.designsystem.generated.resources.label_date_range_span
 import fintrack.core.designsystem.generated.resources.custom_date
 import fintrack.core.designsystem.generated.resources.dp_today
 import fintrack.core.designsystem.generated.resources.fixed_expense_clone_once
@@ -322,6 +326,32 @@ private fun FixedExpenseRow(
                     color = color,
                     maxLines = 1
                 )
+                val rangeText = expense.endDate?.let {
+                    stringResource(
+                        Res.string.label_date_range_span,
+                        DateUtils.formatDate(expense.startDate),
+                        DateUtils.formatDate(it)
+                    )
+                } ?: stringResource(
+                    Res.string.label_date_range_from,
+                    DateUtils.formatDate(expense.startDate)
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    androidx.compose.material3.Icon(
+                        imageVector = Icons.Default.CalendarMonth,
+                        contentDescription = null,
+                        tint = glassColors.text3,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    FintrackLabelSmallText(
+                        text = rangeText,
+                        color = glassColors.text3,
+                        maxLines = 1
+                    )
+                }
             }
             RowActionIcon(icon = Icons.Default.Edit, tint = glassColors.text2, onClick = onEdit)
             RowActionIcon(icon = Icons.Default.Delete, tint = GlassRed, onClick = onDelete)

@@ -1,5 +1,6 @@
 package com.kazemieh.fixed_expense.ui.detail
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,17 +51,14 @@ import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackButton
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import androidx.compose.material3.TextField
 import com.kazemieh.designsystem.component.glassTextFieldColors
-import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.calculator.CalculatorBottomSheet
 import com.kazemieh.designsystem.component.glass.AddFrame
 import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.Field
-import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.LargeAmountCard
 import com.kazemieh.designsystem.component.glass.Switch
@@ -69,15 +67,14 @@ import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import com.kazemieh.jalali.JalaliCalendar
 import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.action_clear
 import fintrack.core.designsystem.generated.resources.category
-import fintrack.core.designsystem.generated.resources.custom_date
 import fintrack.core.designsystem.generated.resources.edit
 import fintrack.core.designsystem.generated.resources.error_category_required_for_auto_post
 import fintrack.core.designsystem.generated.resources.frequency_daily
 import fintrack.core.designsystem.generated.resources.frequency_monthly
 import fintrack.core.designsystem.generated.resources.frequency_weekly
 import fintrack.core.designsystem.generated.resources.frequency_yearly
-import fintrack.core.designsystem.generated.resources.recurrence_none
 import fintrack.core.designsystem.generated.resources.hint_transaction_description
 import fintrack.core.designsystem.generated.resources.ic_1
 import fintrack.core.designsystem.generated.resources.installment_frequency
@@ -85,8 +82,8 @@ import fintrack.core.designsystem.generated.resources.label_auto_post_enabled
 import fintrack.core.designsystem.generated.resources.label_char_count_limit
 import fintrack.core.designsystem.generated.resources.label_end_date
 import fintrack.core.designsystem.generated.resources.label_most_used
+import fintrack.core.designsystem.generated.resources.label_no_end_date
 import fintrack.core.designsystem.generated.resources.label_note
-import fintrack.core.designsystem.generated.resources.label_period_none
 import fintrack.core.designsystem.generated.resources.label_title
 import fintrack.core.designsystem.generated.resources.save_
 import fintrack.core.designsystem.generated.resources.select_category
@@ -134,7 +131,7 @@ fun AddFixedExpenseBottomSheet(
     var showCategoryPicker by remember { mutableStateOf(false) }
     var showSourcePicker by remember { mutableStateOf(false) }
     var showStartDatePicker by remember { mutableStateOf(false) }
-    var showRangePicker by remember { mutableStateOf(false) }
+    var showEndDatePicker by remember { mutableStateOf(false) }
     var showCalculator by remember { mutableStateOf(false) }
 
     ModalBottomSheet(
@@ -232,7 +229,6 @@ fun AddFixedExpenseBottomSheet(
                             selected = state.recurrence,
                             onSelect = { type ->
                                 viewModel.onIntent(AddFixedExpenseIntent.SetRecurrence(type))
-                                if (type == RecurrenceType.CUSTOM) showRangePicker = true
                             }
                         )
                     }
@@ -250,18 +246,30 @@ fun AddFixedExpenseBottomSheet(
                         }
                     }
 
-                    // Custom range end date (only for CUSTOM)
-                    if (state.recurrence == RecurrenceType.CUSTOM) {
-                        item {
-                            Field(
-                                label = stringResource(Res.string.label_end_date),
-                                onClick = { showRangePicker = true }
+                    // End date (optional bound on the recurrence)
+                    item {
+                        Field(
+                            label = stringResource(Res.string.label_end_date),
+                            onClick = { showEndDatePicker = true }
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 PickerValue(
                                     label = state.endDate?.toPersianDate()
-                                        ?: stringResource(Res.string.custom_date),
+                                        ?: stringResource(Res.string.label_no_end_date),
                                     icon = Icons.Default.DateRange
                                 )
+                                if (state.endDate != null) {
+                                    FintrackLabelSmallText(
+                                        text = stringResource(Res.string.action_clear),
+                                        color = GlassGreen,
+                                        modifier = Modifier.clickable {
+                                            viewModel.onIntent(AddFixedExpenseIntent.SetEndDate(null))
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -345,16 +353,17 @@ fun AddFixedExpenseBottomSheet(
         )
     }
 
-    if (showRangePicker) {
-        CustomRangeBottomSheet(
-            startDate = state.startDate,
-            endDate = state.endDate,
-            onConfirm = { start, end ->
-                viewModel.onIntent(AddFixedExpenseIntent.SetStartDate(start))
-                viewModel.onIntent(AddFixedExpenseIntent.SetEndDate(end))
-                showRangePicker = false
-            },
-            onDismiss = { showRangePicker = false }
+    if (showEndDatePicker) {
+        val open = remember { mutableStateOf(true) }
+        LaunchedEffect(open.value) { if (!open.value) showEndDatePicker = false }
+        JalaliDatePickerBottomSheet(
+            openSheet = open,
+            initialDate = JalaliCalendar.fromTimestamp(state.endDate ?: state.startDate),
+            disableBeforeDate = JalaliCalendar.fromTimestamp(state.startDate),
+            onConfirm = {
+                viewModel.onIntent(AddFixedExpenseIntent.SetEndDate(it.toTimestamp()))
+                showEndDatePicker = false
+            }
         )
     }
 
@@ -381,15 +390,11 @@ private fun RecurrenceSelector(
     selected: RecurrenceType,
     onSelect: (RecurrenceType) -> Unit
 ) {
-    // CUSTOM opens the range picker; ONCE is a one-off (non-recurring) expense.
     val types = listOf(
-        RecurrenceType.NONE to Res.string.label_period_none,
         RecurrenceType.DAILY to Res.string.frequency_daily,
         RecurrenceType.WEEKLY to Res.string.frequency_weekly,
         RecurrenceType.MONTHLY to Res.string.frequency_monthly,
-        RecurrenceType.YEARLY to Res.string.frequency_yearly,
-        RecurrenceType.CUSTOM to Res.string.custom_date,
-        RecurrenceType.ONCE to Res.string.recurrence_none
+        RecurrenceType.YEARLY to Res.string.frequency_yearly
     )
     Column {
         FintrackLabelMediumText(
@@ -397,33 +402,17 @@ private fun RecurrenceSelector(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         GlassCard(padding = 10.dp) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    types.take(3).forEach { (type, labelRes) ->
-                        Chip(
-                            active = selected == type,
-                            onClick = { onSelect(type) },
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            FintrackLabelSmallText(text = stringResource(labelRes))
-                        }
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    types.drop(3).forEach { (type, labelRes) ->
-                        Chip(
-                            active = selected == type,
-                            onClick = { onSelect(type) },
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            FintrackLabelSmallText(text = stringResource(labelRes))
-                        }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                types.forEach { (type, labelRes) ->
+                    Chip(
+                        active = selected == type,
+                        onClick = { onSelect(type) },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        FintrackLabelSmallText(text = stringResource(labelRes))
                     }
                 }
             }
@@ -547,69 +536,5 @@ private fun PickerValue(
                 Icon(painter = painterResource(Res.drawable.ic_1), contentDescription = null, modifier = Modifier.size(13.dp))
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun CustomRangeBottomSheet(
-    startDate: Long,
-    endDate: Long?,
-    onConfirm: (start: Long, end: Long) -> Unit,
-    onDismiss: () -> Unit
-) {
-    var localStart by remember { mutableStateOf(startDate) }
-    var localEnd by remember { mutableStateOf(endDate ?: startDate) }
-    var pickStart by remember { mutableStateOf(false) }
-    var pickEnd by remember { mutableStateOf(false) }
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.background,
-        dragHandle = null
-    ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            FintrackBackgroundBlobs()
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                FintrackTitleMediumText(text = stringResource(Res.string.custom_date))
-
-                Field(label = stringResource(Res.string.start), onClick = { pickStart = true }) {
-                    PickerValue(label = localStart.toPersianDate(), icon = Icons.Default.CalendarMonth)
-                }
-                Field(label = stringResource(Res.string.label_end_date), onClick = { pickEnd = true }) {
-                    PickerValue(label = localEnd.toPersianDate(), icon = Icons.Default.DateRange)
-                }
-
-                FintrackButton(
-                    text = stringResource(Res.string.save_),
-                    onClick = { onConfirm(localStart, localEnd) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-    }
-
-    if (pickStart) {
-        val open = remember { mutableStateOf(true) }
-        LaunchedEffect(open.value) { if (!open.value) pickStart = false }
-        JalaliDatePickerBottomSheet(
-            openSheet = open,
-            initialDate = JalaliCalendar.fromTimestamp(localStart),
-            onConfirm = { localStart = it.toTimestamp(); pickStart = false }
-        )
-    }
-
-    if (pickEnd) {
-        val open = remember { mutableStateOf(true) }
-        LaunchedEffect(open.value) { if (!open.value) pickEnd = false }
-        JalaliDatePickerBottomSheet(
-            openSheet = open,
-            initialDate = JalaliCalendar.fromTimestamp(localEnd),
-            disableBeforeDate = JalaliCalendar.fromTimestamp(localStart),
-            onConfirm = { localEnd = it.toTimestamp(); pickEnd = false }
-        )
     }
 }

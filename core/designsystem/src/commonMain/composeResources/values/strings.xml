@@ -1239,6 +1239,10 @@
     <string name="label_target_amount">مبلغ هدف</string>
     <string name="label_saved_amount">مبلغ ذخیره شده</string>
     <string name="label_end_date">تاریخ پایان</string>
+    <string name="label_no_end_date">بدون تاریخ پایان</string>
+    <string name="action_clear">پاک کردن</string>
+    <string name="label_date_range_span">%1$s تا %2$s</string>
+    <string name="label_date_range_from">از %1$s</string>
     <string name="btn_save_goal">ذخیره هدف</string>
     <string name="goal_deleted">هدف حذف شد</string>
 

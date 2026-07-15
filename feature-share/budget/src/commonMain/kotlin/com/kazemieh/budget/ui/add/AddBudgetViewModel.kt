@@ -14,6 +14,8 @@ import com.kazemieh.common.persiandatetime.extensions.minus
 import com.kazemieh.common.persiandatetime.extensions.dayOfWeekIndex
 import com.kazemieh.domain.usecase.AddBudgetUseCase
 import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedCategoriesUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedSourcesUseCase
 import com.kazemieh.domain.usecase.ObserveSourcesUseCase
 import com.kazemieh.domain.usecase.ObserveTagsUseCase
 import com.kazemieh.domain.usecase.UpdateBudgetUseCase
@@ -43,6 +45,8 @@ data class AddBudgetState(
     val sources: List<Source> = emptyList(),
     val selectedTags: Set<Tag> = emptySet(),
     val selectedSource: Source? = null,
+    val mostUsedCategories: List<Category> = emptyList(),
+    val mostUsedSources: List<Source> = emptyList(),
     val isLoading: Boolean = false,
     val topSheet: AddBudgetSheet? = null
 )
@@ -83,7 +87,9 @@ class AddBudgetViewModel(
     private val updateBudgetUseCase: UpdateBudgetUseCase,
     private val observeCategoriesUseCase: ObserveCategoriesUseCase,
     private val observeTagsUseCase: ObserveTagsUseCase,
-    private val observeSourcesUseCase: ObserveSourcesUseCase
+    private val observeSourcesUseCase: ObserveSourcesUseCase,
+    private val observeMostUsedCategoriesUseCase: ObserveMostUsedCategoriesUseCase,
+    private val observeMostUsedSourcesUseCase: ObserveMostUsedSourcesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddBudgetState())
@@ -91,6 +97,23 @@ class AddBudgetViewModel(
 
     private val _effect = Channel<AddBudgetEffect>()
     val effect = _effect.receiveAsFlow()
+
+    init {
+        observeMostUsed()
+    }
+
+    private fun observeMostUsed() {
+        viewModelScope.launch {
+            observeMostUsedCategoriesUseCase(TransactionType.EXPENSE, limit = 3).collect { categories ->
+                _state.update { it.copy(mostUsedCategories = categories) }
+            }
+        }
+        viewModelScope.launch {
+            observeMostUsedSourcesUseCase(limit = 3).collect { sources ->
+                _state.update { it.copy(mostUsedSources = sources) }
+            }
+        }
+    }
 
     fun onIntent(intent: AddBudgetIntent) {
         when (intent) {
@@ -138,6 +161,8 @@ class AddBudgetViewModel(
                             categories = it.categories,
                             tags = it.tags,
                             sources = it.sources,
+                            mostUsedCategories = it.mostUsedCategories,
+                            mostUsedSources = it.mostUsedSources,
                             startAt = adjusted,
                             baseAt = base,
                             period = BudgetPeriod.MONTHLY

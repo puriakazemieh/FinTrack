@@ -20,7 +20,9 @@ val budgetModule = module {
             updateBudgetUseCase = get(),
             observeCategoriesUseCase = get(),
             observeTagsUseCase = get(),
-            observeSourcesUseCase = get()
+            observeSourcesUseCase = get(),
+            observeMostUsedCategoriesUseCase = get(),
+            observeMostUsedSourcesUseCase = get()
         )
     }
 }

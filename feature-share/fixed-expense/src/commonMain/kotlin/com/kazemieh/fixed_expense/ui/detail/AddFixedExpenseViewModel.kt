@@ -90,6 +90,7 @@ class AddFixedExpenseViewModel(
         val now = Clock.System.now().toEpochMilliseconds()
         _state.update {
             AddFixedExpenseState(
+                recurrence = RecurrenceType.MONTHLY,
                 startDate = adjustStartDate(now, RecurrenceType.MONTHLY),
                 baseAt = now,
                 mostUsedCategories = it.mostUsedCategories,
@@ -156,7 +157,8 @@ class AddFixedExpenseViewModel(
         }
 
         viewModelScope.launch {
-            val endDate = if (currentState.recurrence == RecurrenceType.CUSTOM) currentState.endDate else null
+            // End date is an optional bound on the recurrence (null = open-ended).
+            val endDate = currentState.endDate
             val expense = FixedExpense(
                 id = currentState.expenseId ?: 0L,
                 title = currentState.title,
@@ -195,7 +197,7 @@ data class AddFixedExpenseState(
     val amount: String = "",
     val category: Category? = null,
     val source: Source? = null,
-    val recurrence: RecurrenceType = RecurrenceType.NONE,
+    val recurrence: RecurrenceType = RecurrenceType.MONTHLY,
     val startDate: Long = Clock.System.now().toEpochMilliseconds(),
     // Un-snapped reference date the period anchoring derives from (mirrors budgets).
     val baseAt: Long = 0,

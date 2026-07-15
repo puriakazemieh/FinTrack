@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.budget.ui.component.BudgetPeriodSelector
 import com.kazemieh.category.ui.list.CategoryPickerBottomSheet
@@ -101,6 +102,10 @@ fun AddBudgetBottomSheet(
                             icon = FinTrackIcons.findIcon(state.selectedCategory?.iconId).resource
                         )
                     }
+                    MostUsedCategoryChips(
+                        items = state.mostUsedCategories,
+                        onItemClick = { viewModel.onIntent(AddBudgetIntent.SelectCategory(it)) }
+                    )
                 }
 
                 item {
@@ -114,6 +119,10 @@ fun AddBudgetBottomSheet(
                             icon = FinTrackIcons.findIcon(state.selectedSource?.iconId).resource
                         )
                     }
+                    MostUsedSourceChips(
+                        items = state.mostUsedSources,
+                        onItemClick = { viewModel.onIntent(AddBudgetIntent.SelectSource(it)) }
+                    )
                 }
 
                 item {
@@ -221,6 +230,57 @@ fun AddBudgetBottomSheet(
         }
 
         null -> Unit
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MostUsedCategoryChips(
+    items: List<com.kazemieh.common.model.Category>,
+    onItemClick: (com.kazemieh.common.model.Category) -> Unit
+) {
+    if (items.isEmpty()) return
+    MostUsedRow {
+        items.take(3).forEach { category ->
+            Chip(color = GlassGreen, onClick = { onItemClick(category) }) {
+                FintrackLabelSmallText(text = category.name, color = GlassGreen, fontSize = 10.sp)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MostUsedSourceChips(
+    items: List<com.kazemieh.common.model.Source>,
+    onItemClick: (com.kazemieh.common.model.Source) -> Unit
+) {
+    if (items.isEmpty()) return
+    MostUsedRow {
+        items.take(3).forEach { source ->
+            Chip(color = GlassBlue, onClick = { onItemClick(source) }) {
+                FintrackLabelSmallText(text = source.name, color = GlassBlue, fontSize = 10.sp)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MostUsedRow(content: @Composable () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        FintrackLabelSmallText(text = stringResource(Res.string.label_most_used), fontSize = 9.sp)
+        FlowRow(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            content()
+        }
     }
 }
 
