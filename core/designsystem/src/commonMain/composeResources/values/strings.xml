@@ -1008,6 +1008,10 @@
     <string name="reminder">یادآور</string>
     <string name="shopping_list_empty">لیست خرید خالی است</string>
     <string name="notes_empty">یادداشتی وجود ندارد</string>
+    <string name="budget_empty">هنوز بودجه‌ای ثبت نشده</string>
+    <string name="fixed_expense_empty">هنوز هزینه ثابتی ثبت نشده</string>
+    <string name="label_next_due">سررسید %1$s</string>
+    <string name="label_over_count">%1$d مورد از سقف رد شد</string>
 
     <!-- Backup & Sync -->
     <string name="backup_restore_title">پشتیبان‌گیری و بازیابی</string>

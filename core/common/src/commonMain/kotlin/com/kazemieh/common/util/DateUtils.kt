@@ -9,6 +9,12 @@ object DateUtils {
         return "${pdt.year}/${pdt.month.toString().padStart(2, '0')}/${pdt.day.toString().padStart(2, '0')} ${pdt.hour.toString().padStart(2, '0')}:${pdt.minute.toString().padStart(2, '0')}".toPersianDigits()
     }
 
+    /** Date only, e.g. "۱۴۰۵/۰۴/۲۳". */
+    fun formatDate(timestamp: Long): String {
+        val pdt = PersianDateTime.parse(timestamp)
+        return "${pdt.year}/${pdt.month.toString().padStart(2, '0')}/${pdt.day.toString().padStart(2, '0')}".toPersianDigits()
+    }
+
     /** Time-of-day only, e.g. "۱۴:۳۰". */
     fun formatTime(timestamp: Long): String {
         val pdt = PersianDateTime.parse(timestamp)
