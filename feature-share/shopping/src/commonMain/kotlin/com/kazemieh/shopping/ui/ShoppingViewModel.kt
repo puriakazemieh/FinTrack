@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.ShoppingItem
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.domain.usecase.AddShoppingItemUseCase
 import com.kazemieh.domain.usecase.DeleteShoppingItemUseCase
 import com.kazemieh.domain.usecase.GetCategoryUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedCategoriesUseCase
 import com.kazemieh.domain.usecase.ObserveShoppingItemsUseCase
 import com.kazemieh.domain.usecase.UpdateShoppingItemUseCase
 import com.kazemieh.domain.usecase.UpdateShoppingPositionsUseCase
@@ -35,7 +37,8 @@ data class ShoppingState(
     val searchQuery: String = "",
     val showAddSheet: Boolean = false,
     val editingItem: ShoppingItem? = null,
-    val editingCategory: Category? = null
+    val editingCategory: Category? = null,
+    val mostUsedCategories: List<Category> = emptyList()
 )
 
 sealed interface ShoppingIntent {
@@ -61,6 +64,7 @@ class ShoppingViewModel(
     private val deleteShoppingItem: DeleteShoppingItemUseCase,
     private val updatePositions: UpdateShoppingPositionsUseCase,
     private val getCategory: GetCategoryUseCase,
+    private val observeMostUsedCategories: ObserveMostUsedCategoriesUseCase,
     private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
 
@@ -74,6 +78,9 @@ class ShoppingViewModel(
 
     init {
         _state.update { it.copy(isLoading = true) }
+        observeMostUsedCategories(TransactionType.EXPENSE, limit = 3)
+            .onEach { categories -> _state.update { it.copy(mostUsedCategories = categories) } }
+            .launchIn(viewModelScope)
         observeShoppingItems()
             .combine(_searchQuery) { items, query ->
                 val filtered = items.filter {

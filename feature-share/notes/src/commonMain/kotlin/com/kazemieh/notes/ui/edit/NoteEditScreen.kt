@@ -45,9 +45,11 @@ import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackButton
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.ColorSwatches
 import com.kazemieh.designsystem.component.glass.Field
 import com.kazemieh.designsystem.component.glass.FintrackScreen
+import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.RemovableChip
 import com.kazemieh.designsystem.component.glass.SectionContainer
 import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
@@ -59,6 +61,7 @@ import fintrack.core.designsystem.generated.resources.btn_add_tag
 import fintrack.core.designsystem.generated.resources.edit_note
 import fintrack.core.designsystem.generated.resources.label_optional
 import fintrack.core.designsystem.generated.resources.label_tag_prefix
+import fintrack.core.designsystem.generated.resources.label_title
 import fintrack.core.designsystem.generated.resources.note_color_label
 import fintrack.core.designsystem.generated.resources.note_content_hint
 import fintrack.core.designsystem.generated.resources.note_text_label
@@ -117,7 +120,26 @@ fun NoteEditScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Pin / Lock actions, given a clear home at the top of the form.
+                // Title first — vertical "label above, value below" card, matching the
+                // add-shopping-item title style.
+                TitledField(
+                    label = stringResource(Res.string.label_title),
+                    value = state.title,
+                    onValueChange = { viewModel.onIntent(NoteEditIntent.OnTitleChanged(it)) },
+                    placeholder = stringResource(Res.string.note_title_hint)
+                )
+
+                // Note text (optional) — kept right under the title.
+                FintrackLabelMediumText(text = "${stringResource(Res.string.note_text_label)} ($optional)")
+                MarkdownNoteField(
+                    value = state.content,
+                    onValueChange = { viewModel.onIntent(NoteEditIntent.OnContentChanged(it)) },
+                    placeholder = stringResource(Res.string.note_content_hint),
+                    modifier = Modifier.fillMaxWidth(),
+                    startInPreview = noteId != 0L
+                )
+
+                // Pin / Lock actions — moved below the title/note.
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     ToggleButton(
                         icon = Icons.Default.PushPin,
@@ -128,15 +150,6 @@ fun NoteEditScreen(
                         icon = if (state.isLocked) Icons.Default.Lock else Icons.Default.LockOpen,
                         active = state.isLocked,
                         onClick = { viewModel.onIntent(NoteEditIntent.OnToggleLock) }
-                    )
-                }
-
-                // Title — the Field itself renders the "(optional)" marker.
-                Field(label = stringResource(Res.string.note_title_hint)) {
-                    InlineTextField(
-                        value = state.title,
-                        onValueChange = { viewModel.onIntent(NoteEditIntent.OnTitleChanged(it)) },
-                        placeholder = ""
                     )
                 }
 
@@ -157,16 +170,6 @@ fun NoteEditScreen(
                         )
                     }
                 }
-
-                // Note text (optional)
-                FintrackLabelMediumText(text = "${stringResource(Res.string.note_text_label)} ($optional)")
-                MarkdownNoteField(
-                    value = state.content,
-                    onValueChange = { viewModel.onIntent(NoteEditIntent.OnContentChanged(it)) },
-                    placeholder = stringResource(Res.string.note_content_hint),
-                    modifier = Modifier.fillMaxWidth(),
-                    startInPreview = noteId != 0L
-                )
 
                 // Reminder — the Field renders the "(optional)" marker.
                 Field(
@@ -267,6 +270,26 @@ private fun ToggleButton(icon: ImageVector, active: Boolean, onClick: () -> Unit
             tint = if (active) MaterialTheme.colorScheme.primary else glassColors.text2,
             modifier = Modifier.size(20.dp)
         )
+    }
+}
+
+@Composable
+private fun TitledField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String
+) {
+    val glassColors = LocalGlassColors.current
+    GlassCard(padding = 14.dp) {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            FintrackLabelSmallText(text = label, color = glassColors.text3)
+            InlineTextField(
+                value = value,
+                onValueChange = onValueChange,
+                placeholder = placeholder
+            )
+        }
     }
 }
 

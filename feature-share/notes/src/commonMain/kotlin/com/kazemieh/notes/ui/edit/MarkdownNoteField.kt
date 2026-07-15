@@ -2,15 +2,15 @@ package com.kazemieh.notes.ui.edit
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
@@ -58,6 +58,7 @@ import org.jetbrains.compose.resources.stringResource
  * styles) plus a multi-line text field. The caller keeps a plain String; selection is tracked
  * locally so the toolbar can edit around the cursor.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MarkdownNoteField(
     value: String,
@@ -133,13 +134,14 @@ fun MarkdownNoteField(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(2.dp)
+                    .padding(horizontal = 4.dp, vertical = 2.dp),
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                verticalAlignment = Alignment.Top
             ) {
-                Row(
-                    modifier = Modifier
-                        .weight(1f)
-                        .horizontalScroll(rememberScrollState()),
+                // Format buttons wrap onto extra lines instead of hiding behind a horizontal
+                // scroll, so every action stays visible on narrow screens.
+                FlowRow(
+                    modifier = Modifier.weight(1f),
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     // Using a formatting action while previewing drops back to edit and applies it.
@@ -154,10 +156,11 @@ fun MarkdownNoteField(
                 // Clear labelled toggle between raw editing and the rendered ("display") view.
                 Row(
                     modifier = Modifier
+                        .padding(top = 4.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(if (previewMode) GlassGreen.copy(alpha = 0.15f) else glassColors.glass)
                         .clickable { previewMode = !previewMode }
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                        .padding(horizontal = 8.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {

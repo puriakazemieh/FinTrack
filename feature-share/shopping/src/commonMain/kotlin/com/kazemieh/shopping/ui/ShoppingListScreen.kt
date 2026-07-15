@@ -6,6 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.ShoppingItem
 import com.kazemieh.common.model.TransactionType
@@ -61,12 +64,14 @@ import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
+import com.kazemieh.designsystem.component.calculator.CalculatorBottomSheet
 import com.kazemieh.designsystem.component.glass.AddFrame
 import com.kazemieh.designsystem.component.glass.Chip
 import com.kazemieh.designsystem.component.glass.Fab
 import com.kazemieh.designsystem.component.glass.Field
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.LargeAmountCard
 import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
 import com.kazemieh.designsystem.component.picker.FintrackTimePickerBottomSheet
@@ -77,8 +82,8 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.category
 import fintrack.core.designsystem.generated.resources.currency_toman
 import fintrack.core.designsystem.generated.resources.edit
-import fintrack.core.designsystem.generated.resources.estimated_price
 import fintrack.core.designsystem.generated.resources.hint_optional_note
+import fintrack.core.designsystem.generated.resources.label_most_used
 import fintrack.core.designsystem.generated.resources.label_note
 import fintrack.core.designsystem.generated.resources.priority_high
 import fintrack.core.designsystem.generated.resources.priority_normal
@@ -165,6 +170,7 @@ fun ShoppingListScreen(
         ShoppingItemSheet(
             item = null,
             initialCategory = null,
+            mostUsedCategories = state.mostUsedCategories,
             onDismiss = { viewModel.onIntent(ShoppingIntent.OnAddSheetDismiss) },
             onConfirm = { viewModel.onIntent(ShoppingIntent.OnSaveNewItem(it)) }
         )
@@ -174,6 +180,7 @@ fun ShoppingListScreen(
         ShoppingItemSheet(
             item = editing,
             initialCategory = state.editingCategory,
+            mostUsedCategories = state.mostUsedCategories,
             onDismiss = { viewModel.onIntent(ShoppingIntent.OnEditItem(null)) },
             onConfirm = { viewModel.onIntent(ShoppingIntent.OnUpdateItem(it)) }
         )
@@ -310,6 +317,7 @@ private fun RowActionIcon(icon: ImageVector, tint: Color, onClick: () -> Unit) {
 private fun ShoppingItemSheet(
     item: ShoppingItem?,
     initialCategory: Category?,
+    mostUsedCategories: List<Category>,
     onDismiss: () -> Unit,
     onConfirm: (ShoppingItem) -> Unit
 ) {
@@ -323,6 +331,7 @@ private fun ShoppingItemSheet(
     var category by remember { mutableStateOf(initialCategory) }
 
     var showCategoryPicker by remember { mutableStateOf(false) }
+    var showCalculator by remember { mutableStateOf(false) }
     val showDatePicker = remember { mutableStateOf(false) }
     val showTimePicker = remember { mutableStateOf(false) }
     var pendingReminderDate by remember { mutableStateOf<Long?>(null) }
@@ -373,13 +382,11 @@ private fun ShoppingItemSheet(
                 }
 
                 item(key = "price") {
-                    TitledInput(
-                        label = stringResource(Res.string.estimated_price),
-                        value = price,
-                        onValueChange = { new -> price = new.filter { it.isDigit() } },
-                        placeholder = stringResource(Res.string.estimated_price),
-                        singleLine = true,
-                        keyboardType = KeyboardType.Number
+                    LargeAmountCard(
+                        amount = price,
+                        onAmountChange = { new -> price = new.filter { it.isDigit() } },
+                        onCalcClick = { showCalculator = true },
+                        autoFocus = false
                     )
                 }
 
@@ -394,6 +401,10 @@ private fun ShoppingItemSheet(
                             fontWeight = FontWeight.SemiBold
                         )
                     }
+                    MostUsedCategoryChips(
+                        items = mostUsedCategories,
+                        onItemClick = { category = it }
+                    )
                 }
 
                 item {
@@ -463,6 +474,17 @@ private fun ShoppingItemSheet(
         )
     }
 
+    if (showCalculator) {
+        CalculatorBottomSheet(
+            initialAmount = price,
+            onConfirm = {
+                price = it
+                showCalculator = false
+            },
+            onDismiss = { showCalculator = false }
+        )
+    }
+
     // Reminder: pick a date, then a time, then combine both into the reminder timestamp.
     JalaliDatePickerBottomSheet(
         openSheet = showDatePicker,
@@ -491,6 +513,33 @@ private fun ShoppingItemSheet(
             }
         }
     )
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MostUsedCategoryChips(
+    items: List<Category>,
+    onItemClick: (Category) -> Unit
+) {
+    if (items.isEmpty()) return
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        FintrackLabelSmallText(text = stringResource(Res.string.label_most_used), fontSize = 9.sp)
+        FlowRow(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            items.take(3).forEach { category ->
+                Chip(color = GlassGreen, onClick = { onItemClick(category) }) {
+                    FintrackLabelSmallText(text = category.name, color = GlassGreen, fontSize = 10.sp)
+                }
+            }
+        }
+    }
 }
 
 @Composable
