@@ -10,7 +10,9 @@ data class Goal(
     val savedAmount: Long = 0,
     val iconId: Int = 1,
     val colorId: Int = 1,
-    val endDate: String? = null,
+    val startDate: Long = 0,
+    val endDate: Long? = null,
+    val recurrence: RecurrenceType = RecurrenceType.NONE,
     val monthlyTarget: Long = 0,
     override val updatedAt: Long = 0,
     override val syncStatus: SyncStatus = SyncStatus.SYNCED

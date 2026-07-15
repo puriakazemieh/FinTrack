@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
 
 class AddGoalViewModel(
     private val goalUseCases: GoalUseCases
@@ -24,17 +25,25 @@ class AddGoalViewModel(
     fun onIntent(intent: AddGoalIntent) {
         when (intent) {
             is AddGoalIntent.InitialData -> {
-                intent.goal?.let { goal ->
+                if (intent.goal != null) {
+                intent.goal.let { goal ->
+                        _state.update {
+                            it.copy(
+                                id = goal.id,
+                                name = goal.name,
+                                targetAmount = goal.targetAmount.toString(),
+                                savedAmount = goal.savedAmount.toString(),
+                                startDate = goal.startDate,
+                                endDate = goal.endDate,
+                                recurrence = goal.recurrence,
+                                monthlyTarget = goal.monthlyTarget.toString()
+                            )
+                        }
+                    }
+                } else {
                     _state.update {
                         it.copy(
-                            id = goal.id,
-                            name = goal.name,
-                            targetAmount = goal.targetAmount.toString(),
-                            savedAmount = goal.savedAmount.toString(),
-                            iconId = goal.iconId,
-                            colorId = goal.colorId,
-                            endDate = goal.endDate ?: "",
-                            monthlyTarget = goal.monthlyTarget.toString()
+                            startDate = Clock.System.now().toEpochMilliseconds()
                         )
                     }
                 }
@@ -42,9 +51,10 @@ class AddGoalViewModel(
             is AddGoalIntent.UpdateName -> _state.update { it.copy(name = intent.name) }
             is AddGoalIntent.UpdateTargetAmount -> _state.update { it.copy(targetAmount = intent.amount) }
             is AddGoalIntent.UpdateSavedAmount -> _state.update { it.copy(savedAmount = intent.amount) }
+            is AddGoalIntent.UpdateStartDate -> _state.update { it.copy(startDate = intent.date) }
             is AddGoalIntent.UpdateEndDate -> _state.update { it.copy(endDate = intent.date) }
+            is AddGoalIntent.UpdateRecurrence -> _state.update { it.copy(recurrence = intent.recurrence) }
             is AddGoalIntent.UpdateMonthlyTarget -> _state.update { it.copy(monthlyTarget = intent.amount) }
-            is AddGoalIntent.UpdateColorIcon -> _state.update { it.copy(colorId = intent.colorId, iconId = intent.iconId) }
             AddGoalIntent.SaveGoal -> saveGoal()
         }
     }
@@ -57,9 +67,9 @@ class AddGoalViewModel(
                 name = currentState.name,
                 targetAmount = currentState.targetAmount.toLongOrNull() ?: 0L,
                 savedAmount = currentState.savedAmount.toLongOrNull() ?: 0L,
-                iconId = currentState.iconId,
-                colorId = currentState.colorId,
-                endDate = currentState.endDate.ifBlank { null },
+                startDate = currentState.startDate,
+                endDate = currentState.endDate,
+                recurrence = currentState.recurrence,
                 monthlyTarget = currentState.monthlyTarget.toLongOrNull() ?: 0L
             )
             

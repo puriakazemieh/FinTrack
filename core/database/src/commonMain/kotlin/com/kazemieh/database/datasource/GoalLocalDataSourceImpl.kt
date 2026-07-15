@@ -4,6 +4,7 @@ import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.kazemieh.common.model.Goal
+import com.kazemieh.common.model.RecurrenceType
 import com.kazemieh.common.model.SyncStatus
 import com.kazemieh.data_contract.datasource.GoalLocalDataSource
 import com.kazemieh.database.FinTrackDatabase
@@ -39,7 +40,9 @@ class GoalLocalDataSourceImpl(
             savedAmount = goal.savedAmount,
             iconId = goal.iconId.toLong(),
             colorId = goal.colorId.toLong(),
+            startDate = goal.startDate,
             endDate = goal.endDate,
+            recurrence = goal.recurrence.name,
             monthlyTarget = goal.monthlyTarget,
             updatedAt = now,
             syncStatus = 1
@@ -60,7 +63,9 @@ class GoalLocalDataSourceImpl(
             savedAmount = goal.savedAmount,
             iconId = goal.iconId.toLong(),
             colorId = goal.colorId.toLong(),
+            startDate = goal.startDate,
             endDate = goal.endDate,
+            recurrence = goal.recurrence.name,
             monthlyTarget = goal.monthlyTarget,
             updatedAt = now,
             syncStatus = 1
@@ -88,7 +93,9 @@ class GoalLocalDataSourceImpl(
                 savedAmount = goal.savedAmount,
                 iconId = goal.iconId.toLong(),
                 colorId = goal.colorId.toLong(),
+                startDate = goal.startDate,
                 endDate = goal.endDate,
+                recurrence = goal.recurrence.name,
                 monthlyTarget = goal.monthlyTarget,
                 updatedAt = goal.updatedAt,
                 syncStatus = goal.syncStatus.value.toLong()
@@ -116,7 +123,9 @@ class GoalLocalDataSourceImpl(
             savedAmount = savedAmount,
             iconId = iconId.toInt(),
             colorId = colorId.toInt(),
+            startDate = startDate,
             endDate = endDate,
+            recurrence = try { RecurrenceType.valueOf(recurrence) } catch (e: Exception) { RecurrenceType.NONE },
             monthlyTarget = monthlyTarget,
             updatedAt = updatedAt,
             syncStatus = SyncStatus.fromInt(syncStatus.toInt())

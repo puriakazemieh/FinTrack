@@ -27,17 +27,14 @@ import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FAB
-import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.designsystem.component.LeadingIconStyle
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.GlassTone
 import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.goals.presentation.add.AddGoalBottomSheet
 import fintrack.core.designsystem.generated.resources.*
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -310,7 +307,6 @@ private fun GoalCard(
     onEdit: () -> Unit
 ) {
     val glassColors = LocalGlassColors.current
-    val color = MaterialTheme.colorScheme.primary // Should use goal.colorId mapping if available
 
     GlassCard(padding = 14.dp) {
         Column {
@@ -319,14 +315,6 @@ private fun GoalCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(11.dp)
             ) {
-                FinTrackLeadingIcon(
-                    colorId = goal.colorId,
-                    iconId = goal.iconId,
-                    style = LeadingIconStyle.Badge,
-                    size = 40.dp,
-                    iconSize = 18.dp
-                )
-
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = goal.name,
