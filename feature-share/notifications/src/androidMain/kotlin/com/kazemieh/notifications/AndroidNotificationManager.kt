@@ -134,15 +134,15 @@ class AndroidNotificationManager(
         notificationManagerCompat.notify(id, notification)
     }
 
-    override fun showStickyNotification(id: Int, title: String, message: String) {
+    override fun showStickyNotification(id: Int, title: String, message: String, smsDraftId: Long) {
         if (!hasPermission()) return
         if (!isChannelAllowed(NotificationManager.CHANNEL_SMS)) return
 
-        // Deep-link straight into the add-transaction sheet so tapping the notification (or its
-        // "register" action) actually opens the sheet instead of just landing on the dashboard.
+        // Deep-link straight into the add-transaction sheet, carrying the SMS draft id so the sheet
+        // opens pre-filled with the detected amount / type / source instead of a blank form.
         val deepLinkIntent = Intent(
             Intent.ACTION_VIEW,
-            Uri.parse("fintrack://dashboard?showAddTransaction=true")
+            Uri.parse("fintrack://dashboard?showAddTransaction=true&smsDraftId=$smsDraftId")
         ).apply {
             `package` = context.packageName
         }

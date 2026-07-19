@@ -6,7 +6,11 @@ import kotlinx.serialization.Serializable
 sealed class Screen {
 
     @Serializable
-    data class Dashboard(val showAddTransaction: Boolean = false) : Screen()
+    data class Dashboard(
+        val showAddTransaction: Boolean = false,
+        // -1 means "no draft"; set when opened from a bank-SMS notification deep link.
+        val smsDraftId: Long = -1L
+    ) : Screen()
 
     @Serializable
     data class Transactions(

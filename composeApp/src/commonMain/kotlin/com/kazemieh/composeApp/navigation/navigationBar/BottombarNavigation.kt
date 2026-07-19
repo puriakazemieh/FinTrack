@@ -74,12 +74,14 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
 
         composable<Screen.Dashboard>(
             deepLinks = listOf(
-                navDeepLink { uriPattern = "fintrack://dashboard?showAddTransaction={showAddTransaction}" }
+                // Query params carry route defaults, so a URI omitting smsDraftId still matches.
+                navDeepLink { uriPattern = "fintrack://dashboard?showAddTransaction={showAddTransaction}&smsDraftId={smsDraftId}" }
             )
         ) { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.Dashboard>()
             DashboardScreen(
                 showAddTransaction = args.showAddTransaction,
+                smsDraftId = args.smsDraftId,
                 onNavigateToTransactions = navigateToTransactions,
                 onNavigateToSearch = { navController.navigate(Screen.Search) },
                 onNavigateToBudget = { navController.navigate(Screen.Budget) },

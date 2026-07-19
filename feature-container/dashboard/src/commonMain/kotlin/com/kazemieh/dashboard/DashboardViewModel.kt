@@ -207,6 +207,22 @@ class DashboardViewModel(
                 it.copy(showSmsDetection = !it.showSmsDetection)
             }
 
+            is DashboardIntent.OpenSmsDraftTransaction -> viewModelScope.launch {
+                // Tapped a bank-SMS notification: load that specific draft and open the add sheet
+                // pre-filled with its amount / type / source, instead of a blank sheet.
+                val draft = smsDraftRepository.getSmsDraftById(intent.draftId)
+                if (draft != null) {
+                    _state.update {
+                        it.copy(
+                            showAddTransaction = true,
+                            transactionWithRelations = null,
+                            initialTransactionType = null,
+                            smsDraft = draft
+                        )
+                    }
+                }
+            }
+
             is DashboardIntent.IgnoreSmsDraft -> viewModelScope.launch {
                 smsDraftRepository.markSmsDraftAsUsed(intent.draft.id)
             }
@@ -269,6 +285,7 @@ sealed interface DashboardIntent {
     data class ShowAddSource(val source: Source? = null) : DashboardIntent
     data object ToggleBalanceVisibility : DashboardIntent
     data object ToggleSmsDetectionSheet : DashboardIntent
+    data class OpenSmsDraftTransaction(val draftId: Long) : DashboardIntent
     data class IgnoreSmsDraft(val draft: SmsDraft) : DashboardIntent
     data class UpdateSmsDraft(val draft: SmsDraft) : DashboardIntent
     data object ToggleCustomizeSheet : DashboardIntent

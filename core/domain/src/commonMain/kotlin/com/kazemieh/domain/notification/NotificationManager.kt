@@ -6,7 +6,7 @@ interface NotificationManager {
     fun showNotification(id: Int, title: String, message: String, channelId: String)
     fun hasPermission(): Boolean
     fun openSettings()
-    fun showStickyNotification(id: Int, title: String, message: String)
+    fun showStickyNotification(id: Int, title: String, message: String, smsDraftId: Long = -1L)
     fun showBudgetAlert(categoryId: Int, categoryName: String, progressPercentage: Int)
 
     /** Shows a persistent one-tap "add transaction" notification, deep-linking into the add sheet. */

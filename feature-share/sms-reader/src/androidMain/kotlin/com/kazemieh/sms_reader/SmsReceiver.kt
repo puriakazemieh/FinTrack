@@ -55,15 +55,18 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                             draft.copy(sourceId = source?.id)
                         } ?: draft
                         
-                        smsDraftRepository.addSmsDraft(finalDraft)
-                        
+                        val draftId = smsDraftRepository.addSmsDraft(finalDraft)
+
                         val title = getString(Res.string.sms_detection_title)
                         val messageStr = getString(Res.string.sms_detection_desc, finalDraft.bankName)
-                        
+
+                        // Use the persisted draft id as the notification id so both the deep link
+                        // (pre-fill) and the "ignore" action target the correct draft row.
                         notificationManager.showStickyNotification(
-                            id = finalDraft.timeStamp.toInt(),
+                            id = draftId.toInt(),
                             title = title,
-                            message = messageStr
+                            message = messageStr,
+                            smsDraftId = draftId
                         )
                     }
                 }

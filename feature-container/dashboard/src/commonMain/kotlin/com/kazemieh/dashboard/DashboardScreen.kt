@@ -70,6 +70,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun DashboardScreen(
     showAddTransaction: Boolean = false,
+    smsDraftId: Long = -1L,
     viewModel: DashboardViewModel = koinViewModel(),
     onNavigateToTransactions: (Any?) -> Unit = {},
     onNavigateToSearch: () -> Unit = {},
@@ -100,8 +101,11 @@ fun DashboardScreen(
         )
     }
 
-    androidx.compose.runtime.LaunchedEffect(showAddTransaction) {
-        if (showAddTransaction) {
+    androidx.compose.runtime.LaunchedEffect(showAddTransaction, smsDraftId) {
+        if (smsDraftId > 0L) {
+            // Opened from a bank-SMS notification — pre-fill the sheet from that draft.
+            viewModel.onIntent(DashboardIntent.OpenSmsDraftTransaction(smsDraftId))
+        } else if (showAddTransaction) {
             viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet())
         }
     }
