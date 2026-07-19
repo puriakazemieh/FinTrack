@@ -17,6 +17,7 @@ import com.kazemieh.database.Fixed_expense as FixedExpenseDb
 import com.kazemieh.database.Installment as InstallmentDb
 import com.kazemieh.database.Note_table as NoteDb
 import com.kazemieh.database.Person as PersonDb
+import com.kazemieh.database.Rate_cache as RateCacheDb
 import com.kazemieh.database.Shopping_item_table as ShoppingItemDb
 import com.kazemieh.database.Source as SourceDb
 import com.kazemieh.database.Tag as TagDb
@@ -479,6 +480,14 @@ fun AssetHistoryDb.toAssetHistory() = AssetHistory(
     date = kotlin.time.Instant.fromEpochMilliseconds(date),
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())
+)
+
+fun RateCacheDb.toAssetRate() = AssetRate(
+    type = type,
+    code = code,
+    name = name,
+    price = price,
+    lastUpdate = kotlin.time.Instant.fromEpochMilliseconds(lastUpdate)
 )
 
 // Shopping Mappers

@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.AssetRate
 import com.kazemieh.common.toSignedPersianPrice
+import com.kazemieh.common.util.DateUtils
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackButton
@@ -75,6 +76,25 @@ fun FxRatesScreen(
                     contentPadding = PaddingValues(space.medium),
                     verticalArrangement = Arrangement.spacedBy(space.small)
                 ) {
+                    state.lastUpdate?.let { updatedAt ->
+                        item {
+                            Column(Modifier.fillMaxWidth().padding(bottom = space.small)) {
+                                FintrackLabelMediumText(
+                                    text = stringResource(
+                                        Res.string.label_last_update,
+                                        DateUtils.formatTimestamp(updatedAt.toEpochMilliseconds())
+                                    ),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                if (state.error != null) {
+                                    FintrackLabelMediumText(
+                                        text = stringResource(Res.string.msg_rates_stale),
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                            }
+                        }
+                    }
                     items(state.rates) { rate ->
                         RateItem(rate)
                     }
@@ -124,7 +144,7 @@ private fun RateItem(rate: AssetRate) {
                     fontWeight = FontWeight.Bold
                 )
                 FintrackLabelMediumText(
-                    text = stringResource(Res.string.today), // Should show actual update time
+                    text = DateUtils.formatTimestamp(rate.lastUpdate.toEpochMilliseconds()),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

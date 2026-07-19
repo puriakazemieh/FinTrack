@@ -24,9 +24,15 @@ class AssetRepositoryImpl(
     override suspend fun deleteAsset(assetId: Long) = localDataSource.deleteAsset(assetId)
 
     override suspend fun syncRates(): List<AssetRate> {
-        val rates = tgjuService.getLatestRates()
-        val assets = localDataSource.observeAssets().first()
+        val fresh = tgjuService.getLatestRates()
+        // Persist a successful fetch so the UI keeps showing the last known prices even when the
+        // remote source is later unreachable; fall back to the cached snapshot otherwise.
+        if (fresh.isNotEmpty()) {
+            localDataSource.cacheRates(fresh)
+        }
+        val rates = fresh.ifEmpty { localDataSource.getCachedRates() }
 
+        val assets = localDataSource.observeAssets().first()
         assets.forEach { asset ->
             val rate = when (asset.type) {
                 AssetType.GOLD -> rates.find { it.type == AssetType.GOLD }
@@ -38,9 +44,11 @@ class AssetRepositoryImpl(
                 localDataSource.updateAssetPrice(asset.id ?: 0, foundRate.price)
             }
         }
-        return@syncRates rates
+        return rates
     }
 
-    override fun observeAssetHistory(assetId: Long): Flow<List<AssetHistory>> = 
+    override fun observeRates(): Flow<List<AssetRate>> = localDataSource.observeCachedRates()
+
+    override fun observeAssetHistory(assetId: Long): Flow<List<AssetHistory>> =
         localDataSource.observeAssetHistory(assetId)
 }

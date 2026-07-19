@@ -5,6 +5,7 @@ import app.cash.sqldelight.db.SqlDriver
 import com.kazemieh.common.model.AssetType
 import com.kazemieh.data_contract.datasource.*
 import com.kazemieh.database.Asset as AssetDb
+import com.kazemieh.database.Rate_cache as RateCacheDb
 import com.kazemieh.database.DatabaseInitializer
 import com.kazemieh.database.FinTrackDatabase
 import com.kazemieh.database.createDriver
@@ -19,6 +20,9 @@ val databaseModule = module {
         FinTrackDatabase(
             driver = get(),
             assetAdapter = AssetDb.Adapter(
+                typeAdapter = EnumColumnAdapter<AssetType>()
+            ),
+            rate_cacheAdapter = RateCacheDb.Adapter(
                 typeAdapter = EnumColumnAdapter<AssetType>()
             )
         )

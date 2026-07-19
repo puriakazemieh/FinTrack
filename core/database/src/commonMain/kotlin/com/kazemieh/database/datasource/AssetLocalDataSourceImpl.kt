@@ -6,10 +6,12 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.kazemieh.common.model.Asset
 import com.kazemieh.common.model.AssetHistory
+import com.kazemieh.common.model.AssetRate
 import com.kazemieh.data_contract.datasource.AssetLocalDataSource
 import com.kazemieh.database.FinTrackDatabase
 import com.kazemieh.database.mapper.toAsset
 import com.kazemieh.database.mapper.toAssetHistory
+import com.kazemieh.database.mapper.toAssetRate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -21,6 +23,7 @@ class AssetLocalDataSourceImpl(
 ) : AssetLocalDataSource {
 
     private val assetQueries = db.assetQueries
+    private val rateCacheQueries = db.rateCacheQueries
 
     override fun observeAssets(): Flow<List<Asset>> {
         return assetQueries.observeAssets()
@@ -91,6 +94,34 @@ class AssetLocalDataSourceImpl(
             .asFlow()
             .mapToList(Dispatchers.Default)
             .map { list -> list.map { it.toAssetHistory() } }
+    }
+
+    override fun observeCachedRates(): Flow<List<AssetRate>> {
+        return rateCacheQueries.observeRates()
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+            .map { list -> list.map { it.toAssetRate() } }
+    }
+
+    override suspend fun getCachedRates(): List<AssetRate> = withContext(Dispatchers.Default) {
+        rateCacheQueries.getAllRates().awaitAsList().map { it.toAssetRate() }
+    }
+
+    override suspend fun cacheRates(rates: List<AssetRate>) {
+        if (rates.isEmpty()) return
+        withContext(Dispatchers.Default) {
+            db.transaction {
+                rates.forEach { rate ->
+                    rateCacheQueries.upsertRate(
+                        code = rate.code,
+                        type = rate.type,
+                        name = rate.name,
+                        price = rate.price,
+                        lastUpdate = rate.lastUpdate.toEpochMilliseconds()
+                    )
+                }
+            }
+        }
     }
 
     override suspend fun getAllAssets(): List<Asset> = withContext(Dispatchers.Default) {

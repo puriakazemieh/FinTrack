@@ -1328,6 +1328,8 @@
 
     <!-- FX rates / converter -->
     <string name="msg_rates_unavailable">قیمت‌های بازار در دسترس نیست. اتصال اینترنت را بررسی کنید و دوباره تلاش کنید.</string>
+    <string name="label_last_update">آخرین به‌روزرسانی: %1$s</string>
+    <string name="msg_rates_stale">به‌روزرسانی زندهٔ قیمت‌ها ناموفق بود؛ آخرین قیمت‌های ذخیره‌شده نمایش داده می‌شود.</string>
 
     <!-- Sync / backup messages -->
     <string name="sync_msg_success">پشتیبان‌گیری و همگام‌سازی با موفقیت انجام شد</string>

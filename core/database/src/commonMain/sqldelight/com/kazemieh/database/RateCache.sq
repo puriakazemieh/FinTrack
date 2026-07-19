@@ -1,0 +1,22 @@
+import com.kazemieh.common.model.AssetType;
+
+CREATE TABLE IF NOT EXISTS rate_cache (
+    code TEXT PRIMARY KEY NOT NULL,
+    type TEXT AS AssetType NOT NULL,
+    name TEXT NOT NULL,
+    price INTEGER NOT NULL,
+    lastUpdate INTEGER NOT NULL
+);
+
+upsertRate:
+INSERT OR REPLACE INTO rate_cache(code, type, name, price, lastUpdate)
+VALUES (?, ?, ?, ?, ?);
+
+observeRates:
+SELECT * FROM rate_cache ORDER BY type ASC, code ASC;
+
+getAllRates:
+SELECT * FROM rate_cache ORDER BY type ASC, code ASC;
+
+deleteAllRates:
+DELETE FROM rate_cache;

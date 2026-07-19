@@ -2,6 +2,7 @@ package com.kazemieh.data_contract.datasource
 
 import com.kazemieh.common.model.Asset
 import com.kazemieh.common.model.AssetHistory
+import com.kazemieh.common.model.AssetRate
 import kotlinx.coroutines.flow.Flow
 
 interface AssetLocalDataSource {
@@ -11,6 +12,11 @@ interface AssetLocalDataSource {
     suspend fun deleteAsset(assetId: Long)
     suspend fun updateAssetPrice(assetId: Long, currentPrice: Long)
     fun observeAssetHistory(assetId: Long): Flow<List<AssetHistory>>
+
+    /** Latest cached market rates, updated in place whenever a live fetch succeeds. */
+    fun observeCachedRates(): Flow<List<AssetRate>>
+    suspend fun getCachedRates(): List<AssetRate>
+    suspend fun cacheRates(rates: List<AssetRate>)
 
     suspend fun getAllAssets(): List<Asset>
     suspend fun insertFullAsset(asset: Asset)

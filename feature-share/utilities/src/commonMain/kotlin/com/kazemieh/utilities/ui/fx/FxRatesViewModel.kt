@@ -6,6 +6,8 @@ import com.kazemieh.domain.repository.AssetRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -21,6 +23,18 @@ class FxRatesViewModel(
     val effect = _effect.receiveAsFlow()
 
     init {
+        // The cached rates are the source of truth for what's on screen, so a failed live refresh
+        // never blanks the list — the last successful snapshot stays visible.
+        assetRepository.observeRates()
+            .onEach { cached ->
+                _state.update {
+                    it.copy(
+                        rates = cached,
+                        lastUpdate = cached.maxOfOrNull { rate -> rate.lastUpdate }
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
         onIntent(FxRatesIntent.RefreshRates)
     }
 
@@ -35,10 +49,15 @@ class FxRatesViewModel(
             _state.update { it.copy(isLoading = true, error = null) }
             try {
                 val rates = assetRepository.syncRates()
-                _state.update { it.copy(rates = rates, isLoading = false) }
+                if (rates.isEmpty()) {
+                    _state.update { it.copy(error = "empty") }
+                    _effect.send(FxRatesEffect.ShowError("empty"))
+                }
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, error = e.message) }
+                _state.update { it.copy(error = e.message) }
                 _effect.send(FxRatesEffect.ShowError(e.message ?: "Unknown error"))
+            } finally {
+                _state.update { it.copy(isLoading = false) }
             }
         }
     }
