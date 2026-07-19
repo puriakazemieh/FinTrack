@@ -1311,6 +1311,19 @@
     <string name="ai_suggestion_budget_title">ایجاد بودجه برای دسته %1$s</string>
     <string name="ai_suggestion_budget_body">هزینه‌های شما در این دسته ٪%2$d رشد داشته است. با تعیین بودجه می‌توانید آن را کنترل کنید.</string>
 
+    <!-- AI advisor · additional rule-based suggestions -->
+    <string name="ai_suggestion_overspend_title">هزینه‌ها از درآمد بیشتر شده</string>
+    <string name="ai_suggestion_overspend_body">در ۳۰ روز گذشته بیشتر از درآمدتان خرج کرده‌اید. بهتر است هزینه‌های غیرضروری را کاهش دهید.</string>
+    <string name="ai_suggestion_overspend_detail">وقتی هزینه‌ها از درآمد پیشی می‌گیرد، پس‌انداز منفی می‌شود. بزرگ‌ترین دسته‌های هزینه را مرور کنید و برای آن‌ها سقف بودجه تعیین کنید تا ماه آینده به تعادل برسید.</string>
+
+    <string name="ai_suggestion_concentration_title">تمرکز هزینه در دسته %1$s</string>
+    <string name="ai_suggestion_concentration_body">٪%2$d از کل هزینه‌های شما در یک دسته است. توزیع متعادل‌تر ریسک را کم می‌کند.</string>
+    <string name="ai_suggestion_concentration_detail">وقتی بخش بزرگی از خرج در یک دسته متمرکز می‌شود، یک تغییر کوچک در آن دسته اثر زیادی بر کل بودجه دارد. برای این دسته بودجهٔ مشخص تعیین کنید و جایگزین‌های کم‌هزینه‌تر را بسنجید.</string>
+
+    <string name="ai_suggestion_emergency_title">ساخت صندوق روز مبادا</string>
+    <string name="ai_suggestion_emergency_body">پس‌انداز شما سالم است. بخشی از آن را برای مخارج پیش‌بینی‌نشده کنار بگذارید.</string>
+    <string name="ai_suggestion_emergency_detail">داشتن معادل سه تا شش ماه هزینه به‌صورت نقد یا سپردهٔ در دسترس، شما را در برابر هزینه‌های ناگهانی مقاوم می‌کند. یک هدف پس‌انداز برای این منظور بسازید.</string>
+
     <!-- Goals refinement -->
     <string name="label_add_amount">افزودن مبلغ</string>
     <string name="label_goal_eta">تا %1$s</string>

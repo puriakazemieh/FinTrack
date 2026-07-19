@@ -15,7 +15,11 @@ data class SpendingPattern(
     val topExpenseCategoryName: String?,
     val topExpenseAmount: Long,
     val growthCategoryName: String?,
-    val growthPercentage: Int
+    val growthPercentage: Int,
+    /** Share of total expense taken by the single biggest category, 0–100. */
+    val topExpenseSharePercentage: Int,
+    /** True when the last 30 days spent more than they earned. */
+    val isOverspending: Boolean
 )
 
 class ObserveSpendingPatternUseCase(
@@ -57,6 +61,10 @@ class ObserveSpendingPatternUseCase(
                 }
                 .maxByOrNull { it.second }
 
+            val topShare = if (expense > 0 && topExpense != null) {
+                (topExpense.totalAmount * 100 / expense).toInt()
+            } else 0
+
             SpendingPattern(
                 totalIncome = income,
                 totalExpense = expense,
@@ -65,7 +73,9 @@ class ObserveSpendingPatternUseCase(
                 topExpenseCategoryName = topExpense?.name,
                 topExpenseAmount = topExpense?.totalAmount ?: 0,
                 growthCategoryName = fastestGrowing?.first,
-                growthPercentage = fastestGrowing?.second ?: 0
+                growthPercentage = fastestGrowing?.second ?: 0,
+                topExpenseSharePercentage = topShare,
+                isOverspending = expense > income
             )
         }
     }

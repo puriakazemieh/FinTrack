@@ -82,7 +82,22 @@ class AIAdvisorViewModel(
     private fun generateDynamicSuggestions(pattern: com.kazemieh.domain.usecase.SpendingPattern): List<InvestmentSuggestion> {
         val suggestions = mutableListOf<InvestmentSuggestion>()
 
-        // 1. Budgeting suggestion based on top category growth
+        // 1. Overspending — the most urgent signal: last 30 days spent more than earned.
+        if (pattern.isOverspending && pattern.totalExpense > 0) {
+            suggestions.add(
+                InvestmentSuggestion(
+                    title = Res.string.ai_suggestion_overspend_title,
+                    body = Res.string.ai_suggestion_overspend_body,
+                    detail = Res.string.ai_suggestion_overspend_detail,
+                    icon = Res.drawable.ic_cat_shopping,
+                    colorHex = 0xFFEF4444, // GlassRed
+                    risk = RiskLevel.High,
+                    returnRate = Res.string.label_zero
+                )
+            )
+        }
+
+        // 2. Budgeting suggestion based on top category growth.
         if (pattern.growthPercentage > 10 && pattern.growthCategoryName != null) {
             suggestions.add(
                 InvestmentSuggestion(
@@ -99,7 +114,24 @@ class AIAdvisorViewModel(
             )
         }
 
-        // 2. High potential saving -> Investment
+        // 3. Concentration — one category eats a large share of all spending.
+        if (pattern.topExpenseSharePercentage >= 40 && pattern.topExpenseCategoryName != null) {
+            suggestions.add(
+                InvestmentSuggestion(
+                    title = Res.string.ai_suggestion_concentration_title,
+                    titleArgs = listOf(pattern.topExpenseCategoryName!!),
+                    body = Res.string.ai_suggestion_concentration_body,
+                    bodyArgs = listOf(pattern.topExpenseCategoryName!!, pattern.topExpenseSharePercentage.toString()),
+                    detail = Res.string.ai_suggestion_concentration_detail,
+                    icon = Res.drawable.ic_cat_shopping,
+                    colorHex = 0xFFF59E0B, // GlassAmber
+                    risk = RiskLevel.Medium,
+                    returnRate = Res.string.label_zero
+                )
+            )
+        }
+
+        // 4. High potential saving -> Investment.
         if (pattern.savingPotentialPercentage > 15) {
             suggestions.add(
                 InvestmentSuggestion(
@@ -114,8 +146,23 @@ class AIAdvisorViewModel(
             )
         }
 
-        // 3. Low potential saving -> Income increase or debt reduction
-        if (pattern.savingPotentialPercentage < 5) {
+        // 5. Healthy but moderate saving (5–15%) -> build an emergency fund.
+        if (pattern.savingPotentialPercentage in 5..15) {
+            suggestions.add(
+                InvestmentSuggestion(
+                    title = Res.string.ai_suggestion_emergency_title,
+                    body = Res.string.ai_suggestion_emergency_body,
+                    detail = Res.string.ai_suggestion_emergency_detail,
+                    icon = Res.drawable.ic_cat_bank,
+                    colorHex = 0xFF22C55E, // GlassGreen
+                    risk = RiskLevel.Low,
+                    returnRate = Res.string.ai_suggestion_fund_return
+                )
+            )
+        }
+
+        // 6. Low potential saving -> low-risk bank deposit / income focus.
+        if (pattern.savingPotentialPercentage < 5 && !pattern.isOverspending) {
              suggestions.add(
                 InvestmentSuggestion(
                     title = Res.string.ai_suggestion_bank_title,
