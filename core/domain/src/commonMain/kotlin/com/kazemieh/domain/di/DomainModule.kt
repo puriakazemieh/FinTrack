@@ -53,6 +53,7 @@ import com.kazemieh.domain.usecase.ObserveDebtsByPersonUseCase
 import com.kazemieh.domain.usecase.ObserveDebtsUseCase
 import com.kazemieh.domain.usecase.ObserveBudgetsWithProgressUseCase
 import com.kazemieh.domain.usecase.DetectSubscriptionsUseCase
+import com.kazemieh.domain.usecase.GetMonthlyTrendUseCase
 import com.kazemieh.domain.usecase.ObserveCategoriesFlatUseCase
 import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
 import com.kazemieh.domain.usecase.ObserveSpendingPatternUseCase
@@ -122,6 +123,7 @@ val domainModule = module {
     factory { ObserveCategorySumsUseCase(get()) }
     factory { ObserveSpendingPatternUseCase(get()) }
     factory { DetectSubscriptionsUseCase(get()) }
+    factory { GetMonthlyTrendUseCase(get()) }
     factory { ObserveTagsUseCase(get()) }
     factory { ObserveSourcesUseCase(get()) }
     factory { ObserveCategoriesUseCase(get()) }

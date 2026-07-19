@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -45,6 +46,7 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.label_amount_with_unit
 import fintrack.core.designsystem.generated.resources.label_expense
 import fintrack.core.designsystem.generated.resources.label_income
+import fintrack.core.designsystem.generated.resources.label_monthly_trend
 import fintrack.core.designsystem.generated.resources.label_net
 import fintrack.core.designsystem.generated.resources.label_summary_period
 import fintrack.core.designsystem.generated.resources.type_transfer
@@ -358,6 +360,99 @@ fun CategoryStrip(
                 }
             }
         }
+    }
+}
+
+/**
+ * Grouped income/expense bars for the last few Persian months, so the user can see the trend at a
+ * glance. Hidden until there is at least one month with activity. Built with plain layout (bar
+ * heights via fractional fillMaxHeight) rather than a Canvas, so it stays theme-aware and cheap.
+ */
+@Composable
+fun MonthlyTrendCard(
+    viewModel: TransactionReportViewModel = koinViewModel()
+) {
+    val glassColors = LocalGlassColors.current
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val trend = state.monthlyTrend
+    if (trend.isEmpty() || trend.all { it.income == 0L && it.expense == 0L }) return
+
+    val maxValue = trend.maxOf { maxOf(it.income, it.expense) }.coerceAtLeast(1L)
+
+    GlassCard(modifier = Modifier.fillMaxWidth(), padding = 14.dp) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            FintrackLabelMediumText(
+                text = stringResource(Res.string.label_monthly_trend),
+                color = glassColors.text2
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth().height(120.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                trend.forEach { point ->
+                    Column(
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Row(
+                            modifier = Modifier.weight(1f).fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(3.dp),
+                            verticalAlignment = Alignment.Bottom
+                        ) {
+                            TrendBar(
+                                fraction = point.income.toFloat() / maxValue,
+                                color = GlassGreen,
+                                modifier = Modifier.weight(1f)
+                            )
+                            TrendBar(
+                                fraction = point.expense.toFloat() / maxValue,
+                                color = GlassRed,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        Spacer(Modifier.height(6.dp))
+                        FintrackLabelSmallText(
+                            text = point.label,
+                            fontSize = 10.sp,
+                            color = glassColors.text3
+                        )
+                    }
+                }
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                TrendLegend(color = GlassGreen, label = stringResource(Res.string.label_income))
+                TrendLegend(color = GlassRed, label = stringResource(Res.string.label_expense))
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrendBar(fraction: Float, color: Color, modifier: Modifier = Modifier) {
+    // Give any non-zero month a visible sliver so a tiny month isn't indistinguishable from empty.
+    val f = fraction.coerceIn(0f, 1f)
+    val height = if (f > 0f) f.coerceAtLeast(0.03f) else 0f
+    Box(
+        modifier = modifier
+            .fillMaxHeight(height)
+            .clip(RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp))
+            .background(color)
+    )
+}
+
+@Composable
+private fun TrendLegend(color: Color, label: String) {
+    val glassColors = LocalGlassColors.current
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(color))
+        FintrackLabelSmallText(text = label, fontSize = 11.sp, color = glassColors.text3)
     }
 }
 

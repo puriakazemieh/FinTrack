@@ -269,6 +269,7 @@
     <string name="label_calculator">ماشین‌حساب</string>
     <string name="label_new_source">منبع جدید</string>
     <string name="label_summary_period">خلاصه‌ی این دوره</string>
+    <string name="label_monthly_trend">روند ماهانه</string>
 
     <string name="btn_save_category">ذخیره دسته‌بندی</string>
     <string name="btn_save_source">ذخیره منبع</string>

@@ -13,6 +13,8 @@ import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.component.PieChartItem
+import com.kazemieh.domain.usecase.GetMonthlyTrendUseCase
+import com.kazemieh.domain.usecase.MonthlyTrendPoint
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -33,7 +35,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class TransactionReportViewModel(
-    private val transactionUseCaseGroup: TransactionUseCaseGroup
+    private val transactionUseCaseGroup: TransactionUseCaseGroup,
+    private val getMonthlyTrendUseCase: GetMonthlyTrendUseCase
 ) : ViewModel() {
 
     private val pageSize = 20
@@ -78,7 +81,19 @@ class TransactionReportViewModel(
     init {
         observeTransactions()
         observeCategorySums()
+        observeMonthlyTrend()
         refresh()
+    }
+
+    // The trend spans a fixed window of recent months and ignores the active filters, so it's
+    // recomputed on each manual refresh rather than reacting to filter changes.
+    private fun observeMonthlyTrend() {
+        viewModelScope.launch {
+            refreshTrigger.onStart { emit(Unit) }.collectLatest {
+                val trend = runCatching { getMonthlyTrendUseCase() }.getOrDefault(emptyList())
+                _state.update { it.copy(monthlyTrend = trend) }
+            }
+        }
     }
 
     fun onIntent(intent: TransactionReportIntent) {
@@ -362,6 +377,7 @@ data class TransactionReportState(
     val isPositiveBalance: Boolean = true,
     val pieChartData: List<PieChartItem> = emptyList(),
     val categorySums: List<CategorySum> = emptyList(),
+    val monthlyTrend: List<MonthlyTrendPoint> = emptyList(),
 
     // list/reactive paging
     val items: List<TransactionWithRelations> = emptyList(),
