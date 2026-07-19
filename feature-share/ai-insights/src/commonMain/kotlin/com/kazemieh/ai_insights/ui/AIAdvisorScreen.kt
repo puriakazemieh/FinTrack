@@ -95,6 +95,12 @@ fun AIAdvisorScreen(
                         AnalysisCard(state)
                     }
 
+                    if (state.monthIncome > 0 || state.monthExpense > 0) {
+                        item {
+                            MonthSummaryCard(state)
+                        }
+                    }
+
                     if (state.subscriptions.isNotEmpty()) {
                         item {
                             Text(
@@ -253,6 +259,78 @@ private fun AnalysisCard(state: AIAdvisorState) {
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun MonthSummaryCard(state: AIAdvisorState) {
+    val glassColors = LocalGlassColors.current
+    val net = state.monthIncome - state.monthExpense
+    val tomanShort = stringResource(Res.string.unit_toman_short)
+
+    GlassCard(padding = 16.dp) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(
+                text = stringResource(Res.string.ai_month_summary_title),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = glassColors.text
+            )
+
+            MonthSummaryRow(
+                label = stringResource(Res.string.label_income),
+                amount = "${state.monthIncome.toPersianPrice()} $tomanShort",
+                color = com.kazemieh.designsystem.GlassGreen
+            )
+            MonthSummaryRow(
+                label = stringResource(Res.string.label_expense),
+                amount = "${state.monthExpense.toPersianPrice()} $tomanShort",
+                color = com.kazemieh.designsystem.GlassRed
+            )
+            HorizontalDivider(color = glassColors.glassHairline)
+            MonthSummaryRow(
+                label = stringResource(Res.string.label_net),
+                amount = "${net.toPersianPrice()} $tomanShort",
+                color = if (net >= 0) com.kazemieh.designsystem.GlassGreen else com.kazemieh.designsystem.GlassRed,
+                isBold = true
+            )
+
+            state.topExpenseCategoryName?.let { category ->
+                Text(
+                    text = stringResource(Res.string.ai_month_top_category, category),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = glassColors.text2
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MonthSummaryRow(
+    label: String,
+    amount: String,
+    color: Color,
+    isBold: Boolean = false
+) {
+    val glassColors = LocalGlassColors.current
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(color))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = glassColors.text2,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = amount,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = if (isBold) FontWeight.Bold else FontWeight.SemiBold,
+            color = color
+        )
     }
 }
 

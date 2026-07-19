@@ -71,6 +71,10 @@ class AIAdvisorViewModel(
                             activeDays = activeDays,
                             savingPotentialPercentage = pattern.savingPotentialPercentage,
                             savingPotentialAmount = pattern.savingPotentialAmount,
+                            monthIncome = pattern.totalIncome,
+                            monthExpense = pattern.totalExpense,
+                            topExpenseCategoryName = pattern.topExpenseCategoryName,
+                            topExpenseAmount = pattern.topExpenseAmount,
                             suggestions = generateDynamicSuggestions(pattern),
                             subscriptions = subscriptions
                         )

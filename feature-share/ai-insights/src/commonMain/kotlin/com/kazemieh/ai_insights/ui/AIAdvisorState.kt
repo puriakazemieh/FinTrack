@@ -14,6 +14,10 @@ data class AIAdvisorState(
     val savingPotentialPercentage: Int = 12,
     val savingPotentialAmount: Long = 3000000,
     val activeDays: Int = 87,
+    val monthIncome: Long = 0,
+    val monthExpense: Long = 0,
+    val topExpenseCategoryName: String? = null,
+    val topExpenseAmount: Long = 0,
     val suggestions: List<InvestmentSuggestion> = emptyList(),
     val subscriptions: List<DetectedSubscription> = emptyList()
 )

@@ -1141,6 +1141,8 @@
     <string name="ai_analysis_title">تحلیل ماهانه</string>
     <string name="ai_analysis_days">بر اساس %1$d روز فعالیت شما</string>
     <string name="ai_analysis_body">با توجه به الگوی خرج و درآمد، حدود %1$s از درآمد ماهانه قابل پس‌انداز است (تقریباً %2$s تومان).</string>
+    <string name="ai_month_summary_title">خلاصهٔ این ماه</string>
+    <string name="ai_month_top_category">بیشترین هزینه در دستهٔ «%1$s»</string>
     <string name="ai_suggestions_count">پیشنهادهای فعال · %1$d</string>
     <string name="ai_suggestion_risk">ریسک: %1$s</string>
     <string name="ai_suggestion_return">بازدهی: %1$s</string>
