@@ -12,6 +12,7 @@ val domainModule = module {
     factory { ObserveSpendingPatternUseCase(get()) }
     factory { DetectSubscriptionsUseCase(get()) }
     factory { GetMonthlyTrendUseCase(get()) }
+    factory { GetMonthlyCashflowUseCase(get()) }
     factory { ObserveTagsUseCase(get()) }
     factory { ObserveSourcesUseCase(get()) }
     factory { ObserveCategoriesUseCase(get()) }
@@ -63,7 +64,7 @@ val domainModule = module {
     factory { DeleteGoalUseCase(get()) }
     factory { GetGoalByIdUseCase(get()) }
     factory { CalculateFreedomStageUseCase(get(), get(), get()) }
-    
+
     factory { ObserveGoalTemplatesUseCase(get()) }
     factory { AddGoalTemplateUseCase(get()) }
     factory { UpdateGoalTemplateUseCase(get()) }

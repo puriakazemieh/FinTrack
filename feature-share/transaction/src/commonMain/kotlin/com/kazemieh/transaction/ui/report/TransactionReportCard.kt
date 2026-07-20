@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,6 +45,8 @@ import com.kazemieh.designsystem.component.LeadingIconStyle
 import com.kazemieh.designsystem.component.glass.GlassCard
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.label_amount_with_unit
+import fintrack.core.designsystem.generated.resources.label_cashflow_calendar
+import fintrack.core.designsystem.generated.resources.weekday_initials
 import fintrack.core.designsystem.generated.resources.label_expense
 import fintrack.core.designsystem.generated.resources.label_income
 import fintrack.core.designsystem.generated.resources.label_monthly_trend
@@ -453,6 +456,91 @@ private fun TrendLegend(color: Color, label: String) {
     ) {
         Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(color))
         FintrackLabelSmallText(text = label, fontSize = 11.sp, color = glassColors.text3)
+    }
+}
+
+/**
+ * A calendar of the current Persian month where each day is tinted by its net cashflow — green when
+ * income beat expense, red when it didn't. Gives an at-a-glance read of which days cost the user.
+ */
+@Composable
+fun CashflowCalendarCard(
+    viewModel: TransactionReportViewModel = koinViewModel()
+) {
+    val glassColors = LocalGlassColors.current
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val cashflow = state.monthlyCashflow ?: return
+    if (cashflow.netByDay.isEmpty()) return
+
+    val weekdays = stringResource(Res.string.weekday_initials).split(",")
+    // Leading blanks for the offset, then one cell per day, padded to a full final week.
+    val totalCells = cashflow.firstWeekdayOffset + cashflow.daysInMonth
+    val rows = ((totalCells + 6) / 7)
+
+    GlassCard(modifier = Modifier.fillMaxWidth(), padding = 14.dp) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            FintrackLabelMediumText(
+                text = stringResource(Res.string.label_cashflow_calendar, cashflow.monthLabel),
+                color = glassColors.text2
+            )
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                weekdays.forEach { wd ->
+                    FintrackLabelSmallText(
+                        text = wd,
+                        fontSize = 10.sp,
+                        color = glassColors.text3,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            for (row in 0 until rows) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    for (col in 0 until 7) {
+                        val cellIndex = row * 7 + col
+                        val day = cellIndex - cashflow.firstWeekdayOffset + 1
+                        if (day in 1..cashflow.daysInMonth) {
+                            CashflowDayCell(
+                                day = day,
+                                net = cashflow.netByDay[day],
+                                modifier = Modifier.weight(1f)
+                            )
+                        } else {
+                            Spacer(Modifier.weight(1f))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CashflowDayCell(day: Int, net: Long?, modifier: Modifier = Modifier) {
+    val glassColors = LocalGlassColors.current
+    val (bg, fg) = when {
+        net == null || net == 0L -> glassColors.glassHairline.copy(alpha = 0.4f) to glassColors.text3
+        net > 0L -> GlassGreen.copy(alpha = 0.18f) to GlassGreen
+        else -> GlassRed.copy(alpha = 0.18f) to GlassRed
+    }
+    Box(
+        modifier = modifier
+            .height(34.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(bg),
+        contentAlignment = Alignment.Center
+    ) {
+        FintrackLabelSmallText(
+            text = day.toString().toPersianDigits(),
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = fg
+        )
     }
 }
 

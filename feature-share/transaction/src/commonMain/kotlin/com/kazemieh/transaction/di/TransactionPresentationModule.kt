@@ -29,7 +29,8 @@ val transactionReportViewModelModule = module {
     viewModel {
         TransactionReportViewModel(
             transactionUseCaseGroup = get(),
-            getMonthlyTrendUseCase = get()
+            getMonthlyTrendUseCase = get(),
+            getMonthlyCashflowUseCase = get()
         )
     }
 }
