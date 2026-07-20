@@ -13,7 +13,9 @@ import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.designsystem.component.PieChartItem
+import com.kazemieh.domain.usecase.GetMonthlyCashflowUseCase
 import com.kazemieh.domain.usecase.GetMonthlyTrendUseCase
+import com.kazemieh.domain.usecase.MonthlyCashflow
 import com.kazemieh.domain.usecase.MonthlyTrendPoint
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,7 +38,8 @@ import kotlinx.coroutines.launch
 
 class TransactionReportViewModel(
     private val transactionUseCaseGroup: TransactionUseCaseGroup,
-    private val getMonthlyTrendUseCase: GetMonthlyTrendUseCase
+    private val getMonthlyTrendUseCase: GetMonthlyTrendUseCase,
+    private val getMonthlyCashflowUseCase: GetMonthlyCashflowUseCase
 ) : ViewModel() {
 
     private val pageSize = 20
@@ -82,6 +85,7 @@ class TransactionReportViewModel(
         observeTransactions()
         observeCategorySums()
         observeMonthlyTrend()
+        observeMonthlyCashflow()
         refresh()
     }
 
@@ -92,6 +96,16 @@ class TransactionReportViewModel(
             refreshTrigger.onStart { emit(Unit) }.collectLatest {
                 val trend = runCatching { getMonthlyTrendUseCase() }.getOrDefault(emptyList())
                 _state.update { it.copy(monthlyTrend = trend) }
+            }
+        }
+    }
+
+    // Current-month cashflow calendar — likewise filter-independent, refreshed with the screen.
+    private fun observeMonthlyCashflow() {
+        viewModelScope.launch {
+            refreshTrigger.onStart { emit(Unit) }.collectLatest {
+                val cashflow = runCatching { getMonthlyCashflowUseCase() }.getOrNull()
+                _state.update { it.copy(monthlyCashflow = cashflow) }
             }
         }
     }
@@ -378,6 +392,7 @@ data class TransactionReportState(
     val pieChartData: List<PieChartItem> = emptyList(),
     val categorySums: List<CategorySum> = emptyList(),
     val monthlyTrend: List<MonthlyTrendPoint> = emptyList(),
+    val monthlyCashflow: MonthlyCashflow? = null,
 
     // list/reactive paging
     val items: List<TransactionWithRelations> = emptyList(),

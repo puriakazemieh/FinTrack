@@ -152,6 +152,8 @@ fun TransactionListByFilterContent(
             Spacer(Modifier.height(14.dp))
             MonthlyTrendCard()
             Spacer(Modifier.height(14.dp))
+            CashflowCalendarCard()
+            Spacer(Modifier.height(14.dp))
             CategoryStrip()
             Spacer(Modifier.height(24.dp))
         }
