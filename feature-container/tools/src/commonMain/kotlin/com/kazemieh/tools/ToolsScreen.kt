@@ -145,7 +145,8 @@ fun ToolsScreen(
                 goals.visibleIf(ToolFeature.GOALS),
                 fixedExpense.visibleIf(ToolFeature.FIXED_EXPENSE),
                 shopping.visibleIf(ToolFeature.SHOPPING),
-                notes.visibleIf(ToolFeature.NOTES)
+                notes.visibleIf(ToolFeature.NOTES),
+                news.visibleIf(ToolFeature.NEWS)
             )
         ),
         ToolGroup(
@@ -163,8 +164,7 @@ fun ToolsScreen(
             items = listOfNotNull(
                 assets.visibleIf(ToolFeature.ASSETS),
                 fxRates.visibleIf(ToolFeature.FX_RATES),
-                converter.visibleIf(ToolFeature.CONVERTER),
-                news.visibleIf(ToolFeature.NEWS)
+                converter.visibleIf(ToolFeature.CONVERTER)
             )
         ),
         ToolGroup(

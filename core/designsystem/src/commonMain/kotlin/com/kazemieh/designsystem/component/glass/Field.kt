@@ -26,6 +26,7 @@ fun Field(
     hint: String? = null,
     error: Boolean = false,
     onClick: (() -> Unit)? = null,
+    trailingAction: @Composable (() -> Unit)? = null,
     children: @Composable () -> Unit
 ) {
     val glassColors = LocalGlassColors.current
@@ -51,7 +52,7 @@ fun Field(
                             color = GlassRed,
                             modifier = Modifier.padding(start = 2.dp)
                         )
-                    } else {
+                    } else if (hint == null) {
                         FintrackLabelSmallText(
                             text = " (${stringResource(Res.string.label_optional)})",
                             color = glassColors.text3.copy(alpha = 0.6f),
@@ -59,6 +60,7 @@ fun Field(
                             modifier = Modifier.padding(start = 2.dp)
                         )
                     }
+                    trailingAction?.invoke()
                 }
                 
                 Box {

@@ -2,18 +2,20 @@ package com.kazemieh.goals.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.common.model.*
+import com.kazemieh.domain.usecase.AssetUseCases
 import com.kazemieh.domain.usecase.GoalUseCases
 import com.kazemieh.domain.usecase.PreferenceUseCases
+import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import com.kazemieh.preferences.FinTrackPreferences
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class GoalViewModel(
     private val goalUseCases: GoalUseCases,
+    private val assetUseCases: AssetUseCases,
+    private val transactionUseCases: TransactionUseCaseGroup,
     private val preferenceUseCases: PreferenceUseCases
 ) : ViewModel() {
 
@@ -40,7 +42,8 @@ class GoalViewModel(
 
     fun onIntent(intent: GoalIntent) {
         when (intent) {
-            GoalIntent.LoadGoals -> observeGoals()
+            GoalIntent.LoadGoals -> observeData()
+            is GoalIntent.SelectTab -> _state.update { it.copy(currentTab = intent.tab) }
             is GoalIntent.UpdateSearchQuery -> _state.update { it.copy(searchQuery = intent.query) }
             is GoalIntent.DeleteGoal -> deleteGoal(intent.id)
             is GoalIntent.ShowAddGoal -> {
@@ -61,24 +64,86 @@ class GoalViewModel(
                 preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_ROUNDUP_UNIT, intent.unit.toString())
                 _state.update { it.copy(roundUpUnit = intent.unit) }
             }
+            is GoalIntent.AddBasket -> viewModelScope.launch { goalUseCases.addGoalBasket(intent.basket) }
+            is GoalIntent.UpdateBasket -> viewModelScope.launch { goalUseCases.updateGoalBasket(intent.basket) }
+            is GoalIntent.DeleteBasket -> viewModelScope.launch { goalUseCases.deleteGoalBasket(intent.id) }
+            is GoalIntent.AddTemplate -> viewModelScope.launch { goalUseCases.addGoalTemplate(intent.template) }
+            is GoalIntent.UpdateTemplate -> viewModelScope.launch { goalUseCases.updateGoalTemplate(intent.template) }
+            is GoalIntent.DeleteTemplate -> viewModelScope.launch { goalUseCases.deleteGoalTemplate(intent.id) }
         }
     }
 
-    private fun observeGoals() {
+    private fun observeData() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            goalUseCases.observeGoals().collect { goals ->
+            
+            combine(
+                goalUseCases.observeGoals(),
+                goalUseCases.observeGoalBaskets(),
+                goalUseCases.observeGoalTemplates(),
+                assetUseCases.observeAssets(),
+                transactionUseCases.observeSourcesUseCase(),
+                goalUseCases.calculateFreedomStage()
+            ) { flows ->
+                val goals = flows[0] as List<Goal>
+                val baskets = flows[1] as List<GoalBasket>
+                val templates = flows[2] as List<GoalTemplate>
+                val assets = flows[3] as List<Asset>
+                val sources = flows[4] as List<Source>
+                val stage = flows[5] as FreedomStage
+                
                 val totalSaved = goals.sumOf { it.savedAmount }
                 val totalTarget = goals.sumOf { it.targetAmount }
+                
+                val items = mutableListOf<BasketData>()
+                
+                if (baskets.isEmpty()) {
+                    val security = sources.sumOf { it.balance.toLong() } + 
+                            goals.filter { it.type == GoalType.EMERGENCY_FUND }.sumOf { it.savedAmount }
+                    
+                    val growth = assets.sumOf { it.totalCurrentValue } + 
+                            goals.filter { it.type == GoalType.INVESTMENT }.sumOf { it.savedAmount }
+                    
+                    val dream = goals.filter { 
+                        it.type == GoalType.SAVINGS || it.type == GoalType.BIG_PURCHASE 
+                    }.sumOf { it.savedAmount }
+                    
+                    val total = security + growth + dream
+                    
+                    items.add(BasketData(name = "Security", amount = security, percent = if(total > 0) (security * 100 / total).toInt() else 0, colorId = 1))
+                    items.add(BasketData(name = "Growth", amount = growth, percent = if(total > 0) (growth * 100 / total).toInt() else 0, colorId = 2))
+                    items.add(BasketData(name = "Dream", amount = dream, percent = if(total > 0) (dream * 100 / total).toInt() else 0, colorId = 3))
+                } else {
+                    val basketAmounts = baskets.map { b ->
+                        goals.filter { it.basketId == b.id }.sumOf { it.savedAmount }
+                    }
+                    val total = basketAmounts.sum()
+                    
+                    baskets.forEachIndexed { index, b ->
+                        val amount = basketAmounts[index]
+                        items.add(BasketData(
+                            id = b.id,
+                            name = b.name,
+                            amount = amount,
+                            percent = if(total > 0) (amount * 100 / total).toInt() else 0,
+                            colorId = b.colorId
+                        ))
+                    }
+                }
+                
                 _state.update {
                     it.copy(
                         goals = goals,
+                        templates = templates,
+                        baskets = baskets,
+                        basketItems = items,
                         totalSavedAmount = totalSaved,
                         totalTargetAmount = totalTarget,
+                        freedomStage = stage,
                         isLoading = false
                     )
                 }
-            }
+            }.collectLatest { }
         }
     }
 

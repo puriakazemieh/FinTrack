@@ -28,11 +28,22 @@ import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.GlassTone
 import com.kazemieh.designsystem.component.glass.SearchBar
+import com.kazemieh.designsystem.GlassGold
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Settings
+import com.kazemieh.designsystem.component.glass.SheetFrame
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.CheckCircle
 import com.kazemieh.goals.presentation.add.AddGoalBottomSheet
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -58,40 +69,66 @@ fun GoalScreen(
         onBack = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
+            GoalTabs(
+                selected = state.currentTab,
+                onSelect = { viewModel.onIntent(GoalIntent.SelectTab(it)) }
+            )
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(space.medium),
                 verticalArrangement = Arrangement.spacedBy(space.medium)
             ) {
-                item {
-                    GoalSummaryHero(state)
-                }
+                when (state.currentTab) {
+                    GoalTab.GOALS -> {
+                        item {
+                            GoalSummaryHero(state)
+                        }
 
-                item {
-                    RoundUpSummaryCard(
-                        state = state,
-                        onClick = { viewModel.onIntent(GoalIntent.ToggleRoundUpSettings) }
-                    )
-                }
+                        item {
+                            RoundUpSummaryCard(
+                                state = state,
+                                onClick = { viewModel.onIntent(GoalIntent.ToggleRoundUpSettings) }
+                            )
+                        }
 
-                item {
-                    SearchBar(
-                        query = state.searchQuery,
-                        onQueryChange = { viewModel.onIntent(GoalIntent.UpdateSearchQuery(it)) },
-                        placeholder = stringResource(Res.string.hint_search_in, stringResource(Res.string.title_savings_goals))
-                    )
-                }
+                        item {
+                            SearchBar(
+                                query = state.searchQuery,
+                                onQueryChange = { viewModel.onIntent(GoalIntent.UpdateSearchQuery(it)) },
+                                placeholder = stringResource(Res.string.hint_search_in, stringResource(Res.string.title_savings_goals))
+                            )
+                        }
 
-                items(state.goals) { goal ->
-                    GoalCard(
-                        goal = goal,
-                        onAddAmount = {
-                            selectedGoalId = goal.id
-                            amountToAdd = ""
-                            showAddAmountDialog = true
-                        },
-                        onEdit = { viewModel.onIntent(GoalIntent.ShowAddGoal(goal)) }
-                    )
+                        items(state.goals) { goal ->
+                            GoalCard(
+                                goal = goal,
+                                onAddAmount = {
+                                    selectedGoalId = goal.id
+                                    amountToAdd = ""
+                                    showAddAmountDialog = true
+                                },
+                                onEdit = { viewModel.onIntent(GoalIntent.ShowAddGoal(goal)) }
+                            )
+                        }
+                    }
+
+                    GoalTab.ROADMAP -> {
+                        item {
+                            FreedomRoadmap(state)
+                        }
+                    }
+
+                    GoalTab.BASKET -> {
+                        item {
+                            FinancialBasketView(
+                                state = state,
+                                onAddBasket = { viewModel.onIntent(GoalIntent.AddBasket(it)) },
+                                onUpdateBasket = { viewModel.onIntent(GoalIntent.UpdateBasket(it)) },
+                                onDeleteBasket = { viewModel.onIntent(GoalIntent.DeleteBasket(it)) }
+                            )
+                        }
+                    }
                 }
 
                 item { Spacer(Modifier.height(100.dp)) }
@@ -254,6 +291,331 @@ private fun RoundUpSettingsSheet(
 }
 
 @Composable
+private fun GoalTabs(
+    selected: GoalTab,
+    onSelect: (GoalTab) -> Unit
+) {
+    val space = LocalSpacing.current
+    val glassColors = LocalGlassColors.current
+    
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = space.medium, vertical = space.small),
+        horizontalArrangement = Arrangement.spacedBy(space.small)
+    ) {
+        GoalTabItem(
+            label = stringResource(Res.string.title_savings_goals),
+            selected = selected == GoalTab.GOALS,
+            onClick = { onSelect(GoalTab.GOALS) },
+            modifier = Modifier.weight(1f)
+        )
+        GoalTabItem(
+            label = stringResource(Res.string.label_roadmap),
+            selected = selected == GoalTab.ROADMAP,
+            onClick = { onSelect(GoalTab.ROADMAP) },
+            modifier = Modifier.weight(1f)
+        )
+        GoalTabItem(
+            label = stringResource(Res.string.label_financial_basket),
+            selected = selected == GoalTab.BASKET,
+            onClick = { onSelect(GoalTab.BASKET) },
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun GoalTabItem(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val glassColors = LocalGlassColors.current
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.16f) else glassColors.glass)
+            .border(
+                1.dp,
+                if (selected) MaterialTheme.colorScheme.primary else glassColors.glassEdge,
+                RoundedCornerShape(12.dp)
+            )
+            .clickable { onClick() }
+            .padding(vertical = 10.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        FintrackLabelMediumText(
+            text = label,
+            color = if (selected) MaterialTheme.colorScheme.primary else glassColors.text2,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+        )
+    }
+}
+
+@Composable
+private fun FreedomRoadmap(state: GoalState) {
+    val glassColors = LocalGlassColors.current
+    val space = LocalSpacing.current
+    
+    val stages = listOf(
+        Res.string.freedom_stage_1,
+        Res.string.freedom_stage_2,
+        Res.string.freedom_stage_3,
+        Res.string.freedom_stage_4,
+        Res.string.freedom_stage_5,
+        Res.string.freedom_stage_6,
+        Res.string.freedom_stage_7
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(space.medium)) {
+        FintrackTitleMediumText(
+            text = stringResource(Res.string.label_roadmap),
+            fontWeight = FontWeight.Bold
+        )
+        
+        stages.forEachIndexed { index, stageRes ->
+            val level = index + 1
+            val isCompleted = state.freedomStage.level > level
+            val isCurrent = state.freedomStage.level == level
+            
+            RoadmapStageCard(
+                stage = stringResource(stageRes),
+                step = level,
+                isCompleted = isCompleted,
+                isCurrent = isCurrent
+            )
+        }
+    }
+}
+
+@Composable
+private fun RoadmapStageCard(
+    stage: String,
+    step: Int,
+    isCompleted: Boolean,
+    isCurrent: Boolean
+) {
+    val glassColors = LocalGlassColors.current
+    val color = when {
+        isCompleted -> GlassGreen
+        isCurrent -> MaterialTheme.colorScheme.primary
+        else -> glassColors.text3
+    }
+
+    GlassCard(
+        tone = if (isCurrent) GlassTone.Strong else GlassTone.Default
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(color.copy(alpha = 0.1f))
+                    .border(1.dp, color, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                FintrackLabelMediumText(text = step.toString().toPersianDigits(), color = color, fontWeight = FontWeight.Bold)
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            FintrackBodyMediumText(
+                text = stage,
+                fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal,
+                color = if (isCurrent) glassColors.text else glassColors.text2
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            if (isCompleted) {
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = GlassGreen,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FinancialBasketView(
+    state: GoalState,
+    onAddBasket: (com.kazemieh.common.model.GoalBasket) -> Unit,
+    onUpdateBasket: (com.kazemieh.common.model.GoalBasket) -> Unit,
+    onDeleteBasket: (Long) -> Unit
+) {
+    val space = LocalSpacing.current
+    val glassColors = LocalGlassColors.current
+    var showManageBaskets by remember { mutableStateOf(false) }
+    
+    Column(verticalArrangement = Arrangement.spacedBy(space.medium)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            FintrackTitleMediumText(
+                text = stringResource(Res.string.label_financial_basket),
+                fontWeight = FontWeight.Bold
+            )
+            IconButton(onClick = { showManageBaskets = true }) {
+                Icon(Icons.Default.Settings, null, tint = glassColors.text3)
+            }
+        }
+        
+        state.basketItems.forEach { item ->
+            BasketCard(
+                title = item.name,
+                amount = item.amount,
+                percent = item.percent,
+                color = when(item.colorId) {
+                    1 -> GlassGreen
+                    2 -> MaterialTheme.colorScheme.primary
+                    3 -> GlassGold
+                    else -> glassColors.text3
+                }
+            )
+        }
+    }
+
+    if (showManageBaskets) {
+        ManageBasketsBottomSheet(
+            baskets = state.baskets,
+            onAdd = onAddBasket,
+            onUpdate = onUpdateBasket,
+            onDelete = onDeleteBasket,
+            onDismiss = { showManageBaskets = false }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ManageBasketsBottomSheet(
+    baskets: List<com.kazemieh.common.model.GoalBasket>,
+    onAdd: (com.kazemieh.common.model.GoalBasket) -> Unit,
+    onUpdate: (com.kazemieh.common.model.GoalBasket) -> Unit,
+    onDelete: (Long) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var showAddDialog by remember { mutableStateOf(false) }
+    var editingBasket by remember { mutableStateOf<com.kazemieh.common.model.GoalBasket?>(null) }
+    var name by remember { mutableStateOf("") }
+
+    com.kazemieh.designsystem.component.glass.SheetFrame(
+        title = stringResource(Res.string.label_financial_basket),
+        onDismiss = onDismiss,
+        primaryButtonText = stringResource(Res.string.add_new_item),
+        onPrimaryClick = {
+            editingBasket = null
+            name = ""
+            showAddDialog = true
+        }
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            baskets.forEach { basket ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(LocalGlassColors.current.glass)
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FintrackBodyMediumText(text = basket.name, modifier = Modifier.weight(1f))
+                    IconButton(onClick = {
+                        editingBasket = basket
+                        name = basket.name
+                        showAddDialog = true
+                    }) {
+                        Icon(Icons.Default.Edit, null, tint = LocalGlassColors.current.text3, modifier = Modifier.size(20.dp))
+                    }
+                    IconButton(onClick = { onDelete(basket.id) }) {
+                        Icon(Icons.Default.Delete, null, tint = Color.Red, modifier = Modifier.size(20.dp))
+                    }
+                }
+            }
+        }
+    }
+
+    if (showAddDialog) {
+        AlertDialog(
+            onDismissRequest = { showAddDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (name.isNotEmpty()) {
+                        if (editingBasket == null) {
+                            onAdd(com.kazemieh.common.model.GoalBasket(name = name))
+                        } else {
+                            onUpdate(editingBasket!!.copy(name = name))
+                        }
+                        showAddDialog = false
+                    }
+                }) {
+                    Text(stringResource(Res.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAddDialog = false }) {
+                    Text(stringResource(Res.string.cancell_))
+                }
+            },
+            title = { Text(if (editingBasket == null) stringResource(Res.string.add_new_item) else stringResource(Res.string.edit)) },
+            text = {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text(stringResource(Res.string.label_title)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun BasketCard(
+    title: String,
+    amount: Long,
+    percent: Int,
+    color: Color
+) {
+    val glassColors = LocalGlassColors.current
+    GlassCard {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                FintrackBodyMediumText(text = title, fontWeight = FontWeight.Bold)
+                FintrackLabelMediumText(text = "${percent}%".toPersianDigits(), color = color, fontWeight = FontWeight.Bold)
+            }
+            
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(glassColors.glassHairline)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(percent / 100f)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(color)
+                )
+            }
+            
+            FintrackTitleMediumText(text = amount.toPersianPrice(), fontWeight = FontWeight.Black)
+        }
+    }
+}
+
+@Composable
 private fun GoalSummaryHero(state: GoalState) {
     val glassColors = LocalGlassColors.current
     val color = MaterialTheme.colorScheme.primary
@@ -308,7 +670,10 @@ private fun GoalCard(
 ) {
     val glassColors = LocalGlassColors.current
 
-    GlassCard(padding = 14.dp) {
+    GlassCard(
+        padding = 14.dp,
+        onClick = onEdit
+    ) {
         Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -322,12 +687,28 @@ private fun GoalCard(
                         fontWeight = FontWeight.Bold,
                         color = glassColors.text
                     )
-                    Text(
-                        text = stringResource(Res.string.label_monthly_target_with_val, goal.monthlyTarget.toPersianPrice()) + 
-                               (goal.endDate?.let { " · " + stringResource(Res.string.label_goal_eta, it) } ?: ""),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = glassColors.text3
-                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        FintrackLabelSmallText(
+                            text = when(goal.category) {
+                                com.kazemieh.common.model.GoalCategory.SHORT_TERM -> stringResource(Res.string.category_short)
+                                com.kazemieh.common.model.GoalCategory.MID_TERM -> stringResource(Res.string.category_mid)
+                                com.kazemieh.common.model.GoalCategory.LONG_TERM -> stringResource(Res.string.category_long)
+                            },
+                            color = glassColors.text3
+                        )
+                        FintrackLabelSmallText(text = "·", color = glassColors.text3)
+                        FintrackLabelSmallText(
+                            text = when(goal.priority) {
+                                com.kazemieh.common.model.GoalPriority.LOW -> stringResource(Res.string.priority_low)
+                                com.kazemieh.common.model.GoalPriority.MEDIUM -> stringResource(Res.string.priority_medium)
+                                com.kazemieh.common.model.GoalPriority.HIGH -> stringResource(Res.string.priority_high_goal)
+                            },
+                            color = when(goal.priority) {
+                                com.kazemieh.common.model.GoalPriority.HIGH -> Color.Red
+                                else -> glassColors.text3
+                            }
+                        )
+                    }
                 }
 
                 Text(
@@ -335,6 +716,16 @@ private fun GoalCard(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            if (goal.description.isNotEmpty()) {
+                Text(
+                    text = goal.description,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = glassColors.text3,
+                    maxLines = 1,
+                    modifier = Modifier.padding(top = 4.dp)
                 )
             }
 

@@ -1223,7 +1223,7 @@
     <string name="range_all">همه</string>
 
     <!-- Goals -->
-    <string name="title_savings_goals">اهداف پس‌انداز</string>
+    <string name="title_savings_goals">هدف‌گذاری مالی</string>
     <string name="label_active_goals">%1$d هدف فعال</string>
     <string name="label_total_saved">مجموع پس‌انداز شده</string>
     <string name="label_goal_summary">از هدف کل %1$s تومان · ٪%2$d</string>
@@ -1248,13 +1248,49 @@
     <string name="label_date_range_from">از %1$s</string>
     <string name="btn_save_goal">ذخیره هدف</string>
     <string name="goal_deleted">هدف حذف شد</string>
+    <string name="label_roadmap">نقشه راه</string>
+    <string name="label_financial_basket">سبد مالی</string>
+    <string name="label_no_basket">بدون سبد</string>
+    <string name="goal_type_savings">پس‌انداز عمومی</string>
+    <string name="goal_type_emergency">صندوق اضطراری</string>
+    <string name="goal_type_debt">تسویه بدهی</string>
+    <string name="goal_type_retirement">بازنشستگی</string>
+    <string name="goal_type_purchase">خرید بزرگ</string>
+    <string name="goal_type_investment">سرمایه‌گذاری</string>
+    <string name="category_short">کوتاه‌مدت</string>
+    <string name="category_mid">میان‌مدت</string>
+    <string name="category_long">بلندمدت</string>
+    <string name="priority_low">کم</string>
+    <string name="priority_medium">متوسط</string>
+    <string name="priority_high_goal">زیاد</string>
+    <string name="freedom_stage_1">وابستگی مالی</string>
+    <string name="freedom_stage_2">بقای مالی</string>
+    <string name="freedom_stage_3">ثبات مالی</string>
+    <string name="freedom_stage_4">رهایی از بدهی</string>
+    <string name="freedom_stage_5">امنیت مالی</string>
+    <string name="freedom_stage_6">استقلال مالی</string>
+    <string name="freedom_stage_7">آزادی مالی</string>
+    <string name="label_priority">اولویت</string>
+    <string name="label_category_goal">دسته‌بندی</string>
+    <string name="label_type_goal">نوع هدف</string>
+    <string name="label_feasibility">وضعیت امکان‌پذیری</string>
+    <string name="msg_feasibility_realistic">واقع‌بینانه</string>
+    <string name="msg_feasibility_unrealistic">غیرواقع‌بینانه (نیاز به مبلغ بیشتر یا زمان بیشتر)</string>
+
+    <string name="help_goal_type">نوع هدف به شما کمک می‌کند تا اهداف خود را بر اساس مراحل استقلال مالی دسته‌بندی کنید و نقشه راه دقیق‌تری داشته باشید.</string>
+    <string name="help_monthly_target">مبلغی که باید هر ماه برای رسیدن به این هدف در بازه زمانی مشخص شده پس‌انداز کنید. این مقدار به صورت خودکار نیز محاسبه می‌شود.</string>
+    <string name="help_start_date">تاریخی که شروع به جمع‌آوری پول برای این هدف کرده‌اید.</string>
+    <string name="help_end_date">مهلتی که برای رسیدن به کل مبلغ هدف در نظر گرفته‌اید.</string>
+    <string name="help_priority">اولویت هدف تعیین می‌کند که در زمان محدودیت منابع، پول ابتدا به کدام هدف اختصاص یابد.</string>
+    <string name="label_manage_goal_types">مدیریت انواع هدف</string>
+    <string name="label_add_goal_type">افزودن نوع هدف جدید</string>
 
     <!-- Utilities -->
     <string name="title_fx_rates">نرخ ارز و طلا</string>
     <string name="sub_fx_rates">آخرین قیمت‌های بازار</string>
     <string name="title_currency_converter">تبدیل ارز</string>
     <string name="sub_currency_converter">ماشین‌حساب هوشمند تبدیل</string>
-    <string name="title_news">اخبار و آموزش</string>
+    <string name="title_news">آموزش و اخبار</string>
     <string name="sub_news">تازه‌های دنیای اقتصاد و فین‌تراک</string>
     <string name="title_faq">سوالات متداول</string>
     <string name="sub_faq">پاسخ به پرسش‌های رایج شما</string>
@@ -1376,4 +1412,16 @@
     <string name="note_color_label">رنگ</string>
     <string name="shopping_title_label">عنوان</string>
     <string name="shopping_add_title">افزودن به لیست خرید</string>
+    <!-- Education Content -->
+    <string name="edu_smart_goals_title">اهداف SMART در مدیریت مالی</string>
+    <string name="edu_smart_goals_summary">چگونه اهدافی بسازیم که واقعاً به آن‌ها برسیم؟</string>
+    <string name="edu_smart_goals_content">هدف SMART مخفف پنج واژه است:\n۱. مشخص (Specific): دقیقاً بگویید چه می‌خواهید.\n۲. قابل اندازه‌گیری (Measurable): مبلغ دقیق را تعیین کنید.\n۳. دست‌یافتنی (Achievable): با توجه به درآمدتان واقع‌بینانه باشد.\n۴. مرتبط (Relevant): با ارزش‌های زندگی‌تان همسو باشد.\n۵. زمان‌دار (Time-bound): مهلت پایان تعیین کنید.</string>
+
+    <string name="edu_freedom_stages_title">۶ مرحله تا استقلال مالی</string>
+    <string name="edu_freedom_stages_summary">نقشه راه شما برای رهایی از دغدغه‌های پولی</string>
+    <string name="edu_freedom_stages_content">مراحل استقلال مالی عبارتند از:\n۱. وابستگی: مخارج بیشتر از درآمد.\n۲. بقا: پوشش هزینه‌ها بدون پس‌انداز.\n۳. ثبات: ایجاد صندوق اضطراری.\n۴. رهایی از بدهی: تسویه تمام وام‌های بد.\n۵. امنیت: درآمد غیرفعال برای هزینه‌های ضروری.\n۶. استقلال: درآمد غیرفعال برای سبک زندگی مطلوب.</string>
+
+    <string name="edu_basket_title">تشکیل سبد مالی (بسکِت)</string>
+    <string name="edu_basket_summary">توزیع هوشمند دارایی‌ها برای کاهش ریسک</string>
+    <string name="edu_basket_content">یک سبد مالی سالم شامل سه بخش است:\n۱. سبد امنیتی: نقدینگی و صندوق اضطراری برای آرامش.\n۲. سبد رشد: سرمایه‌گذاری در بورس، طلا و ارز برای افزایش ثروت.\n۳. سبد آرزوها: پس‌انداز برای خریدهای بزرگ و تفریح.\nتوازن بین این‌ها کلید موفقیت شماست.</string>
 </resources>

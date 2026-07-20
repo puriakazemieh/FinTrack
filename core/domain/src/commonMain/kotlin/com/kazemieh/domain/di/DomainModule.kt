@@ -1,118 +1,6 @@
 package com.kazemieh.domain.di
 
-import com.kazemieh.domain.usecase.AddBudgetUseCase
-import com.kazemieh.domain.usecase.AddCategoryUseCase
-import com.kazemieh.domain.usecase.AddCheckUseCase
-import com.kazemieh.domain.usecase.AddDebtUseCase
-import com.kazemieh.domain.usecase.AddFixedExpenseUseCase
-import com.kazemieh.domain.usecase.AddInstallmentUseCase
-import com.kazemieh.domain.usecase.AddPersonUseCase
-import com.kazemieh.domain.usecase.AddSourceUseCase
-import com.kazemieh.domain.usecase.AddTagUseCase
-import com.kazemieh.domain.usecase.AddTransactionUseCase
-import com.kazemieh.domain.usecase.CheckAchievementsUseCase
-import com.kazemieh.domain.usecase.CheckUseCaseGroup
-import com.kazemieh.domain.usecase.DeleteBudgetUseCase
-import com.kazemieh.domain.usecase.DeleteCategoryUseCase
-import com.kazemieh.domain.usecase.DeleteCheckUseCase
-import com.kazemieh.domain.usecase.DeleteDebtUseCase
-import com.kazemieh.domain.usecase.DeleteFixedExpenseUseCase
-import com.kazemieh.domain.usecase.DeleteInstallmentUseCase
-import com.kazemieh.domain.usecase.DeletePersonUseCase
-import com.kazemieh.domain.usecase.DeleteRecentSearchUseCase
-import com.kazemieh.domain.usecase.DeleteSourceUseCase
-import com.kazemieh.domain.usecase.DeleteTagUseCase
-import com.kazemieh.domain.usecase.DeleteTransactionUseCase
-import com.kazemieh.domain.usecase.FixedExpenseUseCaseGroup
-import com.kazemieh.domain.usecase.GetBooleanPreferenceUseCase
-import com.kazemieh.domain.usecase.GetCheckByIdUseCase
-import com.kazemieh.domain.usecase.GetDebtByIdUseCase
-import com.kazemieh.domain.usecase.GetFixedExpenseByIdUseCase
-import com.kazemieh.domain.usecase.GetPersonByIdUseCase
-import com.kazemieh.domain.usecase.GetSourceByIdUseCase
-import com.kazemieh.domain.usecase.GetStringFlowUseCase
-import com.kazemieh.domain.usecase.GetStringPreferenceUseCase
-import com.kazemieh.domain.usecase.GetCategoryUseCase
-import com.kazemieh.domain.usecase.GetDefaultCategoryUseCase
-import com.kazemieh.domain.usecase.GetDefaultFinancialSourceUseCase
-import com.kazemieh.domain.usecase.GetGoalByIdUseCase
-import com.kazemieh.domain.usecase.GetRecentSearchesUseCase
-import com.kazemieh.domain.usecase.GetSourceByIdentifierUseCase
-import com.kazemieh.domain.usecase.GetTransferCategoryUseCase
-import com.kazemieh.domain.usecase.GetTransactionAmountRangeUseCase
-import com.kazemieh.domain.usecase.DebtUseCaseGroup
-import com.kazemieh.domain.usecase.InstallmentUseCaseGroup
-import com.kazemieh.domain.usecase.GetInstallmentByIdUseCase
-import com.kazemieh.domain.usecase.UpdateInstallmentUseCase
-import com.kazemieh.domain.usecase.MarkInstallmentAsPaidUseCase
-import com.kazemieh.domain.usecase.ObserveGoalsUseCase
-import com.kazemieh.domain.usecase.ObserveAllChecksUseCase
-import com.kazemieh.domain.usecase.ObserveAllFixedExpensesUseCase
-import com.kazemieh.domain.usecase.ObserveChecksByStatusUseCase
-import com.kazemieh.domain.usecase.ObserveDebtsByPersonUseCase
-import com.kazemieh.domain.usecase.ObserveDebtsUseCase
-import com.kazemieh.domain.usecase.ObserveBudgetsWithProgressUseCase
-import com.kazemieh.domain.usecase.DetectSubscriptionsUseCase
-import com.kazemieh.domain.usecase.GetMonthlyTrendUseCase
-import com.kazemieh.domain.usecase.ObserveCategoriesFlatUseCase
-import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
-import com.kazemieh.domain.usecase.ObserveSpendingPatternUseCase
-import com.kazemieh.domain.usecase.ObserveCategorySumsUseCase
-import com.kazemieh.domain.usecase.ObserveInstallmentsUseCase
-import com.kazemieh.domain.usecase.ObserveMostUsedCategoriesUseCase
-import com.kazemieh.domain.usecase.ObserveMostUsedPersonsUseCase
-import com.kazemieh.domain.usecase.ObserveMostUsedSourcesUseCase
-import com.kazemieh.domain.usecase.ObserveMostUsedTagsUseCase
-import com.kazemieh.domain.usecase.ObservePersonsUseCase
-import com.kazemieh.domain.usecase.ObserveSourceUseCase
-import com.kazemieh.domain.usecase.ObserveStreakUseCase
-import com.kazemieh.domain.usecase.ObserveSourcesUseCase
-import com.kazemieh.domain.usecase.ObserveTagsUseCase
-import com.kazemieh.domain.usecase.ObserveTransactionsUseCase
-import com.kazemieh.domain.usecase.PreferenceUseCases
-import com.kazemieh.domain.usecase.SaveRecentSearchUseCase
-import com.kazemieh.domain.usecase.SearchCategoriesUseCase
-import com.kazemieh.domain.usecase.SearchPersonsUseCase
-import com.kazemieh.domain.usecase.SearchSourcesUseCase
-import com.kazemieh.domain.usecase.SearchTagsUseCase
-import com.kazemieh.domain.usecase.SeedDataUseCase
-import com.kazemieh.domain.usecase.SettleDebtUseCase
-import com.kazemieh.domain.usecase.SetBooleanPreferenceUseCase
-import com.kazemieh.domain.usecase.SetStringPreferenceUseCase
-import com.kazemieh.domain.usecase.SourceUseCases
-import com.kazemieh.domain.usecase.TransactionUseCaseGroup
-import com.kazemieh.domain.usecase.UpdateCategoryPositionsUseCase
-import com.kazemieh.domain.usecase.UpdateCategoryUseCase
-import com.kazemieh.domain.usecase.UpdateCheckUseCase
-import com.kazemieh.domain.usecase.UpdateDebtUseCase
-import com.kazemieh.domain.usecase.UpdateFixedExpenseUseCase
-import com.kazemieh.domain.usecase.UpdateNextDueDateUseCase
-import com.kazemieh.domain.usecase.UpdatePersonPositionsUseCase
-import com.kazemieh.domain.usecase.UpdatePersonUseCase
-import com.kazemieh.domain.usecase.UpdateSourcePositionsUseCase
-import com.kazemieh.domain.usecase.UpdateSourceUseCase
-import com.kazemieh.domain.usecase.UpdateXPUseCase
-import com.kazemieh.domain.usecase.UpdateGoalUseCase
-import com.kazemieh.domain.usecase.UpdateStreakUseCase
-import com.kazemieh.domain.usecase.UpdateTagPositionsUseCase
-import com.kazemieh.domain.usecase.UpdateTagUseCase
-import com.kazemieh.domain.usecase.UpdateTransactionUseCase
-import com.kazemieh.domain.usecase.AssetUseCases
-import com.kazemieh.domain.usecase.AddBudgetUseCase as AddBudgetUseCaseAlias
-import com.kazemieh.domain.usecase.AddAssetUseCase
-import com.kazemieh.domain.usecase.AddGoalUseCase
-import com.kazemieh.domain.usecase.ClearPreferencesUseCase
-import com.kazemieh.domain.usecase.DeleteAssetUseCase
-import com.kazemieh.domain.usecase.DeleteGoalUseCase
-import com.kazemieh.domain.usecase.ObserveAssetHistoryUseCase
-import com.kazemieh.domain.usecase.ObserveAchievementsUseCase
-import com.kazemieh.domain.usecase.ObserveAssetsUseCase
-import com.kazemieh.domain.usecase.SyncAssetRatesUseCase
-import com.kazemieh.domain.usecase.UpdateAssetUseCase
-import com.kazemieh.domain.usecase.UpdateBudgetUseCase
-import com.kazemieh.domain.usecase.GetBudgetByCategoryIdUseCase
-import com.kazemieh.domain.usecase.GetBudgetSpentAmountUseCase
-import com.kazemieh.domain.usecase.HasAnyBudgetsUseCase
+import com.kazemieh.domain.usecase.*
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -174,6 +62,17 @@ val domainModule = module {
     factory { UpdateGoalUseCase(get()) }
     factory { DeleteGoalUseCase(get()) }
     factory { GetGoalByIdUseCase(get()) }
+    factory { CalculateFreedomStageUseCase(get(), get(), get()) }
+    
+    factory { ObserveGoalTemplatesUseCase(get()) }
+    factory { AddGoalTemplateUseCase(get()) }
+    factory { UpdateGoalTemplateUseCase(get()) }
+    factory { DeleteGoalTemplateUseCase(get()) }
+
+    factory { ObserveGoalBasketsUseCase(get()) }
+    factory { AddGoalBasketUseCase(get()) }
+    factory { UpdateGoalBasketUseCase(get()) }
+    factory { DeleteGoalBasketUseCase(get()) }
 
     factory { AddInstallmentUseCase(get(), get()) }
     factory { ObserveInstallmentsUseCase(get()) }
@@ -309,7 +208,16 @@ val domainModule = module {
             addGoal = get(),
             updateGoal = get(),
             deleteGoal = get(),
-            getGoalById = get()
+            getGoalById = get(),
+            calculateFreedomStage = get(),
+            observeGoalTemplates = get(),
+            addGoalTemplate = get(),
+            updateGoalTemplate = get(),
+            deleteGoalTemplate = get(),
+            observeGoalBaskets = get(),
+            addGoalBasket = get(),
+            updateGoalBasket = get(),
+            deleteGoalBasket = get()
         )
     }
     single {
