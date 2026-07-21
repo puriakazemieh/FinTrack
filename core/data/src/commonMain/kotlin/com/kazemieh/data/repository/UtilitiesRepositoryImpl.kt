@@ -15,15 +15,13 @@ class UtilitiesRepositoryImpl(
     private val rssNewsService: RssNewsService
 ) : UtilitiesRepository {
 
-    // Curated educational content, used as a fallback when the live feed is unreachable.
-    private val fallbackNews = GoalEducationContent.allNews
-
-    // The last emitted articles, so the reader can resolve an item by id without re-fetching.
+    // The last fetched articles, so the reader can resolve an item by id without re-fetching.
     private var cachedNews: List<NewsItem> = emptyList()
 
     override fun observeNews(): Flow<List<NewsItem>> = flow {
-        val live = rssNewsService.fetchNews(DEFAULT_NEWS_FEED)
-        val news = live.ifEmpty { fallbackNews }
+        // Live articles only; the curated placeholders carried no real text (their titles came from
+        // a string-id mapper), so on a failed fetch we emit an honest empty list rather than blanks.
+        val news = rssNewsService.fetchNews(DEFAULT_NEWS_FEED)
         cachedNews = news
         emit(news)
     }
@@ -64,9 +62,6 @@ class UtilitiesRepositoryImpl(
 
     override suspend fun getNewsById(id: String): NewsItem? =
         cachedNews.find { it.id.trim().equals(id.trim(), ignoreCase = true) }
-            ?: fallbackNews.find { it.id.trim().equals(id.trim(), ignoreCase = true) }
-            ?: cachedNews.firstOrNull()
-            ?: fallbackNews.firstOrNull()
 
     private companion object {
         // Default Persian economic RSS feed. Falls back to curated content if unreachable.
