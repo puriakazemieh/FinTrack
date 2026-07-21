@@ -51,9 +51,9 @@ fun NewsListScreen(
         ) {
             items(state.news) { article ->
                 NewsCard(
-                    title = stringResource(NewsStringMapper.getTitle(article.id)),
+                    title = article.title,
                     category = stringResource(NewsStringMapper.getCategory(article.category)),
-                    summary = stringResource(NewsStringMapper.getSummary(article.id)),
+                    summary = article.summary,
                     readTime = article.readTimeMinutes,
                     onClick = { onArticleClick(article.id) }
                 )

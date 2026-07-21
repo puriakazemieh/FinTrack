@@ -53,7 +53,7 @@ fun ArticleReaderScreen(
                     .padding(space.medium)
             ) {
                 FintrackTitleLargeText(
-                    text = stringResource(NewsStringMapper.getTitle(article.id)),
+                    text = article.title,
                     fontWeight = FontWeight.Black,
 //                    lineHeight = MaterialTheme.typography.titleLarge.lineHeight * 1.2
                 )
@@ -72,7 +72,7 @@ fun ArticleReaderScreen(
                 }
 
                 FintrackBodyMediumText(
-                    text = stringResource(NewsStringMapper.getContent(article.id)),
+                    text = article.content,
 //                    lineHeight = MaterialTheme.typography.bodyMedium.lineHeight * 1.5
                 )
                 

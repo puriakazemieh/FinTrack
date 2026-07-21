@@ -51,7 +51,7 @@ val dataModule = module {
     single<SmsDraftRepository> { SmsDraftRepositoryImpl(get()) }
     single<AchievementRepository> { AchievementRepositoryImpl(get()) }
     single<GoalRepository> { GoalRepositoryImpl(get()) }
-    single<UtilitiesRepository> { UtilitiesRepositoryImpl() }
+    single<UtilitiesRepository> { UtilitiesRepositoryImpl(get()) }
 
     single<BackupRepository> {
         BackupRepositoryImpl(
