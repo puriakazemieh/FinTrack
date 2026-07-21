@@ -7,14 +7,25 @@ package com.kazemieh.network
  * (e.g. from the signed-in account or a persisted device id).
  */
 object SyncConfig {
-    var baseUrl: String = "http://10.0.2.2:8080/sync"
-    var apiKey: String = "fintrack_secret_token_2026"
+    var baseUrl: String = ""
+    var apiKey: String = ""
     var userId: String = "default_user"
 
     /**
      * Whether a real sync server is configured. Defaults to false so the app never tries to
-     * reach the development URL (which would fail with a cleartext-HTTP error). A real
-     * deployment sets this to true after pointing [baseUrl] at its server.
+     * reach a server until the user has entered their own URL + token in settings.
      */
     var enabled: Boolean = false
+
+    /** Preference keys the UI persists these values under. */
+    const val PREF_SERVER_URL = "pref_sync_server_url"
+    const val PREF_TOKEN = "pref_sync_token"
+    const val PREF_ENABLED = "pref_sync_enabled"
+
+    /** Applies user-entered settings; sync is only truly enabled when a URL and token are present. */
+    fun apply(url: String, token: String, wantEnabled: Boolean) {
+        baseUrl = url.trim()
+        apiKey = token.trim()
+        enabled = wantEnabled && baseUrl.isNotBlank() && apiKey.isNotBlank()
+    }
 }

@@ -1032,6 +1032,10 @@
     <string name="backup_drive_desc">متصل · هر روز</string>
     <string name="backup_server_title">سرور FinTrack</string>
     <string name="backup_server_desc">پریمیوم · هر ۱۵ دقیقه</string>
+    <string name="sync_server_hint">آدرس سرور و توکن خودت را وارد کن. تا وقتی هر دو پر نشوند، همگام‌سازی فعال نمی‌شود.</string>
+    <string name="sync_server_enable">فعال‌سازی همگام‌سازی با سرور</string>
+    <string name="sync_server_url">آدرس سرور (Base URL)</string>
+    <string name="sync_server_token">توکن دسترسی</string>
     <string name="backup_local_title">فایل محلی</string>
     <string name="backup_local_desc">دانلود برای آرشیو دستی</string>
     <string name="backup_saved_list">پشتیبان‌های ذخیره‌شده</string>

@@ -6,6 +6,8 @@ import com.kazemieh.common.model.*
 import com.kazemieh.common.util.DateUtils
 import com.kazemieh.domain.repository.BackupStats
 import com.kazemieh.domain.repository.BackupRepository
+import com.kazemieh.domain.usecase.PreferenceUseCases
+import com.kazemieh.network.SyncConfig
 import com.kazemieh.sync.GoogleDriveSyncManager
 import com.kazemieh.sync.ServerSyncManager
 import kotlinx.coroutines.channels.Channel
@@ -34,10 +36,11 @@ data class SyncState(
     // Drive stays off until OAuth credentials are wired up, so we never report a
     // fake success for it.
     val isGoogleDriveEnabled: Boolean = false,
-    // No sync server is configured in this build, so server sync stays off by default —
-    // otherwise "backup now" would fail against the dev URL. The user can enable it once
-    // a real server/URL is set.
+    // Server sync stays off until the user enters their own server URL + token below.
     val isServerSyncEnabled: Boolean = false,
+    val serverUrl: String = "",
+    val serverToken: String = "",
+    val showServerSettings: Boolean = false,
     val isLoading: Boolean = false
 )
 
@@ -49,12 +52,15 @@ sealed interface SyncIntent {
     data object BackupNow : SyncIntent
     data class ToggleGoogleDrive(val enabled: Boolean) : SyncIntent
     data class RestoreBackup(val timestamp: Long) : SyncIntent
+    data object ToggleServerSettings : SyncIntent
+    data class SaveServerConfig(val url: String, val token: String, val enabled: Boolean) : SyncIntent
 }
 
 class SyncViewModel(
     private val backupRepository: BackupRepository,
     private val googleDriveSyncManager: GoogleDriveSyncManager,
-    private val serverSyncManager: ServerSyncManager
+    private val serverSyncManager: ServerSyncManager,
+    private val preferenceUseCases: PreferenceUseCases
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncState())
@@ -64,7 +70,23 @@ class SyncViewModel(
     val effect = _effect.receiveAsFlow()
 
     init {
+        loadServerConfig()
         loadData()
+    }
+
+    private fun loadServerConfig() {
+        val url = preferenceUseCases.getStringPreference(SyncConfig.PREF_SERVER_URL, "")
+        val token = preferenceUseCases.getStringPreference(SyncConfig.PREF_TOKEN, "")
+        val enabled = preferenceUseCases.getBooleanPreference(SyncConfig.PREF_ENABLED, false)
+        // Push the persisted values into the runtime config the sync service reads.
+        SyncConfig.apply(url, token, enabled)
+        _state.update {
+            it.copy(
+                serverUrl = url,
+                serverToken = token,
+                isServerSyncEnabled = SyncConfig.enabled
+            )
+        }
     }
 
     private fun loadData() {
@@ -98,6 +120,23 @@ class SyncViewModel(
                 }
             }
             is SyncIntent.RestoreBackup -> restoreBackup(intent.timestamp)
+            SyncIntent.ToggleServerSettings -> _state.update { it.copy(showServerSettings = !it.showServerSettings) }
+            is SyncIntent.SaveServerConfig -> saveServerConfig(intent.url, intent.token, intent.enabled)
+        }
+    }
+
+    private fun saveServerConfig(url: String, token: String, enabled: Boolean) {
+        preferenceUseCases.setStringPreference(SyncConfig.PREF_SERVER_URL, url.trim())
+        preferenceUseCases.setStringPreference(SyncConfig.PREF_TOKEN, token.trim())
+        preferenceUseCases.setBooleanPreference(SyncConfig.PREF_ENABLED, enabled)
+        SyncConfig.apply(url, token, enabled)
+        _state.update {
+            it.copy(
+                serverUrl = url.trim(),
+                serverToken = token.trim(),
+                isServerSyncEnabled = SyncConfig.enabled,
+                showServerSettings = false
+            )
         }
     }
 

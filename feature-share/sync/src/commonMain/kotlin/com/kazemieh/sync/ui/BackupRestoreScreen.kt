@@ -107,7 +107,7 @@ fun BackupRestoreScreen(
                         icon = Icons.Outlined.Cloud,
                         color = GlassBlue,
                         isActive = state.isServerSyncEnabled,
-                        onToggle = { }
+                        onToggle = { viewModel.onIntent(SyncIntent.ToggleServerSettings) }
                     )
                     BackupDestinationItem(
                         title = stringResource(Res.string.backup_local_title),
@@ -169,6 +169,95 @@ fun BackupRestoreScreen(
 
     if (showExport) {
         exportSheet { showExport = false }
+    }
+
+    if (state.showServerSettings) {
+        ServerConfigSheet(
+            initialUrl = state.serverUrl,
+            initialToken = state.serverToken,
+            initialEnabled = state.isServerSyncEnabled,
+            onSave = { url, token, enabled ->
+                viewModel.onIntent(SyncIntent.SaveServerConfig(url, token, enabled))
+            },
+            onDismiss = { viewModel.onIntent(SyncIntent.ToggleServerSettings) }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ServerConfigSheet(
+    initialUrl: String,
+    initialToken: String,
+    initialEnabled: Boolean,
+    onSave: (String, String, Boolean) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val colors = LocalGlassColors.current
+    var url by remember { mutableStateOf(initialUrl) }
+    var token by remember { mutableStateOf(initialToken) }
+    var enabled by remember { mutableStateOf(initialEnabled) }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = colors.bg0,
+        dragHandle = { BottomSheetDefaults.DragHandle(color = colors.glassHairline) }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .padding(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Text(
+                text = stringResource(Res.string.backup_server_title),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = colors.text
+            )
+            Text(
+                text = stringResource(Res.string.sync_server_hint),
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.text2
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(Res.string.sync_server_enable),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colors.text
+                )
+                Switch(checked = enabled, onCheckedChange = { enabled = it })
+            }
+
+            OutlinedTextField(
+                value = url,
+                onValueChange = { url = it },
+                label = { Text(stringResource(Res.string.sync_server_url)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = token,
+                onValueChange = { token = it },
+                label = { Text(stringResource(Res.string.sync_server_token)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Button(
+                onClick = { onSave(url, token, enabled) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text(stringResource(Res.string.action_save))
+            }
+        }
     }
 }
 

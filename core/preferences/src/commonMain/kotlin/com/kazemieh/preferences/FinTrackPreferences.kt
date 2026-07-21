@@ -72,10 +72,6 @@ class FinTrackPreferences(private val settings: Settings) {
         const val PREF_AI_API_KEY = "pref_ai_api_key"
         const val PREF_AI_MODEL = "pref_ai_model"
 
-        // Self-hosted sync — user-supplied server URL + token; sync stays off until both are set.
-        const val PREF_SYNC_SERVER_URL = "pref_sync_server_url"
-        const val PREF_SYNC_TOKEN = "pref_sync_token"
-
         const val PREF_NOTIF_BUDGET_ENABLED = "pref_notif_budget_enabled"
         const val PREF_NOTIF_INSTALLMENT_ENABLED = "pref_notif_installment_enabled"
         const val PREF_NOTIF_CHEQUE_ENABLED = "pref_notif_cheque_enabled"
