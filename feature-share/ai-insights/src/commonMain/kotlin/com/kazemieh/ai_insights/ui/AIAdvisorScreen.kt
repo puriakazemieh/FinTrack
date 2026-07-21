@@ -4,7 +4,18 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -14,35 +25,86 @@ import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kazemieh.designsystem.LocalGlassColors
-import com.kazemieh.designsystem.component.glass.GlassCard
-import com.kazemieh.designsystem.component.glass.GlassTone
-import com.kazemieh.designsystem.component.glass.ScreenHeader
-import com.kazemieh.designsystem.component.glass.HeaderAction
-import com.kazemieh.designsystem.component.EmptyList
-import fintrack.core.designsystem.generated.resources.*
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
-import com.kazemieh.common.toPersianDigits
-import com.kazemieh.common.toPersianPrice
 import com.kazemieh.common.persiandatetime.domain.PersianDateTime
 import com.kazemieh.common.persiandatetime.extensions.toDateString
+import com.kazemieh.common.toPersianDigits
+import com.kazemieh.common.toPersianPrice
 import com.kazemieh.designsystem.GlassBlue
+import com.kazemieh.designsystem.LocalGlassColors
+import com.kazemieh.designsystem.component.EmptyList
 import com.kazemieh.designsystem.component.FAB
 import com.kazemieh.designsystem.component.PieChart
 import com.kazemieh.designsystem.component.PieChartItem
+import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.GlassTone
+import com.kazemieh.designsystem.component.glass.HeaderAction
+import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.domain.usecase.DetectedSubscription
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.action_save
+import fintrack.core.designsystem.generated.resources.ai_active_suggestions_label
+import fintrack.core.designsystem.generated.resources.ai_advisor_sub
+import fintrack.core.designsystem.generated.resources.ai_advisor_title
+import fintrack.core.designsystem.generated.resources.ai_analysis_body
+import fintrack.core.designsystem.generated.resources.ai_analysis_days
+import fintrack.core.designsystem.generated.resources.ai_analysis_title
+import fintrack.core.designsystem.generated.resources.ai_cloud_insight_loading
+import fintrack.core.designsystem.generated.resources.ai_cloud_insight_title
+import fintrack.core.designsystem.generated.resources.ai_empty_title
+import fintrack.core.designsystem.generated.resources.ai_month_summary_title
+import fintrack.core.designsystem.generated.resources.ai_month_top_category
+import fintrack.core.designsystem.generated.resources.ai_settings_api_key
+import fintrack.core.designsystem.generated.resources.ai_settings_base_url
+import fintrack.core.designsystem.generated.resources.ai_settings_enable
+import fintrack.core.designsystem.generated.resources.ai_settings_hint
+import fintrack.core.designsystem.generated.resources.ai_settings_model
+import fintrack.core.designsystem.generated.resources.ai_settings_title
+import fintrack.core.designsystem.generated.resources.ai_subscription_next_payment
+import fintrack.core.designsystem.generated.resources.ai_subscription_occurrences
+import fintrack.core.designsystem.generated.resources.ai_subscriptions_label
+import fintrack.core.designsystem.generated.resources.ai_suggestion_return
+import fintrack.core.designsystem.generated.resources.ai_suggestion_risk
+import fintrack.core.designsystem.generated.resources.confirm
+import fintrack.core.designsystem.generated.resources.ic_92
+import fintrack.core.designsystem.generated.resources.label_expense
+import fintrack.core.designsystem.generated.resources.label_income
+import fintrack.core.designsystem.generated.resources.label_net
+import fintrack.core.designsystem.generated.resources.label_retry
+import fintrack.core.designsystem.generated.resources.risk_high
+import fintrack.core.designsystem.generated.resources.risk_low
+import fintrack.core.designsystem.generated.resources.risk_medium
+import fintrack.core.designsystem.generated.resources.unit_toman_short
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,7 +157,12 @@ fun AIAdvisorScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(padding),
-                    contentPadding = PaddingValues(bottom = 100.dp, start = 16.dp, end = 16.dp, top = 16.dp),
+                    contentPadding = PaddingValues(
+                        bottom = 100.dp,
+                        start = 16.dp,
+                        end = 16.dp,
+                        top = 16.dp
+                    ),
                     verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
                     item {
@@ -307,7 +374,10 @@ private fun AnalysisCard(state: AIAdvisorState) {
                             .clip(RoundedCornerShape(14.dp))
                             .background(
                                 Brush.linearGradient(
-                                    listOf(MaterialTheme.colorScheme.tertiary, MaterialTheme.colorScheme.tertiary.copy(alpha = 0.8f))
+                                    listOf(
+                                        MaterialTheme.colorScheme.tertiary,
+                                        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.8f)
+                                    )
                                 )
                             ),
                         contentAlignment = Alignment.Center
@@ -328,7 +398,10 @@ private fun AnalysisCard(state: AIAdvisorState) {
                             color = glassColors.text
                         )
                         Text(
-                            text = stringResource(Res.string.ai_analysis_days, state.activeDays.toPersianDigits()),
+                            text = stringResource(
+                                Res.string.ai_analysis_days,
+                                state.activeDays.toPersianDigits()
+                            ),
                             style = MaterialTheme.typography.labelSmall,
                             color = glassColors.text2
                         )
@@ -541,12 +614,18 @@ private fun SubscriptionCard(subscription: DetectedSubscription) {
                     color = glassColors.text
                 )
                 Text(
-                    text = stringResource(Res.string.ai_subscription_next_payment, nextDate.toPersianDigits()),
+                    text = stringResource(
+                        Res.string.ai_subscription_next_payment,
+                        nextDate.toPersianDigits()
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     color = glassColors.text2
                 )
                 Text(
-                    text = stringResource(Res.string.ai_subscription_occurrences, subscription.occurrences),
+                    text = stringResource(
+                        Res.string.ai_subscription_occurrences,
+                        subscription.occurrences
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     color = glassColors.text3
                 )
@@ -606,14 +685,20 @@ private fun SuggestionCard(
 
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = stringResource(suggestion.title, *suggestion.titleArgs.toTypedArray()),
+                            text = stringResource(
+                                suggestion.title,
+                                *suggestion.titleArgs.toTypedArray()
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             color = glassColors.text
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = stringResource(suggestion.body, *suggestion.bodyArgs.toTypedArray()),
+                            text = stringResource(
+                                suggestion.body,
+                                *suggestion.bodyArgs.toTypedArray()
+                            ),
                             style = MaterialTheme.typography.labelSmall,
                             color = glassColors.text2
                         )
@@ -633,11 +718,17 @@ private fun SuggestionCard(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     InfoChip(
-                        label = stringResource(Res.string.ai_suggestion_risk, stringResource(suggestion.risk.toStringResource())),
+                        label = stringResource(
+                            Res.string.ai_suggestion_risk,
+                            stringResource(suggestion.risk.toStringResource())
+                        ),
                         color = color
                     )
                     InfoChip(
-                        label = stringResource(Res.string.ai_suggestion_return, stringResource(suggestion.returnRate).toPersianDigits()),
+                        label = stringResource(
+                            Res.string.ai_suggestion_return,
+                            stringResource(suggestion.returnRate).toPersianDigits()
+                        ),
                         color = color
                     )
                 }
@@ -693,11 +784,17 @@ private fun DetailBottomSheet(
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 InfoChip(
-                    label = stringResource(Res.string.ai_suggestion_risk, stringResource(suggestion.risk.toStringResource())),
+                    label = stringResource(
+                        Res.string.ai_suggestion_risk,
+                        stringResource(suggestion.risk.toStringResource())
+                    ),
                     color = color
                 )
                 InfoChip(
-                    label = stringResource(Res.string.ai_suggestion_return, stringResource(suggestion.returnRate).toPersianDigits()),
+                    label = stringResource(
+                        Res.string.ai_suggestion_return,
+                        stringResource(suggestion.returnRate).toPersianDigits()
+                    ),
                     color = color
                 )
             }

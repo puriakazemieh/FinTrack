@@ -12,3 +12,14 @@ plugins {
     alias(libs.plugins.android.lint) apply false
     alias(libs.plugins.sqldelight) apply false
 }
+
+subprojects {
+    configurations.all {
+        resolutionStrategy {
+            force("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.4")
+            force("com.fasterxml.jackson.core:jackson-databind:2.15.4")
+            force("com.fasterxml.jackson.core:jackson-core:2.15.4")
+            force("com.fasterxml.jackson.core:jackson-annotations:2.15.4")
+        }
+    }
+}

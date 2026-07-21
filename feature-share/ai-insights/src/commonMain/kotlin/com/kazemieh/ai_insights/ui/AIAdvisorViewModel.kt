@@ -3,30 +3,52 @@ package com.kazemieh.ai_insights.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.SyncStatus
-import com.kazemieh.common.model.TransactionFilterParams
-import com.kazemieh.common.model.TransactionType
 import com.kazemieh.domain.repository.AiConfig
+import com.kazemieh.domain.repository.TransactionRepository
 import com.kazemieh.domain.usecase.AiConfigUseCase
 import com.kazemieh.domain.usecase.DetectSubscriptionsUseCase
 import com.kazemieh.domain.usecase.GenerateAiInsightUseCase
-import com.kazemieh.domain.usecase.ObserveCategorySumsUseCase
+import com.kazemieh.domain.usecase.GetFinancialSummaryUseCase
 import com.kazemieh.domain.usecase.ObserveSpendingPatternUseCase
-import com.kazemieh.domain.repository.TransactionRepository
-import fintrack.core.designsystem.generated.resources.*
-import kotlinx.coroutines.flow.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.ai_suggestion_bank_body
+import fintrack.core.designsystem.generated.resources.ai_suggestion_bank_detail
+import fintrack.core.designsystem.generated.resources.ai_suggestion_bank_return
+import fintrack.core.designsystem.generated.resources.ai_suggestion_bank_title
+import fintrack.core.designsystem.generated.resources.ai_suggestion_budget_body
+import fintrack.core.designsystem.generated.resources.ai_suggestion_budget_title
+import fintrack.core.designsystem.generated.resources.ai_suggestion_concentration_body
+import fintrack.core.designsystem.generated.resources.ai_suggestion_concentration_detail
+import fintrack.core.designsystem.generated.resources.ai_suggestion_concentration_title
+import fintrack.core.designsystem.generated.resources.ai_suggestion_emergency_body
+import fintrack.core.designsystem.generated.resources.ai_suggestion_emergency_detail
+import fintrack.core.designsystem.generated.resources.ai_suggestion_emergency_title
+import fintrack.core.designsystem.generated.resources.ai_suggestion_fund_return
+import fintrack.core.designsystem.generated.resources.ai_suggestion_gold_body
+import fintrack.core.designsystem.generated.resources.ai_suggestion_gold_detail
+import fintrack.core.designsystem.generated.resources.ai_suggestion_gold_return
+import fintrack.core.designsystem.generated.resources.ai_suggestion_gold_title
+import fintrack.core.designsystem.generated.resources.ai_suggestion_overspend_body
+import fintrack.core.designsystem.generated.resources.ai_suggestion_overspend_detail
+import fintrack.core.designsystem.generated.resources.ai_suggestion_overspend_title
+import fintrack.core.designsystem.generated.resources.ic_cat_bank
+import fintrack.core.designsystem.generated.resources.ic_cat_investment
+import fintrack.core.designsystem.generated.resources.ic_cat_shopping
+import fintrack.core.designsystem.generated.resources.label_zero
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.kazemieh.designsystem.GlassBlue
-import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassAmber
-import androidx.compose.ui.graphics.toArgb
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 class AIAdvisorViewModel(
     private val observeSpendingPatternUseCase: ObserveSpendingPatternUseCase,
     private val transactionRepository: TransactionRepository,
     private val detectSubscriptionsUseCase: DetectSubscriptionsUseCase,
     private val generateAiInsightUseCase: GenerateAiInsightUseCase,
+    private val getFinancialSummaryUseCase: GetFinancialSummaryUseCase,
     private val aiConfigUseCase: AiConfigUseCase
 ) : ViewModel() {
 
@@ -61,7 +83,8 @@ class AIAdvisorViewModel(
 
             // Calculate active days
             val allTransactions = transactionRepository.getAllTransactions()
-            val earliestDate = allTransactions.filter { it.syncStatus != SyncStatus.DELETED }.minOfOrNull { it.timeStamp }
+            val earliestDate = allTransactions.filter { it.syncStatus != SyncStatus.DELETED }
+                .minOfOrNull { it.timeStamp }
             val activeDays = if (earliestDate != null) {
                 val now = kotlin.time.Clock.System.now().toEpochMilliseconds()
                 val diff = now - earliestDate
@@ -101,26 +124,61 @@ class AIAdvisorViewModel(
 
     private fun loadCloudInsight(pattern: com.kazemieh.domain.usecase.SpendingPattern) {
         if (!generateAiInsightUseCase.isEnabled()) return
-        if (pattern.totalIncome == 0L && pattern.totalExpense == 0L) return
         viewModelScope.launch {
             _state.update { it.copy(cloudInsightLoading = true, cloudInsight = null) }
-            val insight = generateAiInsightUseCase(buildInsightContext(pattern))
+            val summary = getFinancialSummaryUseCase()
+            val insight = generateAiInsightUseCase(buildInsightContext(pattern, summary))
             _state.update { it.copy(cloudInsight = insight, cloudInsightLoading = false) }
         }
     }
 
-    private fun buildInsightContext(pattern: com.kazemieh.domain.usecase.SpendingPattern): String {
+    private fun buildInsightContext(
+        pattern: com.kazemieh.domain.usecase.SpendingPattern,
+        summary: com.kazemieh.domain.usecase.FinancialSummary
+    ): String {
         return buildString {
-            append("درآمد این ماه: ${pattern.totalIncome} تومان. ")
-            append("هزینهٔ این ماه: ${pattern.totalExpense} تومان. ")
-            append("درصد پس‌انداز بالقوه: ${pattern.savingPotentialPercentage}٪. ")
-            pattern.topExpenseCategoryName?.let {
-                append("بیشترین هزینه در دستهٔ «$it» به مبلغ ${pattern.topExpenseAmount} تومان. ")
+            append("--- خلاصه وضعیت مالی حرفه‌ای ---")
+
+            append("\n[نقدینگی و دارایی]")
+            append("\nموجودی نقد کل: ${summary.totalBalance} تومان")
+            append("\nارزش کل دارایی‌های سرمایه‌ای: ${summary.totalAssets} تومان")
+            if (summary.assetBreakdown.isNotEmpty()) {
+                append("\nتفکیک دارایی‌ها: ${summary.assetBreakdown.entries.joinToString { "${it.key}: ${it.value}" }}")
             }
-            pattern.growthCategoryName?.let {
-                append("دستهٔ با بیشترین رشد: «$it» با ${pattern.growthPercentage}٪ رشد. ")
+
+            append("\n\n[تعهدات و بدهی]")
+            append("\nمجموع بدهی‌های پرداخت نشده: ${summary.totalDebt} تومان")
+            if (summary.upcomingInstallments.isNotEmpty()) {
+                append("\nاقساط سررسید نزدیک (۱۴ روز): ${summary.upcomingInstallments.joinToString { "${it.first}: ${it.second}" }}")
             }
-            append("یک تحلیل کوتاه و کاربردی برای بهبود وضعیت مالی بده.")
+            if (summary.upcomingFixedExpenses.isNotEmpty()) {
+                append("\nهزینه‌های ثابت نزدیک: ${summary.upcomingFixedExpenses.joinToString { "${it.first}: ${it.second}" }}")
+            }
+
+            append("\n\n[بودجه‌بندی]")
+            append("\nتعداد بودجه‌های فعال: ${summary.activeBudgetsCount}")
+            append("\nتعداد بودجه‌های فراتر از حد: ${summary.exceededBudgetsCount}")
+
+            append("\n\n[عملکرد ۳۰ روز اخیر و روند]")
+            append("\nدرآمد این ماه: ${summary.monthlyIncome} (ماه قبل: ${summary.prevMonthlyIncome})")
+            append("\nهزینه این ماه: ${summary.monthlyExpense} (ماه قبل: ${summary.prevMonthlyExpense})")
+            append("\nدرصد پس‌انداز بالقوه: ${pattern.savingPotentialPercentage}٪")
+            if (summary.topExpenseCategories.isNotEmpty()) {
+                append("\nسه دسته پرهزینه: ${summary.topExpenseCategories.joinToString { "${it.first}: ${it.second}" }}")
+            }
+
+            if (summary.goalProgress.isNotEmpty()) {
+                append("\n\n[اهداف مالی]")
+                append("\nپیشرفت اهداف: ${summary.goalProgress.joinToString { "${it.first}: ${it.second}%" }}")
+            }
+
+            append("\n\n--- دستورالعمل تحلیل ---")
+            append("\nبه عنوان یک مشاور مالی خبره، این داده‌های جامع را تحلیل کن.")
+            append("\n1. روند درآمد و هزینه را با ماه قبل مقایسه کن و نکات مثبت یا منفی را بگو.")
+            append("\n2. اگر نقدینگی نسبت به بدهی‌ها یا هزینه‌های سررسید نزدیک کم است، هشدار بده.")
+            append("\n3. به اهداف مالی کاربر توجه کن و برای رسیدن سریع‌تر به آن‌ها راهکار بده.")
+            append("\n4. اگر بودجه‌ای شکسته شده، برای مدیریت آن دسته خاص توصیه عملی بده.")
+            append("\nتحلیل باید حرفه‌ای، دقیق، بدون کلیشه‌ و حداکثر در ۶ جمله باشد.")
         }
     }
 
@@ -149,7 +207,10 @@ class AIAdvisorViewModel(
                     title = Res.string.ai_suggestion_budget_title,
                     titleArgs = listOf(pattern.growthCategoryName!!),
                     body = Res.string.ai_suggestion_budget_body,
-                    bodyArgs = listOf(pattern.growthCategoryName!!, pattern.growthPercentage.toString()),
+                    bodyArgs = listOf(
+                        pattern.growthCategoryName!!,
+                        pattern.growthPercentage.toString()
+                    ),
                     detail = Res.string.ai_suggestion_gold_detail, // Fallback detail
                     icon = Res.drawable.ic_cat_shopping,
                     colorHex = 0xFFEF4444, // GlassRed
@@ -166,7 +227,10 @@ class AIAdvisorViewModel(
                     title = Res.string.ai_suggestion_concentration_title,
                     titleArgs = listOf(pattern.topExpenseCategoryName!!),
                     body = Res.string.ai_suggestion_concentration_body,
-                    bodyArgs = listOf(pattern.topExpenseCategoryName!!, pattern.topExpenseSharePercentage.toString()),
+                    bodyArgs = listOf(
+                        pattern.topExpenseCategoryName!!,
+                        pattern.topExpenseSharePercentage.toString()
+                    ),
                     detail = Res.string.ai_suggestion_concentration_detail,
                     icon = Res.drawable.ic_cat_shopping,
                     colorHex = 0xFFF59E0B, // GlassAmber
@@ -208,7 +272,7 @@ class AIAdvisorViewModel(
 
         // 6. Low potential saving -> low-risk bank deposit / income focus.
         if (pattern.savingPotentialPercentage < 5 && !pattern.isOverspending) {
-             suggestions.add(
+            suggestions.add(
                 InvestmentSuggestion(
                     title = Res.string.ai_suggestion_bank_title,
                     body = Res.string.ai_suggestion_bank_body,
