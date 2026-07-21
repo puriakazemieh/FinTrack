@@ -1439,4 +1439,11 @@
     <string name="edu_basket_title">تشکیل سبد مالی (بسکِت)</string>
     <string name="edu_basket_summary">توزیع هوشمند دارایی‌ها برای کاهش ریسک</string>
     <string name="edu_basket_content">یک سبد مالی سالم شامل سه بخش است:\n۱. سبد امنیتی: نقدینگی و صندوق اضطراری برای آرامش.\n۲. سبد رشد: سرمایه‌گذاری در بورس، طلا و ارز برای افزایش ثروت.\n۳. سبد آرزوها: پس‌انداز برای خریدهای بزرگ و تفریح.\nتوازن بین این‌ها کلید موفقیت شماست.</string>
+
+    <string name="add_and_next">افزودن و بعدی</string>
+    <string name="delete_confirmation">تأیید حذف</string>
+    <string name="delete_item_confirm_msg">آیا از حذف این مورد اطمینان دارید؟</string>
+    <string name="filter">فیلتر</string>
+    <string name="show_purchased">نمایش خریداری‌شده</string>
+    <string name="hide_purchased">مخفی‌سازی خریداری‌شده</string>
 </resources>

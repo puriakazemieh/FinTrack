@@ -53,6 +53,7 @@ fun LargeAmountCard(
     onAmountChange: (String) -> Unit,
     onCalcClick: () -> Unit,
     label: String? = null,
+    required: Boolean = true,
     autoFocus: Boolean = true,
     enabled: Boolean = true,
     isError: Boolean = false,
@@ -82,13 +83,15 @@ fun LargeAmountCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    FintrackLabelSmallText(
-                        text = stringResource(Res.string.label_required_marker),
-                        color = GlassRed,
-                        modifier = Modifier.padding(start = 2.dp)
-                    )
+                    if (required) {
+                        FintrackLabelSmallText(
+                            text = stringResource(Res.string.label_required_marker),
+                            color = GlassRed,
+                            modifier = Modifier.padding(start = 2.dp)
+                        )
+                    }
                     if (label != null) {
-                        Spacer(modifier = Modifier.width(4.dp))
+                        if (required) Spacer(modifier = Modifier.width(4.dp))
                         FintrackLabelSmallText(
                             text = label,
                             color = glassColors.text3

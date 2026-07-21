@@ -34,6 +34,7 @@ kotlin {
                 implementation(project(":core:jalali"))
                 implementation(project(":core:designsystem"))
                 implementation(project(":feature-share:category"))
+                implementation(project(":feature-share:tags"))
                 implementation(project(":feature-share:notifications"))
 
                 implementation(libs.compose.runtime)

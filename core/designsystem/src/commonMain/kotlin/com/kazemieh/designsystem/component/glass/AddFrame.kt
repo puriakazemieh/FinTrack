@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -56,8 +57,12 @@ fun AddFrame(
     backgroundBrush: Brush? = null,
     secondaryLabel: String? = null,
     onSecondaryClick: (() -> Unit)? = null,
+    tertiaryLabel: String? = null,
+    onTertiaryClick: (() -> Unit)? = null,
     onFilterClick: (() -> Unit)? = null,
+    trailingContent: @Composable RowScope.() -> Unit = {},
     hero: @Composable (() -> Unit)? = null,
+    preventSwipeDismiss: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     // Keeps the enclosing ModalBottomSheet from being dismissed by the residual
@@ -83,7 +88,10 @@ fun AddFrame(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .nestedScroll(keepSheetOpenConnection)
+            .then(
+                if (preventSwipeDismiss) Modifier.nestedScroll(keepSheetOpenConnection)
+                else Modifier
+            )
             .then(
                 if (backgroundBrush != null)
                     Modifier.background(backgroundBrush)
@@ -99,6 +107,7 @@ fun AddFrame(
                 title = title,
                 sub = sub,
                 onClose = onClose,
+                trailingContent = trailingContent,
                 actions = if (onFilterClick != null) {
                     listOf(
                         HeaderAction(
@@ -171,10 +180,34 @@ fun AddFrame(
                     .padding(24.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                if ((tertiaryLabel != null) && (onTertiaryClick != null)) {
+                    OutlinedButton(
+                        onClick = onTertiaryClick,
+                        modifier = Modifier
+                            .weight(0.5f)
+                            .height(48.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.primary
+                        ),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        FintrackBodyLargeText(
+                            text = tertiaryLabel,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.W700,
+                            maxLines = 1
+                        )
+                    }
+                }
+
                 Button(
                     onClick = onPrimaryClick,
                     modifier = Modifier
-                        .weight(if (secondaryLabel != null) 0.6f else 1f)
+                        .weight(if (secondaryLabel != null || tertiaryLabel != null) 0.6f else 1f)
                         .height(48.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(

@@ -1,10 +1,13 @@
 package com.kazemieh.data_contract.datasource
 
 import com.kazemieh.common.model.ShoppingItem
+import com.kazemieh.common.model.Tag
 import kotlinx.coroutines.flow.Flow
 
 interface ShoppingLocalDataSource {
     fun observeShoppingItems(): Flow<List<ShoppingItem>>
+    fun observeShoppingItemsFiltered(categoryIds: List<Long>, tagIds: List<Long>): Flow<List<ShoppingItem>>
+    fun observeMostUsedTags(limit: Long): Flow<List<Tag>>
     suspend fun getShoppingItemById(id: Long): ShoppingItem?
     suspend fun addShoppingItem(item: ShoppingItem): Long
     suspend fun updateShoppingItem(item: ShoppingItem)

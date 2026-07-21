@@ -1,6 +1,7 @@
 import com.kazemieh.shopping.ui.ShoppingViewModel
 import com.kazemieh.domain.usecase.AddShoppingItemUseCase
 import com.kazemieh.domain.usecase.DeleteShoppingItemUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedShoppingTagsUseCase
 import com.kazemieh.domain.usecase.ObserveShoppingItemsUseCase
 import com.kazemieh.domain.usecase.UpdateShoppingItemUseCase
 import com.kazemieh.domain.usecase.UpdateShoppingPositionsUseCase
@@ -13,6 +14,7 @@ val shoppingModule = module {
     factory { UpdateShoppingItemUseCase(get()) }
     factory { DeleteShoppingItemUseCase(get()) }
     factory { UpdateShoppingPositionsUseCase(get()) }
+    factory { ObserveMostUsedShoppingTagsUseCase(get()) }
 
     viewModelOf(::ShoppingViewModel)
 }

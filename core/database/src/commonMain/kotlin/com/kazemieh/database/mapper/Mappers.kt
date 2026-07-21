@@ -505,6 +505,99 @@ fun ShoppingItemDb.toShoppingItem() = ShoppingItem(
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
+fun com.kazemieh.database.ObserveShoppingItems.toShoppingItem(): ShoppingItem {
+    val tags = if (tag_ids.isNullOrEmpty()) {
+        emptyList()
+    } else {
+        val ids = tag_ids.split(",")
+        val names = tag_names?.split(",") ?: emptyList()
+        ids.mapIndexed { index, id ->
+            Tag(
+                id = id.toLongOrNull() ?: 0L,
+                name = names.getOrNull(index) ?: "",
+                colorId = 1, // Default or join with tag table properly if needed
+                iconId = 1
+            )
+        }
+    }
+    return ShoppingItem(
+        id = id,
+        name = name,
+        isChecked = isChecked,
+        priority = priority.toInt(),
+        estimatedPrice = estimatedPrice,
+        reminderTime = reminderTime,
+        categoryId = categoryId,
+        note = note,
+        tags = tags,
+        position = position.toInt(),
+        updatedAt = updatedAt,
+        syncStatus = SyncStatus.fromInt(syncStatus.toInt())
+    )
+}
+
+fun com.kazemieh.database.ObserveShoppingItemsFiltered.toShoppingItem(): ShoppingItem {
+    val tags = if (tag_ids.isNullOrEmpty()) {
+        emptyList()
+    } else {
+        val ids = tag_ids.split(",")
+        val names = tag_names?.split(",") ?: emptyList()
+        ids.mapIndexed { index, id ->
+            Tag(
+                id = id.toLongOrNull() ?: 0L,
+                name = names.getOrNull(index) ?: "",
+                colorId = 1,
+                iconId = 1
+            )
+        }
+    }
+    return ShoppingItem(
+        id = id,
+        name = name,
+        isChecked = isChecked,
+        priority = priority.toInt(),
+        estimatedPrice = estimatedPrice,
+        reminderTime = reminderTime,
+        categoryId = categoryId,
+        note = note,
+        tags = tags,
+        position = position.toInt(),
+        updatedAt = updatedAt,
+        syncStatus = SyncStatus.fromInt(syncStatus.toInt())
+    )
+}
+
+fun com.kazemieh.database.GetShoppingItemById.toShoppingItem(): ShoppingItem {
+    val tags = if (tag_ids.isNullOrEmpty()) {
+        emptyList()
+    } else {
+        val ids = tag_ids.split(",")
+        val names = tag_names?.split(",") ?: emptyList()
+        ids.mapIndexed { index, id ->
+            Tag(
+                id = id.toLongOrNull() ?: 0L,
+                name = names.getOrNull(index) ?: "",
+                colorId = 1,
+                iconId = 1
+            )
+        }
+    }
+    return ShoppingItem(
+        id = id,
+        name = name,
+        isChecked = isChecked,
+        priority = priority.toInt(),
+        estimatedPrice = estimatedPrice,
+        reminderTime = reminderTime,
+        categoryId = categoryId,
+        note = note,
+        tags = tags,
+        position = position.toInt(),
+        updatedAt = updatedAt,
+        syncStatus = SyncStatus.fromInt(syncStatus.toInt())
+    )
+}
+
 fun com.kazemieh.database.Sync_history.toSyncHistory() = SyncHistory(
     id = id,
     timestamp = timestamp,

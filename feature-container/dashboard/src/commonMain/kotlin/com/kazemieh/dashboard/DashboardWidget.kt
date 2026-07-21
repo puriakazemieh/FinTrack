@@ -22,6 +22,7 @@ import org.jetbrains.compose.resources.StringResource
  */
 enum class DashboardWidget(val label: StringResource) {
     RECENT_TRANSACTIONS(Res.string.navigation_transactions),
+    SHOPPING(Res.string.shopping_list),
     ACHIEVEMENTS(Res.string.achievements_title),
     BUDGET(Res.string.label_budgets),
     GOAL(Res.string.title_savings_goals),
@@ -30,7 +31,6 @@ enum class DashboardWidget(val label: StringResource) {
     FIXED_EXPENSE(Res.string.title_fixed_expense_management),
     AI_ADVISOR(Res.string.ai_advisor_title),
     ASSET(Res.string.title_assets_management),
-    SHOPPING(Res.string.shopping_list),
     NOTES(Res.string.notes);
 
     companion object {

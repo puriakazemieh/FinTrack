@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.ShoppingItem
+import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.domain.usecase.AddShoppingItemUseCase
 import com.kazemieh.domain.usecase.DeleteShoppingItemUseCase
 import com.kazemieh.domain.usecase.GetCategoryUseCase
 import com.kazemieh.domain.usecase.ObserveMostUsedCategoriesUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedShoppingTagsUseCase
 import com.kazemieh.domain.usecase.ObserveShoppingItemsUseCase
 import com.kazemieh.domain.usecase.UpdateShoppingItemUseCase
 import com.kazemieh.domain.usecase.UpdateShoppingPositionsUseCase
@@ -24,6 +26,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -38,7 +41,13 @@ data class ShoppingState(
     val showAddSheet: Boolean = false,
     val editingItem: ShoppingItem? = null,
     val editingCategory: Category? = null,
-    val mostUsedCategories: List<Category> = emptyList()
+    val mostUsedCategories: List<Category> = emptyList(),
+    val mostUsedTags: List<Tag> = emptyList(),
+    val showPurchased: Boolean = true,
+    val filterCategories: Set<Category> = emptySet(),
+    val filterTags: Set<Tag> = emptySet(),
+    val itemToDelete: Long? = null,
+    val showFilterSheet: Boolean = false
 )
 
 sealed interface ShoppingIntent {
@@ -46,11 +55,19 @@ sealed interface ShoppingIntent {
     data object OnAddClick : ShoppingIntent
     data object OnAddSheetDismiss : ShoppingIntent
     data class OnSaveNewItem(val item: ShoppingItem) : ShoppingIntent
+    data class OnSaveAndNext(val item: ShoppingItem) : ShoppingIntent
     data class OnEditItem(val item: ShoppingItem?) : ShoppingIntent
     data class OnUpdateItem(val item: ShoppingItem) : ShoppingIntent
     data class OnToggleItem(val item: ShoppingItem) : ShoppingIntent
     data class OnDeleteItem(val id: Long) : ShoppingIntent
+    data class OnDeleteClick(val id: Long) : ShoppingIntent
+    data object OnDeleteCancel : ShoppingIntent
     data class OnReorder(val from: Int, val to: Int) : ShoppingIntent
+    data object OnTogglePurchasedVisibility : ShoppingIntent
+    data class OnFilterUpdate(val categories: Set<Category>, val tags: Set<Tag>) : ShoppingIntent
+    data object OnFilterReset : ShoppingIntent
+    data object OnFilterClick : ShoppingIntent
+    data object OnFilterSheetDismiss : ShoppingIntent
 }
 
 sealed interface ShoppingEffect {
@@ -65,6 +82,7 @@ class ShoppingViewModel(
     private val updatePositions: UpdateShoppingPositionsUseCase,
     private val getCategory: GetCategoryUseCase,
     private val observeMostUsedCategories: ObserveMostUsedCategoriesUseCase,
+    private val observeMostUsedTags: ObserveMostUsedShoppingTagsUseCase,
     private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
 
@@ -75,30 +93,41 @@ class ShoppingViewModel(
     val effect = _effect.receiveAsFlow()
 
     private val _searchQuery = MutableStateFlow("")
+    private val _filterCategories = MutableStateFlow<Set<Category>>(emptySet())
+    private val _filterTags = MutableStateFlow<Set<Tag>>(emptySet())
 
     init {
         _state.update { it.copy(isLoading = true) }
         observeMostUsedCategories(TransactionType.EXPENSE, limit = 3)
             .onEach { categories -> _state.update { it.copy(mostUsedCategories = categories) } }
             .launchIn(viewModelScope)
-        observeShoppingItems()
-            .combine(_searchQuery) { items, query ->
-                val filtered = items.filter {
-                    it.name.contains(query, ignoreCase = true)
-                }
-                items to filtered
-            }
-            .onEach { (all, filtered) ->
-                _state.update {
-                    it.copy(
-                        items = all,
-                        filteredItems = filtered,
-                        isLoading = false,
-                        searchQuery = _searchQuery.value
-                    )
-                }
-            }
+
+        observeMostUsedTags(limit = 3)
+            .onEach { tags -> _state.update { it.copy(mostUsedTags = tags) } }
             .launchIn(viewModelScope)
+
+        @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+        combine(_filterCategories, _filterTags) { categories, tags ->
+            categories to tags
+        }.flatMapLatest { (categories, tags) ->
+            observeShoppingItems(categories.mapNotNull { it.id }, tags.mapNotNull { it.id })
+        }.combine(_searchQuery) { items, query ->
+            val filtered = items.filter {
+                it.name.contains(query, ignoreCase = true)
+            }
+            items to filtered
+        }.onEach { (all, filtered) ->
+            _state.update {
+                it.copy(
+                    items = all,
+                    filteredItems = filtered,
+                    isLoading = false,
+                    searchQuery = _searchQuery.value,
+                    filterCategories = _filterCategories.value,
+                    filterTags = _filterTags.value
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun onIntent(intent: ShoppingIntent) {
@@ -106,12 +135,29 @@ class ShoppingViewModel(
             is ShoppingIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
             ShoppingIntent.OnAddClick -> _state.update { it.copy(showAddSheet = true) }
             ShoppingIntent.OnAddSheetDismiss -> _state.update { it.copy(showAddSheet = false) }
-            is ShoppingIntent.OnSaveNewItem -> addItem(intent.item)
+            is ShoppingIntent.OnSaveNewItem -> addItem(intent.item, dismiss = true)
+            is ShoppingIntent.OnSaveAndNext -> addItem(intent.item, dismiss = false)
             is ShoppingIntent.OnEditItem -> openEditor(intent.item)
             is ShoppingIntent.OnUpdateItem -> updateItem(intent.item)
             is ShoppingIntent.OnToggleItem -> toggleItem(intent.item)
-            is ShoppingIntent.OnDeleteItem -> deleteItem(intent.id)
+            is ShoppingIntent.OnDeleteItem -> {
+                deleteItem(intent.id)
+                _state.update { it.copy(itemToDelete = null) }
+            }
+            is ShoppingIntent.OnDeleteClick -> _state.update { it.copy(itemToDelete = intent.id) }
+            ShoppingIntent.OnDeleteCancel -> _state.update { it.copy(itemToDelete = null) }
             is ShoppingIntent.OnReorder -> reorderItems(intent.from, intent.to)
+            ShoppingIntent.OnTogglePurchasedVisibility -> _state.update { it.copy(showPurchased = !it.showPurchased) }
+            is ShoppingIntent.OnFilterUpdate -> {
+                _filterCategories.value = intent.categories
+                _filterTags.value = intent.tags
+            }
+            ShoppingIntent.OnFilterReset -> {
+                _filterCategories.value = emptySet()
+                _filterTags.value = emptySet()
+            }
+            ShoppingIntent.OnFilterClick -> _state.update { it.copy(showFilterSheet = true) }
+            ShoppingIntent.OnFilterSheetDismiss -> _state.update { it.copy(showFilterSheet = false) }
         }
     }
 
@@ -128,7 +174,7 @@ class ShoppingViewModel(
         }
     }
 
-    private fun addItem(item: ShoppingItem) {
+    private fun addItem(item: ShoppingItem, dismiss: Boolean) {
         if (item.name.isBlank()) return
         viewModelScope.launch {
             val newItem = item.copy(
@@ -136,7 +182,9 @@ class ShoppingViewModel(
             )
             val id = addShoppingItem(newItem)
             scheduleReminder(id, newItem)
-            _state.update { it.copy(showAddSheet = false) }
+            if (dismiss) {
+                _state.update { it.copy(showAddSheet = false) }
+            }
         }
     }
 

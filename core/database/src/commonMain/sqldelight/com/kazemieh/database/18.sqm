@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS shopping_item_tag (
+    shoppingItemId INTEGER NOT NULL,
+    tagId INTEGER NOT NULL,
+    PRIMARY KEY (shoppingItemId, tagId),
+    FOREIGN KEY (shoppingItemId) REFERENCES shopping_item_table(id) ON DELETE CASCADE,
+    FOREIGN KEY (tagId) REFERENCES tag(id) ON DELETE CASCADE
+);

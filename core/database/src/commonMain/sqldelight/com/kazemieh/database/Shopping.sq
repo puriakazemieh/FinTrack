@@ -15,15 +15,47 @@ CREATE TABLE IF NOT EXISTS shopping_item_table (
     FOREIGN KEY (categoryId) REFERENCES category(id) ON DELETE SET NULL
 );
 
+CREATE TABLE IF NOT EXISTS shopping_item_tag (
+    shoppingItemId INTEGER NOT NULL,
+    tagId INTEGER NOT NULL,
+    PRIMARY KEY (shoppingItemId, tagId),
+    FOREIGN KEY (shoppingItemId) REFERENCES shopping_item_table(id) ON DELETE CASCADE,
+    FOREIGN KEY (tagId) REFERENCES tag(id) ON DELETE CASCADE
+);
+
 observeShoppingItems:
-SELECT * FROM shopping_item_table WHERE syncStatus != 2 ORDER BY position ASC;
+SELECT
+    s.*,
+    GROUP_CONCAT(tag.id) AS tag_ids,
+    GROUP_CONCAT(tag.name) AS tag_names
+FROM shopping_item_table s
+LEFT JOIN shopping_item_tag sit ON s.id = sit.shoppingItemId
+LEFT JOIN tag ON sit.tagId = tag.id
+WHERE s.syncStatus != 2
+GROUP BY s.id
+ORDER BY s.position ASC;
 
 getShoppingItemById:
-SELECT * FROM shopping_item_table WHERE id = ? AND syncStatus != 2;
+SELECT
+    s.*,
+    GROUP_CONCAT(tag.id) AS tag_ids,
+    GROUP_CONCAT(tag.name) AS tag_names
+FROM shopping_item_table s
+LEFT JOIN shopping_item_tag sit ON s.id = sit.shoppingItemId
+LEFT JOIN tag ON sit.tagId = tag.id
+WHERE s.id = ? AND s.syncStatus != 2
+GROUP BY s.id;
 
 addShoppingItem:
 INSERT INTO shopping_item_table(name, isChecked, priority, estimatedPrice, reminderTime, categoryId, note, position, updatedAt, syncStatus)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+insertShoppingItemTagCrossRef:
+INSERT OR REPLACE INTO shopping_item_tag(shoppingItemId, tagId)
+VALUES (?, ?);
+
+deleteShoppingItemTagCrossRefs:
+DELETE FROM shopping_item_tag WHERE shoppingItemId = ?;
 
 updateShoppingItem:
 UPDATE shopping_item_table
@@ -51,3 +83,26 @@ SELECT * FROM shopping_item_table WHERE syncStatus = 1;
 
 markShoppingItemAsSynced:
 UPDATE shopping_item_table SET syncStatus = 0 WHERE id = ?;
+
+getMostUsedShoppingTags:
+SELECT tag.* FROM tag
+JOIN shopping_item_tag sit ON tag.id = sit.tagId
+GROUP BY tag.id
+ORDER BY COUNT(sit.shoppingItemId) DESC
+LIMIT :limit;
+
+observeShoppingItemsFiltered:
+SELECT
+    s.*,
+    GROUP_CONCAT(tag.id) AS tag_ids,
+    GROUP_CONCAT(tag.name) AS tag_names
+FROM shopping_item_table s
+LEFT JOIN shopping_item_tag sit ON s.id = sit.shoppingItemId
+LEFT JOIN tag ON sit.tagId = tag.id
+WHERE s.syncStatus != 2
+AND (:categoryIdsSize = 0 OR s.categoryId IN :categoryIds)
+AND (:tagIdsSize = 0 OR EXISTS (
+    SELECT 1 FROM shopping_item_tag WHERE shoppingItemId = s.id AND tagId IN :tagIds
+))
+GROUP BY s.id
+ORDER BY s.position ASC;

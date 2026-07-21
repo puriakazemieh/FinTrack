@@ -1,11 +1,13 @@
 package com.kazemieh.domain.usecase
 
 import com.kazemieh.common.model.ShoppingItem
+import com.kazemieh.common.model.Tag
 import com.kazemieh.domain.repository.ShoppingRepository
 import kotlinx.coroutines.flow.Flow
 
 class ObserveShoppingItemsUseCase(private val repository: ShoppingRepository) {
-    operator fun invoke(): Flow<List<ShoppingItem>> = repository.observeShoppingItems()
+    operator fun invoke(categoryIds: List<Long> = emptyList(), tagIds: List<Long> = emptyList()): Flow<List<ShoppingItem>> =
+        repository.observeShoppingItems(categoryIds, tagIds)
 }
 
 class AddShoppingItemUseCase(private val repository: ShoppingRepository) {
@@ -22,4 +24,8 @@ class DeleteShoppingItemUseCase(private val repository: ShoppingRepository) {
 
 class UpdateShoppingPositionsUseCase(private val repository: ShoppingRepository) {
     suspend operator fun invoke(items: List<ShoppingItem>) = repository.updatePositions(items)
+}
+
+class ObserveMostUsedShoppingTagsUseCase(private val repository: ShoppingRepository) {
+    operator fun invoke(limit: Long = 5): Flow<List<Tag>> = repository.observeMostUsedTags(limit)
 }
