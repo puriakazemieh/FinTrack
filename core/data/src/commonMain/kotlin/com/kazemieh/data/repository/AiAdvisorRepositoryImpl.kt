@@ -43,9 +43,10 @@ class AiAdvisorRepositoryImpl(
     }
 
     private companion object {
-        // Defaults target the Nara router (OpenAI-compatible). The user still supplies their own
-        // API key in-app; it is never stored in source.
-        const val DEFAULT_BASE_URL = "https://router.bynara.id/v1"
+        // Defaults target the Nara router (OpenAI-compatible). Koog appends "v1/chat/completions",
+        // so this is the API root. The user still supplies their own API key in-app; it is never
+        // stored in source.
+        const val DEFAULT_BASE_URL = "https://router.bynara.id"
         const val DEFAULT_MODEL = "glm-5.2-free"
         const val SYSTEM_PROMPT =
             "تو یک مشاور مالی شخصی فارسی‌زبان هستی. بر اساس خلاصهٔ مالی کاربر، یک تحلیل کوتاه، " +

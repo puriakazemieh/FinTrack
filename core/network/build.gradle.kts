@@ -52,6 +52,9 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.kermit)
                 implementation(libs.koin.core)
+                implementation(libs.koog.agents)
+                implementation(libs.koog.openai.client)
+                implementation(libs.koog.http.client.ktor)
             }
         }
 

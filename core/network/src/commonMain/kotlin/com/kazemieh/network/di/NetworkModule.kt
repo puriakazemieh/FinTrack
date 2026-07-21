@@ -11,6 +11,6 @@ val networkModule = module {
     single { createHttpClient() }
     single { TgjuService(get()) }
     single { SyncService(get()) }
-    single { AiChatService(get()) }
+    single { AiChatService() }
     single { RssNewsService(get()) }
 }

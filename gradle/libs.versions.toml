@@ -43,6 +43,7 @@ kotlinxCollectionsImmutable = "0.4.0"
 # --- DI / Network / DB ---
 koin = "4.1.1" # :contentReference[oaicite:23]{index=23}
 ktor = "3.3.3" # :contentReference[oaicite:24]{index=24}
+koog = "1.1.1"
 sqldelight = "2.2.1" # :contentReference[oaicite:25]{index=25}
 
 # --- UI Utils ---
@@ -148,6 +149,13 @@ koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
+
+# --- Koog (AI agents) ---
+koog-agents = { module = "ai.koog:koog-agents", version.ref = "koog" }
+# Ktor-backed KoogHttpClient.Factory — the openai client depends on it via `implementation`, so it
+# isn't transitively visible; add it directly for OpenAILLMClient's secondary constructor.
+koog-http-client-ktor = { module = "ai.koog:http-client-ktor", version.ref = "koog" }
+koog-openai-client = { module = "ai.koog:prompt-executor-openai-client", version.ref = "koog" }
 
 # --- Ktor ---
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }

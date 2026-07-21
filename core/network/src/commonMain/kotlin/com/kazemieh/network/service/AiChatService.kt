@@ -1,23 +1,23 @@
 package com.kazemieh.network.service
 
-import io.ktor.client.HttpClient
-import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
+import ai.koog.http.client.ktor.KtorKoogHttpClient
+import ai.koog.prompt.dsl.prompt
+import ai.koog.prompt.executor.clients.openai.OpenAIClientSettings
+import ai.koog.prompt.executor.clients.openai.OpenAILLMClient
+import ai.koog.prompt.llm.LLMCapability
+import ai.koog.prompt.llm.LLModel
+import ai.koog.prompt.llm.OpenAILLMProvider
+import ai.koog.prompt.message.MessagePart
 
 /**
- * Thin client for any OpenAI-compatible chat-completions endpoint. The user brings their own base
- * URL, API key and model name from settings, so nothing is hardcoded here. Any failure returns
- * null and the caller falls back to the local rule-based advisor.
+ * AI chat backed by Koog, pointed at any OpenAI-compatible endpoint. The user supplies the base
+ * URL / API key / model from settings — nothing is hardcoded. Any failure returns null so the
+ * caller falls back to the local rule-based advisor.
+ *
+ * The base URL should be the API root (e.g. https://router.bynara.id); Koog appends the standard
+ * "v1/chat/completions" path itself.
  */
-class AiChatService(private val client: HttpClient) {
-
-    private val json = Json { ignoreUnknownKeys = true; isLenient = true }
+class AiChatService {
 
     suspend fun chat(
         baseUrl: String,
@@ -27,47 +27,31 @@ class AiChatService(private val client: HttpClient) {
         userPrompt: String
     ): String? {
         return try {
-            val url = baseUrl.trimEnd('/') + "/chat/completions"
-            val body = ChatRequest(
-                model = model,
-                messages = listOf(
-                    ChatMessage("system", systemPrompt),
-                    ChatMessage("user", userPrompt)
+            val client = OpenAILLMClient(
+                apiKey = apiKey,
+                settings = OpenAIClientSettings(baseUrl = baseUrl.trimEnd('/')),
+                httpClientFactory = KtorKoogHttpClient.Factory()
+            )
+            val llModel = LLModel(
+                provider = OpenAILLMProvider,
+                id = model,
+                capabilities = listOf(
+                    LLMCapability.Completion,
+                    LLMCapability.OpenAIEndpoint.Completions
                 )
             )
-            val responseText = client.post(url) {
-                header("Authorization", "Bearer $apiKey")
-                contentType(ContentType.Application.Json)
-                setBody(body)
-            }.bodyAsText()
-
-            json.decodeFromString<ChatResponse>(responseText)
-                .choices.firstOrNull()?.message?.content?.trim()?.takeIf { it.isNotEmpty() }
+            val request = prompt("fintrack-advisor") {
+                system(systemPrompt)
+                user(userPrompt)
+            }
+            val response = client.execute(request, llModel, emptyList())
+            response.parts
+                .filterIsInstance<MessagePart.Text>()
+                .joinToString(separator = "") { it.text }
+                .trim()
+                .takeIf { it.isNotEmpty() }
         } catch (e: Exception) {
             null
         }
     }
 }
-
-@Serializable
-private data class ChatRequest(
-    val model: String,
-    val messages: List<ChatMessage>,
-    val temperature: Double = 0.4
-)
-
-@Serializable
-private data class ChatMessage(
-    val role: String,
-    val content: String
-)
-
-@Serializable
-private data class ChatResponse(
-    val choices: List<ChatChoice> = emptyList()
-)
-
-@Serializable
-private data class ChatChoice(
-    val message: ChatMessage? = null
-)
