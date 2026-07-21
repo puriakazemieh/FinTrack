@@ -2,6 +2,7 @@ package com.kazemieh.ai_insights.ui
 
 import androidx.compose.runtime.Immutable
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.domain.repository.AiConfig
 import com.kazemieh.domain.usecase.DetectedSubscription
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
@@ -18,12 +19,19 @@ data class AIAdvisorState(
     val monthExpense: Long = 0,
     val topExpenseCategoryName: String? = null,
     val topExpenseAmount: Long = 0,
+    val cloudEnabled: Boolean = false,
+    val cloudInsight: String? = null,
+    val cloudInsightLoading: Boolean = false,
+    val showAiSettings: Boolean = false,
+    val aiConfig: AiConfig = AiConfig(),
     val suggestions: List<InvestmentSuggestion> = emptyList(),
     val subscriptions: List<DetectedSubscription> = emptyList()
 )
 
 sealed interface AIAdvisorIntent {
     data object Refresh : AIAdvisorIntent
+    data object ToggleAiSettings : AIAdvisorIntent
+    data class SaveAiConfig(val config: AiConfig) : AIAdvisorIntent
 }
 
 sealed interface AIAdvisorEffect {

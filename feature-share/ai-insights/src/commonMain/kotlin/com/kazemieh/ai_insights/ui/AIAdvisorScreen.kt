@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -63,6 +64,12 @@ fun AIAdvisorScreen(
                 onBack = onBack,
                 actions = listOf(
                     HeaderAction(
+                        icon = rememberVectorPainter(Icons.Filled.Settings),
+                        label = stringResource(Res.string.ai_settings_title),
+                        color = MaterialTheme.colorScheme.tertiary,
+                        onClick = { viewModel.onIntent(AIAdvisorIntent.ToggleAiSettings) }
+                    ),
+                    HeaderAction(
                         icon = rememberVectorPainter(Icons.Filled.Refresh),
                         label = stringResource(Res.string.label_retry),
                         color = MaterialTheme.colorScheme.tertiary,
@@ -98,6 +105,12 @@ fun AIAdvisorScreen(
                     if (state.monthIncome > 0 || state.monthExpense > 0) {
                         item {
                             MonthSummaryCard(state)
+                        }
+                    }
+
+                    if (state.cloudEnabled && (state.cloudInsightLoading || state.cloudInsight != null)) {
+                        item {
+                            CloudInsightCard(state)
                         }
                     }
 
@@ -146,6 +159,111 @@ fun AIAdvisorScreen(
                     suggestion = selectedSuggestion!!,
                     onDismiss = { selectedSuggestion = null }
                 )
+            }
+
+            if (state.showAiSettings) {
+                AiSettingsSheet(
+                    config = state.aiConfig,
+                    onSave = { viewModel.onIntent(AIAdvisorIntent.SaveAiConfig(it)) },
+                    onDismiss = { viewModel.onIntent(AIAdvisorIntent.ToggleAiSettings) }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AiSettingsSheet(
+    config: com.kazemieh.domain.repository.AiConfig,
+    onSave: (com.kazemieh.domain.repository.AiConfig) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val glassColors = LocalGlassColors.current
+    var enabled by remember { mutableStateOf(config.enabled) }
+    var baseUrl by remember { mutableStateOf(config.baseUrl) }
+    var apiKey by remember { mutableStateOf(config.apiKey) }
+    var model by remember { mutableStateOf(config.model) }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = glassColors.bg0,
+        scrimColor = Color.Black.copy(alpha = 0.32f),
+        dragHandle = { BottomSheetDefaults.DragHandle(color = glassColors.glassHairline) }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .padding(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Text(
+                text = stringResource(Res.string.ai_settings_title),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = glassColors.text
+            )
+            Text(
+                text = stringResource(Res.string.ai_settings_hint),
+                style = MaterialTheme.typography.labelSmall,
+                color = glassColors.text2
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(Res.string.ai_settings_enable),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = glassColors.text
+                )
+                Switch(checked = enabled, onCheckedChange = { enabled = it })
+            }
+
+            OutlinedTextField(
+                value = baseUrl,
+                onValueChange = { baseUrl = it },
+                label = { Text(stringResource(Res.string.ai_settings_base_url)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = apiKey,
+                onValueChange = { apiKey = it },
+                label = { Text(stringResource(Res.string.ai_settings_api_key)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = model,
+                onValueChange = { model = it },
+                label = { Text(stringResource(Res.string.ai_settings_model)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Button(
+                onClick = {
+                    onSave(
+                        com.kazemieh.domain.repository.AiConfig(
+                            enabled = enabled,
+                            baseUrl = baseUrl,
+                            apiKey = apiKey,
+                            model = model
+                        )
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text(stringResource(Res.string.action_save))
             }
         }
     }
@@ -257,6 +375,57 @@ private fun AnalysisCard(state: AIAdvisorState) {
                     style = MaterialTheme.typography.bodyMedium,
                     color = glassColors.text
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CloudInsightCard(state: AIAdvisorState) {
+    val glassColors = LocalGlassColors.current
+    GlassCard(padding = 16.dp) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_92), // Spark icon
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.tertiary,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = stringResource(Res.string.ai_cloud_insight_title),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = glassColors.text
+                )
+            }
+            if (state.cloudInsightLoading) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                    Text(
+                        text = stringResource(Res.string.ai_cloud_insight_loading),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = glassColors.text2
+                    )
+                }
+            } else {
+                state.cloudInsight?.let { insight ->
+                    Text(
+                        text = insight,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = glassColors.text
+                    )
+                }
             }
         }
     }

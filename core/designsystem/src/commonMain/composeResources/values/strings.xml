@@ -1145,6 +1145,15 @@
     <string name="ai_analysis_body">با توجه به الگوی خرج و درآمد، حدود %1$s از درآمد ماهانه قابل پس‌انداز است (تقریباً %2$s تومان).</string>
     <string name="ai_month_summary_title">خلاصهٔ این ماه</string>
     <string name="ai_month_top_category">بیشترین هزینه در دستهٔ «%1$s»</string>
+    <string name="ai_cloud_insight_title">تحلیل هوشمند</string>
+    <string name="ai_cloud_insight_loading">در حال دریافت تحلیل…</string>
+    <string name="ai_settings_title">تنظیمات تحلیل هوشمند</string>
+    <string name="ai_settings_hint">از هر سرویس سازگار با OpenAI پشتیبانی می‌شود. کلید شما فقط روی همین دستگاه ذخیره می‌شود.</string>
+    <string name="ai_settings_enable">فعال‌سازی تحلیل ابری</string>
+    <string name="ai_settings_base_url">آدرس سرویس (Base URL)</string>
+    <string name="ai_settings_api_key">کلید API</string>
+    <string name="ai_settings_model">نام مدل</string>
+    <string name="action_save">ذخیره</string>
     <string name="ai_suggestions_count">پیشنهادهای فعال · %1$d</string>
     <string name="ai_suggestion_risk">ریسک: %1$s</string>
     <string name="ai_suggestion_return">بازدهی: %1$s</string>

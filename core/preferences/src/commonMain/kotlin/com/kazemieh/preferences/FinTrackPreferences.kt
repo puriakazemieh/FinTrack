@@ -65,6 +65,17 @@ class FinTrackPreferences(private val settings: Settings) {
         const val PREF_LAST_SYNC_TIME = "pref_last_sync_time"
         const val PREF_SYNC_ENABLED = "pref_sync_enabled"
 
+        // Cloud AI advisor — the user brings their own OpenAI-compatible endpoint + key; nothing
+        // is hardcoded, and the feature stays off until they configure it.
+        const val PREF_AI_CLOUD_ENABLED = "pref_ai_cloud_enabled"
+        const val PREF_AI_BASE_URL = "pref_ai_base_url"
+        const val PREF_AI_API_KEY = "pref_ai_api_key"
+        const val PREF_AI_MODEL = "pref_ai_model"
+
+        // Self-hosted sync — user-supplied server URL + token; sync stays off until both are set.
+        const val PREF_SYNC_SERVER_URL = "pref_sync_server_url"
+        const val PREF_SYNC_TOKEN = "pref_sync_token"
+
         const val PREF_NOTIF_BUDGET_ENABLED = "pref_notif_budget_enabled"
         const val PREF_NOTIF_INSTALLMENT_ENABLED = "pref_notif_installment_enabled"
         const val PREF_NOTIF_CHEQUE_ENABLED = "pref_notif_cheque_enabled"

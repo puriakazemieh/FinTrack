@@ -5,7 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.SyncStatus
 import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.domain.repository.AiConfig
+import com.kazemieh.domain.usecase.AiConfigUseCase
 import com.kazemieh.domain.usecase.DetectSubscriptionsUseCase
+import com.kazemieh.domain.usecase.GenerateAiInsightUseCase
 import com.kazemieh.domain.usecase.ObserveCategorySumsUseCase
 import com.kazemieh.domain.usecase.ObserveSpendingPatternUseCase
 import com.kazemieh.domain.repository.TransactionRepository
@@ -22,7 +25,9 @@ import kotlinx.datetime.toLocalDateTime
 class AIAdvisorViewModel(
     private val observeSpendingPatternUseCase: ObserveSpendingPatternUseCase,
     private val transactionRepository: TransactionRepository,
-    private val detectSubscriptionsUseCase: DetectSubscriptionsUseCase
+    private val detectSubscriptionsUseCase: DetectSubscriptionsUseCase,
+    private val generateAiInsightUseCase: GenerateAiInsightUseCase,
+    private val aiConfigUseCase: AiConfigUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AIAdvisorState())
@@ -32,13 +37,22 @@ class AIAdvisorViewModel(
     val effect = _effect.asSharedFlow()
 
     init {
+        _state.update { it.copy(aiConfig = aiConfigUseCase.get()) }
         loadData()
     }
 
     fun onIntent(intent: AIAdvisorIntent) {
         when (intent) {
             AIAdvisorIntent.Refresh -> loadData()
+            AIAdvisorIntent.ToggleAiSettings -> _state.update { it.copy(showAiSettings = !it.showAiSettings) }
+            is AIAdvisorIntent.SaveAiConfig -> saveAiConfig(intent.config)
         }
+    }
+
+    private fun saveAiConfig(config: AiConfig) {
+        aiConfigUseCase.save(config)
+        _state.update { it.copy(aiConfig = config, showAiSettings = false) }
+        loadData()
     }
 
     private fun loadData() {
@@ -76,10 +90,37 @@ class AIAdvisorViewModel(
                             topExpenseCategoryName = pattern.topExpenseCategoryName,
                             topExpenseAmount = pattern.topExpenseAmount,
                             suggestions = generateDynamicSuggestions(pattern),
-                            subscriptions = subscriptions
+                            subscriptions = subscriptions,
+                            cloudEnabled = generateAiInsightUseCase.isEnabled()
                         )
                     }
+                    loadCloudInsight(pattern)
                 }
+        }
+    }
+
+    private fun loadCloudInsight(pattern: com.kazemieh.domain.usecase.SpendingPattern) {
+        if (!generateAiInsightUseCase.isEnabled()) return
+        if (pattern.totalIncome == 0L && pattern.totalExpense == 0L) return
+        viewModelScope.launch {
+            _state.update { it.copy(cloudInsightLoading = true, cloudInsight = null) }
+            val insight = generateAiInsightUseCase(buildInsightContext(pattern))
+            _state.update { it.copy(cloudInsight = insight, cloudInsightLoading = false) }
+        }
+    }
+
+    private fun buildInsightContext(pattern: com.kazemieh.domain.usecase.SpendingPattern): String {
+        return buildString {
+            append("درآمد این ماه: ${pattern.totalIncome} تومان. ")
+            append("هزینهٔ این ماه: ${pattern.totalExpense} تومان. ")
+            append("درصد پس‌انداز بالقوه: ${pattern.savingPotentialPercentage}٪. ")
+            pattern.topExpenseCategoryName?.let {
+                append("بیشترین هزینه در دستهٔ «$it» به مبلغ ${pattern.topExpenseAmount} تومان. ")
+            }
+            pattern.growthCategoryName?.let {
+                append("دستهٔ با بیشترین رشد: «$it» با ${pattern.growthPercentage}٪ رشد. ")
+            }
+            append("یک تحلیل کوتاه و کاربردی برای بهبود وضعیت مالی بده.")
         }
     }
 

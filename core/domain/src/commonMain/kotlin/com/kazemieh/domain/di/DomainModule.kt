@@ -13,6 +13,8 @@ val domainModule = module {
     factory { DetectSubscriptionsUseCase(get()) }
     factory { GetMonthlyTrendUseCase(get()) }
     factory { GetMonthlyCashflowUseCase(get()) }
+    factory { GenerateAiInsightUseCase(get()) }
+    factory { AiConfigUseCase(get()) }
     factory { ObserveTagsUseCase(get()) }
     factory { ObserveSourcesUseCase(get()) }
     factory { ObserveCategoriesUseCase(get()) }
