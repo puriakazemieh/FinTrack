@@ -21,6 +21,7 @@ import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.repository.SmsDraftRepository
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import com.kazemieh.jalali.JalaliCalendar
+import com.kazemieh.money.Currency
 import com.kazemieh.preferences.FinTrackPreferences
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.msg_mandatory_fields_error
@@ -195,17 +196,21 @@ class AddTransactionViewModel(
     ) {
         if (transactionWithRelations == null) {
             val today = JalaliCalendar()
-            _state.value = AddTransactionState(
-                date = "${today.day.toPersianDigits()} / ${today.monthString} / ${today.year.toPersianDigits()}",
-                timeStamp = today.toTimestamp(),
-                mostUsedCategories = _state.value.mostUsedCategories,
-                mostUsedSources = _state.value.mostUsedSources,
-                mostUsedTags = _state.value.mostUsedTags,
-                mostUsedPersons = _state.value.mostUsedPersons,
-                smsDraft = smsDraft,
-                amount = smsDraft?.amount?.toString() ?: "",
-                transactionType = smsDraft?.type ?: TransactionType.EXPENSE
-            ) // Full reset first with today's date
+            val currencyValue = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_CURRENCY, "")
+            val currency = Currency.valueOf(currencyValue)
+            val prefilledAmount = smsDraft?.amount?.let { 
+                if (currency.code == "IRT") (it / 10).toString() else it.toString()
+            } ?: ""
+            
+            _state.update { 
+                it.copy(
+                    date = "${today.day.toPersianDigits()} / ${today.monthString} / ${today.year.toPersianDigits()}",
+                    timeStamp = today.toTimestamp(),
+                    smsDraft = smsDraft,
+                    amount = prefilledAmount,
+                    transactionType = smsDraft?.type ?: TransactionType.EXPENSE
+                )
+            }
             viewModelScope.launch {
                 val defaultSource = transactionUseCaseGroup.getDefaultFinancialSourceUseCase()
                 val detectedSource = if (smsDraft?.sourceId != null) {
@@ -218,10 +223,15 @@ class AddTransactionViewModel(
                 
                 val defaultCategory =
                     transactionUseCaseGroup.getDefaultCategoryUseCase(_state.value.transactionType)
+                
+                val detectedCategory = smsDraft?.categoryId?.let { 
+                    transactionUseCaseGroup.getCategoryUseCase(it)
+                }
+                
                 _state.update {
                     it.copy(
                         source = detectedSource ?: defaultSource,
-                        category = defaultCategory
+                        category = detectedCategory ?: defaultCategory
                     )
                 }
             }

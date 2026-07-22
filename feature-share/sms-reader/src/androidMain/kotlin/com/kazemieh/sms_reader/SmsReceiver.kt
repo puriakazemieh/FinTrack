@@ -14,6 +14,7 @@ import fintrack.core.designsystem.generated.resources.sms_detection_desc
 import fintrack.core.designsystem.generated.resources.sms_detection_title
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import org.koin.core.component.KoinComponent
@@ -50,10 +51,15 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                 val draft = BankParserRegistry.parse(sender, body)
                 if (draft != null) {
                     scope.launch {
-                        val finalDraft = draft.sourceIdentifier?.let { identifier ->
-                            val source = transactionRepository.getSourceByIdentifier(identifier)
-                            draft.copy(sourceId = source?.id)
-                        } ?: draft
+                        val sources = transactionRepository.observeSources().first()
+                        val detectedSource = draft.sourceIdentifier?.let { identifier ->
+                            transactionRepository.getSourceByIdentifier(identifier)
+                        } ?: sources.find { 
+                            it.name.contains(draft.bankName, ignoreCase = true) || 
+                            draft.bankName.contains(it.name, ignoreCase = true)
+                        }
+                        
+                        val finalDraft = draft.copy(sourceId = detectedSource?.id)
                         
                         val draftId = smsDraftRepository.addSmsDraft(finalDraft)
 

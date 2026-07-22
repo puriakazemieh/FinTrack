@@ -31,7 +31,6 @@ import org.jetbrains.compose.resources.stringResource
 fun SmsBanner(
     count: Int,
     onClick: () -> Unit,
-    onClose: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (count <= 0) return
@@ -41,7 +40,6 @@ fun SmsBanner(
         accent = GlassBlue,
         onMore = onClick,
         more = stringResource(Res.string.sms_sheet_sub),
-        onMenu = onClose,
         modifier = modifier
     ) {
         FintrackLabelSmallText(

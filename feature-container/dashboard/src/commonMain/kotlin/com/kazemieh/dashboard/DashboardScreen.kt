@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -67,6 +68,7 @@ import fintrack.core.designsystem.generated.resources.msg_hello
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     showAddTransaction: Boolean = false,
@@ -90,11 +92,6 @@ fun DashboardScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
     val listState = rememberLazyListState()
-    var smsBannerDismissed by androidx.compose.runtime.remember {
-        androidx.compose.runtime.mutableStateOf(
-            false
-        )
-    }
     var repeatTemplate by androidx.compose.runtime.remember {
         androidx.compose.runtime.mutableStateOf<com.kazemieh.common.model.TransactionWithRelations?>(
             null
@@ -146,12 +143,11 @@ fun DashboardScreen(
                 )
             }
 
-            if (state.smsDrafts.isNotEmpty() && !smsBannerDismissed) {
+            if (state.smsDrafts.isNotEmpty()) {
                 item {
                     SmsBanner(
                         count = state.smsDrafts.size,
                         onClick = { viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet) },
-                        onClose = { smsBannerDismissed = true },
                         modifier = Modifier.padding(
                             horizontal = space.large,
                             vertical = space.small
@@ -215,6 +211,43 @@ fun DashboardScreen(
         // The global add-transaction FAB lives in the bottom navigation bar; the dashboard
         // no longer draws its own to avoid two overlapping add buttons.
 
+        if (state.showSmsDetection) {
+            SmsDetectionSheet(
+                drafts = state.smsDrafts,
+                categories = state.categories,
+                sources = state.sources,
+                mostUsedCategories = state.mostUsedCategories,
+                mostUsedSources = state.mostUsedSources,
+                currency = state.currency,
+                onQuickRegister = { draft ->
+                    viewModel.onIntent(DashboardIntent.QuickRegisterSms(draft))
+                },
+                onEdit = { draft ->
+                    viewModel.onIntent(
+                        DashboardIntent.ShowTransactionBottomSheet(
+                            smsDraft = draft,
+                            type = draft.type
+                        )
+                    )
+                },
+                onDelete = { draft ->
+                    viewModel.onIntent(DashboardIntent.ShowDeleteSmsConfirmation(true, draft))
+                },
+                onUpdateDraft = { viewModel.onIntent(DashboardIntent.UpdateSmsDraft(it)) },
+                onDismiss = { viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet) }
+            )
+        }
+
+        if (state.showDeleteSmsConfirmation && state.smsDraftToDelete != null) {
+            com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet(
+                itemName = state.smsDraftToDelete!!.bankName,
+                dismissClicked = { viewModel.onIntent(DashboardIntent.ShowDeleteSmsConfirmation(false)) },
+                confirmClicked = {
+                    viewModel.onIntent(DashboardIntent.IgnoreSmsDraft(state.smsDraftToDelete!!))
+                }
+            )
+        }
+
         if (state.showAddTransaction) {
             AddTransactionBottomSheet(
                 transactionWithRelations = state.transactionWithRelations,
@@ -229,26 +262,6 @@ fun DashboardScreen(
                     repeatTemplate = null
                     viewModel.onIntent(DashboardIntent.AnimationEnabled)
                 },
-            )
-        }
-
-        if (state.showSmsDetection) {
-            SmsDetectionSheet(
-                drafts = state.smsDrafts,
-                categories = state.categories,
-                sources = state.sources,
-                onDraftClick = { draft ->
-                    viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet)
-                    viewModel.onIntent(
-                        DashboardIntent.ShowTransactionBottomSheet(
-                            smsDraft = draft,
-                            type = draft.type
-                        )
-                    )
-                },
-                onIgnore = { viewModel.onIntent(DashboardIntent.IgnoreSmsDraft(it)) },
-                onUpdateDraft = { viewModel.onIntent(DashboardIntent.UpdateSmsDraft(it)) },
-                onDismiss = { viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet) }
             )
         }
 

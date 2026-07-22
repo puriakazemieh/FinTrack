@@ -16,6 +16,8 @@ import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
 import com.kazemieh.domain.usecase.ObserveSourcesUseCase
 import com.kazemieh.domain.usecase.ObserveStreakUseCase
 import com.kazemieh.domain.usecase.PreferenceUseCases
+import com.kazemieh.domain.usecase.TransactionUseCaseGroup
+import com.kazemieh.money.Currency
 import com.kazemieh.preferences.FinTrackPreferences
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.placeholder_user_initial
@@ -37,7 +39,8 @@ class DashboardViewModel(
     private val observeCategories: ObserveCategoriesUseCase,
     private val observeSources: ObserveSourcesUseCase,
     private val observeAchievements: ObserveAchievementsUseCase,
-    private val observeStreak: ObserveStreakUseCase
+    private val observeStreak: ObserveStreakUseCase,
+    private val transactionUseCaseGroup: TransactionUseCaseGroup
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DashboardState())
@@ -53,6 +56,28 @@ class DashboardViewModel(
         observeWidgetLayout()
         observeDisabledTools()
         observeHideBalance()
+        observeCurrency()
+        observeMostUsedData()
+    }
+
+    private fun observeMostUsedData() {
+        transactionUseCaseGroup.observeMostUsedCategoriesUseCase(null)
+            .onEach { categories ->
+                _state.update { it.copy(mostUsedCategories = categories) }
+            }.launchIn(viewModelScope)
+
+        transactionUseCaseGroup.observeMostUsedSourcesUseCase()
+            .onEach { sources ->
+                _state.update { it.copy(mostUsedSources = sources) }
+            }.launchIn(viewModelScope)
+    }
+
+    private fun observeCurrency() {
+        preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_CURRENCY, "")
+            .onEach { currencyJson ->
+                val currency = Currency.valueOf(currencyJson)
+                _state.update { it.copy(currency = currency.code) }
+            }.launchIn(viewModelScope)
     }
 
     private fun observeHideBalance() {
@@ -133,6 +158,19 @@ class DashboardViewModel(
     private fun observeSmsDrafts() {
         smsDraftRepository.observeUnusedSmsDrafts()
             .onEach { drafts ->
+                drafts.forEach { draft ->
+                    if (draft.sourceId == null && draft.bankName.isNotBlank()) {
+                        val source = _state.value.sources.find {
+                            it.name.contains(draft.bankName, ignoreCase = true) ||
+                                    draft.bankName.contains(it.name, ignoreCase = true)
+                        }
+                        if (source != null) {
+                            viewModelScope.launch {
+                                smsDraftRepository.updateSmsDraft(draft.copy(sourceId = source.id))
+                            }
+                        }
+                    }
+                }
                 _state.update { it.copy(smsDrafts = drafts) }
             }.launchIn(viewModelScope)
     }
@@ -225,10 +263,44 @@ class DashboardViewModel(
 
             is DashboardIntent.IgnoreSmsDraft -> viewModelScope.launch {
                 smsDraftRepository.markSmsDraftAsUsed(intent.draft.id)
+                _state.update { it.copy(showDeleteSmsConfirmation = false, smsDraftToDelete = null) }
+            }
+
+            is DashboardIntent.ShowDeleteSmsConfirmation -> _state.update {
+                it.copy(showDeleteSmsConfirmation = intent.show, smsDraftToDelete = intent.draft)
             }
 
             is DashboardIntent.UpdateSmsDraft -> viewModelScope.launch {
                 smsDraftRepository.updateSmsDraft(intent.draft)
+            }
+
+            is DashboardIntent.QuickRegisterSms -> viewModelScope.launch {
+                val draft = intent.draft
+                if (draft.categoryId == null || draft.sourceId == null) {
+                    // Fallback to manual registration if data is missing
+                    onIntent(DashboardIntent.ShowTransactionBottomSheet(smsDraft = draft, type = draft.type))
+                    return@launch
+                }
+
+                _state.update { it.copy(isLoading = true) }
+                
+                val finalAmount = if (_state.value.currency == "IRT") draft.amount / 10 else draft.amount
+                
+                val transaction = com.kazemieh.common.model.Transaction(
+                    id = 0,
+                    amount = finalAmount,
+                    categoryId = draft.categoryId!!,
+                    sourceId = draft.sourceId!!,
+                    description = draft.body,
+                    timeStamp = draft.timeStamp,
+                    type = draft.type,
+                    date = draft.date
+                )
+                val id = transactionUseCaseGroup.addTransactionUseCase(transaction, emptyList(), emptyList())
+                if (id > 0) {
+                    smsDraftRepository.markSmsDraftAsUsed(draft.id)
+                }
+                _state.update { it.copy(isLoading = false) }
             }
 
             DashboardIntent.ToggleCustomizeSheet -> _state.update {
@@ -264,9 +336,15 @@ data class DashboardState(
     val achievements: List<Achievement> = emptyList(),
     val streak: Streak = Streak(),
     val showSmsDetection: Boolean = false,
+    val showDeleteSmsConfirmation: Boolean = false,
+    val smsDraftToDelete: SmsDraft? = null,
     val smsDraft: SmsDraft? = null,
+    val currency: String = "IRR",
+    val mostUsedCategories: List<Category> = emptyList(),
+    val mostUsedSources: List<Source> = emptyList(),
     val dashboardWidgets: List<DashboardWidgetItem> = DashboardWidget.defaultConfig(),
     val showCustomizeSheet: Boolean = false,
+    val isLoading: Boolean = false,
     val disabledTools: Set<ToolFeature> = emptySet()
 )
 
@@ -287,6 +365,8 @@ sealed interface DashboardIntent {
     data object ToggleSmsDetectionSheet : DashboardIntent
     data class OpenSmsDraftTransaction(val draftId: Long) : DashboardIntent
     data class IgnoreSmsDraft(val draft: SmsDraft) : DashboardIntent
+    data class ShowDeleteSmsConfirmation(val show: Boolean, val draft: SmsDraft? = null) : DashboardIntent
+    data class QuickRegisterSms(val draft: SmsDraft) : DashboardIntent
     data class UpdateSmsDraft(val draft: SmsDraft) : DashboardIntent
     data object ToggleCustomizeSheet : DashboardIntent
     data class SetWidgetLayout(val items: List<DashboardWidgetItem>) : DashboardIntent
