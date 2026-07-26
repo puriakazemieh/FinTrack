@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,7 +24,9 @@ import com.kazemieh.designsystem.component.calculator.CalculatorBottomSheet
 import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
+import com.kazemieh.person.ui.list.PersonPickerBottomSheet
 import com.kazemieh.tag.ui.list.TagPickerBottomSheet
+import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -127,14 +130,61 @@ fun AddBudgetBottomSheet(
 
                 item {
                     SectionContainer(
+                        title = stringResource(Res.string.label_related_persons),
+                        sub = stringResource(Res.string.title_person_management),
+                        onAddClick = { viewModel.onIntent(AddBudgetIntent.ToggleSheet(AddBudgetSheet.PersonPicker)) },
+                        addLabel = stringResource(Res.string.btn_add_person)
+                    ) {
+                        state.selectedPersons.forEach { person ->
+                            RemovableChip(
+                                label = person.name,
+                                color = GlassGreen,
+                                onRemove = {
+                                    val newSet = state.selectedPersons.filter { it.id != person.id }.toSet()
+                                    viewModel.onIntent(AddBudgetIntent.SelectPersons(newSet))
+                                },
+                                icon = {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(18.dp)
+                                            .clip(CircleShape)
+                                            .background(GlassGreen),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        FintrackLabelSmallText(
+                                            text = person.name.take(1),
+                                            fontWeight = FontWeight.Bold,
+                                            color = GlassGreenDark
+                                        )
+                                    }
+                                }
+                            )
+                        }
+                    }
+                    MostUsedPersonChips(
+                        items = state.mostUsedPersons,
+                        selectedItems = state.selectedPersons,
+                        onItemClick = { person ->
+                            val newSet = state.selectedPersons.toMutableSet()
+                            if (newSet.contains(person)) newSet.remove(person) else newSet.add(person)
+                            viewModel.onIntent(AddBudgetIntent.SelectPersons(newSet))
+                        }
+                    )
+                }
+
+                item {
+                    val colors = FinTrackPickerColors.rainbow()
+                    SectionContainer(
                         title = stringResource(Res.string.tags),
+                        sub = stringResource(Res.string.title_tag_management),
                         onAddClick = { viewModel.onIntent(AddBudgetIntent.ToggleSheet(AddBudgetSheet.TagPicker)) },
                         addLabel = stringResource(Res.string.btn_add_tag)
                     ) {
                         state.selectedTags.forEach { tag ->
+                            val color = colors.firstOrNull { it.id == tag.colorId }?.color ?: GlassBlue
                             RemovableChip(
                                 label = stringResource(Res.string.label_tag_prefix, tag.name),
-                                color = GlassGreen,
+                                color = color,
                                 onRemove = {
                                     val newSet = state.selectedTags.filter { it.id != tag.id }.toSet()
                                     viewModel.onIntent(AddBudgetIntent.SelectTags(newSet))
@@ -142,6 +192,16 @@ fun AddBudgetBottomSheet(
                             )
                         }
                     }
+                    MostUsedTagChips(
+                        items = state.mostUsedTags,
+                        selectedItems = state.selectedTags,
+                        colors = colors,
+                        onItemClick = { tag ->
+                            val newSet = state.selectedTags.toMutableSet()
+                            if (newSet.contains(tag)) newSet.remove(tag) else newSet.add(tag)
+                            viewModel.onIntent(AddBudgetIntent.SelectTags(newSet))
+                        }
+                    )
                 }
 
                 item {
@@ -213,16 +273,21 @@ fun AddBudgetBottomSheet(
         }
 
         AddBudgetSheet.TagPicker -> {
-            val castedTags: Set<com.kazemieh.common.model.Tag> = state.selectedTags.map { 
-                com.kazemieh.common.model.Tag(it.id, it.name, it.description, it.colorId, it.iconId) 
-            }.toSet()
             TagPickerBottomSheet(
-                selectedTags = castedTags,
+                selectedTags = state.selectedTags,
                 onSubmitClick = { tags ->
-                    val mappedTags = tags?.map { 
-                        com.kazemieh.common.model.Tag(it.id, it.name, it.description, it.colorId, it.iconId) 
-                    }?.toSet() ?: emptySet()
-                    viewModel.onIntent(AddBudgetIntent.SelectTags(mappedTags))
+                    viewModel.onIntent(AddBudgetIntent.SelectTags(tags ?: emptySet()))
+                    viewModel.onIntent(AddBudgetIntent.ToggleSheet(null))
+                },
+                onDismiss = { viewModel.onIntent(AddBudgetIntent.ToggleSheet(null)) }
+            )
+        }
+
+        AddBudgetSheet.PersonPicker -> {
+            PersonPickerBottomSheet(
+                selectedPersons = state.selectedPersons,
+                onSubmitClick = { persons ->
+                    viewModel.onIntent(AddBudgetIntent.SelectPersons(persons ?: emptySet()))
                     viewModel.onIntent(AddBudgetIntent.ToggleSheet(null))
                 },
                 onDismiss = { viewModel.onIntent(AddBudgetIntent.ToggleSheet(null)) }
@@ -230,6 +295,60 @@ fun AddBudgetBottomSheet(
         }
 
         null -> Unit
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MostUsedTagChips(
+    items: List<com.kazemieh.common.model.Tag>,
+    selectedItems: Set<com.kazemieh.common.model.Tag>,
+    colors: List<com.kazemieh.designsystem.picker.PickableColor>,
+    onItemClick: (com.kazemieh.common.model.Tag) -> Unit
+) {
+    if (items.isEmpty()) return
+    MostUsedRow {
+        items.take(3).forEach { tag ->
+            val active = selectedItems.contains(tag)
+            val color = colors.firstOrNull { it.id == tag.colorId }?.color ?: GlassBlue
+            Chip(
+                color = color,
+                active = active,
+                onClick = { onItemClick(tag) }
+            ) {
+                FintrackLabelSmallText(
+                    text = stringResource(Res.string.label_tag_prefix, tag.name),
+                    color = if (active) Color.White else color,
+                    fontSize = 10.sp
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MostUsedPersonChips(
+    items: List<com.kazemieh.common.model.Person>,
+    selectedItems: Set<com.kazemieh.common.model.Person>,
+    onItemClick: (com.kazemieh.common.model.Person) -> Unit
+) {
+    if (items.isEmpty()) return
+    MostUsedRow {
+        items.take(3).forEach { person ->
+            val active = selectedItems.contains(person)
+            Chip(
+                color = GlassGreen,
+                active = active,
+                onClick = { onItemClick(person) }
+            ) {
+                FintrackLabelSmallText(
+                    text = person.name,
+                    color = if (active) Color.White else GlassGreen,
+                    fontSize = 10.sp
+                )
+            }
+        }
     }
 }
 

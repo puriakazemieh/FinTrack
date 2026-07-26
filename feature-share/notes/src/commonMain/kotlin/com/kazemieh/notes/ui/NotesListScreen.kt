@@ -90,6 +90,9 @@ fun NotesListScreen(
                             note = note,
                             onClick = { onEditNote(note.id) },
                             onLongClick = { noteToDelete = note },
+                            onToggleCheckbox = { lineIndex ->
+                                viewModel.onIntent(NotesIntent.OnToggleCheckbox(note, lineIndex))
+                            },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -125,6 +128,7 @@ private fun NoteCard(
     note: Note,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
+    onToggleCheckbox: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val glassColors = LocalGlassColors.current
@@ -200,8 +204,8 @@ private fun NoteCard(
                 // Render the note body as formatted markdown instead of raw syntax.
                 MarkdownRenderer(
                     text = note.content,
-                    onToggleCheckbox = {},
-                    interactive = false,
+                    onToggleCheckbox = onToggleCheckbox,
+                    interactive = true,
                     textColor = onCardColor.copy(alpha = 0.85f)
                 )
             }

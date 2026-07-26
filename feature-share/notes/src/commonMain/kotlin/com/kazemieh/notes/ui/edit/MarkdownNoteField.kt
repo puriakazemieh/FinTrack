@@ -1,33 +1,35 @@
 package com.kazemieh.notes.ui.edit
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckBox
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatItalic
 import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.FormatStrikethrough
 import androidx.compose.material.icons.filled.Title
-import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,26 +39,34 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.kazemieh.designsystem.GlassColors
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.GlassCard
-import com.kazemieh.designsystem.component.glassTextFieldColors
-import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.edit
-import fintrack.core.designsystem.generated.resources.label_preview
-import org.jetbrains.compose.resources.stringResource
 
 /**
- * A lightweight markdown editor for note bodies: a formatting toolbar that inserts markdown syntax
- * at the caret (wrapping the selection for inline styles, or prefixing the current line for block
- * styles) plus a multi-line text field. The caller keeps a plain String; selection is tracked
- * locally so the toolbar can edit around the cursor.
+ * A hybrid markdown editor for note bodies: a formatting toolbar that inserts markdown syntax
+ * while rendering the resulting UI elements (like checkboxes, bullets, and headers) live in the
+ * editor. There is no separate preview mode; the text remains fully editable.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -65,11 +75,12 @@ fun MarkdownNoteField(
     onValueChange: (String) -> Unit,
     placeholder: String,
     modifier: Modifier = Modifier,
-    startInPreview: Boolean = false
+    startInPreview: Boolean = false // Ignored, no longer two modes
 ) {
     val glassColors = LocalGlassColors.current
-    var previewMode by remember { mutableStateOf(startInPreview) }
+    val density = LocalDensity.current
     var fieldValue by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
+    var layoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
 
     // Keep in sync when the note is (re)loaded from the ViewModel.
     LaunchedEffect(value) {
@@ -136,78 +147,88 @@ fun MarkdownNoteField(
                     .fillMaxWidth()
                     .padding(horizontal = 4.dp, vertical = 2.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Format buttons wrap onto extra lines instead of hiding behind a horizontal
-                // scroll, so every action stays visible on narrow screens.
                 FlowRow(
                     modifier = Modifier.weight(1f),
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
-                    // Using a formatting action while previewing drops back to edit and applies it.
-                    ToolbarButton(Icons.Default.Title) { previewMode = false; prefixLine("# ") }
-                    ToolbarButton(Icons.Default.FormatBold) { previewMode = false; wrapSelection("**") }
-                    ToolbarButton(Icons.Default.FormatItalic) { previewMode = false; wrapSelection("*") }
-                    ToolbarButton(Icons.Default.FormatStrikethrough) { previewMode = false; wrapSelection("~~") }
-                    ToolbarButton(Icons.Default.CheckBox) { previewMode = false; prefixLine("- [ ] ") }
-                    ToolbarButton(Icons.Default.FormatListBulleted) { previewMode = false; prefixLine("- ") }
-                    ToolbarButton(Icons.Default.FormatListNumbered) { previewMode = false; prefixLine("1. ") }
-                }
-                // Clear labelled toggle between raw editing and the rendered ("display") view.
-                Row(
-                    modifier = Modifier
-                        .padding(top = 4.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(if (previewMode) GlassGreen.copy(alpha = 0.15f) else glassColors.glass)
-                        .clickable { previewMode = !previewMode }
-                        .padding(horizontal = 8.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Icon(
-                        imageVector = if (previewMode) Icons.Default.Edit else Icons.Default.Visibility,
-                        contentDescription = null,
-                        tint = if (previewMode) GlassGreen else glassColors.text2,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    FintrackLabelSmallText(
-                        text = if (previewMode) stringResource(Res.string.edit) else stringResource(Res.string.label_preview),
-                        color = if (previewMode) GlassGreen else glassColors.text2
-                    )
+                    ToolbarButton(Icons.Default.Title) { prefixLine("# ") }
+                    ToolbarButton(Icons.Default.FormatBold) { wrapSelection("**") }
+                    ToolbarButton(Icons.Default.FormatItalic) { wrapSelection("*") }
+                    ToolbarButton(Icons.Default.FormatStrikethrough) { wrapSelection("~~") }
+                    ToolbarButton(Icons.Default.CheckBox) { prefixLine("- [ ] ") }
+                    ToolbarButton(Icons.Default.FormatListBulleted) { prefixLine("- ") }
+                    ToolbarButton(Icons.Default.FormatListNumbered) { prefixLine("1. ") }
                 }
             }
 
             HorizontalDivider(color = glassColors.glassHairline)
 
-            if (previewMode) {
-                Box(modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp).padding(12.dp)) {
-                    if (fieldValue.text.isBlank()) {
-                        FintrackBodyMediumText(text = placeholder, color = glassColors.text3)
-                    } else {
-                        MarkdownRenderer(
-                            text = fieldValue.text,
-                            onToggleCheckbox = { lineIndex ->
-                                apply(
-                                    TextFieldValue(
-                                        toggleCheckboxLine(fieldValue.text, lineIndex),
-                                        TextRange(fieldValue.selection.min)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 160.dp)
+                    .pointerInput(fieldValue.text) {
+                        detectTapGestures { offset ->
+                            layoutResult?.let { layout ->
+                                val lineIndex = layout.getLineForVerticalPosition(offset.y)
+                                if (lineIndex >= layout.lineCount) return@detectTapGestures
+                                val lineStart = layout.getLineStart(lineIndex)
+                                val lineEnd = layout.getLineEnd(lineIndex)
+                                if (lineStart >= fieldValue.text.length) return@detectTapGestures
+                                val lineText = fieldValue.text.substring(lineStart, lineEnd)
+                                
+                                if (offset.x < with(density) { 36.dp.toPx() } && (lineText.trimStart().startsWith("- [ ]") || lineText.trimStart().startsWith("- [x]"))) {
+                                    apply(
+                                        TextFieldValue(
+                                            toggleCheckboxLine(fieldValue.text, lineIndex),
+                                            fieldValue.selection
+                                        )
                                     )
-                                )
+                                }
                             }
-                        )
+                        }
                     }
-                }
-            } else {
-                TextField(
+            ) {
+                BasicTextField(
                     value = fieldValue,
                     onValueChange = { apply(it) },
-                    placeholder = { FintrackBodyMediumText(text = placeholder, color = glassColors.text3) },
-                    colors = glassTextFieldColors(),
                     textStyle = MaterialTheme.typography.bodyMedium.copy(color = glassColors.text),
+                    cursorBrush = Brush.verticalGradient(listOf(GlassGreen, GlassGreen)),
+                    onTextLayout = { layoutResult = it },
+                    visualTransformation = MarkdownVisualTransformation(glassColors),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 160.dp),
-                    shape = RoundedCornerShape(0.dp)
+                        .padding(start = 36.dp, end = 12.dp, top = 12.dp, bottom = 12.dp)
+                        .heightIn(min = 136.dp),
+                    decorationBox = { innerTextField ->
+                        Box {
+                            if (fieldValue.text.isEmpty()) {
+                                FintrackBodyMediumText(text = placeholder, color = glassColors.text3)
+                            }
+                            
+                            layoutResult?.let { layout ->
+                                val lines = fieldValue.text.split("\n")
+                                lines.forEachIndexed { i, line ->
+                                    if (i >= layout.lineCount) return@forEachIndexed
+                                    val top = layout.getLineTop(i)
+                                    
+                                    Box(
+                                        modifier = Modifier
+                                            .offset(x = (-26).dp, y = with(density) { top.toDp() })
+                                    ) {
+                                        when {
+                                            line.trimStart().startsWith("- [ ]") -> CheckMark(checked = false)
+                                            line.trimStart().startsWith("- [x]") -> CheckMark(checked = true)
+                                            line.trimStart().startsWith("- ") -> FintrackBodyMediumText(text = "•", color = glassColors.text2)
+                                        }
+                                    }
+                                }
+                            }
+                            innerTextField()
+                        }
+                    }
                 )
             }
         }
@@ -215,9 +236,65 @@ fun MarkdownNoteField(
 }
 
 @Composable
+private fun CheckMark(checked: Boolean) {
+    val glassColors = LocalGlassColors.current
+    Box(
+        modifier = Modifier
+            .size(20.dp)
+            .clip(RoundedCornerShape(6.dp))
+            .background(if (checked) GlassGreen else Color.Transparent)
+            .border(1.5.dp, if (checked) GlassGreen else glassColors.glassEdge, RoundedCornerShape(6.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        if (checked) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(14.dp)
+            )
+        }
+    }
+}
+
+private class MarkdownVisualTransformation(private val glassColors: GlassColors) : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val styled = buildAnnotatedString {
+            val lines = text.text.split("\n")
+            lines.forEachIndexed { index, line ->
+                when {
+                    line.startsWith("# ") -> {
+                        withStyle(SpanStyle(color = Color.Transparent, fontSize = 1.sp)) { append("# ") }
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp)) {
+                            append(line.substring(2))
+                        }
+                    }
+                    line.trimStart().startsWith("- [ ]") || line.trimStart().startsWith("- [x]") -> {
+                        val marker = if (line.contains("- [ ]")) "- [ ]" else "- [x]"
+                        val start = line.indexOf(marker)
+                        append(line.substring(0, start))
+                        withStyle(SpanStyle(color = Color.Transparent, fontSize = 1.sp)) { append(marker) }
+                        append(line.substring(start + marker.length))
+                    }
+                    line.trimStart().startsWith("- ") -> {
+                        val start = line.indexOf("- ")
+                        append(line.substring(0, start))
+                        withStyle(SpanStyle(color = Color.Transparent, fontSize = 1.sp)) { append("- ") }
+                        append(line.substring(start + 2))
+                    }
+                    else -> append(line)
+                }
+                if (index < lines.size - 1) append("\n")
+            }
+        }
+        return TransformedText(styled, OffsetMapping.Identity)
+    }
+}
+
+@Composable
 private fun ToolbarButton(
     icon: ImageVector,
-    tint: androidx.compose.ui.graphics.Color = LocalGlassColors.current.text2,
+    tint: Color = LocalGlassColors.current.text2,
     onClick: () -> Unit
 ) {
     IconButton(onClick = onClick) {

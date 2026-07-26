@@ -207,6 +207,9 @@ AND t.timeStamp >= :fromTimestamp AND t.timeStamp < :toTimestamp
 AND (:sourceId IS NULL OR t.sourceId = :sourceId)
 AND (:tagIdsSize = 0 OR EXISTS (
     SELECT 1 FROM transaction_tag WHERE transactionId = t.id AND tagId IN :tagIds
+))
+AND (:personIdsSize = 0 OR EXISTS (
+    SELECT 1 FROM transaction_person WHERE transactionId = t.id AND personId IN :personIds
 ));
 
 insertFullTransaction:

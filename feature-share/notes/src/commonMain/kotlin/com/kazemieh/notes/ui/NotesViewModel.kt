@@ -7,6 +7,8 @@ import com.kazemieh.domain.usecase.DeleteNoteUseCase
 import com.kazemieh.domain.usecase.ObserveNotesUseCase
 import com.kazemieh.domain.usecase.ToggleNoteLockUseCase
 import com.kazemieh.domain.usecase.ToggleNotePinUseCase
+import com.kazemieh.domain.usecase.UpdateNoteUseCase
+import com.kazemieh.notes.ui.edit.toggleCheckboxLine
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,6 +31,7 @@ sealed interface NotesIntent {
     data class OnTogglePin(val note: Note) : NotesIntent
     data class OnToggleLock(val note: Note) : NotesIntent
     data class OnDeleteNote(val id: Long) : NotesIntent
+    data class OnToggleCheckbox(val note: Note, val lineIndex: Int) : NotesIntent
 }
 
 sealed interface NotesEffect {
@@ -39,7 +42,8 @@ class NotesViewModel(
     private val observeNotes: ObserveNotesUseCase,
     private val deleteNote: DeleteNoteUseCase,
     private val togglePin: ToggleNotePinUseCase,
-    private val toggleLock: ToggleNoteLockUseCase
+    private val toggleLock: ToggleNoteLockUseCase,
+    private val updateNote: UpdateNoteUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(NotesState())
@@ -91,6 +95,12 @@ class NotesViewModel(
             is NotesIntent.OnDeleteNote -> {
                 viewModelScope.launch {
                     deleteNote(intent.id)
+                }
+            }
+            is NotesIntent.OnToggleCheckbox -> {
+                viewModelScope.launch {
+                    val newContent = toggleCheckboxLine(intent.note.content, intent.lineIndex)
+                    updateNote(intent.note.copy(content = newContent))
                 }
             }
         }

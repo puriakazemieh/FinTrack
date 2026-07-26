@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS budget (
     startAt INTEGER NOT NULL,
     tagIds TEXT, -- Comma separated IDs
     sourceId INTEGER,
+    personIds TEXT, -- Comma separated IDs
     isAlertEnabled INTEGER NOT NULL DEFAULT 1,
     updatedAt INTEGER NOT NULL DEFAULT 0,
     syncStatus INTEGER NOT NULL DEFAULT 0,
@@ -47,12 +48,12 @@ getBudgetById:
 SELECT * FROM budget WHERE id = ? AND syncStatus != 2;
 
 insertBudget:
-INSERT INTO budget(categoryId, amount, period, startAt, tagIds, sourceId, isAlertEnabled, updatedAt, syncStatus)
-VALUES (:categoryId, :amount, :period, :startAt, :tagIds, :sourceId, :isAlertEnabled, :updatedAt, :syncStatus);
+INSERT INTO budget(categoryId, amount, period, startAt, tagIds, sourceId, personIds, isAlertEnabled, updatedAt, syncStatus)
+VALUES (:categoryId, :amount, :period, :startAt, :tagIds, :sourceId, :personIds, :isAlertEnabled, :updatedAt, :syncStatus);
 
 updateBudget:
 UPDATE budget
-SET categoryId = :categoryId, amount = :amount, period = :period, startAt = :startAt, tagIds = :tagIds, sourceId = :sourceId, isAlertEnabled = :isAlertEnabled, updatedAt = :updatedAt, syncStatus = :syncStatus
+SET categoryId = :categoryId, amount = :amount, period = :period, startAt = :startAt, tagIds = :tagIds, sourceId = :sourceId, personIds = :personIds, isAlertEnabled = :isAlertEnabled, updatedAt = :updatedAt, syncStatus = :syncStatus
 WHERE id = :id AND syncStatus != 2;
 
 deleteBudget:
@@ -62,8 +63,8 @@ physicallyDeleteBudget:
 DELETE FROM budget WHERE id = ?;
 
 insertFullBudget:
-INSERT OR REPLACE INTO budget(id, categoryId, amount, period, startAt, tagIds, sourceId, isAlertEnabled, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO budget(id, categoryId, amount, period, startAt, tagIds, sourceId, personIds, isAlertEnabled, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getModifiedBudgets:
 SELECT * FROM budget WHERE syncStatus = 1;

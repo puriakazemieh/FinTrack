@@ -43,13 +43,16 @@ class BudgetLocalDataSourceImpl(
         return budgetsFlow.combine(transactionsFlow) { budgets, _ ->
             budgets.map { item ->
                 val tagIds = item.tagIds?.split(",")?.mapNotNull { it.toLongOrNull() } ?: emptyList()
+                val personIds = item.personIds?.split(",")?.mapNotNull { it.toLongOrNull() } ?: emptyList()
                 val spent = transactionQueries.getSpentAmountByFilter(
                     categoryId = item.categoryId,
                     fromTimestamp = from,
                     toTimestamp = to,
                     sourceId = item.sourceId,
                     tagIds = tagIds,
-                    tagIdsSize = tagIds.size.toLong()
+                    tagIdsSize = tagIds.size.toLong(),
+                    personIds = personIds,
+                    personIdsSize = personIds.size.toLong()
                 ).executeAsOne().SUM ?: 0L
                 item.toBudgetWithProgress(spent)
             }
@@ -66,13 +69,16 @@ class BudgetLocalDataSourceImpl(
             val to = nextMonth.toEpochMilliseconds(timeZone)
             
             val tagIds = item.tagIds?.split(",")?.mapNotNull { it.toLongOrNull() } ?: emptyList()
+            val personIds = item.personIds?.split(",")?.mapNotNull { it.toLongOrNull() } ?: emptyList()
             val spent = transactionQueries.getSpentAmountByFilter(
                 categoryId = item.categoryId,
                 fromTimestamp = from,
                 toTimestamp = to,
                 sourceId = item.sourceId,
                 tagIds = tagIds,
-                tagIdsSize = tagIds.size.toLong()
+                tagIdsSize = tagIds.size.toLong(),
+                personIds = personIds,
+                personIdsSize = personIds.size.toLong()
             ).executeAsOne().SUM ?: 0L
             item.toBudgetWithProgress(spent)
         }
@@ -95,6 +101,7 @@ class BudgetLocalDataSourceImpl(
             startAt = budget.startAt,
             tagIds = budget.tagIds?.joinToString(","),
             sourceId = budget.sourceId,
+            personIds = budget.personIds?.joinToString(","),
             isAlertEnabled = if (budget.isAlertEnabled) 1L else 0L,
             updatedAt = now,
             syncStatus = 1
@@ -112,6 +119,7 @@ class BudgetLocalDataSourceImpl(
             startAt = budget.startAt,
             tagIds = budget.tagIds?.joinToString(","),
             sourceId = budget.sourceId,
+            personIds = budget.personIds?.joinToString(","),
             isAlertEnabled = if (budget.isAlertEnabled) 1L else 0L,
             updatedAt = now,
             syncStatus = 1
@@ -146,6 +154,7 @@ class BudgetLocalDataSourceImpl(
                 startAt = budget.startAt,
                 tagIds = budget.tagIds?.joinToString(","),
                 sourceId = budget.sourceId,
+                personIds = budget.personIds?.joinToString(","),
                 isAlertEnabled = if (budget.isAlertEnabled) 1L else 0L,
                 updatedAt = budget.updatedAt,
                 syncStatus = budget.syncStatus.value.toLong()
@@ -217,6 +226,7 @@ class BudgetLocalDataSourceImpl(
         startAt = startAt,
         tagIds = tagIds?.split(",")?.mapNotNull { it.toLongOrNull() },
         sourceId = sourceId,
+        personIds = personIds?.split(",")?.mapNotNull { it.toLongOrNull() },
         isAlertEnabled = isAlertEnabled == 1L,
         updatedAt = updatedAt,
         syncStatus = SyncStatus.fromInt(syncStatus.toInt())
@@ -230,6 +240,7 @@ class BudgetLocalDataSourceImpl(
         startAt = startAt,
         tagIds = tagIds?.split(",")?.mapNotNull { it.toLongOrNull() },
         sourceId = sourceId,
+        personIds = personIds?.split(",")?.mapNotNull { it.toLongOrNull() },
         isAlertEnabled = isAlertEnabled == 1L,
         updatedAt = updatedAt,
         syncStatus = SyncStatus.fromInt(syncStatus.toInt())
@@ -243,6 +254,7 @@ class BudgetLocalDataSourceImpl(
         startAt = startAt,
         tagIds = tagIds?.split(",")?.mapNotNull { it.toLongOrNull() },
         sourceId = sourceId,
+        personIds = personIds?.split(",")?.mapNotNull { it.toLongOrNull() },
         isAlertEnabled = isAlertEnabled == 1L,
         updatedAt = updatedAt,
         syncStatus = SyncStatus.fromInt(syncStatus.toInt())

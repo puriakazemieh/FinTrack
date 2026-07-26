@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Budget
 import com.kazemieh.common.model.BudgetPeriod
 import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
@@ -15,7 +16,10 @@ import com.kazemieh.common.persiandatetime.extensions.dayOfWeekIndex
 import com.kazemieh.domain.usecase.AddBudgetUseCase
 import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
 import com.kazemieh.domain.usecase.ObserveMostUsedCategoriesUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedPersonsUseCase
 import com.kazemieh.domain.usecase.ObserveMostUsedSourcesUseCase
+import com.kazemieh.domain.usecase.ObserveMostUsedTagsUseCase
+import com.kazemieh.domain.usecase.ObservePersonsUseCase
 import com.kazemieh.domain.usecase.ObserveSourcesUseCase
 import com.kazemieh.domain.usecase.ObserveTagsUseCase
 import com.kazemieh.domain.usecase.UpdateBudgetUseCase
@@ -43,10 +47,14 @@ data class AddBudgetState(
     val categories: List<Category> = emptyList(),
     val tags: List<Tag> = emptyList(),
     val sources: List<Source> = emptyList(),
+    val persons: List<Person> = emptyList(),
     val selectedTags: Set<Tag> = emptySet(),
+    val selectedPersons: Set<Person> = emptySet(),
     val selectedSource: Source? = null,
     val mostUsedCategories: List<Category> = emptyList(),
     val mostUsedSources: List<Source> = emptyList(),
+    val mostUsedTags: List<Tag> = emptyList(),
+    val mostUsedPersons: List<Person> = emptyList(),
     val isLoading: Boolean = false,
     val topSheet: AddBudgetSheet? = null
 )
@@ -55,6 +63,7 @@ sealed interface AddBudgetSheet {
     data object CategoryPicker : AddBudgetSheet
     data object TagPicker : AddBudgetSheet
     data object SourcePicker : AddBudgetSheet
+    data object PersonPicker : AddBudgetSheet
     data object Calculator : AddBudgetSheet
 }
 
@@ -67,6 +76,7 @@ sealed interface AddBudgetIntent {
     data class LoadCategories(val type: TransactionType = TransactionType.EXPENSE) : AddBudgetIntent
     data object LoadExtraData : AddBudgetIntent
     data class SelectTags(val tags: Set<Tag>) : AddBudgetIntent
+    data class SelectPersons(val persons: Set<Person>) : AddBudgetIntent
     data class SelectSource(val source: Source?) : AddBudgetIntent
     data class InitialData(
         val budget: Budget?,
@@ -88,8 +98,11 @@ class AddBudgetViewModel(
     private val observeCategoriesUseCase: ObserveCategoriesUseCase,
     private val observeTagsUseCase: ObserveTagsUseCase,
     private val observeSourcesUseCase: ObserveSourcesUseCase,
+    private val observePersonsUseCase: ObservePersonsUseCase,
     private val observeMostUsedCategoriesUseCase: ObserveMostUsedCategoriesUseCase,
-    private val observeMostUsedSourcesUseCase: ObserveMostUsedSourcesUseCase
+    private val observeMostUsedSourcesUseCase: ObserveMostUsedSourcesUseCase,
+    private val observeMostUsedTagsUseCase: ObserveMostUsedTagsUseCase,
+    private val observeMostUsedPersonsUseCase: ObserveMostUsedPersonsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddBudgetState())
@@ -113,6 +126,16 @@ class AddBudgetViewModel(
                 _state.update { it.copy(mostUsedSources = sources) }
             }
         }
+        viewModelScope.launch {
+            observeMostUsedTagsUseCase(limit = 3).collect { tags ->
+                _state.update { it.copy(mostUsedTags = tags) }
+            }
+        }
+        viewModelScope.launch {
+            observeMostUsedPersonsUseCase(limit = 3).collect { persons ->
+                _state.update { it.copy(mostUsedPersons = persons) }
+            }
+        }
     }
 
     fun onIntent(intent: AddBudgetIntent) {
@@ -129,6 +152,7 @@ class AddBudgetViewModel(
             is AddBudgetIntent.LoadCategories -> loadCategories(intent.type)
             AddBudgetIntent.LoadExtraData -> loadExtraData()
             is AddBudgetIntent.SelectTags -> _state.update { it.copy(selectedTags = intent.tags) }
+            is AddBudgetIntent.SelectPersons -> _state.update { it.copy(selectedPersons = intent.persons) }
             is AddBudgetIntent.SelectSource -> _state.update { it.copy(selectedSource = intent.source) }
             is AddBudgetIntent.InitialData -> {
                 if (intent.budget != null) {
@@ -208,6 +232,11 @@ class AddBudgetViewModel(
                     _state.update { it.copy(sources = sources) }
                 }
             }
+            launch {
+                observePersonsUseCase().collect { persons ->
+                    _state.update { it.copy(persons = persons) }
+                }
+            }
         }
     }
 
@@ -225,6 +254,7 @@ class AddBudgetViewModel(
                 startAt = currentState.startAt,
                 tagIds = currentState.selectedTags.mapNotNull { it.id },
                 sourceId = currentState.selectedSource?.id,
+                personIds = currentState.selectedPersons.mapNotNull { it.id },
                 isAlertEnabled = currentState.isAlertEnabled
             )
 

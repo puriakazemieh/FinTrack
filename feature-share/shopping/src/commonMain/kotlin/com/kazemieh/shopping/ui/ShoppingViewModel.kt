@@ -43,7 +43,7 @@ data class ShoppingState(
     val editingCategory: Category? = null,
     val mostUsedCategories: List<Category> = emptyList(),
     val mostUsedTags: List<Tag> = emptyList(),
-    val showPurchased: Boolean = true,
+    val showPurchased: Boolean = false,
     val filterCategories: Set<Category> = emptySet(),
     val filterTags: Set<Tag> = emptySet(),
     val itemToDelete: Long? = null,
