@@ -371,6 +371,9 @@
 
     <!-- Tools -->
     <string name="title_check_management">مدیریت چک‌ها</string>
+    <string name="action_register_transaction">افزودن به تراکنش‌ها</string>
+    <string name="msg_fixed_expense_added_to_transactions">به تراکنش‌ها اضافه شد</string>
+    <string name="guide_fixed_expense_auto_post">با فعال کردن این گزینه به طور خودکار در سررسید این هزینه به تراکنش‌های خرج اضافه خواهد شد</string>
     <string name="title_fixed_expense_management">هزینه‌های ثابت</string>
     <string name="title_assets_management">دارایی‌ها</string>
 
@@ -416,7 +419,7 @@
     <string name="error_category_required_for_auto_post">برای ثبت خودکار، انتخاب دسته‌بندی اجباری است</string>
     <string name="error_title_required">وارد کردن عنوان اجباری است</string>
     <string name="label_expense_amount">مبلغ هزینه</string>
-    <string name="label_auto_post_enabled">ثبت خودکار در سررسید</string>
+    <string name="label_auto_post_enabled">افزودن خودکار به تراکنش‌ها</string>
     <string name="sub_fixed_expense_management">مدیریت مخارج دوره‌ای و تکرار شونده</string>
     <string name="label_approx_monthly_total">مجموع ماهانه تقریبی</string>
     <string name="title_upcoming_fixed_expenses">هزینه‌های ثابت پیش‌رو</string>

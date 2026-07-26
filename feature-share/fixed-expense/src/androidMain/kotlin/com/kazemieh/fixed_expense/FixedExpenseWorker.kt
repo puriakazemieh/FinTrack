@@ -15,6 +15,7 @@ import com.kazemieh.common.persiandatetime.extensions.toEpochMilliseconds
 import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
 import com.kazemieh.domain.repository.FixedExpenseRepository
 import com.kazemieh.domain.repository.TransactionRepository
+import com.kazemieh.domain.usecase.FixedExpenseUseCaseGroup
 import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DateTimeUnit
@@ -31,66 +32,32 @@ class FixedExpenseWorker(
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams), KoinComponent {
 
-    private val fixedExpenseRepository: FixedExpenseRepository by inject()
-    private val transactionRepository: TransactionRepository by inject()
+    private val fixedExpenseUseCases: FixedExpenseUseCaseGroup by inject()
 
     override suspend fun doWork(): ListenableWorker.Result {
         val now = Clock.System.now().toEpochMilliseconds()
-        val expenses = fixedExpenseRepository.observeAllFixedExpenses().first()
+        val expenses = fixedExpenseUseCases.observeAllFixedExpensesUseCase().first()
 
-        expenses.filter { it.isActive && it.isAutoPostEnabled && it.recurrence != RecurrenceType.NONE && it.nextDueDate <= now }.forEach { expense ->
-            postTransaction(expense)
-            if (expense.recurrence == RecurrenceType.ONCE) {
-                fixedExpenseRepository.updateFixedExpense(expense.copy(isActive = false))
-            } else {
-                updateNextDueDate(expense)
+        expenses.filter { it.isActive && it.isAutoPostEnabled && it.recurrence != RecurrenceType.NONE }.forEach { expense ->
+            var currentExpense = expense
+            // Catch up all missed periods until nextDueDate is in the future.
+            while (currentExpense.isActive && currentExpense.nextDueDate <= now) {
+                fixedExpenseUseCases.postFixedExpenseAsTransactionUseCase(currentExpense)
+                // Reload or manually advance to continue loop if needed.
+                // Since postFixedExpenseAsTransactionUseCase updates the DB, 
+                // we should either reload from repo or use the advance logic here.
+                
+                // Better approach: use a helper that returns the updated expense.
+                // Or just reload from repository since it's a small list.
+                val updated = fixedExpenseUseCases.getFixedExpenseByIdUseCase(currentExpense.id)
+                if (updated == null || !updated.isActive || updated.nextDueDate <= currentExpense.nextDueDate) {
+                    break // Prevent infinite loop if something went wrong or it became inactive
+                }
+                currentExpense = updated
             }
         }
 
         return ListenableWorker.Result.success()
-    }
-
-    private suspend fun postTransaction(expense: com.kazemieh.common.model.FixedExpense) {
-        val transaction = Transaction(
-            id = 0,
-            amount = expense.amount.toInt(),
-            categoryId = expense.categoryId,
-            sourceId = expense.sourceId,
-            description = expense.description ?: expense.title,
-            timeStamp = Clock.System.now().toEpochMilliseconds(),
-            type = TransactionType.EXPENSE,
-            date = ""
-        )
-        transactionRepository.addTransactionWithBalance(
-            transaction = transaction,
-            tagIds = emptyList(),
-            personIds = emptyList(),
-            balanceDeltas = mapOf(expense.sourceId to -expense.amount.toInt())
-        )
-    }
-
-    private suspend fun updateNextDueDate(expense: com.kazemieh.common.model.FixedExpense) {
-        val timeZone = TimeZone.currentSystemDefault()
-        val currentDueDate = Instant.fromEpochMilliseconds(expense.nextDueDate).toPersianDateTime(timeZone)
-
-        val next = when (expense.recurrence) {
-            RecurrenceType.DAILY -> currentDueDate.plus(1, DateTimeUnit.DAY)
-            RecurrenceType.WEEKLY -> currentDueDate.plus(7, DateTimeUnit.DAY)
-            RecurrenceType.MONTHLY -> currentDueDate.plus(1, DateTimeUnit.MONTH)
-            RecurrenceType.YEARLY -> currentDueDate.plus(1, DateTimeUnit.YEAR)
-            // CUSTOM repeats daily within its [startDate, endDate] range.
-            RecurrenceType.CUSTOM -> currentDueDate.plus(1, DateTimeUnit.DAY)
-            else -> currentDueDate
-        }
-
-        val nextTimestamp = next.toEpochMilliseconds(timeZone)
-        // Stop a custom-range expense once it advances past its end date.
-        val endDate = expense.endDate
-        if (endDate != null && nextTimestamp > endDate) {
-            fixedExpenseRepository.updateFixedExpense(expense.copy(isActive = false))
-        } else {
-            fixedExpenseRepository.updateNextDueDate(expense.id, nextTimestamp)
-        }
     }
 
     companion object {

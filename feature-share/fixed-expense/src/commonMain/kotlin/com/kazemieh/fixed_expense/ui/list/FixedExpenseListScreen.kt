@@ -4,88 +4,44 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.kazemieh.category.ui.list.CategoryFilterSelectionContent
 import com.kazemieh.common.DateFilterType
 import com.kazemieh.common.Direction
-import com.kazemieh.common.model.FixedExpense
-import com.kazemieh.common.model.RecurrenceType
+import com.kazemieh.common.model.*
 import com.kazemieh.common.toPersianPrice
 import com.kazemieh.common.util.DateUtils
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalGlassColors
-import com.kazemieh.designsystem.component.FinTrackLeadingIcon
-import com.kazemieh.designsystem.component.FintrackBodyLargeText
-import com.kazemieh.designsystem.component.FintrackBodySmallText
-import com.kazemieh.designsystem.component.FintrackLabelSmallText
-import com.kazemieh.designsystem.component.FintrackTitleMediumText
-import com.kazemieh.designsystem.component.FintrackTitleSmallText
-import com.kazemieh.designsystem.component.LeadingIconStyle
+import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet
-import com.kazemieh.designsystem.component.glass.Fab
-import com.kazemieh.designsystem.component.glass.FintrackScreen
-import com.kazemieh.designsystem.component.glass.GlassCard
-import com.kazemieh.designsystem.component.glass.GlassTone
-import com.kazemieh.designsystem.component.glass.PeriodNavigator
-import com.kazemieh.designsystem.component.glass.dateRangeLabelText
-import com.kazemieh.designsystem.component.glass.SearchBar
-import com.kazemieh.designsystem.component.glass.stickyHeaderSurface
+import com.kazemieh.designsystem.component.glass.*
+import com.kazemieh.financialsource.ui.list.SourceFilterSelectionContent
 import com.kazemieh.fixed_expense.ui.detail.AddFixedExpenseBottomSheet
-import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.all
-import fintrack.core.designsystem.generated.resources.currency_toman
-import fintrack.core.designsystem.generated.resources.label_date_range_from
-import fintrack.core.designsystem.generated.resources.label_date_range_span
-import fintrack.core.designsystem.generated.resources.custom_date
-import fintrack.core.designsystem.generated.resources.dp_today
-import fintrack.core.designsystem.generated.resources.fixed_expense_clone_once
-import fintrack.core.designsystem.generated.resources.frequency_daily
-import fintrack.core.designsystem.generated.resources.frequency_monthly
-import fintrack.core.designsystem.generated.resources.frequency_weekly
-import fintrack.core.designsystem.generated.resources.frequency_yearly
-import fintrack.core.designsystem.generated.resources.hint_search_in
-import fintrack.core.designsystem.generated.resources.label_approx_monthly_total
-import fintrack.core.designsystem.generated.resources.label_this_year
-import fintrack.core.designsystem.generated.resources.label_unknown_person
-import fintrack.core.designsystem.generated.resources.last_month
-import fintrack.core.designsystem.generated.resources.this_month
-import fintrack.core.designsystem.generated.resources.this_week
-import fintrack.core.designsystem.generated.resources.title_add_fixed_expense
-import fintrack.core.designsystem.generated.resources.title_fixed_expense_management
-import fintrack.core.designsystem.generated.resources.today
-import fintrack.core.designsystem.generated.resources.yesterday
+import com.kazemieh.person.ui.list.PersonFilterSelectionContent
+import com.kazemieh.tag.ui.list.TagFilterSelectionContent
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -107,6 +63,18 @@ fun FixedExpenseListScreen(
     val state by viewModel.state.collectAsState()
     var showAddExpense by remember { mutableStateOf(false) }
     var selectedExpenseId by remember { mutableStateOf<Long?>(null) }
+    val glassColors = LocalGlassColors.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is FixedExpenseListEffect.ShowMessage -> {
+                    snackbarHostState.showSnackbar(getString(effect.messageRes))
+                }
+            }
+        }
+    }
 
     val displayLabel = dateRangeLabelText(state.dateRange?.label)
 
@@ -127,17 +95,44 @@ fun FixedExpenseListScreen(
                 excludeCustomRange = true
             )
 
-            SummaryCard(total = state.totalApprox)
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                SearchBar(
+                    query = state.searchQuery,
+                    onQueryChange = { viewModel.onIntent(FixedExpenseListIntent.UpdateSearchQuery(it)) },
+                    placeholder = stringResource(Res.string.hint_search_in, ""),
+                    modifier = Modifier.weight(1f)
+                )
 
-            SearchBar(
-                query = state.searchQuery,
-                onQueryChange = { viewModel.onIntent(FixedExpenseListIntent.UpdateSearchQuery(it)) },
-                placeholder = stringResource(
-                    Res.string.hint_search_in,
-                    stringResource(Res.string.title_fixed_expense_management)
-                ),
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
-            )
+                CompactSummaryCard(total = state.totalApprox)
+
+                IconButton(
+                    onClick = { viewModel.onIntent(FixedExpenseListIntent.OnFilterClick) },
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(
+                            if (state.filterCategories.isNotEmpty() || state.filterTags.isNotEmpty() || state.filterSources.isNotEmpty() || state.filterPersons.isNotEmpty())
+                                GlassGreen.copy(alpha = 0.1f) else glassColors.glass
+                        )
+                        .border(
+                            1.dp,
+                            if (state.filterCategories.isNotEmpty() || state.filterTags.isNotEmpty() || state.filterSources.isNotEmpty() || state.filterPersons.isNotEmpty())
+                                GlassGreen else glassColors.glassEdge,
+                            RoundedCornerShape(12.dp)
+                        )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.FilterList,
+                        contentDescription = null,
+                        tint = if (state.filterCategories.isNotEmpty() || state.filterTags.isNotEmpty() || state.filterSources.isNotEmpty() || state.filterPersons.isNotEmpty())
+                            GlassGreen else glassColors.text2
+                    )
+                }
+            }
 
             LazyColumn(
                 modifier = Modifier.weight(1f),
@@ -164,6 +159,9 @@ fun FixedExpenseListScreen(
                                             expense
                                         )
                                     )
+                                },
+                                onRegister = {
+                                    viewModel.onIntent(FixedExpenseListIntent.RegisterAsTransaction(expense))
                                 }
                             )
                         }
@@ -197,6 +195,55 @@ fun FixedExpenseListScreen(
                 confirmClicked = { viewModel.onIntent(FixedExpenseListIntent.ConfirmDelete) }
             )
         }
+
+        if (state.showFilterSheet) {
+            FixedExpenseFilterBottomSheet(
+                selectedCategories = state.filterCategories,
+                selectedSources = state.filterSources,
+                selectedTags = state.filterTags,
+                selectedPersons = state.filterPersons,
+                onReset = { viewModel.onIntent(FixedExpenseListIntent.OnFilterReset) },
+                onDismiss = { viewModel.onIntent(FixedExpenseListIntent.OnFilterSheetDismiss) },
+                onUpdate = { cats: Set<Category>, srcs: Set<Source>, tags: Set<Tag>, pers: Set<Person> ->
+                    viewModel.onIntent(FixedExpenseListIntent.OnFilterUpdate(cats, srcs, tags, pers))
+                }
+            )
+        }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 80.dp)
+        )
+    }
+}
+
+@Composable
+private fun CompactSummaryCard(total: Long) {
+    val glassColors = LocalGlassColors.current
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(glassColors.glass)
+            .border(1.dp, glassColors.glassEdge, RoundedCornerShape(12.dp))
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            FintrackLabelSmallText(text = stringResource(Res.string.label_approx_monthly_total), fontSize = 8.sp, color = glassColors.text3)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                FintrackLabelMediumText(
+                    text = total.toPersianPrice(),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                FintrackLabelSmallText(
+                    text = stringResource(Res.string.currency_toman),
+                    fontSize = 8.sp,
+                    color = glassColors.text3,
+                    modifier = Modifier.padding(start = 2.dp)
+                )
+            }
+        }
     }
 }
 
@@ -209,39 +256,6 @@ private fun recurrenceLabel(recurrence: RecurrenceType): String = when (recurren
     RecurrenceType.CUSTOM -> stringResource(Res.string.custom_date)
     RecurrenceType.ONCE -> stringResource(Res.string.dp_today)
     else -> stringResource(Res.string.all)
-}
-
-@Composable
-private fun SummaryCard(total: Long) {
-    val glassColors = LocalGlassColors.current
-    GlassCard(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 8.dp),
-        tone = GlassTone.Strong,
-        padding = 14.dp
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(2.dp)
-        ) {
-            FintrackLabelSmallText(
-                text = stringResource(Res.string.label_approx_monthly_total),
-                color = glassColors.text3
-            )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                FintrackTitleMediumText(
-                    text = total.toPersianPrice(),
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                FintrackLabelSmallText(
-                    text = stringResource(Res.string.currency_toman),
-                    color = glassColors.text3,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
-        }
-    }
 }
 
 @Composable
@@ -269,7 +283,7 @@ private fun SectionHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                androidx.compose.material3.Icon(
+                Icon(
                     imageVector = Icons.Default.ContentCopy,
                     contentDescription = null,
                     tint = GlassGreen,
@@ -285,11 +299,13 @@ private fun SectionHeader(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun FixedExpenseRow(
     expense: FixedExpense,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onRegister: () -> Unit
 ) {
     val glassColors = LocalGlassColors.current
     val color = if (expense.isActive) MaterialTheme.colorScheme.primary else glassColors.text3
@@ -315,8 +331,6 @@ private fun FixedExpenseRow(
                 verticalArrangement = Arrangement.spacedBy(3.dp)
             ) {
                 FintrackTitleSmallText(
-                    // Title is the primary user-entered name; fall back to category/description
-                    // only when it's empty (category is optional).
                     text = expense.title.takeIf { it.isNotBlank() }
                         ?: expense.categoryName
                         ?: expense.description?.takeIf { it.isNotBlank() }
@@ -330,6 +344,29 @@ private fun FixedExpenseRow(
                     color = color,
                     maxLines = 1
                 )
+
+                if (expense.tagNames.isNotEmpty() || expense.personNames.isNotEmpty()) {
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        expense.tagNames.forEach { name ->
+                            FintrackLabelSmallText(
+                                text = "#$name",
+                                color = GlassGreen,
+                                fontSize = 10.sp
+                            )
+                        }
+                        expense.personNames.forEach { name ->
+                            FintrackLabelSmallText(
+                                text = name,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
+                }
+
                 val rangeText = expense.endDate?.let {
                     stringResource(
                         Res.string.label_date_range_span,
@@ -344,7 +381,7 @@ private fun FixedExpenseRow(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    androidx.compose.material3.Icon(
+                    Icon(
                         imageVector = Icons.Default.CalendarMonth,
                         contentDescription = null,
                         tint = glassColors.text3,
@@ -357,8 +394,37 @@ private fun FixedExpenseRow(
                     )
                 }
             }
-            RowActionIcon(icon = Icons.Default.Edit, tint = glassColors.text2, onClick = onEdit)
-            RowActionIcon(icon = Icons.Default.Delete, tint = GlassRed, onClick = onDelete)
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    RowActionIcon(icon = Icons.Default.Edit, tint = glassColors.text2, onClick = onEdit)
+                    RowActionIcon(icon = Icons.Default.Delete, tint = GlassRed, onClick = onDelete)
+                }
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(GlassGreen.copy(alpha = 0.12f))
+                        .clickable(onClick = onRegister)
+                        .padding(horizontal = 8.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AddCircle,
+                        contentDescription = null,
+                        tint = GlassGreen,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    FintrackLabelSmallText(
+                        text = stringResource(Res.string.action_register_transaction),
+                        color = GlassGreen,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 10.sp
+                    )
+                }
+            }
         }
     }
 }
@@ -366,7 +432,7 @@ private fun FixedExpenseRow(
 @Composable
 private fun RowActionIcon(
     icon: ImageVector,
-    tint: androidx.compose.ui.graphics.Color,
+    tint: Color,
     onClick: () -> Unit
 ) {
     val glassColors = LocalGlassColors.current
@@ -379,11 +445,128 @@ private fun RowActionIcon(
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        androidx.compose.material3.Icon(
+        Icon(
             imageVector = icon,
             contentDescription = null,
             tint = tint,
             modifier = Modifier.size(15.dp)
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FixedExpenseFilterBottomSheet(
+    selectedCategories: Set<Category>,
+    selectedSources: Set<Source>,
+    selectedTags: Set<Tag>,
+    selectedPersons: Set<Person>,
+    onReset: () -> Unit,
+    onDismiss: () -> Unit,
+    onUpdate: (Set<Category>, Set<Source>, Set<Tag>, Set<Person>) -> Unit
+) {
+    var cats by remember { mutableStateOf(selectedCategories) }
+    var srcs by remember { mutableStateOf(selectedSources) }
+    var tags by remember { mutableStateOf(selectedTags) }
+    var pers by remember { mutableStateOf(selectedPersons) }
+
+    SheetFrame(
+        title = stringResource(Res.string.report),
+        sub = stringResource(Res.string.msg_filters_combined),
+        onDismiss = onDismiss,
+        horizontalPadding = 20.dp,
+        trailingContent = {
+            TextButton(onClick = onReset) {
+                FintrackLabelMediumText(
+                    text = stringResource(Res.string.btn_clear_all),
+                    color = GlassRed
+                )
+            }
+        },
+        primaryButtonText = stringResource(Res.string.save_),
+        onPrimaryClick = {
+            onUpdate(cats, srcs, tags, pers)
+            onDismiss()
+        }
+    ) {
+        val scrollState = rememberScrollState()
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(scrollState)
+                .padding(bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            FilterSection(title = stringResource(Res.string.category)) {
+                CategoryFilterSelectionContent(
+                    selectedCategories = cats,
+                    selectedTransactionType = TransactionType.EXPENSE,
+                    isAllSelected = cats.isEmpty(),
+                    onSelectionChanged = { selected, _ ->
+                        cats = selected
+                    }
+                )
+            }
+
+            FilterSection(title = stringResource(Res.string.source)) {
+                SourceFilterSelectionContent(
+                    selectedSources = srcs,
+                    isAllSelected = srcs.isEmpty(),
+                    onSelectionChanged = { selected, _ ->
+                        srcs = selected
+                    }
+                )
+            }
+
+            FilterSection(title = stringResource(Res.string.tags)) {
+                TagFilterSelectionContent(
+                    selectedTags = tags,
+                    isAllSelected = tags.isEmpty(),
+                    onSelectionChanged = { selected, _ ->
+                        tags = selected
+                    }
+                )
+            }
+
+            FilterSection(title = stringResource(Res.string.persons)) {
+                PersonFilterSelectionContent(
+                    selectedPersons = pers,
+                    isAllSelected = pers.isEmpty(),
+                    onSelectionChanged = { selected, _ ->
+                        pers = selected
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FilterSection(
+    title: String,
+    content: @Composable () -> Unit
+) {
+    val glassColors = LocalGlassColors.current
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(6.dp)
+                    .clip(CircleShape)
+                    .background(GlassGreen)
+            )
+            FintrackLabelMediumText(
+                text = title,
+                color = glassColors.text,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        content()
     }
 }

@@ -371,6 +371,12 @@ class TransactionLocalDataSourceImpl(
             .map { it.map { t -> t.toTag() } }
     }
 
+    override suspend fun getTagById(id: Long): Tag? = withContext(Dispatchers.Default) {
+        tagQueries.getTagById(id)
+            .awaitAsOneOrNull()
+            ?.toTag()
+    }
+
     override suspend fun adjustSourceBalance(id: Long, delta: Int): Unit =
         withContext(Dispatchers.Default) {
             val now = Clock.System.now().toEpochMilliseconds()

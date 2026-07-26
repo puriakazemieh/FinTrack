@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS fixed_expense_person (
+    fixedExpenseId INTEGER NOT NULL,
+    personId INTEGER NOT NULL,
+    PRIMARY KEY (fixedExpenseId, personId),
+    FOREIGN KEY (fixedExpenseId) REFERENCES fixed_expense(id) ON DELETE CASCADE,
+    FOREIGN KEY (personId) REFERENCES person(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_fixed_expense_person_expense ON fixed_expense_person(fixedExpenseId);
+CREATE INDEX IF NOT EXISTS idx_fixed_expense_person_person ON fixed_expense_person(personId);
+
+insertFixedExpensePerson:
+INSERT OR IGNORE INTO fixed_expense_person(fixedExpenseId, personId)
+VALUES (?, ?);
+
+deletePersonsByFixedExpenseId:
+DELETE FROM fixed_expense_person WHERE fixedExpenseId = ?;
+
+getPersonsForFixedExpense:
+SELECT p.* FROM person p
+INNER JOIN fixed_expense_person fep ON p.id = fep.personId
+WHERE fep.fixedExpenseId = ?;

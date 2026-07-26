@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS fixed_expense_tag (
+    fixedExpenseId INTEGER NOT NULL,
+    tagId INTEGER NOT NULL,
+    PRIMARY KEY (fixedExpenseId, tagId),
+    FOREIGN KEY (fixedExpenseId) REFERENCES fixed_expense(id) ON DELETE CASCADE,
+    FOREIGN KEY (tagId) REFERENCES tag(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_fixed_expense_tag_expense ON fixed_expense_tag(fixedExpenseId);
+CREATE INDEX IF NOT EXISTS idx_fixed_expense_tag_tag ON fixed_expense_tag(tagId);
+
+insertFixedExpenseTag:
+INSERT OR IGNORE INTO fixed_expense_tag(fixedExpenseId, tagId)
+VALUES (?, ?);
+
+deleteTagsByFixedExpenseId:
+DELETE FROM fixed_expense_tag WHERE fixedExpenseId = ?;
+
+getTagsForFixedExpense:
+SELECT t.* FROM tag t
+INNER JOIN fixed_expense_tag fet ON t.id = fet.tagId
+WHERE fet.fixedExpenseId = ?;

@@ -19,6 +19,10 @@ data class FixedExpense(
     val endDate: Long? = null,
     val isAutoPostEnabled: Boolean = false,
     val isActive: Boolean = true,
+    val tagIds: List<Long> = emptyList(),
+    val tagNames: List<String> = emptyList(),
+    val personIds: List<Long> = emptyList(),
+    val personNames: List<String> = emptyList(),
     override val updatedAt: Long = 0,
     override val syncStatus: SyncStatus = SyncStatus.SYNCED
 ) : SyncableEntity

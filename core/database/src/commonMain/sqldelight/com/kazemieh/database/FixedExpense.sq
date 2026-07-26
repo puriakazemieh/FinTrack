@@ -42,11 +42,45 @@ observeAllFixedExpenses:
 SELECT
     f.*,
     c.name AS categoryName,
-    s.name AS sourceName
+    s.name AS sourceName,
+    GROUP_CONCAT(DISTINCT fet.tagId) AS tagIds,
+    GROUP_CONCAT(DISTINCT tag.name) AS tagNames,
+    GROUP_CONCAT(DISTINCT fep.personId) AS personIds,
+    GROUP_CONCAT(DISTINCT person.name) AS personNames
 FROM fixed_expense f
 LEFT JOIN category c ON f.categoryId = c.id
 LEFT JOIN source s ON f.sourceId = s.id
+LEFT JOIN fixed_expense_tag fet ON f.id = fet.fixedExpenseId
+LEFT JOIN tag ON fet.tagId = tag.id
+LEFT JOIN fixed_expense_person fep ON f.id = fep.fixedExpenseId
+LEFT JOIN person ON fep.personId = person.id
 WHERE f.syncStatus != 2
+GROUP BY f.id
+ORDER BY f.nextDueDate ASC;
+
+observeFixedExpensesFiltered:
+SELECT
+    f.*,
+    c.name AS categoryName,
+    s.name AS sourceName,
+    GROUP_CONCAT(DISTINCT fet.tagId) AS tagIds,
+    GROUP_CONCAT(DISTINCT tag.name) AS tagNames,
+    GROUP_CONCAT(DISTINCT fep.personId) AS personIds,
+    GROUP_CONCAT(DISTINCT person.name) AS personNames
+FROM fixed_expense f
+LEFT JOIN category c ON f.categoryId = c.id
+LEFT JOIN source s ON f.sourceId = s.id
+LEFT JOIN fixed_expense_tag fet ON f.id = fet.fixedExpenseId
+LEFT JOIN tag ON fet.tagId = tag.id
+LEFT JOIN fixed_expense_person fep ON f.id = fep.fixedExpenseId
+LEFT JOIN person ON fep.personId = person.id
+WHERE f.syncStatus != 2
+AND (:query IS NULL OR f.title LIKE ('%' || :query || '%') OR f.description LIKE ('%' || :query || '%'))
+AND (:categoryIdsSize = 0 OR f.categoryId IN :categoryIds)
+AND (:sourceIdsSize = 0 OR f.sourceId IN :sourceIds)
+AND (:tagIdsSize = 0 OR EXISTS (SELECT 1 FROM fixed_expense_tag WHERE fixedExpenseId = f.id AND tagId IN :tagIds))
+AND (:personIdsSize = 0 OR EXISTS (SELECT 1 FROM fixed_expense_person WHERE fixedExpenseId = f.id AND personId IN :personIds))
+GROUP BY f.id
 ORDER BY f.nextDueDate ASC;
 
 updateNextDueDate:

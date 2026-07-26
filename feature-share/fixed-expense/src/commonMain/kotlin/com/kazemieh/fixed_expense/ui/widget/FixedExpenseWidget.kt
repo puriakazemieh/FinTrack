@@ -1,19 +1,16 @@
 package com.kazemieh.fixed_expense.ui.widget
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EventRepeat
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kazemieh.common.util.DateUtils
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
@@ -38,6 +35,8 @@ fun FixedExpenseWidget(
     // Soonest due first — the ones the user is about to pay are the most useful to see.
     val upcoming = activeExpenses.sortedBy { it.nextDueDate }
 
+    var showMoreItems by remember { mutableStateOf(false) }
+
     WidgetCard(
         title = stringResource(Res.string.title_upcoming_fixed_expenses_label),
         count = activeExpenses.size.takeIf { it > 0 },
@@ -51,9 +50,10 @@ fun FixedExpenseWidget(
             )
         } else {
             Column {
-                upcoming.take(3).forEach { expense ->
+                val itemsToShow = if (showMoreItems) 10 else 5
+                upcoming.take(itemsToShow).forEach { expense ->
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -62,14 +62,34 @@ fun FixedExpenseWidget(
                                 text = expense.title.takeIf { it.isNotBlank() }
                                     ?: expense.categoryName
                                     ?: stringResource(Res.string.label_unknown_person),
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 11.sp,
+                                maxLines = 1
                             )
                             FintrackLabelSmallText(
                                 text = stringResource(Res.string.label_next_due, DateUtils.formatDate(expense.nextDueDate)),
-                                color = glassColors.text3
+                                color = glassColors.text3,
+                                fontSize = 9.sp
                             )
                         }
-                        MoneyText(amount = expense.amount)
+                        MoneyText(
+                            amount = expense.amount,
+                            size = 11
+                        )
+                    }
+                }
+
+                if (upcoming.size > 5 && !showMoreItems) {
+                    TextButton(
+                        onClick = { showMoreItems = true },
+                        contentPadding = PaddingValues(0.dp),
+                        modifier = Modifier.height(32.dp).align(Alignment.Start)
+                    ) {
+                        FintrackLabelSmallText(
+                            text = stringResource(Res.string.view_all),
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 10.sp
+                        )
                     }
                 }
             }

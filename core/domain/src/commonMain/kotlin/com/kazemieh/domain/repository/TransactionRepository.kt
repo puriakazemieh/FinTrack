@@ -55,6 +55,7 @@ interface TransactionRepository {
     suspend fun updateTag(tag: Tag): Int
     suspend fun deleteTag(from: Tag, to: Tag?)
     fun observeTags(): Flow<List<Tag>>
+    suspend fun getTagById(id: Long): Tag?
 
 
     suspend fun addPerson(person: Person): Long

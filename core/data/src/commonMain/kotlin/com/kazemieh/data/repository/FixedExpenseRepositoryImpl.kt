@@ -13,5 +13,15 @@ class FixedExpenseRepositoryImpl(
     override suspend fun deleteFixedExpense(id: Long) = localDataSource.deleteFixedExpense(id)
     override suspend fun getFixedExpenseById(id: Long): FixedExpense? = localDataSource.getFixedExpenseById(id)
     override fun observeAllFixedExpenses(): Flow<List<FixedExpense>> = localDataSource.observeAllFixedExpenses()
+    override fun observeFixedExpensesFiltered(
+        query: String?,
+        categoryIds: List<Long>,
+        sourceIds: List<Long>,
+        tagIds: List<Long>,
+        personIds: List<Long>
+    ): Flow<List<FixedExpense>> = localDataSource.observeFixedExpensesFiltered(
+        query, categoryIds, sourceIds, tagIds, personIds
+    )
+
     override suspend fun updateNextDueDate(id: Long, nextDueDate: Long) = localDataSource.updateNextDueDate(id, nextDueDate)
 }

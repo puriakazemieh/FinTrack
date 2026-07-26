@@ -110,7 +110,10 @@ val domainModule = module {
     factory { GetPersonByIdUseCase(get()) }
     factory { GetSourceByIdUseCase(get()) }
     factory { ObserveAllFixedExpensesUseCase(get()) }
+    factory { ObserveFixedExpensesFilteredUseCase(get()) }
     factory { UpdateNextDueDateUseCase(get()) }
+    factory { PostFixedExpenseAsTransactionUseCase(get(), get(), get(), get()) }
+    factory { GetTagByIdUseCase(get()) }
 
     factory { GetBooleanPreferenceUseCase(get()) }
     factory { SetBooleanPreferenceUseCase(get()) }
@@ -203,7 +206,9 @@ val domainModule = module {
             deleteFixedExpenseUseCase = get(),
             getFixedExpenseByIdUseCase = get(),
             observeAllFixedExpensesUseCase = get(),
-            updateNextDueDateUseCase = get()
+            observeFixedExpensesFilteredUseCase = get(),
+            updateNextDueDateUseCase = get(),
+            postFixedExpenseAsTransactionUseCase = get()
         )
     }
     single {

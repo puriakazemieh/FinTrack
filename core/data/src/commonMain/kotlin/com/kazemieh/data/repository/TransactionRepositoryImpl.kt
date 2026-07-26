@@ -160,6 +160,10 @@ class TransactionRepositoryImpl(
         return localDataSource.observeTags()
     }
 
+    override suspend fun getTagById(id: Long): Tag? {
+        return localDataSource.getTagById(id)
+    }
+
     override fun observePersons(): Flow<List<Person>> {
         return localDataSource.observePersons()
     }

@@ -4,14 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.FixedExpense
+import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.RecurrenceType
 import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
-import com.kazemieh.domain.usecase.FixedExpenseUseCaseGroup
-import com.kazemieh.domain.usecase.GetCategoryUseCase
-import com.kazemieh.domain.usecase.GetSourceByIdUseCase
-import com.kazemieh.domain.usecase.ObserveMostUsedCategoriesUseCase
-import com.kazemieh.domain.usecase.ObserveMostUsedSourcesUseCase
+import com.kazemieh.domain.usecase.*
 import com.kazemieh.common.persiandatetime.extensions.toEpochMilliseconds
 import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
 import com.kazemieh.common.persiandatetime.extensions.minus
@@ -35,8 +33,12 @@ class AddFixedExpenseViewModel(
     private val fixedExpenseUseCases: FixedExpenseUseCaseGroup,
     private val getCategoryUseCase: GetCategoryUseCase,
     private val getSourceByIdUseCase: GetSourceByIdUseCase,
+    private val getTagByIdUseCase: GetTagByIdUseCase,
+    private val getPersonByIdUseCase: GetPersonByIdUseCase,
     private val observeMostUsedCategoriesUseCase: ObserveMostUsedCategoriesUseCase,
-    private val observeMostUsedSourcesUseCase: ObserveMostUsedSourcesUseCase
+    private val observeMostUsedSourcesUseCase: ObserveMostUsedSourcesUseCase,
+    private val observeMostUsedTagsUseCase: ObserveMostUsedTagsUseCase,
+    private val observeMostUsedPersonsUseCase: ObserveMostUsedPersonsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddFixedExpenseState())
@@ -67,8 +69,11 @@ class AddFixedExpenseViewModel(
             is AddFixedExpenseIntent.SetEndDate -> _state.update { it.copy(endDate = intent.endDate) }
             is AddFixedExpenseIntent.SetAutoPost -> _state.update { it.copy(isAutoPostEnabled = intent.enabled) }
             is AddFixedExpenseIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
+            is AddFixedExpenseIntent.SetTags -> _state.update { it.copy(tags = intent.tags) }
+            is AddFixedExpenseIntent.SetPersons -> _state.update { it.copy(persons = intent.persons) }
             is AddFixedExpenseIntent.LoadExpense -> loadExpense(intent.expenseId)
             AddFixedExpenseIntent.Reset -> reset()
+            AddFixedExpenseIntent.RegisterAsTransaction -> registerAsTransaction()
             AddFixedExpenseIntent.Submit -> submit()
         }
     }
@@ -84,6 +89,16 @@ class AddFixedExpenseViewModel(
                 _state.update { it.copy(mostUsedSources = sources) }
             }
         }
+        viewModelScope.launch {
+            observeMostUsedTagsUseCase(limit = 6).collect { tags ->
+                _state.update { it.copy(mostUsedTags = tags) }
+            }
+        }
+        viewModelScope.launch {
+            observeMostUsedPersonsUseCase(limit = 6).collect { persons ->
+                _state.update { it.copy(mostUsedPersons = persons) }
+            }
+        }
     }
 
     private fun reset() {
@@ -94,7 +109,9 @@ class AddFixedExpenseViewModel(
                 startDate = adjustStartDate(now, RecurrenceType.MONTHLY),
                 baseAt = now,
                 mostUsedCategories = it.mostUsedCategories,
-                mostUsedSources = it.mostUsedSources
+                mostUsedSources = it.mostUsedSources,
+                mostUsedTags = it.mostUsedTags,
+                mostUsedPersons = it.mostUsedPersons
             )
         }
     }
@@ -120,6 +137,8 @@ class AddFixedExpenseViewModel(
             val expense = fixedExpenseUseCases.getFixedExpenseByIdUseCase(expenseId) ?: return@launch
             val category = getCategoryUseCase(expense.categoryId)
             val source = getSourceByIdUseCase(expense.sourceId)
+            val tags = expense.tagIds.mapNotNull { getTagByIdUseCase(it) }
+            val persons = expense.personIds.mapNotNull { getPersonByIdUseCase(it) }
             _state.update {
                 it.copy(
                     expenseId = expense.id,
@@ -127,6 +146,8 @@ class AddFixedExpenseViewModel(
                     amount = expense.amount.toString(),
                     category = category,
                     source = source,
+                    tags = tags.toSet(),
+                    persons = persons.toSet(),
                     recurrence = expense.recurrence,
                     startDate = expense.startDate,
                     baseAt = expense.startDate,
@@ -137,6 +158,40 @@ class AddFixedExpenseViewModel(
                     description = expense.description ?: ""
                 )
             }
+        }
+    }
+
+    private fun registerAsTransaction() {
+        val currentState = _state.value
+        val amountValue = currentState.amount.toLongOrNull() ?: return
+        if (currentState.category == null || currentState.source == null) return
+
+        viewModelScope.launch {
+            val expense = FixedExpense(
+                id = currentState.expenseId ?: 0L,
+                title = currentState.title,
+                amount = amountValue,
+                categoryId = currentState.category.id ?: 0L,
+                sourceId = currentState.source.id ?: 0L,
+                recurrence = currentState.recurrence,
+                startDate = currentState.startDate,
+                endDate = currentState.endDate,
+                nextDueDate = currentState.nextDueDate,
+                isAutoPostEnabled = currentState.isAutoPostEnabled,
+                isActive = currentState.isActive,
+                description = currentState.description,
+                tagIds = currentState.tags.mapNotNull { it.id },
+                personIds = currentState.persons.mapNotNull { it.id }
+            )
+            fixedExpenseUseCases.postFixedExpenseAsTransactionUseCase(expense)
+            if (currentState.expenseId != null) {
+                // If we were editing, reload to get updated nextDueDate
+                loadExpense(currentState.expenseId)
+            }
+            _effect.send(AddFixedExpenseEffect.Saved) // Close or show success?
+            // Actually maybe we should stay on screen but advance date.
+            // The user said: "یه گزینه دیگه اضافه کن برای اینکه این هزینه به عنوان یک تراکنش ثبت بشه"
+            // I'll close it for now as "Saved" means success in this VM.
         }
     }
 
@@ -172,7 +227,9 @@ class AddFixedExpenseViewModel(
                 nextDueDate = if (currentState.expenseId != null) currentState.nextDueDate else currentState.startDate,
                 isAutoPostEnabled = currentState.isAutoPostEnabled,
                 isActive = currentState.isActive,
-                description = currentState.description
+                description = currentState.description,
+                tagIds = currentState.tags.mapNotNull { it.id },
+                personIds = currentState.persons.mapNotNull { it.id }
             )
             val reminderTitle = getString(Res.string.notif_installment_label)
             val reminderMessage = getString(
@@ -206,8 +263,12 @@ data class AddFixedExpenseState(
     val isAutoPostEnabled: Boolean = false,
     val isActive: Boolean = true,
     val description: String = "",
+    val tags: Set<Tag> = emptySet(),
+    val persons: Set<Person> = emptySet(),
     val mostUsedCategories: List<Category> = emptyList(),
-    val mostUsedSources: List<Source> = emptyList()
+    val mostUsedSources: List<Source> = emptyList(),
+    val mostUsedTags: List<Tag> = emptyList(),
+    val mostUsedPersons: List<Person> = emptyList()
 )
 
 sealed interface AddFixedExpenseIntent {
@@ -215,6 +276,8 @@ sealed interface AddFixedExpenseIntent {
     data class SetAmount(val amount: String) : AddFixedExpenseIntent
     data class SetCategory(val category: Category?) : AddFixedExpenseIntent
     data class SetSource(val source: Source?) : AddFixedExpenseIntent
+    data class SetTags(val tags: Set<Tag>) : AddFixedExpenseIntent
+    data class SetPersons(val persons: Set<Person>) : AddFixedExpenseIntent
     data class SetRecurrence(val recurrence: RecurrenceType) : AddFixedExpenseIntent
     data class SetStartDate(val startDate: Long) : AddFixedExpenseIntent
     data class SetEndDate(val endDate: Long?) : AddFixedExpenseIntent
@@ -222,6 +285,7 @@ sealed interface AddFixedExpenseIntent {
     data class SetDescription(val description: String) : AddFixedExpenseIntent
     data class LoadExpense(val expenseId: Long) : AddFixedExpenseIntent
     data object Reset : AddFixedExpenseIntent
+    data object RegisterAsTransaction : AddFixedExpenseIntent
     data object Submit : AddFixedExpenseIntent
 }
 

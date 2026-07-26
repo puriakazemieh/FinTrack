@@ -435,6 +435,33 @@ fun ObserveAllFixedExpenses.toFixedExpense() = FixedExpense(
     endDate = endDate,
     isAutoPostEnabled = isAutoPostEnabled == 1L,
     isActive = isActive == 1L,
+    tagIds = tagIds?.split(",")?.mapNotNull { it.toLongOrNull() } ?: emptyList(),
+    tagNames = tagNames?.split(",") ?: emptyList(),
+    personIds = personIds?.split(",")?.mapNotNull { it.toLongOrNull() } ?: emptyList(),
+    personNames = personNames?.split(",") ?: emptyList(),
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
+)
+
+fun ObserveFixedExpensesFiltered.toFixedExpense() = FixedExpense(
+    id = id,
+    title = title,
+    amount = amount,
+    categoryId = categoryId,
+    categoryName = categoryName,
+    sourceId = sourceId,
+    sourceName = sourceName,
+    description = description,
+    recurrence = RecurrenceType.valueOf(recurrence),
+    startDate = startDate,
+    nextDueDate = nextDueDate,
+    endDate = endDate,
+    isAutoPostEnabled = isAutoPostEnabled == 1L,
+    isActive = isActive == 1L,
+    tagIds = tagIds?.split(",")?.mapNotNull { it.toLongOrNull() } ?: emptyList(),
+    tagNames = tagNames?.split(",") ?: emptyList(),
+    personIds = personIds?.split(",")?.mapNotNull { it.toLongOrNull() } ?: emptyList(),
+    personNames = personNames?.split(",") ?: emptyList(),
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )

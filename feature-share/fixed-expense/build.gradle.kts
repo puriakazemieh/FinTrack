@@ -52,6 +52,8 @@ kotlin {
                 implementation(project(":core:domain"))
                 implementation(project(":feature-share:category"))
                 implementation(project(":feature-share:source"))
+                implementation(project(":feature-share:tags"))
+                implementation(project(":feature-share:person"))
                 implementation(project(":core:designsystem"))
                 implementation(project(":core:jalali"))
 

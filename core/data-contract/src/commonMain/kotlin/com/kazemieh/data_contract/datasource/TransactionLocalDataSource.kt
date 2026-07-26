@@ -59,6 +59,7 @@ interface TransactionLocalDataSource {
     fun observeSource(sourceId: Long): Flow<Source?>
     suspend fun getSourceById(id: Long): Source?
     fun observeTags(): Flow<List<Tag>>
+    suspend fun getTagById(id: Long): Tag?
     suspend fun adjustSourceBalance(id: Long, delta: Int)
     suspend fun getDefaultCategory(type: TransactionType): Category
     suspend fun getTransferCategory(): Category

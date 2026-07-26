@@ -17,31 +17,13 @@ class FixedExpenseLocalDataSourceImpl(
     private val database: FinTrackDatabase
 ) : FixedExpenseLocalDataSource {
     private val queries = database.fixedExpenseQueries
+    private val tagQueries = database.fixedExpenseTagQueries
+    private val personQueries = database.fixedExpensePersonQueries
 
     override suspend fun insertFixedExpense(expense: FixedExpense): Long = withContext(Dispatchers.Default) {
         val now = Clock.System.now().toEpochMilliseconds()
-        queries.insertFixedExpense(
-            title = expense.title,
-            amount = expense.amount,
-            categoryId = expense.categoryId,
-            sourceId = expense.sourceId,
-            description = expense.description,
-            recurrence = expense.recurrence.name,
-            startDate = expense.startDate,
-            nextDueDate = expense.nextDueDate,
-            endDate = expense.endDate,
-            isAutoPostEnabled = if (expense.isAutoPostEnabled) 1L else 0L,
-            isActive = if (expense.isActive) 1L else 0L,
-            updatedAt = now,
-            syncStatus = 1
-        )
-        queries.lastInsertRowId().executeAsOne()
-    }
-
-    override suspend fun updateFixedExpense(expense: FixedExpense) {
-        withContext(Dispatchers.Default) {
-            val now = Clock.System.now().toEpochMilliseconds()
-            queries.updateFixedExpense(
+        database.transaction {
+            queries.insertFixedExpense(
                 title = expense.title,
                 amount = expense.amount,
                 categoryId = expense.categoryId,
@@ -54,9 +36,48 @@ class FixedExpenseLocalDataSourceImpl(
                 isAutoPostEnabled = if (expense.isAutoPostEnabled) 1L else 0L,
                 isActive = if (expense.isActive) 1L else 0L,
                 updatedAt = now,
-                syncStatus = 1,
-                id = expense.id
+                syncStatus = 1
             )
+            val id = queries.lastInsertRowId().executeAsOne()
+            expense.tagIds.forEach { tagId ->
+                tagQueries.insertFixedExpenseTag(id, tagId)
+            }
+            expense.personIds.forEach { personId ->
+                personQueries.insertFixedExpensePerson(id, personId)
+            }
+        }
+        queries.lastInsertRowId().executeAsOne()
+    }
+
+    override suspend fun updateFixedExpense(expense: FixedExpense) {
+        withContext(Dispatchers.Default) {
+            val now = Clock.System.now().toEpochMilliseconds()
+            database.transaction {
+                queries.updateFixedExpense(
+                    title = expense.title,
+                    amount = expense.amount,
+                    categoryId = expense.categoryId,
+                    sourceId = expense.sourceId,
+                    description = expense.description,
+                    recurrence = expense.recurrence.name,
+                    startDate = expense.startDate,
+                    nextDueDate = expense.nextDueDate,
+                    endDate = expense.endDate,
+                    isAutoPostEnabled = if (expense.isAutoPostEnabled) 1L else 0L,
+                    isActive = if (expense.isActive) 1L else 0L,
+                    updatedAt = now,
+                    syncStatus = 1,
+                    id = expense.id
+                )
+                tagQueries.deleteTagsByFixedExpenseId(expense.id)
+                expense.tagIds.forEach { tagId ->
+                    tagQueries.insertFixedExpenseTag(expense.id, tagId)
+                }
+                personQueries.deletePersonsByFixedExpenseId(expense.id)
+                expense.personIds.forEach { personId ->
+                    personQueries.insertFixedExpensePerson(expense.id, personId)
+                }
+            }
         }
     }
 
@@ -80,6 +101,28 @@ class FixedExpenseLocalDataSourceImpl(
 
     override fun observeAllFixedExpenses(): Flow<List<FixedExpense>> {
         return queries.observeAllFixedExpenses().asFlow().mapToList(Dispatchers.Default).map { list ->
+            list.map { it.toFixedExpense() }
+        }
+    }
+
+    override fun observeFixedExpensesFiltered(
+        query: String?,
+        categoryIds: List<Long>,
+        sourceIds: List<Long>,
+        tagIds: List<Long>,
+        personIds: List<Long>
+    ): Flow<List<FixedExpense>> {
+        return queries.observeFixedExpensesFiltered(
+            query = query,
+            categoryIds = categoryIds,
+            categoryIdsSize = categoryIds.size.toLong(),
+            sourceIds = sourceIds,
+            sourceIdsSize = sourceIds.size.toLong(),
+            tagIds = tagIds,
+            tagIdsSize = tagIds.size.toLong(),
+            personIds = personIds,
+            personIdsSize = personIds.size.toLong()
+        ).asFlow().mapToList(Dispatchers.Default).map { list ->
             list.map { it.toFixedExpense() }
         }
     }
