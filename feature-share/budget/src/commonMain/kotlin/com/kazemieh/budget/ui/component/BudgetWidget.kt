@@ -67,7 +67,10 @@ fun BudgetWidget(
                             modifier = Modifier.size(40.dp)
                         )
                         FintrackLabelSmallText(
-                            text = (progress * 100).toInt().toLong().toPersianDigits() + "٪",
+                            text = stringResource(
+                                Res.string.percentage_format,
+                                (progress * 100).toInt().toLong().toPersianDigits()
+                            ),
                             fontWeight = FontWeight.Bold,
                             fontSize = 9.sp
                         )

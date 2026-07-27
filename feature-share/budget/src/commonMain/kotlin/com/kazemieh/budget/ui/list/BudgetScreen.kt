@@ -298,7 +298,10 @@ private fun BudgetRow(
                 }
 
                 FintrackLabelSmallText(
-                    text = (item.progress * 100).toInt().toLong().toPersianDigits() + "٪",
+                    text = stringResource(
+                        Res.string.percentage_format,
+                        (item.progress * 100).toInt().toLong().toPersianDigits()
+                    ),
                     fontWeight = FontWeight.Bold,
                     color = if (isOver) GlassRed else LocalGlassColors.current.text,
                     fontSize = 11.sp
