@@ -12,8 +12,8 @@ android {
         applicationId = "com.kazemieh.fintrack"
         minSdk = 24
         targetSdk = 36
-        versionCode = 7
-        versionName = "3.5.0"
+        versionCode = 8
+        versionName = "4.0.0"
     }
 
     signingConfigs {
@@ -65,6 +65,7 @@ android {
     }
 
     kotlin {
+        jvmToolchain(17)
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
