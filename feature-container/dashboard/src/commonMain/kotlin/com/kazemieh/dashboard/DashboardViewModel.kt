@@ -100,7 +100,6 @@ class DashboardViewModel(
         // todo disable feature toggle -> remove or change setStringPreference
         preferenceUseCases.setStringPreference(
             FinTrackPreferences.PREF_DISABLED_TOOLS,
-//            ToolFeature.serializeDisabled(ToolFeature.entries.toSet())
             ToolFeature.serializeDisabled(
                 ToolFeature.entries.toSet() -
                         setOf(
@@ -112,10 +111,10 @@ class DashboardViewModel(
                             ToolFeature.FIXED_EXPENSE,
                             ToolFeature.SHOPPING,
                             ToolFeature.NOTES,
-                            ToolFeature.GOALS,
-                            ToolFeature.INSTALLMENT,
-                            ToolFeature.DEBT,
-                            ToolFeature.CHECK,
+//                            ToolFeature.GOALS,
+//                            ToolFeature.INSTALLMENT,
+//                            ToolFeature.DEBT,
+//                            ToolFeature.CHECK,
                         )
             )
         )

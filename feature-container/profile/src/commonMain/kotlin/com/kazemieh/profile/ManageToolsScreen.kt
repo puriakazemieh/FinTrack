@@ -96,8 +96,7 @@ fun ManageToolsScreen(
             item {
                 WidgetCard(title = stringResource(Res.string.navigation_tools)) {
                     // todo disable
-                    ToolFeature.entries -
-                            setOf(
+                    ToolFeature.entries - setOf(
                                 ToolFeature.SOURCES,
                                 ToolFeature.CATEGORIES,
                                 ToolFeature.PERSONS,
@@ -106,11 +105,12 @@ fun ManageToolsScreen(
                                 ToolFeature.FIXED_EXPENSE,
                                 ToolFeature.SHOPPING,
                                 ToolFeature.NOTES,
-                                ToolFeature.GOALS,
-                                ToolFeature.INSTALLMENT,
-                                ToolFeature.DEBT,
-                                ToolFeature.CHECK,
-                            ).forEach { feature ->
+//                                ToolFeature.GOALS,
+//                                ToolFeature.INSTALLMENT,
+//                                ToolFeature.DEBT,
+//                                ToolFeature.CHECK,
+                            )
+                                .forEach { feature ->
                         SettingItem(
                             title = feature.displayLabel(),
                             icon = feature.displayIcon,
