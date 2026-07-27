@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,8 +22,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material3.Icon
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.IconButton
+import com.kazemieh.designsystem.GlassRed
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -36,7 +39,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.border
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import com.kazemieh.common.model.Note
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -156,9 +161,25 @@ private fun NoteCard(
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .padding(12.dp)
     ) {
+        // Delete Button at Top Left
+        IconButton(
+            onClick = onLongClick, // Opens delete sheet
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .size(28.dp)
+                .offset(x = (-4).dp, y = (-4).dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = null,
+                tint = GlassRed.copy(alpha = 0.6f),
+                modifier = Modifier.size(16.dp)
+            )
+        }
+
         Column {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(start = 24.dp), // Space for delete button
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -170,9 +191,11 @@ private fun NoteCard(
                         maxLines = 1,
                         modifier = Modifier.weight(1f)
                     )
+                } else {
+                    Spacer(Modifier.weight(1f))
                 }
                 
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     if (note.isPinned) {
                         Icon(
                             imageVector = Icons.Default.PushPin,
@@ -180,6 +203,7 @@ private fun NoteCard(
                             tint = onCardColor.copy(alpha = 0.6f),
                             modifier = Modifier.size(14.dp)
                         )
+                        Spacer(Modifier.width(8.dp))
                     }
                     if (note.isLocked) {
                         Icon(

@@ -41,10 +41,5 @@ fun SmsBanner(
         onMore = onClick,
         more = stringResource(Res.string.sms_sheet_sub),
         modifier = modifier
-    ) {
-        FintrackLabelSmallText(
-            text = stringResource(Res.string.sms_banner_desc, count.toPersianDigits()),
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        )
-    }
+    ) {}
 }

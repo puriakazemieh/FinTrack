@@ -1,5 +1,6 @@
 package com.kazemieh.fixed_expense.ui.widget
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EventRepeat
@@ -26,6 +27,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun FixedExpenseWidget(
     onMore: () -> Unit,
+    onAdd: () -> Unit = {},
+    onEdit: (Long) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: FixedExpenseListViewModel = koinViewModel()
 ) {
@@ -41,6 +44,7 @@ fun FixedExpenseWidget(
         title = stringResource(Res.string.title_upcoming_fixed_expenses_label),
         count = activeExpenses.size.takeIf { it > 0 },
         onMore = onMore,
+        onAdd = onAdd,
         modifier = modifier
     ) {
         if (activeExpenses.isEmpty()) {
@@ -53,7 +57,10 @@ fun FixedExpenseWidget(
                 val itemsToShow = if (showMoreItems) 10 else 5
                 upcoming.take(itemsToShow).forEach { expense ->
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onEdit(expense.id) }
+                            .padding(vertical = 4.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {

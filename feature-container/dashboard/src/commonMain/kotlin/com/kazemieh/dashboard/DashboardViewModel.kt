@@ -10,6 +10,7 @@ import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.ToolFeature
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
+import com.kazemieh.domain.repository.GoalRepository
 import com.kazemieh.domain.repository.SmsDraftRepository
 import com.kazemieh.domain.usecase.ObserveAchievementsUseCase
 import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
@@ -40,7 +41,8 @@ class DashboardViewModel(
     private val observeSources: ObserveSourcesUseCase,
     private val observeAchievements: ObserveAchievementsUseCase,
     private val observeStreak: ObserveStreakUseCase,
-    private val transactionUseCaseGroup: TransactionUseCaseGroup
+    private val transactionUseCaseGroup: TransactionUseCaseGroup,
+    private val goalRepository: GoalRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DashboardState())
@@ -315,6 +317,58 @@ class DashboardViewModel(
                 // Optimistic update; the pref flow will re-emit the same value.
                 _state.update { it.copy(dashboardWidgets = intent.items) }
             }
+
+            is DashboardIntent.ToggleBudgetSheet -> _state.update {
+                it.copy(
+                    showBudgetSheet = !it.showBudgetSheet,
+                    selectedBudget = intent.budget
+                )
+            }
+
+            is DashboardIntent.ToggleNoteSheet -> _state.update {
+                it.copy(
+                    showNoteSheet = !it.showNoteSheet,
+                    selectedNote = intent.note
+                )
+            }
+
+            is DashboardIntent.ToggleShoppingSheet -> _state.update {
+                it.copy(
+                    showShoppingSheet = !it.showShoppingSheet,
+                    selectedShoppingItem = intent.item
+                )
+            }
+
+            is DashboardIntent.ToggleFixedExpenseSheet -> _state.update {
+                it.copy(
+                    showFixedExpenseSheet = !it.showFixedExpenseSheet,
+                    selectedFixedExpenseId = intent.fixedExpenseId
+                )
+            }
+
+            is DashboardIntent.ToggleGoalSheet -> viewModelScope.launch {
+                val goal = intent.goalId?.let { goalRepository.getGoalById(it) }
+                _state.update {
+                    it.copy(
+                        showGoalSheet = !it.showGoalSheet,
+                        selectedGoal = goal
+                    )
+                }
+            }
+
+            is DashboardIntent.ToggleInstallmentSheet -> _state.update {
+                it.copy(
+                    showInstallmentSheet = !it.showInstallmentSheet,
+                    selectedInstallmentId = intent.installmentId
+                )
+            }
+
+            is DashboardIntent.ToggleCheckSheet -> _state.update {
+                it.copy(
+                    showCheckSheet = !it.showCheckSheet,
+                    selectedCheckId = intent.checkId
+                )
+            }
         }
     }
 }
@@ -345,7 +399,28 @@ data class DashboardState(
     val dashboardWidgets: List<DashboardWidgetItem> = DashboardWidget.defaultConfig(),
     val showCustomizeSheet: Boolean = false,
     val isLoading: Boolean = false,
-    val disabledTools: Set<ToolFeature> = emptySet()
+    val disabledTools: Set<ToolFeature> = emptySet(),
+
+    val showBudgetSheet: Boolean = false,
+    val selectedBudget: com.kazemieh.common.model.BudgetWithProgress? = null,
+
+    val showNoteSheet: Boolean = false,
+    val selectedNote: com.kazemieh.common.model.Note? = null,
+
+    val showShoppingSheet: Boolean = false,
+    val selectedShoppingItem: com.kazemieh.common.model.ShoppingItem? = null,
+
+    val showFixedExpenseSheet: Boolean = false,
+    val selectedFixedExpenseId: Long? = null,
+
+    val showGoalSheet: Boolean = false,
+    val selectedGoal: com.kazemieh.common.model.Goal? = null,
+
+    val showInstallmentSheet: Boolean = false,
+    val selectedInstallmentId: Long? = null,
+
+    val showCheckSheet: Boolean = false,
+    val selectedCheckId: Long? = null
 )
 
 
@@ -370,4 +445,12 @@ sealed interface DashboardIntent {
     data class UpdateSmsDraft(val draft: SmsDraft) : DashboardIntent
     data object ToggleCustomizeSheet : DashboardIntent
     data class SetWidgetLayout(val items: List<DashboardWidgetItem>) : DashboardIntent
+
+    data class ToggleBudgetSheet(val budget: com.kazemieh.common.model.BudgetWithProgress? = null) : DashboardIntent
+    data class ToggleNoteSheet(val note: com.kazemieh.common.model.Note? = null) : DashboardIntent
+    data class ToggleShoppingSheet(val item: com.kazemieh.common.model.ShoppingItem? = null) : DashboardIntent
+    data class ToggleFixedExpenseSheet(val fixedExpenseId: Long? = null) : DashboardIntent
+    data class ToggleGoalSheet(val goalId: Long? = null) : DashboardIntent
+    data class ToggleInstallmentSheet(val installmentId: Long? = null) : DashboardIntent
+    data class ToggleCheckSheet(val checkId: Long? = null) : DashboardIntent
 }

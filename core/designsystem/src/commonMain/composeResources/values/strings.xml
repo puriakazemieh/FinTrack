@@ -1014,6 +1014,12 @@
     <string name="note_unlocked">باز شد</string>
     <string name="note_not_found">یادداشت یافت نشد</string>
     <string name="reminder">یادآور</string>
+    <string name="label_pin">پین</string>
+    <string name="label_pin_active">پین شده</string>
+    <string name="label_pin_inactive">پین کردن</string>
+    <string name="label_lock">قفل</string>
+    <string name="label_lock_active">قفل شده</string>
+    <string name="label_lock_inactive">قفل کردن</string>
     <string name="shopping_list_empty">لیست خرید خالی است</string>
     <string name="notes_empty">یادداشتی وجود ندارد</string>
     <string name="budget_empty">هنوز بودجه‌ای ثبت نشده</string>

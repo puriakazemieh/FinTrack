@@ -4,17 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -50,6 +40,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
@@ -58,31 +49,22 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.designsystem.GlassColors
-import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
-import com.kazemieh.designsystem.component.glass.GlassCard
 
-/**
- * A hybrid markdown editor for note bodies: a formatting toolbar that inserts markdown syntax
- * while rendering the resulting UI elements (like checkboxes, bullets, and headers) live in the
- * editor. There is no separate preview mode; the text remains fully editable.
- */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MarkdownNoteField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
-    modifier: Modifier = Modifier,
-    startInPreview: Boolean = false // Ignored, no longer two modes
+    modifier: Modifier = Modifier
 ) {
     val glassColors = LocalGlassColors.current
     val density = LocalDensity.current
     var fieldValue by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
     var layoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
 
-    // Keep in sync when the note is (re)loaded from the ViewModel.
     LaunchedEffect(value) {
         if (value != fieldValue.text) {
             fieldValue = TextFieldValue(value, TextRange(value.length))
@@ -94,8 +76,6 @@ fun MarkdownNoteField(
         onValueChange(newValue.text)
     }
 
-    // Toggling: if the selection is already wrapped by the marker (just outside or just inside the
-    // selection) remove it, otherwise add it. Fixes repeated taps stacking "****" markers.
     fun wrapSelection(marker: String) {
         val text = fieldValue.text
         val start = fieldValue.selection.min
@@ -112,13 +92,6 @@ fun MarkdownNoteField(
         }
 
         val selected = text.substring(start, end)
-        if (selected.length >= 2 * len && selected.startsWith(marker) && selected.endsWith(marker)) {
-            val inner = selected.substring(len, selected.length - len)
-            val newText = text.substring(0, start) + inner + text.substring(end)
-            apply(TextFieldValue(newText, TextRange(start, start + inner.length)))
-            return
-        }
-
         val newText = text.substring(0, start) + marker + selected + marker + text.substring(end)
         val selection = if (start == end) TextRange(start + len) else TextRange(start + len, end + len)
         apply(TextFieldValue(newText, selection))
@@ -131,7 +104,6 @@ fun MarkdownNoteField(
         val lineEnd = text.indexOf('\n', lineStart).let { if (it == -1) text.length else it }
         val currentLine = text.substring(lineStart, lineEnd)
         if (currentLine.startsWith(prefix)) {
-            // Remove an already-applied block marker instead of stacking another one.
             val newText = text.substring(0, lineStart) + currentLine.removePrefix(prefix) + text.substring(lineEnd)
             apply(TextFieldValue(newText, TextRange((caret - prefix.length).coerceAtLeast(lineStart))))
         } else {
@@ -140,46 +112,51 @@ fun MarkdownNoteField(
         }
     }
 
-    GlassCard(padding = 0.dp, modifier = modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp, vertical = 2.dp),
-                horizontalArrangement = Arrangement.spacedBy(2.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                FlowRow(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(2.dp)
-                ) {
-                    ToolbarButton(Icons.Default.Title) { prefixLine("# ") }
-                    ToolbarButton(Icons.Default.FormatBold) { wrapSelection("**") }
-                    ToolbarButton(Icons.Default.FormatItalic) { wrapSelection("*") }
-                    ToolbarButton(Icons.Default.FormatStrikethrough) { wrapSelection("~~") }
-                    ToolbarButton(Icons.Default.CheckBox) { prefixLine("- [ ] ") }
-                    ToolbarButton(Icons.Default.FormatListBulleted) { prefixLine("- ") }
-                    ToolbarButton(Icons.Default.FormatListNumbered) { prefixLine("1. ") }
-                }
-            }
+    // Unified Card for Toolbar and Text
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .background(glassColors.glass)
+            .border(1.dp, glassColors.glassEdge, MaterialTheme.shapes.medium)
+    ) {
+        // Toolbar
+        FlowRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp, vertical = 2.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            ToolbarButton(Icons.Default.Title) { prefixLine("# ") }
+            ToolbarButton(Icons.Default.FormatBold) { wrapSelection("**") }
+            ToolbarButton(Icons.Default.FormatItalic) { wrapSelection("*") }
+            ToolbarButton(Icons.Default.FormatStrikethrough) { wrapSelection("~~") }
+            ToolbarButton(Icons.Default.CheckBox) { prefixLine("- [ ] ") }
+            ToolbarButton(Icons.Default.FormatListBulleted) { prefixLine("- ") }
+            ToolbarButton(Icons.Default.FormatListNumbered) { prefixLine("1. ") }
+        }
 
-            HorizontalDivider(color = glassColors.glassHairline)
+        HorizontalDivider(color = glassColors.glassHairline, thickness = 1.dp)
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 160.dp)
-                    .pointerInput(fieldValue.text) {
-                        detectTapGestures { offset ->
-                            layoutResult?.let { layout ->
-                                val lineIndex = layout.getLineForVerticalPosition(offset.y)
-                                if (lineIndex >= layout.lineCount) return@detectTapGestures
-                                val lineStart = layout.getLineStart(lineIndex)
-                                val lineEnd = layout.getLineEnd(lineIndex)
-                                if (lineStart >= fieldValue.text.length) return@detectTapGestures
-                                val lineText = fieldValue.text.substring(lineStart, lineEnd)
-                                
-                                if (offset.x < with(density) { 36.dp.toPx() } && (lineText.trimStart().startsWith("- [ ]") || lineText.trimStart().startsWith("- [x]"))) {
+        // Text Area
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 200.dp)
+                .pointerInput(fieldValue.text) {
+                    detectTapGestures { offset ->
+                        layoutResult?.let { layout ->
+                            val lineIndex = layout.getLineForVerticalPosition(offset.y)
+                            if (lineIndex >= layout.lineCount) return@detectTapGestures
+                            val lineStart = layout.getLineStart(lineIndex)
+                            val lineEnd = layout.getLineEnd(lineIndex)
+                            if (lineStart >= fieldValue.text.length) return@detectTapGestures
+                            val lineText = fieldValue.text.substring(lineStart, lineEnd)
+
+                            // Checkbox click area for RTL (Right side)
+                            // In RTL, Start is Right. offset.x < 48dp would be the right edge.
+                            if (offset.x < with(density) { 48.dp.toPx() }) {
+                                if (lineText.trimStart().startsWith("- [ ]") || lineText.trimStart().startsWith("- [x]")) {
                                     apply(
                                         TextFieldValue(
                                             toggleCheckboxLine(fieldValue.text, lineIndex),
@@ -190,47 +167,62 @@ fun MarkdownNoteField(
                             }
                         }
                     }
-            ) {
-                BasicTextField(
-                    value = fieldValue,
-                    onValueChange = { apply(it) },
-                    textStyle = MaterialTheme.typography.bodyMedium.copy(color = glassColors.text),
-                    cursorBrush = Brush.verticalGradient(listOf(GlassGreen, GlassGreen)),
-                    onTextLayout = { layoutResult = it },
-                    visualTransformation = MarkdownVisualTransformation(glassColors),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 36.dp, end = 12.dp, top = 12.dp, bottom = 12.dp)
-                        .heightIn(min = 136.dp),
-                    decorationBox = { innerTextField ->
-                        Box {
-                            if (fieldValue.text.isEmpty()) {
-                                FintrackBodyMediumText(text = placeholder, color = glassColors.text3)
-                            }
-                            
-                            layoutResult?.let { layout ->
-                                val lines = fieldValue.text.split("\n")
-                                lines.forEachIndexed { i, line ->
-                                    if (i >= layout.lineCount) return@forEachIndexed
-                                    val top = layout.getLineTop(i)
-                                    
+                }
+        ) {
+            BasicTextField(
+                value = fieldValue,
+                onValueChange = { apply(it) },
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    color = glassColors.text,
+                    textAlign = TextAlign.Start // This is Right in RTL
+                ),
+                cursorBrush = Brush.verticalGradient(listOf(com.kazemieh.designsystem.GlassGreen, com.kazemieh.designsystem.GlassGreen)),
+                onTextLayout = { layoutResult = it },
+                visualTransformation = MarkdownVisualTransformation(glassColors),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 42.dp, end = 12.dp, top = 12.dp, bottom = 12.dp) // Start is Right in RTL
+                    .heightIn(min = 180.dp),
+                decorationBox = { innerTextField ->
+                    Box {
+                        if (fieldValue.text.isEmpty()) {
+                            FintrackBodyMediumText(text = placeholder, color = glassColors.text3)
+                        }
+
+                        layoutResult?.let { layout ->
+                            val lines = fieldValue.text.split("\n")
+                            lines.forEachIndexed { i, line ->
+                                if (i >= layout.lineCount) return@forEachIndexed
+                                val top = layout.getLineTop(i)
+
+                                if (line.trimStart().startsWith("- [ ]") || line.trimStart().startsWith("- [x]")) {
+                                    val isChecked = line.trimStart().startsWith("- [x]")
                                     Box(
                                         modifier = Modifier
-                                            .offset(x = (-26).dp, y = with(density) { top.toDp() })
+                                            .align(Alignment.TopStart) // Top Right in RTL
+                                            .offset(x = (-32).dp, y = with(density) { top.toDp() })
+                                            .size(24.dp),
+                                        contentAlignment = Alignment.Center
                                     ) {
-                                        when {
-                                            line.trimStart().startsWith("- [ ]") -> CheckMark(checked = false)
-                                            line.trimStart().startsWith("- [x]") -> CheckMark(checked = true)
-                                            line.trimStart().startsWith("- ") -> FintrackBodyMediumText(text = "•", color = glassColors.text2)
-                                        }
+                                        CheckMark(checked = isChecked)
+                                    }
+                                } else if (line.trimStart().startsWith("- ")) {
+                                    Box(
+                                        modifier = Modifier
+                                            .align(Alignment.TopStart) // Top Right in RTL
+                                            .offset(x = (-32).dp, y = with(density) { top.toDp() })
+                                            .size(24.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        FintrackBodyMediumText(text = "•", color = glassColors.text2)
                                     }
                                 }
                             }
-                            innerTextField()
                         }
+                        innerTextField()
                     }
-                )
-            }
+                }
+            )
         }
     }
 }
@@ -240,10 +232,10 @@ private fun CheckMark(checked: Boolean) {
     val glassColors = LocalGlassColors.current
     Box(
         modifier = Modifier
-            .size(20.dp)
-            .clip(RoundedCornerShape(6.dp))
-            .background(if (checked) GlassGreen else Color.Transparent)
-            .border(1.5.dp, if (checked) GlassGreen else glassColors.glassEdge, RoundedCornerShape(6.dp)),
+            .size(18.dp)
+            .clip(RoundedCornerShape(5.dp))
+            .background(if (checked) com.kazemieh.designsystem.GlassGreen else Color.Transparent)
+            .border(1.2.dp, if (checked) com.kazemieh.designsystem.GlassGreen else glassColors.glassEdge, RoundedCornerShape(5.dp)),
         contentAlignment = Alignment.Center
     ) {
         if (checked) {
@@ -251,7 +243,7 @@ private fun CheckMark(checked: Boolean) {
                 imageVector = Icons.Default.Check,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(14.dp)
+                modifier = Modifier.size(12.dp)
             )
         }
     }
@@ -297,12 +289,12 @@ private fun ToolbarButton(
     tint: Color = LocalGlassColors.current.text2,
     onClick: () -> Unit
 ) {
-    IconButton(onClick = onClick) {
+    IconButton(onClick = onClick, modifier = Modifier.size(36.dp)) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             tint = tint,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(18.dp)
         )
     }
 }

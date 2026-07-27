@@ -21,7 +21,9 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -114,46 +116,45 @@ class TransactionViewModel(
     private fun startObservingTransactionsIfNeeded() {
         if (listJob != null) return
 
-        listJob = viewModelScope.launch {
-            val filterFlow = state
-                .map { it.filterParams }
-                .distinctUntilChanged()
+        val filterFlow = state
+            .map { it.filterParams }
+            .distinctUntilChanged()
 
-            combine(
-                filterFlow,
-                requestFlow,
-                refreshTrigger.onStart { emit(Unit) }
-            ) { params, req, _ -> params to req }
-                .flatMapLatest { (params, req) ->
-                    transactionUseCaseGroup.observeTransactionsUseCase(
-                        transactionFilterParams = params,
-                        request = req
+        listJob = combine(
+            filterFlow,
+            requestFlow,
+            refreshTrigger.onStart { emit(Unit) }
+        ) { params, req, _ -> params to req }
+            .flatMapLatest { (params, req) ->
+                transactionUseCaseGroup.observeTransactionsUseCase(
+                    transactionFilterParams = params,
+                    request = req
+                )
+            }
+            .onEach { page ->
+                val items = page.items
+                val limit = page.request.limit
+
+                _state.update { s ->
+                    s.copy(
+                        items = items,
+                        endReached = items.size < limit,
+                        isRefreshing = false,
+                        isAppending = false,
+                        refreshError = null,
+                        appendError = null
                     )
                 }
-                .catch { e ->
-                    val msg = e.message ?: "Unknown error"
-                    _state.update { s ->
-                        if (s.isAppending) s.copy(isAppending = false, appendError = msg)
-                        else s.copy(isRefreshing = false, refreshError = msg)
-                    }
-                    _effects.trySend(TransactionEffect.ShowMessage(msg))
+            }
+            .catch { e ->
+                val msg = e.message ?: "Unknown error"
+                _state.update { s ->
+                    if (s.isAppending) s.copy(isAppending = false, appendError = msg)
+                    else s.copy(isRefreshing = false, refreshError = msg)
                 }
-                .collectLatest { page ->
-                    val items = page.items
-                    val limit = page.request.limit
-
-                    _state.update { s ->
-                        s.copy(
-                            items = items,
-                            endReached = items.size < limit,
-                            isRefreshing = false,
-                            isAppending = false,
-                            refreshError = null,
-                            appendError = null
-                        )
-                    }
-                }
-        }
+                _effects.trySend(TransactionEffect.ShowMessage(msg))
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun refresh() {

@@ -21,6 +21,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun GoalWidget(
     viewModel: GoalViewModel = koinViewModel(),
     onMore: () -> Unit,
+    onAdd: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -28,6 +29,7 @@ fun GoalWidget(
     WidgetCard(
         title = stringResource(Res.string.title_savings_goals),
         onMore = onMore,
+        onAdd = onAdd,
         modifier = modifier
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {

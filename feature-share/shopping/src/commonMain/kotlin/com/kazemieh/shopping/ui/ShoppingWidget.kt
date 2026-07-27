@@ -49,6 +49,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ShoppingWidget(
     modifier: Modifier = Modifier,
     onMore: () -> Unit,
+    onAdd: () -> Unit = {},
+    onEdit: (com.kazemieh.common.model.ShoppingItem) -> Unit = {},
     viewModel: ShoppingViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -59,6 +61,7 @@ fun ShoppingWidget(
         title = stringResource(Res.string.shopping_list),
         count = uncheckedItems.size.takeIf { it > 0 },
         onMore = onMore,
+        onAdd = onAdd,
         modifier = modifier
     ) {
         if (uncheckedItems.isEmpty()) {
@@ -71,7 +74,10 @@ fun ShoppingWidget(
                 val itemsToShow = if (showMoreItems) 10 else 5
                 uncheckedItems.take(itemsToShow).forEach { item ->
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onEdit(item) }
+                            .padding(vertical = 4.dp),
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {

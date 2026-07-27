@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -19,11 +21,13 @@ import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.WidgetCard
+import com.kazemieh.designsystem.component.glass.WidgetEmptyState
 import com.kazemieh.installment.ui.InstallmentIntent
 import com.kazemieh.installment.ui.InstallmentViewModel
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.installment_widget_title
 import fintrack.core.designsystem.generated.resources.remaining_installments
+import fintrack.core.designsystem.generated.resources.msg_empty_list
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -31,6 +35,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun InstallmentWidget(
     viewModel: InstallmentViewModel = koinViewModel(),
     onMore: () -> Unit,
+    onAdd: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -39,17 +44,23 @@ fun InstallmentWidget(
         viewModel.onIntent(InstallmentIntent.Init)
     }
 
-    if (state.upcoming.isEmpty() && state.overdue.isEmpty()) return
-
     WidgetCard(
         title = stringResource(Res.string.installment_widget_title),
         onMore = onMore,
+        onAdd = onAdd,
         modifier = modifier
     ) {
         val displayItems = (state.overdue + state.upcoming).take(3)
-        displayItems.forEach { item ->
-            InstallmentRowMinimal(item)
-            Spacer(Modifier.height(8.dp))
+        if (displayItems.isEmpty()) {
+            WidgetEmptyState(
+                icon = Icons.Default.CalendarToday,
+                text = stringResource(Res.string.msg_empty_list)
+            )
+        } else {
+            displayItems.forEach { item ->
+                InstallmentRowMinimal(item)
+                Spacer(Modifier.height(8.dp))
+            }
         }
     }
 }

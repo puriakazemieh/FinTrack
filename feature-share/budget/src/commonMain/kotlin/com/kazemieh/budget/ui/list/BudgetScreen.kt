@@ -15,25 +15,33 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.budget.ui.add.AddBudgetBottomSheet
 import com.kazemieh.common.DateFilterType
 import com.kazemieh.common.model.BudgetPeriod
 import com.kazemieh.common.model.BudgetWithProgress
 import com.kazemieh.common.model.Category
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.common.toPersianPrice
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet
 import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.component.model.UiText
+import com.kazemieh.designsystem.picker.FinTrackIcons
+import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -83,7 +91,8 @@ fun BudgetScreen(
 
             LazyColumn(
                 modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(bottom = 100.dp)
+                contentPadding = PaddingValues(bottom = 100.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 // DAILY SECTION
                 if (state.dailyBudgets.isNotEmpty() || state.canCloneDaily) {
@@ -215,25 +224,108 @@ private fun BudgetRow(
     viewModel: BudgetViewModel,
     onNavigateToTransactions: ((Category) -> Unit)?
 ) {
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val glassColors = LocalGlassColors.current
+    val color = FinTrackPickerColors.getColorById(item.category?.colorId ?: 1, isDark)
+    val icon = FinTrackIcons.findIcon(item.category?.iconId ?: 1).resource
     val progress = (item.spentAmount.toFloat() / item.budget.amount).coerceIn(0f, 1f)
-    val percentage = (progress * 100).toInt()
-    
-    EntityRowWrapper(
-        item = EntityItem(
-            id = item.budget.id ?: 0L,
-            name = item.category?.name ?: "",
-            sub = "${item.spentAmount.toPersianPrice()} / ${item.budget.amount.toPersianPrice()}",
-            badge = "$percentage%",
-            color = if (progress >= 0.8f) MaterialTheme.colorScheme.error else GlassGreen,
-            iconId = item.category?.iconId,
-            colorId = item.category?.colorId
-        ),
-        onEdit = { viewModel.onIntent(BudgetIntent.ShowAddBudget(item)) },
-        onDelete = { viewModel.onIntent(BudgetIntent.DeleteBudget(item)) },
-        onFilter = onNavigateToTransactions?.let { callback ->
-            { item.category?.let { callback(it) } }
+    val isOver = item.progress > 1f
+
+    GlassCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 14.dp, vertical = 2.dp),
+        padding = 8.dp
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            // Row 1: Icon + Name ... Spent of Total
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .background(color.copy(alpha = 0.15f))
+                        .border(0.5.dp, color.copy(alpha = 0.25f), MaterialTheme.shapes.small),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(icon),
+                        contentDescription = null,
+                        tint = color,
+                        modifier = Modifier.size(15.dp)
+                    )
+                }
+
+                FintrackLabelMediumText(
+                    text = item.category?.name ?: stringResource(Res.string.label_unknown),
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f)
+                )
+
+                FintrackLabelSmallText(
+                    text = stringResource(
+                        Res.string.label_spent_of_budget,
+                        item.spentAmount.toPersianPrice(),
+                        item.budget.amount.toPersianPrice()
+                    ),
+                    color = if (isOver) GlassRed else LocalGlassColors.current.text3,
+                    fontSize = 11.sp
+                )
+            }
+
+            // Row 2: Progress Bar + Actions
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(7.dp)
+                        .clip(CircleShape)
+                        .background(LocalGlassColors.current.text.copy(alpha = 0.08f))
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(progress)
+                            .fillMaxHeight()
+                            .clip(CircleShape)
+                            .background(Brush.horizontalGradient(listOf(color, color.copy(alpha = 0.6f))))
+                    )
+                }
+
+                FintrackLabelSmallText(
+                    text = (item.progress * 100).toInt().toLong().toPersianDigits() + "٪",
+                    fontWeight = FontWeight.Bold,
+                    color = if (isOver) GlassRed else LocalGlassColors.current.text,
+                    fontSize = 11.sp
+                )
+
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    onNavigateToTransactions?.let { callback ->
+                        ActionIcon(
+                            icon = Icons.AutoMirrored.Filled.ReceiptLong,
+                            onClick = { item.category?.let { callback(it) } },
+                            color = GlassGreen
+                        )
+                    }
+                    ActionIcon(
+                        icon = Icons.Default.Edit,
+                        onClick = { viewModel.onIntent(BudgetIntent.ShowAddBudget(item)) },
+                        color = glassColors.text2
+                    )
+                    ActionIcon(
+                        icon = Icons.Default.Delete,
+                        onClick = { viewModel.onIntent(BudgetIntent.DeleteBudget(item)) },
+                        color = Color.Red
+                    )
+                }
+            }
         }
-    )
+    }
 }
 
 @Composable
@@ -263,59 +355,6 @@ private fun SummaryItem(label: String, value: String, color: androidx.compose.ui
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         FintrackLabelSmallText(text = label, color = glassColors.text3)
         FintrackBodyLargeText(text = value, fontWeight = FontWeight.Bold, color = color ?: glassColors.text)
-    }
-}
-
-// Minimal EntityRow implementation for Budget
-@Composable
-private fun EntityRowWrapper(
-    item: EntityItem,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit,
-    onFilter: (() -> Unit)? = null
-) {
-    val glassColors = LocalGlassColors.current
-    val color = item.color ?: GlassGreen
-    GlassCard(
-        modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp),
-        padding = 10.dp
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            FinTrackLeadingIcon(
-                colorId = item.colorId,
-                iconId = item.iconId,
-                style = LeadingIconStyle.Badge,
-                size = 38.dp,
-                iconSize = 16.dp,
-                corner = 12.dp
-            )
-
-            Column(modifier = Modifier.weight(1f)) {
-                FintrackBodyMediumText(text = item.name, fontWeight = FontWeight.SemiBold)
-                item.sub?.let { FintrackLabelSmallText(text = it, color = glassColors.text3) }
-            }
-
-            Box(
-                modifier = Modifier
-                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
-                    .background(color.copy(alpha = 0.12f))
-                    .padding(horizontal = 7.dp, vertical = 2.dp)
-            ) {
-                FintrackLabelSmallText(text = item.badge ?: "", fontWeight = FontWeight.Bold, color = color)
-            }
-
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                onFilter?.let {
-                    ActionIcon(icon = androidx.compose.material.icons.Icons.Default.FilterList, onClick = it, color = GlassGreen)
-                }
-                ActionIcon(icon = androidx.compose.material.icons.Icons.Default.Edit, onClick = onEdit, color = glassColors.text2)
-                ActionIcon(icon = androidx.compose.material.icons.Icons.Default.Delete, onClick = onDelete, color = androidx.compose.ui.graphics.Color.Red)
-            }
-        }
     }
 }
 

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,8 +19,15 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.BudgetPeriod
 import com.kazemieh.common.model.BudgetWithProgress
+import com.kazemieh.common.persiandatetime.extensions.dayOfWeekIndex
+import com.kazemieh.common.persiandatetime.extensions.isLeapYear
+import com.kazemieh.common.persiandatetime.extensions.monthLength
+import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
+import com.kazemieh.common.toPersianDigits
+import com.kazemieh.common.toPersianPrice
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.glass.Chip
@@ -28,15 +36,9 @@ import com.kazemieh.designsystem.component.glass.MoneyText
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import fintrack.core.designsystem.generated.resources.*
+import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-
-import androidx.compose.runtime.remember
-import com.kazemieh.common.persiandatetime.extensions.dayOfWeekIndex
-import com.kazemieh.common.persiandatetime.extensions.isLeapYear
-import com.kazemieh.common.persiandatetime.extensions.monthLength
-import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
-import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 
 @Composable
@@ -58,11 +60,11 @@ fun BudgetHero(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.size(116.dp)) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.size(116.dp)) {
                 CircularProgress(progress = progress)
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     FintrackTitleLargeText(
-                        text = stringResource(Res.string.label_percentage_value, (progress * 100).toInt()),
+                        text = (progress * 100).toInt().toLong().toPersianDigits(),
                         fontWeight = FontWeight.Bold
                     )
                     FintrackLabelSmallText(text = stringResource(Res.string.label_budget_consumed))
@@ -80,7 +82,7 @@ fun BudgetHero(
                 
                 Spacer(modifier = Modifier.height(6.dp))
                 FintrackLabelSmallText(
-                    text = stringResource(Res.string.label_days_remaining, daysRemaining),
+                    text = stringResource(Res.string.label_days_remaining, daysRemaining.toLong().toPersianDigits()),
                     color = GlassAmber
                 )
             }
@@ -166,77 +168,86 @@ fun BudgetRow(
 
     GlassCard(
         modifier = modifier.fillMaxWidth().clickable { onEdit() },
-        padding = 12.dp
+        padding = 8.dp
     ) {
-        Column {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            // Row 1: Icon + Name ... Spent of Total
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(26.dp)
                         .clip(MaterialTheme.shapes.small)
-                        .background(color.copy(alpha = 0.2f))
-                        .border(0.5.dp, color.copy(alpha = 0.3f), MaterialTheme.shapes.small),
+                        .background(color.copy(alpha = 0.15f))
+                        .border(0.5.dp, color.copy(alpha = 0.25f), MaterialTheme.shapes.small),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         painter = painterResource(icon),
                         contentDescription = null,
                         tint = color,
-                        modifier = Modifier.size(15.dp)
+                        modifier = Modifier.size(12.dp)
                     )
                 }
 
-                Column(modifier = Modifier.weight(1f)) {
-                    FintrackLabelLargeText(text = budgetProgress.category?.name ?: stringResource(Res.string.label_unknown), fontWeight = FontWeight.SemiBold)
-                    FintrackLabelSmallText(
-                        text = stringResource(
-                            Res.string.label_spent_of_budget,
-                            budgetProgress.spentAmount,
-                            budgetProgress.budget.amount
-                        ),
-                        color = if (isOver) GlassRed else LocalGlassColors.current.text3
-                    )
-                }
+                FintrackLabelMediumText(
+                    text = budgetProgress.category?.name ?: stringResource(Res.string.label_unknown),
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f),
+                    fontSize = 11.sp
+                )
 
-                FintrackLabelLargeText(
+                FintrackLabelSmallText(
                     text = stringResource(
-                        Res.string.label_percentage_value,
-                        (budgetProgress.progress * 100).toInt()
+                        Res.string.label_spent_of_budget,
+                        budgetProgress.spentAmount.toPersianPrice(),
+                        budgetProgress.budget.amount.toPersianPrice()
                     ),
-                    fontWeight = FontWeight.Bold,
-                    color = if (isOver) GlassRed else LocalGlassColors.current.text
+                    color = if (isOver) GlassRed else LocalGlassColors.current.text3,
+                    fontSize = 10.sp
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(6.dp)
-                    .clip(CircleShape)
-                    .background(LocalGlassColors.current.text.copy(alpha = 0.1f))
+            // Row 2: Progress Bar + Percentage
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(horizontal = 2.dp)
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(progress)
-                        .fillMaxHeight()
+                        .weight(1f)
+                        .height(5.dp)
                         .clip(CircleShape)
-                        .background(Brush.horizontalGradient(listOf(color, color.copy(alpha = 0.5f))))
+                        .background(LocalGlassColors.current.text.copy(alpha = 0.08f))
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(progress)
+                            .fillMaxHeight()
+                            .clip(CircleShape)
+                            .background(Brush.horizontalGradient(listOf(color, color.copy(alpha = 0.6f))))
+                    )
+                }
+
+                FintrackLabelSmallText(
+                    text = (budgetProgress.progress * 100).toInt().toLong().toPersianDigits() + "٪",
+                    fontWeight = FontWeight.Bold,
+                    color = if (isOver) GlassRed else LocalGlassColors.current.text,
+                    fontSize = 9.sp
                 )
             }
 
             if (isOver) {
                 Row(
-                    modifier = Modifier.padding(top = 6.dp),
+                    modifier = Modifier.padding(top = 1.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(GlassRed))
-                    FintrackLabelSmallText(text = stringResource(Res.string.label_budget_over), color = GlassRed)
+                    Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(GlassRed))
+                    FintrackLabelSmallText(text = stringResource(Res.string.label_budget_over), color = GlassRed, fontSize = 8.sp)
                 }
             }
         }

@@ -27,7 +27,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -40,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.ai_insights.ui.AIAdvisorWidget
 import com.kazemieh.asset.ui.component.AssetWidget
 import com.kazemieh.budget.ui.component.BudgetWidget
+import com.kazemieh.check.ui.add.AddCheckBottomSheet
 import com.kazemieh.check.ui.widget.CheckWidget
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.dashboard.component.QuickActions
@@ -52,17 +55,23 @@ import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
+import com.kazemieh.fixed_expense.ui.detail.AddFixedExpenseBottomSheet
 import com.kazemieh.fixed_expense.ui.widget.FixedExpenseWidget
 import com.kazemieh.gamification.ui.AchievementWidget
+import com.kazemieh.goals.presentation.add.AddGoalBottomSheet
 import com.kazemieh.goals.presentation.component.GoalWidget
+import com.kazemieh.installment.ui.add.AddInstallmentBottomSheet
 import com.kazemieh.installment.ui.widget.InstallmentWidget
 import com.kazemieh.notes.ui.NotesWidget
+import com.kazemieh.notes.ui.edit.AddNoteBottomSheet
+import com.kazemieh.shopping.ui.AddShoppingBottomSheet
 import com.kazemieh.shopping.ui.ShoppingWidget
 import com.kazemieh.sms_reader.ui.SmsBanner
 import com.kazemieh.sms_reader.ui.SmsDetectionSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.BalanceHero
+import com.kazemieh.budget.ui.add.AddBudgetBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.msg_hello
 import org.jetbrains.compose.resources.stringResource
@@ -92,15 +101,12 @@ fun DashboardScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
     val listState = rememberLazyListState()
-    var repeatTemplate by androidx.compose.runtime.remember {
-        androidx.compose.runtime.mutableStateOf<com.kazemieh.common.model.TransactionWithRelations?>(
-            null
-        )
+    var repeatTemplate by remember {
+        mutableStateOf<com.kazemieh.common.model.TransactionWithRelations?>(null)
     }
 
-    androidx.compose.runtime.LaunchedEffect(showAddTransaction, smsDraftId) {
+    LaunchedEffect(showAddTransaction, smsDraftId) {
         if (smsDraftId > 0L) {
-            // Opened from a bank-SMS notification — pre-fill the sheet from that draft.
             viewModel.onIntent(DashboardIntent.OpenSmsDraftTransaction(smsDraftId))
         } else if (showAddTransaction) {
             viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet())
@@ -144,6 +150,8 @@ fun DashboardScreen(
             }
 
             if (state.smsDrafts.isNotEmpty()) {
+
+                item { Spacer(Modifier.height(space.mediumSmall)) }
                 item {
                     SmsBanner(
                         count = state.smsDrafts.size,
@@ -156,21 +164,21 @@ fun DashboardScreen(
                 }
             }
 
-            item { Spacer(Modifier.height(space.large)) }
+//            item { Spacer(Modifier.height(space.large)) }
 
-            item {
-                QuickActions(
-                    onActionClick = {
-                        viewModel.onIntent(
-                            DashboardIntent.ShowTransactionBottomSheet(type = it)
-                        )
-                    },
-                    onSearchClick = onNavigateToSearch,
-                    modifier = Modifier.padding(horizontal = space.large)
-                )
-            }
+//            item {
+//                QuickActions(
+//                    onActionClick = {
+//                        viewModel.onIntent(
+//                            DashboardIntent.ShowTransactionBottomSheet(type = it)
+//                        )
+//                    },
+//                    onSearchClick = onNavigateToSearch,
+//                    modifier = Modifier.padding(horizontal = space.large)
+//                )
+//            }
 
-            item { Spacer(Modifier.height(space.large)) }
+            item { Spacer(Modifier.height(space.mediumSmall)) }
 
             state.dashboardWidgets.forEach { cfg ->
                 if (!cfg.visible) return@forEach
@@ -190,6 +198,31 @@ fun DashboardScreen(
                         onRepeatTransaction = { twr ->
                             repeatTemplate = twr
                             viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet())
+                        },
+                        onAdd = {
+                            when (it) {
+                                DashboardWidget.RECENT_TRANSACTIONS -> viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet())
+                                DashboardWidget.BUDGET -> viewModel.onIntent(DashboardIntent.ToggleBudgetSheet())
+                                DashboardWidget.NOTES -> viewModel.onIntent(DashboardIntent.ToggleNoteSheet())
+                                DashboardWidget.SHOPPING -> viewModel.onIntent(DashboardIntent.ToggleShoppingSheet())
+                                DashboardWidget.FIXED_EXPENSE -> viewModel.onIntent(DashboardIntent.ToggleFixedExpenseSheet())
+                                DashboardWidget.GOAL -> viewModel.onIntent(DashboardIntent.ToggleGoalSheet())
+                                DashboardWidget.INSTALLMENT -> viewModel.onIntent(DashboardIntent.ToggleInstallmentSheet())
+                                DashboardWidget.CHECK -> viewModel.onIntent(DashboardIntent.ToggleCheckSheet())
+                                else -> {}
+                            }
+                        },
+                        onEditBudget = { budget ->
+                            viewModel.onIntent(DashboardIntent.ToggleBudgetSheet(budget))
+                        },
+                        onEditNote = { note ->
+                            viewModel.onIntent(DashboardIntent.ToggleNoteSheet(note))
+                        },
+                        onEditFixedExpense = { id ->
+                            viewModel.onIntent(DashboardIntent.ToggleFixedExpenseSheet(id))
+                        },
+                        onEditShopping = { item ->
+                            viewModel.onIntent(DashboardIntent.ToggleShoppingSheet(item))
                         },
                         onNavigateToTransactions = onNavigateToTransactions,
                         onNavigateToBudget = onNavigateToBudget,
@@ -293,6 +326,78 @@ fun DashboardScreen(
                 setSource = { viewModel.onIntent(DashboardIntent.ShowAddSource()) }
             )
         }
+
+        if (state.showBudgetSheet) {
+            AddBudgetBottomSheet(
+                budgetWithProgress = state.selectedBudget,
+                onDismiss = {
+                    viewModel.onIntent(DashboardIntent.ToggleBudgetSheet())
+                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                }
+            )
+        }
+
+        if (state.showGoalSheet) {
+            AddGoalBottomSheet(
+                goal = state.selectedGoal,
+                onDismiss = {
+                    viewModel.onIntent(DashboardIntent.ToggleGoalSheet())
+                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                }
+            )
+        }
+
+        if (state.showInstallmentSheet) {
+            AddInstallmentBottomSheet(
+                installmentId = state.selectedInstallmentId,
+                onDismiss = {
+                    viewModel.onIntent(DashboardIntent.ToggleInstallmentSheet())
+                },
+                onSuccess = {
+                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                }
+            )
+        }
+
+        if (state.showCheckSheet) {
+            AddCheckBottomSheet(
+                checkId = state.selectedCheckId,
+                onDismiss = {
+                    viewModel.onIntent(DashboardIntent.ToggleCheckSheet())
+                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                }
+            )
+        }
+
+        if (state.showFixedExpenseSheet) {
+            AddFixedExpenseBottomSheet(
+                expenseId = state.selectedFixedExpenseId,
+                onDismiss = {
+                    viewModel.onIntent(DashboardIntent.ToggleFixedExpenseSheet())
+                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                }
+            )
+        }
+
+        if (state.showNoteSheet) {
+            AddNoteBottomSheet(
+                note = state.selectedNote,
+                onDismiss = {
+                    viewModel.onIntent(DashboardIntent.ToggleNoteSheet())
+                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                }
+            )
+        }
+
+        if (state.showShoppingSheet) {
+            AddShoppingBottomSheet(
+                item = state.selectedShoppingItem,
+                onDismiss = {
+                    viewModel.onIntent(DashboardIntent.ToggleShoppingSheet())
+                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                }
+            )
+        }
     }
 }
 
@@ -303,6 +408,11 @@ private fun DashboardWidgetContent(
     onEditTransaction: (com.kazemieh.common.model.TransactionWithRelations) -> Unit,
     onDeleteTransaction: (com.kazemieh.common.model.TransactionWithRelations) -> Unit,
     onRepeatTransaction: (com.kazemieh.common.model.TransactionWithRelations) -> Unit,
+    onAdd: (DashboardWidget) -> Unit,
+    onEditBudget: (com.kazemieh.common.model.BudgetWithProgress) -> Unit,
+    onEditNote: (com.kazemieh.common.model.Note) -> Unit,
+    onEditFixedExpense: (Long) -> Unit,
+    onEditShopping: (com.kazemieh.common.model.ShoppingItem) -> Unit,
     onNavigateToTransactions: (Any?) -> Unit,
     onNavigateToBudget: () -> Unit,
     onNavigateToGoal: () -> Unit,
@@ -319,6 +429,7 @@ private fun DashboardWidgetContent(
     when (widget) {
         DashboardWidget.RECENT_TRANSACTIONS -> RecentTransactionsWidget(
             onMore = { onNavigateToTransactions(true) },
+            onAdd = { onAdd(DashboardWidget.RECENT_TRANSACTIONS) },
             onEdit = onEditTransaction,
             onDelete = onDeleteTransaction,
             onRepeat = onRepeatTransaction,
@@ -332,16 +443,35 @@ private fun DashboardWidgetContent(
             modifier = padding
         )
 
-        DashboardWidget.BUDGET -> BudgetWidget(onMore = onNavigateToBudget, modifier = padding)
-        DashboardWidget.GOAL -> GoalWidget(onMore = onNavigateToGoal, modifier = padding)
-        DashboardWidget.INSTALLMENT -> InstallmentWidget(
-            onMore = onNavigateToInstallment,
+        DashboardWidget.BUDGET -> BudgetWidget(
+            onMore = onNavigateToBudget,
+            onAdd = { onAdd(DashboardWidget.BUDGET) },
+            onEditBudget = onEditBudget,
             modifier = padding
         )
 
-        DashboardWidget.CHECK -> CheckWidget(onMore = onNavigateToCheck, modifier = padding)
+        DashboardWidget.GOAL -> GoalWidget(
+            onMore = onNavigateToGoal,
+            onAdd = { onAdd(DashboardWidget.GOAL) },
+            modifier = padding
+        )
+
+        DashboardWidget.INSTALLMENT -> InstallmentWidget(
+            onMore = onNavigateToInstallment,
+            onAdd = { onAdd(DashboardWidget.INSTALLMENT) },
+            modifier = padding
+        )
+
+        DashboardWidget.CHECK -> CheckWidget(
+            onMore = onNavigateToCheck,
+            onAdd = { onAdd(DashboardWidget.CHECK) },
+            modifier = padding
+        )
+
         DashboardWidget.FIXED_EXPENSE -> FixedExpenseWidget(
             onMore = onNavigateToFixedExpense,
+            onAdd = { onAdd(DashboardWidget.FIXED_EXPENSE) },
+            onEdit = onEditFixedExpense,
             modifier = padding
         )
 
@@ -350,13 +480,24 @@ private fun DashboardWidgetContent(
             modifier = padding
         )
 
-        DashboardWidget.ASSET -> AssetWidget(onMore = onNavigateToAssets, modifier = padding)
-        DashboardWidget.SHOPPING -> ShoppingWidget(
-            onMore = onNavigateToShopping,
+        DashboardWidget.ASSET -> AssetWidget(
+            onMore = onNavigateToAssets,
             modifier = padding
         )
 
-        DashboardWidget.NOTES -> NotesWidget(onMore = onNavigateToNotes, modifier = padding)
+        DashboardWidget.SHOPPING -> ShoppingWidget(
+            onMore = onNavigateToShopping,
+            onAdd = { onAdd(DashboardWidget.SHOPPING) },
+            onEdit = onEditShopping,
+            modifier = padding
+        )
+
+        DashboardWidget.NOTES -> NotesWidget(
+            onMore = onNavigateToNotes,
+            onAdd = { onAdd(DashboardWidget.NOTES) },
+            onEditNote = onEditNote,
+            modifier = padding
+        )
     }
 }
 

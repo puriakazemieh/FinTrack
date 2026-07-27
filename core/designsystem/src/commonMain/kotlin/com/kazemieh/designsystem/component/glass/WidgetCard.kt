@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
@@ -48,6 +50,7 @@ fun WidgetCard(
     accent: Color? = null,
     more: String? = stringResource(Res.string.more_details),
     onMore: (() -> Unit)? = null,
+    onAdd: (() -> Unit)? = null,
     onMenu: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -84,12 +87,13 @@ fun WidgetCard(
                         modifier = Modifier
                             .clip(RoundedCornerShape(99.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                            .padding(horizontal = 5.dp, vertical = 1.dp)
                     ) {
                         FintrackLabelSmallText(
                             text = it.toLong().toPersianDigits(),
                             fontWeight = FontWeight.W700,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 10.sp
                         )
                     }
                 }
@@ -111,6 +115,18 @@ fun WidgetCard(
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
+
+                // Add button
+                onAdd?.let {
+                    IconButton(onClick = it, modifier = Modifier.size(24.dp)) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
 
                 // Menu button
                 onMenu?.let {

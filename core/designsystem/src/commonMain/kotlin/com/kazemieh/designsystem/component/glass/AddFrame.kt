@@ -63,6 +63,7 @@ fun AddFrame(
     trailingContent: @Composable RowScope.() -> Unit = {},
     hero: @Composable (() -> Unit)? = null,
     preventSwipeDismiss: Boolean = true,
+    horizontalPadding: androidx.compose.ui.unit.Dp = 24.dp,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     // Keeps the enclosing ModalBottomSheet from being dismissed by the residual
@@ -122,7 +123,7 @@ fun AddFrame(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 24.dp)
+                    .padding(horizontal = horizontalPadding)
             ) {
                 // Hero Section
                 if (showHero) {

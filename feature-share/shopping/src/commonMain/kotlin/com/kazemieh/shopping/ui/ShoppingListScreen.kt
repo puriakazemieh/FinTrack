@@ -432,7 +432,7 @@ private fun RowActionIcon(icon: ImageVector, tint: Color, onClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-private fun ShoppingItemSheet(
+fun ShoppingItemSheet(
     item: ShoppingItem?,
     initialCategory: Category?,
     mostUsedCategories: List<Category>,

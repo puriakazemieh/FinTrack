@@ -9,7 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.budget.ui.list.BudgetViewModel
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.component.*
@@ -24,6 +26,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun BudgetWidget(
     viewModel: BudgetViewModel = koinViewModel(),
     onMore: () -> Unit,
+    onAdd: () -> Unit = {},
+    onEditBudget: (com.kazemieh.common.model.BudgetWithProgress) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -42,6 +46,7 @@ fun BudgetWidget(
         accent = if (overCount > 0) GlassRed else null,
         badge = if (overCount > 0) stringResource(Res.string.label_over_count, overCount) else null,
         onMore = onMore,
+        onAdd = onAdd,
         modifier = modifier
     ) {
         if (budgets.isEmpty()) {
@@ -50,29 +55,34 @@ fun BudgetWidget(
                 text = stringResource(Res.string.budget_empty)
             )
         } else {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(14.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.padding(bottom = 2.dp)
                 ) {
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier.size(64.dp)) {
-                        CircularProgress(progress = progress)
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier.size(40.dp)) {
+                        CircularProgress(
+                            progress = progress,
+                            modifier = Modifier.size(40.dp)
+                        )
                         FintrackLabelSmallText(
-                            text = stringResource(Res.string.percentage_format, (progress * 100).toInt()),
-                            fontWeight = FontWeight.Bold
+                            text = (progress * 100).toInt().toLong().toPersianDigits() + "٪",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 9.sp
                         )
                     }
 
                     Column {
-                        FintrackLabelSmallText(text = stringResource(Res.string.label_budget_sum))
-                        MoneyText(amount = totalBudget, size = 16)
+                        FintrackLabelSmallText(text = stringResource(Res.string.label_budget_sum), fontSize = 9.sp)
+                        MoneyText(amount = totalBudget, size = 13)
                     }
                 }
 
                 mostUsed.take(2).forEach { budgetProgress ->
                     BudgetRow(
                         budgetProgress = budgetProgress,
-                        onEdit = onMore
+                        onEdit = { onEditBudget(budgetProgress) }
                     )
                 }
             }
