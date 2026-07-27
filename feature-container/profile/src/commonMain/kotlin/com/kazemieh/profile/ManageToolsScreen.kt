@@ -105,10 +105,9 @@ fun ManageToolsScreen(
                                 ToolFeature.FIXED_EXPENSE,
                                 ToolFeature.SHOPPING,
                                 ToolFeature.NOTES,
-//                                ToolFeature.GOALS,
-//                                ToolFeature.INSTALLMENT,
-//                                ToolFeature.DEBT,
-//                                ToolFeature.CHECK,
+                                ToolFeature.INSTALLMENT,
+                                ToolFeature.DEBT,
+                                ToolFeature.CHECK,
                             )
                                 .forEach { feature ->
                         SettingItem(
