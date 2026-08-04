@@ -19,7 +19,9 @@ sealed class Screen {
         val sourceId: Long? = null,
         val tagId: Long? = null,
         val personId: Long? = null,
-        val transactionType: com.kazemieh.common.model.TransactionType? = null,
+        // Navigation supports primitives consistently across all KMP targets.
+        // Keep the enum at the screen boundary and pass its stable enum name in the route.
+        val transactionType: String? = null,
         val query: String? = null
     ) : Screen()
 

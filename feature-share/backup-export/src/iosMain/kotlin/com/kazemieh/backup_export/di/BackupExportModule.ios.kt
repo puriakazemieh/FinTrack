@@ -9,6 +9,13 @@ actual val platformBackupExportModule: Module = module {
         object : PlatformExporter {
             override suspend fun exportToExcel(transactions: List<com.kazemieh.common.model.Transaction>): String? = null
             override suspend fun exportToPdf(transactions: List<com.kazemieh.common.model.Transaction>): String? = null
+            override fun shareFile(path: String) {
+                throw UnsupportedOperationException("File sharing is not available on iOS yet.")
+            }
+
+            override fun shareText(content: String, title: String) {
+                throw UnsupportedOperationException("Text sharing is not available on iOS yet.")
+            }
         }
     }
 }

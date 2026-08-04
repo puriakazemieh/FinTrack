@@ -17,6 +17,7 @@ import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.composeApp.navigation.Screen
 import com.kazemieh.dashboard.DashboardScreen
 import com.kazemieh.debt.ui.list.DebtsScreen
@@ -57,7 +58,7 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
             is Source -> Screen.Transactions(sourceId = data.id)
             is Tag -> Screen.Transactions(tagId = data.id)
             is Person -> Screen.Transactions(personId = data.id)
-            is com.kazemieh.common.model.TransactionType -> Screen.Transactions(transactionType = data)
+            is TransactionType -> Screen.Transactions(transactionType = data.name)
             is String -> Screen.Transactions(query = data)
             is Boolean -> Screen.Transactions(resetFilters = data)
             else -> Screen.Transactions()
@@ -107,7 +108,8 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 sourceId = args.sourceId,
                 tagId = args.tagId,
                 personId = args.personId,
-                transactionType = args.transactionType,
+                transactionType = args.transactionType
+                    ?.let { typeName -> runCatching { TransactionType.valueOf(typeName) }.getOrNull() },
                 onNavigateToSearch = { navController.navigate(Screen.Search) }
             )
         }

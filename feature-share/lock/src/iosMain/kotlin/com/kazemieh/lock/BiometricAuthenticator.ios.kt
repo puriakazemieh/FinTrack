@@ -2,12 +2,14 @@ package com.kazemieh.lock
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSError
 import platform.LocalAuthentication.LAContext
 import platform.LocalAuthentication.LAPolicyDeviceOwnerAuthenticationWithBiometrics
 import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_main_queue
 
+@OptIn(ExperimentalForeignApi::class)
 class IosBiometricAuthenticator : BiometricAuthenticator {
 
     override fun isBiometricAvailable(): Boolean {

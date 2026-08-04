@@ -24,23 +24,31 @@ kotlin {
         minSdk = 24
     }
 
-    val xcfName = "composAppKit"
+    // This is the only iOS framework exposed to the Swift host application.
+    // Feature/core modules remain implementation details of this umbrella framework.
+    val xcfName = "FinTrackKit"
 
     iosX64 {
         binaries.framework {
             baseName = xcfName
+            binaryOption("bundleId", "com.kazemieh.fintrack.kit")
+            linkerOpts("-lsqlite3")
         }
     }
 
     iosArm64 {
         binaries.framework {
             baseName = xcfName
+            binaryOption("bundleId", "com.kazemieh.fintrack.kit")
+            linkerOpts("-lsqlite3")
         }
     }
 
     iosSimulatorArm64 {
         binaries.framework {
             baseName = xcfName
+            binaryOption("bundleId", "com.kazemieh.fintrack.kit")
+            linkerOpts("-lsqlite3")
         }
     }
 
