@@ -1,0 +1,1242 @@
+{
+  "ai-insights/build.gradle.kts": {
+    "mtime": 1785684293.566847,
+    "ast_hash": "b071e93f55c3774c2cdffefbb01d538f",
+    "semantic_hash": "b071e93f55c3774c2cdffefbb01d538f"
+  },
+  "ai-insights/src/commonMain/kotlin/com/kazemieh/ai_insights/di/AIInsightsModule.kt": {
+    "mtime": 1785684293.5670793,
+    "ast_hash": "d1a187e9f7392081f43cf87e4136d265",
+    "semantic_hash": "d1a187e9f7392081f43cf87e4136d265"
+  },
+  "ai-insights/src/commonMain/kotlin/com/kazemieh/ai_insights/ui/AIAdvisorScreen.kt": {
+    "mtime": 1785684293.5672276,
+    "ast_hash": "3513af6236c375c4c21f1289b90b27a3",
+    "semantic_hash": "3513af6236c375c4c21f1289b90b27a3"
+  },
+  "ai-insights/src/commonMain/kotlin/com/kazemieh/ai_insights/ui/AIAdvisorState.kt": {
+    "mtime": 1785684293.567285,
+    "ast_hash": "3eb8aedb468f1d02222c852919e33b4b",
+    "semantic_hash": "3eb8aedb468f1d02222c852919e33b4b"
+  },
+  "ai-insights/src/commonMain/kotlin/com/kazemieh/ai_insights/ui/AIAdvisorViewModel.kt": {
+    "mtime": 1785684293.567361,
+    "ast_hash": "373a8e18fe01d6d4b5ff298e51812a83",
+    "semantic_hash": "373a8e18fe01d6d4b5ff298e51812a83"
+  },
+  "ai-insights/src/commonMain/kotlin/com/kazemieh/ai_insights/ui/AIAdvisorWidget.kt": {
+    "mtime": 1785684293.567423,
+    "ast_hash": "314934b9b79bae449f85d5faf0c476bd",
+    "semantic_hash": "314934b9b79bae449f85d5faf0c476bd"
+  },
+  "asset/build.gradle.kts": {
+    "mtime": 1785684293.5675423,
+    "ast_hash": "20c43827f890ddc3ca108d0578ae3e35",
+    "semantic_hash": "20c43827f890ddc3ca108d0578ae3e35"
+  },
+  "asset/src/commonMain/kotlin/com/kazemieh/asset/di/AssetModule.kt": {
+    "mtime": 1785684293.5677786,
+    "ast_hash": "6e42e03cc23538496adbafd30e7c8865",
+    "semantic_hash": "6e42e03cc23538496adbafd30e7c8865"
+  },
+  "asset/src/commonMain/kotlin/com/kazemieh/asset/ui/AssetViewModel.kt": {
+    "mtime": 1785684293.5678616,
+    "ast_hash": "f4634b918519bc8a61d8db3483f29c47",
+    "semantic_hash": "f4634b918519bc8a61d8db3483f29c47"
+  },
+  "asset/src/commonMain/kotlin/com/kazemieh/asset/ui/add/AddAssetScreen.kt": {
+    "mtime": 1785684293.5679488,
+    "ast_hash": "6f73103dc329e61f1955450acc2abfa1",
+    "semantic_hash": "6f73103dc329e61f1955450acc2abfa1"
+  },
+  "asset/src/commonMain/kotlin/com/kazemieh/asset/ui/component/AssetActionsSheet.kt": {
+    "mtime": 1785684293.568037,
+    "ast_hash": "40bd4c255a4a39e188760beb8ade422e",
+    "semantic_hash": "40bd4c255a4a39e188760beb8ade422e"
+  },
+  "asset/src/commonMain/kotlin/com/kazemieh/asset/ui/component/AssetHistorySheet.kt": {
+    "mtime": 1785684293.5680861,
+    "ast_hash": "ad5961a368499c9caeb2e4514c23a0b8",
+    "semantic_hash": "ad5961a368499c9caeb2e4514c23a0b8"
+  },
+  "asset/src/commonMain/kotlin/com/kazemieh/asset/ui/component/AssetWidget.kt": {
+    "mtime": 1785684293.5681462,
+    "ast_hash": "e33632fac3b71bf5226e2312b0fef095",
+    "semantic_hash": "e33632fac3b71bf5226e2312b0fef095"
+  },
+  "asset/src/commonMain/kotlin/com/kazemieh/asset/ui/component/CustomAssetSheet.kt": {
+    "mtime": 1785684293.5681953,
+    "ast_hash": "ab5b66ef6869c000ec8df3d06ee2b507",
+    "semantic_hash": "ab5b66ef6869c000ec8df3d06ee2b507"
+  },
+  "asset/src/commonMain/kotlin/com/kazemieh/asset/ui/component/StocksPortfolio.kt": {
+    "mtime": 1785684293.568245,
+    "ast_hash": "8f41d2b6d185b5150807150ed224739d",
+    "semantic_hash": "8f41d2b6d185b5150807150ed224739d"
+  },
+  "asset/src/commonMain/kotlin/com/kazemieh/asset/ui/list/AssetsListScreen.kt": {
+    "mtime": 1785684293.5683405,
+    "ast_hash": "ec49d3dfddd913f8556d76b69e2dfbfe",
+    "semantic_hash": "ec49d3dfddd913f8556d76b69e2dfbfe"
+  },
+  "backup-export/build.gradle.kts": {
+    "mtime": 1785684293.568461,
+    "ast_hash": "73431ec73a379efacdc737513660e118",
+    "semantic_hash": "73431ec73a379efacdc737513660e118"
+  },
+  "backup-export/src/androidMain/kotlin/com/kazemieh/backup_export/AndroidPlatformExporter.kt": {
+    "mtime": 1785684293.5686564,
+    "ast_hash": "cdcd7de2ffe196dcdb99aa3b04ef2eef",
+    "semantic_hash": "cdcd7de2ffe196dcdb99aa3b04ef2eef"
+  },
+  "backup-export/src/androidMain/kotlin/com/kazemieh/backup_export/ExcelExporter.kt": {
+    "mtime": 1785684293.5687032,
+    "ast_hash": "b922b9c6518458bc3d5677f3568f321a",
+    "semantic_hash": "b922b9c6518458bc3d5677f3568f321a"
+  },
+  "backup-export/src/androidMain/kotlin/com/kazemieh/backup_export/PdfExporter.kt": {
+    "mtime": 1785684293.5687504,
+    "ast_hash": "f4e6ab8352fa090288488ea3f0c1220b",
+    "semantic_hash": "f4e6ab8352fa090288488ea3f0c1220b"
+  },
+  "backup-export/src/androidMain/kotlin/com/kazemieh/backup_export/di/BackupExportModule.android.kt": {
+    "mtime": 1785684293.5688245,
+    "ast_hash": "22c46a02ee242a6a858ce2ee5ac86e13",
+    "semantic_hash": "22c46a02ee242a6a858ce2ee5ac86e13"
+  },
+  "backup-export/src/commonMain/kotlin/com/kazemieh/backup_export/BackupManager.kt": {
+    "mtime": 1785684293.568995,
+    "ast_hash": "67749123806f5e663d3bf007c97ae0fc",
+    "semantic_hash": "67749123806f5e663d3bf007c97ae0fc"
+  },
+  "backup-export/src/commonMain/kotlin/com/kazemieh/backup_export/PlatformExporter.kt": {
+    "mtime": 1785684293.5690343,
+    "ast_hash": "3aabbded4917dbc08b92467bbc313fa4",
+    "semantic_hash": "3aabbded4917dbc08b92467bbc313fa4"
+  },
+  "backup-export/src/commonMain/kotlin/com/kazemieh/backup_export/di/BackupExportModule.kt": {
+    "mtime": 1785684293.5690956,
+    "ast_hash": "8efdadd2ec55d487ab7cb5d0490fad15",
+    "semantic_hash": "8efdadd2ec55d487ab7cb5d0490fad15"
+  },
+  "backup-export/src/commonMain/kotlin/com/kazemieh/backup_export/ui/BackupExportViewModel.kt": {
+    "mtime": 1785684293.5691636,
+    "ast_hash": "c0499d55fb49634c17c7986047ee1a04",
+    "semantic_hash": "c0499d55fb49634c17c7986047ee1a04"
+  },
+  "backup-export/src/commonMain/kotlin/com/kazemieh/backup_export/ui/DateRange.kt": {
+    "mtime": 1785684293.5692036,
+    "ast_hash": "5abbaf8ddc5fcfe273dfca908375b510",
+    "semantic_hash": "5abbaf8ddc5fcfe273dfca908375b510"
+  },
+  "backup-export/src/commonMain/kotlin/com/kazemieh/backup_export/ui/ExportSheet.kt": {
+    "mtime": 1785684293.569259,
+    "ast_hash": "af3a9ce6dc220deb4a33e1a89d6a0841",
+    "semantic_hash": "af3a9ce6dc220deb4a33e1a89d6a0841"
+  },
+  "backup-export/src/iosMain/kotlin/com/kazemieh/backup_export/di/BackupExportModule.ios.kt": {
+    "mtime": 1785763767.113635,
+    "ast_hash": "331aa160d89f5447032b521024dd632c",
+    "semantic_hash": "331aa160d89f5447032b521024dd632c"
+  },
+  "budget/build.gradle.kts": {
+    "mtime": 1785684293.5695686,
+    "ast_hash": "93f86c1e48b5b41cd277521a850a1fab",
+    "semantic_hash": "93f86c1e48b5b41cd277521a850a1fab"
+  },
+  "budget/src/commonMain/kotlin/com/kazemieh/budget/di/BudgetModule.kt": {
+    "mtime": 1785684293.5697775,
+    "ast_hash": "de5a7bb004e84903d96355ddc8ddd1b8",
+    "semantic_hash": "de5a7bb004e84903d96355ddc8ddd1b8"
+  },
+  "budget/src/commonMain/kotlin/com/kazemieh/budget/ui/add/AddBudgetBottomSheet.kt": {
+    "mtime": 1785684293.5698936,
+    "ast_hash": "415bfed56aef66008a4989dd08c7b820",
+    "semantic_hash": "415bfed56aef66008a4989dd08c7b820"
+  },
+  "budget/src/commonMain/kotlin/com/kazemieh/budget/ui/add/AddBudgetViewModel.kt": {
+    "mtime": 1785684293.5699596,
+    "ast_hash": "11b2f3b1668ecffc28b79b5fd3a48577",
+    "semantic_hash": "11b2f3b1668ecffc28b79b5fd3a48577"
+  },
+  "budget/src/commonMain/kotlin/com/kazemieh/budget/ui/component/BudgetComponents.kt": {
+    "mtime": 1785684293.570037,
+    "ast_hash": "469948e03ab526d7d91f5e55bf10e28f",
+    "semantic_hash": "469948e03ab526d7d91f5e55bf10e28f"
+  },
+  "budget/src/commonMain/kotlin/com/kazemieh/budget/ui/component/BudgetWidget.kt": {
+    "mtime": 1785684293.570095,
+    "ast_hash": "e76c8d00f7866496ae295e6fdc9053f3",
+    "semantic_hash": "e76c8d00f7866496ae295e6fdc9053f3"
+  },
+  "budget/src/commonMain/kotlin/com/kazemieh/budget/ui/list/BudgetScreen.kt": {
+    "mtime": 1785684293.5702088,
+    "ast_hash": "d768baa659394b273e72e66600a63a7b",
+    "semantic_hash": "d768baa659394b273e72e66600a63a7b"
+  },
+  "budget/src/commonMain/kotlin/com/kazemieh/budget/ui/list/BudgetViewModel.kt": {
+    "mtime": 1785684293.5702677,
+    "ast_hash": "8d42dfa80e43b89152f574db8cf4cdf1",
+    "semantic_hash": "8d42dfa80e43b89152f574db8cf4cdf1"
+  },
+  "category/build.gradle.kts": {
+    "mtime": 1785684293.5703726,
+    "ast_hash": "2f864459ce6d6891494d2a53fc1bfaea",
+    "semantic_hash": "2f864459ce6d6891494d2a53fc1bfaea"
+  },
+  "category/src/commonMain/kotlin/com/kazemieh/category/di/TransactionCategoryModule.kt": {
+    "mtime": 1785684293.5706427,
+    "ast_hash": "6c4ac7cd618ee4220fb39d0c574a43a1",
+    "semantic_hash": "6c4ac7cd618ee4220fb39d0c574a43a1"
+  },
+  "category/src/commonMain/kotlin/com/kazemieh/category/ui/add/AddCategoryBottomSheet.kt": {
+    "mtime": 1785684293.5707622,
+    "ast_hash": "1c7fddc3b7a3008b59997b5c6c6fb58e",
+    "semantic_hash": "1c7fddc3b7a3008b59997b5c6c6fb58e"
+  },
+  "category/src/commonMain/kotlin/com/kazemieh/category/ui/add/AddCategoryViewModel.kt": {
+    "mtime": 1785684293.570816,
+    "ast_hash": "1265ed4bc9e0e25ab1e46645d4797d49",
+    "semantic_hash": "1265ed4bc9e0e25ab1e46645d4797d49"
+  },
+  "category/src/commonMain/kotlin/com/kazemieh/category/ui/delete/DeleteCategoryBottomSheet.kt": {
+    "mtime": 1785684293.5708988,
+    "ast_hash": "15ffa2fb70ce31563ca147a76b32e595",
+    "semantic_hash": "15ffa2fb70ce31563ca147a76b32e595"
+  },
+  "category/src/commonMain/kotlin/com/kazemieh/category/ui/delete/DeleteCategoryViewModel.kt": {
+    "mtime": 1785684293.5709562,
+    "ast_hash": "30453d0911fa18c33b432944c4f029ba",
+    "semantic_hash": "30453d0911fa18c33b432944c4f029ba"
+  },
+  "category/src/commonMain/kotlin/com/kazemieh/category/ui/list/CategoriesScreen.kt": {
+    "mtime": 1785684293.5710335,
+    "ast_hash": "eefec4e520f7885d6afbd705203f8631",
+    "semantic_hash": "eefec4e520f7885d6afbd705203f8631"
+  },
+  "category/src/commonMain/kotlin/com/kazemieh/category/ui/list/CategoryBottomSheets.kt": {
+    "mtime": 1785684293.5710843,
+    "ast_hash": "018cbe55c4b0041ba21d96d421ebd1df",
+    "semantic_hash": "018cbe55c4b0041ba21d96d421ebd1df"
+  },
+  "category/src/commonMain/kotlin/com/kazemieh/category/ui/list/CategoryFilterSelectionContent.kt": {
+    "mtime": 1785684293.5711489,
+    "ast_hash": "2cdf0138b8dc052b814f83aaa2d6b876",
+    "semantic_hash": "2cdf0138b8dc052b814f83aaa2d6b876"
+  },
+  "category/src/commonMain/kotlin/com/kazemieh/category/ui/list/CategoryViewModel.kt": {
+    "mtime": 1785684293.5712068,
+    "ast_hash": "4f00ed7537a77733e984868ecbda9890",
+    "semantic_hash": "4f00ed7537a77733e984868ecbda9890"
+  },
+  "check/build.gradle.kts": {
+    "mtime": 1785684293.5713177,
+    "ast_hash": "d42f81af39ce65bea12dbdf8f998f277",
+    "semantic_hash": "d42f81af39ce65bea12dbdf8f998f277"
+  },
+  "check/src/commonMain/kotlin/com/kazemieh/check/di/CheckModule.kt": {
+    "mtime": 1785684293.5715425,
+    "ast_hash": "ef52440e17189cfd57fd83fa6cf76ce7",
+    "semantic_hash": "ef52440e17189cfd57fd83fa6cf76ce7"
+  },
+  "check/src/commonMain/kotlin/com/kazemieh/check/ui/add/AddCheckBottomSheet.kt": {
+    "mtime": 1785684293.5716507,
+    "ast_hash": "d27ee5b72153a636f87b90306e640261",
+    "semantic_hash": "d27ee5b72153a636f87b90306e640261"
+  },
+  "check/src/commonMain/kotlin/com/kazemieh/check/ui/add/AddCheckViewModel.kt": {
+    "mtime": 1785684293.571716,
+    "ast_hash": "37447b293954891d71e331d5e5f110fa",
+    "semantic_hash": "37447b293954891d71e331d5e5f110fa"
+  },
+  "check/src/commonMain/kotlin/com/kazemieh/check/ui/list/CheckListScreen.kt": {
+    "mtime": 1785684293.5717971,
+    "ast_hash": "8d39f45b761068f31b4bbec763c6b750",
+    "semantic_hash": "8d39f45b761068f31b4bbec763c6b750"
+  },
+  "check/src/commonMain/kotlin/com/kazemieh/check/ui/list/CheckListViewModel.kt": {
+    "mtime": 1785684293.5718539,
+    "ast_hash": "4273638557a755f0722bd223936b31d5",
+    "semantic_hash": "4273638557a755f0722bd223936b31d5"
+  },
+  "check/src/commonMain/kotlin/com/kazemieh/check/ui/widget/CheckWidget.kt": {
+    "mtime": 1785684293.5719407,
+    "ast_hash": "85ca92ae8b10a0be86d16c1fa65890cc",
+    "semantic_hash": "85ca92ae8b10a0be86d16c1fa65890cc"
+  },
+  "debt/build.gradle.kts": {
+    "mtime": 1785684293.572055,
+    "ast_hash": "1143e217ee623d31a994ecb198a3eae2",
+    "semantic_hash": "1143e217ee623d31a994ecb198a3eae2"
+  },
+  "debt/src/commonMain/kotlin/com/kazemieh/debt/di/DebtModule.kt": {
+    "mtime": 1785684293.5722837,
+    "ast_hash": "570e07bfb2b9f48b807c7db9c3ee13b2",
+    "semantic_hash": "570e07bfb2b9f48b807c7db9c3ee13b2"
+  },
+  "debt/src/commonMain/kotlin/com/kazemieh/debt/ui/add/AddDebtBottomSheet.kt": {
+    "mtime": 1785684293.572393,
+    "ast_hash": "dcf153f9bc9586ceed7933005e99e7cc",
+    "semantic_hash": "dcf153f9bc9586ceed7933005e99e7cc"
+  },
+  "debt/src/commonMain/kotlin/com/kazemieh/debt/ui/add/AddDebtViewModel.kt": {
+    "mtime": 1785684293.5724432,
+    "ast_hash": "eceb31a3475d98bd381b9759a6a1dd18",
+    "semantic_hash": "eceb31a3475d98bd381b9759a6a1dd18"
+  },
+  "debt/src/commonMain/kotlin/com/kazemieh/debt/ui/list/DebtViewModel.kt": {
+    "mtime": 1785684293.5725284,
+    "ast_hash": "165528a18e388aa2a111e6cda482a8b2",
+    "semantic_hash": "165528a18e388aa2a111e6cda482a8b2"
+  },
+  "debt/src/commonMain/kotlin/com/kazemieh/debt/ui/list/DebtsScreen.kt": {
+    "mtime": 1785684293.5725813,
+    "ast_hash": "7f6abfb0f39ace96360971072c4eefce",
+    "semantic_hash": "7f6abfb0f39ace96360971072c4eefce"
+  },
+  "fixed-expense/build.gradle.kts": {
+    "mtime": 1785684293.5726962,
+    "ast_hash": "d1bd566503509ed8593221e5cb242338",
+    "semantic_hash": "d1bd566503509ed8593221e5cb242338"
+  },
+  "fixed-expense/src/androidMain/kotlin/com/kazemieh/fixed_expense/FixedExpenseWorker.kt": {
+    "mtime": 1785684293.5728836,
+    "ast_hash": "cc639b1f702cd001ac986f0e2d638c93",
+    "semantic_hash": "cc639b1f702cd001ac986f0e2d638c93"
+  },
+  "fixed-expense/src/commonMain/kotlin/com/kazemieh/fixed_expense/di/FixedExpenseModule.kt": {
+    "mtime": 1785684293.5730574,
+    "ast_hash": "b48907480603de259571c0567c462220",
+    "semantic_hash": "b48907480603de259571c0567c462220"
+  },
+  "fixed-expense/src/commonMain/kotlin/com/kazemieh/fixed_expense/ui/detail/AddFixedExpenseBottomSheet.kt": {
+    "mtime": 1785684293.5731804,
+    "ast_hash": "16af3177bbcbbc7dddb31b06cfd3f4fc",
+    "semantic_hash": "16af3177bbcbbc7dddb31b06cfd3f4fc"
+  },
+  "fixed-expense/src/commonMain/kotlin/com/kazemieh/fixed_expense/ui/detail/AddFixedExpenseViewModel.kt": {
+    "mtime": 1785684293.57325,
+    "ast_hash": "9665be52dc914bfa1c8bbf355459568a",
+    "semantic_hash": "9665be52dc914bfa1c8bbf355459568a"
+  },
+  "fixed-expense/src/commonMain/kotlin/com/kazemieh/fixed_expense/ui/list/FixedExpenseListScreen.kt": {
+    "mtime": 1785684293.5733697,
+    "ast_hash": "e28ab08415606a8ae9882b4d1b3d3f2d",
+    "semantic_hash": "e28ab08415606a8ae9882b4d1b3d3f2d"
+  },
+  "fixed-expense/src/commonMain/kotlin/com/kazemieh/fixed_expense/ui/list/FixedExpenseListViewModel.kt": {
+    "mtime": 1785684293.5734286,
+    "ast_hash": "279aac937743301f22a811d95eb4d787",
+    "semantic_hash": "279aac937743301f22a811d95eb4d787"
+  },
+  "fixed-expense/src/commonMain/kotlin/com/kazemieh/fixed_expense/ui/widget/FixedExpenseWidget.kt": {
+    "mtime": 1785684293.573515,
+    "ast_hash": "1d01c391743cdc5a892048f2c27dbfbc",
+    "semantic_hash": "1d01c391743cdc5a892048f2c27dbfbc"
+  },
+  "gamification/build.gradle.kts": {
+    "mtime": 1785684293.573627,
+    "ast_hash": "f208e29b99386d505acfdfd60dfbc79c",
+    "semantic_hash": "f208e29b99386d505acfdfd60dfbc79c"
+  },
+  "gamification/src/commonMain/kotlin/com/kazemieh/gamification/di/GamificationModule.kt": {
+    "mtime": 1785684293.5738456,
+    "ast_hash": "a0b9a56a4419c51deb0e7eb02d3db365",
+    "semantic_hash": "a0b9a56a4419c51deb0e7eb02d3db365"
+  },
+  "gamification/src/commonMain/kotlin/com/kazemieh/gamification/ui/AchievementWidget.kt": {
+    "mtime": 1785684293.5739138,
+    "ast_hash": "9a646feb8ac50e0264393ea39e0ab2d5",
+    "semantic_hash": "9a646feb8ac50e0264393ea39e0ab2d5"
+  },
+  "gamification/src/commonMain/kotlin/com/kazemieh/gamification/ui/AchievementsScreen.kt": {
+    "mtime": 1785684293.5739658,
+    "ast_hash": "ecf1021103e1f6b5cdf20cbc8fb9ca82",
+    "semantic_hash": "ecf1021103e1f6b5cdf20cbc8fb9ca82"
+  },
+  "gamification/src/commonMain/kotlin/com/kazemieh/gamification/ui/GamificationViewModel.kt": {
+    "mtime": 1785684293.57401,
+    "ast_hash": "34b1bb179e85da3a60e667f83dffa68b",
+    "semantic_hash": "34b1bb179e85da3a60e667f83dffa68b"
+  },
+  "gamification/src/commonMain/kotlin/com/kazemieh/gamification/ui/StreakHero.kt": {
+    "mtime": 1785684293.574053,
+    "ast_hash": "143f19166590594fc5391d51fca79e8e",
+    "semantic_hash": "143f19166590594fc5391d51fca79e8e"
+  },
+  "goals/build.gradle.kts": {
+    "mtime": 1785684293.5741434,
+    "ast_hash": "c8162d31fa925133a939ec4cc79a20be",
+    "semantic_hash": "c8162d31fa925133a939ec4cc79a20be"
+  },
+  "goals/src/commonMain/kotlin/com/kazemieh/goals/di/GoalModule.kt": {
+    "mtime": 1785684293.5743446,
+    "ast_hash": "bee3999159de154ef90a86bff703a89c",
+    "semantic_hash": "bee3999159de154ef90a86bff703a89c"
+  },
+  "goals/src/commonMain/kotlin/com/kazemieh/goals/presentation/GoalContract.kt": {
+    "mtime": 1785684293.5744183,
+    "ast_hash": "3bdcc77265c33de9accafbb78a94c8ca",
+    "semantic_hash": "3bdcc77265c33de9accafbb78a94c8ca"
+  },
+  "goals/src/commonMain/kotlin/com/kazemieh/goals/presentation/GoalScreen.kt": {
+    "mtime": 1785684293.5745137,
+    "ast_hash": "29361a7d75572212cf1fdd92390f7a85",
+    "semantic_hash": "29361a7d75572212cf1fdd92390f7a85"
+  },
+  "goals/src/commonMain/kotlin/com/kazemieh/goals/presentation/GoalViewModel.kt": {
+    "mtime": 1785684293.5745668,
+    "ast_hash": "155eb43b0f025df61729cc87909e73ab",
+    "semantic_hash": "155eb43b0f025df61729cc87909e73ab"
+  },
+  "goals/src/commonMain/kotlin/com/kazemieh/goals/presentation/add/AddGoalBottomSheet.kt": {
+    "mtime": 1785684293.5746443,
+    "ast_hash": "81a09a79488e9be99bc7d925843508a1",
+    "semantic_hash": "81a09a79488e9be99bc7d925843508a1"
+  },
+  "goals/src/commonMain/kotlin/com/kazemieh/goals/presentation/add/AddGoalContract.kt": {
+    "mtime": 1785684293.5746884,
+    "ast_hash": "c5efecdc22f305e55c0fd58016a6af87",
+    "semantic_hash": "c5efecdc22f305e55c0fd58016a6af87"
+  },
+  "goals/src/commonMain/kotlin/com/kazemieh/goals/presentation/add/AddGoalViewModel.kt": {
+    "mtime": 1785684293.5747392,
+    "ast_hash": "fda2371ac27ebb59adecc86aa196d9cd",
+    "semantic_hash": "fda2371ac27ebb59adecc86aa196d9cd"
+  },
+  "goals/src/commonMain/kotlin/com/kazemieh/goals/presentation/component/GoalWidget.kt": {
+    "mtime": 1785684293.5748158,
+    "ast_hash": "a1b5bf3a615e2c59eec8f2a4b000ba82",
+    "semantic_hash": "a1b5bf3a615e2c59eec8f2a4b000ba82"
+  },
+  "installment/build.gradle.kts": {
+    "mtime": 1785684293.574906,
+    "ast_hash": "f3f2a3a2520c16a6966e338d8b2de1a4",
+    "semantic_hash": "f3f2a3a2520c16a6966e338d8b2de1a4"
+  },
+  "installment/src/commonMain/kotlin/com/kazemieh/installment/di/InstallmentModule.kt": {
+    "mtime": 1785684293.5751047,
+    "ast_hash": "1800b38a5b41821df3e9ed09ebd73603",
+    "semantic_hash": "1800b38a5b41821df3e9ed09ebd73603"
+  },
+  "installment/src/commonMain/kotlin/com/kazemieh/installment/ui/InstallmentViewModel.kt": {
+    "mtime": 1785684293.5751727,
+    "ast_hash": "074c0517fd40d4b093bb6646242e2d41",
+    "semantic_hash": "074c0517fd40d4b093bb6646242e2d41"
+  },
+  "installment/src/commonMain/kotlin/com/kazemieh/installment/ui/add/AddInstallmentBottomSheet.kt": {
+    "mtime": 1785684293.5752523,
+    "ast_hash": "b522cf34c1b5069a87089d0ce5761e2d",
+    "semantic_hash": "b522cf34c1b5069a87089d0ce5761e2d"
+  },
+  "installment/src/commonMain/kotlin/com/kazemieh/installment/ui/add/AddInstallmentViewModel.kt": {
+    "mtime": 1785684293.5753088,
+    "ast_hash": "dc4c3465f95e9c3d4aa3a0ee6ae44eac",
+    "semantic_hash": "dc4c3465f95e9c3d4aa3a0ee6ae44eac"
+  },
+  "installment/src/commonMain/kotlin/com/kazemieh/installment/ui/add/component/InstallmentComponents.kt": {
+    "mtime": 1785684293.575385,
+    "ast_hash": "9378b9ee1fed17368c4bd88652189d75",
+    "semantic_hash": "9378b9ee1fed17368c4bd88652189d75"
+  },
+  "installment/src/commonMain/kotlin/com/kazemieh/installment/ui/list/InstallmentsScreen.kt": {
+    "mtime": 1785684293.575487,
+    "ast_hash": "e429e0b89dc4de9f9597decc657e55fe",
+    "semantic_hash": "e429e0b89dc4de9f9597decc657e55fe"
+  },
+  "installment/src/commonMain/kotlin/com/kazemieh/installment/ui/widget/InstallmentWidget.kt": {
+    "mtime": 1785684293.5755596,
+    "ast_hash": "8ea9f9eec4edd9f7b9cad9ea910674f8",
+    "semantic_hash": "8ea9f9eec4edd9f7b9cad9ea910674f8"
+  },
+  "lock/build.gradle.kts": {
+    "mtime": 1785684293.5756714,
+    "ast_hash": "dcc93963f5318e61c302fecaf3b8d2a5",
+    "semantic_hash": "dcc93963f5318e61c302fecaf3b8d2a5"
+  },
+  "lock/src/androidMain/kotlin/com/kazemieh/lock/BiometricAuthenticator.android.kt": {
+    "mtime": 1785684293.5758767,
+    "ast_hash": "3186bba55f9a733eb4362988c81baf24",
+    "semantic_hash": "3186bba55f9a733eb4362988c81baf24"
+  },
+  "lock/src/commonMain/kotlin/com/kazemieh/lock/BiometricAuthenticator.kt": {
+    "mtime": 1785684293.5760708,
+    "ast_hash": "a6cebfb0dcc4992b92a3e4bdb9cb829e",
+    "semantic_hash": "a6cebfb0dcc4992b92a3e4bdb9cb829e"
+  },
+  "lock/src/commonMain/kotlin/com/kazemieh/lock/LockContract.kt": {
+    "mtime": 1785684293.5761225,
+    "ast_hash": "4abb74e89f39084617349754cd19a0d6",
+    "semantic_hash": "4abb74e89f39084617349754cd19a0d6"
+  },
+  "lock/src/commonMain/kotlin/com/kazemieh/lock/LockGate.kt": {
+    "mtime": 1785684293.5761726,
+    "ast_hash": "83f5268fc12ce2513b931e74549d4ee7",
+    "semantic_hash": "83f5268fc12ce2513b931e74549d4ee7"
+  },
+  "lock/src/commonMain/kotlin/com/kazemieh/lock/LockViewModel.kt": {
+    "mtime": 1785684293.5762331,
+    "ast_hash": "3d8d6413ac7bad931684c562b834e004",
+    "semantic_hash": "3d8d6413ac7bad931684c562b834e004"
+  },
+  "lock/src/commonMain/kotlin/com/kazemieh/lock/PINScreen.kt": {
+    "mtime": 1785684293.576299,
+    "ast_hash": "0decec489f9ba9a6a2cd06f74278185e",
+    "semantic_hash": "0decec489f9ba9a6a2cd06f74278185e"
+  },
+  "lock/src/commonMain/kotlin/com/kazemieh/lock/di/lockModule.kt": {
+    "mtime": 1785684293.5763693,
+    "ast_hash": "5858b5156da9498d9dd6eb0150b6b2ca",
+    "semantic_hash": "5858b5156da9498d9dd6eb0150b6b2ca"
+  },
+  "lock/src/iosMain/kotlin/com/kazemieh/lock/BiometricAuthenticator.ios.kt": {
+    "mtime": 1785763412.0357273,
+    "ast_hash": "b1e1291e9d08dbdf9d6f25aeb3d134b8",
+    "semantic_hash": "b1e1291e9d08dbdf9d6f25aeb3d134b8"
+  },
+  "lock/src/jsMain/kotlin/com/kazemieh/lock/BiometricAuthenticator.js.kt": {
+    "mtime": 1785684293.5767386,
+    "ast_hash": "8ea5afc687224d3a293b663e7c17b7e9",
+    "semantic_hash": "8ea5afc687224d3a293b663e7c17b7e9"
+  },
+  "lock/src/jvmMain/kotlin/com/kazemieh/lock/BiometricAuthenticator.jvm.kt": {
+    "mtime": 1785684293.5769155,
+    "ast_hash": "7ec869fb6a8b55e94f4f9a5dd18b857e",
+    "semantic_hash": "7ec869fb6a8b55e94f4f9a5dd18b857e"
+  },
+  "notes/build.gradle.kts": {
+    "mtime": 1785684293.5770164,
+    "ast_hash": "c621c98eea269423798de1acd04bfadd",
+    "semantic_hash": "c621c98eea269423798de1acd04bfadd"
+  },
+  "notes/src/commonMain/kotlin/com/kazemieh/notes/di/NotesModule.kt": {
+    "mtime": 1785684293.5772145,
+    "ast_hash": "8ad500f3f305b4f180731161bfc35343",
+    "semantic_hash": "8ad500f3f305b4f180731161bfc35343"
+  },
+  "notes/src/commonMain/kotlin/com/kazemieh/notes/ui/NotesListScreen.kt": {
+    "mtime": 1785684293.5772984,
+    "ast_hash": "d4d9910ba315599ff0db1ff98e4f9e49",
+    "semantic_hash": "d4d9910ba315599ff0db1ff98e4f9e49"
+  },
+  "notes/src/commonMain/kotlin/com/kazemieh/notes/ui/NotesViewModel.kt": {
+    "mtime": 1785684293.577355,
+    "ast_hash": "92ba841d55244545659abb095303eb83",
+    "semantic_hash": "92ba841d55244545659abb095303eb83"
+  },
+  "notes/src/commonMain/kotlin/com/kazemieh/notes/ui/NotesWidget.kt": {
+    "mtime": 1785684293.5773997,
+    "ast_hash": "f63f35eba40ccceab22cbc7bb504a155",
+    "semantic_hash": "f63f35eba40ccceab22cbc7bb504a155"
+  },
+  "notes/src/commonMain/kotlin/com/kazemieh/notes/ui/edit/AddNoteBottomSheet.kt": {
+    "mtime": 1785684293.5774775,
+    "ast_hash": "b536819b8c5db7e1793c53c2bdbb5af9",
+    "semantic_hash": "b536819b8c5db7e1793c53c2bdbb5af9"
+  },
+  "notes/src/commonMain/kotlin/com/kazemieh/notes/ui/edit/MarkdownNoteField.kt": {
+    "mtime": 1785684293.57755,
+    "ast_hash": "ceb9c0e1c8f1fc578199a39c9f0eca15",
+    "semantic_hash": "ceb9c0e1c8f1fc578199a39c9f0eca15"
+  },
+  "notes/src/commonMain/kotlin/com/kazemieh/notes/ui/edit/MarkdownRenderer.kt": {
+    "mtime": 1785684293.5775986,
+    "ast_hash": "ee3d1e88e8a353d98e78701d414ae0c5",
+    "semantic_hash": "ee3d1e88e8a353d98e78701d414ae0c5"
+  },
+  "notes/src/commonMain/kotlin/com/kazemieh/notes/ui/edit/NoteEditScreen.kt": {
+    "mtime": 1785684293.5776577,
+    "ast_hash": "d0485c761b4fdf733f3de8f143ecf193",
+    "semantic_hash": "d0485c761b4fdf733f3de8f143ecf193"
+  },
+  "notes/src/commonMain/kotlin/com/kazemieh/notes/ui/edit/NoteEditViewModel.kt": {
+    "mtime": 1785684293.577709,
+    "ast_hash": "a313211499774a24966670b8c0c0cbf3",
+    "semantic_hash": "a313211499774a24966670b8c0c0cbf3"
+  },
+  "notifications/build.gradle.kts": {
+    "mtime": 1785684293.5778265,
+    "ast_hash": "508173280f6fd76b4c2d5afde9014a1d",
+    "semantic_hash": "508173280f6fd76b4c2d5afde9014a1d"
+  },
+  "notifications/src/androidMain/kotlin/com/kazemieh/notifications/AndroidNotificationManager.kt": {
+    "mtime": 1785684293.5780444,
+    "ast_hash": "04ef46c1b0d3cd7ddea31054dd41fd25",
+    "semantic_hash": "04ef46c1b0d3cd7ddea31054dd41fd25"
+  },
+  "notifications/src/androidMain/kotlin/com/kazemieh/notifications/AndroidNotificationScheduler.kt": {
+    "mtime": 1785684293.5780919,
+    "ast_hash": "17c44321ae5e865e9104010cb4fedcad",
+    "semantic_hash": "17c44321ae5e865e9104010cb4fedcad"
+  },
+  "notifications/src/androidMain/kotlin/com/kazemieh/notifications/NotificationWorker.kt": {
+    "mtime": 1785684293.578138,
+    "ast_hash": "d8efa54c182f489aa785e250126be597",
+    "semantic_hash": "d8efa54c182f489aa785e250126be597"
+  },
+  "notifications/src/androidMain/kotlin/com/kazemieh/notifications/di/AndroidNotificationModule.kt": {
+    "mtime": 1785684293.5782156,
+    "ast_hash": "d455cd4daf085830a6157233e6cc61f4",
+    "semantic_hash": "d455cd4daf085830a6157233e6cc61f4"
+  },
+  "notifications/src/androidMain/kotlin/com/kazemieh/notifications/ui/PermissionLauncher.android.kt": {
+    "mtime": 1785684293.5782926,
+    "ast_hash": "84ee2177c011db54cd6edf23df0c6455",
+    "semantic_hash": "84ee2177c011db54cd6edf23df0c6455"
+  },
+  "notifications/src/androidMain/kotlin/com/kazemieh/notifications/ui/PermissionRationaleHelper.android.kt": {
+    "mtime": 1785684293.578347,
+    "ast_hash": "a82c88d56fc793f3011701c4e3b6ebf9",
+    "semantic_hash": "a82c88d56fc793f3011701c4e3b6ebf9"
+  },
+  "notifications/src/androidMain/kotlin/com/kazemieh/notifications/ui/SmsPermissionLauncher.android.kt": {
+    "mtime": 1785684293.5783985,
+    "ast_hash": "da2d973ff203cd7229e337d26161e835",
+    "semantic_hash": "da2d973ff203cd7229e337d26161e835"
+  },
+  "notifications/src/commonMain/kotlin/com/kazemieh/notifications/di/NotificationModule.kt": {
+    "mtime": 1785684293.5786107,
+    "ast_hash": "344abcfecb9fae8914ed2bcc27714893",
+    "semantic_hash": "344abcfecb9fae8914ed2bcc27714893"
+  },
+  "notifications/src/commonMain/kotlin/com/kazemieh/notifications/ui/NotificationSettingsEffect.kt": {
+    "mtime": 1785684293.5786798,
+    "ast_hash": "bc922074e091c04301a7f968c436fbd2",
+    "semantic_hash": "bc922074e091c04301a7f968c436fbd2"
+  },
+  "notifications/src/commonMain/kotlin/com/kazemieh/notifications/ui/NotificationSettingsIntent.kt": {
+    "mtime": 1785684293.5787196,
+    "ast_hash": "ff6a811b125c70bcbaf56b8d38397647",
+    "semantic_hash": "ff6a811b125c70bcbaf56b8d38397647"
+  },
+  "notifications/src/commonMain/kotlin/com/kazemieh/notifications/ui/NotificationSettingsScreen.kt": {
+    "mtime": 1785684293.5787694,
+    "ast_hash": "8ab926390099982e673c2fd02d347e87",
+    "semantic_hash": "8ab926390099982e673c2fd02d347e87"
+  },
+  "notifications/src/commonMain/kotlin/com/kazemieh/notifications/ui/NotificationSettingsState.kt": {
+    "mtime": 1785684293.5788076,
+    "ast_hash": "39364f5ab9ede055993989d1f3e86535",
+    "semantic_hash": "39364f5ab9ede055993989d1f3e86535"
+  },
+  "notifications/src/commonMain/kotlin/com/kazemieh/notifications/ui/NotificationSettingsViewModel.kt": {
+    "mtime": 1785684293.5788534,
+    "ast_hash": "78d8bd0994f90bb015385aa296091f18",
+    "semantic_hash": "78d8bd0994f90bb015385aa296091f18"
+  },
+  "notifications/src/commonMain/kotlin/com/kazemieh/notifications/ui/PermissionLauncher.kt": {
+    "mtime": 1785684293.5788908,
+    "ast_hash": "894f72375722e6731f1fc34c7f3357bb",
+    "semantic_hash": "894f72375722e6731f1fc34c7f3357bb"
+  },
+  "notifications/src/commonMain/kotlin/com/kazemieh/notifications/ui/PermissionRationaleHelper.kt": {
+    "mtime": 1785684293.578938,
+    "ast_hash": "6863322946615236cdb6402a290ab030",
+    "semantic_hash": "6863322946615236cdb6402a290ab030"
+  },
+  "notifications/src/commonMain/kotlin/com/kazemieh/notifications/ui/SmsPermissionLauncher.kt": {
+    "mtime": 1785684293.5789912,
+    "ast_hash": "7846fe31e73187e1b80a7d334559c7ef",
+    "semantic_hash": "7846fe31e73187e1b80a7d334559c7ef"
+  },
+  "notifications/src/iosMain/kotlin/com/kazemieh/notifications/IosNotificationManager.kt": {
+    "mtime": 1785684293.579177,
+    "ast_hash": "3f0d5f25822216531e1b1cb02c89d7d8",
+    "semantic_hash": "3f0d5f25822216531e1b1cb02c89d7d8"
+  },
+  "notifications/src/iosMain/kotlin/com/kazemieh/notifications/IosNotificationScheduler.kt": {
+    "mtime": 1785684293.5792232,
+    "ast_hash": "4c26c242410dd6d8f98730060dd3a386",
+    "semantic_hash": "4c26c242410dd6d8f98730060dd3a386"
+  },
+  "notifications/src/iosMain/kotlin/com/kazemieh/notifications/di/IosNotificationModule.kt": {
+    "mtime": 1785684293.5792892,
+    "ast_hash": "558b4218b1d1c6a2a3f6a2b1e53cfbb0",
+    "semantic_hash": "558b4218b1d1c6a2a3f6a2b1e53cfbb0"
+  },
+  "notifications/src/iosMain/kotlin/com/kazemieh/notifications/ui/PermissionLauncher.ios.kt": {
+    "mtime": 1785684293.579361,
+    "ast_hash": "1ca3b8eb102dbf4ba1f79b65b9ad8792",
+    "semantic_hash": "1ca3b8eb102dbf4ba1f79b65b9ad8792"
+  },
+  "notifications/src/iosMain/kotlin/com/kazemieh/notifications/ui/PermissionRationaleHelper.ios.kt": {
+    "mtime": 1785684293.5794039,
+    "ast_hash": "e23ed8b4df47dec7239d973e14ffa24c",
+    "semantic_hash": "e23ed8b4df47dec7239d973e14ffa24c"
+  },
+  "notifications/src/iosMain/kotlin/com/kazemieh/notifications/ui/SmsPermissionLauncher.ios.kt": {
+    "mtime": 1785684293.5794532,
+    "ast_hash": "a7b5652bd1b6e4f7f8f912bfcc65e564",
+    "semantic_hash": "a7b5652bd1b6e4f7f8f912bfcc65e564"
+  },
+  "notifications/src/jsMain/kotlin/com/kazemieh/notifications/di/JsNotificationModule.kt": {
+    "mtime": 1785684293.5797074,
+    "ast_hash": "5b16014d5dc1085fbd26e864ee323958",
+    "semantic_hash": "5b16014d5dc1085fbd26e864ee323958"
+  },
+  "notifications/src/jsMain/kotlin/com/kazemieh/notifications/ui/PermissionLauncher.js.kt": {
+    "mtime": 1785684293.579803,
+    "ast_hash": "1ca3b8eb102dbf4ba1f79b65b9ad8792",
+    "semantic_hash": "1ca3b8eb102dbf4ba1f79b65b9ad8792"
+  },
+  "notifications/src/jsMain/kotlin/com/kazemieh/notifications/ui/PermissionRationaleHelper.js.kt": {
+    "mtime": 1785684293.5798542,
+    "ast_hash": "e23ed8b4df47dec7239d973e14ffa24c",
+    "semantic_hash": "e23ed8b4df47dec7239d973e14ffa24c"
+  },
+  "notifications/src/jsMain/kotlin/com/kazemieh/notifications/ui/SmsPermissionLauncher.js.kt": {
+    "mtime": 1785684293.5799077,
+    "ast_hash": "d2beea27ef2787c158bf7808f0af2303",
+    "semantic_hash": "d2beea27ef2787c158bf7808f0af2303"
+  },
+  "notifications/src/jvmMain/kotlin/com/kazemieh/notifications/di/JvmNotificationModule.kt": {
+    "mtime": 1785684293.5801218,
+    "ast_hash": "5b16014d5dc1085fbd26e864ee323958",
+    "semantic_hash": "5b16014d5dc1085fbd26e864ee323958"
+  },
+  "notifications/src/jvmMain/kotlin/com/kazemieh/notifications/ui/PermissionLauncher.jvm.kt": {
+    "mtime": 1785684293.5801973,
+    "ast_hash": "1ca3b8eb102dbf4ba1f79b65b9ad8792",
+    "semantic_hash": "1ca3b8eb102dbf4ba1f79b65b9ad8792"
+  },
+  "notifications/src/jvmMain/kotlin/com/kazemieh/notifications/ui/PermissionRationaleHelper.jvm.kt": {
+    "mtime": 1785684293.580246,
+    "ast_hash": "e23ed8b4df47dec7239d973e14ffa24c",
+    "semantic_hash": "e23ed8b4df47dec7239d973e14ffa24c"
+  },
+  "notifications/src/jvmMain/kotlin/com/kazemieh/notifications/ui/SmsPermissionLauncher.jvm.kt": {
+    "mtime": 1785684293.5802937,
+    "ast_hash": "00c19e84c3ddeafc5ed549451ea3d3fb",
+    "semantic_hash": "00c19e84c3ddeafc5ed549451ea3d3fb"
+  },
+  "person/build.gradle.kts": {
+    "mtime": 1785684293.58041,
+    "ast_hash": "b68f0b92b78488b07fd5c822fd8497c1",
+    "semantic_hash": "b68f0b92b78488b07fd5c822fd8497c1"
+  },
+  "person/src/commonMain/kotlin/com/kazemieh/person/di/TransactionPersonModule.kt": {
+    "mtime": 1785684293.5807388,
+    "ast_hash": "fe0a397d7946026b226bd6cb254f465f",
+    "semantic_hash": "fe0a397d7946026b226bd6cb254f465f"
+  },
+  "person/src/commonMain/kotlin/com/kazemieh/person/ui/add/AddPersonBottomSheet.kt": {
+    "mtime": 1785684293.580845,
+    "ast_hash": "0a2d37649001bafe8ee8e4199c08d03f",
+    "semantic_hash": "0a2d37649001bafe8ee8e4199c08d03f"
+  },
+  "person/src/commonMain/kotlin/com/kazemieh/person/ui/add/AddPersonViewModel.kt": {
+    "mtime": 1785684293.5808923,
+    "ast_hash": "75beac7e4e113b1c13983b09ad283668",
+    "semantic_hash": "75beac7e4e113b1c13983b09ad283668"
+  },
+  "person/src/commonMain/kotlin/com/kazemieh/person/ui/delete/DeletePersonBottomSheet.kt": {
+    "mtime": 1785684293.5809617,
+    "ast_hash": "b19faaa7888643e9eb15264132f93282",
+    "semantic_hash": "b19faaa7888643e9eb15264132f93282"
+  },
+  "person/src/commonMain/kotlin/com/kazemieh/person/ui/delete/DeletePersonViewModel.kt": {
+    "mtime": 1785684293.5810056,
+    "ast_hash": "dca05cb5f64eaee954750d0a95335595",
+    "semantic_hash": "dca05cb5f64eaee954750d0a95335595"
+  },
+  "person/src/commonMain/kotlin/com/kazemieh/person/ui/detail/PersonDetailScreen.kt": {
+    "mtime": 1785684293.5810874,
+    "ast_hash": "3357e676997da805a4a75713db84e11c",
+    "semantic_hash": "3357e676997da805a4a75713db84e11c"
+  },
+  "person/src/commonMain/kotlin/com/kazemieh/person/ui/detail/PersonDetailViewModel.kt": {
+    "mtime": 1785684293.5811362,
+    "ast_hash": "609a2479be1ab124c92272b45b4a2361",
+    "semantic_hash": "609a2479be1ab124c92272b45b4a2361"
+  },
+  "person/src/commonMain/kotlin/com/kazemieh/person/ui/list/PersonBottomSheets.kt": {
+    "mtime": 1785684293.5812106,
+    "ast_hash": "325b6a6401733dfa65b6626b70e0315b",
+    "semantic_hash": "325b6a6401733dfa65b6626b70e0315b"
+  },
+  "person/src/commonMain/kotlin/com/kazemieh/person/ui/list/PersonFilterSelectionContent.kt": {
+    "mtime": 1785684293.5812643,
+    "ast_hash": "913de2b277c03b0624acfb839e423dbd",
+    "semantic_hash": "913de2b277c03b0624acfb839e423dbd"
+  },
+  "person/src/commonMain/kotlin/com/kazemieh/person/ui/list/PersonViewModel.kt": {
+    "mtime": 1785684293.5813308,
+    "ast_hash": "92439c80544409ac27a79d7fd1e9956f",
+    "semantic_hash": "92439c80544409ac27a79d7fd1e9956f"
+  },
+  "person/src/commonMain/kotlin/com/kazemieh/person/ui/list/PersonsScreen.kt": {
+    "mtime": 1785684293.5813844,
+    "ast_hash": "b3f1017ae7da5365ef4c372babecde33",
+    "semantic_hash": "b3f1017ae7da5365ef4c372babecde33"
+  },
+  "search/build.gradle.kts": {
+    "mtime": 1785684293.5814853,
+    "ast_hash": "45351457fa7db4a55769487a935aae30",
+    "semantic_hash": "45351457fa7db4a55769487a935aae30"
+  },
+  "search/src/commonMain/kotlin/com/kazemieh/search/di/SearchDI.kt": {
+    "mtime": 1785684293.581777,
+    "ast_hash": "401874dc098eb85285cc0b00ecf94c27",
+    "semantic_hash": "401874dc098eb85285cc0b00ecf94c27"
+  },
+  "search/src/commonMain/kotlin/com/kazemieh/search/ui/SearchContract.kt": {
+    "mtime": 1785684293.5818415,
+    "ast_hash": "d56cb3307ff32b537620f7307db007e4",
+    "semantic_hash": "d56cb3307ff32b537620f7307db007e4"
+  },
+  "search/src/commonMain/kotlin/com/kazemieh/search/ui/SearchScreen.kt": {
+    "mtime": 1785684293.5818887,
+    "ast_hash": "a88afb565981ff62211718789ee7e47d",
+    "semantic_hash": "a88afb565981ff62211718789ee7e47d"
+  },
+  "search/src/commonMain/kotlin/com/kazemieh/search/ui/SearchViewModel.kt": {
+    "mtime": 1785684293.5819514,
+    "ast_hash": "f489e299496fe7883f7b6f9629bf26a0",
+    "semantic_hash": "f489e299496fe7883f7b6f9629bf26a0"
+  },
+  "shopping/build.gradle.kts": {
+    "mtime": 1785684293.582055,
+    "ast_hash": "b768fb773f63fe7d66dcae754aa4aa0b",
+    "semantic_hash": "b768fb773f63fe7d66dcae754aa4aa0b"
+  },
+  "shopping/src/commonMain/kotlin/com/kazemieh/shopping/di/ShoppingModule.kt": {
+    "mtime": 1785684293.5822904,
+    "ast_hash": "333d2ecf6b32353ba70c654900e9c075",
+    "semantic_hash": "333d2ecf6b32353ba70c654900e9c075"
+  },
+  "shopping/src/commonMain/kotlin/com/kazemieh/shopping/ui/AddShoppingBottomSheet.kt": {
+    "mtime": 1785684293.5823672,
+    "ast_hash": "7a7b2b2452ea0e93d84cc96cf3d57a1e",
+    "semantic_hash": "7a7b2b2452ea0e93d84cc96cf3d57a1e"
+  },
+  "shopping/src/commonMain/kotlin/com/kazemieh/shopping/ui/ShoppingListScreen.kt": {
+    "mtime": 1785684293.582421,
+    "ast_hash": "18e9d2fcbf84cdefd453863f16277733",
+    "semantic_hash": "18e9d2fcbf84cdefd453863f16277733"
+  },
+  "shopping/src/commonMain/kotlin/com/kazemieh/shopping/ui/ShoppingViewModel.kt": {
+    "mtime": 1785684293.5824876,
+    "ast_hash": "29db49b8b3c0a3e7153dcb33494f1cfc",
+    "semantic_hash": "29db49b8b3c0a3e7153dcb33494f1cfc"
+  },
+  "shopping/src/commonMain/kotlin/com/kazemieh/shopping/ui/ShoppingWidget.kt": {
+    "mtime": 1785684293.5825305,
+    "ast_hash": "eb88a94c76daa53170ee816646d5be3c",
+    "semantic_hash": "eb88a94c76daa53170ee816646d5be3c"
+  },
+  "sms-reader/build.gradle.kts": {
+    "mtime": 1785684293.5826354,
+    "ast_hash": "eb5c3f55d4f1a61b8abfb20445e32bca",
+    "semantic_hash": "eb5c3f55d4f1a61b8abfb20445e32bca"
+  },
+  "sms-reader/src/androidMain/kotlin/com/kazemieh/sms_reader/SmsActionReceiver.kt": {
+    "mtime": 1785684293.5828686,
+    "ast_hash": "70c6b071579a626622473d61ad6a18ff",
+    "semantic_hash": "70c6b071579a626622473d61ad6a18ff"
+  },
+  "sms-reader/src/androidMain/kotlin/com/kazemieh/sms_reader/SmsReceiver.kt": {
+    "mtime": 1785684293.5829184,
+    "ast_hash": "91c9527f43ae3588c9d6a206b92f8a80",
+    "semantic_hash": "91c9527f43ae3588c9d6a206b92f8a80"
+  },
+  "sms-reader/src/commonMain/kotlin/com/kazemieh/sms_reader/BankParser.kt": {
+    "mtime": 1785684293.583094,
+    "ast_hash": "6d7d4be01a56dc4f51e32410bed81b84",
+    "semantic_hash": "6d7d4be01a56dc4f51e32410bed81b84"
+  },
+  "sms-reader/src/commonMain/kotlin/com/kazemieh/sms_reader/BankParsers.kt": {
+    "mtime": 1785684293.58315,
+    "ast_hash": "eb812969c689802c52319b327b2b19d9",
+    "semantic_hash": "eb812969c689802c52319b327b2b19d9"
+  },
+  "sms-reader/src/commonMain/kotlin/com/kazemieh/sms_reader/di/SmsReaderModule.kt": {
+    "mtime": 1785684293.5832245,
+    "ast_hash": "a6a6a21b7740ab5967f35092794b223a",
+    "semantic_hash": "a6a6a21b7740ab5967f35092794b223a"
+  },
+  "sms-reader/src/commonMain/kotlin/com/kazemieh/sms_reader/ui/SmsBanner.kt": {
+    "mtime": 1785684293.5832949,
+    "ast_hash": "1eb3fc13713711f52d3ca1cefeaaa8cb",
+    "semantic_hash": "1eb3fc13713711f52d3ca1cefeaaa8cb"
+  },
+  "sms-reader/src/commonMain/kotlin/com/kazemieh/sms_reader/ui/SmsDetectionSheet.kt": {
+    "mtime": 1785684293.583361,
+    "ast_hash": "72afdc08de98d82461b52643ec63e6f1",
+    "semantic_hash": "72afdc08de98d82461b52643ec63e6f1"
+  },
+  "source/build.gradle.kts": {
+    "mtime": 1785684293.583481,
+    "ast_hash": "6e462ed2e46347e26361ea164c0356a2",
+    "semantic_hash": "6e462ed2e46347e26361ea164c0356a2"
+  },
+  "source/src/commonMain/kotlin/com/kazemieh/financialsource/di/TransactionFinancialSourceModule.kt": {
+    "mtime": 1785684293.5838218,
+    "ast_hash": "d72892e61294c4b3eacc1ace1a1421d4",
+    "semantic_hash": "d72892e61294c4b3eacc1ace1a1421d4"
+  },
+  "source/src/commonMain/kotlin/com/kazemieh/financialsource/ui/add/AddSourceBottomSheet.kt": {
+    "mtime": 1785684293.5839353,
+    "ast_hash": "47bbdfc0642ae8842fdb7f890c96f8fc",
+    "semantic_hash": "47bbdfc0642ae8842fdb7f890c96f8fc"
+  },
+  "source/src/commonMain/kotlin/com/kazemieh/financialsource/ui/add/AddSourceViewModel.kt": {
+    "mtime": 1785684293.584003,
+    "ast_hash": "8074696f62984530d84295c00675d6fe",
+    "semantic_hash": "8074696f62984530d84295c00675d6fe"
+  },
+  "source/src/commonMain/kotlin/com/kazemieh/financialsource/ui/delete/DeleteSourceBottomSheet.kt": {
+    "mtime": 1785684293.584088,
+    "ast_hash": "5123df8fe3c781257a086578c970870a",
+    "semantic_hash": "5123df8fe3c781257a086578c970870a"
+  },
+  "source/src/commonMain/kotlin/com/kazemieh/financialsource/ui/delete/DeleteSourceViewModel.kt": {
+    "mtime": 1785684293.5841546,
+    "ast_hash": "c4bc2327019a352e22ec72f679997190",
+    "semantic_hash": "c4bc2327019a352e22ec72f679997190"
+  },
+  "source/src/commonMain/kotlin/com/kazemieh/financialsource/ui/list/SourceBottomSheets.kt": {
+    "mtime": 1785684293.5842505,
+    "ast_hash": "78db04359cc7b793495e09dd327e544c",
+    "semantic_hash": "78db04359cc7b793495e09dd327e544c"
+  },
+  "source/src/commonMain/kotlin/com/kazemieh/financialsource/ui/list/SourceFilterSelectionContent.kt": {
+    "mtime": 1785684293.5843022,
+    "ast_hash": "bcc55be406cd9d88c86ca35fd2ab1d61",
+    "semantic_hash": "bcc55be406cd9d88c86ca35fd2ab1d61"
+  },
+  "source/src/commonMain/kotlin/com/kazemieh/financialsource/ui/list/SourceHorizontalList.kt": {
+    "mtime": 1785684293.584361,
+    "ast_hash": "ce0342e5841f44341e09b8c5e7b2c0b6",
+    "semantic_hash": "ce0342e5841f44341e09b8c5e7b2c0b6"
+  },
+  "source/src/commonMain/kotlin/com/kazemieh/financialsource/ui/list/SourceViewModel.kt": {
+    "mtime": 1785684293.584429,
+    "ast_hash": "93e5842611bded94cc2e60f2aad38b6d",
+    "semantic_hash": "93e5842611bded94cc2e60f2aad38b6d"
+  },
+  "source/src/commonMain/kotlin/com/kazemieh/financialsource/ui/list/SourcesScreen.kt": {
+    "mtime": 1785684293.5844877,
+    "ast_hash": "9a28460bebe31ce99215dab1d7dd28a2",
+    "semantic_hash": "9a28460bebe31ce99215dab1d7dd28a2"
+  },
+  "sync/build.gradle.kts": {
+    "mtime": 1785684293.5846155,
+    "ast_hash": "5d412c8037640f84f4294cf5e4b23f73",
+    "semantic_hash": "5d412c8037640f84f4294cf5e4b23f73"
+  },
+  "sync/src/androidMain/kotlin/com/kazemieh/sync/SyncWorker.kt": {
+    "mtime": 1785684293.5848477,
+    "ast_hash": "86bfe50c37bca5b560cf145bc080ac81",
+    "semantic_hash": "86bfe50c37bca5b560cf145bc080ac81"
+  },
+  "sync/src/commonMain/kotlin/com/kazemieh/sync/GoogleDriveSyncManager.kt": {
+    "mtime": 1785684293.5850642,
+    "ast_hash": "60d8bb3782e4d145ad4306c081de2e4e",
+    "semantic_hash": "60d8bb3782e4d145ad4306c081de2e4e"
+  },
+  "sync/src/commonMain/kotlin/com/kazemieh/sync/ServerSyncManager.kt": {
+    "mtime": 1785684293.5851207,
+    "ast_hash": "649e36858871c3d49c6daede40f841f3",
+    "semantic_hash": "649e36858871c3d49c6daede40f841f3"
+  },
+  "sync/src/commonMain/kotlin/com/kazemieh/sync/di/SyncModule.kt": {
+    "mtime": 1785684293.5852022,
+    "ast_hash": "69434ca20c223edefe7e4e75c96bb1a3",
+    "semantic_hash": "69434ca20c223edefe7e4e75c96bb1a3"
+  },
+  "sync/src/commonMain/kotlin/com/kazemieh/sync/ui/BackupRestoreScreen.kt": {
+    "mtime": 1785684293.5853066,
+    "ast_hash": "568e9ece68f5dd7fa417f8df35f17d5c",
+    "semantic_hash": "568e9ece68f5dd7fa417f8df35f17d5c"
+  },
+  "sync/src/commonMain/kotlin/com/kazemieh/sync/ui/SyncViewModel.kt": {
+    "mtime": 1785684293.5853736,
+    "ast_hash": "450356d7e0a493b4b1b0fbf50d12f977",
+    "semantic_hash": "450356d7e0a493b4b1b0fbf50d12f977"
+  },
+  "tags/build.gradle.kts": {
+    "mtime": 1785684293.5854962,
+    "ast_hash": "331e8b7f16bb5c8466cd1a6f4afe2226",
+    "semantic_hash": "331e8b7f16bb5c8466cd1a6f4afe2226"
+  },
+  "tags/src/commonMain/kotlin/com/kazemieh/tag/di/TransactionTagModule.kt": {
+    "mtime": 1785684293.5857904,
+    "ast_hash": "2b81b6702ad551c565fc48b0007c9830",
+    "semantic_hash": "2b81b6702ad551c565fc48b0007c9830"
+  },
+  "tags/src/commonMain/kotlin/com/kazemieh/tag/ui/add/AddTagBottomSheet.kt": {
+    "mtime": 1785684293.5858953,
+    "ast_hash": "6cc311393676a71292c5febb47749620",
+    "semantic_hash": "6cc311393676a71292c5febb47749620"
+  },
+  "tags/src/commonMain/kotlin/com/kazemieh/tag/ui/add/AddTagViewModel.kt": {
+    "mtime": 1785684293.5859432,
+    "ast_hash": "d3257a285a324d0b3458bce3aa67d60c",
+    "semantic_hash": "d3257a285a324d0b3458bce3aa67d60c"
+  },
+  "tags/src/commonMain/kotlin/com/kazemieh/tag/ui/delete/DeleteTagBottomSheet.kt": {
+    "mtime": 1785684293.5860174,
+    "ast_hash": "bad8bd26a1506220293fb95832d8071f",
+    "semantic_hash": "bad8bd26a1506220293fb95832d8071f"
+  },
+  "tags/src/commonMain/kotlin/com/kazemieh/tag/ui/delete/DeleteTagViewModel.kt": {
+    "mtime": 1785684293.5860598,
+    "ast_hash": "6ff1b78805ec81d55f178083cc85a6f4",
+    "semantic_hash": "6ff1b78805ec81d55f178083cc85a6f4"
+  },
+  "tags/src/commonMain/kotlin/com/kazemieh/tag/ui/list/TagBottomSheets.kt": {
+    "mtime": 1785684293.5861397,
+    "ast_hash": "e091e6acab4de684e0cb21b9f0e104bf",
+    "semantic_hash": "e091e6acab4de684e0cb21b9f0e104bf"
+  },
+  "tags/src/commonMain/kotlin/com/kazemieh/tag/ui/list/TagFilterSelectionContent.kt": {
+    "mtime": 1785684293.5861857,
+    "ast_hash": "886abb87be26552eca918643c4d7bd0b",
+    "semantic_hash": "886abb87be26552eca918643c4d7bd0b"
+  },
+  "tags/src/commonMain/kotlin/com/kazemieh/tag/ui/list/TagViewModel.kt": {
+    "mtime": 1785684293.586235,
+    "ast_hash": "350e7999cf29db20de2e9d2e820d2549",
+    "semantic_hash": "350e7999cf29db20de2e9d2e820d2549"
+  },
+  "tags/src/commonMain/kotlin/com/kazemieh/tag/ui/list/TagsScreen.kt": {
+    "mtime": 1785684293.5862882,
+    "ast_hash": "728c419c1be575728020ddc080f58738",
+    "semantic_hash": "728c419c1be575728020ddc080f58738"
+  },
+  "transaction/build.gradle.kts": {
+    "mtime": 1785684293.5863967,
+    "ast_hash": "16bc4c357d922b2535d1c181630bd59a",
+    "semantic_hash": "16bc4c357d922b2535d1c181630bd59a"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/di/TransactionPresentationModule.kt": {
+    "mtime": 1785684293.5866838,
+    "ast_hash": "8d820addbd5dd671b20cd175da8fd60f",
+    "semantic_hash": "8d820addbd5dd671b20cd175da8fd60f"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/ui/add/AddTransactionBottomSheet.kt": {
+    "mtime": 1785684293.586817,
+    "ast_hash": "35ada471afced803daa88f72df89178e",
+    "semantic_hash": "35ada471afced803daa88f72df89178e"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/ui/add/AddTransactionComponents.kt": {
+    "mtime": 1785684293.5868664,
+    "ast_hash": "a3aabde14f78a14d247dcdd4e3ad8629",
+    "semantic_hash": "a3aabde14f78a14d247dcdd4e3ad8629"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/ui/add/AddTransactionViewModel.kt": {
+    "mtime": 1785684293.5869312,
+    "ast_hash": "7bcee3e3f39d35a0c7526ec470076cdd",
+    "semantic_hash": "7bcee3e3f39d35a0c7526ec470076cdd"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/ui/component/TransactionItem.kt": {
+    "mtime": 1785684293.5870135,
+    "ast_hash": "64b8159be0a02552728199c32723bdc0",
+    "semantic_hash": "64b8159be0a02552728199c32723bdc0"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/ui/component/transactionListContent.kt": {
+    "mtime": 1785684293.587061,
+    "ast_hash": "9b18762dc1415df2ece8910c38e01a3d",
+    "semantic_hash": "9b18762dc1415df2ece8910c38e01a3d"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/ui/delete/DeleteTransactionBottomSheet.kt": {
+    "mtime": 1785684293.5871246,
+    "ast_hash": "b28a1d2ce3e2f7c50b468ede71ee1c6e",
+    "semantic_hash": "b28a1d2ce3e2f7c50b468ede71ee1c6e"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/ui/delete/DeleteTransactionViewModel.kt": {
+    "mtime": 1785684293.587183,
+    "ast_hash": "44c8fc7a8759b3ca8f7fd57022713a28",
+    "semantic_hash": "44c8fc7a8759b3ca8f7fd57022713a28"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/ui/detail/TransactionDetailBottomSheet.kt": {
+    "mtime": 1785684293.5872586,
+    "ast_hash": "2e1dfaa29e5322640d4b8af82fcef975",
+    "semantic_hash": "2e1dfaa29e5322640d4b8af82fcef975"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/ui/main/BalanceHero.kt": {
+    "mtime": 1785684293.5873303,
+    "ast_hash": "c870413438d39eb13125822dd879f7a0",
+    "semantic_hash": "c870413438d39eb13125822dd879f7a0"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/ui/main/TransactionCard.kt": {
+    "mtime": 1785684293.5874016,
+    "ast_hash": "6c435c5cc2fc00055e26bc9cb85937ea",
+    "semantic_hash": "6c435c5cc2fc00055e26bc9cb85937ea"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/ui/main/TransactionListScreen.kt": {
+    "mtime": 1785684293.587448,
+    "ast_hash": "507fdfd874b6e2b1bf65a6e1da610a96",
+    "semantic_hash": "507fdfd874b6e2b1bf65a6e1da610a96"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/ui/main/TransactionViewModel.kt": {
+    "mtime": 1785684293.5875068,
+    "ast_hash": "6238ac860341a6ba3879d01f405a7068",
+    "semantic_hash": "6238ac860341a6ba3879d01f405a7068"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/ui/report/TransactionListByFilterScreen.kt": {
+    "mtime": 1785684293.5875843,
+    "ast_hash": "f052a008d3b3ce2e03db986fe4052acb",
+    "semantic_hash": "f052a008d3b3ce2e03db986fe4052acb"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/ui/report/TransactionReportCard.kt": {
+    "mtime": 1785684293.5876317,
+    "ast_hash": "392eb1b65ef8f23308a3416350b54b2c",
+    "semantic_hash": "392eb1b65ef8f23308a3416350b54b2c"
+  },
+  "transaction/src/commonMain/kotlin/com/kazemieh/transaction/ui/report/TransactionReportViewModel.kt": {
+    "mtime": 1785684293.587688,
+    "ast_hash": "33bc11bb10a528dcd12db12c544e277d",
+    "semantic_hash": "33bc11bb10a528dcd12db12c544e277d"
+  },
+  "utilities/build.gradle.kts": {
+    "mtime": 1785684293.5877492,
+    "ast_hash": "83eed8b020b6c35fc02a7e0a9d0a51a2",
+    "semantic_hash": "83eed8b020b6c35fc02a7e0a9d0a51a2"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/di/UtilitiesModule.kt": {
+    "mtime": 1785684293.588013,
+    "ast_hash": "ee2f183e9f84c791f25aa7e0264f8c44",
+    "semantic_hash": "ee2f183e9f84c791f25aa7e0264f8c44"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/calendar/FinancialCalendarScreen.kt": {
+    "mtime": 1785684293.5881374,
+    "ast_hash": "b264b7df489b9566095df2a6142ffd89",
+    "semantic_hash": "b264b7df489b9566095df2a6142ffd89"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/calendar/FinancialCalendarViewModel.kt": {
+    "mtime": 1785684293.5881903,
+    "ast_hash": "d9a83a88cde2aa17f04337f8cd7ccfe8",
+    "semantic_hash": "d9a83a88cde2aa17f04337f8cd7ccfe8"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/converter/CurrencyConverterMvi.kt": {
+    "mtime": 1785684293.5882726,
+    "ast_hash": "067b855b8263c3e164b8ade5bb1d38ad",
+    "semantic_hash": "067b855b8263c3e164b8ade5bb1d38ad"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/converter/CurrencyConverterScreen.kt": {
+    "mtime": 1785684293.5883527,
+    "ast_hash": "64eabf9d1b552fd072b89a3d9dbc886b",
+    "semantic_hash": "64eabf9d1b552fd072b89a3d9dbc886b"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/converter/CurrencyConverterViewModel.kt": {
+    "mtime": 1785684293.588419,
+    "ast_hash": "aa74cdc0e77e8e2e0e59803a97152548",
+    "semantic_hash": "aa74cdc0e77e8e2e0e59803a97152548"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/events/EventStringMapper.kt": {
+    "mtime": 1785684293.588495,
+    "ast_hash": "cf9f84d32565af5ea0da1593def2f13c",
+    "semantic_hash": "cf9f84d32565af5ea0da1593def2f13c"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/events/EventsMvi.kt": {
+    "mtime": 1785684293.5885491,
+    "ast_hash": "27f3ad1ea1a0abeb9f5d6b785be10bf4",
+    "semantic_hash": "27f3ad1ea1a0abeb9f5d6b785be10bf4"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/events/EventsScreen.kt": {
+    "mtime": 1785684293.588657,
+    "ast_hash": "72b082c869e0209b07067c5524d6d749",
+    "semantic_hash": "72b082c869e0209b07067c5524d6d749"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/events/EventsViewModel.kt": {
+    "mtime": 1785684293.5887074,
+    "ast_hash": "d1990955f79a7306a55105c060428d0b",
+    "semantic_hash": "d1990955f79a7306a55105c060428d0b"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/faq/FAQMvi.kt": {
+    "mtime": 1785684293.5887868,
+    "ast_hash": "34f01eb847c7ab051d1d88da778c2170",
+    "semantic_hash": "34f01eb847c7ab051d1d88da778c2170"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/faq/FAQScreen.kt": {
+    "mtime": 1785684293.588849,
+    "ast_hash": "1dd13186e732aabf8d714a4210b494d1",
+    "semantic_hash": "1dd13186e732aabf8d714a4210b494d1"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/faq/FAQStringMapper.kt": {
+    "mtime": 1785684293.588898,
+    "ast_hash": "3db4094e229295122c6011307c537bc5",
+    "semantic_hash": "3db4094e229295122c6011307c537bc5"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/faq/FAQViewModel.kt": {
+    "mtime": 1785684293.5889473,
+    "ast_hash": "0d361a01e53dd1445456b8338f0184d2",
+    "semantic_hash": "0d361a01e53dd1445456b8338f0184d2"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/fx/FxRatesMvi.kt": {
+    "mtime": 1785684293.589023,
+    "ast_hash": "5ccee887ec0155ec751742a2fbd58324",
+    "semantic_hash": "5ccee887ec0155ec751742a2fbd58324"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/fx/FxRatesScreen.kt": {
+    "mtime": 1785684293.5890832,
+    "ast_hash": "7df4bacbf879475488101ace40b13c52",
+    "semantic_hash": "7df4bacbf879475488101ace40b13c52"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/fx/FxRatesViewModel.kt": {
+    "mtime": 1785684293.5891385,
+    "ast_hash": "3d95ab15971ff90be20e5d5fc96dedeb",
+    "semantic_hash": "3d95ab15971ff90be20e5d5fc96dedeb"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/news/ArticleReaderScreen.kt": {
+    "mtime": 1785684293.5892198,
+    "ast_hash": "a025c11647ddc9976802608d05631c8d",
+    "semantic_hash": "a025c11647ddc9976802608d05631c8d"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/news/NewsListScreen.kt": {
+    "mtime": 1785684293.5892696,
+    "ast_hash": "0905ac9222b2695cd9e7c057f962c5dd",
+    "semantic_hash": "0905ac9222b2695cd9e7c057f962c5dd"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/news/NewsMvi.kt": {
+    "mtime": 1785684293.589315,
+    "ast_hash": "2267561769b1be882343a0db768c278b",
+    "semantic_hash": "2267561769b1be882343a0db768c278b"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/news/NewsStringMapper.kt": {
+    "mtime": 1785684293.589361,
+    "ast_hash": "7ca51057187d22834119df639f6c6aec",
+    "semantic_hash": "7ca51057187d22834119df639f6c6aec"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/news/NewsViewModel.kt": {
+    "mtime": 1785684293.5894024,
+    "ast_hash": "d395cd40bb1edd1f15a9ae9e266d72aa",
+    "semantic_hash": "d395cd40bb1edd1f15a9ae9e266d72aa"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/support/SupportMvi.kt": {
+    "mtime": 1785684293.589473,
+    "ast_hash": "065764629d4bccad9f1cfad7d0733375",
+    "semantic_hash": "065764629d4bccad9f1cfad7d0733375"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/support/SupportScreen.kt": {
+    "mtime": 1785684293.5895364,
+    "ast_hash": "225954622c61b06d4b51d66cf2620e1c",
+    "semantic_hash": "225954622c61b06d4b51d66cf2620e1c"
+  },
+  "utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/support/SupportViewModel.kt": {
+    "mtime": 1785684293.5895805,
+    "ast_hash": "b17d2da6687861ccb46851ab7e152919",
+    "semantic_hash": "b17d2da6687861ccb46851ab7e152919"
+  },
+  "widget/build.gradle.kts": {
+    "mtime": 1785684293.5896816,
+    "ast_hash": "f9c47fc18c166989cd096d1ab3ca14dd",
+    "semantic_hash": "f9c47fc18c166989cd096d1ab3ca14dd"
+  },
+  "widget/src/androidMain/kotlin/com/kazemieh/widget/FinTrackWidget.kt": {
+    "mtime": 1785684293.5898669,
+    "ast_hash": "5361dd7c165709ea6fa4792c6a97fa36",
+    "semantic_hash": "5361dd7c165709ea6fa4792c6a97fa36"
+  },
+  "widget/src/androidMain/kotlin/com/kazemieh/widget/FinTrackWidgetReceiver.kt": {
+    "mtime": 1785684293.5899065,
+    "ast_hash": "ffea1f9a3d5ff7c7b1766da6876cfaf8",
+    "semantic_hash": "ffea1f9a3d5ff7c7b1766da6876cfaf8"
+  },
+  "widget/src/androidMain/kotlin/com/kazemieh/widget/WidgetUpdater.kt": {
+    "mtime": 1785684293.589946,
+    "ast_hash": "7ffad523ad7bfb5cd529f2d93e7a0818",
+    "semantic_hash": "7ffad523ad7bfb5cd529f2d93e7a0818"
+  }
+}

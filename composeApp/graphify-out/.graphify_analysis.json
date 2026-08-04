@@ -1,0 +1,227 @@
+{
+  "communities": {
+    "0": [
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_achievements",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_addasset",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_aiadvisor",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_articlereader",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_assets",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_backuprestore",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_bottombargraph",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_budget",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_categories",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_check",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_currencyconverter",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_currencysettings",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_dashboard",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_debt",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_editprofile",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_events",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_faq",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_financialcalendar",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_fixedexpense",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_fxrates",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_goal",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_installment",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_managetools",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_news",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_noteedit",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_notes",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_notificationsettings",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_onboarding",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_person",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_persondetail",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_profile",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_screen",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_search",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_shopping",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_sources",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_support",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_tags",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_themesettings",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_tools",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_transactions"
+    ],
+    "1": [
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations_destinations",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations_destinations_achievements",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations_destinations_ai_advisor",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations_destinations_assets",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations_destinations_budget",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations_destinations_dashboard",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations_destinations_goal",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations_destinations_notes",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations_destinations_profile",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations_destinations_shopping",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations_destinations_tools",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations_destinations_transactions",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations_parsetabs",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations_serializetabs"
+    ],
+    "2": [
+      "koinappdeclaration",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_app",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_app_app",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_app_initkoin",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_app_istimeinrange",
+      "src_iosmain_kotlin_com_kazemieh_composeapp_mainviewcontroller",
+      "src_iosmain_kotlin_com_kazemieh_composeapp_mainviewcontroller_mainviewcontroller",
+      "src_jvmmain_kotlin_com_kazemieh_fintrack_main",
+      "src_jvmmain_kotlin_com_kazemieh_fintrack_main_main",
+      "src_webmain_kotlin_com_kazemieh_composeapp_main",
+      "src_webmain_kotlin_com_kazemieh_composeapp_main_main",
+      "uiviewcontroller"
+    ],
+    "3": [
+      "androidx",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_fintrackhost",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_fintrackhost_fintrackhost",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_navigationbar_bottombarcustomizesheet",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_navigationbar_bottombarcustomizesheet_bottombarcustomizesheet",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_navigationbar_bottombarcustomizesheet_tabicon",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_navigationbar_fintracknavigationbar",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_navigationbar_fintracknavigationbar_fintracknavigationbar",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_navigationbar_fintracknavigationbar_kt_modifier",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_navigationbar_fintracknavigationbar_kt_navhostcontroller"
+    ],
+    "4": [
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_appnavigation",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_appnavigation_appnavhost",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_appnavigation_kt_modifier",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_appnavigation_kt_navhostcontroller",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_navigationbar_bottombarnavigation",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_navigationbar_bottombarnavigation_bottombarnavgraph",
+      "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_navigationbar_bottombarnavigation_kt_navhostcontroller"
+    ],
+    "5": [
+      "build_gradle"
+    ],
+    "6": [
+      "webpack_config_d_sqljs_fallback"
+    ]
+  },
+  "cohesion": {
+    "0": 0.04878048780487805,
+    "1": 0.1523809523809524,
+    "2": 0.22727272727272727,
+    "3": 0.2222222222222222,
+    "4": 0.2857142857142857,
+    "5": 1.0,
+    "6": 1.0
+  },
+  "gods": [
+    {
+      "id": "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_screen_screen",
+      "label": "Screen",
+      "degree": 42
+    },
+    {
+      "id": "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_destinations_destinations",
+      "label": "Destinations",
+      "degree": 17
+    },
+    {
+      "id": "src_commonmain_kotlin_com_kazemieh_composeapp_app_app",
+      "label": "App()",
+      "degree": 6
+    },
+    {
+      "id": "src_commonmain_kotlin_com_kazemieh_composeapp_fintrackhost_fintrackhost",
+      "label": "FinTrackHost()",
+      "degree": 6
+    },
+    {
+      "id": "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_appnavigation_appnavhost",
+      "label": "AppNavHost()",
+      "degree": 6
+    },
+    {
+      "id": "src_commonmain_kotlin_com_kazemieh_composeapp_app_initkoin",
+      "label": "initKoin()",
+      "degree": 5
+    },
+    {
+      "id": "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_navigationbar_fintracknavigationbar_fintracknavigationbar",
+      "label": "FintrackNavigationBar()",
+      "degree": 5
+    },
+    {
+      "id": "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_navigationbar_bottombarcustomizesheet_bottombarcustomizesheet",
+      "label": "BottomBarCustomizeSheet()",
+      "degree": 4
+    },
+    {
+      "id": "src_commonmain_kotlin_com_kazemieh_composeapp_navigation_navigationbar_bottombarcustomizesheet_tabicon",
+      "label": "TabIcon()",
+      "degree": 4
+    },
+    {
+      "id": "src_iosmain_kotlin_com_kazemieh_composeapp_mainviewcontroller_mainviewcontroller",
+      "label": "MainViewController()",
+      "degree": 4
+    }
+  ],
+  "surprises": [
+    {
+      "source": "App()",
+      "target": "FinTrackHost()",
+      "source_files": [
+        "src/commonMain/kotlin/com/kazemieh/composeApp/App.kt",
+        "src/commonMain/kotlin/com/kazemieh/composeApp/FinTrackHost.kt"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "FinTrackHost()",
+      "target": "AppNavHost()",
+      "source_files": [
+        "src/commonMain/kotlin/com/kazemieh/composeApp/FinTrackHost.kt",
+        "src/commonMain/kotlin/com/kazemieh/composeApp/navigation/AppNavigation.kt"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "MainViewController()",
+      "target": "App()",
+      "source_files": [
+        "src/iosMain/kotlin/com/kazemieh/composeApp/MainViewController.kt",
+        "src/commonMain/kotlin/com/kazemieh/composeApp/App.kt"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source"
+    },
+    {
+      "source": "main()",
+      "target": "App()",
+      "source_files": [
+        "src/jvmMain/kotlin/com/kazemieh/fintrack/Main.kt",
+        "src/commonMain/kotlin/com/kazemieh/composeApp/App.kt"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source"
+    },
+    {
+      "source": "main()",
+      "target": "App()",
+      "source_files": [
+        "src/webMain/kotlin/com/kazemieh/composeApp/main.kt",
+        "src/commonMain/kotlin/com/kazemieh/composeApp/App.kt"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}

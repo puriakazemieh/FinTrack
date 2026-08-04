@@ -1,0 +1,9 @@
+// Replace DEVELOPMENT_TEAM with your Apple Developer Team ID before creating an
+// archive for a physical device or TestFlight. Simulator builds need no signing.
+PRODUCT_BUNDLE_IDENTIFIER = com.kazemieh.fintrack
+MARKETING_VERSION = 4.5.0
+CURRENT_PROJECT_VERSION = 9
+IPHONEOS_DEPLOYMENT_TARGET = 16.0
+SWIFT_VERSION = 6.0
+CODE_SIGN_STYLE = Automatic
+DEVELOPMENT_TEAM =

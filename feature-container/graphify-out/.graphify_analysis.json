@@ -1,0 +1,525 @@
+{
+  "communities": {
+    "0": [
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_component_recenttransactionswidget",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_component_recenttransactionswidget_kt_modifier",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_component_recenttransactionswidget_recenttransactionswidget",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardscreen",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardscreen_dashboardheader",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardscreen_dashboardscreen",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardscreen_dashboardwidgetcontent",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardscreen_headericonbutton",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardscreen_kt_androidx",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardscreen_kt_modifier",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardstate",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardviewmodel",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardviewmodel_loadachievements",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardviewmodel_loadcategories",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardviewmodel_loadsources",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardviewmodel_loadstreak",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardviewmodel_observecurrency",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardviewmodel_observedisabledtools",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardviewmodel_observehidebalance",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardviewmodel_observemostuseddata",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardviewmodel_observesmsdrafts",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardviewmodel_observeusername",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardviewmodel_observewidgetlayout",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_deletetransactionbottomsheet",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_kt_stateflow",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_kt_viewmodel",
+      "transactionviewmodel"
+    ],
+    "1": [
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_cycletextsize",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_kt_stateflow",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_kt_viewmodel",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_logout",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_navigatetoonboarding",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_profileeffect",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_profileintent",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_profilestate",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_profileviewmodel",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_profileviewmodel_loadprofile",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_profileviewmodel_loadsettings",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_profileviewmodel_loadstats",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_profileviewmodel_observecurrencychanges",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_profileviewmodel_observethemechanges",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_profileviewmodel_onintent",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_refresh",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_selectcurrency",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_setlockstate",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_showlockpin",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_showpremiuminfo",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_togglebackup",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_toggledarkmode",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_togglefingerprint",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_togglehidebalance",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_togglelock",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_togglepushnotifications",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_toggletransactionalerts"
+    ],
+    "2": [
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_animationenabled",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardintent",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardviewmodel_onintent",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_ignoresmsdraft",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_opensmsdrafttransaction",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_quickregistersms",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_setwidgetlayout",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_showaddsource",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_showdeletesmsconfirmation",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_showtransactionbottomsheet",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_togglebalancevisibility",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_togglebudgetsheet",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_togglechecksheet",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_togglecustomizesheet",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_togglefixedexpensesheet",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_togglegoalsheet",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_toggleinstallmentsheet",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_togglenotesheet",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_toggleshoppingsheet",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_togglesmsdetectionsheet",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_updatesmsdraft"
+    ],
+    "3": [
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_activefilters",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_customdatebottomsheet",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_datefilterbottomsheet",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_dateinput",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_filterchip",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_filterchipdata",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_filtertype",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_filtertype_amount",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_filtertype_category",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_filtertype_person",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_filtertype_tag",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_filtertype_transactiontype",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_headerbutton",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_kt_androidx",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_kt_color",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_kt_modifier",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_txheader",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsscreen",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsscreen_transactionsscreen",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_deletetransactionbottomsheet"
+    ],
+    "4": [
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_applyfilter",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_onamountrangechanged",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_oncategoriesselected",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_ondatesheetsubmit",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_onnextclick",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_onpersonselected",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_onprevclick",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_onsourcesselected",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_ontagselected",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_ontogglecategorysheet",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_ontogglecustomdatesheet",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_ontoggledatesheet",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_ontogglefiltersheet",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_ontogglepersonsheet",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_ontogglesearch",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_ontogglesourcesheet",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_ontoggletagsheet",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_ontransactiontypeselected",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_resetfilters",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_showtransactionbottomsheet",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_transactionsintent"
+    ],
+    "5": [
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardcustomizesheet",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardcustomizesheet_dashboardcustomizesheet",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_dashboardwidget",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_dashboardwidget_achievements",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_dashboardwidget_ai_advisor",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_dashboardwidget_asset",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_dashboardwidget_budget",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_dashboardwidget_check",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_dashboardwidget_fixed_expense",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_dashboardwidget_goal",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_dashboardwidget_installment",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_dashboardwidget_notes",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_dashboardwidget_recent_transactions",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_dashboardwidget_shopping",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_dashboardwidgetitem",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_defaultconfig",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_parse",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_serialize",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_toolfeature"
+    ],
+    "6": [
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_profileediteffect",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_profileeditintent",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_profileeditstate",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_profilesaved",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_removeavatar",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_saveprofile",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_showerror",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_updateavatar",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_updatebirthday",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_updatecity",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_updateemail",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_updatefinancialgoal",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_updatefirstname",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_updategender",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_updateincome",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_updatejobtitle",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_updatelastname",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_updatenickname",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_updatephone"
+    ],
+    "7": [
+      "datefiltertype",
+      "daterange",
+      "timezone",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionfilterbottomsheet",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionfilterbottomsheet_filtersection",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionfilterbottomsheet_transactionfilterbottomsheet",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_kt_viewmodel",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_ondaterange",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_transactionsstate",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_transactionsviewmodel",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_transactionsviewmodel_getperiodsublabel",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_transactionsviewmodel_getrangeasuitext",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_transactionsviewmodel_loadamountrange",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_transactionsviewmodel_observedisabledtools",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_transactionsviewmodel_onintent",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_transactionsviewmodel_touitext",
+      "uitext"
+    ],
+    "8": [
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_finish",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_kt_viewmodel",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_navigatetodashboard",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_nextstep",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_onboardingeffect",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_onboardingintent",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_onboardingstate",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_onboardingviewmodel",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_onboardingviewmodel_finishonboarding",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_onboardingviewmodel_onintent",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_previousstep",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_setsmsreading",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_skip",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_updatesecuritydetails",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_updatesourcedetails",
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_reporttopbar_filtertype_source"
+    ],
+    "9": [
+      "accentpalette",
+      "apptheme",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsscreen",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsscreen_accentlabelres",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsscreen_accentpalettesection",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsscreen_accentswatch",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsscreen_getthemepreviewgradient",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsscreen_kt_androidx",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsscreen_kt_modifier",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsscreen_themegrid",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsscreen_themeitem",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsscreen_thememodeitem",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsscreen_thememodesection",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsscreen_themesettingsscreen",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsscreen_timepickeritem",
+      "thememode"
+    ],
+    "10": [
+      "keyboardoptions",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditscreen",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditscreen_completioncard",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditscreen_genderoption",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditscreen_genderselector",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditscreen_profileeditscreen",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditscreen_profilefield",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditviewmodel",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditviewmodel_kt_stateflow",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditviewmodel_kt_viewmodel",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditviewmodel_profileeditviewmodel",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditviewmodel_profileeditviewmodel_calculatecompletion",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditviewmodel_profileeditviewmodel_loadprofile",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditviewmodel_profileeditviewmodel_onintent",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditviewmodel_profileeditviewmodel_saveprofile"
+    ],
+    "11": [
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingscreen",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingscreen_featureitem",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingscreen_kt_androidx",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingscreen_kt_imagevector",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingscreen_kt_modifier",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingscreen_onboardingprogress",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingscreen_onboardingscreen",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingscreen_permissionsstep",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingscreen_permissiontoggleitem",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingscreen_primarypillbutton",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingscreen_secondarypillbutton",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingscreen_setupstep",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingscreen_stepcontent",
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingscreen_welcomestep"
+    ],
+    "12": [
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsviewmodel",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsviewmodel_kt_stateflow",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsviewmodel_kt_viewmodel",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsviewmodel_selectaccent",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsviewmodel_selectmode",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsviewmodel_selecttheme",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsviewmodel_setendtime",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsviewmodel_setstarttime",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsviewmodel_themesettingsintent",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsviewmodel_themesettingsstate",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsviewmodel_themesettingsviewmodel",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsviewmodel_themesettingsviewmodel_loadsettings",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsviewmodel_themesettingsviewmodel_onintent",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_themesettingsviewmodel_togglefollowsystemtheme"
+    ],
+    "13": [
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profilescreen",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profilescreen_border",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profilescreen_kt_androidx",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profilescreen_kt_color",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profilescreen_kt_imagevector",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profilescreen_logoutbutton",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profilescreen_premiumstatuscard",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profilescreen_profilehero",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profilescreen_profilelinks",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profilescreen_profilescreen",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profilescreen_profilestatitem",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profilescreen_settingitem",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_profilescreen_synccard"
+    ],
+    "14": [
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsviewmodel",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsviewmodel_currencysettingsintent",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsviewmodel_currencysettingsstate",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsviewmodel_currencysettingsviewmodel",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsviewmodel_currencysettingsviewmodel_filtercurrencies",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsviewmodel_currencysettingsviewmodel_loadcustomcurrencies",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsviewmodel_currencysettingsviewmodel_loadsettings",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsviewmodel_currencysettingsviewmodel_onintent",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsviewmodel_kt_stateflow",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsviewmodel_kt_viewmodel",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsviewmodel_selectcurrency",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsviewmodel_updatesearchquery"
+    ],
+    "15": [
+      "currency",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsscreen",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsscreen_autoconvertcard",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsscreen_currencylistitem",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsscreen_currencysettingsscreen",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsscreen_getcurrencydisplayname",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsscreen_sectionheader",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsscreen_tabkind",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsscreen_tabkind_crypto",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsscreen_tabkind_custom",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsscreen_tabkind_fiat"
+    ],
+    "16": [
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_managetoolsscreen",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_managetoolsscreen_managetoolsscreen",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_managetoolsviewmodel",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_managetoolsviewmodel_kt_stateflow",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_managetoolsviewmodel_kt_viewmodel",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_managetoolsviewmodel_managetoolsintent",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_managetoolsviewmodel_managetoolsstate",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_managetoolsviewmodel_managetoolsviewmodel",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_managetoolsviewmodel_managetoolsviewmodel_onintent",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_managetoolsviewmodel_setsmsreading",
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_managetoolsviewmodel_toggletool"
+    ],
+    "17": [
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_component_quickactions",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_component_quickactions_kt_color",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_component_quickactions_kt_imagevector",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_component_quickactions_kt_modifier",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_component_quickactions_quickactionitem",
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_component_quickactions_quickactions"
+    ],
+    "18": [
+      "tools_src_commonmain_kotlin_com_kazemieh_tools_toolsscreen",
+      "tools_src_commonmain_kotlin_com_kazemieh_tools_toolsscreen_toolgroup",
+      "tools_src_commonmain_kotlin_com_kazemieh_tools_toolsscreen_toolsscreen"
+    ],
+    "19": [
+      "dashboard_build_gradle"
+    ],
+    "20": [
+      "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_di_dashboardmodule"
+    ],
+    "21": [
+      "onboarding_build_gradle"
+    ],
+    "22": [
+      "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_di_onboardingmodule"
+    ],
+    "23": [
+      "profile_build_gradle"
+    ],
+    "24": [
+      "profile_src_commonmain_kotlin_com_kazemieh_profile_di_profilemodule"
+    ],
+    "25": [
+      "tools_build_gradle"
+    ],
+    "26": [
+      "tools_src_commonmain_kotlin_com_kazemieh_tools_di_di"
+    ],
+    "27": [
+      "transactions_build_gradle"
+    ],
+    "28": [
+      "transactions_src_commonmain_kotlin_com_kazemieh_transactions_di_di"
+    ]
+  },
+  "cohesion": {
+    "0": 0.082010582010582,
+    "1": 0.082010582010582,
+    "2": 0.1,
+    "3": 0.14761904761904762,
+    "4": 0.09523809523809523,
+    "5": 0.12105263157894737,
+    "6": 0.1,
+    "7": 0.1830065359477124,
+    "8": 0.1323529411764706,
+    "9": 0.24166666666666667,
+    "10": 0.20952380952380953,
+    "11": 0.26373626373626374,
+    "12": 0.16483516483516483,
+    "13": 0.23076923076923078,
+    "14": 0.21212121212121213,
+    "15": 0.2545454545454545,
+    "16": 0.21818181818181817,
+    "17": 0.4666666666666667,
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0,
+    "25": 1.0,
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0
+  },
+  "gods": [
+    {
+      "id": "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsviewmodel_transactionsintent",
+      "label": "TransactionsIntent",
+      "degree": 24
+    },
+    {
+      "id": "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardintent",
+      "label": "DashboardIntent",
+      "degree": 22
+    },
+    {
+      "id": "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardviewmodel_dashboardviewmodel",
+      "label": "DashboardViewModel",
+      "degree": 17
+    },
+    {
+      "id": "profile_src_commonmain_kotlin_com_kazemieh_profile_profileeditcontract_profileeditintent",
+      "label": "ProfileEditIntent",
+      "degree": 16
+    },
+    {
+      "id": "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_profileintent",
+      "label": "ProfileIntent",
+      "degree": 15
+    },
+    {
+      "id": "dashboard_src_commonmain_kotlin_com_kazemieh_dashboard_dashboardwidget_dashboardwidget",
+      "label": "DashboardWidget",
+      "degree": 13
+    },
+    {
+      "id": "profile_src_commonmain_kotlin_com_kazemieh_profile_profileviewmodel_profileviewmodel",
+      "label": "ProfileViewModel",
+      "degree": 11
+    },
+    {
+      "id": "transactions_src_commonmain_kotlin_com_kazemieh_transactions_transactionsscreen_transactionsscreen",
+      "label": "TransactionsScreen()",
+      "degree": 10
+    },
+    {
+      "id": "onboarding_src_commonmain_kotlin_com_kazemieh_onboarding_ui_onboardingviewmodel_onboardingintent",
+      "label": "OnboardingIntent",
+      "degree": 9
+    },
+    {
+      "id": "profile_src_commonmain_kotlin_com_kazemieh_profile_currencysettingsviewmodel_currencysettingsviewmodel",
+      "label": "CurrencySettingsViewModel",
+      "degree": 9
+    }
+  ],
+  "surprises": [
+    {
+      "source": "StepContent()",
+      "target": "OnboardingState",
+      "source_files": [
+        "onboarding/src/commonMain/kotlin/com/kazemieh/onboarding/ui/OnboardingScreen.kt",
+        "onboarding/src/commonMain/kotlin/com/kazemieh/onboarding/ui/OnboardingViewModel.kt"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "bridges separate communities; peripheral node `OnboardingState` unexpectedly reaches hub `StepContent()`"
+    },
+    {
+      "source": "ManageToolsScreen()",
+      "target": "SettingItem()",
+      "source_files": [
+        "profile/src/commonMain/kotlin/com/kazemieh/profile/ManageToolsScreen.kt",
+        "profile/src/commonMain/kotlin/com/kazemieh/profile/ProfileScreen.kt"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "ProfileEditViewModel",
+      "target": "ProfileEditState",
+      "source_files": [
+        "profile/src/commonMain/kotlin/com/kazemieh/profile/ProfileEditViewModel.kt",
+        "profile/src/commonMain/kotlin/com/kazemieh/profile/ProfileEditContract.kt"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "bridges separate communities; peripheral node `ProfileEditState` unexpectedly reaches hub `ProfileEditViewModel`"
+    },
+    {
+      "source": "TransactionsScreen()",
+      "target": "DateFilterBottomSheet()",
+      "source_files": [
+        "transactions/src/commonMain/kotlin/com/kazemieh/transactions/TransactionsScreen.kt",
+        "transactions/src/commonMain/kotlin/com/kazemieh/transactions/ReportTopBar.kt"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; peripheral node `DateFilterBottomSheet()` unexpectedly reaches hub `TransactionsScreen()`"
+    },
+    {
+      "source": "TransactionsScreen()",
+      "target": "TransactionFilterBottomSheet()",
+      "source_files": [
+        "transactions/src/commonMain/kotlin/com/kazemieh/transactions/TransactionsScreen.kt",
+        "transactions/src/commonMain/kotlin/com/kazemieh/transactions/TransactionFilterBottomSheet.kt"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}
