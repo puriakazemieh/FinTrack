@@ -50,7 +50,7 @@ fun InstallmentWidget(
         onAdd = onAdd,
         modifier = modifier
     ) {
-        val displayItems = (state.overdue + state.upcoming).take(3)
+        val displayItems = (state.overdue + state.upcomingMonth + state.future).take(3)
         if (displayItems.isEmpty()) {
             WidgetEmptyState(
                 icon = Icons.Default.CalendarToday,

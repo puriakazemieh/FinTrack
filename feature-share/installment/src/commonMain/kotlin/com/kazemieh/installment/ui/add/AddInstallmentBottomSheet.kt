@@ -32,9 +32,6 @@ import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassGreenDark
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.*
-import com.kazemieh.designsystem.component.PersianNumberTransformation
-import com.kazemieh.designsystem.component.NumberCommaTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import com.kazemieh.designsystem.component.calculator.CalculatorBottomSheet
 import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
@@ -119,7 +116,7 @@ fun AddInstallmentBottomSheet(
             ) {
                 item {
                     TitledInput(
-                        label = stringResource(Res.string.installment_title),
+                        label = stringResource(Res.string.installment_title) + " " + stringResource(Res.string.required_star),
                         value = state.title,
                         onValueChange = { viewModel.onIntent(AddInstallmentIntent.SetTitle(it)) },
                         placeholder = stringResource(Res.string.installment_title),
@@ -152,21 +149,6 @@ fun AddInstallmentBottomSheet(
                 }
 
                 item {
-                    Field(label = stringResource(Res.string.total_installment_amount)) {
-                        TextField(
-                            value = state.totalAmount,
-                            onValueChange = { viewModel.onIntent(AddInstallmentIntent.SetTotalAmount(it.filter { c -> c.isDigit() })) },
-                            colors = glassTextFieldColors(),
-                            textStyle = MaterialTheme.typography.bodyLarge.copy(color = glassColors.text, fontWeight = FontWeight.SemiBold),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            visualTransformation = NumberCommaTransformation(),
-                            modifier = Modifier.fillMaxWidth(),
-                            placeholder = { FintrackBodyMediumText(text = "۰".toPersianDigits(), color = glassColors.text3) }
-                        )
-                    }
-                }
-
-                item {
                     Field(label = stringResource(Res.string.total_installments)) {
                         Column {
                             TextField(
@@ -187,6 +169,21 @@ fun AddInstallmentBottomSheet(
                                 )
                             }
                         }
+                    }
+                }
+
+                item {
+                    Field(label = stringResource(Res.string.total_installment_amount)) {
+                        TextField(
+                            value = state.totalAmount,
+                            onValueChange = { viewModel.onIntent(AddInstallmentIntent.SetTotalAmount(it.filter { c -> c.isDigit() })) },
+                            colors = glassTextFieldColors(),
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(color = glassColors.text, fontWeight = FontWeight.SemiBold),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            visualTransformation = NumberCommaTransformation(),
+                            modifier = Modifier.fillMaxWidth(),
+                            placeholder = { FintrackBodyMediumText(text = "۰".toPersianDigits(), color = glassColors.text3) }
+                        )
                     }
                 }
 
@@ -290,15 +287,6 @@ fun AddInstallmentBottomSheet(
                                 FintrackBodyLargeText(text = stringResource(Res.string.reminder), fontWeight = FontWeight.SemiBold)
                             }
                             Switch(on = state.reminderEnabled, onToggle = { viewModel.onIntent(AddInstallmentIntent.SetReminderEnabled(it)) })
-                        }
-                    }
-                }
-
-                item {
-                    GlassCard(padding = 14.dp) {
-                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                            FintrackBodyLargeText(text = stringResource(Res.string.label_post_as_transaction), fontWeight = FontWeight.SemiBold)
-                            Switch(on = state.postAsTransaction, onToggle = { viewModel.onIntent(AddInstallmentIntent.SetPostAsTransaction(it)) })
                         }
                     }
                 }
