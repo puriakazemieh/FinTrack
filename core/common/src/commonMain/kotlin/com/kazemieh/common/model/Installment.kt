@@ -19,6 +19,7 @@ data class Installment(
     val description: String? = null,
     val isCompleted: Boolean = false, // آیا تمام اقساط پرداخت شده؟
     val reminderEnabled: Boolean = true,
+    val postAsTransaction: Boolean = true,
     override val updatedAt: Long = 0,
     override val syncStatus: SyncStatus = SyncStatus.SYNCED
 ) : SyncableEntity
@@ -27,7 +28,9 @@ data class Installment(
 data class InstallmentWithRelations(
     val installment: Installment,
     val category: Category?,
-    val source: Source?
+    val source: Source?,
+    val tags: List<Tag> = emptyList(),
+    val persons: List<Person> = emptyList()
 )
 
 @Serializable

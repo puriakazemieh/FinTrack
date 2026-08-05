@@ -300,6 +300,7 @@ fun InstallmentDb.toInstallment() = Installment(
     description = description,
     isCompleted = isCompleted == 1L,
     reminderEnabled = reminderEnabled == 1L,
+    postAsTransaction = postAsTransaction == 1L,
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
@@ -319,42 +320,197 @@ fun ObserveInstallments.toInstallment() = Installment(
     description = description,
     isCompleted = isCompleted == 1L,
     reminderEnabled = reminderEnabled == 1L,
+    postAsTransaction = postAsTransaction == 1L,
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
-fun ObserveInstallments.toInstallmentWithRelations() = InstallmentWithRelations(
-    installment = this.toInstallment(),
-    category = Category(
-        id = category_id ?: 0L,
-        name = category_name ?: "",
-        description = category_description,
-        type = TransactionType.fromInt(category_type?.toInt() ?: TransactionType.EXPENSE.count),
-        colorId = category_colorId?.toInt() ?: 1,
-        iconId = category_iconId?.toInt() ?: 1,
-        parentId = category_parentId,
-        updatedAt = 0,
-        syncStatus = SyncStatus.SYNCED
-    ),
-    source = Source(
-        id = source_id ?: 0L,
-        name = source_name ?: "",
-        balance = source_balance?.toInt() ?: 0,
-        cardNumber = source_cardNumber,
-        description = source_description,
-        type = source_type?.toInt() ?: 0,
-        colorId = source_colorId?.toInt() ?: 1,
-        iconId = source_iconId?.toInt() ?: 1,
-        shabaNumber = source_shabaNumber,
-        accountNumber = source_accountNumber,
-        cvv2 = source_cvv2,
-        expirationMonth = source_expirationMonth,
-        expirationYear = source_expirationYear,
-        branchCode = source_branchCode,
-        branchName = source_branchName,
-        updatedAt = 0,
-        syncStatus = SyncStatus.SYNCED
+fun ObserveInstallments.toInstallmentWithRelations(): InstallmentWithRelations {
+    return mapInstallmentWithRelations(
+        installment = this.toInstallment(),
+        category_id = category_id,
+        category_name = category_name,
+        category_description = category_description,
+        category_type = category_type,
+        category_colorId = category_colorId,
+        category_iconId = category_iconId,
+        category_parentId = category_parentId,
+        source_id = source_id,
+        source_name = source_name,
+        source_balance = source_balance,
+        source_cardNumber = source_cardNumber,
+        source_description = source_description,
+        source_type = source_type,
+        source_colorId = source_colorId,
+        source_iconId = source_iconId,
+        source_shabaNumber = source_shabaNumber,
+        source_accountNumber = source_accountNumber,
+        source_cvv2 = source_cvv2,
+        source_expirationMonth = source_expirationMonth,
+        source_expirationYear = source_expirationYear,
+        source_branchCode = source_branchCode,
+        source_branchName = source_branchName,
+        tag_ids = tag_ids,
+        tag_names = tag_names,
+        tag_colorIds = tag_colorIds,
+        tag_iconIds = tag_iconIds,
+        person_ids = person_ids,
+        person_names = person_names
     )
+}
+
+fun GetInstallmentWithRelationsById.toInstallmentWithRelations(): InstallmentWithRelations {
+    return mapInstallmentWithRelations(
+        installment = this.toInstallment(),
+        category_id = category_id,
+        category_name = category_name,
+        category_description = category_description,
+        category_type = category_type,
+        category_colorId = category_colorId,
+        category_iconId = category_iconId,
+        category_parentId = category_parentId,
+        source_id = source_id,
+        source_name = source_name,
+        source_balance = source_balance,
+        source_cardNumber = source_cardNumber,
+        source_description = source_description,
+        source_type = source_type,
+        source_colorId = source_colorId,
+        source_iconId = source_iconId,
+        source_shabaNumber = source_shabaNumber,
+        source_accountNumber = source_accountNumber,
+        source_cvv2 = source_cvv2,
+        source_expirationMonth = source_expirationMonth,
+        source_expirationYear = source_expirationYear,
+        source_branchCode = source_branchCode,
+        source_branchName = source_branchName,
+        tag_ids = tag_ids,
+        tag_names = tag_names,
+        tag_colorIds = tag_colorIds,
+        tag_iconIds = tag_iconIds,
+        person_ids = person_ids,
+        person_names = person_names
+    )
+}
+
+private fun mapInstallmentWithRelations(
+    installment: Installment,
+    category_id: Long?,
+    category_name: String?,
+    category_description: String?,
+    category_type: Long?,
+    category_colorId: Long?,
+    category_iconId: Long?,
+    category_parentId: Long?,
+    source_id: Long?,
+    source_name: String?,
+    source_balance: Long?,
+    source_cardNumber: String?,
+    source_description: String?,
+    source_type: Long?,
+    source_colorId: Long?,
+    source_iconId: Long?,
+    source_shabaNumber: String?,
+    source_accountNumber: String?,
+    source_cvv2: String?,
+    source_expirationMonth: String?,
+    source_expirationYear: String?,
+    source_branchCode: String?,
+    source_branchName: String?,
+    tag_ids: String?,
+    tag_names: String?,
+    tag_colorIds: String?,
+    tag_iconIds: String?,
+    person_ids: String?,
+    person_names: String?
+): InstallmentWithRelations {
+    val tags = if (tag_ids.isNullOrEmpty()) {
+        emptyList()
+    } else {
+        val ids = tag_ids.split(",")
+        val names = tag_names?.split(",") ?: emptyList()
+        val colorIds = tag_colorIds?.split(",") ?: emptyList()
+        val iconIds = tag_iconIds?.split(",") ?: emptyList()
+
+        ids.mapIndexed { index, id ->
+            Tag(
+                id = id.toLong(),
+                name = names.getOrNull(index) ?: "",
+                colorId = colorIds.getOrNull(index)?.toIntOrNull() ?: 1,
+                iconId = iconIds.getOrNull(index)?.toIntOrNull() ?: 1
+            )
+        }
+    }
+
+    val persons = if (person_ids.isNullOrEmpty()) {
+        emptyList()
+    } else {
+        val ids = person_ids.split(",")
+        val names = person_names?.split(",") ?: emptyList()
+
+        ids.mapIndexed { index, id ->
+            Person(
+                id = id.toLong(),
+                name = names.getOrNull(index) ?: ""
+            )
+        }
+    }
+
+    return InstallmentWithRelations(
+        installment = installment,
+        category = Category(
+            id = category_id ?: 0L,
+            name = category_name ?: "",
+            description = category_description,
+            type = TransactionType.fromInt(category_type?.toInt() ?: TransactionType.EXPENSE.count),
+            colorId = category_colorId?.toInt() ?: 1,
+            iconId = category_iconId?.toInt() ?: 1,
+            parentId = category_parentId,
+            updatedAt = 0,
+            syncStatus = SyncStatus.SYNCED
+        ),
+        source = Source(
+            id = source_id ?: 0L,
+            name = source_name ?: "",
+            balance = source_balance?.toInt() ?: 0,
+            cardNumber = source_cardNumber,
+            description = source_description,
+            type = source_type?.toInt() ?: 0,
+            colorId = source_colorId?.toInt() ?: 1,
+            iconId = source_iconId?.toInt() ?: 1,
+            shabaNumber = source_shabaNumber,
+            accountNumber = source_accountNumber,
+            cvv2 = source_cvv2,
+            expirationMonth = source_expirationMonth,
+            expirationYear = source_expirationYear,
+            branchCode = source_branchCode,
+            branchName = source_branchName,
+            updatedAt = 0,
+            syncStatus = SyncStatus.SYNCED
+        ),
+        tags = tags,
+        persons = persons
+    )
+}
+
+fun GetInstallmentWithRelationsById.toInstallment() = Installment(
+    id = id,
+    title = title,
+    totalAmount = totalAmount,
+    installmentAmount = installmentAmount,
+    totalInstallments = totalInstallments.toInt(),
+    paidInstallments = paidInstallments.toInt(),
+    categoryId = categoryId,
+    sourceId = sourceId,
+    startDate = startDate,
+    nextDueDate = nextDueDate,
+    frequency = InstallmentFrequency.valueOf(frequency),
+    description = description,
+    isCompleted = isCompleted == 1L,
+    reminderEnabled = reminderEnabled == 1L,
+    postAsTransaction = postAsTransaction == 1L,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
 // Check Mappers

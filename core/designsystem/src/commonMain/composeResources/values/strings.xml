@@ -476,6 +476,8 @@
     <string name="label_app_lock">قفل برنامه</string>
 
     <string name="msg_mandatory_fields_error">موارد اجباری باید پر بشه</string>
+    <string name="label_post_as_transaction">ثبت در تراکنش‌ها هنگام پرداخت</string>
+    <string name="msg_installment_mismatch">تعداد اقساط با مبلغ کل همخوانی ندارد (باقی‌مانده دارد)</string>
     <string name="label_most_used">پراستفاده‌ها</string>
 
     <string name="type_expense">خرج</string>
@@ -717,7 +719,8 @@
     <!-- Installment -->
     <string name="navigation_installment">اقساط</string>
     <string name="installment_upcoming">آینده</string>
-    <string name="installment_paid">پرداخت شده</string>
+    <string name="installment_upcoming_month">پیش رو</string>
+    <string name="installment_paid">تکمیل شده</string>
     <string name="installment_overdue">معوقه</string>
     <string name="add_installment">افزودن قسط</string>
     <string name="installment_title">عنوان قسط</string>

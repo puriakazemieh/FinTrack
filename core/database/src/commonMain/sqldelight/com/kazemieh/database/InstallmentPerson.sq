@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS installment_person (
+    installmentId INTEGER NOT NULL,
+    personId INTEGER NOT NULL,
+    PRIMARY KEY (installmentId, personId),
+    FOREIGN KEY (installmentId) REFERENCES installment(id) ON DELETE CASCADE,
+    FOREIGN KEY (personId) REFERENCES person(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_installment_person_installment ON installment_person(installmentId);
+CREATE INDEX IF NOT EXISTS idx_installment_person_person ON installment_person(personId);
+
+insertInstallmentPerson:
+INSERT OR IGNORE INTO installment_person(installmentId, personId)
+VALUES (?, ?);
+
+deletePersonsByInstallmentId:
+DELETE FROM installment_person WHERE installmentId = ?;
+
+getPersonsForInstallment:
+SELECT p.* FROM person p
+INNER JOIN installment_person ip ON p.id = ip.personId
+WHERE ip.installmentId = ?;

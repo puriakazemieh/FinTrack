@@ -82,7 +82,7 @@ val domainModule = module {
     factory { ObserveInstallmentsUseCase(get()) }
     factory { DeleteInstallmentUseCase(get(), get()) }
     factory { MarkInstallmentAsPaidUseCase(get(), get(), get()) }
-    factory { GetInstallmentByIdUseCase(get()) }
+    factory { GetInstallmentUseCase(get()) }
     factory { UpdateInstallmentUseCase(get(), get()) }
     factory { GetBudgetByCategoryIdUseCase(get()) }
     factory { GetBudgetSpentAmountUseCase(get()) }
@@ -172,7 +172,7 @@ val domainModule = module {
             observeInstallmentsUseCase = get(),
             markInstallmentAsPaidUseCase = get(),
             deleteInstallmentUseCase = get(),
-            getInstallmentByIdUseCase = get(),
+            getInstallmentUseCase = get(),
             updateInstallmentUseCase = get()
         )
     }

@@ -23,12 +23,12 @@ data class InstallmentUseCaseGroup(
     val observeInstallmentsUseCase: ObserveInstallmentsUseCase,
     val markInstallmentAsPaidUseCase: MarkInstallmentAsPaidUseCase,
     val deleteInstallmentUseCase: DeleteInstallmentUseCase,
-    val getInstallmentByIdUseCase: GetInstallmentByIdUseCase,
+    val getInstallmentUseCase: GetInstallmentUseCase,
     val updateInstallmentUseCase: UpdateInstallmentUseCase
 )
 
-class GetInstallmentByIdUseCase(private val repository: InstallmentRepository) {
-    suspend operator fun invoke(id: Long): Installment? = repository.getInstallmentById(id)
+class GetInstallmentUseCase(private val repository: InstallmentRepository) {
+    suspend operator fun invoke(id: Long): InstallmentWithRelations? = repository.getInstallmentWithRelations(id)
 }
 
 class UpdateInstallmentUseCase(
@@ -37,10 +37,12 @@ class UpdateInstallmentUseCase(
 ) {
     suspend operator fun invoke(
         installment: Installment,
+        tagIds: List<Long>,
+        personIds: List<Long>,
         reminderTitle: String,
         reminderMessage: String
     ) {
-        repository.updateInstallment(installment)
+        repository.updateInstallment(installment, tagIds, personIds)
         if (!installment.isCompleted && installment.reminderEnabled) {
             val nextDueInstant = Instant.fromEpochMilliseconds(installment.nextDueDate)
             notificationScheduler.scheduleReminder(
@@ -62,10 +64,12 @@ class AddInstallmentUseCase(
 ) {
     suspend operator fun invoke(
         installment: Installment,
+        tagIds: List<Long>,
+        personIds: List<Long>,
         reminderTitle: String,
         reminderMessage: String
     ) {
-        val id = repository.insertInstallment(installment)
+        val id = repository.insertInstallment(installment, tagIds, personIds)
         if (installment.reminderEnabled) {
             scheduleReminder(installment.copy(id = id), reminderTitle, reminderMessage)
         }
@@ -112,7 +116,8 @@ class MarkInstallmentAsPaidUseCase(
         reminderTitle: String,
         reminderMessage: String
     ) {
-        val installment = installmentRepository.getInstallmentById(installmentId) ?: return
+        val installmentWithRelations = installmentRepository.getInstallmentWithRelations(installmentId) ?: return
+        val installment = installmentWithRelations.installment
         if (installment.isCompleted) return
 
         val paidInstallments = installment.paidInstallments + 1
@@ -128,12 +133,17 @@ class MarkInstallmentAsPaidUseCase(
             type = TransactionType.EXPENSE,
             timeStamp = Clock.System.now().toEpochMilliseconds()
         )
-        transactionRepository.addTransactionWithBalance(
-            transaction = transaction,
-            tagIds = emptyList(),
-            personIds = emptyList(),
-            balanceDeltas = mapOf(installment.sourceId to -installment.installmentAmount.toInt())
-        )
+        val tagIds = installmentWithRelations.tags.mapNotNull { it.id }
+        val personIds = installmentWithRelations.persons.mapNotNull { it.id }
+
+        if (installment.postAsTransaction) {
+            transactionRepository.addTransactionWithBalance(
+                transaction = transaction,
+                tagIds = tagIds,
+                personIds = personIds,
+                balanceDeltas = mapOf(installment.sourceId to -installment.installmentAmount.toInt())
+            )
+        }
 
         // 2. Calculate next due date
         val nextDueDate = if (!isCompleted) {
@@ -149,7 +159,7 @@ class MarkInstallmentAsPaidUseCase(
         )
 
         // 3. Update Installment
-        installmentRepository.updateInstallment(updatedInstallment)
+        installmentRepository.updateInstallment(updatedInstallment, tagIds, personIds)
 
         // 4. Update Reminder
         if (!isCompleted && updatedInstallment.reminderEnabled) {

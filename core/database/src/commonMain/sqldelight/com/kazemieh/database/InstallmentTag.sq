@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS installment_tag (
+    installmentId INTEGER NOT NULL,
+    tagId INTEGER NOT NULL,
+    PRIMARY KEY (installmentId, tagId),
+    FOREIGN KEY (installmentId) REFERENCES installment(id) ON DELETE CASCADE,
+    FOREIGN KEY (tagId) REFERENCES tag(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_installment_tag_installment ON installment_tag(installmentId);
+CREATE INDEX IF NOT EXISTS idx_installment_tag_tag ON installment_tag(tagId);
+
+insertInstallmentTag:
+INSERT OR IGNORE INTO installment_tag(installmentId, tagId)
+VALUES (?, ?);
+
+deleteTagsByInstallmentId:
+DELETE FROM installment_tag WHERE installmentId = ?;
+
+getTagsForInstallment:
+SELECT t.* FROM tag t
+INNER JOIN installment_tag it ON t.id = it.tagId
+WHERE it.installmentId = ?;

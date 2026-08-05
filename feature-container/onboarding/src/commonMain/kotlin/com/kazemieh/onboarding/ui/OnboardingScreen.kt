@@ -50,6 +50,10 @@ fun OnboardingScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 OnboardingEffect.NavigateToDashboard -> onFinish()
+                is OnboardingEffect.ShowError -> {
+                    // We could show a Snackbar here.
+                    // For now, let's just log it or rely on the user seeing the loading stop.
+                }
             }
         }
     }

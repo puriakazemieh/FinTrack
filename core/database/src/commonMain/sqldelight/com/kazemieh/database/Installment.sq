@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS installment (
     description TEXT,
     isCompleted INTEGER NOT NULL DEFAULT 0,
     reminderEnabled INTEGER NOT NULL DEFAULT 1,
+    postAsTransaction INTEGER NOT NULL DEFAULT 1,
     updatedAt INTEGER NOT NULL DEFAULT 0,
     syncStatus INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (categoryId) REFERENCES category(id) ON DELETE CASCADE,
@@ -22,12 +23,12 @@ CREATE TABLE IF NOT EXISTS installment (
 CREATE INDEX IF NOT EXISTS idx_installment_nextDueDate ON installment(nextDueDate);
 
 insertInstallment:
-INSERT INTO installment(title, totalAmount, installmentAmount, totalInstallments, paidInstallments, categoryId, sourceId, startDate, nextDueDate, frequency, description, isCompleted, reminderEnabled, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO installment(title, totalAmount, installmentAmount, totalInstallments, paidInstallments, categoryId, sourceId, startDate, nextDueDate, frequency, description, isCompleted, reminderEnabled, postAsTransaction, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateInstallment:
 UPDATE installment
-SET title = ?, totalAmount = ?, installmentAmount = ?, totalInstallments = ?, paidInstallments = ?, categoryId = ?, sourceId = ?, startDate = ?, nextDueDate = ?, frequency = ?, description = ?, isCompleted = ?, reminderEnabled = ?, updatedAt = ?, syncStatus = ?
+SET title = ?, totalAmount = ?, installmentAmount = ?, totalInstallments = ?, paidInstallments = ?, categoryId = ?, sourceId = ?, startDate = ?, nextDueDate = ?, frequency = ?, description = ?, isCompleted = ?, reminderEnabled = ?, postAsTransaction = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 deleteInstallment:
@@ -36,8 +37,46 @@ UPDATE installment SET syncStatus = 2, updatedAt = ? WHERE id = ?;
 physicallyDeleteInstallment:
 DELETE FROM installment WHERE id = ?;
 
-getInstallmentById:
-SELECT * FROM installment WHERE id = ? AND syncStatus != 2;
+getInstallmentWithRelationsById:
+SELECT
+    i.*,
+    c.id AS category_id,
+    c.name AS category_name,
+    c.description AS category_description,
+    c.type AS category_type,
+    c.colorId AS category_colorId,
+    c.iconId AS category_iconId,
+    c.parentId AS category_parentId,
+    s.id AS source_id,
+    s.name AS source_name,
+    s.balance AS source_balance,
+    s.cardNumber AS source_cardNumber,
+    s.description AS source_description,
+    s.type AS source_type,
+    s.colorId AS source_colorId,
+    s.iconId AS source_iconId,
+    s.shabaNumber AS source_shabaNumber,
+    s.accountNumber AS source_accountNumber,
+    s.cvv2 AS source_cvv2,
+    s.expirationMonth AS source_expirationMonth,
+    s.expirationYear AS source_expirationYear,
+    s.branchCode AS source_branchCode,
+    s.branchName AS source_branchName,
+    GROUP_CONCAT(DISTINCT tag.id) AS tag_ids,
+    GROUP_CONCAT(DISTINCT tag.name) AS tag_names,
+    GROUP_CONCAT(DISTINCT tag.colorId) AS tag_colorIds,
+    GROUP_CONCAT(DISTINCT tag.iconId) AS tag_iconIds,
+    GROUP_CONCAT(DISTINCT person.id) AS person_ids,
+    GROUP_CONCAT(DISTINCT person.name) AS person_names
+FROM installment i
+LEFT JOIN category c ON i.categoryId = c.id
+LEFT JOIN source s ON i.sourceId = s.id
+LEFT JOIN installment_tag it ON i.id = it.installmentId
+LEFT JOIN tag ON it.tagId = tag.id
+LEFT JOIN installment_person ip ON i.id = ip.installmentId
+LEFT JOIN person ON ip.personId = person.id
+WHERE i.id = ? AND i.syncStatus != 2
+GROUP BY i.id;
 
 observeInstallments:
 SELECT
@@ -63,19 +102,30 @@ SELECT
     s.expirationMonth AS source_expirationMonth,
     s.expirationYear AS source_expirationYear,
     s.branchCode AS source_branchCode,
-    s.branchName AS source_branchName
+    s.branchName AS source_branchName,
+    GROUP_CONCAT(DISTINCT tag.id) AS tag_ids,
+    GROUP_CONCAT(DISTINCT tag.name) AS tag_names,
+    GROUP_CONCAT(DISTINCT tag.colorId) AS tag_colorIds,
+    GROUP_CONCAT(DISTINCT tag.iconId) AS tag_iconIds,
+    GROUP_CONCAT(DISTINCT person.id) AS person_ids,
+    GROUP_CONCAT(DISTINCT person.name) AS person_names
 FROM installment i
 LEFT JOIN category c ON i.categoryId = c.id
 LEFT JOIN source s ON i.sourceId = s.id
+LEFT JOIN installment_tag it ON i.id = it.installmentId
+LEFT JOIN tag ON it.tagId = tag.id
+LEFT JOIN installment_person ip ON i.id = ip.installmentId
+LEFT JOIN person ON ip.personId = person.id
 WHERE i.syncStatus != 2
+GROUP BY i.id
 ORDER BY i.isCompleted ASC, i.nextDueDate ASC;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertFullInstallment:
-INSERT OR REPLACE INTO installment(id, title, totalAmount, installmentAmount, totalInstallments, paidInstallments, categoryId, sourceId, startDate, nextDueDate, frequency, description, isCompleted, reminderEnabled, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO installment(id, title, totalAmount, installmentAmount, totalInstallments, paidInstallments, categoryId, sourceId, startDate, nextDueDate, frequency, description, isCompleted, reminderEnabled, postAsTransaction, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getModifiedInstallments:
 SELECT * FROM installment WHERE syncStatus = 1;
