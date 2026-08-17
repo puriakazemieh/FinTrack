@@ -97,7 +97,7 @@ val domainModule = module {
     factory { GetDebtWithRelationsUseCase(get()) }
 
     factory { AddCheckUseCase(get(), get()) }
-    factory { UpdateCheckUseCase(get()) }
+    factory { UpdateCheckUseCase(get(), get()) }
     factory { DeleteCheckUseCase(get(), get()) }
     factory { GetCheckByIdUseCase(get()) }
     factory { ObserveAllChecksUseCase(get()) }

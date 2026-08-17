@@ -1,38 +1,62 @@
 package com.kazemieh.check.ui.list
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.category.ui.list.CategoryFilterSelectionContent
 import com.kazemieh.check.ui.add.AddCheckBottomSheet
+import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.Check
 import com.kazemieh.common.model.CheckStatus
+import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.Tag
+import com.kazemieh.common.model.TransactionType
+import com.kazemieh.common.persiandatetime.extensions.persianMonth
+import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
+import com.kazemieh.common.toPersianDigits
 import com.kazemieh.common.toPersianPrice
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
+import com.kazemieh.designsystem.LocalGlassColors
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.glass.EntityItem
+import com.kazemieh.designsystem.component.glass.EntityItemGroup
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.EntitySummary
 import com.kazemieh.designsystem.component.glass.FintrackScreen
+import com.kazemieh.designsystem.component.glass.SheetFrame
 import com.kazemieh.designsystem.component.glass.Tabs
 import com.kazemieh.designsystem.component.model.UiText
+import com.kazemieh.financialsource.ui.list.SourceFilterSelectionContent
+import com.kazemieh.person.ui.list.PersonFilterSelectionContent
+import com.kazemieh.tag.ui.list.TagFilterSelectionContent
 import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.currency_toman
-import fintrack.core.designsystem.generated.resources.label_check_status_cancelled
-import fintrack.core.designsystem.generated.resources.label_check_status_ongoing
-import fintrack.core.designsystem.generated.resources.label_check_status_passed
-import fintrack.core.designsystem.generated.resources.label_check_status_returned
-import fintrack.core.designsystem.generated.resources.label_total_amount
-import fintrack.core.designsystem.generated.resources.label_unknown_person
-import fintrack.core.designsystem.generated.resources.sub_check_list_management_desc
-import fintrack.core.designsystem.generated.resources.title_check_management
+import fintrack.core.designsystem.generated.resources.*
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -41,27 +65,39 @@ fun CheckListScreen(
     onBack: () -> Unit,
     viewModel: CheckListViewModel = koinViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     var selectedTab by remember { mutableStateOf(0) }
     var showAddCheck by remember { mutableStateOf(false) }
     var selectedCheckId by remember { mutableStateOf<Long?>(null) }
+    val filtersActive = state.filterCategories.isNotEmpty() || state.filterSources.isNotEmpty() ||
+        state.filterTags.isNotEmpty() || state.filterPersons.isNotEmpty()
 
     val tabs = listOf(
         stringResource(Res.string.label_check_status_ongoing),
         stringResource(Res.string.label_check_status_passed),
         stringResource(Res.string.label_check_status_returned),
-        stringResource(Res.string.label_check_status_cancelled),
+        stringResource(Res.string.label_check_status_cancelled)
     )
-
-    val currentStatus = when (selectedTab) {
-        0 -> CheckStatus.PENDING
-        1 -> CheckStatus.PASSED
-        2 -> CheckStatus.REJECTED
-        else -> CheckStatus.CANCELLED
-    }
-
+    val currentStatus = CheckStatus.entries[selectedTab]
     val filteredChecks = state.filteredChecks.filter { it.status == currentStatus }
     val totalAmount = filteredChecks.sumOf { it.amount }
+    val checkGroups = filteredChecks
+        .sortedByDescending { it.dueDate }
+        .groupBy { it.dueDate.monthHeader() }
+        .map { (month, checks) ->
+            EntityItemGroup(
+                title = month,
+                items = checks.map {
+                    EntityItem(
+                        id = it.id,
+                        name = it.personName ?: stringResource(Res.string.label_unknown_person),
+                        sub = it.description,
+                        badge = it.amount.toPersianPrice(),
+                        color = if (it.isIncoming) GlassGreen else GlassRed
+                    )
+                }
+            )
+        }
 
     FintrackScreen(
         title = stringResource(Res.string.title_check_management),
@@ -74,14 +110,8 @@ fun CheckListScreen(
                 active = selectedTab,
                 onChange = { selectedTab = it },
                 modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
-                counts = listOf(
-                    state.checks.count { it.status == CheckStatus.PENDING },
-                    state.checks.count { it.status == CheckStatus.PASSED },
-                    state.checks.count { it.status == CheckStatus.REJECTED },
-                    state.checks.count { it.status == CheckStatus.CANCELLED }
-                )
+                counts = CheckStatus.entries.map { status -> state.filteredChecks.count { it.status == status } }
             )
-
             EntityList(
                 title = stringResource(Res.string.title_check_management),
                 query = state.searchQuery,
@@ -95,26 +125,133 @@ fun CheckListScreen(
                         color = MaterialTheme.colorScheme.primary
                     )
                 ),
-                items = filteredChecks.map {
-                    EntityItem(
-                        id = it.id,
-                        name = it.personName ?: stringResource(Res.string.label_unknown_person),
-                        sub = it.description,
-                        badge = it.amount.toPersianPrice(),
-                        color = if (it.isIncoming) GlassGreen else GlassRed
-                    )
-                },
+                items = checkGroups.flatMap { it.items },
                 onEditClick = { selectedCheckId = it.id; showAddCheck = true },
                 onDeleteClick = { viewModel.onIntent(CheckListIntent.DeleteCheck(it.id)) },
-                showActions = true
+                showActions = true,
+                itemGroups = checkGroups,
+                searchTrailing = {
+                    IconButton(
+                        onClick = { viewModel.onIntent(CheckListIntent.OpenFilters) },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (filtersActive) GlassGreen.copy(alpha = .1f) else LocalGlassColors.current.glass)
+                            .border(1.dp, if (filtersActive) GlassGreen else LocalGlassColors.current.glassEdge, RoundedCornerShape(12.dp))
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = null,
+                            tint = if (filtersActive) GlassGreen else LocalGlassColors.current.text2
+                        )
+                    }
+                }
             )
         }
-
         if (showAddCheck) {
             AddCheckBottomSheet(
                 checkId = selectedCheckId,
                 onDismiss = { showAddCheck = false; selectedCheckId = null }
             )
         }
+        if (state.showFilterSheet) {
+            CheckFilterBottomSheet(
+                categories = state.filterCategories,
+                sources = state.filterSources,
+                tags = state.filterTags,
+                persons = state.filterPersons,
+                onReset = { viewModel.onIntent(CheckListIntent.ResetFilters) },
+                onDismiss = { viewModel.onIntent(CheckListIntent.DismissFilters) },
+                onUpdate = { categories, sources, tags, persons ->
+                    viewModel.onIntent(CheckListIntent.UpdateFilters(categories, sources, tags, persons))
+                }
+            )
+        }
+    }
+}
+
+private fun Long.monthHeader(): String {
+    val date = Instant.fromEpochMilliseconds(this).toPersianDateTime(TimeZone.currentSystemDefault())
+    return "${date.persianMonth().displayName} ${date.year.toString().toPersianDigits()}"
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CheckFilterBottomSheet(
+    categories: Set<Category>,
+    sources: Set<Source>,
+    tags: Set<Tag>,
+    persons: Set<Person>,
+    onReset: () -> Unit,
+    onDismiss: () -> Unit,
+    onUpdate: (Set<Category>, Set<Source>, Set<Tag>, Set<Person>) -> Unit
+) {
+    var selectedCategories by remember(categories) { mutableStateOf(categories) }
+    var selectedSources by remember(sources) { mutableStateOf(sources) }
+    var selectedTags by remember(tags) { mutableStateOf(tags) }
+    var selectedPersons by remember(persons) { mutableStateOf(persons) }
+    SheetFrame(
+        title = stringResource(Res.string.report),
+        sub = stringResource(Res.string.msg_filters_combined),
+        onDismiss = onDismiss,
+        primaryButtonText = stringResource(Res.string.save_),
+        onPrimaryClick = {
+            onUpdate(selectedCategories, selectedSources, selectedTags, selectedPersons)
+            onDismiss()
+        },
+        trailingContent = {
+            TextButton(onClick = {
+                selectedCategories = emptySet()
+                selectedSources = emptySet()
+                selectedTags = emptySet()
+                selectedPersons = emptySet()
+                onReset()
+            }) {
+                FintrackLabelMediumText(stringResource(Res.string.btn_clear_all), color = GlassRed)
+            }
+        }
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            CheckFilterSection(stringResource(Res.string.category)) {
+                CategoryFilterSelectionContent(
+                    selectedCategories = selectedCategories,
+                    selectedTransactionType = TransactionType.ALL,
+                    isAllSelected = selectedCategories.isEmpty(),
+                    onSelectionChanged = { selected, _ -> selectedCategories = selected }
+                )
+            }
+            CheckFilterSection(stringResource(Res.string.source)) {
+                SourceFilterSelectionContent(
+                    selectedSources = selectedSources,
+                    isAllSelected = selectedSources.isEmpty(),
+                    onSelectionChanged = { selected, _ -> selectedSources = selected }
+                )
+            }
+            CheckFilterSection(stringResource(Res.string.tags)) {
+                TagFilterSelectionContent(
+                    selectedTags = selectedTags,
+                    isAllSelected = selectedTags.isEmpty(),
+                    onSelectionChanged = { selected, _ -> selectedTags = selected }
+                )
+            }
+            CheckFilterSection(stringResource(Res.string.persons)) {
+                PersonFilterSelectionContent(
+                    selectedPersons = selectedPersons,
+                    isAllSelected = selectedPersons.isEmpty(),
+                    onSelectionChanged = { selected, _ -> selectedPersons = selected }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CheckFilterSection(title: String, content: @Composable () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        FintrackLabelMediumText(title, color = LocalGlassColors.current.text)
+        content()
     }
 }

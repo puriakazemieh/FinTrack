@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +52,7 @@ import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.EmptyList
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodySmallText
+import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.FintrackTitleSmallText
@@ -68,6 +70,7 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 /**
  * 2.9 EntityList — management list with summary header + search + edit/delete rows
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EntityList(
     title: String,
@@ -90,7 +93,9 @@ fun EntityList(
     isReorderMode: Boolean = false,
     onMove: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> },
     indentSubCategories: Boolean = false,
-    parentId: Long? = null
+    parentId: Long? = null,
+    searchTrailing: (@Composable () -> Unit)? = null,
+    itemGroups: List<EntityItemGroup>? = null
 ) {
     var internalItems by remember(items.map { it.id }) { mutableStateOf(items) }
 
@@ -113,7 +118,7 @@ fun EntityList(
 
             Column(modifier = Modifier.fillMaxSize()) {
                 SummaryHeader(summary)
-                SearchHeader(query, onQueryChange, title)
+                SearchHeader(query, onQueryChange, title, searchTrailing)
 
                 LazyColumn(
                     modifier = Modifier.weight(1f),
@@ -161,37 +166,43 @@ fun EntityList(
         } else {
             Column(modifier = Modifier.fillMaxSize()) {
                 SummaryHeader(summary)
-                SearchHeader(query, onQueryChange, title)
+                SearchHeader(query, onQueryChange, title, searchTrailing)
 
                 LazyColumn(
                     modifier = Modifier.weight(1f),
                     contentPadding = PaddingValues(bottom = 100.dp)
                 ) {
-                    if (items.isEmpty()) {
+                    val groups = itemGroups ?: listOf(EntityItemGroup(items = items))
+                    if (groups.all { it.items.isEmpty() }) {
                         item {
                             Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp)) {
                                 EmptyList(emptyHint ?: stringResource(Res.string.msg_empty_list))
                             }
                         }
                     } else {
-                        items(items) {
-                            AnimatedVisibility(
-                                visible = true,
-                                enter = fadeIn(tween(200)),
-                                exit = fadeOut(tween(200))
-                            ) {
-                                EntityRow(
-                                    item = it,
-                                    mainColor = color,
-                                    showActions = showActions,
-                                    onEdit = { onEditClick(it) },
-                                    onDelete = { onDeleteClick(it) },
-                                    onFilter = onFilterClick?.let { callback -> { callback(it) } },
-                                    onClick = { onItemClick(it) },
-                                    onExpand = onExpandClick?.let { callback -> { callback(it) } },
-                                    isSubCategory = indentSubCategories && it.parentId != null,
-                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp)
-                                )
+                        groups.forEach { group ->
+                            if (group.title != null && group.items.isNotEmpty()) {
+                                stickyHeader { EntityGroupHeader(group.title) }
+                            }
+                            items(group.items) { item ->
+                                AnimatedVisibility(
+                                    visible = true,
+                                    enter = fadeIn(tween(200)),
+                                    exit = fadeOut(tween(200))
+                                ) {
+                                    EntityRow(
+                                        item = item,
+                                        mainColor = color,
+                                        showActions = showActions,
+                                        onEdit = { onEditClick(item) },
+                                        onDelete = { onDeleteClick(item) },
+                                        onFilter = onFilterClick?.let { callback -> { callback(item) } },
+                                        onClick = { onItemClick(item) },
+                                        onExpand = onExpandClick?.let { callback -> { callback(item) } },
+                                        isSubCategory = indentSubCategories && item.parentId != null,
+                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp)
+                                    )
+                                }
                             }
                         }
                     }
@@ -261,12 +272,35 @@ fun SummaryHeader(summary: List<EntitySummary>?) {
 }
 
 @Composable
-private fun SearchHeader(query: String, onQueryChange: (String) -> Unit, title: String) {
-    SearchBar(
-        query = query,
-        onQueryChange = onQueryChange,
-        placeholder = stringResource(Res.string.hint_search_in, title),
-        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
+private fun SearchHeader(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    title: String,
+    trailing: (@Composable () -> Unit)?
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        SearchBar(
+            query = query,
+            onQueryChange = onQueryChange,
+            placeholder = stringResource(Res.string.hint_search_in, title),
+            modifier = Modifier.weight(1f)
+        )
+        trailing?.invoke()
+    }
+}
+
+@Composable
+private fun EntityGroupHeader(title: String) {
+    val glassColors = LocalGlassColors.current
+    FintrackBodyLargeText(
+        text = title,
+        fontWeight = FontWeight.Bold,
+        color = glassColors.text,
+        modifier = Modifier.stickyHeaderSurface().padding(horizontal = 14.dp, vertical = 9.dp)
     )
 }
 
@@ -447,4 +481,9 @@ data class EntityItem(
     val isExpandable: Boolean = false,
     val isExpanded: Boolean = false,
     val trailingContent: (@Composable () -> Unit)? = null
+)
+
+data class EntityItemGroup(
+    val title: String? = null,
+    val items: List<EntityItem>
 )

@@ -5,6 +5,10 @@ CREATE TABLE IF NOT EXISTS check_table (
     dueDate INTEGER NOT NULL,
     status TEXT NOT NULL,
     personId INTEGER NOT NULL,
+    categoryId INTEGER,
+    sourceId INTEGER,
+    tagIds TEXT,
+    reminderEnabled INTEGER NOT NULL DEFAULT 1,
     photoPath TEXT,
     description TEXT,
     isIncoming INTEGER NOT NULL DEFAULT 0,
@@ -16,12 +20,12 @@ CREATE TABLE IF NOT EXISTS check_table (
 CREATE INDEX IF NOT EXISTS idx_check_person ON check_table(personId);
 
 insertCheck:
-INSERT INTO check_table(amount, date, dueDate, status, personId, photoPath, description, isIncoming, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO check_table(amount, date, dueDate, status, personId, categoryId, sourceId, tagIds, reminderEnabled, photoPath, description, isIncoming, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateCheck:
 UPDATE check_table
-SET amount = ?, date = ?, dueDate = ?, status = ?, personId = ?, photoPath = ?, description = ?, isIncoming = ?, updatedAt = ?, syncStatus = ?
+SET amount = ?, date = ?, dueDate = ?, status = ?, personId = ?, categoryId = ?, sourceId = ?, tagIds = ?, reminderEnabled = ?, photoPath = ?, description = ?, isIncoming = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 observeAllChecks:
@@ -55,8 +59,8 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertFullCheck:
-INSERT OR REPLACE INTO check_table(id, amount, date, dueDate, status, personId, photoPath, description, isIncoming, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO check_table(id, amount, date, dueDate, status, personId, categoryId, sourceId, tagIds, reminderEnabled, photoPath, description, isIncoming, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getModifiedChecks:
 SELECT * FROM check_table WHERE syncStatus = 1;

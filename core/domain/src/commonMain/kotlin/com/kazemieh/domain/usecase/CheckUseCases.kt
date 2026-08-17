@@ -16,7 +16,9 @@ class AddCheckUseCase(
 ) {
     suspend operator fun invoke(check: Check, reminderTitle: String, reminderMessage: String) {
         val id = repository.insertCheck(check)
-        scheduleReminder(check.copy(id = id), reminderTitle, reminderMessage)
+        if (check.reminderEnabled) {
+            scheduleReminder(check.copy(id = id), reminderTitle, reminderMessage)
+        }
     }
 
     private fun scheduleReminder(check: Check, title: String, message: String) {
@@ -31,8 +33,29 @@ class AddCheckUseCase(
     }
 }
 
-class UpdateCheckUseCase(private val repository: CheckRepository) {
-    suspend operator fun invoke(check: Check) = repository.updateCheck(check)
+class UpdateCheckUseCase(
+    private val repository: CheckRepository,
+    private val notificationScheduler: NotificationScheduler
+) {
+    suspend operator fun invoke(
+        check: Check,
+        reminderTitle: String? = null,
+        reminderMessage: String? = null
+    ) {
+        repository.updateCheck(check)
+        if (check.reminderEnabled && reminderTitle != null && reminderMessage != null) {
+            val dueInstant = Instant.fromEpochMilliseconds(check.dueDate)
+            notificationScheduler.scheduleReminder(
+                id = "check_${check.id}",
+                title = reminderTitle,
+                message = reminderMessage,
+                scheduledTime = dueInstant.toLocalDateTime(TimeZone.currentSystemDefault()),
+                channelId = NotificationManager.CHANNEL_CHEQUE
+            )
+        } else if (!check.reminderEnabled) {
+            notificationScheduler.cancelReminder("check_${check.id}")
+        }
+    }
 }
 
 class DeleteCheckUseCase(
