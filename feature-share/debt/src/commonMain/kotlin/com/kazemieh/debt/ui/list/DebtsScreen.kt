@@ -2,6 +2,7 @@ package com.kazemieh.debt.ui.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -10,6 +11,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -57,6 +60,8 @@ fun DebtsScreen(
 
     var selectedDebtForEdit by remember { mutableStateOf<Long?>(null) }
     var showAddDebt by remember { mutableStateOf(false) }
+    var debtToSettle by remember { mutableStateOf<DebtWithRelations?>(null) }
+    var postSettlementAsTransaction by remember { mutableStateOf(false) }
 
     FintrackScreen(
         title = stringResource(Res.string.navigation_debts),
@@ -125,14 +130,40 @@ fun DebtsScreen(
                 items(state.filteredDebts.size) { index ->
                     val item = state.filteredDebts[index]
                     val typeColor = if (item.debt.type == DebtType.OWED_TO_ME) GlassGreen else GlassRed
-                    
+                    val typeLabel = stringResource(
+                        if (item.debt.type == DebtType.OWED_TO_ME) Res.string.debt_owed_to_me
+                        else Res.string.debt_owed_by_me
+                    )
+
                     EntityRow(
                         item = EntityItem(
                             id = item.debt.id,
                             name = item.person.name,
-                            sub = (if (item.debt.type == DebtType.OWED_TO_ME) "طلب" else "بدهی") + "  |  " + (item.debt.description ?: ""),
+                            sub = listOfNotNull(typeLabel, item.debt.description?.takeIf { it.isNotBlank() })
+                                .joinToString("  |  "),
+                            sub2 = if (item.debt.isSettled) {
+                                stringResource(
+                                    if (item.debt.type == DebtType.OWED_TO_ME) Res.string.credit_collected
+                                    else Res.string.debt_paid
+                                )
+                            } else {
+                                null
+                            },
                             badge = item.debt.amount.toPersianPrice(),
-                            color = typeColor
+                            color = typeColor,
+                            trailingContent = {
+                                if (item.debt.isSettled) {
+                                    SettledDebtIndicator(item.debt.type)
+                                } else {
+                                    SettleDebtAction(
+                                        debtType = item.debt.type,
+                                        onClick = {
+                                            debtToSettle = item
+                                            postSettlementAsTransaction = false
+                                        }
+                                    )
+                                }
+                            }
                         ),
                         mainColor = typeColor,
                         showActions = true,
@@ -176,6 +207,120 @@ fun DebtsScreen(
                     viewModel.onIntent(DebtIntent.OnFilterUpdate(cats, srcs, tags, pers))
                 }
             )
+        }
+
+        debtToSettle?.let { debt ->
+            DebtSettlementBottomSheet(
+                debt = debt,
+                postAsTransaction = postSettlementAsTransaction,
+                onPostAsTransactionChange = { postSettlementAsTransaction = it },
+                onConfirm = {
+                    viewModel.onIntent(
+                        DebtIntent.SettleDebt(
+                            debtId = debt.debt.id,
+                            postAsTransaction = postSettlementAsTransaction
+                        )
+                    )
+                    debtToSettle = null
+                },
+                onDismiss = { debtToSettle = null }
+            )
+        }
+    }
+}
+
+@Composable
+private fun SettleDebtAction(
+    debtType: DebtType,
+    onClick: () -> Unit
+) {
+    val color = if (debtType == DebtType.OWED_TO_ME) GlassGreen else GlassRed
+    Box(
+        modifier = Modifier
+            .size(32.dp)
+            .clip(RoundedCornerShape(9.dp))
+            .background(color.copy(alpha = 0.12f))
+            .border(1.dp, color.copy(alpha = 0.35f), RoundedCornerShape(9.dp))
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.Check,
+            contentDescription = stringResource(Res.string.settle_debt),
+            tint = color,
+            modifier = Modifier.size(16.dp)
+        )
+    }
+}
+
+@Composable
+private fun SettledDebtIndicator(debtType: DebtType) {
+    val color = if (debtType == DebtType.OWED_TO_ME) GlassGreen else GlassRed
+    Icon(
+        imageVector = Icons.Default.CheckCircle,
+        contentDescription = stringResource(Res.string.debt_settled),
+        tint = color,
+        modifier = Modifier.size(22.dp)
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DebtSettlementBottomSheet(
+    debt: DebtWithRelations,
+    postAsTransaction: Boolean,
+    onPostAsTransactionChange: (Boolean) -> Unit,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val canPostAsTransaction = debt.debt.sourceId != null
+    val completionLabel = stringResource(
+        if (debt.debt.type == DebtType.OWED_TO_ME) Res.string.credit_collected
+        else Res.string.debt_paid
+    )
+    val glassColors = LocalGlassColors.current
+
+    SheetFrame(
+        title = completionLabel,
+        sub = stringResource(Res.string.debt_settle_confirm),
+        onDismiss = onDismiss,
+        isFullScreen = false,
+        primaryButtonText = stringResource(Res.string.confirm),
+        onPrimaryClick = onConfirm,
+        secondaryButtonText = stringResource(Res.string.cancell_),
+        onSecondaryClick = onDismiss
+    ) {
+        GlassCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            padding = 16.dp
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        FintrackLabelMediumText(
+                            text = stringResource(Res.string.label_post_as_transaction),
+                            color = if (canPostAsTransaction) glassColors.text else glassColors.text3
+                        )
+                        if (!canPostAsTransaction) {
+                            FintrackLabelSmallText(
+                                text = stringResource(Res.string.settlement_no_source),
+                                color = glassColors.text3
+                            )
+                        }
+                    }
+                    Switch(
+                        on = postAsTransaction,
+                        onToggle = onPostAsTransactionChange,
+                        enabled = canPostAsTransaction
+                    )
+                }
+            }
         }
     }
 }

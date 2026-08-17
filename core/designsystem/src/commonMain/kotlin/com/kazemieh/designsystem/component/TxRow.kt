@@ -54,6 +54,8 @@ import fintrack.core.designsystem.generated.resources.label_amount_with_unit
 import fintrack.core.designsystem.generated.resources.label_comma
 import fintrack.core.designsystem.generated.resources.label_more_count
 import fintrack.core.designsystem.generated.resources.label_to
+import fintrack.core.designsystem.generated.resources.transaction_credit_collection
+import fintrack.core.designsystem.generated.resources.transaction_debt_payment
 import fintrack.core.designsystem.generated.resources.title_edit_transaction
 import fintrack.core.designsystem.generated.resources.unit_toman_short
 import org.jetbrains.compose.resources.DrawableResource
@@ -180,6 +182,15 @@ fun TxRow(
     val icon = FinTrackIcons.findIcon(item.category.iconId)
     val isTransfer = item.transaction.type == TransactionType.TRANSFER
     val glassColors = LocalGlassColors.current
+    val settlementLabel = item.transaction.relatedDebtId?.let {
+        stringResource(
+            if (item.transaction.type == TransactionType.INCOME) {
+                Res.string.transaction_credit_collection
+            } else {
+                Res.string.transaction_debt_payment
+            }
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -200,6 +211,13 @@ fun TxRow(
             TransactionIconBox(icon.resource, color, bgColor)
 
             Column(modifier = Modifier.weight(1f)) {
+                settlementLabel?.let {
+                    FintrackLabelSmallText(
+                        text = it,
+                        fontWeight = FontWeight.Bold,
+                        color = color
+                    )
+                }
                 FintrackBodyMediumText(
                     text = item.category.name,
                     fontWeight = FontWeight.Bold

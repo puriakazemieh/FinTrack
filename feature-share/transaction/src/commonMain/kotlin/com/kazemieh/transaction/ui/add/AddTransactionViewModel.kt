@@ -328,6 +328,7 @@ class AddTransactionViewModel(
                 categoryId = current.category?.id ?: 0,
                 sourceId = current.source?.id ?: 0,
                 sourceEndId = current.sourceEnd?.id,
+                relatedDebtId = current.oldTransaction?.relatedDebtId,
                 description = current.description,
                 photoPath = photoPath,
                 timeStamp = current.timeStamp,

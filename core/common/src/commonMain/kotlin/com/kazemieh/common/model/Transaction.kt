@@ -12,6 +12,7 @@ data class Transaction(
     val categoryId: Long,
     val sourceId: Long,
     val sourceEndId: Long? = null,
+    val relatedDebtId: Long? = null,
     val description: String? = null,
     val photoPath: String? = null,
     val timeStamp: Long = Clock.System.now().toEpochMilliseconds(),

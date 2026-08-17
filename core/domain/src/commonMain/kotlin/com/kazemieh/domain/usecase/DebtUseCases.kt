@@ -97,12 +97,16 @@ class SettleDebtUseCase(
     private val debtRepository: DebtRepository,
     private val transactionRepository: TransactionRepository
 ) {
-    suspend operator fun invoke(debtId: Long, description: String) {
+    suspend operator fun invoke(
+        debtId: Long,
+        description: String,
+        postAsTransaction: Boolean = false
+    ) {
         val debtWithRelations = debtRepository.getDebtById(debtId) ?: return
         if (debtWithRelations.isSettled) return
 
-        // 1. Create Transaction if source is selected
-        debtWithRelations.sourceId?.let { sourceId ->
+        // 1. Create a transaction only when explicitly requested by the user.
+        if (postAsTransaction) debtWithRelations.sourceId?.let { sourceId ->
             val transactionType = if (debtWithRelations.type == DebtType.OWED_TO_ME) {
                 TransactionType.INCOME // Receiving money that was owed to me
             } else {
@@ -116,6 +120,7 @@ class SettleDebtUseCase(
                 amount = debtWithRelations.amount.toInt(),
                 categoryId = categoryId,
                 sourceId = sourceId,
+                relatedDebtId = debtId,
                 description = description,
                 type = transactionType,
                 timeStamp = Clock.System.now().toEpochMilliseconds()

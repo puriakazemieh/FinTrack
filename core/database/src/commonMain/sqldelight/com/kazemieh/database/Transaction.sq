@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     categoryId INTEGER NOT NULL,
     sourceId INTEGER NOT NULL,
     sourceEndId INTEGER,
+    relatedDebtId INTEGER,
     description TEXT,
     photoPath TEXT,
     timeStamp INTEGER NOT NULL,
@@ -20,14 +21,15 @@ CREATE INDEX IF NOT EXISTS  idx_transaction_category ON transactions(categoryId)
 CREATE INDEX IF NOT EXISTS  idx_transaction_source ON transactions(sourceId);
 CREATE INDEX IF NOT EXISTS  idx_transaction_sourceEnd ON transactions(sourceEndId);
 CREATE INDEX IF NOT EXISTS  idx_transaction_timestamp ON transactions(timeStamp);
+CREATE INDEX IF NOT EXISTS  idx_transaction_related_debt ON transactions(relatedDebtId);
 
 insertTransaction:
-INSERT INTO transactions(amount, amountTransfer, categoryId, sourceId, sourceEndId, description, photoPath, timeStamp, type, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO transactions(amount, amountTransfer, categoryId, sourceId, sourceEndId, relatedDebtId, description, photoPath, timeStamp, type, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateTransaction:
 UPDATE transactions
-SET amount = ?, amountTransfer = ?, categoryId = ?, sourceId = ?, sourceEndId = ?, description = ?, photoPath = ?, timeStamp = ?, type = ?, updatedAt = ?, syncStatus = ?
+SET amount = ?, amountTransfer = ?, categoryId = ?, sourceId = ?, sourceEndId = ?, relatedDebtId = ?, description = ?, photoPath = ?, timeStamp = ?, type = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 deleteTransaction:
@@ -68,6 +70,7 @@ SELECT
     t.categoryId,
     t.sourceId,
     t.sourceEndId,
+    t.relatedDebtId,
     t.description,
     t.photoPath,
     t.timeStamp,
@@ -213,5 +216,5 @@ AND (:personIdsSize = 0 OR EXISTS (
 ));
 
 insertFullTransaction:
-INSERT OR REPLACE INTO transactions(id, amount, amountTransfer, categoryId, sourceId, sourceEndId, description, photoPath, timeStamp, type, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO transactions(id, amount, amountTransfer, categoryId, sourceId, sourceEndId, relatedDebtId, description, photoPath, timeStamp, type, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);

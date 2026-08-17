@@ -22,7 +22,7 @@ class DebtViewModel(
             is DebtIntent.ObserveAllDebts -> observeAllDebts()
             is DebtIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
             is DebtIntent.ObserveDebtsByPerson -> observeDebtsByPerson(intent.personId)
-            is DebtIntent.SettleDebt -> settleDebt(intent.debtId, intent.description)
+            is DebtIntent.SettleDebt -> settleDebt(intent.debtId, intent.postAsTransaction)
             is DebtIntent.DeleteDebt -> deleteDebt(intent.debtId)
             
             DebtIntent.OnFilterClick -> _state.update { it.copy(showFilterSheet = true) }
@@ -81,9 +81,13 @@ class DebtViewModel(
         }
     }
 
-    private fun settleDebt(debtId: Long, description: String) {
+    private fun settleDebt(debtId: Long, postAsTransaction: Boolean) {
         viewModelScope.launch {
-            debtUseCases.settleDebtUseCase(debtId, description)
+            debtUseCases.settleDebtUseCase(
+                debtId = debtId,
+                description = "",
+                postAsTransaction = postAsTransaction
+            )
         }
     }
 
@@ -112,7 +116,7 @@ sealed interface DebtIntent {
     data object ObserveAllDebts : DebtIntent
     data class UpdateSearchQuery(val query: String) : DebtIntent
     data class ObserveDebtsByPerson(val personId: Long) : DebtIntent
-    data class SettleDebt(val debtId: Long, val description: String) : DebtIntent
+    data class SettleDebt(val debtId: Long, val postAsTransaction: Boolean) : DebtIntent
     data class DeleteDebt(val debtId: Long) : DebtIntent
     
     data object OnFilterClick : DebtIntent
