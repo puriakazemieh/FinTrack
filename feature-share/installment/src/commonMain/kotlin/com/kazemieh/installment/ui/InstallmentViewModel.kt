@@ -3,10 +3,9 @@ package com.kazemieh.installment.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.*
-import com.kazemieh.common.DateFilterType
-import com.kazemieh.common.DateRange
-import com.kazemieh.common.DateFilterHelper
-import com.kazemieh.common.Direction
+import com.kazemieh.common.persiandatetime.domain.PersianDateTime
+import com.kazemieh.common.persiandatetime.extensions.plus
+import com.kazemieh.common.persiandatetime.extensions.toEpochMilliseconds
 import com.kazemieh.domain.usecase.InstallmentUseCaseGroup
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -16,6 +15,8 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.installment_deleted
 import fintrack.core.designsystem.generated.resources.payment
 import fintrack.core.designsystem.generated.resources.transaction_failed
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 
 sealed interface InstallmentIntent {
@@ -39,8 +40,6 @@ sealed interface InstallmentIntent {
         val persons: Set<Person>
     ) : InstallmentIntent
 
-    data class ChangeFilterType(val type: DateFilterType) : InstallmentIntent
-    data class ShiftRange(val direction: Direction) : InstallmentIntent
 }
 
 sealed interface InstallmentEffect {
@@ -48,15 +47,15 @@ sealed interface InstallmentEffect {
 }
 
 data class InstallmentState(
-    val upcomingMonth: List<InstallmentWithRelations> = emptyList(),
-    val future: List<InstallmentWithRelations> = emptyList(),
-    val overdue: List<InstallmentWithRelations> = emptyList(),
-    val completed: List<InstallmentWithRelations> = emptyList(),
+    val upcomingMonth: List<ScheduledInstallment> = emptyList(),
+    val future: List<ScheduledInstallment> = emptyList(),
+    val overdue: List<ScheduledInstallment> = emptyList(),
+    val completed: List<ScheduledInstallment> = emptyList(),
     
-    val filteredUpcomingMonth: List<InstallmentWithRelations> = emptyList(),
-    val filteredFuture: List<InstallmentWithRelations> = emptyList(),
-    val filteredOverdue: List<InstallmentWithRelations> = emptyList(),
-    val filteredCompleted: List<InstallmentWithRelations> = emptyList(),
+    val filteredUpcomingMonth: List<ScheduledInstallment> = emptyList(),
+    val filteredFuture: List<ScheduledInstallment> = emptyList(),
+    val filteredOverdue: List<ScheduledInstallment> = emptyList(),
+    val filteredCompleted: List<ScheduledInstallment> = emptyList(),
     
     val isLoading: Boolean = false,
     val searchQuery: String = "",
@@ -66,8 +65,15 @@ data class InstallmentState(
     val filterSources: Set<Source> = emptySet(),
     val filterTags: Set<Tag> = emptySet(),
     val filterPersons: Set<Person> = emptySet(),
-    val dateRange: DateRange? = DateFilterHelper.getRange(DateFilterType.THIS_MONTH),
     val totalAmount: Long = 0
+)
+
+/** A single payable occurrence generated from an installment plan. */
+data class ScheduledInstallment(
+    val installmentWithRelations: InstallmentWithRelations,
+    val dueDate: Long,
+    val installmentNumber: Int,
+    val isPayable: Boolean
 )
 
 class InstallmentViewModel(
@@ -100,17 +106,6 @@ class InstallmentViewModel(
                 _filterState.update { it.copy(categories = intent.categories, sources = intent.sources, tags = intent.tags, persons = intent.persons) }
                 _state.update { it.copy(filterCategories = intent.categories, filterSources = intent.sources, filterTags = intent.tags, filterPersons = intent.persons) }
             }
-            is InstallmentIntent.ChangeFilterType -> {
-                val range = DateFilterHelper.getRange(intent.type)
-                _filterState.update { it.copy(dateRange = range) }
-                _state.update { it.copy(dateRange = range) }
-            }
-            is InstallmentIntent.ShiftRange -> {
-                val current = _filterState.value.dateRange ?: return
-                val shifted = DateFilterHelper.shiftDateRange(current.start, current.end, current.filterType, intent.direction)
-                _filterState.update { it.copy(dateRange = shifted) }
-                _state.update { it.copy(dateRange = shifted) }
-            }
         }
     }
 
@@ -121,7 +116,6 @@ class InstallmentViewModel(
                 .combine(_searchQuery) { installments, query -> installments to query }
                 .combine(_filterState) { (installments, query), filters ->
                     val now = Clock.System.now().toEpochMilliseconds()
-                    val oneMonthFromNow = now + (30L * 24 * 60 * 60 * 1000)
                     
                     val filtered = installments.filter { item ->
                         val inst = item.installment
@@ -130,34 +124,39 @@ class InstallmentViewModel(
                         val inTag = filters.tags.isEmpty() || item.tags.any { it.id in filters.tags.map { t -> t.id } }
                         val inPerson = filters.persons.isEmpty() || item.persons.any { it.id in filters.persons.map { p -> p.id } }
                         
-                        val range = filters.dateRange
-                        val inTimeRange = if (range != null) {
-                            inst.nextDueDate >= range.start && inst.nextDueDate < range.end
-                        } else true
-
-                        inCategory && inSource && inTag && inPerson && inTimeRange
+                        inCategory && inSource && inTag && inPerson
                     }
 
-                    val overdue = mutableListOf<InstallmentWithRelations>()
-                    val upcomingMonth = mutableListOf<InstallmentWithRelations>()
-                    val future = mutableListOf<InstallmentWithRelations>()
-                    val completed = mutableListOf<InstallmentWithRelations>()
+                    val overdue = mutableListOf<ScheduledInstallment>()
+                    val upcomingMonth = mutableListOf<ScheduledInstallment>()
+                    val future = mutableListOf<ScheduledInstallment>()
+                    val completed = mutableListOf<ScheduledInstallment>()
 
                     filtered.forEach { item ->
-                        if (item.installment.isCompleted) {
-                            completed.add(item)
-                        } else if (item.installment.nextDueDate < now) {
-                            overdue.add(item)
-                        } else if (item.installment.nextDueDate <= oneMonthFromNow) {
-                            upcomingMonth.add(item)
+                        val installment = item.installment
+                        val isSettled = installment.isCompleted ||
+                                installment.paidInstallments >= installment.totalInstallments
+
+                        if (isSettled) {
+                            completed.add(
+                                ScheduledInstallment(
+                                    installmentWithRelations = item,
+                                    dueDate = installment.nextDueDate,
+                                    installmentNumber = installment.totalInstallments,
+                                    isPayable = false
+                                )
+                            )
                         } else {
-                            future.add(item)
+                            val schedule = buildSchedule(item)
+                            val nearest = schedule.firstOrNull() ?: return@forEach
+                            if (nearest.dueDate < now) overdue.add(nearest) else upcomingMonth.add(nearest)
+                            future.addAll(schedule.drop(1))
                         }
                     }
 
-                    fun List<InstallmentWithRelations>.filterByQuery(q: String) = filter {
-                        it.installment.title.contains(q, ignoreCase = true) ||
-                                it.installment.description?.contains(q, ignoreCase = true) == true
+                    fun List<ScheduledInstallment>.filterByQuery(q: String) = filter {
+                        it.installmentWithRelations.installment.title.contains(q, ignoreCase = true) ||
+                                it.installmentWithRelations.installment.description?.contains(q, ignoreCase = true) == true
                     }
 
                     InstallmentData(
@@ -173,7 +172,8 @@ class InstallmentViewModel(
                 }
                 .collectLatest { data ->
                     val total = (data.upcomingMonth + data.future + data.overdue + data.completed)
-                        .sumOf { it.installment.installmentAmount }
+                        .distinctBy { it.installmentWithRelations.installment.id }
+                        .sumOf { it.installmentWithRelations.installment.totalAmount }
                     _state.update {
                         it.copy(
                             upcomingMonth = data.upcomingMonth,
@@ -219,23 +219,50 @@ class InstallmentViewModel(
             }
         }
     }
+
+    private fun buildSchedule(item: InstallmentWithRelations): List<ScheduledInstallment> {
+        val installment = item.installment
+        val remainingInstallments = (installment.totalInstallments - installment.paidInstallments).coerceAtLeast(0)
+        var dueDate = installment.nextDueDate
+        return List(remainingInstallments) { index ->
+            val scheduledDueDate = dueDate
+            dueDate = calculateNextDueDate(scheduledDueDate, installment.frequency)
+            ScheduledInstallment(
+                installmentWithRelations = item,
+                dueDate = scheduledDueDate,
+                installmentNumber = installment.paidInstallments + index + 1,
+                isPayable = index == 0
+            )
+        }
+    }
+
+    private fun calculateNextDueDate(currentDueDate: Long, frequency: InstallmentFrequency): Long {
+        val timeZone = TimeZone.currentSystemDefault()
+        val current = PersianDateTime.parse(currentDueDate, timeZone)
+        val next = when (frequency) {
+            InstallmentFrequency.DAILY -> current.plus(1, DateTimeUnit.DAY)
+            InstallmentFrequency.WEEKLY -> current.plus(7, DateTimeUnit.DAY)
+            InstallmentFrequency.MONTHLY -> current.plus(1, DateTimeUnit.MONTH)
+            InstallmentFrequency.YEARLY -> current.plus(1, DateTimeUnit.YEAR)
+        }
+        return next.toEpochMilliseconds(timeZone)
+    }
 }
 
 private data class FilterParams(
     val categories: Set<Category> = emptySet(),
     val sources: Set<Source> = emptySet(),
     val tags: Set<Tag> = emptySet(),
-    val persons: Set<Person> = emptySet(),
-    val dateRange: DateRange? = DateFilterHelper.getRange(DateFilterType.THIS_MONTH)
+    val persons: Set<Person> = emptySet()
 )
 
 private data class InstallmentData(
-    val overdue: List<InstallmentWithRelations>,
-    val upcomingMonth: List<InstallmentWithRelations>,
-    val future: List<InstallmentWithRelations>,
-    val completed: List<InstallmentWithRelations>,
-    val filteredOverdue: List<InstallmentWithRelations>,
-    val filteredUpcomingMonth: List<InstallmentWithRelations>,
-    val filteredFuture: List<InstallmentWithRelations>,
-    val filteredCompleted: List<InstallmentWithRelations>
+    val overdue: List<ScheduledInstallment>,
+    val upcomingMonth: List<ScheduledInstallment>,
+    val future: List<ScheduledInstallment>,
+    val completed: List<ScheduledInstallment>,
+    val filteredOverdue: List<ScheduledInstallment>,
+    val filteredUpcomingMonth: List<ScheduledInstallment>,
+    val filteredFuture: List<ScheduledInstallment>,
+    val filteredCompleted: List<ScheduledInstallment>
 )

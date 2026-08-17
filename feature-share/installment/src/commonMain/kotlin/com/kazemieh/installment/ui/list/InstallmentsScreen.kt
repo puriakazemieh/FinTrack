@@ -1,5 +1,6 @@
 package com.kazemieh.installment.ui.list
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,8 +24,6 @@ import androidx.compose.ui.unit.sp
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.list.CategoryFilterSelectionContent
-import com.kazemieh.common.DateFilterType
-import com.kazemieh.common.Direction
 import com.kazemieh.common.model.*
 import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.GlassGreen
@@ -43,6 +42,7 @@ import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.financialsource.ui.list.SourceFilterSelectionContent
 import com.kazemieh.installment.ui.InstallmentIntent
 import com.kazemieh.installment.ui.InstallmentViewModel
+import com.kazemieh.installment.ui.ScheduledInstallment
 import com.kazemieh.installment.ui.add.AddInstallmentBottomSheet
 import com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet
 import com.kazemieh.person.ui.list.PersonFilterSelectionContent
@@ -51,7 +51,7 @@ import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun InstallmentsScreen(
     viewModel: InstallmentViewModel = koinViewModel(),
@@ -144,9 +144,9 @@ fun InstallmentsScreen(
             }
 
             val groupedItems = items
-                .sortedBy { it.installment.nextDueDate }
+                .sortedBy { it.dueDate }
                 .groupBy { item ->
-                    val pdt = PersianDateTime.parse(item.installment.nextDueDate)
+                    val pdt = PersianDateTime.parse(item.dueDate)
                     val monthName = PersianMonth.values().getOrNull(pdt.month)?.displayName ?: ""
                     "$monthName ${pdt.year}".toPersianDigits()
                 }
@@ -157,9 +157,7 @@ fun InstallmentsScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 groupedItems.forEach { (monthYear, monthItems) ->
-                    item {
-                        SectionHeader(title = monthYear)
-                    }
+                    stickyHeader { SectionHeader(title = monthYear) }
                     items(monthItems.size) { index ->
                         InstallmentItemRow(
                             monthItems[index],
@@ -221,40 +219,44 @@ private fun SectionHeader(title: String) {
         text = title,
         color = glassColors.text,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+        modifier = Modifier
+            .stickyHeaderSurface()
+            .padding(horizontal = 20.dp, vertical = 8.dp)
     )
 }
 
 @Composable
 private fun InstallmentItemRow(
-    item: InstallmentWithRelations,
+    scheduledInstallment: ScheduledInstallment,
     viewModel: InstallmentViewModel,
     onEdit: (Long) -> Unit,
     onDelete: (Installment) -> Unit
 ) {
     val glassColors = LocalGlassColors.current
-    val progress = (item.installment.paidInstallments.toFloat() / item.installment.totalInstallments).coerceIn(0f, 1f)
+    val item = scheduledInstallment.installmentWithRelations
+    val installment = item.installment
+    val progress = (scheduledInstallment.installmentNumber.toFloat() / installment.totalInstallments).coerceIn(0f, 1f)
     val percentage = (progress * 100).toInt()
     
-    val paymentDesc = stringResource(Res.string.payment_for, item.installment.title)
+    val paymentDesc = stringResource(Res.string.payment_for, installment.title)
     val reminderTitle = stringResource(Res.string.notif_installment_title)
-    val reminderMsg = stringResource(Res.string.notif_installment_desc, item.installment.title)
-    val mainColor = if (item.installment.isCompleted) GlassGreen else MaterialTheme.colorScheme.primary
+    val reminderMsg = stringResource(Res.string.notif_installment_desc, installment.title)
+    val mainColor = if (installment.isCompleted) GlassGreen else MaterialTheme.colorScheme.primary
 
     EntityRow(
         item = EntityItem(
-            id = item.installment.id,
-            name = item.installment.title,
+            id = installment.id,
+            name = installment.title,
             sub = stringResource(
                 Res.string.remaining_installments,
-                (item.installment.totalInstallments - item.installment.paidInstallments)
+                (installment.totalInstallments - scheduledInstallment.installmentNumber)
             ),
             badge = "$percentage%",
             color = mainColor,
-            sub2 = DateUtils.formatDate(item.installment.nextDueDate) + "  |  " + 
-                    item.installment.installmentAmount.toInt().toSignedPersianPrice() + " " + stringResource(Res.string.currency_toman),
+            sub2 = DateUtils.formatDate(scheduledInstallment.dueDate) + "  |  " +
+                    installment.installmentAmount.toInt().toSignedPersianPrice() + " " + stringResource(Res.string.currency_toman),
             trailingContent = {
-                if (!item.installment.isCompleted) {
+                if (scheduledInstallment.isPayable && !installment.isCompleted) {
                     Box(
                         modifier = Modifier
                             .size(32.dp)
@@ -263,7 +265,7 @@ private fun InstallmentItemRow(
                             .border(1.dp, glassColors.glassEdge, RoundedCornerShape(9.dp))
                             .clickable {
                                 viewModel.onIntent(InstallmentIntent.MarkAsPaid(
-                                    installmentId = item.installment.id,
+                                    installmentId = installment.id,
                                     transactionDescription = paymentDesc,
                                     reminderTitle = reminderTitle,
                                     reminderMessage = reminderMsg
@@ -283,9 +285,9 @@ private fun InstallmentItemRow(
         ),
         mainColor = mainColor,
         showActions = true,
-        onEdit = { onEdit(item.installment.id) },
-        onDelete = { onDelete(item.installment) },
-        onClick = { onEdit(item.installment.id) }
+        onEdit = { onEdit(installment.id) },
+        onDelete = { onDelete(installment) },
+        onClick = { onEdit(installment.id) }
     )
 }
 

@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.kazemieh.common.model.InstallmentWithRelations
 import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
@@ -23,6 +22,7 @@ import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.WidgetCard
 import com.kazemieh.designsystem.component.glass.WidgetEmptyState
 import com.kazemieh.installment.ui.InstallmentIntent
+import com.kazemieh.installment.ui.ScheduledInstallment
 import com.kazemieh.installment.ui.InstallmentViewModel
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.installment_widget_title
@@ -50,7 +50,10 @@ fun InstallmentWidget(
         onAdd = onAdd,
         modifier = modifier
     ) {
-        val displayItems = (state.overdue + state.upcomingMonth + state.future).take(3)
+        // The widget shows one actionable, nearest due date per installment plan.
+        val displayItems = (state.overdue + state.upcomingMonth)
+            .sortedBy { it.dueDate }
+            .take(3)
         if (displayItems.isEmpty()) {
             WidgetEmptyState(
                 icon = Icons.Default.CalendarToday,
@@ -66,7 +69,9 @@ fun InstallmentWidget(
 }
 
 @Composable
-private fun InstallmentRowMinimal(item: InstallmentWithRelations) {
+private fun InstallmentRowMinimal(scheduledInstallment: ScheduledInstallment) {
+    val installment = scheduledInstallment.installmentWithRelations.installment
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -74,18 +79,18 @@ private fun InstallmentRowMinimal(item: InstallmentWithRelations) {
     ) {
         Column {
             FintrackLabelMediumText(
-                text = item.installment.title
+                text = installment.title
             )
             FintrackLabelSmallText(
                 text = stringResource(
                     Res.string.remaining_installments,
-                    (item.installment.totalInstallments - item.installment.paidInstallments)
+                    (installment.totalInstallments - scheduledInstallment.installmentNumber)
                 )
             )
         }
 
         FintrackLabelMediumText(
-            text = item.installment.installmentAmount.toInt().toSignedPersianPrice()
+            text = installment.installmentAmount.toInt().toSignedPersianPrice()
         )
     }
 }
