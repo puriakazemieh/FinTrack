@@ -82,7 +82,8 @@ class AndroidNotificationManager(
             )
             createChannel(
                 NotificationManager.CHANNEL_INSTALLMENT,
-                getString(Res.string.notif_channel_installment)
+                getString(Res.string.notif_channel_installment),
+                importance = AndroidNotificationManagerSystem.IMPORTANCE_MAX
             )
             createChannel(
                 NotificationManager.CHANNEL_CHEQUE,
@@ -194,6 +195,71 @@ class AndroidNotificationManager(
             val message = getString(Res.string.notif_budget_exceeded_desc, categoryName, progressPercentage)
             showNotification(categoryId, title, message, NotificationManager.CHANNEL_BUDGET)
         }
+    }
+
+    override fun showInstallmentNotification(id: Int, title: String, message: String, installmentId: Long) {
+        if (!hasPermission()) return
+        if (!isChannelAllowed(NotificationManager.CHANNEL_INSTALLMENT)) return
+
+        val deepLinkIntent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("fintrack://installment")
+        ).apply {
+            `package` = context.packageName
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            context, id + 4000, deepLinkIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val registerLabel = runBlocking { getString(Res.string.notif_action_register) }
+        val ignoreLabel = runBlocking { getString(Res.string.notif_action_ignore) }
+
+        // Action for Mark as Paid (Broadcast)
+        val registerIntent = Intent("com.kazemieh.installment.ACTION_MARK_PAID").apply {
+            putExtra("installment_id", installmentId)
+            putExtra("notification_id", id)
+            `package` = context.packageName
+        }
+        val registerPendingIntent = PendingIntent.getBroadcast(
+            context, id + 2000, registerIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val registerAction = NotificationCompat.Action.Builder(
+            android.R.drawable.ic_menu_save, registerLabel, registerPendingIntent
+        ).build()
+
+        // Action for Ignore (Broadcast)
+        val ignoreIntent = Intent("com.kazemieh.installment.ACTION_IGNORE").apply {
+            putExtra("notification_id", id)
+            `package` = context.packageName
+        }
+        val ignorePendingIntent = PendingIntent.getBroadcast(
+            context, id + 3000, ignoreIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val ignoreAction = NotificationCompat.Action.Builder(
+            android.R.drawable.ic_menu_close_clear_cancel, ignoreLabel, ignorePendingIntent
+        ).build()
+
+        val notification = NotificationCompat.Builder(context, NotificationManager.CHANNEL_INSTALLMENT)
+            .setSmallIcon(appIcon)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setContentIntent(pendingIntent)
+            .addAction(registerAction)
+            .addAction(ignoreAction)
+            .setAutoCancel(true)
+            .setDefaults(android.app.Notification.DEFAULT_ALL)
+            .setFullScreenIntent(pendingIntent, true) // Add this back for Heads-up
+            .build()
+
+        notificationManagerCompat.notify(id, notification)
     }
 
     override fun showQuickAddNotification(title: String, message: String, actionLabel: String) {

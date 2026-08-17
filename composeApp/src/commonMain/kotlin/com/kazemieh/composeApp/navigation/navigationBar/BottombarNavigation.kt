@@ -254,7 +254,11 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
             )
         }
 
-        composable<Screen.Installment> {
+        composable<Screen.Installment>(
+            deepLinks = listOf(
+                navDeepLink { uriPattern = "fintrack://installment" }
+            )
+        ) {
             InstallmentsScreen(
                 onBack = { navController.popBackStack() }
             )

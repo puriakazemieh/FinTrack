@@ -271,7 +271,7 @@ private fun SearchHeader(query: String, onQueryChange: (String) -> Unit, title: 
 }
 
 @Composable
-private fun EntityRow(
+fun EntityRow(
     item: EntityItem,
     mainColor: Color,
     showActions: Boolean,

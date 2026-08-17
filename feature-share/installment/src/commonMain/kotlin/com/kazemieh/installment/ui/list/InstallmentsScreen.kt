@@ -31,6 +31,13 @@ import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.material.icons.filled.*
+import com.kazemieh.common.persiandatetime.domain.PersianDateTime
+import com.kazemieh.common.persiandatetime.domain.PersianMonth
+import com.kazemieh.common.toPersianDigits
+import com.kazemieh.common.util.DateUtils
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.financialsource.ui.list.SourceFilterSelectionContent
@@ -70,26 +77,13 @@ fun InstallmentsScreen(
         viewModel.onIntent(InstallmentIntent.Init)
     }
 
-    val displayLabel = dateRangeLabelText(state.dateRange?.label)
-
     FintrackScreen(
         title = stringResource(Res.string.navigation_installment),
-        sub = displayLabel,
         onBack = onBack
     ) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            PeriodNavigator(
-                currentPeriod = state.dateRange?.filterType ?: DateFilterType.THIS_MONTH,
-                periodLabel = displayLabel,
-                periodSubLabel = "",
-                onPeriodSelected = { viewModel.onIntent(InstallmentIntent.ChangeFilterType(it)) },
-                onPrevClick = { viewModel.onIntent(InstallmentIntent.ShiftRange(Direction.PREVIOUS)) },
-                onNextClick = { viewModel.onIntent(InstallmentIntent.ShiftRange(Direction.NEXT)) },
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
-                excludeCustomRange = true
-            )
 
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 8.dp),
@@ -149,71 +143,41 @@ fun InstallmentsScreen(
                 else -> state.filteredCompleted
             }
 
-            EntityList(
-                title = tabs[selectedTabIndex],
-                addLabel = stringResource(Res.string.add_installment),
-                query = state.searchQuery,
-                onQueryChange = { viewModel.onIntent(InstallmentIntent.UpdateSearchQuery(it)) },
-                onAddClick = { selectedInstallmentId = null; showAddInstallment = true },
-                items = items.map { item ->
-                    val progress =
-                        (item.installment.paidInstallments.toFloat() / item.installment.totalInstallments).coerceIn(
-                            0f,
-                            1f
-                        )
-                    val percentage = (progress * 100).toInt()
-                    val paymentDesc = stringResource(Res.string.payment_for, item.installment.title)
-                    val reminderTitle = stringResource(Res.string.notif_installment_title)
-                    val reminderMsg = stringResource(Res.string.notif_installment_desc, item.installment.title)
+            val groupedItems = items
+                .sortedBy { it.installment.nextDueDate }
+                .groupBy { item ->
+                    val pdt = PersianDateTime.parse(item.installment.nextDueDate)
+                    val monthName = PersianMonth.values().getOrNull(pdt.month)?.displayName ?: ""
+                    "$monthName ${pdt.year}".toPersianDigits()
+                }
 
-                    EntityItem(
-                        id = item.installment.id,
-                        name = item.installment.title,
-                        sub = stringResource(
-                            Res.string.remaining_installments,
-                            (item.installment.totalInstallments - item.installment.paidInstallments)
-                        ),
-                        badge = "$percentage%",
-                        color = if (item.installment.isCompleted) GlassGreen else MaterialTheme.colorScheme.primary,
-                        sub2 = item.installment.installmentAmount.toInt()
-                            .toSignedPersianPrice() + " " + stringResource(Res.string.currency_toman),
-                        trailingContent = {
-                            if (!item.installment.isCompleted) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(32.dp)
-                                        .clip(RoundedCornerShape(9.dp))
-                                        .background(glassColors.glass)
-                                        .border(1.dp, glassColors.glassEdge, RoundedCornerShape(9.dp))
-                                        .clickable {
-                                            viewModel.onIntent(InstallmentIntent.MarkAsPaid(
-                                                installmentId = item.installment.id,
-                                                transactionDescription = paymentDesc,
-                                                reminderTitle = reminderTitle,
-                                                reminderMessage = reminderMsg
-                                            ))
-                                        },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Check,
-                                        contentDescription = null,
-                                        tint = GlassGreen,
-                                        modifier = Modifier.size(13.dp)
-                                    )
-                                }
-                            }
-                        }
-                    )
-                },
-                onEditClick = { clickedItem -> selectedInstallmentId = clickedItem.id; showAddInstallment = true },
-                onDeleteClick = { clickedItem ->
-                    installmentToDelete = (state.overdue + state.upcomingMonth + state.future + state.completed)
-                        .find { it.installment.id == clickedItem.id }?.installment
-                },
-                showActions = true
-            )
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(bottom = 100.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                groupedItems.forEach { (monthYear, monthItems) ->
+                    item {
+                        SectionHeader(title = monthYear)
+                    }
+                    items(monthItems.size) { index ->
+                        InstallmentItemRow(
+                            monthItems[index],
+                            viewModel,
+                            { selectedInstallmentId = it; showAddInstallment = true },
+                            { installmentToDelete = it }
+                        )
+                    }
+                }
+            }
         }
+
+        Fab(
+            label = stringResource(Res.string.add_installment),
+            icon = rememberVectorPainter(Icons.Default.Add),
+            onClick = { selectedInstallmentId = null; showAddInstallment = true },
+            modifier = Modifier.align(Alignment.BottomStart).padding(24.dp).padding(bottom = 80.dp)
+        )
 
         if (showAddInstallment) {
             AddInstallmentBottomSheet(
@@ -248,6 +212,81 @@ fun InstallmentsScreen(
             )
         }
     }
+}
+
+@Composable
+private fun SectionHeader(title: String) {
+    val glassColors = LocalGlassColors.current
+    FintrackLabelMediumText(
+        text = title,
+        color = glassColors.text,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+    )
+}
+
+@Composable
+private fun InstallmentItemRow(
+    item: InstallmentWithRelations,
+    viewModel: InstallmentViewModel,
+    onEdit: (Long) -> Unit,
+    onDelete: (Installment) -> Unit
+) {
+    val glassColors = LocalGlassColors.current
+    val progress = (item.installment.paidInstallments.toFloat() / item.installment.totalInstallments).coerceIn(0f, 1f)
+    val percentage = (progress * 100).toInt()
+    
+    val paymentDesc = stringResource(Res.string.payment_for, item.installment.title)
+    val reminderTitle = stringResource(Res.string.notif_installment_title)
+    val reminderMsg = stringResource(Res.string.notif_installment_desc, item.installment.title)
+    val mainColor = if (item.installment.isCompleted) GlassGreen else MaterialTheme.colorScheme.primary
+
+    EntityRow(
+        item = EntityItem(
+            id = item.installment.id,
+            name = item.installment.title,
+            sub = stringResource(
+                Res.string.remaining_installments,
+                (item.installment.totalInstallments - item.installment.paidInstallments)
+            ),
+            badge = "$percentage%",
+            color = mainColor,
+            sub2 = DateUtils.formatDate(item.installment.nextDueDate) + "  |  " + 
+                    item.installment.installmentAmount.toInt().toSignedPersianPrice() + " " + stringResource(Res.string.currency_toman),
+            trailingContent = {
+                if (!item.installment.isCompleted) {
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(9.dp))
+                            .background(glassColors.glass)
+                            .border(1.dp, glassColors.glassEdge, RoundedCornerShape(9.dp))
+                            .clickable {
+                                viewModel.onIntent(InstallmentIntent.MarkAsPaid(
+                                    installmentId = item.installment.id,
+                                    transactionDescription = paymentDesc,
+                                    reminderTitle = reminderTitle,
+                                    reminderMessage = reminderMsg
+                                ))
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            tint = GlassGreen,
+                            modifier = Modifier.size(13.dp)
+                        )
+                    }
+                }
+            }
+        ),
+        mainColor = mainColor,
+        showActions = true,
+        onEdit = { onEdit(item.installment.id) },
+        onDelete = { onDelete(item.installment) },
+        onClick = { onEdit(item.installment.id) }
+    )
 }
 
 @Composable
