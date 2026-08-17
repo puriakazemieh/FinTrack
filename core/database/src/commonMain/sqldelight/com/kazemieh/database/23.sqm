@@ -1,1 +1,3 @@
-ALTER TABLE debt ADD COLUMN reminderEnabled INTEGER NOT NULL DEFAULT 0;
+-- reminderEnabled was added in 22.sqm. Keep this version as a no-op so users
+-- upgrading through both migrations do not attempt to add the column twice.
+UPDATE debt SET reminderEnabled = reminderEnabled WHERE 0;
