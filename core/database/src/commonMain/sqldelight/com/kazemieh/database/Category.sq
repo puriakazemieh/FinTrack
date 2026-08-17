@@ -96,10 +96,13 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getMostUsedCategories:
 SELECT c.* FROM category c
-JOIN transactions t ON c.id = t.categoryId
+LEFT JOIN transactions t ON c.id = t.categoryId
+LEFT JOIN debt d ON c.id = d.categoryId
+LEFT JOIN installment i ON c.id = i.categoryId
 WHERE (:type IS NULL OR c.type = :type)
 GROUP BY c.id
-ORDER BY COUNT(t.id) DESC
+HAVING (COUNT(t.id) + COUNT(d.id) + COUNT(i.id)) > 0
+ORDER BY (COUNT(t.id) + COUNT(d.id) + COUNT(i.id)) DESC
 LIMIT :limit;
 
 searchCategories:

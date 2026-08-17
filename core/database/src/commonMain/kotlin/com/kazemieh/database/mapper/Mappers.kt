@@ -201,12 +201,14 @@ fun DebtDb.toDebt() = Debt(
     id = id,
     personId = personId,
     amount = amount,
+    categoryId = categoryId,
     date = date,
     dueDate = dueDate,
     sourceId = sourceId,
     description = description,
     type = DebtType.fromInt(type.toInt()),
     isSettled = isSettled == 1L,
+    reminderEnabled = reminderEnabled == 1L,
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
@@ -215,12 +217,14 @@ fun ObserveAllDebts.toDebt() = Debt(
     id = id,
     personId = personId,
     amount = amount,
+    categoryId = categoryId,
     date = date,
     dueDate = dueDate,
     sourceId = sourceId,
     description = description,
     type = DebtType.fromInt(type.toInt()),
     isSettled = isSettled == 1L,
+    reminderEnabled = reminderEnabled == 1L,
     personName = personName,
     sourceName = sourceName,
     updatedAt = updatedAt,
@@ -231,59 +235,119 @@ fun ObserveDebtsByPerson.toDebt() = Debt(
     id = id,
     personId = personId,
     amount = amount,
+    categoryId = categoryId,
     date = date,
     dueDate = dueDate,
     sourceId = sourceId,
     description = description,
     type = DebtType.fromInt(type.toInt()),
     isSettled = isSettled == 1L,
+    reminderEnabled = reminderEnabled == 1L,
     personName = personName,
     sourceName = sourceName,
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
-fun ObserveAllDebts.toDebtWithRelations() = DebtWithRelations(
-    debt = this.toDebt(),
-    person = Person(
-        id = personId,
-        name = personName,
-        description = personDescription,
-        updatedAt = 0,
-        syncStatus = SyncStatus.SYNCED
-    ),
-    source = sourceId?.let {
-        Source(
-            id = it,
-            name = sourceName ?: "",
-            colorId = sourceColorId?.toInt() ?: 0,
-            iconId = sourceIconId?.toInt() ?: 0,
+fun ObserveAllDebts.toDebtWithRelations(): DebtWithRelations {
+    val tags = if (tagIds.isNullOrEmpty()) {
+        emptyList()
+    } else {
+        val ids = tagIds.split(",")
+        val names = tagNames?.split(",") ?: emptyList()
+        val colorIds = tagColorIds?.split(",") ?: emptyList()
+        ids.mapIndexed { index, id ->
+            Tag(
+                id = id.toLong(),
+                name = names.getOrNull(index) ?: "",
+                colorId = colorIds.getOrNull(index)?.toIntOrNull() ?: 1,
+                iconId = 1
+            )
+        }
+    }
+    return DebtWithRelations(
+        debt = this.toDebt(),
+        person = Person(
+            id = personId,
+            name = personName,
+            description = personDescription,
             updatedAt = 0,
             syncStatus = SyncStatus.SYNCED
-        )
-    }
-)
+        ),
+        category = categoryId?.let {
+            Category(
+                id = it,
+                name = categoryName ?: "",
+                colorId = categoryColorId?.toInt() ?: 1,
+                iconId = categoryIconId?.toInt() ?: 1,
+                type = TransactionType.fromInt(type.toInt()), // or map based on DebtType
+                updatedAt = 0,
+                syncStatus = SyncStatus.SYNCED
+            )
+        },
+        source = sourceId?.let {
+            Source(
+                id = it,
+                name = sourceName ?: "",
+                colorId = sourceColorId?.toInt() ?: 0,
+                iconId = sourceIconId?.toInt() ?: 0,
+                updatedAt = 0,
+                syncStatus = SyncStatus.SYNCED
+            )
+        },
+        tags = tags
+    )
+}
 
-fun ObserveDebtsByPerson.toDebtWithRelations() = DebtWithRelations(
-    debt = this.toDebt(),
-    person = Person(
-        id = personId,
-        name = personName,
-        description = personDescription,
-        updatedAt = 0,
-        syncStatus = SyncStatus.SYNCED
-    ),
-    source = sourceId?.let {
-        Source(
-            id = it,
-            name = sourceName ?: "",
-            colorId = sourceColorId?.toInt() ?: 0,
-            iconId = sourceIconId?.toInt() ?: 0,
+fun ObserveDebtsByPerson.toDebtWithRelations(): DebtWithRelations {
+    val tags = if (tagIds.isNullOrEmpty()) {
+        emptyList()
+    } else {
+        val ids = tagIds.split(",")
+        val names = tagNames?.split(",") ?: emptyList()
+        val colorIds = tagColorIds?.split(",") ?: emptyList()
+        ids.mapIndexed { index, id ->
+            Tag(
+                id = id.toLong(),
+                name = names.getOrNull(index) ?: "",
+                colorId = colorIds.getOrNull(index)?.toIntOrNull() ?: 1,
+                iconId = 1
+            )
+        }
+    }
+    return DebtWithRelations(
+        debt = this.toDebt(),
+        person = Person(
+            id = personId,
+            name = personName,
+            description = personDescription,
             updatedAt = 0,
             syncStatus = SyncStatus.SYNCED
-        )
-    }
-)
+        ),
+        category = categoryId?.let {
+            Category(
+                id = it,
+                name = categoryName ?: "",
+                colorId = categoryColorId?.toInt() ?: 1,
+                iconId = categoryIconId?.toInt() ?: 1,
+                type = TransactionType.fromInt(type.toInt()),
+                updatedAt = 0,
+                syncStatus = SyncStatus.SYNCED
+            )
+        },
+        source = sourceId?.let {
+            Source(
+                id = it,
+                name = sourceName ?: "",
+                colorId = sourceColorId?.toInt() ?: 0,
+                iconId = sourceIconId?.toInt() ?: 0,
+                updatedAt = 0,
+                syncStatus = SyncStatus.SYNCED
+            )
+        },
+        tags = tags
+    )
+}
 
 fun InstallmentDb.toInstallment() = Installment(
     id = id,
@@ -688,7 +752,7 @@ fun ShoppingItemDb.toShoppingItem() = ShoppingItem(
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
 
-fun com.kazemieh.database.ObserveShoppingItems.toShoppingItem(): ShoppingItem {
+fun ObserveShoppingItems.toShoppingItem(): ShoppingItem {
     val tags = if (tag_ids.isNullOrEmpty()) {
         emptyList()
     } else {
@@ -719,7 +783,7 @@ fun com.kazemieh.database.ObserveShoppingItems.toShoppingItem(): ShoppingItem {
     )
 }
 
-fun com.kazemieh.database.ObserveShoppingItemsFiltered.toShoppingItem(): ShoppingItem {
+fun ObserveShoppingItemsFiltered.toShoppingItem(): ShoppingItem {
     val tags = if (tag_ids.isNullOrEmpty()) {
         emptyList()
     } else {
@@ -750,7 +814,7 @@ fun com.kazemieh.database.ObserveShoppingItemsFiltered.toShoppingItem(): Shoppin
     )
 }
 
-fun com.kazemieh.database.GetShoppingItemById.toShoppingItem(): ShoppingItem {
+fun GetShoppingItemById.toShoppingItem(): ShoppingItem {
     val tags = if (tag_ids.isNullOrEmpty()) {
         emptyList()
     } else {
@@ -781,7 +845,7 @@ fun com.kazemieh.database.GetShoppingItemById.toShoppingItem(): ShoppingItem {
     )
 }
 
-fun com.kazemieh.database.Sync_history.toSyncHistory() = SyncHistory(
+fun Sync_history.toSyncHistory() = SyncHistory(
     id = id,
     timestamp = timestamp,
     type = SyncType.valueOf(type),

@@ -8,6 +8,9 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.domain.repository.DebtRepository
 import com.kazemieh.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
 data class DebtUseCaseGroup(
@@ -18,6 +21,7 @@ data class DebtUseCaseGroup(
     val deleteDebtUseCase: DeleteDebtUseCase,
     val updateDebtUseCase: UpdateDebtUseCase,
     val getDebtByIdUseCase: GetDebtByIdUseCase,
+    val getDebtWithRelationsUseCase: GetDebtWithRelationsUseCase,
     val getPersonByIdUseCase: GetPersonByIdUseCase,
     val getSourceByIdUseCase: GetSourceByIdUseCase
 )
@@ -26,12 +30,54 @@ class GetDebtByIdUseCase(private val repository: DebtRepository) {
     suspend operator fun invoke(id: Long) = repository.getDebtById(id)
 }
 
-class AddDebtUseCase(private val repository: DebtRepository) {
-    suspend operator fun invoke(debt: Debt): Long = repository.insertDebt(debt)
+class GetDebtWithRelationsUseCase(private val repository: DebtRepository) {
+    suspend operator fun invoke(id: Long): DebtWithRelations? = repository.observeAllDebts()
+        .map { it.find { d -> d.debt.id == id } }
+        .firstOrNull()
+}
+// Note: Alternatively, add a direct query for it in DebtRepository.
+// For now, let's keep it simple or check if DebtRepository has it.
+
+class AddDebtUseCase(
+    private val repository: DebtRepository,
+    private val notificationScheduler: com.kazemieh.domain.notification.NotificationScheduler
+) {
+    suspend operator fun invoke(debt: Debt, tagIds: List<Long> = emptyList()): Long {
+        val id = repository.insertDebt(debt, tagIds)
+        if (debt.reminderEnabled && debt.dueDate != null) {
+            notificationScheduler.scheduleReminder(
+                id = "debt_$id",
+                title = debt.personName ?: "یادآور بدهی",
+                message = debt.description ?: "سررسید بدهی/طلب",
+                scheduledTime = kotlinx.datetime.Instant.fromEpochMilliseconds(debt.dueDate!!)
+                    .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault()),
+                channelId = "debt_reminders"
+            )
+        }
+        return id
+    }
 }
 
-class UpdateDebtUseCase(private val repository: DebtRepository) {
-    suspend operator fun invoke(debt: Debt): Int = repository.updateDebt(debt)
+class UpdateDebtUseCase(
+    private val repository: DebtRepository,
+    private val notificationScheduler: com.kazemieh.domain.notification.NotificationScheduler
+) {
+    suspend operator fun invoke(debt: Debt, tagIds: List<Long> = emptyList()): Int {
+        val result = repository.updateDebt(debt, tagIds)
+        if (debt.reminderEnabled && debt.dueDate != null) {
+            notificationScheduler.scheduleReminder(
+                id = "debt_${debt.id}",
+                title = debt.personName ?: "یادآور بدهی",
+                message = debt.description ?: "سررسید بدهی/طلب",
+                scheduledTime = kotlinx.datetime.Instant.fromEpochMilliseconds(debt.dueDate!!)
+                    .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault()),
+                channelId = "debt_reminders"
+            )
+        } else {
+            notificationScheduler.cancelReminder("debt_${debt.id}")
+        }
+        return result
+    }
 }
 
 class ObserveDebtsUseCase(private val repository: DebtRepository) {
@@ -63,12 +109,12 @@ class SettleDebtUseCase(
                 TransactionType.EXPENSE // Paying money that I owed
             }
 
-            val category = transactionRepository.getDefaultCategory(transactionType)
+            val categoryId = debtWithRelations.categoryId ?: transactionRepository.getDefaultCategory(transactionType).id ?: 0L
 
             val transaction = Transaction(
                 id = 0,
                 amount = debtWithRelations.amount.toInt(),
-                categoryId = category.id ?: 0L,
+                categoryId = categoryId,
                 sourceId = sourceId,
                 description = description,
                 type = transactionType,

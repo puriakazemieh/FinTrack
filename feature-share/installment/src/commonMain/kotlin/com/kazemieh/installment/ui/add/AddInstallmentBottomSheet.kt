@@ -46,6 +46,7 @@ import com.kazemieh.jalali.JalaliCalendar
 import com.kazemieh.person.ui.list.PersonPickerBottomSheet
 import com.kazemieh.tag.ui.list.TagPickerBottomSheet
 import fintrack.core.designsystem.generated.resources.*
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -60,6 +61,7 @@ fun AddInstallmentBottomSheet(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val glassColors = LocalGlassColors.current
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(installmentId) {
         if (installmentId != null) {
@@ -73,8 +75,12 @@ fun AddInstallmentBottomSheet(
         viewModel.effects.collect { effect ->
             when (effect) {
                 AddInstallmentEffect.Success -> {
-                    onSuccess()
-                    onDismiss()
+                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            onSuccess()
+                            onDismiss()
+                        }
+                    }
                 }
                 is AddInstallmentEffect.Error -> {
                 }
@@ -151,15 +157,19 @@ fun AddInstallmentBottomSheet(
                 item {
                     Field(label = stringResource(Res.string.total_installments)) {
                         Column {
-                            TextField(
+                            BasicTextField(
                                 value = state.totalInstallments,
                                 onValueChange = { viewModel.onIntent(AddInstallmentIntent.SetTotalInstallments(it.filter { c -> c.isDigit() })) },
-                                colors = glassTextFieldColors(),
                                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = glassColors.text, fontWeight = FontWeight.SemiBold),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 visualTransformation = PersianNumberTransformation(),
                                 modifier = Modifier.fillMaxWidth(),
-                                placeholder = { FintrackBodyMediumText(text = "۰".toPersianDigits(), color = glassColors.text3) }
+                                decorationBox = @Composable { innerTextField ->
+                                    Box {
+                                        if (state.totalInstallments.isEmpty()) FintrackBodyMediumText(text = "۰".toPersianDigits(), color = glassColors.text3)
+                                        innerTextField()
+                                    }
+                                }
                             )
                             if (state.showMismatchWarning) {
                                 FintrackLabelSmallText(
@@ -174,15 +184,19 @@ fun AddInstallmentBottomSheet(
 
                 item {
                     Field(label = stringResource(Res.string.total_installment_amount)) {
-                        TextField(
+                        BasicTextField(
                             value = state.totalAmount,
                             onValueChange = { viewModel.onIntent(AddInstallmentIntent.SetTotalAmount(it.filter { c -> c.isDigit() })) },
-                            colors = glassTextFieldColors(),
                             textStyle = MaterialTheme.typography.bodyLarge.copy(color = glassColors.text, fontWeight = FontWeight.SemiBold),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             visualTransformation = NumberCommaTransformation(),
                             modifier = Modifier.fillMaxWidth(),
-                            placeholder = { FintrackBodyMediumText(text = "۰".toPersianDigits(), color = glassColors.text3) }
+                            decorationBox = @Composable { innerTextField ->
+                                Box {
+                                    if (state.totalAmount.isEmpty()) FintrackBodyMediumText(text = "۰".toPersianDigits(), color = glassColors.text3)
+                                    innerTextField()
+                                }
+                            }
                         )
                     }
                 }
@@ -387,12 +401,14 @@ private fun RecurrenceSelector(selected: InstallmentFrequency, onSelect: (Instal
 @Composable
 private fun MostUsedCategoryChips(items: List<com.kazemieh.common.model.Category>, onItemClick: (com.kazemieh.common.model.Category) -> Unit) {
     if (items.isEmpty()) return
+    val colors = FinTrackPickerColors.rainbow()
     Row(modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FintrackLabelSmallText(text = stringResource(Res.string.label_most_used), fontSize = 9.sp)
         FlowRow(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             items.take(3).forEach { category ->
-                Chip(color = GlassGreen, onClick = { onItemClick(category) }) {
-                    FintrackLabelSmallText(text = category.name, color = GlassGreen, fontSize = 10.sp)
+                val color = colors.firstOrNull { it.id == category.colorId }?.color ?: GlassGreen
+                Chip(color = color, onClick = { onItemClick(category) }) {
+                    FintrackLabelSmallText(text = category.name, color = color, fontSize = 10.sp)
                 }
             }
         }

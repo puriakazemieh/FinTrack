@@ -88,12 +88,13 @@ val domainModule = module {
     factory { GetBudgetSpentAmountUseCase(get()) }
     factory { HasAnyBudgetsUseCase(get()) }
 
-    factory { AddDebtUseCase(get()) }
-    factory { UpdateDebtUseCase(get()) }
+    factory { AddDebtUseCase(get(), get()) }
+    factory { UpdateDebtUseCase(get(), get()) }
     factory { DeleteDebtUseCase(get()) }
     factory { ObserveDebtsUseCase(get()) }
     factory { ObserveDebtsByPersonUseCase(get()) }
     factory { SettleDebtUseCase(get(), get()) }
+    factory { GetDebtWithRelationsUseCase(get()) }
 
     factory { AddCheckUseCase(get(), get()) }
     factory { UpdateCheckUseCase(get()) }
@@ -185,6 +186,7 @@ val domainModule = module {
             observeDebtsByPersonUseCase = get(),
             settleDebtUseCase = get(),
             getDebtByIdUseCase = get(),
+            getDebtWithRelationsUseCase = get(),
             getPersonByIdUseCase = get(),
             getSourceByIdUseCase = get()
         )

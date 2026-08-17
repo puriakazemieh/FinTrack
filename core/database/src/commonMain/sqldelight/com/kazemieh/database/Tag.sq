@@ -46,9 +46,12 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
 getMostUsedTags:
 SELECT tag.* FROM tag
-JOIN transaction_tag tt ON tag.id = tt.tagId
+LEFT JOIN transaction_tag tt ON tag.id = tt.tagId
+LEFT JOIN debt_tag dt ON tag.id = dt.tagId
+LEFT JOIN installment_tag it ON tag.id = it.tagId
 GROUP BY tag.id
-ORDER BY COUNT(tt.transactionId) DESC
+HAVING (COUNT(tt.transactionId) + COUNT(dt.debtId) + COUNT(it.installmentId)) > 0
+ORDER BY (COUNT(tt.transactionId) + COUNT(dt.debtId) + COUNT(it.installmentId)) DESC
 LIMIT :limit;
 
 searchTags:

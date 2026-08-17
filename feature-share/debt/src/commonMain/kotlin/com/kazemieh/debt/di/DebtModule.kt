@@ -13,7 +13,8 @@ val debtModule = module {
     }
     viewModel {
         AddDebtViewModel(
-            debtUseCases = get()
+            debtUseCases = get(),
+            transactionUseCases = get()
         )
     }
 }

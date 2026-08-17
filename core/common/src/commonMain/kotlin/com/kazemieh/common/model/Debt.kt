@@ -8,12 +8,14 @@ data class Debt(
     val id: Long = 0,
     val personId: Long,
     val amount: Long,
+    val categoryId: Long? = null,
     val date: Long = Clock.System.now().toEpochMilliseconds(),
     val dueDate: Long? = null,
     val sourceId: Long? = null,
     val description: String? = null,
     val type: DebtType,
     val isSettled: Boolean = false,
+    val reminderEnabled: Boolean = false,
     val personName: String? = null,
     val sourceName: String? = null,
     override val updatedAt: Long = 0,
@@ -24,7 +26,9 @@ data class Debt(
 data class DebtWithRelations(
     val debt: Debt,
     val person: Person,
-    val source: Source? = null
+    val category: Category? = null,
+    val source: Source? = null,
+    val tags: List<Tag> = emptyList()
 )
 
 @Serializable

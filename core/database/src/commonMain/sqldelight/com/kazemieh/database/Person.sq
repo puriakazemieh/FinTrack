@@ -44,9 +44,12 @@ VALUES (?, ?, ?, ?, ?, ?);
 
 getMostUsedPersons:
 SELECT person.* FROM person
-JOIN transaction_person tp ON person.id = tp.personId
+LEFT JOIN transaction_person tp ON person.id = tp.personId
+LEFT JOIN debt d ON person.id = d.personId
+LEFT JOIN installment_person ip ON person.id = ip.personId
 GROUP BY person.id
-ORDER BY COUNT(tp.transactionId) DESC
+HAVING (COUNT(tp.transactionId) + COUNT(d.id) + COUNT(ip.installmentId)) > 0
+ORDER BY (COUNT(tp.transactionId) + COUNT(d.id) + COUNT(ip.installmentId)) DESC
 LIMIT :limit;
 
 searchPersons:

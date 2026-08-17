@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS debt_tag (
+    debtId INTEGER NOT NULL,
+    tagId INTEGER NOT NULL,
+    PRIMARY KEY (debtId, tagId),
+    FOREIGN KEY (debtId) REFERENCES debt(id) ON DELETE CASCADE,
+    FOREIGN KEY (tagId) REFERENCES tag(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_debt_tag_debt ON debt_tag(debtId);
+CREATE INDEX IF NOT EXISTS idx_debt_tag_tag ON debt_tag(tagId);
+
+insertDebtTag:
+INSERT OR REPLACE INTO debt_tag(debtId, tagId) VALUES (?, ?);
+
+deleteTagsByDebtId:
+DELETE FROM debt_tag WHERE debtId = ?;

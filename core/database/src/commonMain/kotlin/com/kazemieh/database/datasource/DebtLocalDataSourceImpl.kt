@@ -38,38 +38,54 @@ class DebtLocalDataSourceImpl(private val db: FinTrackDatabase) : DebtLocalDataS
         queries.getDebtById(id).executeAsOneOrNull()?.toDebt()
     }
 
-    override suspend fun insertDebt(debt: Debt): Long = withContext(Dispatchers.Default) {
+    override suspend fun insertDebt(debt: Debt, tagIds: List<Long>): Long = withContext(Dispatchers.Default) {
         val now = Clock.System.now().toEpochMilliseconds()
-        queries.insertDebt(
-            personId = debt.personId,
-            amount = debt.amount,
-            date = debt.date,
-            dueDate = debt.dueDate,
-            sourceId = debt.sourceId,
-            description = debt.description,
-            type = debt.type.value.toLong(),
-            isSettled = if (debt.isSettled) 1L else 0L,
-            updatedAt = now,
-            syncStatus = 1
-        )
+        db.transaction {
+            queries.insertDebt(
+                personId = debt.personId,
+                amount = debt.amount,
+                categoryId = debt.categoryId,
+                date = debt.date,
+                dueDate = debt.dueDate,
+                sourceId = debt.sourceId,
+                description = debt.description,
+                type = debt.type.value.toLong(),
+                isSettled = if (debt.isSettled) 1L else 0L,
+                reminderEnabled = if (debt.reminderEnabled) 1L else 0L,
+                updatedAt = now,
+                syncStatus = 1
+            )
+            val id = queries.lastInsertRowId().executeAsOne()
+            tagIds.forEach { tagId ->
+                db.debtTagQueries.insertDebtTag(id, tagId)
+            }
+        }
         queries.lastInsertRowId().executeAsOne()
     }
 
-    override suspend fun updateDebt(debt: Debt): Int = withContext(Dispatchers.Default) {
+    override suspend fun updateDebt(debt: Debt, tagIds: List<Long>): Int = withContext(Dispatchers.Default) {
         val now = Clock.System.now().toEpochMilliseconds()
-        queries.updateDebt(
-            personId = debt.personId,
-            amount = debt.amount,
-            date = debt.date,
-            dueDate = debt.dueDate,
-            sourceId = debt.sourceId,
-            description = debt.description,
-            type = debt.type.value.toLong(),
-            isSettled = if (debt.isSettled) 1L else 0L,
-            updatedAt = now,
-            syncStatus = 1,
-            id = debt.id
-        )
+        db.transaction {
+            queries.updateDebt(
+                personId = debt.personId,
+                amount = debt.amount,
+                categoryId = debt.categoryId,
+                date = debt.date,
+                dueDate = debt.dueDate,
+                sourceId = debt.sourceId,
+                description = debt.description,
+                type = debt.type.value.toLong(),
+                isSettled = if (debt.isSettled) 1L else 0L,
+                reminderEnabled = if (debt.reminderEnabled) 1L else 0L,
+                updatedAt = now,
+                syncStatus = 1,
+                id = debt.id
+            )
+            db.debtTagQueries.deleteTagsByDebtId(debt.id)
+            tagIds.forEach { tagId ->
+                db.debtTagQueries.insertDebtTag(debt.id, tagId)
+            }
+        }
         1
     }
 
@@ -97,12 +113,14 @@ class DebtLocalDataSourceImpl(private val db: FinTrackDatabase) : DebtLocalDataS
                 id = debt.id,
                 personId = debt.personId,
                 amount = debt.amount,
+                categoryId = debt.categoryId,
                 date = debt.date,
                 dueDate = debt.dueDate,
                 sourceId = debt.sourceId,
                 description = debt.description,
                 type = debt.type.value.toLong(),
                 isSettled = if (debt.isSettled) 1L else 0L,
+                reminderEnabled = if (debt.reminderEnabled) 1L else 0L,
                 updatedAt = debt.updatedAt,
                 syncStatus = debt.syncStatus.value.toLong()
             )

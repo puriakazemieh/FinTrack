@@ -69,10 +69,15 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getMostUsedSources:
 SELECT * FROM source
-WHERE id IN (SELECT sourceId FROM transactions) OR id IN (SELECT sourceEndId FROM transactions)
+WHERE id IN (SELECT sourceId FROM transactions)
+   OR id IN (SELECT sourceEndId FROM transactions)
+   OR id IN (SELECT sourceId FROM debt)
+   OR id IN (SELECT sourceId FROM installment)
 ORDER BY (
     (SELECT COUNT(*) FROM transactions WHERE sourceId = source.id) +
-    (SELECT COUNT(*) FROM transactions WHERE sourceEndId = source.id)
+    (SELECT COUNT(*) FROM transactions WHERE sourceEndId = source.id) +
+    (SELECT COUNT(*) FROM debt WHERE sourceId = source.id) +
+    (SELECT COUNT(*) FROM installment WHERE sourceId = source.id)
 ) DESC
 LIMIT :limit;
 

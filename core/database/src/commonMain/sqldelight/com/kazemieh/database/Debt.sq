@@ -2,28 +2,31 @@ CREATE TABLE IF NOT EXISTS debt (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     personId INTEGER NOT NULL,
     amount INTEGER NOT NULL,
+    categoryId INTEGER,
     date INTEGER NOT NULL,
     dueDate INTEGER,
     sourceId INTEGER,
     description TEXT,
     type INTEGER NOT NULL,
     isSettled INTEGER NOT NULL DEFAULT 0,
+    reminderEnabled INTEGER NOT NULL DEFAULT 0,
     updatedAt INTEGER NOT NULL DEFAULT 0,
     syncStatus INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (personId) REFERENCES person(id) ON DELETE CASCADE,
-    FOREIGN KEY (sourceId) REFERENCES source(id) ON DELETE SET NULL
+    FOREIGN KEY (sourceId) REFERENCES source(id) ON DELETE SET NULL,
+    FOREIGN KEY (categoryId) REFERENCES category(id) ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_debt_person ON debt(personId);
 CREATE INDEX IF NOT EXISTS idx_debt_source ON debt(sourceId);
 
 insertDebt:
-INSERT INTO debt(personId, amount, date, dueDate, sourceId, description, type, isSettled, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO debt(personId, amount, categoryId, date, dueDate, sourceId, description, type, isSettled, reminderEnabled, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateDebt:
 UPDATE debt
-SET personId = ?, amount = ?, date = ?, dueDate = ?, sourceId = ?, description = ?, type = ?, isSettled = ?, updatedAt = ?, syncStatus = ?
+SET personId = ?, amount = ?, categoryId = ?, date = ?, dueDate = ?, sourceId = ?, description = ?, type = ?, isSettled = ?, reminderEnabled = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ?;
 
 deleteDebt:
@@ -42,11 +45,21 @@ SELECT
     p.description AS personDescription,
     s.name AS sourceName,
     s.colorId AS sourceColorId,
-    s.iconId AS sourceIconId
+    s.iconId AS sourceIconId,
+    c.name AS categoryName,
+    c.colorId AS categoryColorId,
+    c.iconId AS categoryIconId,
+    GROUP_CONCAT(DISTINCT t.id) AS tagIds,
+    GROUP_CONCAT(DISTINCT t.name) AS tagNames,
+    GROUP_CONCAT(DISTINCT t.colorId) AS tagColorIds
 FROM debt d
 INNER JOIN person p ON d.personId = p.id
 LEFT JOIN source s ON d.sourceId = s.id
+LEFT JOIN category c ON d.categoryId = c.id
+LEFT JOIN debt_tag dt ON d.id = dt.debtId
+LEFT JOIN tag t ON dt.tagId = t.id
 WHERE d.syncStatus != 2
+GROUP BY d.id
 ORDER BY d.isSettled ASC, d.date DESC;
 
 observeDebtsByPerson:
@@ -56,11 +69,21 @@ SELECT
     p.description AS personDescription,
     s.name AS sourceName,
     s.colorId AS sourceColorId,
-    s.iconId AS sourceIconId
+    s.iconId AS sourceIconId,
+    c.name AS categoryName,
+    c.colorId AS categoryColorId,
+    c.iconId AS categoryIconId,
+    GROUP_CONCAT(DISTINCT t.id) AS tagIds,
+    GROUP_CONCAT(DISTINCT t.name) AS tagNames,
+    GROUP_CONCAT(DISTINCT t.colorId) AS tagColorIds
 FROM debt d
 INNER JOIN person p ON d.personId = p.id
 LEFT JOIN source s ON d.sourceId = s.id
+LEFT JOIN category c ON d.categoryId = c.id
+LEFT JOIN debt_tag dt ON d.id = dt.debtId
+LEFT JOIN tag t ON dt.tagId = t.id
 WHERE d.personId = ? AND d.syncStatus != 2
+GROUP BY d.id
 ORDER BY d.date DESC;
 
 settleDebt:
@@ -70,8 +93,8 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertFullDebt:
-INSERT OR REPLACE INTO debt(id, personId, amount, date, dueDate, sourceId, description, type, isSettled, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO debt(id, personId, amount, categoryId, date, dueDate, sourceId, description, type, isSettled, reminderEnabled, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getModifiedDebts:
 SELECT * FROM debt WHERE syncStatus = 1;

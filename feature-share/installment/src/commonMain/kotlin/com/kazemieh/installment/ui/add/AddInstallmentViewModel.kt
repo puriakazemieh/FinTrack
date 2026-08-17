@@ -266,7 +266,9 @@ class AddInstallmentViewModel(
             mostUsedCategories = _state.value.mostUsedCategories,
             mostUsedSources = _state.value.mostUsedSources,
             mostUsedTags = _state.value.mostUsedTags,
-            mostUsedPersons = _state.value.mostUsedPersons
+            mostUsedPersons = _state.value.mostUsedPersons,
+            startDate = Clock.System.now().toEpochMilliseconds(),
+            nextDueDate = Clock.System.now().toEpochMilliseconds()
         )
     }
 

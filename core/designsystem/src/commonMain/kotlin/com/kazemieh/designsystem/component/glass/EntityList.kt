@@ -213,7 +213,7 @@ fun EntityList(
 }
 
 @Composable
-private fun SummaryHeader(summary: List<EntitySummary>?) {
+fun SummaryHeader(summary: List<EntitySummary>?) {
     val glassColors = LocalGlassColors.current
     if (summary != null) {
         GlassCard(

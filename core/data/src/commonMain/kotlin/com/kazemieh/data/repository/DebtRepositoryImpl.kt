@@ -16,9 +16,9 @@ class DebtRepositoryImpl(
 
     override suspend fun getDebtById(id: Long): Debt? = localDataSource.getDebtById(id)
 
-    override suspend fun insertDebt(debt: Debt): Long = localDataSource.insertDebt(debt)
+    override suspend fun insertDebt(debt: Debt, tagIds: List<Long>): Long = localDataSource.insertDebt(debt, tagIds)
 
-    override suspend fun updateDebt(debt: Debt): Int = localDataSource.updateDebt(debt)
+    override suspend fun updateDebt(debt: Debt, tagIds: List<Long>): Int = localDataSource.updateDebt(debt, tagIds)
 
     override suspend fun deleteDebt(id: Long) = localDataSource.deleteDebt(id)
 
