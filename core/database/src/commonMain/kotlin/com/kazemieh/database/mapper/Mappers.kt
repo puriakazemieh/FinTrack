@@ -65,8 +65,8 @@ fun GetAllTransactionsFiltered.toTransactionWithRelations(): TransactionWithRela
     return TransactionWithRelations(
         transaction = Transaction(
             id = id,
-            amount = amount.toInt(),
-            amountTransfer = amountTransfer?.toInt() ?: 0,
+            amount = amount,
+            amountTransfer = amountTransfer ?: 0L,
             categoryId = categoryId,
             sourceId = sourceId,
             sourceEndId = sourceEndId,
@@ -94,7 +94,7 @@ fun GetAllTransactionsFiltered.toTransactionWithRelations(): TransactionWithRela
         source = Source(
             id = source_id,
             name = source_name,
-            balance = source_balance.toInt(),
+            balance = source_balance,
             cardNumber = source_cardNumber,
             description = source_description,
             type = source_type.toInt(),
@@ -112,7 +112,7 @@ fun GetAllTransactionsFiltered.toTransactionWithRelations(): TransactionWithRela
             Source(
                 id = it,
                 name = sourceEnd_name!!,
-                balance = sourceEnd_balance!!.toInt(),
+                balance = sourceEnd_balance!!,
                 cardNumber = sourceEnd_cardNumber,
                 description = sourceEnd_description,
                 type = sourceEnd_type!!.toInt(),
@@ -160,7 +160,7 @@ fun ObserveCategorySumsByFilter.toCategorySum(): CategorySum {
 fun SourceDb.toSource() = Source(
     id = id,
     name = name,
-    balance = balance.toInt(),
+    balance = balance,
     cardNumber = cardNumber,
     description = description,
     type = type.toInt(),
@@ -702,8 +702,8 @@ fun ObserveFixedExpensesFiltered.toFixedExpense() = FixedExpense(
 // Transaction Mappers
 fun TransactionDb.toTransaction() = Transaction(
     id = id,
-    amount = amount.toInt(),
-    amountTransfer = amountTransfer?.toInt() ?: 0,
+    amount = amount,
+    amountTransfer = amountTransfer ?: 0L,
     categoryId = categoryId,
     sourceId = sourceId,
     sourceEndId = sourceEndId,
@@ -887,7 +887,7 @@ fun Sms_draft.toSmsDraft() = SmsDraft(
     id = id,
     sender = sender,
     body = body,
-    amount = amount.toInt(),
+    amount = amount,
     bankName = bankName,
     type = TransactionType.fromInt(type.toInt()),
     sourceId = sourceId,

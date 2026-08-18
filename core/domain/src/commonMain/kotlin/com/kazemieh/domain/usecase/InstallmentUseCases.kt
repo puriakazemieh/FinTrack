@@ -126,7 +126,7 @@ class MarkInstallmentAsPaidUseCase(
         // 1. Create Transaction
         val transaction = Transaction(
             id = 0,
-            amount = installment.installmentAmount.toInt(),
+            amount = installment.installmentAmount,
             categoryId = installment.categoryId,
             sourceId = installment.sourceId,
             description = transactionDescription,
@@ -141,7 +141,7 @@ class MarkInstallmentAsPaidUseCase(
                 transaction = transaction,
                 tagIds = tagIds,
                 personIds = personIds,
-                balanceDeltas = mapOf(installment.sourceId to -installment.installmentAmount.toInt())
+                balanceDeltas = mapOf(installment.sourceId to -installment.installmentAmount)
             )
         }
 

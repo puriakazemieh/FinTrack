@@ -67,7 +67,7 @@ class TransactionRepositoryImpl(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
-        balanceDeltas: Map<Long, Int>
+        balanceDeltas: Map<Long, Long>
     ): Long =
         localDataSource.addTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
 
@@ -75,13 +75,13 @@ class TransactionRepositoryImpl(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
-        balanceDeltas: Map<Long, Int>
+        balanceDeltas: Map<Long, Long>
     ): Long =
         localDataSource.updateTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
 
     override suspend fun deleteTransactionWithBalance(
         transaction: Transaction,
-        balanceDeltas: Map<Long, Int>
+        balanceDeltas: Map<Long, Long>
     ) = localDataSource.deleteTransactionWithBalance(transaction, balanceDeltas)
 
     override fun observeCategories(type: TransactionType?, parentId: Long?): Flow<List<Category>> {

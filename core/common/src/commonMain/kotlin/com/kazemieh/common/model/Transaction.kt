@@ -7,8 +7,8 @@ import kotlin.time.Clock
 @Serializable
 data class Transaction(
     val id: Long,
-    val amount: Int,
-    val amountTransfer: Int = 0,
+    val amount: Long,
+    val amountTransfer: Long = 0L,
     val categoryId: Long,
     val sourceId: Long,
     val sourceEndId: Long? = null,

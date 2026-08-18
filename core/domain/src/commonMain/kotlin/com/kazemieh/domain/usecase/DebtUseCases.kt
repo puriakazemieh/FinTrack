@@ -120,7 +120,7 @@ class SettleDebtUseCase(
 
             val transaction = Transaction(
                 id = 0,
-                amount = debtWithRelations.amount.toInt(),
+                amount = debtWithRelations.amount,
                 categoryId = categoryId,
                 sourceId = sourceId,
                 relatedDebtId = debtId,
@@ -133,7 +133,7 @@ class SettleDebtUseCase(
                 transaction = transaction,
                 tagIds = emptyList(),
                 personIds = listOf(debtWithRelations.personId),
-                balanceDeltas = mapOf(sourceId to (if (transactionType == TransactionType.INCOME) debtWithRelations.amount else -debtWithRelations.amount).toInt())
+                balanceDeltas = mapOf(sourceId to (if (transactionType == TransactionType.INCOME) debtWithRelations.amount else -debtWithRelations.amount))
             )
         }
 

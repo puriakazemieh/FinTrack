@@ -11,8 +11,9 @@ actual fun Scope.createDriver(): SqlDriver {
     val context = KoinPlatform.getKoin().get<Context>()
 
     val oldDb = context.getDatabasePath("fin_track.db")
-    if (oldDb.exists()) {
-        context.deleteDatabase("fin_track.db")
+    val newDb = context.getDatabasePath("fintrack.db")
+    if (oldDb.exists() && !newDb.exists()) {
+        oldDb.renameTo(newDb)
     }
     return AndroidSqliteDriver(
         schema = FinTrackDatabase.Schema.synchronous(),
