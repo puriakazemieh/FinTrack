@@ -643,7 +643,7 @@ class TransactionLocalDataSourceImpl(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
-        balanceDeltas: Map<Long, Int>
+        balanceDeltas: Map<Long, Long>
     ): Long = withContext(Dispatchers.Default) {
         db.transactionWithResult {
             val now = Clock.System.now().toEpochMilliseconds()
@@ -685,7 +685,7 @@ class TransactionLocalDataSourceImpl(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
-        balanceDeltas: Map<Long, Int>
+        balanceDeltas: Map<Long, Long>
     ): Long = withContext(Dispatchers.Default) {
         db.transactionWithResult {
             val now = Clock.System.now().toEpochMilliseconds()
@@ -723,6 +723,10 @@ class TransactionLocalDataSourceImpl(
                 transactionPersonQueries.insertTransactionPersonCrossRefs(transaction.id, personId)
             }
 
+            balanceDeltas.forEach { (sourceId, delta) ->
+                sourceQueries.adjustBalance(delta.toLong(), now, 1, sourceId)
+            }
+
             transaction.id
 
         }
@@ -730,7 +734,7 @@ class TransactionLocalDataSourceImpl(
 
     override suspend fun deleteTransactionWithBalance(
         transaction: Transaction,
-        balanceDeltas: Map<Long, Int>
+        balanceDeltas: Map<Long, Long>
     ) = withContext(Dispatchers.Default) {
         db.transaction {
             val now = Clock.System.now().toEpochMilliseconds()

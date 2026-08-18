@@ -53,7 +53,7 @@ class DetectSubscriptionsUseCase(
                 DetectedSubscription(
                     categoryId = categoryId,
                     categoryName = category?.name ?: "",
-                    amount = amount.toLong(),
+                    amount = amount,
                     averageIntervalDays = avgGap.toInt(),
                     lastPaymentTimestamp = lastTimestamp,
                     nextEstimatedTimestamp = lastTimestamp + (avgGap.toLong() * DAY_MS),

@@ -20,6 +20,10 @@ class AddTransactionUseCase(
         tagIds: List<Long>,
         personIds: List<Long>,
     ): Long {
+        if (transaction.type == TransactionType.TRANSFER && transaction.sourceId == transaction.sourceEndId) {
+            throw IllegalArgumentException("Cannot transfer to the same account")
+        }
+
         val impact = transaction.balanceImpact()
         val resultId = repository.addTransactionWithBalance(transaction, tagIds, personIds, impact)
 

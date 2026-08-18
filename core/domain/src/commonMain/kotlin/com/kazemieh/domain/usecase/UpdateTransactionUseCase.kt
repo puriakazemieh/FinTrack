@@ -13,6 +13,10 @@ class UpdateTransactionUseCase(
         tagIds: List<Long>,
         personIds: List<Long>,
     ): Long {
+        if (newTransaction.type == TransactionType.TRANSFER && newTransaction.sourceId == newTransaction.sourceEndId) {
+            throw IllegalArgumentException("Cannot transfer to the same account")
+        }
+
         val oldImpact = oldTransaction.balanceImpact()
         val newImpact = newTransaction.balanceImpact()
 

@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 data class Source(
     val id: Long? = null,
     val name: String,
-    val balance: Int = 0,
+    val balance: Long = 0,
     val cardNumber: String? = null,
     val description: String? = null,
     val type: Int = 0,

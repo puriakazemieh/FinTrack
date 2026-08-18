@@ -94,7 +94,7 @@ class PostFixedExpenseAsTransactionUseCase(
 
         val transaction = Transaction(
             id = 0,
-            amount = expense.amount.toInt(),
+            amount = expense.amount,
             categoryId = finalCategoryId,
             sourceId = finalSourceId,
             description = expense.description ?: expense.title,

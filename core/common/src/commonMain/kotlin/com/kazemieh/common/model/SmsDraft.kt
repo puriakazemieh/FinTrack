@@ -7,7 +7,7 @@ data class SmsDraft(
     val id: Long = 0,
     val sender: String,
     val body: String,
-    val amount: Int,
+    val amount: Long,
     val bankName: String,
     val type: TransactionType,
     val categoryId: Long? = null,

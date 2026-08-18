@@ -19,19 +19,19 @@ interface TransactionLocalDataSource {
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
-        balanceDeltas: Map<Long, Int>
+        balanceDeltas: Map<Long, Long>
     ): Long
 
     suspend fun updateTransactionWithBalance(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
-        balanceDeltas: Map<Long, Int>
+        balanceDeltas: Map<Long, Long>
     ): Long
 
     suspend fun deleteTransactionWithBalance(
         transaction: Transaction,
-        balanceDeltas: Map<Long, Int>
+        balanceDeltas: Map<Long, Long>
     )
 
     fun observeTransactions(

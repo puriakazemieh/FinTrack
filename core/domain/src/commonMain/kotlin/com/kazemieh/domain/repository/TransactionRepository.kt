@@ -19,19 +19,19 @@ interface TransactionRepository {
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
-        balanceDeltas: Map<Long, Int>
+        balanceDeltas: Map<Long, Long>
     ): Long
 
     suspend fun updateTransactionWithBalance(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
-        balanceDeltas: Map<Long, Int>
+        balanceDeltas: Map<Long, Long>
     ): Long
 
     suspend fun deleteTransactionWithBalance(
         transaction: Transaction,
-        balanceDeltas: Map<Long, Int>
+        balanceDeltas: Map<Long, Long>
     )
 
     fun observeTransactions(
@@ -88,10 +88,10 @@ interface TransactionRepository {
     suspend fun saveRecentSearch(query: String)
     suspend fun deleteRecentSearch(query: String)
 
-    suspend fun updateCategoryPositions(positions: Map<Long, Int>)
-    suspend fun updateSourcePositions(positions: Map<Long, Int>)
-    suspend fun updateTagPositions(positions: Map<Long, Int>)
-    suspend fun updatePersonPositions(positions: Map<Long, Int>)
+    suspend fun updateCategoryPositions(positions: Map<Long, Long>)
+    suspend fun updateSourcePositions(positions: Map<Long, Long>)
+    suspend fun updateTagPositions(positions: Map<Long, Long>)
+    suspend fun updatePersonPositions(positions: Map<Long, Long>)
 
     suspend fun getTransactionAmountRange(): Pair<Long, Long>
 
