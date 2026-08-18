@@ -20,6 +20,8 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,10 +35,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.list.CategoryPickerBottomSheet
 import com.kazemieh.common.model.CheckStatus
@@ -230,12 +235,45 @@ fun AddCheckBottomSheet(
                     CheckStatusSelector(state.status) { viewModel.onIntent(AddCheckIntent.SetStatus(it)) }
                 }
                 item {
-                    FintrackOutlinedTextField(
-                        value = state.description,
-                        onValueChange = { viewModel.onIntent(AddCheckIntent.SetDescription(it)) },
-                        label = { FintrackBodyMediumText(stringResource(Res.string.description)) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    GlassCard(padding = 14.dp) {
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                FintrackLabelSmallText(
+                                    text = stringResource(Res.string.label_note)
+                                )
+                                FintrackLabelSmallText(
+                                    text = stringResource(
+                                        Res.string.label_char_count_limit,
+                                        state.description.length.toLong().toPersianDigits(),
+                                        250.toLong().toPersianDigits()
+                                    )
+                                )
+                            }
+                            BasicTextField(
+                                value = state.description,
+                                onValueChange = { desc ->
+                                    if (desc.length <= 250) viewModel.onIntent(AddCheckIntent.SetDescription(desc))
+                                },
+                                textStyle = MaterialTheme.typography.bodyMedium.copy(color = LocalGlassColors.current.text),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                                cursorBrush = Brush.verticalGradient(listOf(GlassGreen, GlassGreen)),
+                                modifier = Modifier.fillMaxWidth(),
+                                decorationBox = @Composable { innerTextField ->
+                                    Box {
+                                        if (state.description.isEmpty()) {
+                                            FintrackBodyMediumText(
+                                                text = stringResource(Res.string.hint_transaction_description)
+                                            )
+                                        }
+                                        innerTextField()
+                                    }
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -344,15 +382,24 @@ private fun CheckPickerValue(label: String, drawable: DrawableResource? = null, 
 @Composable
 private fun MostUsedRow(items: List<String>, color: Color = GlassGreen, onClick: (Int) -> Unit) {
     if (items.isEmpty()) return
-    FlowRow(
-        modifier = Modifier.padding(start = 8.dp, top = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        FintrackLabelSmallText(stringResource(Res.string.label_most_used), color = LocalGlassColors.current.text3)
-        items.take(3).forEachIndexed { index, label ->
-            Chip(color = color, onClick = { onClick(index) }) {
-                FintrackLabelSmallText(label, color = color)
+        FintrackLabelSmallText(
+            text = stringResource(Res.string.label_most_used),
+            fontSize = 9.sp
+        )
+        FlowRow(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            items.take(3).forEachIndexed { index, label ->
+                Chip(color = color, onClick = { onClick(index) }) {
+                    FintrackLabelSmallText(label, color = color, fontSize = 10.sp)
+                }
             }
         }
     }

@@ -19,7 +19,8 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
         title: String,
         message: String,
         scheduledTime: LocalDateTime,
-        channelId: String
+        channelId: String,
+        extraId: Long?
     ) {
         val now = JavaLocalDateTime.now()
         val target = scheduledTime.toJavaLocalDateTime()
@@ -34,7 +35,8 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
                     title,
                     message,
                     channelId,
-                    id.hashCode()
+                    id.hashCode(),
+                    extraId
                 )
             )
             .build()

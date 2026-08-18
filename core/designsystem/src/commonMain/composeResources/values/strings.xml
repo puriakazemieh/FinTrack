@@ -1094,9 +1094,11 @@
     <string name="label_quick_add_notification_desc">نوتیفیکیشن دائمی با دکمه‌ی افزودن تراکنش</string>
     <string name="notif_channel_installment">یادآور اقساط</string>
     <string name="notif_channel_cheque">یادآور چک‌ها</string>
+    <string name="notif_channel_debt">یادآور بدهی و طلب</string>
     <string name="notif_channel_desc">اعلان‌های برنامه فین‌تراک</string>
     <string name="notif_action_register">ثبت سریع</string>
     <string name="notif_action_ignore">نادیده گرفتن</string>
+    <string name="notif_action_manage">مدیریت</string>
     <string name="bank_label">بانک %1$s</string>
     <string name="amount_rial_label">%1$s ریال</string>
     <string name="sms_banner_desc">شما %1$s تراکنش ثبت نشده از پیامک‌های بانکی دارید.</string>

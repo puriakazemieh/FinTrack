@@ -34,6 +34,7 @@ import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet
 import com.kazemieh.designsystem.component.glass.*
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.financialsource.ui.list.SourceFilterSelectionContent
@@ -59,6 +60,7 @@ fun DebtsScreen(
     }
 
     var selectedDebtForEdit by remember { mutableStateOf<Long?>(null) }
+    var selectedDebtForDelete by remember { mutableStateOf<DebtWithRelations?>(null) }
     var showAddDebt by remember { mutableStateOf(false) }
     var debtToSettle by remember { mutableStateOf<DebtWithRelations?>(null) }
     var postSettlementAsTransaction by remember { mutableStateOf(false) }
@@ -171,7 +173,7 @@ fun DebtsScreen(
                             selectedDebtForEdit = item.debt.id
                             showAddDebt = true
                         },
-                        onDelete = { viewModel.onIntent(DebtIntent.DeleteDebt(item.debt.id)) },
+                        onDelete = { selectedDebtForDelete = item },
                         onClick = { onNavigateToPersonDetail(item.person.id ?: 0L) }
                     )
                 }
@@ -192,6 +194,17 @@ fun DebtsScreen(
             AddDebtBottomSheet(
                 debtId = selectedDebtForEdit,
                 onDismiss = { showAddDebt = false }
+            )
+        }
+
+        selectedDebtForDelete?.let { item ->
+            DeleteBottomSheet(
+                itemName = item.person.name + (item.debt.description?.let { " ($it)" } ?: ""),
+                dismissClicked = { selectedDebtForDelete = null },
+                confirmClicked = {
+                    viewModel.onIntent(DebtIntent.DeleteDebt(item.debt.id))
+                    selectedDebtForDelete = null
+                }
             )
         }
 

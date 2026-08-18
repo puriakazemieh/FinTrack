@@ -6,7 +6,8 @@ interface NotificationScheduler {
         title: String,
         message: String,
         scheduledTime: kotlinx.datetime.LocalDateTime,
-        channelId: String
+        channelId: String,
+        extraId: Long? = null
     )
     fun cancelReminder(id: String)
 }

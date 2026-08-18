@@ -20,8 +20,9 @@ class NotificationWorker(
         val message = inputData.getString(KEY_MESSAGE) ?: return Result.failure()
         val channelId = inputData.getString(KEY_CHANNEL_ID) ?: return Result.failure()
         val notificationId = inputData.getInt(KEY_NOTIFICATION_ID, 0)
+        val extraId = inputData.getLong(KEY_EXTRA_ID, -1L)
 
-        notificationManager.showNotification(notificationId, title, message, channelId)
+        notificationManager.showNotification(notificationId, title, message, channelId, extraId)
 
         return Result.success()
     }
@@ -31,13 +32,17 @@ class NotificationWorker(
         const val KEY_MESSAGE = "message"
         const val KEY_CHANNEL_ID = "channelId"
         const val KEY_NOTIFICATION_ID = "notificationId"
+        const val KEY_EXTRA_ID = "extraId"
 
-        fun createInputData(title: String, message: String, channelId: String, notificationId: Int): Data {
+        fun createInputData(title: String, message: String, channelId: String, notificationId: Int, extraId: Long? = null): Data {
             return Data.Builder()
                 .putString(KEY_TITLE, title)
                 .putString(KEY_MESSAGE, message)
                 .putString(KEY_CHANNEL_ID, channelId)
                 .putInt(KEY_NOTIFICATION_ID, notificationId)
+                .apply {
+                    extraId?.let { putLong(KEY_EXTRA_ID, it) }
+                }
                 .build()
         }
     }

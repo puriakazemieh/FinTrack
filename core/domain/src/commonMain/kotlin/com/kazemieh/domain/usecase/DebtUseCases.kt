@@ -5,6 +5,7 @@ import com.kazemieh.common.model.DebtType
 import com.kazemieh.common.model.DebtWithRelations
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.domain.notification.NotificationManager
 import com.kazemieh.domain.repository.DebtRepository
 import com.kazemieh.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
@@ -51,7 +52,8 @@ class AddDebtUseCase(
                 message = debt.description ?: "سررسید بدهی/طلب",
                 scheduledTime = kotlinx.datetime.Instant.fromEpochMilliseconds(debt.dueDate!!)
                     .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault()),
-                channelId = "debt_reminders"
+                channelId = NotificationManager.CHANNEL_DEBT,
+                extraId = id
             )
         }
         return id
@@ -71,7 +73,8 @@ class UpdateDebtUseCase(
                 message = debt.description ?: "سررسید بدهی/طلب",
                 scheduledTime = kotlinx.datetime.Instant.fromEpochMilliseconds(debt.dueDate!!)
                     .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault()),
-                channelId = "debt_reminders"
+                channelId = NotificationManager.CHANNEL_DEBT,
+                extraId = debt.id
             )
         } else {
             notificationScheduler.cancelReminder("debt_${debt.id}")

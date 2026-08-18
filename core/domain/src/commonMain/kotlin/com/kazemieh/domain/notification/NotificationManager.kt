@@ -3,7 +3,7 @@ package com.kazemieh.domain.notification
 interface NotificationManager {
     fun createChannels()
     fun createChannel(id: String, name: String, importance: Int = 3)
-    fun showNotification(id: Int, title: String, message: String, channelId: String)
+    fun showNotification(id: Int, title: String, message: String, channelId: String, extraId: Long = -1L)
     fun hasPermission(): Boolean
     fun openSettings()
     fun showStickyNotification(id: Int, title: String, message: String, smsDraftId: Long = -1L)
@@ -22,6 +22,7 @@ interface NotificationManager {
         const val CHANNEL_SHOPPING = "shopping_reminders"
         const val CHANNEL_NOTE = "note_reminders"
         const val CHANNEL_SMS = "sms_detection"
+        const val CHANNEL_DEBT = "debt_reminders"
         const val CHANNEL_QUICK_ADD = "quick_add"
         const val ID_QUICK_ADD = 9001
     }

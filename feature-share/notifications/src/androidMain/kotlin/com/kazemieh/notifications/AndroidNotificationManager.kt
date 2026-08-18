@@ -16,11 +16,13 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.notif_action_ignore
+import fintrack.core.designsystem.generated.resources.notif_action_manage
 import fintrack.core.designsystem.generated.resources.notif_action_register
 import fintrack.core.designsystem.generated.resources.notif_budget_exceeded_desc
 import fintrack.core.designsystem.generated.resources.notif_budget_exceeded_title
 import fintrack.core.designsystem.generated.resources.notif_channel_budget
 import fintrack.core.designsystem.generated.resources.notif_channel_cheque
+import fintrack.core.designsystem.generated.resources.notif_channel_debt
 import fintrack.core.designsystem.generated.resources.notif_channel_desc
 import fintrack.core.designsystem.generated.resources.notif_channel_installment
 import fintrack.core.designsystem.generated.resources.notif_channel_note
@@ -63,6 +65,7 @@ class AndroidNotificationManager(
                 toolEnabled(ToolFeature.INSTALLMENT) && notifEnabled(FinTrackPreferences.PREF_NOTIF_INSTALLMENT_ENABLED)
             NotificationManager.CHANNEL_CHEQUE ->
                 toolEnabled(ToolFeature.CHECK) && notifEnabled(FinTrackPreferences.PREF_NOTIF_CHEQUE_ENABLED)
+            NotificationManager.CHANNEL_DEBT -> toolEnabled(ToolFeature.DEBT)
             NotificationManager.CHANNEL_SHOPPING -> toolEnabled(ToolFeature.SHOPPING)
             NotificationManager.CHANNEL_NOTE -> toolEnabled(ToolFeature.NOTES)
             NotificationManager.CHANNEL_SMS ->
@@ -88,6 +91,10 @@ class AndroidNotificationManager(
             createChannel(
                 NotificationManager.CHANNEL_CHEQUE,
                 getString(Res.string.notif_channel_cheque)
+            )
+            createChannel(
+                NotificationManager.CHANNEL_DEBT,
+                getString(Res.string.notif_channel_debt)
             )
             createChannel(
                 NotificationManager.CHANNEL_SMS,
@@ -120,19 +127,53 @@ class AndroidNotificationManager(
         }
     }
 
-    override fun showNotification(id: Int, title: String, message: String, channelId: String) {
+    override fun showNotification(id: Int, title: String, message: String, channelId: String, extraId: Long) {
         if (!hasPermission()) return
         if (!isChannelAllowed(channelId)) return
 
-        val notification = NotificationCompat.Builder(context, channelId)
+        val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(appIcon)
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
-            .build()
 
-        notificationManagerCompat.notify(id, notification)
+        when (channelId) {
+            NotificationManager.CHANNEL_CHEQUE -> {
+                val deepLinkIntent = Intent(Intent.ACTION_VIEW, Uri.parse("fintrack://check")).apply {
+                    `package` = context.packageName
+                }
+                val pendingIntent = PendingIntent.getActivity(context, id, deepLinkIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                builder.setContentIntent(pendingIntent)
+
+                builder.addAction(0, runBlocking { getString(Res.string.notif_action_manage) }, pendingIntent)
+
+                val ignoreIntent = Intent("com.kazemieh.check.ACTION_IGNORE").apply {
+                    putExtra("notification_id", id)
+                    `package` = context.packageName
+                }
+                val ignorePendingIntent = PendingIntent.getBroadcast(context, id + 1000, ignoreIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                builder.addAction(0, runBlocking { getString(Res.string.notif_action_ignore) }, ignorePendingIntent)
+            }
+            NotificationManager.CHANNEL_DEBT -> {
+                val deepLinkIntent = Intent(Intent.ACTION_VIEW, Uri.parse("fintrack://debt")).apply {
+                    `package` = context.packageName
+                }
+                val pendingIntent = PendingIntent.getActivity(context, id, deepLinkIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                builder.setContentIntent(pendingIntent)
+
+                builder.addAction(0, runBlocking { getString(Res.string.notif_action_manage) }, pendingIntent)
+
+                val ignoreIntent = Intent("com.kazemieh.debt.ACTION_IGNORE").apply {
+                    putExtra("notification_id", id)
+                    `package` = context.packageName
+                }
+                val ignorePendingIntent = PendingIntent.getBroadcast(context, id + 1000, ignoreIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                builder.addAction(0, runBlocking { getString(Res.string.notif_action_ignore) }, ignorePendingIntent)
+            }
+        }
+
+        notificationManagerCompat.notify(id, builder.build())
     }
 
     override fun showStickyNotification(id: Int, title: String, message: String, smsDraftId: Long) {

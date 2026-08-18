@@ -28,7 +28,8 @@ class AddCheckUseCase(
             title = title,
             message = message,
             scheduledTime = dueInstant.toLocalDateTime(TimeZone.currentSystemDefault()),
-            channelId = NotificationManager.CHANNEL_CHEQUE
+            channelId = NotificationManager.CHANNEL_CHEQUE,
+            extraId = check.id
         )
     }
 }
@@ -50,7 +51,8 @@ class UpdateCheckUseCase(
                 title = reminderTitle,
                 message = reminderMessage,
                 scheduledTime = dueInstant.toLocalDateTime(TimeZone.currentSystemDefault()),
-                channelId = NotificationManager.CHANNEL_CHEQUE
+                channelId = NotificationManager.CHANNEL_CHEQUE,
+                extraId = check.id
             )
         } else if (!check.reminderEnabled) {
             notificationScheduler.cancelReminder("check_${check.id}")

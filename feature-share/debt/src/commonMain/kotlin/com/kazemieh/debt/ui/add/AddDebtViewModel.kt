@@ -79,7 +79,7 @@ class AddDebtViewModel(
             is AddDebtIntent.SetTags -> _state.update { it.copy(tags = intent.tags) }
             is AddDebtIntent.SetDate -> _state.update { it.copy(date = intent.date) }
             is AddDebtIntent.SetDueDate -> _state.update { it.copy(dueDate = intent.dueDate) }
-            is AddDebtIntent.SetReminderEnabled -> _state.update { it.copy(reminderEnabled = intent.enabled) }
+            is AddDebtIntent.SetReminderEnabled -> _state.update { it.copy(reminderEnabled = intent.enabled, dueDate = if (intent.enabled && it.dueDate == null) it.date else it.dueDate) }
             is AddDebtIntent.SetReminderTime -> setReminderTime(intent.hour, intent.minute)
             is AddDebtIntent.SetSource -> _state.update { it.copy(source = intent.source) }
             is AddDebtIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
