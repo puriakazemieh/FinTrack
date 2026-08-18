@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Sms
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,12 +58,6 @@ fun ManageToolsScreen(
             if (granted) requestNotifPermission = true
         }
     )
-    // Users who enabled SMS reading before the notification permission was requested (e.g. the
-    // onboarding flow was skipped) never granted POST_NOTIFICATIONS, so the SMS notification was
-    // silently dropped. Prompt for it when they land here with SMS reading already on.
-    LaunchedEffect(state.smsReadingEnabled) {
-        if (state.smsReadingEnabled) requestNotifPermission = true
-    }
 
     FintrackScreen(
         title = stringResource(Res.string.manage_tools_title),
@@ -114,8 +107,13 @@ fun ManageToolsScreen(
                             title = feature.displayLabel(),
                             icon = feature.displayIcon,
                             on = feature !in state.disabledTools,
-                            onToggle = { viewModel.onIntent(ManageToolsIntent.ToggleTool(feature)) }
-                        )
+                        onToggle = {
+                            if (feature in state.disabledTools) {
+                                requestNotifPermission = true
+                            }
+                            viewModel.onIntent(ManageToolsIntent.ToggleTool(feature))
+                        }
+                    )
                     }
                 }
             }
