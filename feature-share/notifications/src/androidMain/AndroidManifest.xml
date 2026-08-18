@@ -2,11 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
         <receiver
-            android:name=".InstallmentActionReceiver"
+            android:name=".NotificationActionReceiver"
             android:exported="false">
             <intent-filter>
+                <action android:name="com.kazemieh.notifications.ACTION_MANAGE" />
                 <action android:name="com.kazemieh.installment.ACTION_MARK_PAID" />
                 <action android:name="com.kazemieh.installment.ACTION_IGNORE" />
+                <action android:name="com.kazemieh.check.ACTION_IGNORE" />
+                <action android:name="com.kazemieh.debt.ACTION_IGNORE" />
             </intent-filter>
         </receiver>
     </application>

@@ -146,7 +146,13 @@ class AndroidNotificationManager(
                 val pendingIntent = PendingIntent.getActivity(context, id, deepLinkIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 builder.setContentIntent(pendingIntent)
 
-                builder.addAction(0, runBlocking { getString(Res.string.notif_action_manage) }, pendingIntent)
+                val manageIntent = Intent("com.kazemieh.notifications.ACTION_MANAGE").apply {
+                    putExtra("notification_id", id)
+                    putExtra("uri", "fintrack://check")
+                    `package` = context.packageName
+                }
+                val managePendingIntent = PendingIntent.getBroadcast(context, id + 2000, manageIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                builder.addAction(0, runBlocking { getString(Res.string.notif_action_manage) }, managePendingIntent)
 
                 val ignoreIntent = Intent("com.kazemieh.check.ACTION_IGNORE").apply {
                     putExtra("notification_id", id)
@@ -162,7 +168,13 @@ class AndroidNotificationManager(
                 val pendingIntent = PendingIntent.getActivity(context, id, deepLinkIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 builder.setContentIntent(pendingIntent)
 
-                builder.addAction(0, runBlocking { getString(Res.string.notif_action_manage) }, pendingIntent)
+                val manageIntent = Intent("com.kazemieh.notifications.ACTION_MANAGE").apply {
+                    putExtra("notification_id", id)
+                    putExtra("uri", "fintrack://debt")
+                    `package` = context.packageName
+                }
+                val managePendingIntent = PendingIntent.getBroadcast(context, id + 2000, manageIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                builder.addAction(0, runBlocking { getString(Res.string.notif_action_manage) }, managePendingIntent)
 
                 val ignoreIntent = Intent("com.kazemieh.debt.ACTION_IGNORE").apply {
                     putExtra("notification_id", id)
@@ -182,25 +194,19 @@ class AndroidNotificationManager(
 
         // Deep-link straight into the add-transaction sheet, carrying the SMS draft id so the sheet
         // opens pre-filled with the detected amount / type / source instead of a blank form.
-        val deepLinkIntent = Intent(
-            Intent.ACTION_VIEW,
-            Uri.parse("fintrack://dashboard?showAddTransaction=true&smsDraftId=$smsDraftId")
-        ).apply {
-            `package` = context.packageName
-        }
-
-        val pendingIntent = PendingIntent.getActivity(
-            context, id, deepLinkIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val deepLinkUri = "fintrack://dashboard?showAddTransaction=true&smsDraftId=$smsDraftId"
 
         val registerLabel = runBlocking { getString(Res.string.notif_action_register) }
         val ignoreLabel = runBlocking { getString(Res.string.notif_action_ignore) }
 
-        // Action for Register (same as main click)
-        val registerAction = NotificationCompat.Action.Builder(
-            0, registerLabel, pendingIntent
-        ).build()
+        // Content intent and Register action (using broadcast to allow dismissal of ongoing notif)
+        val manageIntent = Intent("com.kazemieh.notifications.ACTION_MANAGE").apply {
+            putExtra("notification_id", id)
+            putExtra("uri", deepLinkUri)
+            `package` = context.packageName
+        }
+        val managePendingIntent = PendingIntent.getBroadcast(context, id + 2000, manageIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val registerAction = NotificationCompat.Action.Builder(0, registerLabel, managePendingIntent).build()
 
         // Action for Ignore (Broadcast)
         val ignoreIntent = Intent("com.kazemieh.sms_reader.ACTION_IGNORE").apply {
@@ -221,7 +227,7 @@ class AndroidNotificationManager(
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
-            .setContentIntent(pendingIntent)
+            .setContentIntent(managePendingIntent)
             .addAction(registerAction)
             .addAction(ignoreAction)
             .setAutoCancel(true)
@@ -242,10 +248,8 @@ class AndroidNotificationManager(
         if (!hasPermission()) return
         if (!isChannelAllowed(NotificationManager.CHANNEL_INSTALLMENT)) return
 
-        val deepLinkIntent = Intent(
-            Intent.ACTION_VIEW,
-            Uri.parse("fintrack://installment")
-        ).apply {
+        val deepLinkUri = "fintrack://installment"
+        val deepLinkIntent = Intent(Intent.ACTION_VIEW, Uri.parse(deepLinkUri)).apply {
             `package` = context.packageName
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }

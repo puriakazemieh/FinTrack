@@ -174,7 +174,7 @@ fun InstallmentsScreen(
             label = stringResource(Res.string.add_installment),
             icon = rememberVectorPainter(Icons.Default.Add),
             onClick = { selectedInstallmentId = null; showAddInstallment = true },
-            modifier = Modifier.align(Alignment.BottomStart).padding(24.dp).padding(bottom = 80.dp)
+            modifier = Modifier.align(Alignment.BottomStart).padding(16.dp)
         )
 
         if (showAddInstallment) {

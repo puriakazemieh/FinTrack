@@ -187,7 +187,7 @@ fun DebtsScreen(
                 selectedDebtForEdit = null
                 showAddDebt = true
             },
-            modifier = Modifier.align(Alignment.BottomStart).padding(24.dp).padding(bottom = 80.dp)
+            modifier = Modifier.align(Alignment.BottomStart).padding(16.dp)
         )
 
         if (showAddDebt) {

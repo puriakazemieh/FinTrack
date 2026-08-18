@@ -407,18 +407,21 @@ private fun MostUsedRow(items: List<String>, color: Color = GlassGreen, onClick:
 
 @Composable
 private fun CheckStatusSelector(selected: CheckStatus, onSelect: (CheckStatus) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         FintrackBodyMediumText(stringResource(Res.string.label_check_status_title), color = LocalGlassColors.current.text2)
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-            CheckStatus.entries.forEach { status ->
-                val label = when (status) {
-                    CheckStatus.PENDING -> Res.string.label_check_status_ongoing
-                    CheckStatus.PASSED -> Res.string.label_check_status_passed
-                    CheckStatus.REJECTED -> Res.string.label_check_status_returned
-                    CheckStatus.CANCELLED -> Res.string.label_check_status_cancelled
-                }
-                Chip(active = selected == status, onClick = { onSelect(status) }, modifier = Modifier.weight(1f)) {
-                    FintrackLabelSmallText(stringResource(label))
+        val chunks = CheckStatus.entries.chunked(2)
+        chunks.forEach { rowItems ->
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                rowItems.forEach { status ->
+                    val label = when (status) {
+                        CheckStatus.PENDING -> Res.string.label_check_status_ongoing
+                        CheckStatus.PASSED -> Res.string.label_check_status_passed
+                        CheckStatus.REJECTED -> Res.string.label_check_status_returned
+                        CheckStatus.CANCELLED -> Res.string.label_check_status_cancelled
+                    }
+                    Chip(active = selected == status, onClick = { onSelect(status) }, modifier = Modifier.weight(1f)) {
+                        FintrackLabelSmallText(stringResource(label))
+                    }
                 }
             }
         }
