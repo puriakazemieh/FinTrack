@@ -78,14 +78,45 @@ open class FakeAchievementRepository : AchievementRepository {
 }
 
 open class FakeBudgetRepository : BudgetRepository {
-    override fun observeBudgetsWithProgress(from: Long, to: Long): Flow<List<BudgetWithProgress>> = emptyFlow()
-    override suspend fun getBudgetWithProgressByCategory(categoryId: Long): BudgetWithProgress? = null
-    override suspend fun addBudget(budget: Budget): Long = 1L
-    override suspend fun updateBudget(budget: Budget): Int = 1
-    override suspend fun deleteBudget(id: Long) {}
-    override suspend fun getBudgetByCategoryId(categoryId: Long): Budget? = null
+    private val budgets = mutableMapOf<Long, Budget>()
+
+    override fun observeBudgetsWithProgress(from: Long, to: Long): Flow<List<BudgetWithProgress>> = kotlinx.coroutines.flow.flow {
+        val list = budgets.values.filter { it.syncStatus != SyncStatus.DELETED && it.startAt in from..to }.map { b ->
+            BudgetWithProgress(budget = b, category = null, spentAmount = 0L, progress = 0f)
+        }
+        emit(list)
+    }
+
+    override suspend fun getBudgetWithProgressByCategory(categoryId: Long): BudgetWithProgress? {
+        val b = budgets.values.find { it.categoryId == categoryId && it.syncStatus != SyncStatus.DELETED } ?: return null
+        return BudgetWithProgress(budget = b, category = null, spentAmount = 0L, progress = 0f)
+    }
+
+    override suspend fun addBudget(budget: Budget): Long {
+        val id = budget.id ?: (budgets.size + 1).toLong()
+        budgets[id] = budget.copy(id = id)
+        return id
+    }
+
+    override suspend fun updateBudget(budget: Budget): Int {
+        if (budget.id == null) return 0
+        budgets[budget.id!!] = budget
+        return 1
+    }
+
+    override suspend fun deleteBudget(id: Long) {
+        budgets[id]?.let {
+            budgets[id] = it.copy(syncStatus = SyncStatus.DELETED)
+        }
+    }
+
+    override suspend fun getBudgetByCategoryId(categoryId: Long): Budget? {
+        return budgets.values.find { it.categoryId == categoryId && it.syncStatus != SyncStatus.DELETED }
+    }
+
     override suspend fun getSpentAmountByCategory(categoryId: Long, from: Long, to: Long): Long = 0L
-    override suspend fun hasAnyBudgets(): Boolean = false
+
+    override suspend fun hasAnyBudgets(): Boolean = budgets.values.any { it.syncStatus != SyncStatus.DELETED }
 }
 
 open class FakeNotificationManager : com.kazemieh.domain.notification.NotificationManager, com.kazemieh.domain.notification.NotificationScheduler {
