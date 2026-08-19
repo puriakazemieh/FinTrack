@@ -20,9 +20,9 @@ class TransactionMatrixTest {
                 achievementRepository = FakeAchievementRepository(),
                 transactionRepository = repo,
                 budgetRepository = FakeBudgetRepository(),
-                updateXP = UpdateXPUseCase(FakeGamificationRepository())
+                updateXP = UpdateXPUseCase(FakeAchievementRepository())
             ),
-            updateXP = UpdateXPUseCase(FakeGamificationRepository())
+            updateXP = UpdateXPUseCase(FakeAchievementRepository())
         )
         val updateUseCase = UpdateTransactionUseCase(repo)
         return Triple(addUseCase, updateUseCase, repo)

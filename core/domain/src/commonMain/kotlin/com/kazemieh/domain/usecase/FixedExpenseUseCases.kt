@@ -81,6 +81,8 @@ class PostFixedExpenseAsTransactionUseCase(
     private val getDefaultFinancialSourceUseCase: GetDefaultFinancialSourceUseCase
 ) {
     suspend operator fun invoke(expense: FixedExpense) {
+        if (!expense.isActive) return
+
         val timeZone = TimeZone.currentSystemDefault()
         val nowTs = Clock.System.now().toEpochMilliseconds()
 

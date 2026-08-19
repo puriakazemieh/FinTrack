@@ -43,9 +43,9 @@ open class FakeTransactionRepository : TransactionRepository {
     override suspend fun deleteSource(from: Source, to: Source?) {}
     override fun observeSources(): Flow<List<Source>> = emptyFlow()
     override fun observeSource(sourceId: Long): Flow<Source?> = emptyFlow()
-    override suspend fun getSourceById(id: Long): Source? = null
+    override suspend fun getSourceById(id: Long): Source? = Source(id = id, name = "Src", balance = 0L, type = 0, colorId = 0, iconId = 0)
     override suspend fun getSourceByIdentifier(identifier: String): Source? = null
-    override suspend fun getDefaultSource(): Source? = null
+    override suspend fun getDefaultSource(): Source? = Source(id = 1, name = "DefSrc", balance = 0L, type = 0, colorId = 0, iconId = 0)
     override fun observeMostUsedCategories(type: TransactionType?, limit: Long): Flow<List<Category>> = emptyFlow()
     override fun observeMostUsedSources(limit: Long): Flow<List<Source>> = emptyFlow()
     override fun observeMostUsedTags(limit: Long): Flow<List<Tag>> = emptyFlow()
@@ -88,7 +88,7 @@ open class FakeBudgetRepository : BudgetRepository {
     override suspend fun hasAnyBudgets(): Boolean = false
 }
 
-open class FakeNotificationManager : com.kazemieh.domain.notification.NotificationManager {
+open class FakeNotificationManager : com.kazemieh.domain.notification.NotificationManager, com.kazemieh.domain.notification.NotificationScheduler {
     override fun showBudgetAlert(categoryId: Int, categoryName: String, progressPercentage: Int) {}
     override fun createChannels() {}
     override fun createChannel(id: String, name: String, importance: Int) {}
@@ -99,14 +99,62 @@ open class FakeNotificationManager : com.kazemieh.domain.notification.Notificati
     override fun showInstallmentNotification(id: Int, title: String, message: String, installmentId: Long) {}
     override fun showQuickAddNotification(title: String, message: String, actionLabel: String) {}
     override fun cancelNotification(id: Int) {}
+    
+    override fun scheduleReminder(id: String, title: String, message: String, scheduledTime: kotlinx.datetime.LocalDateTime, channelId: String, extraId: Long?) {}
+    override fun cancelReminder(id: String) {}
 }
 
-open class FakeGamificationRepository : GamificationRepository {
-    override suspend fun updateXP(amount: Int) {}
-    override suspend fun getXP(): Int = 0
-    override suspend fun updateStreak(lastActiveDate: kotlinx.datetime.Instant) {}
-    override suspend fun getStreakDays(): Int = 0
-    override suspend fun getLastActiveDate(): kotlinx.datetime.Instant? = null
-    override suspend fun unlockAchievement(achievementId: Long) {}
-    override fun observeUnlockedAchievements(): Flow<List<Achievement>> = emptyFlow()
+
+open class FakeDebtRepository : DebtRepository {
+    private val debts = mutableMapOf<Long, DebtWithRelations>()
+    override suspend fun insertDebt(debt: Debt, tagIds: List<Long>): Long {
+        debts[debt.id] = DebtWithRelations(debt, Person(1, "Person", null), Category(1, "Cat", null, TransactionType.EXPENSE, 0, 0, 0, null), Source(id = 10, name = "Source", balance = 0L, type = 0, colorId = 0, iconId = 0), emptyList())
+        return debt.id
+    }
+    override suspend fun updateDebt(debt: Debt, tagIds: List<Long>): Int {
+        debts[debt.id] = debts[debt.id]!!.copy(debt = debt)
+        return 1
+    }
+    override suspend fun settleDebt(id: Long) {
+        val d = debts[id] ?: return
+        debts[id] = d.copy(debt = d.debt.copy(isSettled = true))
+    }
+    override suspend fun deleteDebt(id: Long) { debts.remove(id) }
+    override suspend fun getDebtById(id: Long): Debt? = debts[id]?.debt
+    
+    override fun observeAllDebts(): Flow<List<DebtWithRelations>> = flowOf(debts.values.toList())
+    override fun observeDebtsByPerson(personId: Long): Flow<List<DebtWithRelations>> = flowOf(debts.values.filter { it.person.id == personId })
+}
+
+open class FakeInstallmentRepository : InstallmentRepository {
+    private val installments = mutableMapOf<Long, InstallmentWithRelations>()
+    override suspend fun insertInstallment(installment: Installment, tagIds: List<Long>, personIds: List<Long>): Long {
+        installments[installment.id] = InstallmentWithRelations(installment, Category(1, "Cat", null, TransactionType.EXPENSE, 0, 0, 0, null), Source(id = 10, name = "Source", balance = 0L, type = 0, colorId = 0, iconId = 0), emptyList(), emptyList())
+        return installment.id
+    }
+    override suspend fun updateInstallment(installment: Installment, tagIds: List<Long>, personIds: List<Long>) {
+        installments[installment.id] = installments[installment.id]!!.copy(installment = installment)
+    }
+    override suspend fun deleteInstallment(id: Long) { installments.remove(id) }
+    override suspend fun getInstallmentWithRelations(id: Long): InstallmentWithRelations? = installments[id]
+    override fun observeInstallments(): Flow<List<InstallmentWithRelations>> = flowOf(installments.values.toList())
+    override suspend fun getInstallmentById(id: Long): Installment? = installments[id]?.installment
+}
+
+open class FakeFixedExpenseRepository : FixedExpenseRepository {
+    private val fixed = mutableMapOf<Long, FixedExpense>()
+    override suspend fun insertFixedExpense(expense: FixedExpense): Long {
+        fixed[expense.id] = expense
+        return expense.id
+    }
+    override suspend fun updateFixedExpense(expense: FixedExpense) {
+        fixed[expense.id] = expense
+    }
+    override suspend fun updateNextDueDate(id: Long, nextDueDate: Long) {
+        fixed[id] = fixed[id]!!.copy(nextDueDate = nextDueDate)
+    }
+    override suspend fun deleteFixedExpense(id: Long) { fixed.remove(id) }
+    override suspend fun getFixedExpenseById(id: Long): FixedExpense? = fixed[id]
+    override fun observeAllFixedExpenses(): Flow<List<FixedExpense>> = flowOf(fixed.values.toList())
+    override fun observeFixedExpensesFiltered(query: String?, categoryIds: List<Long>, sourceIds: List<Long>, tagIds: List<Long>, personIds: List<Long>): Flow<List<FixedExpense>> = flowOf(fixed.values.toList())
 }
