@@ -95,6 +95,13 @@ kotlin {
                 implementation("app.cash.sqldelight:sqlite-driver:${libs.versions.sqldelight.get()}")
             }
         }
+        
+        jvmTest {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(kotlin("test-junit"))
+            }
+        }
 
     }
 }
