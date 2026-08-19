@@ -17,7 +17,8 @@ class BackupRepositoryImpl(
     private val installmentLocalDataSource: InstallmentLocalDataSource,
     private val noteLocalDataSource: NoteLocalDataSource,
     private val shoppingLocalDataSource: ShoppingLocalDataSource,
-    private val syncHistoryLocalDataSource: SyncHistoryLocalDataSource
+    private val syncHistoryLocalDataSource: SyncHistoryLocalDataSource,
+    private val databaseTransactionProvider: DatabaseTransactionProvider
 ) : BackupRepository {
 
     override suspend fun getBackupData(fromTimestamp: Long?, toTimestamp: Long?): BackupData {
@@ -65,7 +66,7 @@ class BackupRepositoryImpl(
         )
     }
 
-    override suspend fun restoreBackupData(data: BackupData): Pair<Int, Int> {
+    override suspend fun restoreBackupData(data: BackupData): Pair<Int, Int> = databaseTransactionProvider.runInTransaction {
         val inserted = 0
         val updated = 0
         
@@ -85,7 +86,7 @@ class BackupRepositoryImpl(
         data.notes.filter { it.syncStatus != SyncStatus.DELETED }.forEach { noteLocalDataSource.insertFullNote(it) }
         data.shoppingItems.filter { it.syncStatus != SyncStatus.DELETED }.forEach { shoppingLocalDataSource.insertFullShoppingItem(it) }
         
-        return inserted to updated
+        inserted to updated
     }
 
     private suspend fun handleRemoteDeletions(data: BackupData) {

@@ -64,7 +64,8 @@ val dataModule = module {
             installmentLocalDataSource = get(),
             noteLocalDataSource = get(),
             shoppingLocalDataSource = get(),
-            syncHistoryLocalDataSource = get()
+            syncHistoryLocalDataSource = get(),
+            databaseTransactionProvider = get()
         )
     }
 

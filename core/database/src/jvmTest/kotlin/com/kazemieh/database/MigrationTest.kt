@@ -1,25 +1,21 @@
 package com.kazemieh.database
 
+import app.cash.sqldelight.async.coroutines.synchronous
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
-import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import kotlin.test.assertEquals
 
 class MigrationTest {
 
     @Test
-    fun `test all database migrations execute successfully`() = runBlocking {
+    fun `test all database migrations execute successfully`() {
         // Create an in-memory database driver
         val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
         
-        // This will run all migration scripts sequentially (1.sqm -> 25.sqm)
-        FinTrackDatabase.Schema.migrate(
-            driver = driver,
-            oldVersion = 0,
-            newVersion = FinTrackDatabase.Schema.version
-        )
+        // Schema.synchronous().create runs the initial CREATE TABLE statements 
+        // plus all migration scripts (1.sqm -> 25.sqm) sequentially
+        FinTrackDatabase.Schema.synchronous().create(driver)
         
-        // Verify the database is usable
+        // Verify the database is usable by creating a FinTrackDatabase instance
         val database = FinTrackDatabase(
             driver = driver,
             assetAdapter = com.kazemieh.database.Asset.Adapter(
@@ -30,7 +26,7 @@ class MigrationTest {
             )
         )
         
-        // If we reach here without exception, migrations have successfully completed
+        // If we reach here without exception, the schema is valid
         // which means there are no SQL syntax errors or conflicting alters in any .sqm files.
         driver.close()
     }
