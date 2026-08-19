@@ -8,16 +8,25 @@ import com.kazemieh.common.model.CheckStatus
 import com.kazemieh.common.model.Person
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
+import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.domain.usecase.CheckUseCaseGroup
+import com.kazemieh.domain.usecase.AddTransactionUseCase
+import com.kazemieh.domain.usecase.GetDefaultCategoryUseCase
+import com.kazemieh.domain.usecase.GetDefaultFinancialSourceUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
 
 class CheckListViewModel(
-    private val checkUseCases: CheckUseCaseGroup
+    private val checkUseCases: CheckUseCaseGroup,
+    private val addTransactionUseCase: AddTransactionUseCase,
+    private val getDefaultCategoryUseCase: GetDefaultCategoryUseCase,
+    private val getDefaultFinancialSourceUseCase: GetDefaultFinancialSourceUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(CheckListState())
     val state: StateFlow<CheckListState> = _state.asStateFlow()
@@ -49,7 +58,21 @@ class CheckListViewModel(
                 filterTags.value = intent.tags
                 filterPersons.value = intent.persons
             }
-            is CheckListIntent.UpdateStatus -> updateStatus(intent.checkId, intent.newStatus)
+            is CheckListIntent.UpdateStatus -> {
+                val check = _state.value.checks.find { it.id == intent.checkId }
+                if (check?.status == CheckStatus.PENDING && intent.newStatus == CheckStatus.PASSED) {
+                    _state.update { it.copy(confirmTransactionForCheckId = intent.checkId, confirmTransactionForNewStatus = intent.newStatus) }
+                } else {
+                    updateStatus(intent.checkId, intent.newStatus, false)
+                }
+            }
+            is CheckListIntent.SubmitStatusUpdate -> {
+                _state.update { it.copy(confirmTransactionForCheckId = null, confirmTransactionForNewStatus = null) }
+                updateStatus(intent.checkId, intent.newStatus, intent.createTransaction)
+            }
+            CheckListIntent.CancelStatusUpdate -> {
+                _state.update { it.copy(confirmTransactionForCheckId = null, confirmTransactionForNewStatus = null) }
+            }
             is CheckListIntent.DeleteCheck -> deleteCheck(intent.checkId)
         }
     }
@@ -97,10 +120,29 @@ class CheckListViewModel(
         }
     }
 
-    private fun updateStatus(checkId: Long, newStatus: CheckStatus) {
+    private fun updateStatus(checkId: Long, newStatus: CheckStatus, createTransaction: Boolean) {
         viewModelScope.launch {
             _state.value.checks.find { it.id == checkId }?.let { check ->
                 checkUseCases.updateCheckUseCase(check.copy(status = newStatus))
+                if (createTransaction && newStatus == CheckStatus.PASSED) {
+                    val defaultCat = if (check.categoryId == null) getDefaultCategoryUseCase(if (check.isIncoming) TransactionType.INCOME else TransactionType.EXPENSE).id else null
+                    val defaultSrc = if (check.sourceId == null) getDefaultFinancialSourceUseCase()?.id else null
+                    
+                    val transaction = Transaction(
+                        id = 0L,
+                        amount = check.amount,
+                        timeStamp = Clock.System.now().toEpochMilliseconds(),
+                        categoryId = check.categoryId ?: defaultCat ?: 0L,
+                        sourceId = check.sourceId ?: defaultSrc ?: 0L,
+                        type = if (check.isIncoming) TransactionType.INCOME else TransactionType.EXPENSE,
+                        description = "پاس شدن چک: ${check.description ?: ""}"
+                    )
+                    addTransactionUseCase(
+                        transaction = transaction,
+                        tagIds = check.tagIds ?: emptyList(),
+                        personIds = listOf(check.personId)
+                    )
+                }
             }
         }
     }
@@ -128,7 +170,9 @@ data class CheckListState(
     val filterCategories: Set<Category> = emptySet(),
     val filterSources: Set<Source> = emptySet(),
     val filterTags: Set<Tag> = emptySet(),
-    val filterPersons: Set<Person> = emptySet()
+    val filterPersons: Set<Person> = emptySet(),
+    val confirmTransactionForCheckId: Long? = null,
+    val confirmTransactionForNewStatus: CheckStatus? = null
 )
 
 sealed interface CheckListIntent {
@@ -143,5 +187,7 @@ sealed interface CheckListIntent {
         val persons: Set<Person>
     ) : CheckListIntent
     data class UpdateStatus(val checkId: Long, val newStatus: CheckStatus) : CheckListIntent
+    data class SubmitStatusUpdate(val checkId: Long, val newStatus: CheckStatus, val createTransaction: Boolean) : CheckListIntent
+    data object CancelStatusUpdate : CheckListIntent
     data class DeleteCheck(val checkId: Long) : CheckListIntent
 }

@@ -191,6 +191,50 @@ fun CheckListScreen(
                 onDismiss = { selectedCheckForStatus = null }
             )
         }
+        if (state.confirmTransactionForCheckId != null && state.confirmTransactionForNewStatus != null) {
+            CheckTransactionConfirmBottomSheet(
+                onDismiss = { viewModel.onIntent(CheckListIntent.CancelStatusUpdate) },
+                onConfirm = { createTransaction ->
+                    viewModel.onIntent(CheckListIntent.SubmitStatusUpdate(state.confirmTransactionForCheckId!!, state.confirmTransactionForNewStatus!!, createTransaction))
+                }
+            )
+        }
+    }
+}
+
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@Composable
+private fun CheckTransactionConfirmBottomSheet(
+    onDismiss: () -> Unit,
+    onConfirm: (Boolean) -> Unit
+) {
+    SheetFrame(
+        title = "ثبت تراکنش",
+        sub = "آیا می‌خواهید پاس شدن این چک به عنوان یک تراکنش در برنامه ثبت شود؟",
+        onDismiss = onDismiss,
+        isFullScreen = false
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp, start = 16.dp, end = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            androidx.compose.material3.Button(
+                onClick = { onConfirm(true) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                FintrackLabelMediumText("بله، به عنوان تراکنش ثبت شود", color = MaterialTheme.colorScheme.onPrimary)
+            }
+            androidx.compose.material3.TextButton(
+                onClick = { onConfirm(false) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                FintrackLabelMediumText("خیر، فقط وضعیت تغییر کند", color = LocalGlassColors.current.text)
+            }
+        }
     }
 }
 
