@@ -187,7 +187,7 @@ private val AddSourceMode.sourceIdOrNull: Long?
 data class SourceDraft(
     val name: String = "",
     val description: String? = null,
-    val balance: Int = 0,
+    val balance: Long = 0L,
     val type: TypeSource = TypeSource.CREDIT,
     val cardNumber: String? = null,
     val colorId: Int? = null,
@@ -245,7 +245,7 @@ sealed interface AddSourceIntent {
 
     data class UpdateName(val value: String) : AddSourceIntent
     data class UpdateDescription(val value: String?) : AddSourceIntent
-    data class UpdateBalance(val value: Int) : AddSourceIntent
+    data class UpdateBalance(val value: Long) : AddSourceIntent
     data class UpdateType(val value: TypeSource) : AddSourceIntent
     data class UpdateCardNumber(val value: String?) : AddSourceIntent
     data class UpdateShabaNumber(val value: String?) : AddSourceIntent

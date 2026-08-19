@@ -1,6 +1,7 @@
 package com.kazemieh.domain.usecase
 
 import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionType
 import com.kazemieh.domain.repository.TransactionRepository
 import com.kazemieh.domain.util.balanceImpact
 
@@ -23,8 +24,8 @@ class UpdateTransactionUseCase(
         val allSourceIds = (oldImpact.keys + newImpact.keys).toSet()
         val deltas = buildMap {
             allSourceIds.forEach { sourceId ->
-                val delta = (newImpact[sourceId] ?: 0) - (oldImpact[sourceId] ?: 0)
-                if (delta != 0) put(sourceId, delta)
+                val delta = (newImpact[sourceId] ?: 0L) - (oldImpact[sourceId] ?: 0L)
+                if (delta != 0L) put(sourceId, delta)
             }
         }
 

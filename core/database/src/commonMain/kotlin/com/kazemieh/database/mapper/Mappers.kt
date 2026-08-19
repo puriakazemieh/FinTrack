@@ -537,7 +537,7 @@ private fun mapInstallmentWithRelations(
         source = Source(
             id = source_id ?: 0L,
             name = source_name ?: "",
-            balance = source_balance?.toInt() ?: 0,
+            balance = source_balance ?: 0L,
             cardNumber = source_cardNumber,
             description = source_description,
             type = source_type?.toInt() ?: 0,

@@ -6,14 +6,14 @@ import com.kazemieh.common.toEnglishDigits
 import kotlin.time.Clock
 
 abstract class BaseBankParser : BankParser {
-    protected fun extractAmount(body: String, regex: Regex): Int {
+    protected fun extractAmount(body: String, regex: Regex): Long {
         val match = regex.find(body)
         return match?.groupValues?.get(1)
             ?.replace(",", "")
             ?.replace("،", "")
             ?.replace("٬", "")
             ?.toEnglishDigits()
-            ?.toIntOrNull() ?: 0
+            ?.toLongOrNull() ?: 0L
     }
 
     protected fun extractSourceIdentifier(body: String): String? {
@@ -25,7 +25,7 @@ abstract class BaseBankParser : BankParser {
     protected fun createDraft(
         sender: String,
         body: String,
-        amount: Int,
+        amount: Long,
         type: TransactionType,
         bankName: String? = null,
         sourceIdentifier: String? = null,
@@ -120,9 +120,9 @@ class GenericBankParser : BaseBankParser() {
         val sourceIdentifier = extractSourceIdentifier(text)
         val bankDisplayName = bankNameHints.entries.firstOrNull { text.contains(it.key) }?.value
             ?: sender.replace("Bank", "").replace("bank", "").trim()
-        val amountInt = txAmount.coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+        val amountLong = txAmount
 
-        return createDraft(sender, body, amountInt, type, bankDisplayName, sourceIdentifier, confidence = 75)
+        return createDraft(sender, body, amountLong, type, bankDisplayName, sourceIdentifier, confidence = 75)
     }
 }
 

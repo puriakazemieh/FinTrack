@@ -16,7 +16,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -34,7 +33,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Source
-import com.kazemieh.designsystem.GlassEdge
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassGreenSoft
 import com.kazemieh.designsystem.LocalGlassColors
@@ -44,7 +42,6 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackHeadlineLargeText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
-import com.kazemieh.designsystem.component.glassTextFieldColors
 import com.kazemieh.designsystem.component.FourDigitGroupingTransformation
 import com.kazemieh.designsystem.component.LeadingIconStyle
 import com.kazemieh.designsystem.component.NumberCommaTransformation
@@ -53,6 +50,7 @@ import com.kazemieh.designsystem.component.glass.ColorSwatches
 import com.kazemieh.designsystem.component.glass.Field
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.IconGrid
+import com.kazemieh.designsystem.component.glassTextFieldColors
 import com.kazemieh.designsystem.component.model.asString
 import com.kazemieh.designsystem.model.Bank
 import com.kazemieh.designsystem.picker.FinTrackIcons
@@ -163,21 +161,20 @@ fun AddSourceContent(
         onClose = { onIntent(AddSourceIntent.OnDismiss) },
         onFilterClick = if (state.mode is AddSourceMode.Edit && onNavigateToTransactions != null) {
             {
-                (state.mode as? AddSourceMode.Edit)?.sourceId?.let { id ->
-                    onNavigateToTransactions(
-                        Source(
-                            id = id,
-                            name = state.draft.name,
-                            description = state.draft.description,
-                            balance = state.draft.balance,
-                            type = state.draft.type.ordinal + 1, // TypeSource mapping might need verification
-                            cardNumber = state.draft.cardNumber,
-                            colorId = state.draft.colorId ?: 1,
-                            iconId = state.draft.iconId ?: 1
-                        )
+                onNavigateToTransactions(
+                    Source(
+                        id = state.mode.sourceId,
+                        name = state.draft.name,
+                        description = state.draft.description,
+                        balance = state.draft.balance,
+                        type = state.draft.type.ordinal + 1, // TypeSource mapping might need verification
+                        cardNumber = state.draft.cardNumber,
+                        colorId = state.draft.colorId ?: 1,
+                        iconId = state.draft.iconId ?: 1
                     )
-                    onIntent(AddSourceIntent.OnDismiss)
-                }
+                )
+                onIntent(AddSourceIntent.OnDismiss)
+
             }
         } else null,
         hero = {
@@ -250,9 +247,9 @@ fun AddSourceContent(
             item {
                 Field(label = stringResource(Res.string.initial_balance_label)) {
                     TextField(
-                        value = if (state.draft.balance == 0) "" else state.draft.balance.toString(),
+                        value = if (state.draft.balance == 0L) "" else state.draft.balance.toString(),
                         onValueChange = { input ->
-                            val newValue = input.toIntOrNull() ?: 0
+                            val newValue = input.toLongOrNull() ?: 0L
                             onIntent(AddSourceIntent.UpdateBalance(newValue))
                         },
                         visualTransformation = NumberCommaTransformation(),
@@ -510,7 +507,10 @@ private fun SourceTypeSelector(
     GlassCard(padding = 14.dp) {
         val glassColors = LocalGlassColors.current
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            FintrackLabelSmallText(text = stringResource(Res.string.label_type), color = glassColors.text3)
+            FintrackLabelSmallText(
+                text = stringResource(Res.string.label_type),
+                color = glassColors.text3
+            )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -528,7 +528,11 @@ private fun SourceTypeSelector(
                                     GlassGreen.copy(alpha = 0.33f),
                                     RoundedCornerShape(10.dp)
                                 )
-                                else Modifier.border(1.dp, glassColors.glassEdge, RoundedCornerShape(10.dp))
+                                else Modifier.border(
+                                    1.dp,
+                                    glassColors.glassEdge,
+                                    RoundedCornerShape(10.dp)
+                                )
                             )
                             .clickable { onTypeSelected(option) }
                             .padding(vertical = 10.dp),

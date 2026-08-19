@@ -318,7 +318,7 @@ class TransactionReportViewModel(
                 totalIncome = totalIncome,
                 totalExpense = totalExpense,
                 totalTransfer = totalTransfer,
-                isPositiveBalance = balanceValue >= 0,
+                isPositiveBalance = balanceValue >= 0L,
                 pieChartData = pieChartItems,
                 categorySums = categorySums
             )

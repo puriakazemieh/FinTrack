@@ -217,7 +217,7 @@ class TransactionViewModel(
                         totalExpense = totalExpense,
                         formatedTotalTransfer = totalTransfer.toInt().toSignedPersianPrice(),
                         totalTransfer = totalTransfer,
-                        balance = balance.toInt().toSignedPersianPrice(),
+                        balance = balance.toLong().toSignedPersianPrice(),
                         isPositiveBalance = balance >= 0L
                     )
                 }

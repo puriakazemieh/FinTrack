@@ -71,7 +71,7 @@ class OnboardingViewModel(
                 } else {
                     Source(
                         name = _state.value.sourceName,
-                        balance = _state.value.sourceBalance.toIntOrNull() ?: 0,
+                        balance = _state.value.sourceBalance.toLongOrNull() ?: 0L,
                         colorId = 34,
                         iconId = 22
                     )
