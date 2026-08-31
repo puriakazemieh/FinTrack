@@ -17,6 +17,7 @@ import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.getString
 
 class OnboardingViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val seedDataUseCase: SeedDataUseCase,
     private val preferenceUseCases: PreferenceUseCases
 ) : ViewModel() {
@@ -26,6 +27,10 @@ class OnboardingViewModel(
 
     private val _effect = Channel<OnboardingEffect>()
     val effect = _effect.receiveAsFlow()
+
+    init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.OnboardingStarted)
+    }
 
     fun onIntent(intent: OnboardingIntent) {
         when (intent) {
@@ -87,6 +92,7 @@ class OnboardingViewModel(
                     securityAnswer = _state.value.securityAnswer,
                     localizedNames = localizedNames
                 )
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.OnboardingCompleted)
                 _effect.send(OnboardingEffect.NavigateToDashboard)
             } catch (e: Exception) {
                 _effect.send(OnboardingEffect.ShowError(e.message ?: "Unknown Error"))
