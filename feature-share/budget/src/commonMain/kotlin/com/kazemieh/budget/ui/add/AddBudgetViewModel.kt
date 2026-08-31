@@ -93,6 +93,7 @@ sealed interface AddBudgetEffect {
 }
 
 class AddBudgetViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val addBudgetUseCase: AddBudgetUseCase,
     private val updateBudgetUseCase: UpdateBudgetUseCase,
     private val observeCategoriesUseCase: ObserveCategoriesUseCase,
@@ -260,8 +261,10 @@ class AddBudgetViewModel(
 
             if (budget.id == null) {
                 addBudgetUseCase(budget)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("budget_created"))
             } else {
                 updateBudgetUseCase(budget)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("budget_updated"))
             }
             _effect.send(AddBudgetEffect.BudgetSaved)
         }

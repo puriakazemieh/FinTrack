@@ -25,6 +25,7 @@ import kotlin.time.Clock
 
 
 class AddDebtViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val debtUseCases: DebtUseCaseGroup,
     private val transactionUseCases: TransactionUseCaseGroup
 ) : ViewModel() {
@@ -155,8 +156,10 @@ class AddDebtViewModel(
             
             if (currentState.debtId == null) {
                 debtUseCases.addDebtUseCase(debt, tagIds)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("debt_created"))
             } else {
                 debtUseCases.updateDebtUseCase(debt, tagIds)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("debt_updated"))
             }
             _effect.send(AddDebtEffect.Saved)
         }

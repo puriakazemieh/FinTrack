@@ -77,6 +77,7 @@ data class ScheduledInstallment(
 )
 
 class InstallmentViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val useCases: InstallmentUseCaseGroup
 ) : ViewModel() {
 
@@ -91,7 +92,10 @@ class InstallmentViewModel(
 
     fun onIntent(intent: InstallmentIntent) {
         when (intent) {
-            InstallmentIntent.Init -> observeInstallments()
+            InstallmentIntent.Init -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("installment_list"))
+                observeInstallments()
+            }
             is InstallmentIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
             is InstallmentIntent.MarkAsPaid -> markAsPaid(intent)
             is InstallmentIntent.Delete -> deleteInstallment(intent.installmentId)
@@ -202,6 +206,7 @@ class InstallmentViewModel(
                     reminderTitle = intent.reminderTitle,
                     reminderMessage = intent.reminderMessage
                 )
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("installment_paid"))
                 _effects.send(InstallmentEffect.ShowMessage(getString(Res.string.payment)))
             } catch (e: Exception) {
                 _effects.send(InstallmentEffect.ShowMessage(getString(Res.string.transaction_failed)))
@@ -213,6 +218,7 @@ class InstallmentViewModel(
         viewModelScope.launch {
             try {
                 useCases.deleteInstallmentUseCase(id)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("installment_deleted"))
                 _effects.send(InstallmentEffect.ShowMessage(getString(Res.string.installment_deleted)))
             } catch (e: Exception) {
                 _effects.send(InstallmentEffect.ShowMessage(getString(Res.string.transaction_failed)))

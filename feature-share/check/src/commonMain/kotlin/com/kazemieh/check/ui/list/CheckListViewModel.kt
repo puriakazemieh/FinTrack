@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import kotlin.time.Clock
 
 class CheckListViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val checkUseCases: CheckUseCaseGroup,
     private val addTransactionUseCase: AddTransactionUseCase,
     private val getDefaultCategoryUseCase: GetDefaultCategoryUseCase,
@@ -38,6 +39,7 @@ class CheckListViewModel(
     private val filterPersons = MutableStateFlow<Set<Person>>(emptySet())
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("check_list"))
         observeChecks()
     }
 
@@ -124,6 +126,7 @@ class CheckListViewModel(
         viewModelScope.launch {
             _state.value.checks.find { it.id == checkId }?.let { check ->
                 checkUseCases.updateCheckUseCase(check.copy(status = newStatus))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("check_status_changed"))
                 if (createTransaction && newStatus == CheckStatus.PASSED) {
                     val defaultCat = if (check.categoryId == null) getDefaultCategoryUseCase(if (check.isIncoming) TransactionType.INCOME else TransactionType.EXPENSE).id else null
                     val defaultSrc = if (check.sourceId == null) getDefaultFinancialSourceUseCase()?.id else null
@@ -148,7 +151,10 @@ class CheckListViewModel(
     }
 
     private fun deleteCheck(checkId: Long) {
-        viewModelScope.launch { checkUseCases.deleteCheckUseCase(checkId) }
+        viewModelScope.launch { 
+            checkUseCases.deleteCheckUseCase(checkId) 
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("check_deleted"))
+        }
     }
 
     private data class CheckResult(

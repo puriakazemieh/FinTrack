@@ -40,6 +40,7 @@ import org.jetbrains.compose.resources.getString
 import kotlin.time.Clock
 
 class AddCheckViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val checkUseCases: CheckUseCaseGroup,
     private val getPersonByIdUseCase: GetPersonByIdUseCase,
     private val getCategoryUseCase: GetCategoryUseCase,
@@ -178,8 +179,10 @@ class AddCheckViewModel(
             }
             if (current.checkId == null) {
                 checkUseCases.addCheckUseCase(check, reminderTitle, reminderMessage)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("check_created"))
             } else {
                 checkUseCases.updateCheckUseCase(check, reminderTitle, reminderMessage)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("check_updated"))
             }
             _effect.send(AddCheckEffect.Saved)
         }

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class DebtViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val debtUseCases: DebtUseCaseGroup
 ) : ViewModel() {
 
@@ -19,7 +20,10 @@ class DebtViewModel(
 
     fun onIntent(intent: DebtIntent) {
         when (intent) {
-            is DebtIntent.ObserveAllDebts -> observeAllDebts()
+            is DebtIntent.ObserveAllDebts -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("debt_list"))
+                observeAllDebts()
+            }
             is DebtIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
             is DebtIntent.ObserveDebtsByPerson -> observeDebtsByPerson(intent.personId)
             is DebtIntent.SettleDebt -> settleDebt(intent.debtId, intent.postAsTransaction)
@@ -88,12 +92,14 @@ class DebtViewModel(
                 description = "",
                 postAsTransaction = postAsTransaction
             )
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("debt_settled"))
         }
     }
 
     private fun deleteDebt(debtId: Long) {
         viewModelScope.launch {
             debtUseCases.deleteDebtUseCase(debtId)
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("debt_deleted"))
         }
     }
 }

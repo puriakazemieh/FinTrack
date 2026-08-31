@@ -62,6 +62,7 @@ sealed interface BudgetEffect {
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BudgetViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val observeBudgetsWithProgressUseCase: ObserveBudgetsWithProgressUseCase,
     private val deleteBudgetUseCase: DeleteBudgetUseCase,
     private val addBudgetUseCase: AddBudgetUseCase,
@@ -85,7 +86,10 @@ class BudgetViewModel(
 
     fun onIntent(intent: BudgetIntent) {
         when (intent) {
-            BudgetIntent.LoadBudgets -> observeBudgets()
+            BudgetIntent.LoadBudgets -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("budget_list"))
+                observeBudgets()
+            }
             is BudgetIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
             is BudgetIntent.DeleteBudget -> _state.update { it.copy(pendingDeleteBudget = intent.budget) }
             BudgetIntent.ConfirmDeleteBudget -> deleteBudget()
@@ -127,9 +131,6 @@ class BudgetViewModel(
                     val monthly = filtered.filter { it.budget.period == BudgetPeriod.MONTHLY }
                     val yearly = filtered.filter { it.budget.period == BudgetPeriod.YEARLY }
 
-                    // Clone logic per section: offer "copy from previous" for any period that has
-                    // no budget in the current range but has one in ANY earlier range (so the prompt
-                    // keeps appearing however far forward the user navigates).
                     var canCloneDaily = false
                     var canCloneWeekly = false
                     var canCloneMonthly = false
@@ -181,8 +182,6 @@ class BudgetViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
-            // Look at every earlier budget and, per period, copy only the most recent instance's
-            // budgets into the current range. This keeps working however far ahead the user is.
             val earlier = observeBudgetsWithProgressUseCase(0L, currentRange.start - 1).first()
             val candidates = if (period == null) earlier else earlier.filter { it.budget.period == period }
             val toClone = candidates.groupBy { it.budget.period }.flatMap { (_, list) ->
@@ -208,6 +207,7 @@ class BudgetViewModel(
         val budgetToDelete = _state.value.pendingDeleteBudget ?: return
         viewModelScope.launch {
             deleteBudgetUseCase(budgetToDelete.budget.id ?: 0L)
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("budget_deleted"))
             _state.update { it.copy(pendingDeleteBudget = null) }
         }
     }

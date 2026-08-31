@@ -90,6 +90,7 @@ data class AddInstallmentState(
 )
 
 class AddInstallmentViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val installmentUseCases: InstallmentUseCaseGroup,
     private val transactionUseCaseGroup: TransactionUseCaseGroup
 ) : ViewModel() {
@@ -338,6 +339,7 @@ class AddInstallmentViewModel(
                         reminderTitle = intent.reminderTitle,
                         reminderMessage = intent.reminderMessage
                     )
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("installment_updated"))
                 } else {
                     installmentUseCases.addInstallmentUseCase(
                         installment = installment,
@@ -346,6 +348,7 @@ class AddInstallmentViewModel(
                         reminderTitle = intent.reminderTitle,
                         reminderMessage = intent.reminderMessage
                     )
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("installment_created"))
                 }
                 _effects.send(AddInstallmentEffect.Success)
             } catch (e: Exception) {

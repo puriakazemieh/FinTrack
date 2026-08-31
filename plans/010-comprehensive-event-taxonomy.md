@@ -64,25 +64,25 @@
 
 
 ## ۸. بودجه‌بندی (Budgets)
-- [ ] `budget_list_viewed`
-- [ ] `budget_created` (پارامتر مجاز: `period` = monthly/yearly/etc)
-- [ ] `budget_updated`
-- [ ] `budget_deleted`
+- [x] `budget_list_viewed`
+- [x] `budget_created` (پارامتر مجاز: `period` = monthly/yearly/etc)
+- [x] `budget_updated`
+- [x] `budget_deleted`
 - [ ] `budget_exceeded_warning` (نمایش هشدار رد شدن از سقف بودجه)
 
 ## ۹. دیون و تعهدات (Debts & Checks & Installments)
-- [ ] `debt_list_viewed`
-- [ ] `debt_created` (پارامتر مجاز: طلب یا بدهی)
-- [ ] `debt_settled` (تسویه کامل یا جزئی بدهی)
-- [ ] `debt_deleted`
-- [ ] `installment_list_viewed`
-- [ ] `installment_created`
-- [ ] `installment_paid` (پرداخت یک قسط)
-- [ ] `installment_deleted`
-- [ ] `check_list_viewed`
-- [ ] `check_created`
-- [ ] `check_status_changed` (تغییر وضعیت چک به پاس شده یا برگشتی)
-- [ ] `check_deleted`
+- [x] `debt_list_viewed`
+- [x] `debt_created` (پارامتر مجاز: طلب یا بدهی)
+- [x] `debt_settled` (تسویه کامل یا جزئی بدهی)
+- [x] `debt_deleted`
+- [x] `installment_list_viewed`
+- [x] `installment_created`
+- [x] `installment_paid` (پرداخت یک قسط)
+- [x] `installment_deleted`
+- [x] `check_list_viewed`
+- [x] `check_created`
+- [x] `check_status_changed` (تغییر وضعیت چک به پاس شده یا برگشتی)
+- [x] `check_deleted`
 
 ## ۱۰. هزینه‌های ثابت (Fixed Expenses)
 - [ ] `fixed_expense_list_viewed`
