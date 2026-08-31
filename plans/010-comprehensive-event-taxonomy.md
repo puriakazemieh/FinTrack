@@ -16,11 +16,11 @@
 - [ ] `app_locked_timeout` (قفل شدن خودکار به دلیل عدم فعالیت)
 
 ## ۲. داشبورد (Dashboard)
-- [ ] `dashboard_viewed` (باز کردن داشبورد)
+- [x] `dashboard_viewed` (باز کردن داشبورد)
 - [ ] `dashboard_quick_add_clicked` (کلیک روی دکمه افزودن سریع)
 - [ ] `dashboard_recent_transaction_clicked` (کلیک روی یک تراکنش اخیر در داشبورد)
 - [ ] `dashboard_wallet_summary_viewed` (بررسی خلاصه کیف پول و موجودی‌ها در داشبورد)
-- [ ] `dashboard_widget_reordered` (تغییر چیدمان ویجت‌های داشبورد)
+- [x] `dashboard_widget_reordered` (تغییر چیدمان ویجت‌های داشبورد)
 - [ ] `dashboard_widget_toggled` (روشن یا خاموش کردن نمایش یک ویجت خاص)
 
 ## ۳. تراکنش‌ها (Transactions)

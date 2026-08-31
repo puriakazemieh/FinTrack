@@ -23,7 +23,26 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     data object SyncStarted : ProductEvent("sync_started")
     data object SyncCompleted : ProductEvent("sync_completed")
 
-    // Feature Usage
+    // Dashboard
+    data object DashboardViewed : ProductEvent("dashboard_viewed")
+    data object DashboardWidgetReordered : ProductEvent("dashboard_widget_reordered")
+    data object DashboardQuickAddClicked : ProductEvent("dashboard_quick_add_clicked")
+
+    // Transactions
+    data object TransactionListViewed : ProductEvent("transaction_list_viewed")
+    data class TransactionCreated(val type: String) : ProductEvent("transaction_created", mapOf("type" to type))
+    data object TransactionUpdated : ProductEvent("transaction_updated")
+    data object TransactionDeleted : ProductEvent("transaction_deleted")
+    
+    // Settings
+    data class ProfileEdited(val hasName: Boolean) : ProductEvent("profile_edited", mapOf("has_name" to hasName))
+    data class ThemeChanged(val themeName: String) : ProductEvent("theme_changed", mapOf("theme" to themeName))
+    
+    // Auth & Security
+    data object AppUnlocked : ProductEvent("app_unlocked")
+    data object AuthPinCreated : ProductEvent("auth_pin_created")
+    
+    // Feature Usage (Generic Fallback if not specifically modeled)
     data class FeatureOpened(val featureKey: String) : ProductEvent(
         eventName = "feature_opened", 
         params = mapOf("feature_key" to featureKey)

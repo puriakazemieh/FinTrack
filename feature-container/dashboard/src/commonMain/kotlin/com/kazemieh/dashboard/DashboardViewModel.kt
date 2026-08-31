@@ -35,6 +35,7 @@ import org.jetbrains.compose.resources.getString
 
 
 class DashboardViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val preferenceUseCases: PreferenceUseCases,
     private val smsDraftRepository: SmsDraftRepository,
     private val observeCategories: ObserveCategoriesUseCase,
@@ -49,6 +50,7 @@ class DashboardViewModel(
     val state: StateFlow<DashboardState> = _state.asStateFlow()
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.DashboardViewed)
         observeUserName()
         observeSmsDrafts()
         loadCategories()
@@ -308,6 +310,7 @@ class DashboardViewModel(
             }
 
             is DashboardIntent.SetWidgetLayout -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.DashboardWidgetReordered)
                 preferenceUseCases.setStringPreference(
                     FinTrackPreferences.PREF_DASHBOARD_WIDGETS,
                     DashboardWidget.serialize(intent.items)
