@@ -146,9 +146,9 @@ FinTrack از نظر گستره قابلیت‌ها جلوتر از یک MVP س�
 - [x] **فاز ۲: پیکربندی Gradle و وابستگی‌ها در KMP (توسط هوش مصنوعی)**
   - [x] اضافه کردن پلاگین‌ها و کتابخانه‌های `firebase-analytics`
   - [x] اعمال پلاگین‌ها در `build.gradle.kts` ماژول `:app` و `androidMain`
-- [ ] **فاز ۳: پیاده‌سازی لایه اندروید و DI (توسط هوش مصنوعی)**
-  - [ ] ساخت `AndroidAnalyticsService` و `AndroidCrashReporter`
-  - [ ] معرفی کلاس‌ها به Koin در `CommonModule.android.kt`
+- [x] **فاز ۳: پیاده‌سازی لایه اندروید و DI (توسط هوش مصنوعی)**
+  - [x] ساخت `AndroidAnalyticsService` و `AndroidCrashReporter`
+  - [x] معرفی کلاس‌ها به Koin در `CommonModule.android.kt` یا `AppModule`
 - [ ] **فاز ۴: تزریق ایونت‌های رشد و جامع در ViewModelها (توسط هوش مصنوعی)**
   - [ ] پیاده‌سازی و تزریق تمامی ایونت‌های ثبت‌شده در فایل `010-comprehensive-event-taxonomy.md` (برای تمام ماژول‌ها)
   - [ ] اتصال سیستم Consent (ارسال اطلاعات فقط پس از تایید کاربر)

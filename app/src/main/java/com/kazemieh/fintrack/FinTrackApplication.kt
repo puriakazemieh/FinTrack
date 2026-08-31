@@ -18,6 +18,7 @@ class FinTrackApplication : Application() {
 
         initKoin {
             androidContext(this@FinTrackApplication)
+            modules(com.kazemieh.fintrack.di.appModule)
         }
 
         notificationManager.createChannels()
