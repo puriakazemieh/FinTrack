@@ -183,7 +183,7 @@ class ShoppingViewModel(
                 position = (_state.value.items.maxOfOrNull { it.position } ?: -1) + 1
             )
             val id = addShoppingItem(newItem)
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("shopping_list_item_added"))
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.ShoppingItemAdded)
             scheduleReminder(id, newItem)
             if (dismiss) {
                 _state.update { it.copy(showAddSheet = false) }

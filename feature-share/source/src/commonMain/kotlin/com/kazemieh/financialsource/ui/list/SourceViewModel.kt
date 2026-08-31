@@ -21,6 +21,10 @@ class SourceViewModel(
     private val updateSourcePositionsUseCase: UpdateSourcePositionsUseCase
 ) : ViewModel() {
 
+    init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.SourceListViewed)
+    }
+
     private val _state = MutableStateFlow(SourceState())
     val state = _state.asStateFlow()
 

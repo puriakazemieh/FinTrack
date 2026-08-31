@@ -20,6 +20,7 @@ class ManageToolsViewModel(
     val state: StateFlow<ManageToolsState> = _state.asStateFlow()
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.ToolsHubViewed)
         preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_DISABLED_TOOLS, "")
             .onEach { csv ->
                 _state.update { it.copy(disabledTools = ToolFeature.parseDisabled(csv)) }

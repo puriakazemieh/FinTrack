@@ -65,13 +65,13 @@ class AddCategoryViewModel(
             }
 
             is AddCategoryIntent.UpdateParentId -> {
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("category_parent_changed"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.CategoryParentChanged)
                 updateDraft { it.copy(parentId = intent.parentId) }
             }
 
             is AddCategoryIntent.SetColorIcon -> {
                 if (intent.iconId != _state.value.draft.iconId || intent.colorId != _state.value.draft.colorId) {
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("category_icon_changed"))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.CategoryIconChanged)
                 }
                 _state.update {
                     it.copy(

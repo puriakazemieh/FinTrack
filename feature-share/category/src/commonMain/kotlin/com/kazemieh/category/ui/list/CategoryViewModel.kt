@@ -31,6 +31,10 @@ class CategoryViewModel(
     private val updateCategoryPositionsUseCase: UpdateCategoryPositionsUseCase
 ) : ViewModel() {
 
+    init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.CategoryListViewed)
+    }
+
     private val _state = MutableStateFlow(CategoryState())
     val state = _state.asStateFlow()
 
@@ -129,7 +133,7 @@ class CategoryViewModel(
             }
 
             is CategoryIntent.UpdatePositions -> {
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("category_reordered"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.CategoryReordered)
                 viewModelScope.launch {
                     updateCategoryPositionsUseCase(intent.positions)
                 }

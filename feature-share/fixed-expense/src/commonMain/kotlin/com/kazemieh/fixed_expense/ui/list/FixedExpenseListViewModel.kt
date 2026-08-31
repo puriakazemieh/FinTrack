@@ -33,6 +33,7 @@ class FixedExpenseListViewModel(
     private val _filterPersons = MutableStateFlow<Set<Person>>(emptySet())
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FixedExpenseListViewed)
         analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("fixed_expense_list"))
         observeExpenses()
     }

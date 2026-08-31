@@ -105,13 +105,16 @@ class TransactionsViewModel(
                 )
             }
 
-            is TransactionsIntent.OnTransactionTypeSelected -> _state.update {
-                it.copy(
-                    selectedTransactionType = intent.type,
-                    selectedCategories = emptySet(),
-                    isAllCategorySelected = true,
-                    enableAnimationChart = !_state.value.enableAnimationChart
-                )
+            is TransactionsIntent.OnTransactionTypeSelected -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FilterApplied("transaction_type"))
+                _state.update {
+                    it.copy(
+                        selectedTransactionType = intent.type,
+                        selectedCategories = emptySet(),
+                        isAllCategorySelected = true,
+                        enableAnimationChart = !_state.value.enableAnimationChart
+                    )
+                }
             }
 
             is TransactionsIntent.OnAmountRangeChanged -> _state.update {

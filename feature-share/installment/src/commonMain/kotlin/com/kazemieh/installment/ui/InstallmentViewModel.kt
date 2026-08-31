@@ -81,6 +81,10 @@ class InstallmentViewModel(
     private val useCases: InstallmentUseCaseGroup
 ) : ViewModel() {
 
+    init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.InstallmentListViewed)
+    }
+
     private val _state = MutableStateFlow(InstallmentState())
     val state: StateFlow<InstallmentState> = _state.asStateFlow()
 

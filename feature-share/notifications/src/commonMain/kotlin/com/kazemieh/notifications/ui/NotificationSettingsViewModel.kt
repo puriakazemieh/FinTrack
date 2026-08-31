@@ -58,6 +58,7 @@ class NotificationSettingsViewModel(
                 if (notificationManager.hasPermission()) {
                     val newValue = !_state.value.isBudgetNotifEnabled
                     preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_BUDGET_ENABLED, newValue)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingsChanged)
                     _state.update { it.copy(isBudgetNotifEnabled = newValue) }
                     analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("budget", newValue))
                 } else {
@@ -69,6 +70,7 @@ class NotificationSettingsViewModel(
                 if (notificationManager.hasPermission()) {
                     val newValue = !_state.value.isInstallmentNotifEnabled
                     preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_INSTALLMENT_ENABLED, newValue)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingsChanged)
                     _state.update { it.copy(isInstallmentNotifEnabled = newValue) }
                     analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("installment", newValue))
                 } else {
@@ -79,6 +81,7 @@ class NotificationSettingsViewModel(
                 if (notificationManager.hasPermission()) {
                     val newValue = !_state.value.isChequeNotifEnabled
                     preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_CHEQUE_ENABLED, newValue)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingsChanged)
                     _state.update { it.copy(isChequeNotifEnabled = newValue) }
                     analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("cheque", newValue))
                 } else {
@@ -89,6 +92,7 @@ class NotificationSettingsViewModel(
                 if (notificationManager.hasPermission()) {
                     val newValue = !_state.value.isQuickAddNotifEnabled
                     preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_QUICK_ADD_NOTIF_ENABLED, newValue)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingsChanged)
                     _state.update { it.copy(isQuickAddNotifEnabled = newValue) }
                     analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("quick_add", newValue))
                     if (newValue) {
@@ -109,16 +113,19 @@ class NotificationSettingsViewModel(
             NotificationSettingsIntent.ToggleQuietHours -> {
                 val newValue = !_state.value.isQuietHoursEnabled
                 preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_QUIET_HOURS_ENABLED, newValue)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingsChanged)
                 _state.update { it.copy(isQuietHoursEnabled = newValue) }
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("quiet_hours", newValue))
             }
             is NotificationSettingsIntent.SetQuietStart -> {
                 preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_NOTIF_QUIET_START, intent.time)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingsChanged)
                 _state.update { it.copy(quietStart = intent.time) }
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("quiet_start", true))
             }
             is NotificationSettingsIntent.SetQuietEnd -> {
                 preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_NOTIF_QUIET_END, intent.time)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingsChanged)
                 _state.update { it.copy(quietEnd = intent.time) }
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("quiet_end", true))
             }
@@ -137,6 +144,7 @@ class NotificationSettingsViewModel(
                     } else {
                         _state.update { it.copy(triggerSystemPermissionRequest = true, showPermissionRationale = false) }
                         preferenceUseCases.setBooleanPreference("has_requested_notif_permission", true)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingsChanged)
                     }
                 }
             }

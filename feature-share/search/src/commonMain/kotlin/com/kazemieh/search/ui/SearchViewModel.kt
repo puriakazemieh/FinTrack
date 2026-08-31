@@ -63,6 +63,7 @@ class SearchViewModel(
     private val _filterParams = MutableStateFlow(TransactionFilterParams())
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionSearchUsed)
         getRecentSearchesUseCase()
             .onEach { recents ->
                 _state.update { it.copy(recentSearches = recents) }
@@ -140,6 +141,7 @@ class SearchViewModel(
     fun onIntent(intent: SearchIntent) {
         when (intent) {
             is SearchIntent.UpdateQuery -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionSearchPerformed)
                 if (intent.query.isNotBlank() && _query.value != intent.query) {
                     analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionSearched)
                 }

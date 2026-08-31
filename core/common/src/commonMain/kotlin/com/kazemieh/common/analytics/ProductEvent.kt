@@ -101,16 +101,12 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     data object CurrencyConverterUsed : ProductEvent("currency_converter_used")
     data object AiAdvisorOpened : ProductEvent("ai_advisor_opened")
     data object AiInsightGenerated : ProductEvent("ai_insight_generated")
-    data object AiInsightFeedbackGiven : ProductEvent("ai_insight_feedback_given")
-    data object CalendarViewed : ProductEvent("calendar_viewed")
-    data object ShoppingListCreated : ProductEvent("shopping_list_created")
+    data object ShoppingItemAdded : ProductEvent("shopping_item_added")
     data object ShoppingItemPurchased : ProductEvent("shopping_item_purchased")
     data object NoteCreated : ProductEvent("note_created")
 
     // 13. Backup & Sync
-    data object BackupExportCompleted : ProductEvent("backup_export_completed")
     data object BackupExportedLocal : ProductEvent("backup_exported_local")
-    data object RestoreCompleted : ProductEvent("restore_completed")
     data object BackupRestored : ProductEvent("backup_restored")
     data object SyncStarted : ProductEvent("sync_started")
     data object SyncCompleted : ProductEvent("sync_completed")
@@ -122,7 +118,6 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     data class ThemeChanged(val themeName: String) : ProductEvent("theme_changed", mapOf("theme" to themeName))
     data object BaseCurrencyChanged : ProductEvent("base_currency_changed")
     data object NotificationSettingsChanged : ProductEvent("notification_settings_changed")
-    data object LanguageChanged : ProductEvent("language_changed")
     
     // 15. Lifecycle & Notifications
     data object AppInstalled : ProductEvent("app_installed")
@@ -134,7 +129,6 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     
     // 16. General Filters
     data class FilterApplied(val featureKey: String) : ProductEvent("filter_applied", mapOf("feature_key" to featureKey))
-    data class FilterCleared(val featureKey: String) : ProductEvent("filter_cleared", mapOf("feature_key" to featureKey))
 
     // Fallbacks
     data object AccountCreated : ProductEvent("account_created")

@@ -21,6 +21,10 @@ class TagViewModel(
     private val updateTagPositionsUseCase: UpdateTagPositionsUseCase
 ) : ViewModel() {
 
+    init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.TagListViewed)
+    }
+
     private val _state = MutableStateFlow(TagState())
     val state = _state.asStateFlow()
 

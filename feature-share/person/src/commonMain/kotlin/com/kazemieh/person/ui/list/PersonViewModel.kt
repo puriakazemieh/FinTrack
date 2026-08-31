@@ -21,6 +21,10 @@ class PersonViewModel(
     private val updatePersonPositionsUseCase: UpdatePersonPositionsUseCase
 ) : ViewModel() {
 
+    init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.PersonListViewed)
+    }
+
     private val _state = MutableStateFlow(PersonState())
     val state = _state.asStateFlow()
 

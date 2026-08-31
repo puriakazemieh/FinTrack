@@ -20,6 +20,7 @@ class CurrencyConverterViewModel(
     val state = _state.asStateFlow()
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyConverterUsed)
         analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("currency_converter"))
         loadRates()
     }

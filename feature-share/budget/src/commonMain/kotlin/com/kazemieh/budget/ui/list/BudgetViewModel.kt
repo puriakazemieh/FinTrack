@@ -81,6 +81,7 @@ class BudgetViewModel(
     private var observeJob: Job? = null
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.BudgetListViewed)
         observeBudgets()
     }
 

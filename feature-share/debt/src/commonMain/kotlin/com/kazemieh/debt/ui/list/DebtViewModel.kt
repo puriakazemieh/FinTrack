@@ -12,6 +12,10 @@ class DebtViewModel(
     private val debtUseCases: DebtUseCaseGroup
 ) : ViewModel() {
 
+    init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.DebtListViewed)
+    }
+
     private val _state = MutableStateFlow(DebtState())
     val state: StateFlow<DebtState> = _state.asStateFlow()
 

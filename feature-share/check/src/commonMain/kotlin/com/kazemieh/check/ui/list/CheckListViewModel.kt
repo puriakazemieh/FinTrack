@@ -39,6 +39,7 @@ class CheckListViewModel(
     private val filterPersons = MutableStateFlow<Set<Person>>(emptySet())
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.CheckListViewed)
         analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("check_list"))
         observeChecks()
     }
@@ -126,7 +127,7 @@ class CheckListViewModel(
         viewModelScope.launch {
             _state.value.checks.find { it.id == checkId }?.let { check ->
                 checkUseCases.updateCheckUseCase(check.copy(status = newStatus))
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("check_status_changed"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.CheckStatusChanged)
                 if (createTransaction && newStatus == CheckStatus.PASSED) {
                     val defaultCat = if (check.categoryId == null) getDefaultCategoryUseCase(if (check.isIncoming) TransactionType.INCOME else TransactionType.EXPENSE).id else null
                     val defaultSrc = if (check.sourceId == null) getDefaultFinancialSourceUseCase()?.id else null
