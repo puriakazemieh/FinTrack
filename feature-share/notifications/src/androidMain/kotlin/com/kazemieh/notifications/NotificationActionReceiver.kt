@@ -33,12 +33,29 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
                 val uri = intent.getStringExtra("uri")
                 if (uri != null) {
                     val launchIntent = Intent(Intent.ACTION_VIEW, Uri.parse(uri)).apply {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                         `package` = context.packageName
                     }
                     context.startActivity(launchIntent)
                 }
                 if (notificationId != -1) nm.cancel(notificationId)
+            }
+            "com.kazemieh.notifications.ACTION_CONTENT_CLICK" -> {
+                val channelId = intent.getStringExtra("channel_id") ?: "unknown"
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationClicked(channelId))
+                val uri = intent.getStringExtra("uri")
+                if (uri != null) {
+                    val launchIntent = Intent(Intent.ACTION_VIEW, Uri.parse(uri)).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        `package` = context.packageName
+                    }
+                    context.startActivity(launchIntent)
+                }
+                if (notificationId != -1) nm.cancel(notificationId)
+            }
+            "com.kazemieh.notifications.ACTION_DISMISSED" -> {
+                val channelId = intent.getStringExtra("channel_id") ?: "unknown"
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationDismissed(channelId))
             }
             "com.kazemieh.check.ACTION_IGNORE",
             "com.kazemieh.debt.ACTION_IGNORE",

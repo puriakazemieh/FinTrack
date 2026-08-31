@@ -128,24 +128,48 @@ class AndroidNotificationManager(
         }
     }
 
+    private fun getClickPendingIntent(id: Int, uri: String, channelId: String): PendingIntent {
+        val intent = Intent("com.kazemieh.notifications.ACTION_CONTENT_CLICK").apply {
+            putExtra("notification_id", id)
+            putExtra("uri", uri)
+            putExtra("channel_id", channelId)
+            `package` = context.packageName
+        }
+        return PendingIntent.getBroadcast(
+            context, id, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
+    private fun getDismissPendingIntent(id: Int, channelId: String): PendingIntent {
+        val intent = Intent("com.kazemieh.notifications.ACTION_DISMISSED").apply {
+            putExtra("notification_id", id)
+            putExtra("channel_id", channelId)
+            `package` = context.packageName
+        }
+        return PendingIntent.getBroadcast(
+            context, id + 5000, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
     override fun showNotification(id: Int, title: String, message: String, channelId: String, extraId: Long) {
         if (!hasPermission()) return
         if (!isChannelAllowed(channelId)) return
 
+        val defaultUri = "fintrack://dashboard"
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(appIcon)
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
+            .setDeleteIntent(getDismissPendingIntent(id, channelId))
+            .setContentIntent(getClickPendingIntent(id, defaultUri, channelId))
 
         when (channelId) {
             NotificationManager.CHANNEL_CHEQUE -> {
-                val deepLinkIntent = Intent(Intent.ACTION_VIEW, Uri.parse("fintrack://check")).apply {
-                    `package` = context.packageName
-                }
-                val pendingIntent = PendingIntent.getActivity(context, id, deepLinkIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                builder.setContentIntent(pendingIntent)
+                builder.setContentIntent(getClickPendingIntent(id, "fintrack://check", channelId))
 
                 val manageIntent = Intent("com.kazemieh.notifications.ACTION_MANAGE").apply {
                     putExtra("notification_id", id)
@@ -163,11 +187,7 @@ class AndroidNotificationManager(
                 builder.addAction(0, runBlocking { getString(Res.string.notif_action_ignore) }, ignorePendingIntent)
             }
             NotificationManager.CHANNEL_DEBT -> {
-                val deepLinkIntent = Intent(Intent.ACTION_VIEW, Uri.parse("fintrack://debt")).apply {
-                    `package` = context.packageName
-                }
-                val pendingIntent = PendingIntent.getActivity(context, id, deepLinkIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                builder.setContentIntent(pendingIntent)
+                builder.setContentIntent(getClickPendingIntent(id, "fintrack://debt", channelId))
 
                 val manageIntent = Intent("com.kazemieh.notifications.ACTION_MANAGE").apply {
                     putExtra("notification_id", id)
@@ -229,6 +249,7 @@ class AndroidNotificationManager(
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
             .setContentIntent(managePendingIntent)
+            .setDeleteIntent(getDismissPendingIntent(id, NotificationManager.CHANNEL_SMS))
             .addAction(registerAction)
             .addAction(ignoreAction)
             .setAutoCancel(true)
@@ -250,15 +271,7 @@ class AndroidNotificationManager(
         if (!isChannelAllowed(NotificationManager.CHANNEL_INSTALLMENT)) return
 
         val deepLinkUri = "fintrack://installment"
-        val deepLinkIntent = Intent(Intent.ACTION_VIEW, Uri.parse(deepLinkUri)).apply {
-            `package` = context.packageName
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        }
-
-        val pendingIntent = PendingIntent.getActivity(
-            context, id + 4000, deepLinkIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val pendingIntent = getClickPendingIntent(id, deepLinkUri, NotificationManager.CHANNEL_INSTALLMENT)
 
         val registerLabel = runBlocking { getString(Res.string.notif_action_register) }
         val ignoreLabel = runBlocking { getString(Res.string.notif_action_ignore) }
@@ -298,6 +311,7 @@ class AndroidNotificationManager(
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentIntent(pendingIntent)
+            .setDeleteIntent(getDismissPendingIntent(id, NotificationManager.CHANNEL_INSTALLMENT))
             .addAction(registerAction)
             .addAction(ignoreAction)
             .setAutoCancel(true)
@@ -312,16 +326,8 @@ class AndroidNotificationManager(
         if (!hasPermission()) return
 
         val id = NotificationManager.ID_QUICK_ADD
-        val deepLinkIntent = Intent(
-            Intent.ACTION_VIEW,
-            Uri.parse("fintrack://dashboard?showAddTransaction=true")
-        ).apply {
-            `package` = context.packageName
-        }
-        val pendingIntent = PendingIntent.getActivity(
-            context, id, deepLinkIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val deepLinkUri = "fintrack://dashboard?showAddTransaction=true"
+        val pendingIntent = getClickPendingIntent(id, deepLinkUri, NotificationManager.CHANNEL_QUICK_ADD)
         val action = NotificationCompat.Action.Builder(0, actionLabel, pendingIntent).build()
 
         val notification = NotificationCompat.Builder(context, NotificationManager.CHANNEL_QUICK_ADD)
@@ -331,6 +337,7 @@ class AndroidNotificationManager(
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
             .setContentIntent(pendingIntent)
+            .setDeleteIntent(getDismissPendingIntent(id, NotificationManager.CHANNEL_QUICK_ADD))
             .addAction(action)
             .build()
         analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationReceived(NotificationManager.CHANNEL_QUICK_ADD))

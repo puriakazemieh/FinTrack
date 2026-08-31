@@ -6,6 +6,8 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="com.kazemieh.notifications.ACTION_MANAGE" />
+                <action android:name="com.kazemieh.notifications.ACTION_CONTENT_CLICK" />
+                <action android:name="com.kazemieh.notifications.ACTION_DISMISSED" />
                 <action android:name="com.kazemieh.installment.ACTION_MARK_PAID" />
                 <action android:name="com.kazemieh.installment.ACTION_IGNORE" />
                 <action android:name="com.kazemieh.check.ACTION_IGNORE" />
