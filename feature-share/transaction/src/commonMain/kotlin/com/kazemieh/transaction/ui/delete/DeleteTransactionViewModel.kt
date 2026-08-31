@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 
 
 class DeleteTransactionViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val transactionUseCaseGroup: TransactionUseCaseGroup
 ) : ViewModel() {
 
@@ -56,6 +57,7 @@ class DeleteTransactionViewModel(
             _state.update { it.copy(isLoading = true) }
 
             val ok = runCatching {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionDeleted)
                 transactionUseCaseGroup.deleteTransactionUseCase(tx)
             }.isSuccess
 

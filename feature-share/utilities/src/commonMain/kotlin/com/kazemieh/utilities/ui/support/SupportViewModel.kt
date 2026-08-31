@@ -12,6 +12,10 @@ sealed interface SupportEffect {
 
 class SupportViewModel : ViewModel() {
 
+    init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("support"))
+    }
+
     private val _effect = MutableSharedFlow<SupportEffect>()
     val effect = _effect.asSharedFlow()
 

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class FAQViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val utilitiesRepository: UtilitiesRepository
 ) : ViewModel() {
 
@@ -16,6 +17,7 @@ class FAQViewModel(
     val state = _state.asStateFlow()
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("faq"))
         onIntent(FAQIntent.LoadFAQs)
     }
 

@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 
 class PersonDetailViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val personId: Long,
     private val observePersonsUseCase: ObservePersonsUseCase,
     private val debtUseCases: DebtUseCaseGroup,
@@ -30,6 +31,7 @@ class PersonDetailViewModel(
     private val _searchQuery = MutableStateFlow("")
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("person_detail"))
         loadData()
     }
 
