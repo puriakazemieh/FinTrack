@@ -15,6 +15,7 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 class ProfileEditViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val preferenceUseCases: PreferenceUseCases
 ) : ViewModel() {
 
@@ -134,6 +135,8 @@ class ProfileEditViewModel(
         } else {
             preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_USER_AVATAR, "")
         }
+        
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("profile_updated"))
 
         viewModelScope.launch {
             _effect.send(ProfileEditEffect.ProfileSaved)

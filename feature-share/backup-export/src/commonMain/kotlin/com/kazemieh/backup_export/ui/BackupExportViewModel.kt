@@ -34,6 +34,7 @@ sealed interface BackupExportIntent {
 }
 
 class BackupExportViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val backupManager: BackupManager,
     private val backupRepository: BackupRepository,
     private val platformExporter: PlatformExporter
@@ -74,6 +75,7 @@ class BackupExportViewModel(
             _state.update { it.copy(isLoading = true) }
             try {
                 backupManager.importFromJson(content)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("backup_restored"))
                 _effect.send(BackupExportEffect.ShowMessage("Restore successful"))
                 loadStats()
             } catch (e: Exception) {
@@ -89,6 +91,7 @@ class BackupExportViewModel(
             _state.update { it.copy(isLoading = true) }
             val json = backupManager.exportToJson()
             platformExporter.shareText(json, "FinTrack Backup JSON")
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("backup_exported_local"))
             _state.update { it.copy(isLoading = false) }
         }
     }
@@ -98,6 +101,7 @@ class BackupExportViewModel(
             _state.update { it.copy(isLoading = true) }
             val csv = backupManager.exportToCsv()
             platformExporter.shareText(csv, "FinTrack Export CSV")
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("backup_exported_local"))
             _state.update { it.copy(isLoading = false) }
         }
     }
@@ -110,6 +114,7 @@ class BackupExportViewModel(
             val path = platformExporter.exportToExcel(transactions)
             if (path != null) {
                 platformExporter.shareFile(path)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("backup_exported_local"))
             } else {
                 _effect.send(BackupExportEffect.ShowMessage("Excel export failed"))
             }
@@ -125,6 +130,7 @@ class BackupExportViewModel(
             val path = platformExporter.exportToPdf(transactions)
             if (path != null) {
                 platformExporter.shareFile(path)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("backup_exported_local"))
             } else {
                 _effect.send(BackupExportEffect.ShowMessage("PDF export failed"))
             }

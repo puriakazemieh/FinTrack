@@ -29,6 +29,7 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 class ProfileViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val preferenceUseCases: PreferenceUseCases,
     private val transactionRepository: TransactionRepository,
     private val observeStreakUseCase: ObserveStreakUseCase,
@@ -41,6 +42,7 @@ class ProfileViewModel(
     val effect = _effect.receiveAsFlow()
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("profile"))
         loadSettings()
         loadProfile()
         loadStats()
@@ -222,6 +224,7 @@ class ProfileViewModel(
                     FinTrackPreferences.PREF_THEME,
                     newTheme.name
                 )
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("theme_changed", mapOf("theme_mode" to newTheme.name)))
 
                 // If the user manually toggles, we switch to MANUAL mode to ensure their choice sticks
                 if (currentMode != ThemeMode.MANUAL) {
@@ -284,6 +287,7 @@ class ProfileViewModel(
             is ProfileIntent.SelectCurrency -> {
                 val currencyJson = Json.encodeToString(intent.currency)
                 preferenceUseCases.setStringPreference(PREF_CURRENCY, currencyJson)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("currency_changed", mapOf("currency" to intent.currency.name)))
                 _state.update { it.copy(selectedCurrency = intent.currency) }
             }
 
@@ -317,6 +321,7 @@ class ProfileViewModel(
                     )
                     _state.update { it.copy(isLockEnabled = false, isFingerprintEnabled = false) }
                 } else {
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("app_locked"))
                     _state.update { it.copy(isLockEnabled = true) }
                 }
             }

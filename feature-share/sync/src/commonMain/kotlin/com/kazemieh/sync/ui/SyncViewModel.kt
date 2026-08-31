@@ -57,6 +57,7 @@ sealed interface SyncIntent {
 }
 
 class SyncViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val backupRepository: BackupRepository,
     private val googleDriveSyncManager: GoogleDriveSyncManager,
     private val serverSyncManager: ServerSyncManager,
@@ -143,6 +144,7 @@ class SyncViewModel(
     private fun backupNow() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("sync_started"))
             try {
                 var totalInserted = 0
                 var totalUpdated = 0
@@ -176,6 +178,7 @@ class SyncViewModel(
                     updatedCount = totalUpdated
                 ))
                 
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("sync_completed"))
                 _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_success)))
                 loadData()
             } catch (e: Exception) {
@@ -186,6 +189,7 @@ class SyncViewModel(
                     recordCount = 0,
                     errorMessage = e.message
                 ))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("sync_failed"))
                 _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_failed, e.message ?: "")))
                 loadData()
             } finally {
@@ -200,6 +204,7 @@ class SyncViewModel(
             _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_restoring)))
             try {
                 val (inserted, updated) = serverSyncManager.restoreFromServer()
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("backup_restored"))
                 _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_restored, inserted.toString(), updated.toString())))
                 loadData()
             } catch (e: Exception) {
