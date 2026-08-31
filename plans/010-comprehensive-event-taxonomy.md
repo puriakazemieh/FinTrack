@@ -36,10 +36,10 @@
 - [ ] `transaction_report_viewed` (مشاهده گزارش و نمودارهای گرافیکی)
 
 ## ۴. منابع مالی و حساب‌ها (Financial Sources)
-- [ ] `source_list_viewed`
-- [ ] `source_created` (پارامتر مجاز: نوع حساب مثلاً کارت، نقد، بانک)
-- [ ] `source_updated`
-- [ ] `source_deleted`
+- [x] `source_list_viewed`
+- [x] `source_created` (پارامتر مجاز: نوع حساب مثلاً کارت، نقد، بانک)
+- [x] `source_updated`
+- [x] `source_deleted`
 - [ ] `source_transfer_initiated` (شروع انتقال وجه بین دو حساب)
 
 ## ۵. دسته‌بندی‌ها (Categories)

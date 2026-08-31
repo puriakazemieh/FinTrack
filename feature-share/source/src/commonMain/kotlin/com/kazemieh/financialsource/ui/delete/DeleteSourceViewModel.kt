@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DeleteSourceViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val deleteSourceUseCase: DeleteSourceUseCase,
     private val observeSourceUseCase: ObserveSourceUseCase,
 ) : ViewModel() {
@@ -85,6 +86,7 @@ class DeleteSourceViewModel(
             }
             _state.value.source?.let { deleteSource ->
                 deleteSourceUseCase(deleteSource, _state.value.moveSource)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("source_deleted"))
                 _effect.send(DeleteSourceEffect.DeletedTransaction)
             }
         }

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SourceViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val observeSourcesUseCase: ObserveSourcesUseCase,
     private val updateSourcePositionsUseCase: UpdateSourcePositionsUseCase
 ) : ViewModel() {
@@ -30,7 +31,10 @@ class SourceViewModel(
 
     fun onIntent(intent: SourceIntent) {
         when (intent) {
-            SourceIntent.LoadAllSource -> loadAllFinancialSource()
+            SourceIntent.LoadAllSource -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("source_list"))
+                loadAllFinancialSource()
+            }
 
             is SourceIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
 

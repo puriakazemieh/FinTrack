@@ -9,6 +9,7 @@ import org.koin.dsl.module
 val transactionFinancialSourceModule = module {
     viewModel {
         SourceViewModel(
+            analytics = get(),
             observeSourcesUseCase = get(),
             updateSourcePositionsUseCase = get()
         )
@@ -17,6 +18,7 @@ val transactionFinancialSourceModule = module {
 val deleteSourceModule = module {
     viewModel {
         DeleteSourceViewModel(
+            analytics = get(),
             deleteSourceUseCase = get(),
             observeSourceUseCase = get()
         )
@@ -25,6 +27,7 @@ val deleteSourceModule = module {
 val transactionAddFinancialSourceModule = module {
     viewModel {
         AddSourceViewModel(
+            analytics = get(),
             sourceUseCases = get()
         )
     }

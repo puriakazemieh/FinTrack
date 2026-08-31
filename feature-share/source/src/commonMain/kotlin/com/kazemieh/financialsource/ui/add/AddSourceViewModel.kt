@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 
 
 class AddSourceViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val sourceUseCases: SourceUseCases
 ) : ViewModel() {
 
@@ -156,8 +157,16 @@ class AddSourceViewModel(
             val source = draft.toSource(id = mode.sourceIdOrNull)
 
             val sourceId = when (mode) {
-                AddSourceMode.Add -> sourceUseCases.addSource(source)
-                is AddSourceMode.Edit -> sourceUseCases.updateSourceUseCase(source).toLong()
+                AddSourceMode.Add -> {
+                    val id = sourceUseCases.addSource(source)
+                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("source_created"))
+                    id
+                }
+                is AddSourceMode.Edit -> {
+                    val id = sourceUseCases.updateSourceUseCase(source).toLong()
+                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("source_updated"))
+                    id
+                }
             }
 
             if (sourceId >= 0) {
