@@ -246,6 +246,11 @@ class ProfileViewModel(
                         FinTrackPreferences.PREF_BIOMETRIC_ENABLED,
                         newValue
                     )
+                    if (newValue) {
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("auth_biometric_enabled"))
+                    } else {
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("auth_biometric_disabled"))
+                    }
                     _state.update { it.copy(isFingerprintEnabled = newValue) }
                 }
             }

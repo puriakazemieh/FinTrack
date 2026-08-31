@@ -38,6 +38,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
 class SearchViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val observeTransactionsUseCase: ObserveTransactionsUseCase,
     private val searchCategoriesUseCase: SearchCategoriesUseCase,
     private val searchSourcesUseCase: SearchSourcesUseCase,
@@ -139,6 +140,9 @@ class SearchViewModel(
     fun onIntent(intent: SearchIntent) {
         when (intent) {
             is SearchIntent.UpdateQuery -> {
+                if (intent.query.isNotBlank() && _query.value != intent.query) {
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("transaction_search_performed"))
+                }
                 _query.value = intent.query
                 _state.update { it.copy(query = intent.query) }
             }
