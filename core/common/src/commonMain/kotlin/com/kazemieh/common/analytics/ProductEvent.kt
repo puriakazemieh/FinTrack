@@ -135,6 +135,8 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     data object AppInstalled : ProductEvent("app_installed")
     data object AppUninstalled : ProductEvent("app_uninstalled")
     data object AppUpdated : ProductEvent("app_updated")
+    data object AppOpened : ProductEvent("app_opened")
+    data class CampaignAttributed(val source: String, val campaign: String) : ProductEvent("campaign_attributed", mapOf("source" to source, "campaign" to campaign))
     data class NotificationReceived(val type: String) : ProductEvent("notification_received", mapOf("type" to type))
     data class NotificationClicked(val type: String) : ProductEvent("notification_clicked", mapOf("type" to type))
     data class NotificationDismissed(val type: String) : ProductEvent("notification_dismissed", mapOf("type" to type))
