@@ -124,6 +124,18 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     data object NotificationSettingsChanged : ProductEvent("notification_settings_changed")
     data object LanguageChanged : ProductEvent("language_changed")
     
+    // 15. Lifecycle & Notifications
+    data object AppInstalled : ProductEvent("app_installed")
+    data object AppUpdated : ProductEvent("app_updated")
+    data object AppUninstalled : ProductEvent("app_uninstalled")
+    data class NotificationReceived(val type: String) : ProductEvent("notification_received", mapOf("type" to type))
+    data class NotificationClicked(val type: String) : ProductEvent("notification_clicked", mapOf("type" to type))
+    data class NotificationDismissed(val type: String) : ProductEvent("notification_dismissed", mapOf("type" to type))
+    
+    // 16. General Filters
+    data class FilterApplied(val featureKey: String) : ProductEvent("filter_applied", mapOf("feature_key" to featureKey))
+    data class FilterCleared(val featureKey: String) : ProductEvent("filter_cleared", mapOf("feature_key" to featureKey))
+
     // Fallbacks
     data object AccountCreated : ProductEvent("account_created")
     data object FirstTransactionCompleted : ProductEvent("first_transaction_completed")

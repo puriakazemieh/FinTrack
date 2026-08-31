@@ -122,3 +122,15 @@
 - [x] `base_currency_changed` (تغییر واحد پول اصلی اپلیکیشن)
 - [x] `notification_settings_changed` (روشن/خاموش کردن اعلان‌ها یا یادآورها)
 - [x] `language_changed` (تغییر زبان اپلیکیشن)
+
+## ۱۵. چرخه عمر اپلیکیشن و اعلانات (Lifecycle & Notifications)
+- [x] `app_installed` (نصب اپلیکیشن)
+- [x] `app_updated` (به‌روزرسانی اپلیکیشن)
+- [x] `app_uninstalled` (حذف اپلیکیشن)
+- [x] `notification_received` (دریافت نوتیفیکیشن)
+- [x] `notification_clicked` (کلیک روی نوتیفیکیشن)
+- [x] `notification_dismissed` (رد کردن نوتیفیکیشن)
+
+## ۱۶. فیلترهای عمومی (General Filters)
+- [x] `filter_applied` (اعمال فیلتر روی یک لیست)
+- [x] `filter_cleared` (پاک کردن فیلترها)
