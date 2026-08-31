@@ -85,6 +85,11 @@ fun ToolsScreen(
     val glassColors = LocalGlassColors.current
 
     val preferenceUseCases = koinInject<PreferenceUseCases>()
+    val analytics = koinInject<com.kazemieh.common.analytics.AnalyticsService>()
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("tools_hub"))
+    }
+    
     val disabledToolsCsv by preferenceUseCases
         .getStringFlow(FinTrackPreferences.PREF_DISABLED_TOOLS, "")
         .collectAsState("")

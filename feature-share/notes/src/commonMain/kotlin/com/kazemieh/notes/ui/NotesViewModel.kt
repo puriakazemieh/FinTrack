@@ -39,6 +39,7 @@ sealed interface NotesEffect {
 }
 
 class NotesViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val observeNotes: ObserveNotesUseCase,
     private val deleteNote: DeleteNoteUseCase,
     private val togglePin: ToggleNotePinUseCase,
@@ -55,6 +56,7 @@ class NotesViewModel(
     private val _searchQuery = MutableStateFlow("")
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("note_list"))
         _state.update { it.copy(isLoading = true) }
         observeNotes()
             .combine(_searchQuery) { notes, query ->
@@ -95,6 +97,7 @@ class NotesViewModel(
             is NotesIntent.OnDeleteNote -> {
                 viewModelScope.launch {
                     deleteNote(intent.id)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("note_deleted"))
                 }
             }
             is NotesIntent.OnToggleCheckbox -> {

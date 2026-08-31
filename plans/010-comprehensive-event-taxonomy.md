@@ -85,28 +85,28 @@
 - [x] `check_deleted`
 
 ## ۱۰. هزینه‌های ثابت (Fixed Expenses)
-- [ ] `fixed_expense_list_viewed`
-- [ ] `fixed_expense_created`
-- [ ] `fixed_expense_deleted`
-- [ ] `fixed_expense_auto_logged` (ثبت خودکار هزینه ثابت توسط سیستم)
+- [x] `fixed_expense_list_viewed`
+- [x] `fixed_expense_created`
+- [x] `fixed_expense_deleted`
+- [x] `fixed_expense_auto_logged` (ثبت خودکار هزینه ثابت توسط سیستم)
 
 ## ۱۱. مدیریت دارایی‌ها (Assets & Gold/Crypto)
-- [ ] `asset_list_viewed`
-- [ ] `asset_created` (پارامتر مجاز: نوع دارایی مثلاً طلا/ارز)
-- [ ] `asset_updated`
-- [ ] `asset_deleted`
-- [ ] `fx_rates_viewed` (بررسی نرخ لحظه‌ای ارز و طلا)
+- [x] `asset_list_viewed`
+- [x] `asset_created` (پارامتر مجاز: نوع دارایی مثلاً طلا/ارز)
+- [x] `asset_updated`
+- [x] `asset_deleted`
+- [x] `fx_rates_viewed` (بررسی نرخ لحظه‌ای ارز و طلا)
 
 ## ۱۲. امکانات جانبی و ابزارها (Utilities & Tools)
-- [ ] `tools_hub_viewed` (باز کردن صفحه ابزارها)
+- [x] `tools_hub_viewed` (باز کردن صفحه ابزارها)
 - [ ] `currency_converter_used` (استفاده از ماشین حساب تبدیل ارز)
 - [ ] `ai_advisor_opened` (باز کردن صفحه هوش مصنوعی)
 - [ ] `ai_insight_generated` (دریافت تحلیل از هوش مصنوعی)
 - [ ] `ai_insight_feedback_given` (لایک یا دیس‌لایک کردن پاسخ هوش مصنوعی)
-- [ ] `calendar_viewed` (مشاهده تقویم مالی)
-- [ ] `shopping_list_created`
-- [ ] `shopping_item_purchased` (تیک زدن یک آیتم در لیست خرید)
-- [ ] `note_created`
+- [x] `calendar_viewed` (مشاهده تقویم مالی)
+- [x] `shopping_list_created`
+- [x] `shopping_item_purchased` (تیک زدن یک آیتم در لیست خرید)
+- [x] `note_created`
 
 ## ۱۳. پشتیبان‌گیری و همگام‌سازی (Backup & Sync)
 - [ ] `backup_exported_local` (خروجی گرفتن روی حافظه گوشی)

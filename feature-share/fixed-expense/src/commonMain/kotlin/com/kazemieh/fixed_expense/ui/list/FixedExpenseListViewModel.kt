@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class FixedExpenseListViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val fixedExpenseUseCases: FixedExpenseUseCaseGroup
 ) : ViewModel() {
 
@@ -32,6 +33,7 @@ class FixedExpenseListViewModel(
     private val _filterPersons = MutableStateFlow<Set<Person>>(emptySet())
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("fixed_expense_list"))
         observeExpenses()
     }
 
@@ -181,6 +183,7 @@ class FixedExpenseListViewModel(
     private fun registerAsTransaction(expense: FixedExpense) {
         viewModelScope.launch {
             fixedExpenseUseCases.postFixedExpenseAsTransactionUseCase(expense)
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("fixed_expense_auto_logged"))
             _effect.send(FixedExpenseListEffect.ShowMessage(Res.string.msg_fixed_expense_added_to_transactions))
         }
     }
@@ -189,6 +192,7 @@ class FixedExpenseListViewModel(
         val expense = _state.value.selectedExpense ?: return
         viewModelScope.launch {
             fixedExpenseUseCases.deleteFixedExpenseUseCase(expense.id)
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("fixed_expense_deleted"))
             _state.update { it.copy(isDeleteShow = false, selectedExpense = null) }
         }
     }

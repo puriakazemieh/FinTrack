@@ -75,6 +75,7 @@ sealed interface ShoppingEffect {
 }
 
 class ShoppingViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val observeShoppingItems: ObserveShoppingItemsUseCase,
     private val addShoppingItem: AddShoppingItemUseCase,
     private val updateShoppingItem: UpdateShoppingItemUseCase,
@@ -97,6 +98,7 @@ class ShoppingViewModel(
     private val _filterTags = MutableStateFlow<Set<Tag>>(emptySet())
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("shopping_list"))
         _state.update { it.copy(isLoading = true) }
         observeMostUsedCategories(TransactionType.EXPENSE, limit = 3)
             .onEach { categories -> _state.update { it.copy(mostUsedCategories = categories) } }
@@ -181,6 +183,7 @@ class ShoppingViewModel(
                 position = (_state.value.items.maxOfOrNull { it.position } ?: -1) + 1
             )
             val id = addShoppingItem(newItem)
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("shopping_list_item_added"))
             scheduleReminder(id, newItem)
             if (dismiss) {
                 _state.update { it.copy(showAddSheet = false) }
@@ -211,6 +214,9 @@ class ShoppingViewModel(
     private fun toggleItem(item: ShoppingItem) {
         viewModelScope.launch {
             updateShoppingItem(item.copy(isChecked = !item.isChecked))
+            if (!item.isChecked) {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("shopping_list_item_checked"))
+            }
         }
     }
 

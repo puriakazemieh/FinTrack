@@ -30,6 +30,7 @@ import org.jetbrains.compose.resources.getString
 import kotlin.time.Clock
 
 class AddFixedExpenseViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val fixedExpenseUseCases: FixedExpenseUseCaseGroup,
     private val getCategoryUseCase: GetCategoryUseCase,
     private val getSourceByIdUseCase: GetSourceByIdUseCase,
@@ -184,6 +185,7 @@ class AddFixedExpenseViewModel(
                 personIds = currentState.persons.mapNotNull { it.id }
             )
             fixedExpenseUseCases.postFixedExpenseAsTransactionUseCase(expense)
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("fixed_expense_auto_logged"))
             if (currentState.expenseId != null) {
                 // If we were editing, reload to get updated nextDueDate
                 loadExpense(currentState.expenseId)
@@ -238,8 +240,10 @@ class AddFixedExpenseViewModel(
             )
             if (currentState.expenseId != null) {
                 fixedExpenseUseCases.updateFixedExpenseUseCase(expense)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("fixed_expense_updated"))
             } else {
                 fixedExpenseUseCases.addFixedExpenseUseCase(expense, reminderTitle, reminderMessage)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("fixed_expense_created"))
             }
             // Clear the form so the next "add" starts empty.
             reset()

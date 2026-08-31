@@ -45,6 +45,7 @@ sealed interface FinancialCalendarIntent {
 }
 
 class FinancialCalendarViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val observeTransactions: ObserveTransactionsUseCase
 ) : ViewModel() {
 
@@ -54,6 +55,7 @@ class FinancialCalendarViewModel(
     private var allMonthTransactions: List<TransactionWithRelations> = emptyList()
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("calendar"))
         loadMonth()
     }
 

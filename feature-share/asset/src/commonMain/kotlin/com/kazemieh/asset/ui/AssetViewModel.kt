@@ -43,6 +43,7 @@ sealed interface AssetEffect {
 }
 
 class AssetViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val assetUseCases: AssetUseCases
 ) : ViewModel() {
 
@@ -55,6 +56,7 @@ class AssetViewModel(
     private val _searchQuery = MutableStateFlow("")
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("asset_list"))
         onIntent(AssetIntent.LoadAssets)
     }
 
@@ -116,6 +118,7 @@ class AssetViewModel(
     private fun addAsset(asset: Asset) {
         viewModelScope.launch {
             assetUseCases.addAsset(asset)
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("asset_created"))
             _effect.send(AssetEffect.ShowMessage(UiText.StringResourceText(Res.string.msg_asset_added)))
         }
     }
@@ -123,6 +126,7 @@ class AssetViewModel(
     private fun deleteAsset(id: Long) {
         viewModelScope.launch {
             assetUseCases.deleteAsset(id)
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("asset_deleted"))
             _effect.send(AssetEffect.ShowMessage(UiText.StringResourceText(Res.string.msg_asset_deleted)))
         }
     }
@@ -130,6 +134,7 @@ class AssetViewModel(
     private fun updateAsset(asset: Asset) {
         viewModelScope.launch {
             assetUseCases.updateAsset(asset)
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("asset_updated"))
             _effect.send(AssetEffect.ShowMessage(UiText.StringResourceText(Res.string.msg_asset_updated)))
         }
     }
@@ -138,6 +143,7 @@ class AssetViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             assetUseCases.syncAssetRates()
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("asset_rate_synced"))
             _state.update { it.copy(isLoading = false) }
         }
     }

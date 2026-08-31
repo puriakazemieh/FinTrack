@@ -59,6 +59,7 @@ sealed interface NoteEditEffect {
 }
 
 class NoteEditViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val getNoteById: GetNoteByIdUseCase,
     private val addNote: AddNoteUseCase,
     private val updateNote: UpdateNoteUseCase,
@@ -155,7 +156,15 @@ class NoteEditViewModel(
                 reminderTime = current.reminderTime,
                 tags = current.selectedTags
             )
-            val noteId = if (note.id == 0L) addNote(note) else { updateNote(note); note.id }
+            val noteId = if (note.id == 0L) {
+                val id = addNote(note)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("note_created"))
+                id
+            } else { 
+                updateNote(note)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("note_updated"))
+                note.id 
+            }
             syncReminder(noteId, current.reminderTime, current.title.ifBlank { current.content })
             _effect.send(NoteEditEffect.SaveSuccess)
         }

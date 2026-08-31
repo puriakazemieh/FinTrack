@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class FxRatesViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val assetRepository: AssetRepository
 ) : ViewModel() {
 
@@ -23,6 +24,7 @@ class FxRatesViewModel(
     val effect = _effect.receiveAsFlow()
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("fx_rates"))
         // The cached rates are the source of truth for what's on screen, so a failed live refresh
         // never blanks the list — the last successful snapshot stays visible.
         assetRepository.observeRates()
