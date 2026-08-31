@@ -10,6 +10,7 @@ import org.koin.dsl.module
 val transactionPresentationModule = module {
     viewModel {
         TransactionViewModel(
+            analytics = get(),
             transactionUseCaseGroup = get()
         )
     }
@@ -17,6 +18,7 @@ val transactionPresentationModule = module {
 val addTransactionPresentationModule = module {
     viewModel {
         AddTransactionViewModel(
+            analytics = get(),
             transactionUseCaseGroup = get(),
             imageStorage = get(),
             smsDraftRepository = get(),

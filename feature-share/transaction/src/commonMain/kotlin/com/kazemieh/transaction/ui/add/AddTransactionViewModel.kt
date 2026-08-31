@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AddTransactionViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val transactionUseCaseGroup: TransactionUseCaseGroup,
     private val imageStorage: ImageStorage,
     private val smsDraftRepository: SmsDraftRepository,
@@ -185,6 +186,9 @@ class AddTransactionViewModel(
             _state.update { it.copy(isLoading = true) }
             transaction.photoPath?.let { imageStorage.deleteImage(it) }
             transactionUseCaseGroup.deleteTransactionUseCase(transaction)
+            
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionDeleted)
+            
             _state.update { it.copy(isLoading = false) }
             _effect.send(AddTransactionEffect.AddedTransaction)
         }
@@ -340,14 +344,18 @@ class AddTransactionViewModel(
             val personIds = current.persons?.mapNotNull { it.id } ?: emptyList()
 
             val id = if (current.oldTransaction == null) {
-                transactionUseCaseGroup.addTransactionUseCase(transaction, tagIds, personIds)
+                val newId = transactionUseCaseGroup.addTransactionUseCase(transaction, tagIds, personIds)
+                if (newId > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionCreated(transaction.type.name))
+                newId
             } else {
-                transactionUseCaseGroup.updateTransactionUseCase(
+                val updatedId = transactionUseCaseGroup.updateTransactionUseCase(
                     current.oldTransaction,
                     transaction,
                     tagIds,
                     personIds
                 )
+                if (updatedId > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionUpdated)
+                updatedId
             }
             _state.update { it.copy(isLoading = false) }
             if (id > 0) {

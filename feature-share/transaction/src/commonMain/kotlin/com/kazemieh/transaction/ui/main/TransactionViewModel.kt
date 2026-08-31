@@ -65,6 +65,7 @@ data class TransactionState(
 )
 
 class TransactionViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val transactionUseCaseGroup: TransactionUseCaseGroup
 ) : ViewModel() {
 
@@ -85,6 +86,7 @@ class TransactionViewModel(
     fun onIntent(intent: TransactionIntent) {
         when (intent) {
             TransactionIntent.Init -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionListViewed)
                 observeSummary()
                 startObservingTransactionsIfNeeded()
                 refresh()
@@ -93,6 +95,7 @@ class TransactionViewModel(
             TransactionIntent.Refresh -> refresh()
 
             is TransactionIntent.SetFilter -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("transaction_filter_applied"))
                 _state.update {
                     it.copy(
                         filterParams = intent.params,

@@ -24,12 +24,13 @@
 - [ ] `dashboard_widget_toggled` (روشن یا خاموش کردن نمایش یک ویجت خاص)
 
 ## ۳. تراکنش‌ها (Transactions)
-- [ ] `transaction_list_viewed` (باز کردن لیست تراکنش‌ها)
-- [ ] `transaction_created` (پارامتر مجاز: `type` = income/expense/transfer)
-- [ ] `transaction_updated`
-- [ ] `transaction_deleted`
-- [ ] `transaction_duplicated` (کپی کردن یک تراکنش)
-- [ ] `transaction_filter_applied` (استفاده از فیلتر تاریخ/دسته‌بندی در لیست)
+- [x] `transaction_list_viewed` (باز کردن لیست تراکنش‌ها)
+- [x] `transaction_created` (ساخت تراکنش جدید - همراه با نوع تراکنش)
+- [x] `transaction_updated` (ویرایش تراکنش)
+- [x] `transaction_deleted` (حذف تراکنش)
+- [x] `transaction_filter_applied` (استفاده از فیلتر در لیست تراکنش‌ها)
+- [ ] `transaction_search_used` (جستجو در تراکنش‌ها)
+- [ ] `transaction_duplicate_clicked` (تکرار یک تراکنش)
 - [ ] `transaction_sort_changed` (تغییر مرتب‌سازی لیست)
 - [ ] `transaction_search_performed` (جستجو در تراکنش‌ها)
 - [ ] `transaction_report_viewed` (مشاهده گزارش و نمودارهای گرافیکی)
