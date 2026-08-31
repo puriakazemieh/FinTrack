@@ -104,7 +104,19 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     data object ShoppingItemAdded : ProductEvent("shopping_item_added")
     data object ShoppingItemPurchased : ProductEvent("shopping_item_purchased")
     data object NoteCreated : ProductEvent("note_created")
+    data object NoteUpdated : ProductEvent("note_updated")
+    data object NoteDeleted : ProductEvent("note_deleted")
+    data object NoteListViewed : ProductEvent("note_list_viewed")
 
+    // 13. Gamification & Achievements
+    data object GamificationHubViewed : ProductEvent("gamification_hub_viewed")
+    data class AchievementUnlocked(val name: String) : ProductEvent("achievement_unlocked", mapOf("name" to name))
+    
+    // 14. Financial Goals
+    data object GoalListViewed : ProductEvent("goal_list_viewed")
+    data object GoalCreated : ProductEvent("goal_created")
+    data object GoalUpdated : ProductEvent("goal_updated")
+    data object GoalDeleted : ProductEvent("goal_deleted")
     // 13. Backup & Sync
     data object BackupExportedLocal : ProductEvent("backup_exported_local")
     data object BackupRestored : ProductEvent("backup_restored")
@@ -126,6 +138,8 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     data class NotificationReceived(val type: String) : ProductEvent("notification_received", mapOf("type" to type))
     data class NotificationClicked(val type: String) : ProductEvent("notification_clicked", mapOf("type" to type))
     data class NotificationDismissed(val type: String) : ProductEvent("notification_dismissed", mapOf("type" to type))
+    data object WidgetAdded : ProductEvent("widget_added")
+    data object WidgetRemoved : ProductEvent("widget_removed")
     
     // 16. General Filters
     data class FilterApplied(val featureKey: String) : ProductEvent("filter_applied", mapOf("feature_key" to featureKey))

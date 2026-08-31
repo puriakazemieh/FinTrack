@@ -56,7 +56,7 @@ class NotesViewModel(
     private val _searchQuery = MutableStateFlow("")
 
     init {
-        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("note_list"))
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.NoteListViewed)
         _state.update { it.copy(isLoading = true) }
         observeNotes()
             .combine(_searchQuery) { notes, query ->

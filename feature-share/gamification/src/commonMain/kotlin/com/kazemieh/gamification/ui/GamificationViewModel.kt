@@ -12,9 +12,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 class GamificationViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     observeStreak: ObserveStreakUseCase,
     observeAchievements: ObserveAchievementsUseCase
 ) : ViewModel() {
+
+    init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.GamificationHubViewed)
+    }
 
     val state: StateFlow<GamificationState> = combine(
         observeStreak(),

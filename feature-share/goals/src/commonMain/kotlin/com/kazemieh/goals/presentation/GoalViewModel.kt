@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class GoalViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val goalUseCases: GoalUseCases,
     private val assetUseCases: AssetUseCases,
     private val transactionUseCases: TransactionUseCaseGroup,
@@ -26,6 +27,7 @@ class GoalViewModel(
     val effect = _effect.receiveAsFlow()
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.GoalListViewed)
         onIntent(GoalIntent.LoadGoals)
         loadRoundUpSettings()
     }
@@ -149,6 +151,7 @@ class GoalViewModel(
 
     private fun deleteGoal(id: Long) {
         viewModelScope.launch {
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.GoalDeleted)
             goalUseCases.deleteGoal(id)
         }
     }
@@ -157,6 +160,7 @@ class GoalViewModel(
         viewModelScope.launch {
             val goal = goalUseCases.getGoalById(id)
             if (goal != null) {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.GoalUpdated)
                 val updatedGoal = goal.copy(savedAmount = goal.savedAmount + amount)
                 goalUseCases.updateGoal(updatedGoal)
             }

@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlin.time.Clock
 
 class AddGoalViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val goalUseCases: GoalUseCases
 ) : ViewModel() {
 
@@ -134,8 +135,10 @@ class AddGoalViewModel(
             )
             
             if (goal.id == 0L) {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.GoalCreated)
                 goalUseCases.addGoal(goal)
             } else {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.GoalUpdated)
                 goalUseCases.updateGoal(goal)
             }
             _effect.send(AddGoalEffect.GoalSaved)
