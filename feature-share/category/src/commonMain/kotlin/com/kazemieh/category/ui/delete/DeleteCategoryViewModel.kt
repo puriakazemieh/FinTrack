@@ -73,7 +73,7 @@ class DeleteCategoryViewModel(
             }
             _state.value.category?.let { deleteCategory ->
                 deleteCategoryUseCase(deleteCategory, _state.value.moveCategory)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("category_deleted"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.CategoryDeleted)
                 _effect.send(DeleteCategoryEffect.DeletedTransaction)
             }
         }

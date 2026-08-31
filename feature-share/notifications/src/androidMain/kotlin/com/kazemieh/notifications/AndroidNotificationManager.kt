@@ -38,7 +38,8 @@ import org.jetbrains.compose.resources.getString
 
 class AndroidNotificationManager(
     private val context: Context,
-    private val preferenceUseCases: PreferenceUseCases
+    private val preferenceUseCases: PreferenceUseCases,
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService
 ) : NotificationManager {
 
     private val notificationManagerCompat = NotificationManagerCompat.from(context)
@@ -184,7 +185,7 @@ class AndroidNotificationManager(
                 builder.addAction(0, runBlocking { getString(Res.string.notif_action_ignore) }, ignorePendingIntent)
             }
         }
-
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationReceived(channelId))
         notificationManagerCompat.notify(id, builder.build())
     }
 
@@ -232,7 +233,7 @@ class AndroidNotificationManager(
             .addAction(ignoreAction)
             .setAutoCancel(true)
             .build()
-
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationReceived(NotificationManager.CHANNEL_SMS))
         notificationManagerCompat.notify(id, notification)
     }
 
@@ -303,7 +304,7 @@ class AndroidNotificationManager(
             .setDefaults(android.app.Notification.DEFAULT_ALL)
             .setFullScreenIntent(pendingIntent, true) // Add this back for Heads-up
             .build()
-
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationReceived(NotificationManager.CHANNEL_INSTALLMENT))
         notificationManagerCompat.notify(id, notification)
     }
 
@@ -332,7 +333,7 @@ class AndroidNotificationManager(
             .setContentIntent(pendingIntent)
             .addAction(action)
             .build()
-
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationReceived(NotificationManager.CHANNEL_QUICK_ADD))
         notificationManagerCompat.notify(id, notification)
     }
 

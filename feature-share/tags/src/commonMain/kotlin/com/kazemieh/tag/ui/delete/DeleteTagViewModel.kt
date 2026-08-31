@@ -74,7 +74,7 @@ class DeleteTagViewModel(
             }
             _state.value.tag?.let { deleteTag ->
                 deleteTagUseCase(deleteTag, _state.value.moveTag)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("tag_deleted"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.TagDeleted)
                 _effect.send(DeleteTagEffect.DeletedTransaction)
             }
         }

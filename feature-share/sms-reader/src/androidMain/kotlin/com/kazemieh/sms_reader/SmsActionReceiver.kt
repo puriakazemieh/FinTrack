@@ -14,6 +14,7 @@ import org.koin.core.component.inject
 class SmsActionReceiver : BroadcastReceiver(), KoinComponent {
 
     private val smsDraftRepository: SmsDraftRepository by inject()
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService by inject()
     private val scope = CoroutineScope(Dispatchers.IO)
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -22,6 +23,7 @@ class SmsActionReceiver : BroadcastReceiver(), KoinComponent {
 
         when (intent.action) {
             "com.kazemieh.sms_reader.ACTION_IGNORE" -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationDismissed("ignore"))
                 scope.launch {
                     smsDraftRepository.markSmsDraftAsUsed(id)
                     val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

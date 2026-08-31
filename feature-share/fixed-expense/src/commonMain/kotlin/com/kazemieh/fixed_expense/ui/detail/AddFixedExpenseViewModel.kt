@@ -185,7 +185,7 @@ class AddFixedExpenseViewModel(
                 personIds = currentState.persons.mapNotNull { it.id }
             )
             fixedExpenseUseCases.postFixedExpenseAsTransactionUseCase(expense)
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("fixed_expense_auto_logged"))
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FixedExpenseAutoLogged)
             if (currentState.expenseId != null) {
                 // If we were editing, reload to get updated nextDueDate
                 loadExpense(currentState.expenseId)
@@ -240,10 +240,10 @@ class AddFixedExpenseViewModel(
             )
             if (currentState.expenseId != null) {
                 fixedExpenseUseCases.updateFixedExpenseUseCase(expense)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("fixed_expense_updated"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FixedExpenseUpdated)
             } else {
                 fixedExpenseUseCases.addFixedExpenseUseCase(expense, reminderTitle, reminderMessage)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("fixed_expense_created"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FixedExpenseCreated)
             }
             // Clear the form so the next "add" starts empty.
             reset()

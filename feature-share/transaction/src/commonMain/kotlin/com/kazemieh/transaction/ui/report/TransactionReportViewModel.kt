@@ -83,7 +83,7 @@ class TransactionReportViewModel(
         )
 
     init {
-        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("transaction_report_viewed"))
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionReportViewed)
         observeTransactions()
         observeCategorySums()
         observeMonthlyTrend()

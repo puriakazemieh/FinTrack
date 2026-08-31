@@ -156,10 +156,10 @@ class AddDebtViewModel(
             
             if (currentState.debtId == null) {
                 debtUseCases.addDebtUseCase(debt, tagIds)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("debt_created"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.DebtCreated(_state.value.type.name))
             } else {
                 debtUseCases.updateDebtUseCase(debt, tagIds)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("debt_updated"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.DebtUpdated)
             }
             _effect.send(AddDebtEffect.Saved)
         }

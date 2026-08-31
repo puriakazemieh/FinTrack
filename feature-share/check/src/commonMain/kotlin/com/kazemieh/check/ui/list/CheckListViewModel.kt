@@ -153,7 +153,7 @@ class CheckListViewModel(
     private fun deleteCheck(checkId: Long) {
         viewModelScope.launch { 
             checkUseCases.deleteCheckUseCase(checkId) 
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("check_deleted"))
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.CheckDeleted)
         }
     }
 

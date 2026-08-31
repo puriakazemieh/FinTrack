@@ -339,7 +339,7 @@ class AddInstallmentViewModel(
                         reminderTitle = intent.reminderTitle,
                         reminderMessage = intent.reminderMessage
                     )
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("installment_updated"))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.InstallmentUpdated)
                 } else {
                     installmentUseCases.addInstallmentUseCase(
                         installment = installment,
@@ -348,7 +348,7 @@ class AddInstallmentViewModel(
                         reminderTitle = intent.reminderTitle,
                         reminderMessage = intent.reminderMessage
                     )
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("installment_created"))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.InstallmentCreated(currentState.interval.name))
                 }
                 _effects.send(AddInstallmentEffect.Success)
             } catch (e: Exception) {

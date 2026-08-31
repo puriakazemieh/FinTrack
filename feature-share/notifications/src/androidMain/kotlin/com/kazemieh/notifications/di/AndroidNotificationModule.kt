@@ -8,6 +8,6 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 actual fun notificationPlatformModule(): Module = module {
-    single<NotificationManager> { AndroidNotificationManager(get(), get()) }
+    single<NotificationManager> { AndroidNotificationManager(get(), get(), get()) }
     single<NotificationScheduler> { AndroidNotificationScheduler(get()) }
 }

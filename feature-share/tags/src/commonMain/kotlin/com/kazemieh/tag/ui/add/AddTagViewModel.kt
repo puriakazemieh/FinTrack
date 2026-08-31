@@ -94,12 +94,12 @@ class AddTagViewModel(
             val tagId = when (mode) {
                 is AddTagMode.Add -> {
                     val id = addTagUseCase(tag)
-                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("tag_created"))
+                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.TagCreated)
                     id
                 }
                 is AddTagMode.Edit -> {
                     val id = updateTagUseCase(tag).toLong()
-                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("tag_updated"))
+                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.TagUpdated)
                     id
                 }
             }

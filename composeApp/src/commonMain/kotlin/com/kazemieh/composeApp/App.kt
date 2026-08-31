@@ -85,6 +85,7 @@ fun App() {
     val initializer = koinInject<DatabaseInitializer>()
     val preferenceUseCases = koinInject<PreferenceUseCases>()
     val notificationManager = koinInject<NotificationManager>()
+    val analytics = koinInject<com.kazemieh.common.analytics.AnalyticsService>()
 
     var isReady by remember { mutableStateOf(false) }
 
@@ -169,6 +170,19 @@ fun App() {
                 actionLabel = org.jetbrains.compose.resources.getString(fintrack.core.designsystem.generated.resources.Res.string.notif_quick_add_action)
             )
         }
+        
+        val lastVersion = preferenceUseCases.getStringPreference("pref_last_app_version", "")
+        val currentVersion = "1.0.0" // we can hardcode for now or use buildconfig if available. Let's just track opened.
+        if (lastVersion.isEmpty()) {
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.AppInstalled)
+            preferenceUseCases.setStringPreference("pref_last_app_version", currentVersion)
+        } else if (lastVersion != currentVersion) {
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.AppUpdated)
+            preferenceUseCases.setStringPreference("pref_last_app_version", currentVersion)
+        }
+        
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.AppOpened)
+        
         isReady = true
     }
 

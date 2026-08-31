@@ -97,7 +97,7 @@ class NotesViewModel(
             is NotesIntent.OnDeleteNote -> {
                 viewModelScope.launch {
                     deleteNote(intent.id)
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("note_deleted"))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NoteDeleted)
                 }
             }
             is NotesIntent.OnToggleCheckbox -> {

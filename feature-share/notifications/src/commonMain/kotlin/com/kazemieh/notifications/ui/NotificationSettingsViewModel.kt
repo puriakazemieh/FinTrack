@@ -59,7 +59,7 @@ class NotificationSettingsViewModel(
                     val newValue = !_state.value.isBudgetNotifEnabled
                     preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_BUDGET_ENABLED, newValue)
                     _state.update { it.copy(isBudgetNotifEnabled = newValue) }
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("notification_settings_changed", mapOf("setting" to "budget", "enabled" to newValue.toString())))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("budget", newValue))
                 } else {
                     // Trigger flow via UI check
                     _state.update { it.copy(triggerSystemPermissionRequest = true) }
@@ -70,7 +70,7 @@ class NotificationSettingsViewModel(
                     val newValue = !_state.value.isInstallmentNotifEnabled
                     preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_INSTALLMENT_ENABLED, newValue)
                     _state.update { it.copy(isInstallmentNotifEnabled = newValue) }
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("notification_settings_changed", mapOf("setting" to "installment", "enabled" to newValue.toString())))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("installment", newValue))
                 } else {
                     _state.update { it.copy(triggerSystemPermissionRequest = true) }
                 }
@@ -80,7 +80,7 @@ class NotificationSettingsViewModel(
                     val newValue = !_state.value.isChequeNotifEnabled
                     preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_CHEQUE_ENABLED, newValue)
                     _state.update { it.copy(isChequeNotifEnabled = newValue) }
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("notification_settings_changed", mapOf("setting" to "cheque", "enabled" to newValue.toString())))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("cheque", newValue))
                 } else {
                     _state.update { it.copy(triggerSystemPermissionRequest = true) }
                 }
@@ -90,7 +90,7 @@ class NotificationSettingsViewModel(
                     val newValue = !_state.value.isQuickAddNotifEnabled
                     preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_QUICK_ADD_NOTIF_ENABLED, newValue)
                     _state.update { it.copy(isQuickAddNotifEnabled = newValue) }
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("notification_settings_changed", mapOf("setting" to "quick_add", "enabled" to newValue.toString())))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("quick_add", newValue))
                     if (newValue) {
                         viewModelScope.launch {
                             notificationManager.showQuickAddNotification(
@@ -110,17 +110,17 @@ class NotificationSettingsViewModel(
                 val newValue = !_state.value.isQuietHoursEnabled
                 preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_QUIET_HOURS_ENABLED, newValue)
                 _state.update { it.copy(isQuietHoursEnabled = newValue) }
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("notification_settings_changed", mapOf("setting" to "quiet_hours", "enabled" to newValue.toString())))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("quiet_hours", newValue))
             }
             is NotificationSettingsIntent.SetQuietStart -> {
                 preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_NOTIF_QUIET_START, intent.time)
                 _state.update { it.copy(quietStart = intent.time) }
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("notification_settings_changed", mapOf("setting" to "quiet_start")))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("quiet_start", true))
             }
             is NotificationSettingsIntent.SetQuietEnd -> {
                 preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_NOTIF_QUIET_END, intent.time)
                 _state.update { it.copy(quietEnd = intent.time) }
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("notification_settings_changed", mapOf("setting" to "quiet_end")))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("quiet_end", true))
             }
             is NotificationSettingsIntent.RefreshPermissionStatus -> {
                 if (!notificationManager.hasPermission() && intent.shouldShowRationale) {

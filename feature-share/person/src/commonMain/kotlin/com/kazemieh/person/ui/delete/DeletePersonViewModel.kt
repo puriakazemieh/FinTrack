@@ -71,7 +71,7 @@ class DeletePersonViewModel(
             }
             _state.value.person?.let { deletePerson ->
                 deletePersonUseCase(deletePerson, _state.value.movePerson)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("person_deleted"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.PersonDeleted)
                 _effect.send(DeletePersonEffect.DeletedTransaction)
             }
         }

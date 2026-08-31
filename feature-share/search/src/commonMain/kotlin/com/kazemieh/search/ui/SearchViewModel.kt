@@ -141,7 +141,7 @@ class SearchViewModel(
         when (intent) {
             is SearchIntent.UpdateQuery -> {
                 if (intent.query.isNotBlank() && _query.value != intent.query) {
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("transaction_search_performed"))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionSearched)
                 }
                 _query.value = intent.query
                 _state.update { it.copy(query = intent.query) }

@@ -145,7 +145,7 @@ class BudgetViewModel(
                     val allWarned = mutableSetOf<Long>()
                     filtered.forEach { bw ->
                         if (bw.spentAmount > bw.budget.amount && !allWarned.contains(bw.budget.id)) {
-                            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("budget_exceeded_warning"))
+                            analytics.track(com.kazemieh.common.analytics.ProductEvent.BudgetExceededWarning)
                             allWarned.add(bw.budget.id ?: 0L)
                         }
                     }
@@ -213,7 +213,7 @@ class BudgetViewModel(
         val budgetToDelete = _state.value.pendingDeleteBudget ?: return
         viewModelScope.launch {
             deleteBudgetUseCase(budgetToDelete.budget.id ?: 0L)
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("budget_deleted"))
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.BudgetDeleted)
             _state.update { it.copy(pendingDeleteBudget = null) }
         }
     }

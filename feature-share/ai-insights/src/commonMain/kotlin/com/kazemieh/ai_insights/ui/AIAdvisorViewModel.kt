@@ -60,7 +60,7 @@ class AIAdvisorViewModel(
     val effect = _effect.asSharedFlow()
 
     init {
-        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("ai_advisor_opened"))
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.AiAdvisorOpened)
         _state.update { it.copy(aiConfig = aiConfigUseCase.get()) }
         loadData()
     }
@@ -131,7 +131,7 @@ class AIAdvisorViewModel(
             val summary = getFinancialSummaryUseCase()
             val insight = generateAiInsightUseCase(buildInsightContext(pattern, summary))
             if (insight.isNotBlank()) {
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("ai_insight_generated"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.AiInsightGenerated)
             }
             _state.update { it.copy(cloudInsight = insight, cloudInsightLoading = false) }
         }

@@ -206,7 +206,7 @@ class InstallmentViewModel(
                     reminderTitle = intent.reminderTitle,
                     reminderMessage = intent.reminderMessage
                 )
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("installment_paid"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.InstallmentPaid)
                 _effects.send(InstallmentEffect.ShowMessage(getString(Res.string.payment)))
             } catch (e: Exception) {
                 _effects.send(InstallmentEffect.ShowMessage(getString(Res.string.transaction_failed)))
@@ -218,7 +218,7 @@ class InstallmentViewModel(
         viewModelScope.launch {
             try {
                 useCases.deleteInstallmentUseCase(id)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("installment_deleted"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.InstallmentDeleted)
                 _effects.send(InstallmentEffect.ShowMessage(getString(Res.string.installment_deleted)))
             } catch (e: Exception) {
                 _effects.send(InstallmentEffect.ShowMessage(getString(Res.string.transaction_failed)))

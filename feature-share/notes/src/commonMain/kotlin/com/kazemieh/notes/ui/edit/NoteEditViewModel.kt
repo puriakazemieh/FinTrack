@@ -158,11 +158,11 @@ class NoteEditViewModel(
             )
             val noteId = if (note.id == 0L) {
                 val id = addNote(note)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("note_created"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.NoteCreated)
                 id
             } else { 
                 updateNote(note)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("note_updated"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.NoteUpdated)
                 note.id 
             }
             syncReminder(noteId, current.reminderTime, current.title.ifBlank { current.content })

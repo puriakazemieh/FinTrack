@@ -144,7 +144,7 @@ class SyncViewModel(
     private fun backupNow() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("sync_started"))
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.SyncStarted)
             try {
                 var totalInserted = 0
                 var totalUpdated = 0
@@ -178,7 +178,7 @@ class SyncViewModel(
                     updatedCount = totalUpdated
                 ))
                 
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("sync_completed"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.SyncCompleted("backup"))
                 _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_success)))
                 loadData()
             } catch (e: Exception) {
@@ -189,7 +189,7 @@ class SyncViewModel(
                     recordCount = 0,
                     errorMessage = e.message
                 ))
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("sync_failed"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.SyncFailed)
                 _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_failed, e.message ?: "")))
                 loadData()
             } finally {
@@ -204,7 +204,7 @@ class SyncViewModel(
             _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_restoring)))
             try {
                 val (inserted, updated) = serverSyncManager.restoreFromServer()
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("backup_restored"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.BackupRestored)
                 _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_restored, inserted.toString(), updated.toString())))
                 loadData()
             } catch (e: Exception) {

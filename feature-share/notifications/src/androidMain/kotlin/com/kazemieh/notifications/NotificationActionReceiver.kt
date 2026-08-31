@@ -20,6 +20,7 @@ import org.jetbrains.compose.resources.getString
 class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
 
     private val installmentUseCases: InstallmentUseCaseGroup by inject()
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService by inject()
     private val scope = CoroutineScope(Dispatchers.IO)
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -28,6 +29,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
 
         when (intent.action) {
             "com.kazemieh.notifications.ACTION_MANAGE" -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationClicked("manage"))
                 val uri = intent.getStringExtra("uri")
                 if (uri != null) {
                     val launchIntent = Intent(Intent.ACTION_VIEW, Uri.parse(uri)).apply {
@@ -41,9 +43,11 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             "com.kazemieh.check.ACTION_IGNORE",
             "com.kazemieh.debt.ACTION_IGNORE",
             "com.kazemieh.installment.ACTION_IGNORE" -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationDismissed("ignore"))
                 if (notificationId != -1) nm.cancel(notificationId)
             }
             "com.kazemieh.installment.ACTION_MARK_PAID" -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationClicked("mark_paid"))
                 val installmentId = intent.getLongExtra("installment_id", -1L)
                 if (installmentId == -1L) return
                 scope.launch {

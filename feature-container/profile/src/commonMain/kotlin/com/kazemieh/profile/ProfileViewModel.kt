@@ -42,7 +42,7 @@ class ProfileViewModel(
     val effect = _effect.receiveAsFlow()
 
     init {
-        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("profile"))
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.ProfileViewed)
         loadSettings()
         loadProfile()
         loadStats()
@@ -224,7 +224,7 @@ class ProfileViewModel(
                     FinTrackPreferences.PREF_THEME,
                     newTheme.name
                 )
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("theme_changed", mapOf("theme_mode" to newTheme.name)))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.ThemeChanged(newTheme.name))
 
                 // If the user manually toggles, we switch to MANUAL mode to ensure their choice sticks
                 if (currentMode != ThemeMode.MANUAL) {
@@ -247,9 +247,9 @@ class ProfileViewModel(
                         newValue
                     )
                     if (newValue) {
-                        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("auth_biometric_enabled"))
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.AuthBiometricEnabled)
                     } else {
-                        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("auth_biometric_disabled"))
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.AuthBiometricDisabled)
                     }
                     _state.update { it.copy(isFingerprintEnabled = newValue) }
                 }
@@ -292,7 +292,7 @@ class ProfileViewModel(
             is ProfileIntent.SelectCurrency -> {
                 val currencyJson = Json.encodeToString(intent.currency)
                 preferenceUseCases.setStringPreference(PREF_CURRENCY, currencyJson)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("currency_changed", mapOf("currency" to intent.currency.name)))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.BaseCurrencyChanged)
                 _state.update { it.copy(selectedCurrency = intent.currency) }
             }
 
@@ -326,7 +326,7 @@ class ProfileViewModel(
                     )
                     _state.update { it.copy(isLockEnabled = false, isFingerprintEnabled = false) }
                 } else {
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("app_locked"))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.AppLockedTimeout)
                     _state.update { it.copy(isLockEnabled = true) }
                 }
             }

@@ -95,10 +95,10 @@ class TransactionViewModel(
             TransactionIntent.Refresh -> refresh()
 
             is TransactionIntent.SetFilter -> {
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("transaction_filter_applied"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionFilterApplied)
                 
                 if (intent.params.sortBy != _state.value.filterParams.sortBy) {
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("transaction_sort_changed"))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionSortChanged)
                 }
                 
                 _state.update {

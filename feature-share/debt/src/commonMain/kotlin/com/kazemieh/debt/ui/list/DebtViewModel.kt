@@ -92,14 +92,14 @@ class DebtViewModel(
                 description = "",
                 postAsTransaction = postAsTransaction
             )
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("debt_settled"))
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.DebtSettled)
         }
     }
 
     private fun deleteDebt(debtId: Long) {
         viewModelScope.launch {
             debtUseCases.deleteDebtUseCase(debtId)
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("debt_deleted"))
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.DebtDeleted)
         }
     }
 }

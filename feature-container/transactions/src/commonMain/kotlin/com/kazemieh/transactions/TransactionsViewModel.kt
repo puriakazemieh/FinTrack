@@ -53,6 +53,7 @@ import kotlinx.datetime.toLocalDateTime
 
 
 class TransactionsViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val transactionUseCaseGroup: TransactionUseCaseGroup,
     private val preferenceUseCases: PreferenceUseCases
 ) : ViewModel() {
@@ -61,6 +62,7 @@ class TransactionsViewModel(
     val state = _state.asStateFlow()
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionListViewed)
         onIntent(TransactionsIntent.OnDateRange(DateFilterType.THIS_MONTH))
         loadAmountRange()
         observeDisabledTools()

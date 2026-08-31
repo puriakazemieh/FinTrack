@@ -86,7 +86,7 @@ class DeleteSourceViewModel(
             }
             _state.value.source?.let { deleteSource ->
                 deleteSourceUseCase(deleteSource, _state.value.moveSource)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("source_deleted"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.SourceDeleted)
                 _effect.send(DeleteSourceEffect.DeletedTransaction)
             }
         }

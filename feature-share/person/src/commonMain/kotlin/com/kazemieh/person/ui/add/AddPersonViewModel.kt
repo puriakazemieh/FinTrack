@@ -83,12 +83,12 @@ class AddPersonViewModel(
             val personId = when (mode) {
                 is AddPersonMode.Add -> {
                     val id = addPersonUseCase(person)
-                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("person_created"))
+                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.PersonCreated)
                     id
                 }
                 is AddPersonMode.Edit -> {
                     val id = updatePersonUseCase(person).toLong()
-                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("person_updated"))
+                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.PersonUpdated)
                     id
                 }
             }

@@ -183,7 +183,7 @@ class FixedExpenseListViewModel(
     private fun registerAsTransaction(expense: FixedExpense) {
         viewModelScope.launch {
             fixedExpenseUseCases.postFixedExpenseAsTransactionUseCase(expense)
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("fixed_expense_auto_logged"))
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FixedExpenseAutoLogged)
             _effect.send(FixedExpenseListEffect.ShowMessage(Res.string.msg_fixed_expense_added_to_transactions))
         }
     }
@@ -192,7 +192,7 @@ class FixedExpenseListViewModel(
         val expense = _state.value.selectedExpense ?: return
         viewModelScope.launch {
             fixedExpenseUseCases.deleteFixedExpenseUseCase(expense.id)
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("fixed_expense_deleted"))
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FixedExpenseDeleted)
             _state.update { it.copy(isDeleteShow = false, selectedExpense = null) }
         }
     }

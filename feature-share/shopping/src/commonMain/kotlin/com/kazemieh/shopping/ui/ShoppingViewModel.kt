@@ -215,7 +215,7 @@ class ShoppingViewModel(
         viewModelScope.launch {
             updateShoppingItem(item.copy(isChecked = !item.isChecked))
             if (!item.isChecked) {
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("shopping_list_item_checked"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.ShoppingItemPurchased)
             }
         }
     }

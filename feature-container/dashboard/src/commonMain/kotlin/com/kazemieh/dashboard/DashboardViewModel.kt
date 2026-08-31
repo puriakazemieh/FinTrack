@@ -205,7 +205,7 @@ class DashboardViewModel(
                     if (intent.transactionWithRelations == null) {
                         analytics.track(com.kazemieh.common.analytics.ProductEvent.DashboardQuickAddClicked)
                     } else {
-                        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("dashboard_recent_transaction_clicked"))
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.DashboardRecentTransactionClicked)
                     }
                 }
                 _state.update {
@@ -252,7 +252,7 @@ class DashboardViewModel(
                 )
                 if (nowHidden) { // Meaning it was visible and now hiding, or wait: nowHidden is the PREVIOUS state of isBalanceVisible. If it was true, it's becoming hidden.
                     // Let's track when they toggle it to SHOW balance
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("dashboard_wallet_summary_viewed"))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.DashboardWalletSummaryViewed)
                 }
                 _state.update { it.copy(isBalanceVisible = !nowHidden) }
             }
@@ -329,7 +329,7 @@ class DashboardViewModel(
                 intent.items.forEach { newItem ->
                     val oldVisibility = oldItems[newItem.widget]?.visible
                     if (oldVisibility != null && oldVisibility != newItem.visible) {
-                        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("dashboard_widget_toggled", mapOf("widget" to newItem.widget.name, "visible" to newItem.visible.toString())))
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.DashboardWidgetToggled)
                     }
                 }
                 preferenceUseCases.setStringPreference(

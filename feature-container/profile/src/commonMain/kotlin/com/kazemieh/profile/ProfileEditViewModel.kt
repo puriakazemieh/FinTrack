@@ -136,7 +136,7 @@ class ProfileEditViewModel(
             preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_USER_AVATAR, "")
         }
         
-        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("profile_updated"))
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.ProfileUpdated)
 
         viewModelScope.launch {
             _effect.send(ProfileEditEffect.ProfileSaved)

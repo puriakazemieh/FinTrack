@@ -126,8 +126,8 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     
     // 15. Lifecycle & Notifications
     data object AppInstalled : ProductEvent("app_installed")
-    data object AppUpdated : ProductEvent("app_updated")
     data object AppUninstalled : ProductEvent("app_uninstalled")
+    data object AppUpdated : ProductEvent("app_updated")
     data class NotificationReceived(val type: String) : ProductEvent("notification_received", mapOf("type" to type))
     data class NotificationClicked(val type: String) : ProductEvent("notification_clicked", mapOf("type" to type))
     data class NotificationDismissed(val type: String) : ProductEvent("notification_dismissed", mapOf("type" to type))

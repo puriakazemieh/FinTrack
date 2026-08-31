@@ -179,10 +179,10 @@ class AddCheckViewModel(
             }
             if (current.checkId == null) {
                 checkUseCases.addCheckUseCase(check, reminderTitle, reminderMessage)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("check_created"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.CheckCreated(_state.value.type.name))
             } else {
                 checkUseCases.updateCheckUseCase(check, reminderTitle, reminderMessage)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("check_updated"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.CheckUpdated)
             }
             _effect.send(AddCheckEffect.Saved)
         }

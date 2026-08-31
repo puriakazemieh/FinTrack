@@ -261,10 +261,10 @@ class AddBudgetViewModel(
 
             if (budget.id == null) {
                 addBudgetUseCase(budget)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("budget_created"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.BudgetCreated(currentState.period.name))
             } else {
                 updateBudgetUseCase(budget)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("budget_updated"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.BudgetUpdated)
             }
             _effect.send(AddBudgetEffect.BudgetSaved)
         }

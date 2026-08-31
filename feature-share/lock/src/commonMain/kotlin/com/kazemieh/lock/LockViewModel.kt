@@ -42,7 +42,7 @@ class LockViewModel(
                 _state.update { it.copy(mode = intent.mode, pin = "", error = null, subtitle = intent.subtitle) }
                 if (intent.mode == LockMode.UNLOCK) {
                     if (_state.value.isLockEnabled) {
-                        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("app_locked_timeout"))
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.AppLockedTimeout)
                         _state.update { it.copy(isLocked = true) }
                     }
                     if (_state.value.isLockEnabled && _state.value.isBiometricEnabled) {
@@ -156,7 +156,7 @@ class LockViewModel(
         preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_HASHED_PIN, hashed)
         preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, true)
         if (isChanging) {
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("auth_pin_changed"))
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.AuthPinChanged)
         } else {
             analytics.track(com.kazemieh.common.analytics.ProductEvent.AuthPinCreated)
         }

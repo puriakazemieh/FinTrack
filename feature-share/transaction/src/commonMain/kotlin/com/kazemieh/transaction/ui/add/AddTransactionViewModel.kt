@@ -289,7 +289,7 @@ class AddTransactionViewModel(
             tags = template.tags.toSet(),
             persons = template.persons.toSet()
         )
-        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("transaction_duplicate_clicked"))
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionDuplicateClicked)
         _typeFlow.value = template.transaction.type
     }
 
@@ -428,7 +428,7 @@ class AddTransactionViewModel(
 
     private fun onTypeChanged(type: TransactionType) {
         if (type == TransactionType.TRANSFER && _typeFlow.value != TransactionType.TRANSFER) {
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("source_transfer_initiated"))
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.SourceTransferInitiated)
         }
         _typeFlow.value = type
         viewModelScope.launch {
