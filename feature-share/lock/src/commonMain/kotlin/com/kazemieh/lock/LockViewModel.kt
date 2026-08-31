@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class LockViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val preferenceUseCases: PreferenceUseCases
 ) : ViewModel() {
 
@@ -147,13 +148,20 @@ class LockViewModel(
 
     private fun saveNewPin(pin: String) {
         val hashed = createHash(pin)
+        val isChanging = _state.value.isLockEnabled
         preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_HASHED_PIN, hashed)
         preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, true)
+        if (isChanging) {
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("auth_pin_changed"))
+        } else {
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.AuthPinCreated)
+        }
         _state.update { it.copy(isLockEnabled = true) }
         unlock()
     }
 
     private fun unlock() {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.AppUnlocked)
         _state.update { it.copy(isLocked = false, pin = "") }
         viewModelScope.launch { _effect.send(LockEffect.Success) }
     }

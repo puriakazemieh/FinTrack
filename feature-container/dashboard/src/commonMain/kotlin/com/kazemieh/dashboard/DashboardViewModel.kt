@@ -199,13 +199,23 @@ class DashboardViewModel(
 
     fun onIntent(intent: DashboardIntent) {
         when (intent) {
-            is DashboardIntent.ShowTransactionBottomSheet -> _state.update {
-                it.copy(
-                    showAddTransaction = !_state.value.showAddTransaction,
-                    transactionWithRelations = intent.transactionWithRelations,
-                    initialTransactionType = intent.type,
-                    smsDraft = intent.smsDraft
-                )
+            is DashboardIntent.ShowTransactionBottomSheet -> {
+                val isOpening = !_state.value.showAddTransaction
+                if (isOpening) {
+                    if (intent.transactionWithRelations == null) {
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.DashboardQuickAddClicked)
+                    } else {
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("dashboard_recent_transaction_clicked"))
+                    }
+                }
+                _state.update {
+                    it.copy(
+                        showAddTransaction = !_state.value.showAddTransaction,
+                        transactionWithRelations = intent.transactionWithRelations,
+                        initialTransactionType = intent.type,
+                        smsDraft = intent.smsDraft
+                    )
+                }
             }
 
             is DashboardIntent.DeleteTransactionBottomSheet -> _state.update {
@@ -240,6 +250,10 @@ class DashboardViewModel(
                     FinTrackPreferences.PREF_HIDE_BALANCE,
                     nowHidden.toString()
                 )
+                if (nowHidden) { // Meaning it was visible and now hiding, or wait: nowHidden is the PREVIOUS state of isBalanceVisible. If it was true, it's becoming hidden.
+                    // Let's track when they toggle it to SHOW balance
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("dashboard_wallet_summary_viewed"))
+                }
                 _state.update { it.copy(isBalanceVisible = !nowHidden) }
             }
 
