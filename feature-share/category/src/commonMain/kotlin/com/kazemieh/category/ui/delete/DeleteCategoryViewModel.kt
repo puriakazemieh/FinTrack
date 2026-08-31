@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DeleteCategoryViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val deleteCategoryUseCase: DeleteCategoryUseCase
 ) : ViewModel() {
 
@@ -72,6 +73,7 @@ class DeleteCategoryViewModel(
             }
             _state.value.category?.let { deleteCategory ->
                 deleteCategoryUseCase(deleteCategory, _state.value.moveCategory)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("category_deleted"))
                 _effect.send(DeleteCategoryEffect.DeletedTransaction)
             }
         }

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AddTagViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val addTagUseCase: AddTagUseCase,
     private val updateTagUseCase: UpdateTagUseCase
 ) : ViewModel() {
@@ -91,8 +92,16 @@ class AddTagViewModel(
             val tag = draft.toTag(id = mode.tagIdOrNull)
 
             val tagId = when (mode) {
-                is AddTagMode.Add -> addTagUseCase(tag)
-                is AddTagMode.Edit -> updateTagUseCase(tag).toLong()
+                is AddTagMode.Add -> {
+                    val id = addTagUseCase(tag)
+                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("tag_created"))
+                    id
+                }
+                is AddTagMode.Edit -> {
+                    val id = updateTagUseCase(tag).toLong()
+                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("tag_updated"))
+                    id
+                }
             }
 
             if (tagId >= 0) {

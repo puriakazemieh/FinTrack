@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class TagViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val observeTagsUseCase: ObserveTagsUseCase,
     private val updateTagPositionsUseCase: UpdateTagPositionsUseCase
 ) : ViewModel() {
@@ -30,7 +31,10 @@ class TagViewModel(
 
     fun onIntent(intent: TagIntent) {
         when (intent) {
-            TagIntent.GetAllTag -> loadAllTags()
+            TagIntent.GetAllTag -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("tag_list"))
+                loadAllTags()
+            }
 
             is TagIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
 

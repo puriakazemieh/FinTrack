@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class AddCategoryViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val addCategoryUseCase: AddCategoryUseCase,
     private val updateCategoryUseCase: UpdateCategoryUseCase,
     private val observeCategoriesUseCase: ObserveCategoriesUseCase
@@ -125,8 +126,16 @@ class AddCategoryViewModel(
             val category = draft.toCategory(id = mode.categoryIdOrNull)
 
             val categoryId = when (mode) {
-                is AddCategoryMode.Add -> addCategoryUseCase(category)
-                is AddCategoryMode.Edit -> updateCategoryUseCase(category).toLong()
+                is AddCategoryMode.Add -> {
+                    val id = addCategoryUseCase(category)
+                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("category_created"))
+                    id
+                }
+                is AddCategoryMode.Edit -> {
+                    val id = updateCategoryUseCase(category).toLong()
+                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("category_updated"))
+                    id
+                }
             }
 
             if (categoryId >= 0) {

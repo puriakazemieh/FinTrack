@@ -43,24 +43,25 @@
 - [ ] `source_transfer_initiated` (شروع انتقال وجه بین دو حساب)
 
 ## ۵. دسته‌بندی‌ها (Categories)
-- [ ] `category_list_viewed`
-- [ ] `category_created` (پارامتر مجاز: نوع درآمد/هزینه)
-- [ ] `category_updated`
-- [ ] `category_deleted`
-- [ ] `category_reordered` (تغییر ترتیب دسته‌بندی‌ها)
+- [x] `category_list_viewed`
+- [x] `category_created`
+- [x] `category_updated`
+- [x] `category_deleted`
+- [ ] `category_parent_changed` (تغییر والد یک دسته)
+- [ ] `category_icon_changed`
+- [ ] `category_reordered`
 
-## ۶. اشخاص (Persons)
-- [ ] `person_list_viewed`
-- [ ] `person_detail_viewed` (باز کردن صفحه جزئیات و مانده حساب یک شخص)
-- [ ] `person_created`
-- [ ] `person_updated`
-- [ ] `person_deleted`
+## ۶. تگ‌ها و اشخاص (Tags & Persons)
+- [x] `tag_list_viewed`
+- [x] `tag_created`
+- [x] `tag_updated`
+- [x] `tag_deleted`
+- [x] `person_list_viewed`
+- [x] `person_created`
+- [x] `person_updated`
+- [x] `person_deleted`
 
-## ۷. برچسب‌ها (Tags)
-- [ ] `tag_list_viewed`
-- [ ] `tag_created`
-- [ ] `tag_updated`
-- [ ] `tag_deleted`
+
 
 ## ۸. بودجه‌بندی (Budgets)
 - [ ] `budget_list_viewed`

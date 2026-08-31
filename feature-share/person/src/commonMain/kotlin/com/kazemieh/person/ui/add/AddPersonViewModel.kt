@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AddPersonViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val addPersonUseCase: AddPersonUseCase,
     private val updatePersonUseCase: UpdatePersonUseCase
 ) : ViewModel() {
@@ -80,8 +81,16 @@ class AddPersonViewModel(
             val person = draft.toPerson(id = mode.personIdOrNull)
 
             val personId = when (mode) {
-                is AddPersonMode.Add -> addPersonUseCase(person)
-                is AddPersonMode.Edit -> updatePersonUseCase(person).toLong()
+                is AddPersonMode.Add -> {
+                    val id = addPersonUseCase(person)
+                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("person_created"))
+                    id
+                }
+                is AddPersonMode.Edit -> {
+                    val id = updatePersonUseCase(person).toLong()
+                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("person_updated"))
+                    id
+                }
             }
 
             if (personId >= 0) {

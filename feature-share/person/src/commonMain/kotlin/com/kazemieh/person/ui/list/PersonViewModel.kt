@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PersonViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val observePersonsUseCase: ObservePersonsUseCase,
     private val updatePersonPositionsUseCase: UpdatePersonPositionsUseCase
 ) : ViewModel() {
@@ -30,7 +31,10 @@ class PersonViewModel(
 
     fun onIntent(intent: PersonIntent) {
         when (intent) {
-            PersonIntent.GetAllPerson -> loadAllPersons()
+            PersonIntent.GetAllPerson -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("person_list"))
+                loadAllPersons()
+            }
 
             is PersonIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
 

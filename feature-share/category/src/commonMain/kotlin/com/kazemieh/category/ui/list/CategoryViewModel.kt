@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 
 
 class CategoryViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val observeCategoriesUseCase: ObserveCategoriesUseCase,
     private val observeCategoriesFlatUseCase: ObserveCategoriesFlatUseCase,
     private val updateCategoryPositionsUseCase: UpdateCategoryPositionsUseCase
@@ -38,11 +39,14 @@ class CategoryViewModel(
 
     fun onIntent(intent: CategoryIntent) {
         when (intent) {
-            is CategoryIntent.LoadCategoryByType -> loadAllCategory(
-                intent.type,
-                intent.parentId,
-                intent.isHierarchical
-            )
+            is CategoryIntent.LoadCategoryByType -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("category_list"))
+                loadAllCategory(
+                    intent.type,
+                    intent.parentId,
+                    intent.isHierarchical
+                )
+            }
 
             is CategoryIntent.OnParentCategoryClick -> {
                 _state.update {

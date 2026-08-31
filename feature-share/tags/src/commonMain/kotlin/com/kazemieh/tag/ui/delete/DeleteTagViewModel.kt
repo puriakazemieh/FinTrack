@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DeleteTagViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val deleteTagUseCase: DeleteTagUseCase
 ) : ViewModel() {
 
@@ -73,6 +74,7 @@ class DeleteTagViewModel(
             }
             _state.value.tag?.let { deleteTag ->
                 deleteTagUseCase(deleteTag, _state.value.moveTag)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("tag_deleted"))
                 _effect.send(DeleteTagEffect.DeletedTransaction)
             }
         }

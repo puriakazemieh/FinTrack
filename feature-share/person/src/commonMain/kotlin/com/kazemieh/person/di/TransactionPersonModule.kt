@@ -10,6 +10,7 @@ import org.koin.dsl.module
 val transactionPersonModule = module {
     viewModel {
         PersonViewModel(
+            analytics = get(),
             observePersonsUseCase = get(),
             updatePersonPositionsUseCase = get()
         )
@@ -26,6 +27,7 @@ val transactionPersonModule = module {
 val transactionDeletePersonModule = module {
     viewModel {
         DeletePersonViewModel(
+            analytics = get(),
             deletePersonUseCase = get()
         )
     }
@@ -33,6 +35,7 @@ val transactionDeletePersonModule = module {
 val transactionAddPersonModule = module {
     viewModel {
         AddPersonViewModel(
+            analytics = get(),
             addPersonUseCase = get(),
             updatePersonUseCase = get()
         )

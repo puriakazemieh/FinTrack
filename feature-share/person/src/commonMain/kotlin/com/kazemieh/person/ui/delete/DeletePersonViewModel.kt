@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DeletePersonViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val deletePersonUseCase: DeletePersonUseCase
 ) : ViewModel() {
 
@@ -70,6 +71,7 @@ class DeletePersonViewModel(
             }
             _state.value.person?.let { deletePerson ->
                 deletePersonUseCase(deletePerson, _state.value.movePerson)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("person_deleted"))
                 _effect.send(DeletePersonEffect.DeletedTransaction)
             }
         }

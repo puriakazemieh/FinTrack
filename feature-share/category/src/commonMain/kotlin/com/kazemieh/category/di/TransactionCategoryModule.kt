@@ -9,6 +9,7 @@ import org.koin.dsl.module
 val transactionCategoryModule = module {
     viewModel {
         CategoryViewModel(
+            analytics = get(),
             observeCategoriesUseCase = get(),
             observeCategoriesFlatUseCase = get(),
             updateCategoryPositionsUseCase = get()
@@ -18,6 +19,7 @@ val transactionCategoryModule = module {
 val transactionDeleteCategoryModule = module {
     viewModel {
         DeleteCategoryViewModel(
+            analytics = get(),
             deleteCategoryUseCase = get()
         )
     }
@@ -25,6 +27,7 @@ val transactionDeleteCategoryModule = module {
 val transactionAddCategoryModule = module {
     viewModel {
         AddCategoryViewModel(
+            analytics = get(),
             addCategoryUseCase = get(),
             updateCategoryUseCase = get(),
             observeCategoriesUseCase = get()
