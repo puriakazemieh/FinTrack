@@ -1,4 +1,4 @@
-# Sync امن، Backup ابری و Collaboration
+﻿# Sync امن، Backup ابری و Collaboration
 
 **Priority:** P0 برای quarantine؛ P2 برای بازطراحی و Phase 15/19  
 **Planned at:** `51c80fb9` — 2026-07-29  

@@ -1,4 +1,4 @@
-# نقشه‌راه جامع محصول و مهندسی FinTrack
+﻿# نقشه‌راه جامع محصول و مهندسی FinTrack
 
 **وضعیت مبنا:** انتشار Android 4.5.0 طبق گزارش مالک محصول و `versionName` repository؛ iOS/Web/Desktop در سطح یک codebase مشترک اما نه همگی release-ready  
 **مبنای ممیزی:** commit `51c80fb9` در تاریخ 2026-07-29  

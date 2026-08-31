@@ -1,4 +1,4 @@
-# رجیستری Feature Gate و Platform Capability
+﻿# رجیستری Feature Gate و Platform Capability
 
 **Priority:** P0/P1  
 **Planned at:** `51c80fb9` — 2026-07-29  

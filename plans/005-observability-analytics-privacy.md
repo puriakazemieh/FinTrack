@@ -1,4 +1,4 @@
-# Observability، Analytics و حریم خصوصی
+﻿# Observability، Analytics و حریم خصوصی
 
 **Priority:** P1 — Phase 5 / 5.1.0  
 **Planned at:** `51c80fb9` — 2026-07-29  
