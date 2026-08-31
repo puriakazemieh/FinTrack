@@ -325,11 +325,17 @@ class DashboardViewModel(
 
             is DashboardIntent.SetWidgetLayout -> {
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.DashboardWidgetReordered)
+                val oldItems = _state.value.dashboardWidgets.associateBy { it.widget }
+                intent.items.forEach { newItem ->
+                    val oldVisibility = oldItems[newItem.widget]?.visible
+                    if (oldVisibility != null && oldVisibility != newItem.visible) {
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("dashboard_widget_toggled", mapOf("widget" to newItem.widget.name, "visible" to newItem.visible.toString())))
+                    }
+                }
                 preferenceUseCases.setStringPreference(
                     FinTrackPreferences.PREF_DASHBOARD_WIDGETS,
                     DashboardWidget.serialize(intent.items)
                 )
-                // Optimistic update; the pref flow will re-emit the same value.
                 _state.update { it.copy(dashboardWidgets = intent.items) }
             }
 

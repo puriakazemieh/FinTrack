@@ -49,7 +49,8 @@ class AIAdvisorViewModel(
     private val detectSubscriptionsUseCase: DetectSubscriptionsUseCase,
     private val generateAiInsightUseCase: GenerateAiInsightUseCase,
     private val getFinancialSummaryUseCase: GetFinancialSummaryUseCase,
-    private val aiConfigUseCase: AiConfigUseCase
+    private val aiConfigUseCase: AiConfigUseCase,
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AIAdvisorState())
@@ -59,6 +60,7 @@ class AIAdvisorViewModel(
     val effect = _effect.asSharedFlow()
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("ai_advisor_opened"))
         _state.update { it.copy(aiConfig = aiConfigUseCase.get()) }
         loadData()
     }
@@ -83,10 +85,10 @@ class AIAdvisorViewModel(
 
             // Calculate active days
             val allTransactions = transactionRepository.getAllTransactions()
-            val earliestDate = allTransactions.filter { it.syncStatus != SyncStatus.DELETED }
+            val earliestDate = allTransactions.filter { it.syncStatus != com.kazemieh.common.model.SyncStatus.DELETED }
                 .minOfOrNull { it.timeStamp }
             val activeDays = if (earliestDate != null) {
-                val now = kotlin.time.Clock.System.now().toEpochMilliseconds()
+                val now = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
                 val diff = now - earliestDate
                 (diff / (1000 * 60 * 60 * 24)).toInt().coerceAtLeast(1)
             } else 0
@@ -128,6 +130,9 @@ class AIAdvisorViewModel(
             _state.update { it.copy(cloudInsightLoading = true, cloudInsight = null) }
             val summary = getFinancialSummaryUseCase()
             val insight = generateAiInsightUseCase(buildInsightContext(pattern, summary))
+            if (insight.isNotBlank()) {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("ai_insight_generated"))
+            }
             _state.update { it.copy(cloudInsight = insight, cloudInsightLoading = false) }
         }
     }

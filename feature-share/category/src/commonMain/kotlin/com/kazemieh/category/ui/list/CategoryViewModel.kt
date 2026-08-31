@@ -129,6 +129,7 @@ class CategoryViewModel(
             }
 
             is CategoryIntent.UpdatePositions -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("category_reordered"))
                 viewModelScope.launch {
                     updateCategoryPositionsUseCase(intent.positions)
                 }

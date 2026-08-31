@@ -64,16 +64,24 @@ class AddCategoryViewModel(
                 )
             }
 
-            is AddCategoryIntent.UpdateParentId -> updateDraft { it.copy(parentId = intent.parentId) }
+            is AddCategoryIntent.UpdateParentId -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("category_parent_changed"))
+                updateDraft { it.copy(parentId = intent.parentId) }
+            }
 
-            is AddCategoryIntent.SetColorIcon -> _state.update {
-                it.copy(
-                    draft = it.draft.copy(
-                        colorId = intent.colorId,
-                        iconId = intent.iconId
-                    ),
-                    isPickerOpen = false
-                )
+            is AddCategoryIntent.SetColorIcon -> {
+                if (intent.iconId != _state.value.draft.iconId || intent.colorId != _state.value.draft.colorId) {
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("category_icon_changed"))
+                }
+                _state.update {
+                    it.copy(
+                        draft = it.draft.copy(
+                            colorId = intent.colorId,
+                            iconId = intent.iconId
+                        ),
+                        isPickerOpen = false
+                    )
+                }
             }
 
             is AddCategoryIntent.StartEdit -> startEdit(intent.category)

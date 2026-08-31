@@ -8,20 +8,20 @@
 ## ۱. چرخه عمر کاربر و امنیت (Onboarding & Security)
 - [x] `onboarding_started` (شروع آنبوردینگ)
 - [x] `onboarding_completed` (پایان آنبوردینگ)
-- [ ] `auth_pin_created` (تنظیم رمز عبور)
-- [ ] `auth_pin_changed` (تغییر رمز عبور)
-- [ ] `auth_biometric_enabled` (فعال‌سازی اثر انگشت/تشخیص چهره)
-- [ ] `auth_biometric_disabled`
-- [ ] `app_unlocked` (ورود موفق به اپلیکیشن)
-- [ ] `app_locked_timeout` (قفل شدن خودکار به دلیل عدم فعالیت)
+- [x] `auth_pin_created` (تنظیم رمز عبور)
+- [x] `auth_pin_changed` (تغییر رمز عبور)
+- [x] `auth_biometric_enabled` (فعال‌سازی اثر انگشت/تشخیص چهره)
+- [x] `auth_biometric_disabled`
+- [x] `app_unlocked` (ورود موفق به اپلیکیشن)
+- [x] `app_locked_timeout` (قفل شدن خودکار به دلیل عدم فعالیت)
 
 ## ۲. داشبورد (Dashboard)
 - [x] `dashboard_viewed` (باز کردن داشبورد)
-- [ ] `dashboard_quick_add_clicked` (کلیک روی دکمه افزودن سریع)
-- [ ] `dashboard_recent_transaction_clicked` (کلیک روی یک تراکنش اخیر در داشبورد)
-- [ ] `dashboard_wallet_summary_viewed` (بررسی خلاصه کیف پول و موجودی‌ها در داشبورد)
+- [x] `dashboard_quick_add_clicked` (کلیک روی دکمه افزودن سریع)
+- [x] `dashboard_recent_transaction_clicked` (کلیک روی یک تراکنش اخیر در داشبورد)
+- [x] `dashboard_wallet_summary_viewed` (بررسی خلاصه کیف پول و موجودی‌ها در داشبورد)
 - [x] `dashboard_widget_reordered` (تغییر چیدمان ویجت‌های داشبورد)
-- [ ] `dashboard_widget_toggled` (روشن یا خاموش کردن نمایش یک ویجت خاص)
+- [x] `dashboard_widget_toggled` (روشن یا خاموش کردن نمایش یک ویجت خاص)
 
 ## ۳. تراکنش‌ها (Transactions)
 - [x] `transaction_list_viewed` (باز کردن لیست تراکنش‌ها)
@@ -29,27 +29,27 @@
 - [x] `transaction_updated` (ویرایش تراکنش)
 - [x] `transaction_deleted` (حذف تراکنش)
 - [x] `transaction_filter_applied` (استفاده از فیلتر در لیست تراکنش‌ها)
-- [ ] `transaction_search_used` (جستجو در تراکنش‌ها)
-- [ ] `transaction_duplicate_clicked` (تکرار یک تراکنش)
-- [ ] `transaction_sort_changed` (تغییر مرتب‌سازی لیست)
-- [ ] `transaction_search_performed` (جستجو در تراکنش‌ها)
-- [ ] `transaction_report_viewed` (مشاهده گزارش و نمودارهای گرافیکی)
+- [x] `transaction_search_used` (جستجو در تراکنش‌ها)
+- [x] `transaction_duplicate_clicked` (تکرار یک تراکنش)
+- [x] `transaction_sort_changed` (تغییر مرتب‌سازی لیست)
+- [x] `transaction_search_performed` (جستجو در تراکنش‌ها)
+- [x] `transaction_report_viewed` (مشاهده گزارش و نمودارهای گرافیکی)
 
 ## ۴. منابع مالی و حساب‌ها (Financial Sources)
 - [x] `source_list_viewed`
 - [x] `source_created` (پارامتر مجاز: نوع حساب مثلاً کارت، نقد، بانک)
 - [x] `source_updated`
 - [x] `source_deleted`
-- [ ] `source_transfer_initiated` (شروع انتقال وجه بین دو حساب)
+- [x] `source_transfer_initiated` (شروع انتقال وجه بین دو حساب)
 
 ## ۵. دسته‌بندی‌ها (Categories)
 - [x] `category_list_viewed`
 - [x] `category_created`
 - [x] `category_updated`
 - [x] `category_deleted`
-- [ ] `category_parent_changed` (تغییر والد یک دسته)
-- [ ] `category_icon_changed`
-- [ ] `category_reordered`
+- [x] `category_parent_changed` (تغییر والد یک دسته)
+- [x] `category_icon_changed`
+- [x] `category_reordered`
 
 ## ۶. تگ‌ها و اشخاص (Tags & Persons)
 - [x] `tag_list_viewed`
@@ -68,7 +68,7 @@
 - [x] `budget_created` (پارامتر مجاز: `period` = monthly/yearly/etc)
 - [x] `budget_updated`
 - [x] `budget_deleted`
-- [ ] `budget_exceeded_warning` (نمایش هشدار رد شدن از سقف بودجه)
+- [x] `budget_exceeded_warning` (نمایش هشدار رد شدن از سقف بودجه)
 
 ## ۹. دیون و تعهدات (Debts & Checks & Installments)
 - [x] `debt_list_viewed`
@@ -100,9 +100,9 @@
 ## ۱۲. امکانات جانبی و ابزارها (Utilities & Tools)
 - [x] `tools_hub_viewed` (باز کردن صفحه ابزارها)
 - [x] `currency_converter_used` (استفاده از ماشین حساب تبدیل ارز)
-- [ ] `ai_advisor_opened` (باز کردن صفحه هوش مصنوعی)
-- [ ] `ai_insight_generated` (دریافت تحلیل از هوش مصنوعی)
-- [ ] `ai_insight_feedback_given` (لایک یا دیس‌لایک کردن پاسخ هوش مصنوعی)
+- [x] `ai_advisor_opened` (باز کردن صفحه هوش مصنوعی)
+- [x] `ai_insight_generated` (دریافت تحلیل از هوش مصنوعی)
+- [x] `ai_insight_feedback_given` (لایک یا دیس‌لایک کردن پاسخ هوش مصنوعی)
 - [x] `calendar_viewed` (مشاهده تقویم مالی)
 - [x] `shopping_list_created`
 - [x] `shopping_item_purchased` (تیک زدن یک آیتم در لیست خرید)
@@ -119,20 +119,20 @@
 ## ۱. چرخه عمر کاربر و امنیت (Onboarding & Security)
 - [x] `onboarding_started` (شروع آنبوردینگ)
 - [x] `onboarding_completed` (پایان آنبوردینگ)
-- [ ] `auth_pin_created` (تنظیم رمز عبور)
-- [ ] `auth_pin_changed` (تغییر رمز عبور)
-- [ ] `auth_biometric_enabled` (فعال‌سازی اثر انگشت/تشخیص چهره)
-- [ ] `auth_biometric_disabled`
-- [ ] `app_unlocked` (ورود موفق به اپلیکیشن)
-- [ ] `app_locked_timeout` (قفل شدن خودکار به دلیل عدم فعالیت)
+- [x] `auth_pin_created` (تنظیم رمز عبور)
+- [x] `auth_pin_changed` (تغییر رمز عبور)
+- [x] `auth_biometric_enabled` (فعال‌سازی اثر انگشت/تشخیص چهره)
+- [x] `auth_biometric_disabled`
+- [x] `app_unlocked` (ورود موفق به اپلیکیشن)
+- [x] `app_locked_timeout` (قفل شدن خودکار به دلیل عدم فعالیت)
 
 ## ۲. داشبورد (Dashboard)
 - [x] `dashboard_viewed` (باز کردن داشبورد)
-- [ ] `dashboard_quick_add_clicked` (کلیک روی دکمه افزودن سریع)
-- [ ] `dashboard_recent_transaction_clicked` (کلیک روی یک تراکنش اخیر در داشبورد)
-- [ ] `dashboard_wallet_summary_viewed` (بررسی خلاصه کیف پول و موجودی‌ها در داشبورد)
+- [x] `dashboard_quick_add_clicked` (کلیک روی دکمه افزودن سریع)
+- [x] `dashboard_recent_transaction_clicked` (کلیک روی یک تراکنش اخیر در داشبورد)
+- [x] `dashboard_wallet_summary_viewed` (بررسی خلاصه کیف پول و موجودی‌ها در داشبورد)
 - [x] `dashboard_widget_reordered` (تغییر چیدمان ویجت‌های داشبورد)
-- [ ] `dashboard_widget_toggled` (روشن یا خاموش کردن نمایش یک ویجت خاص)
+- [x] `dashboard_widget_toggled` (روشن یا خاموش کردن نمایش یک ویجت خاص)
 
 ## ۳. تراکنش‌ها (Transactions)
 - [x] `transaction_list_viewed` (باز کردن لیست تراکنش‌ها)
@@ -140,27 +140,27 @@
 - [x] `transaction_updated` (ویرایش تراکنش)
 - [x] `transaction_deleted` (حذف تراکنش)
 - [x] `transaction_filter_applied` (استفاده از فیلتر در لیست تراکنش‌ها)
-- [ ] `transaction_search_used` (جستجو در تراکنش‌ها)
-- [ ] `transaction_duplicate_clicked` (تکرار یک تراکنش)
-- [ ] `transaction_sort_changed` (تغییر مرتب‌سازی لیست)
-- [ ] `transaction_search_performed` (جستجو در تراکنش‌ها)
-- [ ] `transaction_report_viewed` (مشاهده گزارش و نمودارهای گرافیکی)
+- [x] `transaction_search_used` (جستجو در تراکنش‌ها)
+- [x] `transaction_duplicate_clicked` (تکرار یک تراکنش)
+- [x] `transaction_sort_changed` (تغییر مرتب‌سازی لیست)
+- [x] `transaction_search_performed` (جستجو در تراکنش‌ها)
+- [x] `transaction_report_viewed` (مشاهده گزارش و نمودارهای گرافیکی)
 
 ## ۴. منابع مالی و حساب‌ها (Financial Sources)
 - [x] `source_list_viewed`
 - [x] `source_created` (پارامتر مجاز: نوع حساب مثلاً کارت، نقد، بانک)
 - [x] `source_updated`
 - [x] `source_deleted`
-- [ ] `source_transfer_initiated` (شروع انتقال وجه بین دو حساب)
+- [x] `source_transfer_initiated` (شروع انتقال وجه بین دو حساب)
 
 ## ۵. دسته‌بندی‌ها (Categories)
 - [x] `category_list_viewed`
 - [x] `category_created`
 - [x] `category_updated`
 - [x] `category_deleted`
-- [ ] `category_parent_changed` (تغییر والد یک دسته)
-- [ ] `category_icon_changed`
-- [ ] `category_reordered`
+- [x] `category_parent_changed` (تغییر والد یک دسته)
+- [x] `category_icon_changed`
+- [x] `category_reordered`
 
 ## ۶. تگ‌ها و اشخاص (Tags & Persons)
 - [x] `tag_list_viewed`
@@ -179,7 +179,7 @@
 - [x] `budget_created` (پارامتر مجاز: `period` = monthly/yearly/etc)
 - [x] `budget_updated`
 - [x] `budget_deleted`
-- [ ] `budget_exceeded_warning` (نمایش هشدار رد شدن از سقف بودجه)
+- [x] `budget_exceeded_warning` (نمایش هشدار رد شدن از سقف بودجه)
 
 ## ۹. دیون و تعهدات (Debts & Checks & Installments)
 - [x] `debt_list_viewed`
@@ -211,9 +211,9 @@
 ## ۱۲. امکانات جانبی و ابزارها (Utilities & Tools)
 - [x] `tools_hub_viewed` (باز کردن صفحه ابزارها)
 - [x] `currency_converter_used` (استفاده از ماشین حساب تبدیل ارز)
-- [ ] `ai_advisor_opened` (باز کردن صفحه هوش مصنوعی)
-- [ ] `ai_insight_generated` (دریافت تحلیل از هوش مصنوعی)
-- [ ] `ai_insight_feedback_given` (لایک یا دیس‌لایک کردن پاسخ هوش مصنوعی)
+- [x] `ai_advisor_opened` (باز کردن صفحه هوش مصنوعی)
+- [x] `ai_insight_generated` (دریافت تحلیل از هوش مصنوعی)
+- [x] `ai_insight_feedback_given` (لایک یا دیس‌لایک کردن پاسخ هوش مصنوعی)
 - [x] `calendar_viewed` (مشاهده تقویم مالی)
 - [x] `shopping_list_created`
 - [x] `shopping_item_purchased` (تیک زدن یک آیتم در لیست خرید)
@@ -232,9 +232,9 @@
 - [x] `theme_changed` (تغییر تم تاریک/روشن یا رنگ‌بندی)
 - [x] `base_currency_changed` (تغییر واحد پول اصلی اپلیکیشن)
 - [x] `notification_settings_changed` (روشن/خاموش کردن اعلان‌ها یا یادآورها)
-- [ ] `language_changed` (تغییر زبان اپلیکیشن)
+- [x] `language_changed` (تغییر زبان اپلیکیشن)
 
 ## ۱۵. آنبوردینگ (Onboarding)
 - [x] onboarding_started
-- [ ] onboarding_step_completed (پارامتر: شماره مرحله)
+- [x] onboarding_step_completed (پارامتر: شماره مرحله)
 - [x] onboarding_completed

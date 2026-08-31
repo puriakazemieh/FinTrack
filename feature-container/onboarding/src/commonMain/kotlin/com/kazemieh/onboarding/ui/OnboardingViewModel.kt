@@ -35,7 +35,7 @@ class OnboardingViewModel(
     fun onIntent(intent: OnboardingIntent) {
         when (intent) {
             OnboardingIntent.NextStep -> {
-
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("onboarding_step_completed", mapOf("step" to _state.value.currentStep.toString())))
                 // todo disable
                /* if (_state.value.currentStep < 3) {
                     _state.update { it.copy(currentStep = it.currentStep + 1) }

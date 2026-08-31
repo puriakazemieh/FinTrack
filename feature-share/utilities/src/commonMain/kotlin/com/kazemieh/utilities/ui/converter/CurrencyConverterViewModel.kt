@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import kotlin.time.Clock
 
 class CurrencyConverterViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val assetRepository: AssetRepository
 ) : ViewModel() {
 
@@ -19,6 +20,7 @@ class CurrencyConverterViewModel(
     val state = _state.asStateFlow()
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("currency_converter"))
         loadRates()
     }
 

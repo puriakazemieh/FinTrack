@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class TransactionReportViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val transactionUseCaseGroup: TransactionUseCaseGroup,
     private val getMonthlyTrendUseCase: GetMonthlyTrendUseCase,
     private val getMonthlyCashflowUseCase: GetMonthlyCashflowUseCase
@@ -82,6 +83,7 @@ class TransactionReportViewModel(
         )
 
     init {
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("transaction_report_viewed"))
         observeTransactions()
         observeCategorySums()
         observeMonthlyTrend()
