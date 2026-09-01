@@ -179,7 +179,7 @@ class AddCheckViewModel(
             }
             if (current.checkId == null) {
                 checkUseCases.addCheckUseCase(check, reminderTitle, reminderMessage)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.CheckCreated(_state.value.type.name))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.CheckCreated)
             } else {
                 checkUseCases.updateCheckUseCase(check, reminderTitle, reminderMessage)
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.CheckUpdated)

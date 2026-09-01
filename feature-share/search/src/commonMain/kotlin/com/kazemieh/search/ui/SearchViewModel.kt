@@ -1,4 +1,4 @@
-package com.kazemieh.search.ui
+﻿package com.kazemieh.search.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -143,7 +143,7 @@ class SearchViewModel(
             is SearchIntent.UpdateQuery -> {
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionSearchPerformed)
                 if (intent.query.isNotBlank() && _query.value != intent.query) {
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionSearched)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionSearchPerformed)
                 }
                 _query.value = intent.query
                 _state.update { it.copy(query = intent.query) }

@@ -136,7 +136,7 @@ class AddCategoryViewModel(
             val categoryId = when (mode) {
                 is AddCategoryMode.Add -> {
                     val id = addCategoryUseCase(category)
-                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.CategoryCreated(if(category.parentId == null) "parent" else "sub"))
+                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.CategoryCreated)
                     id
                 }
                 is AddCategoryMode.Edit -> {

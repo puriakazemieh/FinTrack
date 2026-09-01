@@ -1,7 +1,6 @@
 package com.kazemieh.common.model
 
 import kotlinx.serialization.Serializable
-import kotlinx.datetime.Clock
 
 @Serializable
 data class Installment(

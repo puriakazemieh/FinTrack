@@ -1,6 +1,6 @@
 package com.kazemieh.common.model
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class NewsItem(
     val id: String,

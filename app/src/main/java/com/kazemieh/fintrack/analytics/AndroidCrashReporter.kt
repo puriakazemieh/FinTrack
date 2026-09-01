@@ -1,11 +1,11 @@
-package com.kazemieh.fintrack.analytics
+﻿package com.kazemieh.fintrack.analytics
 
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
+
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.kazemieh.common.analytics.CrashReporter
 
 class AndroidCrashReporter : CrashReporter {
-    private val crashlytics = Firebase.crashlytics
+    private val crashlytics = FirebaseCrashlytics.getInstance()
 
     override fun recordException(error: Throwable, safeMessage: String?) {
         safeMessage?.let {

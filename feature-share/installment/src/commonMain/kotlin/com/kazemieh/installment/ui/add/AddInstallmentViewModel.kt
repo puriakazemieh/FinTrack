@@ -348,7 +348,7 @@ class AddInstallmentViewModel(
                         reminderTitle = intent.reminderTitle,
                         reminderMessage = intent.reminderMessage
                     )
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.InstallmentCreated(currentState.interval.name))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.InstallmentCreated)
                 }
                 _effects.send(AddInstallmentEffect.Success)
             } catch (e: Exception) {

@@ -1,4 +1,4 @@
-package com.kazemieh.profile
+﻿package com.kazemieh.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +13,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
 class ManageToolsViewModel(
-    private val preferenceUseCases: PreferenceUseCases
+    private val preferenceUseCases: PreferenceUseCases,
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ManageToolsState())

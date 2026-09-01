@@ -1,0 +1,201 @@
+diff --git a/core/common/src/commonMain/kotlin/com/kazemieh/common/analytics/ProductEvent.kt b/core/common/src/commonMain/kotlin/com/kazemieh/common/analytics/ProductEvent.kt
+index 00856c8e..0162ae55 100644
+--- a/core/common/src/commonMain/kotlin/com/kazemieh/common/analytics/ProductEvent.kt
++++ b/core/common/src/commonMain/kotlin/com/kazemieh/common/analytics/ProductEvent.kt
+@@ -130,6 +130,7 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> =
+     data class ThemeChanged(val themeName: String) : ProductEvent("theme_changed", mapOf("theme" to themeName))
+     data object BaseCurrencyChanged : ProductEvent("base_currency_changed")
+     data object NotificationSettingsChanged : ProductEvent("notification_settings_changed")
++    data class NotificationSettingToggled(val settingType: String, val enabled: Boolean) : ProductEvent("notification_setting_toggled", mapOf("setting_type" to settingType, "enabled" to enabled))
+     
+     // 15. Lifecycle & Notifications
+     data object AppInstalled : ProductEvent("app_installed")
+diff --git a/core/common/src/commonMain/kotlin/com/kazemieh/common/model/Asset.kt b/core/common/src/commonMain/kotlin/com/kazemieh/common/model/Asset.kt
+index 5aa9f395..9d46fa6e 100644
+--- a/core/common/src/commonMain/kotlin/com/kazemieh/common/model/Asset.kt
++++ b/core/common/src/commonMain/kotlin/com/kazemieh/common/model/Asset.kt
+@@ -1,7 +1,7 @@
+ package com.kazemieh.common.model
+ 
+ import com.kazemieh.common.toSignedPersianPrice
+-import kotlinx.datetime.Instant
++import kotlin.time.Instant
+ import kotlinx.serialization.Serializable
+ 
+ @Serializable
+diff --git a/core/common/src/commonMain/kotlin/com/kazemieh/common/model/Installment.kt b/core/common/src/commonMain/kotlin/com/kazemieh/common/model/Installment.kt
+index 3b504c54..b9b60331 100644
+--- a/core/common/src/commonMain/kotlin/com/kazemieh/common/model/Installment.kt
++++ b/core/common/src/commonMain/kotlin/com/kazemieh/common/model/Installment.kt
+@@ -1,7 +1,7 @@
+ package com.kazemieh.common.model
+ 
+ import kotlinx.serialization.Serializable
+-import kotlinx.datetime.Clock
++import kotlin.time.Clock
+ 
+ @Serializable
+ data class Installment(
+diff --git a/core/common/src/commonMain/kotlin/com/kazemieh/common/model/UtilityModels.kt b/core/common/src/commonMain/kotlin/com/kazemieh/common/model/UtilityModels.kt
+index 54fc77dc..251ff674 100644
+--- a/core/common/src/commonMain/kotlin/com/kazemieh/common/model/UtilityModels.kt
++++ b/core/common/src/commonMain/kotlin/com/kazemieh/common/model/UtilityModels.kt
+@@ -1,6 +1,6 @@
+ package com.kazemieh.common.model
+ 
+-import kotlinx.datetime.Instant
++import kotlin.time.Instant
+ 
+ data class NewsItem(
+     val id: String,
+diff --git a/feature-share/ai-insights/src/commonMain/kotlin/com/kazemieh/ai_insights/ui/AIAdvisorViewModel.kt b/feature-share/ai-insights/src/commonMain/kotlin/com/kazemieh/ai_insights/ui/AIAdvisorViewModel.kt
+index e1ce6673..14efd996 100644
+--- a/feature-share/ai-insights/src/commonMain/kotlin/com/kazemieh/ai_insights/ui/AIAdvisorViewModel.kt
++++ b/feature-share/ai-insights/src/commonMain/kotlin/com/kazemieh/ai_insights/ui/AIAdvisorViewModel.kt
+@@ -3,6 +3,7 @@ package com.kazemieh.ai_insights.ui
+ import androidx.lifecycle.ViewModel
+ import androidx.lifecycle.viewModelScope
+ import com.kazemieh.common.model.SyncStatus
++import kotlin.time.Clock
+ import com.kazemieh.domain.repository.AiConfig
+ import com.kazemieh.domain.repository.TransactionRepository
+ import com.kazemieh.domain.usecase.AiConfigUseCase
+@@ -88,7 +89,7 @@ class AIAdvisorViewModel(
+             val earliestDate = allTransactions.filter { it.syncStatus != com.kazemieh.common.model.SyncStatus.DELETED }
+                 .minOfOrNull { it.timeStamp }
+             val activeDays = if (earliestDate != null) {
+-                val now = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
++                val now = Clock.System.now().toEpochMilliseconds()
+                 val diff = now - earliestDate
+                 (diff / (1000 * 60 * 60 * 24)).toInt().coerceAtLeast(1)
+             } else 0
+@@ -130,7 +131,7 @@ class AIAdvisorViewModel(
+             _state.update { it.copy(cloudInsightLoading = true, cloudInsight = null) }
+             val summary = getFinancialSummaryUseCase()
+             val insight = generateAiInsightUseCase(buildInsightContext(pattern, summary))
+-            if (insight.isNotBlank()) {
++            if (!insight.isNullOrBlank()) {
+                 analytics.track(com.kazemieh.common.analytics.ProductEvent.AiInsightGenerated)
+             }
+             _state.update { it.copy(cloudInsight = insight, cloudInsightLoading = false) }
+diff --git a/feature-share/backup-export/src/commonMain/kotlin/com/kazemieh/backup_export/di/BackupExportModule.kt b/feature-share/backup-export/src/commonMain/kotlin/com/kazemieh/backup_export/di/BackupExportModule.kt
+index 98abaaba..4179daa0 100644
+--- a/feature-share/backup-export/src/commonMain/kotlin/com/kazemieh/backup_export/di/BackupExportModule.kt
++++ b/feature-share/backup-export/src/commonMain/kotlin/com/kazemieh/backup_export/di/BackupExportModule.kt
+@@ -11,5 +11,5 @@ expect val platformBackupExportModule: Module
+ val backupExportModule = module {
+     includes(platformBackupExportModule)
+     single { BackupManager(get()) }
+-    viewModel { BackupExportViewModel(get(), get(), get()) }
++    viewModel { BackupExportViewModel(get(), get(), get(), get()) }
+ }
+diff --git a/feature-share/category/src/commonMain/kotlin/com/kazemieh/category/ui/add/AddCategoryViewModel.kt b/feature-share/category/src/commonMain/kotlin/com/kazemieh/category/ui/add/AddCategoryViewModel.kt
+index af4b7b3e..eb15b130 100644
+--- a/feature-share/category/src/commonMain/kotlin/com/kazemieh/category/ui/add/AddCategoryViewModel.kt
++++ b/feature-share/category/src/commonMain/kotlin/com/kazemieh/category/ui/add/AddCategoryViewModel.kt
+@@ -136,7 +136,7 @@ class AddCategoryViewModel(
+             val categoryId = when (mode) {
+                 is AddCategoryMode.Add -> {
+                     val id = addCategoryUseCase(category)
+-                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.CategoryCreated(if(category.parentId == null) "parent" else "sub"))
++                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.CategoryCreated)
+                     id
+                 }
+                 is AddCategoryMode.Edit -> {
+diff --git a/feature-share/goals/src/commonMain/kotlin/com/kazemieh/goals/di/GoalModule.kt b/feature-share/goals/src/commonMain/kotlin/com/kazemieh/goals/di/GoalModule.kt
+index 73885f5c..9e9d48fb 100644
+--- a/feature-share/goals/src/commonMain/kotlin/com/kazemieh/goals/di/GoalModule.kt
++++ b/feature-share/goals/src/commonMain/kotlin/com/kazemieh/goals/di/GoalModule.kt
+@@ -6,6 +6,6 @@ import org.koin.compose.viewmodel.dsl.viewModel
+ import org.koin.dsl.module
+ 
+ val goalModule = module {
+-    viewModel { GoalViewModel(get(), get(), get(), get()) }
+-    viewModel { AddGoalViewModel(get()) }
++    viewModel { GoalViewModel(get(), get(), get(), get(), get()) }
++    viewModel { AddGoalViewModel(get(), get()) }
+ }
+diff --git a/feature-share/lock/src/commonMain/kotlin/com/kazemieh/lock/di/lockModule.kt b/feature-share/lock/src/commonMain/kotlin/com/kazemieh/lock/di/lockModule.kt
+index 7d9313ca..ad39b43e 100644
+--- a/feature-share/lock/src/commonMain/kotlin/com/kazemieh/lock/di/lockModule.kt
++++ b/feature-share/lock/src/commonMain/kotlin/com/kazemieh/lock/di/lockModule.kt
+@@ -5,5 +5,5 @@ import org.koin.core.module.dsl.viewModel
+ import org.koin.dsl.module
+ 
+ val lockModule = module {
+-    viewModel { LockViewModel(get()) }
++    viewModel { LockViewModel(get(), get()) }
+ }
+diff --git a/feature-share/notifications/src/commonMain/kotlin/com/kazemieh/notifications/di/NotificationModule.kt b/feature-share/notifications/src/commonMain/kotlin/com/kazemieh/notifications/di/NotificationModule.kt
+index 42ad5693..0a8add8a 100644
+--- a/feature-share/notifications/src/commonMain/kotlin/com/kazemieh/notifications/di/NotificationModule.kt
++++ b/feature-share/notifications/src/commonMain/kotlin/com/kazemieh/notifications/di/NotificationModule.kt
+@@ -12,6 +12,7 @@ val notificationModule = module {
+ 
+     viewModel {
+         NotificationSettingsViewModel(
++            analytics = get(),
+             preferenceUseCases = get(),
+             notificationManager = get()
+         )
+diff --git a/feature-share/source/src/commonMain/kotlin/com/kazemieh/financialsource/ui/add/AddSourceViewModel.kt b/feature-share/source/src/commonMain/kotlin/com/kazemieh/financialsource/ui/add/AddSourceViewModel.kt
+index 3583a1fe..b6dfa78c 100644
+--- a/feature-share/source/src/commonMain/kotlin/com/kazemieh/financialsource/ui/add/AddSourceViewModel.kt
++++ b/feature-share/source/src/commonMain/kotlin/com/kazemieh/financialsource/ui/add/AddSourceViewModel.kt
+@@ -159,7 +159,7 @@ class AddSourceViewModel(
+             val sourceId = when (mode) {
+                 AddSourceMode.Add -> {
+                     val id = sourceUseCases.addSource(source)
+-                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.SourceCreated(source.type.name))
++                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.SourceCreated(source.type.toString()))
+                     id
+                 }
+                 is AddSourceMode.Edit -> {
+diff --git a/feature-share/sync/src/commonMain/kotlin/com/kazemieh/sync/ui/SyncViewModel.kt b/feature-share/sync/src/commonMain/kotlin/com/kazemieh/sync/ui/SyncViewModel.kt
+index 9dd7a488..11a4d1ac 100644
+--- a/feature-share/sync/src/commonMain/kotlin/com/kazemieh/sync/ui/SyncViewModel.kt
++++ b/feature-share/sync/src/commonMain/kotlin/com/kazemieh/sync/ui/SyncViewModel.kt
+@@ -178,7 +178,7 @@ class SyncViewModel(
+                     updatedCount = totalUpdated
+                 ))
+                 
+-                analytics.track(com.kazemieh.common.analytics.ProductEvent.SyncCompleted("backup"))
++                analytics.track(com.kazemieh.common.analytics.ProductEvent.SyncCompleted)
+                 _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_success)))
+                 loadData()
+             } catch (e: Exception) {
+diff --git a/feature-share/utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/support/SupportViewModel.kt b/feature-share/utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/support/SupportViewModel.kt
+index b576c27e..6bdfc613 100644
+--- a/feature-share/utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/support/SupportViewModel.kt
++++ b/feature-share/utilities/src/commonMain/kotlin/com/kazemieh/utilities/ui/support/SupportViewModel.kt
+@@ -10,7 +10,9 @@ sealed interface SupportEffect {
+     data class OpenUri(val uri: String) : SupportEffect
+ }
+ 
+-class SupportViewModel : ViewModel() {
++class SupportViewModel(
++    private val analytics: com.kazemieh.common.analytics.AnalyticsService
++) : ViewModel() {
+ 
+     init {
+         analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("support"))
+diff --git a/feature-share/widget/src/androidMain/kotlin/com/kazemieh/widget/FinTrackWidgetReceiver.kt b/feature-share/widget/src/androidMain/kotlin/com/kazemieh/widget/FinTrackWidgetReceiver.kt
+index 8bb4911b..9f89e9d0 100644
+--- a/feature-share/widget/src/androidMain/kotlin/com/kazemieh/widget/FinTrackWidgetReceiver.kt
++++ b/feature-share/widget/src/androidMain/kotlin/com/kazemieh/widget/FinTrackWidgetReceiver.kt
+@@ -2,11 +2,13 @@ package com.kazemieh.widget
+ 
+ import androidx.glance.appwidget.GlanceAppWidget
+ import androidx.glance.appwidget.GlanceAppWidgetReceiver
++import org.koin.core.component.inject
++import org.koin.core.component.KoinComponent
+ 
+-class FinTrackWidgetReceiver : GlanceAppWidgetReceiver(), org.koin.core.component.KoinComponent {
++class FinTrackWidgetReceiver : GlanceAppWidgetReceiver(), KoinComponent {
+     override val glanceAppWidget: GlanceAppWidget = FinTrackWidget()
+ 
+-    private val analytics: com.kazemieh.common.analytics.AnalyticsService by org.koin.core.component.inject()
++    private val analytics: com.kazemieh.common.analytics.AnalyticsService by inject()
+ 
+     override fun onEnabled(context: android.content.Context) {
+         super.onEnabled(context)

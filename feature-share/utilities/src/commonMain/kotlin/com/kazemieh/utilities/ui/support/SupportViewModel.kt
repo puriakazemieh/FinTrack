@@ -10,7 +10,9 @@ sealed interface SupportEffect {
     data class OpenUri(val uri: String) : SupportEffect
 }
 
-class SupportViewModel : ViewModel() {
+class SupportViewModel(
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService
+) : ViewModel() {
 
     init {
         analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("support"))

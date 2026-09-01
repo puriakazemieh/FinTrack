@@ -178,7 +178,7 @@ class SyncViewModel(
                     updatedCount = totalUpdated
                 ))
                 
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.SyncCompleted("backup"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.SyncCompleted)
                 _effect.send(SyncEffect.ShowMessage(getString(Res.string.sync_msg_success)))
                 loadData()
             } catch (e: Exception) {

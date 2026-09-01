@@ -159,7 +159,7 @@ class AddSourceViewModel(
             val sourceId = when (mode) {
                 AddSourceMode.Add -> {
                     val id = sourceUseCases.addSource(source)
-                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.SourceCreated(source.type.name))
+                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.SourceCreated(source.type.toString()))
                     id
                 }
                 is AddSourceMode.Edit -> {

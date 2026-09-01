@@ -3,6 +3,7 @@ package com.kazemieh.ai_insights.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.SyncStatus
+import kotlin.time.Clock
 import com.kazemieh.domain.repository.AiConfig
 import com.kazemieh.domain.repository.TransactionRepository
 import com.kazemieh.domain.usecase.AiConfigUseCase
@@ -88,7 +89,7 @@ class AIAdvisorViewModel(
             val earliestDate = allTransactions.filter { it.syncStatus != com.kazemieh.common.model.SyncStatus.DELETED }
                 .minOfOrNull { it.timeStamp }
             val activeDays = if (earliestDate != null) {
-                val now = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+                val now = Clock.System.now().toEpochMilliseconds()
                 val diff = now - earliestDate
                 (diff / (1000 * 60 * 60 * 24)).toInt().coerceAtLeast(1)
             } else 0
@@ -130,7 +131,7 @@ class AIAdvisorViewModel(
             _state.update { it.copy(cloudInsightLoading = true, cloudInsight = null) }
             val summary = getFinancialSummaryUseCase()
             val insight = generateAiInsightUseCase(buildInsightContext(pattern, summary))
-            if (insight.isNotBlank()) {
+            if (!insight.isNullOrBlank()) {
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.AiInsightGenerated)
             }
             _state.update { it.copy(cloudInsight = insight, cloudInsightLoading = false) }

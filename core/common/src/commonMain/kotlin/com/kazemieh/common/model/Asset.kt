@@ -1,7 +1,7 @@
 package com.kazemieh.common.model
 
 import com.kazemieh.common.toSignedPersianPrice
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -1,4 +1,4 @@
-package com.kazemieh.common.analytics
+﻿package com.kazemieh.common.analytics
 
 /**
  * Represents a safe-by-construction analytics event.
@@ -73,19 +73,23 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     data object DebtListViewed : ProductEvent("debt_list_viewed")
     data class DebtCreated(val type: String) : ProductEvent("debt_created", mapOf("type" to type))
     data object DebtSettled : ProductEvent("debt_settled")
+    data object DebtUpdated : ProductEvent("debt_updated")
     data object DebtDeleted : ProductEvent("debt_deleted")
     data object InstallmentListViewed : ProductEvent("installment_list_viewed")
     data object InstallmentCreated : ProductEvent("installment_created")
+    data object InstallmentUpdated : ProductEvent("installment_updated")
     data object InstallmentPaid : ProductEvent("installment_paid")
     data object InstallmentDeleted : ProductEvent("installment_deleted")
     data object CheckListViewed : ProductEvent("check_list_viewed")
     data object CheckCreated : ProductEvent("check_created")
     data object CheckStatusChanged : ProductEvent("check_status_changed")
+    data object CheckUpdated : ProductEvent("check_updated")
     data object CheckDeleted : ProductEvent("check_deleted")
 
     // 10. Fixed Expenses
     data object FixedExpenseListViewed : ProductEvent("fixed_expense_list_viewed")
     data object FixedExpenseCreated : ProductEvent("fixed_expense_created")
+    data object FixedExpenseUpdated : ProductEvent("fixed_expense_updated")
     data object FixedExpenseDeleted : ProductEvent("fixed_expense_deleted")
     data object FixedExpenseAutoLogged : ProductEvent("fixed_expense_auto_logged")
 
@@ -130,6 +134,7 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     data class ThemeChanged(val themeName: String) : ProductEvent("theme_changed", mapOf("theme" to themeName))
     data object BaseCurrencyChanged : ProductEvent("base_currency_changed")
     data object NotificationSettingsChanged : ProductEvent("notification_settings_changed")
+    data class NotificationSettingToggled(val settingType: String, val enabled: Boolean) : ProductEvent("notification_setting_toggled", mapOf("setting_type" to settingType, "enabled" to enabled))
     
     // 15. Lifecycle & Notifications
     data object AppInstalled : ProductEvent("app_installed")

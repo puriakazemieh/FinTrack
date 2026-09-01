@@ -97,9 +97,6 @@ class TransactionViewModel(
             is TransactionIntent.SetFilter -> {
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionFilterApplied)
                 
-                if (intent.params.sortBy != _state.value.filterParams.sortBy) {
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionSortChanged)
-                }
                 
                 _state.update {
                     it.copy(

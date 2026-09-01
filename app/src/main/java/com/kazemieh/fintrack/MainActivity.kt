@@ -1,4 +1,4 @@
-package com.kazemieh.fintrack
+﻿package com.kazemieh.fintrack
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -20,12 +20,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onNewIntent(intent: android.content.Intent?) {
+    override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         handleIntent(intent)
     }
 
-    private fun handleIntent(intent: android.content.Intent?) {
+    private fun handleIntent(intent: android.content.Intent) {
         val intentData = intent?.data
         val utmSource = intentData?.getQueryParameter("utm_source")
         val utmCampaign = intentData?.getQueryParameter("utm_campaign")

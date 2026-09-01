@@ -17,6 +17,7 @@ val transactionPersonModule = module {
     }
     viewModel { (personId: Long) ->
         PersonDetailViewModel(
+            analytics = get(),
             personId = personId,
             observePersonsUseCase = get(),
             debtUseCases = get(),

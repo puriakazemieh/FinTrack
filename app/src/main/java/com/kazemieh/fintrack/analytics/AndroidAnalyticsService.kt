@@ -1,15 +1,15 @@
-package com.kazemieh.fintrack.analytics
+﻿package com.kazemieh.fintrack.analytics
 
 import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.ktx.Firebase
+
+
 import com.kazemieh.common.analytics.AnalyticsConsent
 import com.kazemieh.common.analytics.AnalyticsService
 import com.kazemieh.common.analytics.ProductEvent
 
-class AndroidAnalyticsService : AnalyticsService {
-    private val firebaseAnalytics = Firebase.analytics
+class AndroidAnalyticsService(private val context: android.content.Context) : AnalyticsService {
+    private val firebaseAnalytics = FirebaseAnalytics.getInstance(context)
 
     override fun track(event: ProductEvent) {
         val bundle = Bundle().apply {

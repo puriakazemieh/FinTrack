@@ -143,6 +143,8 @@ class BudgetViewModel(
                         canCloneWeekly = weekly.isEmpty() && earlier.any { it.budget.period == BudgetPeriod.WEEKLY }
                         canCloneMonthly = monthly.isEmpty() && earlier.any { it.budget.period == BudgetPeriod.MONTHLY }
                         canCloneYearly = yearly.isEmpty() && earlier.any { it.budget.period == BudgetPeriod.YEARLY }
+                    }
+                    
                     val allWarned = mutableSetOf<Long>()
                     filtered.forEach { bw ->
                         if (bw.spentAmount > bw.budget.amount && !allWarned.contains(bw.budget.id)) {

@@ -1,4 +1,4 @@
-package com.kazemieh.transaction.di
+﻿package com.kazemieh.transaction.di
 
 import com.kazemieh.transaction.ui.main.TransactionViewModel
 import com.kazemieh.transaction.ui.add.AddTransactionViewModel
@@ -30,6 +30,7 @@ val addTransactionPresentationModule = module {
 val transactionReportViewModelModule = module {
     viewModel {
         TransactionReportViewModel(
+            analytics = get(),
             transactionUseCaseGroup = get(),
             getMonthlyTrendUseCase = get(),
             getMonthlyCashflowUseCase = get()
@@ -39,6 +40,7 @@ val transactionReportViewModelModule = module {
 val transactionDeleteViewModelModule = module {
     viewModel {
         DeleteTransactionViewModel(
+            analytics = get(),
             transactionUseCaseGroup = get()
         )
     }

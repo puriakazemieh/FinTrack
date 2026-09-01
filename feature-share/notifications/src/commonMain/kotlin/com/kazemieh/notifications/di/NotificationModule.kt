@@ -12,6 +12,7 @@ val notificationModule = module {
 
     viewModel {
         NotificationSettingsViewModel(
+            analytics = get(),
             preferenceUseCases = get(),
             notificationManager = get()
         )

@@ -11,5 +11,5 @@ expect val platformBackupExportModule: Module
 val backupExportModule = module {
     includes(platformBackupExportModule)
     single { BackupManager(get()) }
-    viewModel { BackupExportViewModel(get(), get(), get()) }
+    viewModel { BackupExportViewModel(get(), get(), get(), get()) }
 }
