@@ -98,8 +98,43 @@ import com.kazemieh.lock.LockIntent
 import com.kazemieh.lock.LockMode
 import com.kazemieh.lock.LockViewModel
 import com.kazemieh.lock.PINScreen
-import com.kazemieh.money.Currency
-import fintrack.core.designsystem.generated.resources.*
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.action_logout
+import fintrack.core.designsystem.generated.resources.label_app_lock
+import fintrack.core.designsystem.generated.resources.label_backup_size
+import fintrack.core.designsystem.generated.resources.label_calendar_fa
+import fintrack.core.designsystem.generated.resources.label_currency
+import fintrack.core.designsystem.generated.resources.label_google_drive_backup
+import fintrack.core.designsystem.generated.resources.label_jalali
+import fintrack.core.designsystem.generated.resources.label_language
+import fintrack.core.designsystem.generated.resources.label_large
+import fintrack.core.designsystem.generated.resources.label_manage_tools
+import fintrack.core.designsystem.generated.resources.label_medium
+import fintrack.core.designsystem.generated.resources.label_persian
+import fintrack.core.designsystem.generated.resources.label_premium
+import fintrack.core.designsystem.generated.resources.label_premium_status_summary
+import fintrack.core.designsystem.generated.resources.label_renew
+import fintrack.core.designsystem.generated.resources.label_small
+import fintrack.core.designsystem.generated.resources.label_text_size
+import fintrack.core.designsystem.generated.resources.label_theme
+import fintrack.core.designsystem.generated.resources.lock_biometric_backup_pin
+import fintrack.core.designsystem.generated.resources.profile_premium_title
+import fintrack.core.designsystem.generated.resources.profile_stats_active_days
+import fintrack.core.designsystem.generated.resources.profile_stats_tools
+import fintrack.core.designsystem.generated.resources.profile_stats_transactions
+import fintrack.core.designsystem.generated.resources.profile_sync_active
+import fintrack.core.designsystem.generated.resources.profile_sync_now
+import fintrack.core.designsystem.generated.resources.profile_sync_time
+import fintrack.core.designsystem.generated.resources.section_display
+import fintrack.core.designsystem.generated.resources.section_notifications
+import fintrack.core.designsystem.generated.resources.section_security
+import fintrack.core.designsystem.generated.resources.setting_fingerprint
+import fintrack.core.designsystem.generated.resources.setting_hide_balance
+import fintrack.core.designsystem.generated.resources.setting_push_notifications
+import fintrack.core.designsystem.generated.resources.title_notification_settings
+import fintrack.core.designsystem.generated.resources.user_email_default
+import fintrack.core.designsystem.generated.resources.user_name_default
+import org.jetbrains.compose.resources.decodeToImageBitmap
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.compose.viewmodel.koinViewModel as lockKoinViewModel
@@ -163,8 +198,7 @@ fun ProfileScreen(
         }
     }
 
-// todo disable feature toggle
-    /*if (showLockSheet) {
+    if (showLockSheet) {
         ModalBottomSheet(
             onDismissRequest = { showLockSheet = false },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -185,7 +219,7 @@ fun ProfileScreen(
                 }
             }
         )
-    }*/
+    }
 
     FintrackScreen {
         LazyColumn(
@@ -212,22 +246,19 @@ fun ProfileScreen(
                     isLoading = state.isLoading
                 )
             }*/
-// todo disable
-           item {
+
+            item {
                 WidgetCard(title = stringResource(Res.string.section_display)) {
-                    // todo disable
-                   /*SettingItem(
+                    SettingItem(
                         title = stringResource(Res.string.label_theme),
                         icon = Icons.Default.Palette,
                         onClick = onNavigateToThemeSettings
-                    )*//*
-                    // todo disable
-                   *//* SettingItem(
+                    )
+                    SettingItem(
                         title = stringResource(Res.string.label_currency),
                         icon = Icons.Default.Payments,
                         onClick = onNavigateToCurrencySettings
-                    )*/
-                    // todo disable feature setting
+                    )
                     SettingItem(
                         title = stringResource(Res.string.label_manage_tools),
                         icon = Icons.Default.Build,
@@ -237,7 +268,7 @@ fun ProfileScreen(
                     // Text size is a real setting: tapping cycles small → medium → large and
                     // rescales every text in the app.
                     // todo disable
-                    /*SettingItem(
+                    SettingItem(
                         title = stringResource(Res.string.label_text_size),
                         icon = Icons.Default.TextFormat,
                         value = stringResource(
@@ -248,11 +279,10 @@ fun ProfileScreen(
                             }
                         ),
                         onClick = { viewModel.onIntent(ProfileIntent.CycleTextSize) }
-                    )*//*
+                    )
                     // Language and calendar currently ship a single option; shown as honest
                     // non-interactive value rows until full localization / Gregorian support lands.
-                    // todo disable
-                    *//*SettingItem(
+                    SettingItem(
                         title = stringResource(Res.string.label_language),
                         icon = Icons.Default.Language,
                         value = stringResource(Res.string.label_persian)
@@ -261,12 +291,11 @@ fun ProfileScreen(
                         title = stringResource(Res.string.label_calendar_fa),
                         icon = Icons.Default.CalendarMonth,
                         value = stringResource(Res.string.label_jalali)
-                    )*/
+                    )
                 }
             }
 
-// todo disable
-            /*item {
+            item {
                 WidgetCard(title = stringResource(Res.string.section_security)) {
                     SettingItem(
                         title = stringResource(Res.string.label_app_lock),
@@ -291,10 +320,9 @@ fun ProfileScreen(
                         onToggle = { viewModel.onIntent(ProfileIntent.ToggleHideBalance) }
                     )
                 }
-            }*/
+            }
 
-// todo disable
-            /*item {
+            item {
                 WidgetCard(title = stringResource(Res.string.section_notifications)) {
                     SettingItem(
                         title = stringResource(Res.string.title_notification_settings),
@@ -308,7 +336,7 @@ fun ProfileScreen(
                         onToggle = { viewModel.onIntent(ProfileIntent.TogglePushNotifications) }
                     )
                 }
-            }*/
+            }
 
 // todo disable
             /*item {
