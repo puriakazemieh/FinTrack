@@ -50,7 +50,7 @@ import com.kazemieh.person.di.transactionDeletePersonModule
 import com.kazemieh.person.di.transactionPersonModule
 import com.kazemieh.preferences.FinTrackPreferences
 import com.kazemieh.preferences.preferencesModule
-import com.kazemieh.settings.di.profileModule
+import com.kazemieh.settings.di.settingsModule
 import com.kazemieh.search.di.searchModule
 import com.kazemieh.storage.storageModule
 import com.kazemieh.tag.di.transactionAddTagModule
@@ -256,7 +256,7 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         transactionAddTagModule,
         transactionDeleteTagModule,
         transactionTagModule,
-        profileModule,
+        settingsModule,
         transactionPersonModule,
         debtModule,
         transactionDeletePersonModule,

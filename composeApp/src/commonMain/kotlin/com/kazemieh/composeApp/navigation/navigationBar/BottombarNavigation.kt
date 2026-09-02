@@ -34,7 +34,7 @@ import com.kazemieh.person.ui.list.PersonsScreen
 import com.kazemieh.settings.CurrencySettingsScreen
 import com.kazemieh.settings.ManageToolsScreen
 import com.kazemieh.settings.ProfileEditScreen
-import com.kazemieh.settings.ProfileScreen
+import com.kazemieh.settings.SettingsScreen
 import com.kazemieh.settings.ThemeSettingsScreen
 import com.kazemieh.search.ui.SearchScreen
 import com.kazemieh.shopping.ui.ShoppingListScreen
@@ -359,7 +359,7 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
         }
 
         composable<Screen.Profile> { backStackEntry ->
-            ProfileScreen(
+            SettingsScreen(
                 onNavigateToThemeSettings = { navController.navigate(Screen.ThemeSettings) },
                 onNavigateToCurrencySettings = { navController.navigate(Screen.CurrencySettings) },
                 onNavigateToProfileEdit = { navController.navigate(Screen.EditProfile) },
