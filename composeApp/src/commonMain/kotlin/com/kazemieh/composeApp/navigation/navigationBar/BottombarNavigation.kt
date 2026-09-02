@@ -31,11 +31,11 @@ import com.kazemieh.notes.ui.edit.NoteEditScreen
 import com.kazemieh.notifications.ui.NotificationSettingsScreen
 import com.kazemieh.person.ui.detail.PersonDetailScreen
 import com.kazemieh.person.ui.list.PersonsScreen
-import com.kazemieh.profile.CurrencySettingsScreen
-import com.kazemieh.profile.ManageToolsScreen
-import com.kazemieh.profile.ProfileEditScreen
-import com.kazemieh.profile.ProfileScreen
-import com.kazemieh.profile.ThemeSettingsScreen
+import com.kazemieh.settings.CurrencySettingsScreen
+import com.kazemieh.settings.ManageToolsScreen
+import com.kazemieh.settings.ProfileEditScreen
+import com.kazemieh.settings.ProfileScreen
+import com.kazemieh.settings.ThemeSettingsScreen
 import com.kazemieh.search.ui.SearchScreen
 import com.kazemieh.shopping.ui.ShoppingListScreen
 import com.kazemieh.tag.ui.list.TagsScreen

@@ -110,7 +110,7 @@ kotlin {
             implementation(project(":feature-share:fixed-expense"))
             implementation(project(":feature-container:onboarding"))
             implementation(project(":feature-container:dashboard"))
-            implementation(project(":feature-container:profile"))
+            implementation(project(":feature-container:settings"))
             implementation(project(":feature-container:tools"))
             implementation(project(":feature-share:budget"))
             implementation(project(":feature-share:shopping"))
