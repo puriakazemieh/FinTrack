@@ -8,6 +8,7 @@ import kotlin.time.Clock
 data class Transaction(
     val id: Long,
     val amount: Long,
+    val currencyCode: String = "IRT",
     val amountTransfer: Long = 0L,
     val categoryId: Long,
     val sourceId: Long,

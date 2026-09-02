@@ -243,7 +243,8 @@ fun TransactionItem(
                     text = stringResource(
                         Res.string.amount_label,
                         typeLabel,
-                        amountSign + trx.amount.toLong().toPersianPrice()
+                        amountSign + trx.amount.toLong().toPersianPrice(),
+                        trx.currencyCode
                     ),
                     fontWeight = FontWeight.W700,
                     color = amountColor

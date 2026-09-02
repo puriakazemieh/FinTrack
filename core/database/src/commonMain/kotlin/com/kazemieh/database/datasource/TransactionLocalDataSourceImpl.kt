@@ -548,7 +548,8 @@ class TransactionLocalDataSourceImpl(
                 timeStamp = transaction.timeStamp,
                 type = transaction.type.count.toLong(),
                 updatedAt = transaction.updatedAt,
-                syncStatus = transaction.syncStatus.value.toLong()
+                syncStatus = transaction.syncStatus.value.toLong(),
+                currencyCode = transaction.currencyCode
             )
         }
     }
@@ -659,7 +660,8 @@ class TransactionLocalDataSourceImpl(
                 timeStamp = transaction.timeStamp,
                 type = transaction.type.count.toLong(),
                 updatedAt = now,
-                syncStatus = 1
+                syncStatus = 1,
+                currencyCode = transaction.currencyCode
             )
 
             val transactionId = transactionQueries.lastInsertRowId().awaitAsOne()
@@ -702,6 +704,7 @@ class TransactionLocalDataSourceImpl(
                 type = transaction.type.count.toLong(),
                 updatedAt = now,
                 syncStatus = 1,
+                currencyCode = transaction.currencyCode,
                 id = transaction.id
             )
 

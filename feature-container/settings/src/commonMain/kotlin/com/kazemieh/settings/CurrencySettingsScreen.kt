@@ -22,7 +22,14 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.Text
 import androidx.compose.material3.Surface
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -47,6 +54,7 @@ import com.kazemieh.designsystem.component.FintrackTitleLargeText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.Tabs
+import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.money.Currency
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -90,8 +98,59 @@ fun CurrencySettingsScreen(
 
     FintrackScreen(
         title = stringResource(Res.string.label_currency),
-        onBack = onBack
+        onBack = onBack,
+        floatingActionButton = {
+            if (state.pendingCurrency != null && state.pendingCurrency != state.selectedCurrency) {
+                FloatingActionButton(
+                    onClick = { viewModel.onIntent(CurrencySettingsIntent.ConfirmSelection) },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Icon(Icons.Default.CheckCircle, contentDescription = "Confirm")
+                }
+            }
+        }
     ) {
+        if (state.showConfirmDialog) {
+            AlertDialog(
+                onDismissRequest = { viewModel.onIntent(CurrencySettingsIntent.DismissDialogs) },
+                title = { androidx.compose.material3.Text(text = "تایید تغییر واحد پول") },
+                text = { androidx.compose.material3.Text(text = "آیا مایلید تراکنش های قبلی با نرخ روز به واحد جدید تبدیل شوند؟ در صورت انتخاب 'خیر'، تراکنش های قبلی با واحد قبلی خود نمایش داده می شوند.") },
+                confirmButton = {
+                    TextButton(onClick = { viewModel.onIntent(CurrencySettingsIntent.SubmitConfirmDialog(true)) }) {
+                        androidx.compose.material3.Text(text = "بله، تبدیل کن")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { viewModel.onIntent(CurrencySettingsIntent.SubmitConfirmDialog(false)) }) {
+                        androidx.compose.material3.Text(text = "خیر، به همان شکل بماند")
+                    }
+                }
+            )
+        }
+        
+        if (state.showRateDialog) {
+            AlertDialog(
+                onDismissRequest = { viewModel.onIntent(CurrencySettingsIntent.DismissDialogs) },
+                title = { androidx.compose.material3.Text(text = "نرخ تبدیل") },
+                text = { 
+                    Column {
+                        androidx.compose.material3.Text(text = "لطفا نرخ تبدیل به واحد جدید را وارد کنید:")
+                        Spacer(modifier = Modifier.height(16.dp))
+                        FintrackOutlinedTextField(
+                            value = state.conversionRate,
+                            onValueChange = { viewModel.onIntent(CurrencySettingsIntent.UpdateRate(it)) },
+                            label = { androidx.compose.material3.Text("نرخ تبدیل") }
+                        )
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { viewModel.onIntent(CurrencySettingsIntent.ConfirmRateDialog) }) {
+                        androidx.compose.material3.Text(text = "تایید")
+                    }
+                }
+            )
+        }
         Column(modifier = Modifier.fillMaxSize().padding(horizontal = space.large)) {
             SearchBar(
                 query = state.searchQuery,
@@ -123,7 +182,7 @@ fun CurrencySettingsScreen(
                 items(visibleList) { currency ->
                     CurrencyListItem(
                         currency = currency,
-                        isSelected = currency.code == state.selectedCurrency.code,
+                        isSelected = currency.code == (state.pendingCurrency?.code ?: state.selectedCurrency.code),
                         onClick = { onSelect(currency) }
                     )
                 }
@@ -167,8 +226,7 @@ fun CurrencyListItem(
 
     GlassCard(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
-        padding = 0.dp,
-        borderColor = if (isSelected) primaryColor.copy(alpha = 0.5f) else Color.Transparent
+        padding = 0.dp
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),

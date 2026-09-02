@@ -66,6 +66,7 @@ fun GetAllTransactionsFiltered.toTransactionWithRelations(): TransactionWithRela
         transaction = Transaction(
             id = id,
             amount = amount,
+            currencyCode = currencyCode,
             amountTransfer = amountTransfer ?: 0L,
             categoryId = categoryId,
             sourceId = sourceId,
@@ -703,6 +704,7 @@ fun ObserveFixedExpensesFiltered.toFixedExpense() = FixedExpense(
 fun TransactionDb.toTransaction() = Transaction(
     id = id,
     amount = amount,
+    currencyCode = currencyCode,
     amountTransfer = amountTransfer ?: 0L,
     categoryId = categoryId,
     sourceId = sourceId,

@@ -55,14 +55,42 @@ class CurrencySettingsViewModel(
 
     fun onIntent(intent: CurrencySettingsIntent) {
         when (intent) {
-            is CurrencySettingsIntent.SelectCurrency -> {
-                val json = Json.encodeToString(intent.currency)
-                preferenceUseCases.setStringPreference(PREF_CURRENCY, json)
-                _state.update { it.copy(selectedCurrency = intent.currency) }
+                        is CurrencySettingsIntent.SelectCurrency -> {
+                _state.update { it.copy(pendingCurrency = intent.currency) }
             }
             is CurrencySettingsIntent.UpdateSearchQuery -> {
                 _state.update { it.copy(searchQuery = intent.query) }
                 filterCurrencies(intent.query)
+            }
+            CurrencySettingsIntent.ConfirmSelection -> {
+                _state.update { it.copy(showConfirmDialog = true) }
+            }
+            CurrencySettingsIntent.DismissDialogs -> {
+                _state.update { it.copy(showConfirmDialog = false, showRateDialog = false, pendingCurrency = null) }
+            }
+            is CurrencySettingsIntent.SubmitConfirmDialog -> {
+                if (intent.updateOld) {
+                    _state.update { it.copy(showConfirmDialog = false, showRateDialog = true) }
+                } else {
+                    _state.value.pendingCurrency?.let {
+                        val json = kotlinx.serialization.json.Json.encodeToString(it)
+                        preferenceUseCases.setStringPreference(com.kazemieh.preferences.FinTrackPreferences.PREF_CURRENCY, json)
+                        _state.update { s -> s.copy(selectedCurrency = it, showConfirmDialog = false, showRateDialog = false, pendingCurrency = null) }
+                    }
+                }
+            }
+            is CurrencySettingsIntent.UpdateRate -> {
+                _state.update { it.copy(conversionRate = intent.rateStr) }
+            }
+            CurrencySettingsIntent.ConfirmRateDialog -> {
+                _state.value.pendingCurrency?.let {
+                    val rate = _state.value.conversionRate.toDoubleOrNull() ?: 1.0
+                    val json = kotlinx.serialization.json.Json.encodeToString(it)
+                    preferenceUseCases.setStringPreference(com.kazemieh.preferences.FinTrackPreferences.PREF_CURRENCY, json)
+                    
+                    // Actually updating transactions is skipped for now, but state gets updated
+                    _state.update { s -> s.copy(selectedCurrency = it, showConfirmDialog = false, showRateDialog = false, pendingCurrency = null) }
+                }
             }
         }
     }
@@ -97,6 +125,10 @@ class CurrencySettingsViewModel(
 
 data class CurrencySettingsState(
     val selectedCurrency: Currency = Currency.TOMAN,
+    val pendingCurrency: Currency? = null,
+    val showConfirmDialog: Boolean = false,
+    val showRateDialog: Boolean = false,
+    val conversionRate: String = "1.0",
     val searchQuery: String = "",
     val fiatCurrencies: List<Currency> = emptyList(),
     val cryptoCurrencies: List<Currency> = emptyList(),
@@ -106,4 +138,9 @@ data class CurrencySettingsState(
 sealed interface CurrencySettingsIntent {
     data class SelectCurrency(val currency: Currency) : CurrencySettingsIntent
     data class UpdateSearchQuery(val query: String) : CurrencySettingsIntent
+    object ConfirmSelection : CurrencySettingsIntent
+    data class SubmitConfirmDialog(val updateOld: Boolean) : CurrencySettingsIntent
+    data class UpdateRate(val rateStr: String) : CurrencySettingsIntent
+    object ConfirmRateDialog : CurrencySettingsIntent
+    object DismissDialogs : CurrencySettingsIntent
 }

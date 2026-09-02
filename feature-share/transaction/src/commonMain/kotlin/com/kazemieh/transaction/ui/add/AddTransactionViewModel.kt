@@ -326,8 +326,11 @@ class AddTransactionViewModel(
                 current.amountTransfer?.toLongOrNull() ?: 0L
             }
 
+            val currencyValue = preferenceUseCases.getStringPreference(com.kazemieh.preferences.FinTrackPreferences.PREF_CURRENCY, "IRT")
+
             val transaction = Transaction(
                 id = current.oldTransaction?.id ?: 0,
+                currencyCode = current.oldTransaction?.currencyCode ?: currencyValue,
                 amount = amountValue,
                 amountTransfer = amountTransferValue,
                 categoryId = current.category?.id ?: 0,
