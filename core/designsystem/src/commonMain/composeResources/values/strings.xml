@@ -233,7 +233,7 @@
     <string name="label_search">جستجو</string>
     <string name="navigation_transactions">تراکنش‌ها</string>
     <string name="navigation_tools">ابزارها</string>
-    <string name="navigation_profile">پروفایل</string>
+    <string name="navigation_profile">تنظیمات</string>
 
     <string name="hint_enter_category_name">نام دسته‌بندی را وارد کنید...</string>
     <string name="hint_enter_person_name">نام شخص را وارد کنید...</string>
