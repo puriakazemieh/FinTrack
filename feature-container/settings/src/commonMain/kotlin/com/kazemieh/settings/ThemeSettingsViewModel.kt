@@ -1,4 +1,4 @@
-package com.kazemieh.profile
+package com.kazemieh.settings
 
 import androidx.lifecycle.ViewModel
 import com.kazemieh.designsystem.AccentPalette

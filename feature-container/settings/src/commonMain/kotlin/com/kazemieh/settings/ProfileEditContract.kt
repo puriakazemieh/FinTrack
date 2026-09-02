@@ -1,4 +1,4 @@
-package com.kazemieh.profile
+package com.kazemieh.settings
 
 import com.kazemieh.designsystem.component.model.UiText
 

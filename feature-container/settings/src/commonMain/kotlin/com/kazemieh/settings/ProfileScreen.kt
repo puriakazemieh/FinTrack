@@ -1,4 +1,4 @@
-package com.kazemieh.profile
+package com.kazemieh.settings
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

@@ -1,10 +1,10 @@
-﻿package com.kazemieh.profile.di
+package com.kazemieh.settings.di
 
-import com.kazemieh.profile.CurrencySettingsViewModel
-import com.kazemieh.profile.ManageToolsViewModel
-import com.kazemieh.profile.ProfileEditViewModel
-import com.kazemieh.profile.ProfileViewModel
-import com.kazemieh.profile.ThemeSettingsViewModel
+import com.kazemieh.settings.CurrencySettingsViewModel
+import com.kazemieh.settings.ManageToolsViewModel
+import com.kazemieh.settings.ProfileEditViewModel
+import com.kazemieh.settings.ProfileViewModel
+import com.kazemieh.settings.ThemeSettingsViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
