@@ -141,7 +141,7 @@ import org.koin.compose.viewmodel.koinViewModel as lockKoinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(
+fun SettingsScreen(
     onNavigateToThemeSettings: () -> Unit,
     onNavigateToCurrencySettings: () -> Unit,
     onNavigateToProfileEdit: () -> Unit,
@@ -151,7 +151,7 @@ fun ProfileScreen(
     onNavigateToBackupRestore: () -> Unit = {},
     onNavigateToManageTools: () -> Unit = {},
     onLoggedOut: () -> Unit = {},
-    viewModel: ProfileViewModel = koinViewModel(),
+    viewModel: SettingsViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
@@ -166,10 +166,10 @@ fun ProfileScreen(
 
 
     LaunchedEffect(Unit) {
-        viewModel.onIntent(ProfileIntent.Refresh)
+        viewModel.onIntent(SettingsIntent.Refresh)
         viewModel.effect.collect { effect ->
             when (effect) {
-                is ProfileEffect.ShowLockPIN -> {
+                is SettingsEffect.ShowLockPIN -> {
                     lockDialogMode = effect.mode
                     shouldTriggerFingerprintAfterSetup = effect.triggerFingerprint
                     val subtitle = if (effect.triggerFingerprint) {
@@ -179,7 +179,7 @@ fun ProfileScreen(
                     showLockSheet = true
                 }
 
-                ProfileEffect.NavigateToOnboarding -> onLoggedOut()
+                SettingsEffect.NavigateToOnboarding -> onLoggedOut()
             }
         }
     }
@@ -187,12 +187,12 @@ fun ProfileScreen(
     LaunchedEffect(lockState.isLocked) {
         if (!lockState.isLocked && showLockSheet) {
             if (lockDialogMode == LockMode.CREATE || lockDialogMode == LockMode.CONFIRM) {
-                viewModel.onIntent(ProfileIntent.SetLockState(true))
+                viewModel.onIntent(SettingsIntent.SetLockState(true))
                 if (shouldTriggerFingerprintAfterSetup) {
-                    viewModel.onIntent(ProfileIntent.ToggleFingerprint)
+                    viewModel.onIntent(SettingsIntent.ToggleFingerprint)
                 }
             } else if (lockDialogMode == LockMode.VERIFY_BEFORE_DISABLE) {
-                viewModel.onIntent(ProfileIntent.SetLockState(false))
+                viewModel.onIntent(SettingsIntent.SetLockState(false))
             }
             showLockSheet = false
         }
@@ -278,7 +278,7 @@ fun ProfileScreen(
                                 com.kazemieh.designsystem.TextScale.LARGE -> Res.string.label_large
                             }
                         ),
-                        onClick = { viewModel.onIntent(ProfileIntent.CycleTextSize) }
+                        onClick = { viewModel.onIntent(SettingsIntent.CycleTextSize) }
                     )
                     // Language and calendar currently ship a single option; shown as honest
                     // non-interactive value rows until full localization / Gregorian support lands.
@@ -302,7 +302,7 @@ fun ProfileScreen(
                         icon = Icons.Default.Lock,
                         on = state.isLockEnabled,
                         onToggle = {
-                            viewModel.onIntent(ProfileIntent.ToggleLock)
+                            viewModel.onIntent(SettingsIntent.ToggleLock)
                         }
                     )
                     SettingItem(
@@ -310,14 +310,14 @@ fun ProfileScreen(
                         icon = Icons.Default.Fingerprint,
                         on = state.isFingerprintEnabled,
                         onToggle = {
-                            viewModel.onIntent(ProfileIntent.ToggleFingerprint)
+                            viewModel.onIntent(SettingsIntent.ToggleFingerprint)
                         }
                     )
                     SettingItem(
                         title = stringResource(Res.string.setting_hide_balance),
                         icon = Icons.Default.VisibilityOff,
                         on = state.isBalanceHidden,
-                        onToggle = { viewModel.onIntent(ProfileIntent.ToggleHideBalance) }
+                        onToggle = { viewModel.onIntent(SettingsIntent.ToggleHideBalance) }
                     )
                 }
             }
@@ -333,14 +333,14 @@ fun ProfileScreen(
                         title = stringResource(Res.string.setting_push_notifications),
                         icon = Icons.Default.FlashOn,
                         on = state.isPushNotificationsEnabled,
-                        onToggle = { viewModel.onIntent(ProfileIntent.TogglePushNotifications) }
+                        onToggle = { viewModel.onIntent(SettingsIntent.TogglePushNotifications) }
                     )
                 }
             }
 
 // todo disable
             /*item {
-                PremiumStatusCard(onRenewClick = { viewModel.onIntent(ProfileIntent.ShowPremiumInfo) })
+                PremiumStatusCard(onRenewClick = { viewModel.onIntent(SettingsIntent.ShowPremiumInfo) })
             }*/
 
 // todo disable
@@ -393,7 +393,7 @@ fun ProfileScreen(
 // todo disable
             /*item {
                 Spacer(modifier = Modifier.height(space.medium))
-                LogoutButton(onClick = { viewModel.onIntent(ProfileIntent.Logout) })
+                LogoutButton(onClick = { viewModel.onIntent(SettingsIntent.Logout) })
                 Spacer(modifier = Modifier.height(space.medium))
                 Text(
                     text = stringResource(Res.string.footer_made_with_love),
@@ -410,7 +410,7 @@ fun ProfileScreen(
 
 @Composable
 fun ProfileHero(
-    state: ProfileState,
+    state: SettingsState,
     onEditClick: () -> Unit
 ) {
     val space = LocalSpacing.current

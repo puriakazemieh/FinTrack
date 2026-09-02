@@ -28,17 +28,17 @@ import kotlinx.serialization.json.Json
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-class ProfileViewModel(
+class SettingsViewModel(
     private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val preferenceUseCases: PreferenceUseCases,
     private val transactionRepository: TransactionRepository,
     private val observeStreakUseCase: ObserveStreakUseCase,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ProfileState())
-    val state: StateFlow<ProfileState> = _state
+    private val _state = MutableStateFlow(SettingsState())
+    val state: StateFlow<SettingsState> = _state
 
-    private val _effect = Channel<ProfileEffect>()
+    private val _effect = Channel<SettingsEffect>()
     val effect = _effect.receiveAsFlow()
 
     init {
@@ -196,9 +196,9 @@ class ProfileViewModel(
             .launchIn(viewModelScope)
     }
 
-    fun onIntent(intent: ProfileIntent) {
+    fun onIntent(intent: SettingsIntent) {
         when (intent) {
-            is ProfileIntent.ToggleDarkMode -> {
+            is SettingsIntent.ToggleDarkMode -> {
                 val currentThemeName = preferenceUseCases.getStringPreference(
                     FinTrackPreferences.PREF_THEME,
                     AppTheme.GLASS_DARK.name
@@ -235,10 +235,10 @@ class ProfileViewModel(
                 }
             }
 
-            is ProfileIntent.ToggleFingerprint -> {
+            is SettingsIntent.ToggleFingerprint -> {
                 if (!_state.value.isLockEnabled) {
                     viewModelScope.launch {
-                        _effect.send(ProfileEffect.ShowLockPIN(LockMode.CREATE, true))
+                        _effect.send(SettingsEffect.ShowLockPIN(LockMode.CREATE, true))
                     }
                 } else {
                     val newValue = !_state.value.isFingerprintEnabled
@@ -255,13 +255,13 @@ class ProfileViewModel(
                 }
             }
 
-            is ProfileIntent.ToggleBackup -> {
+            is SettingsIntent.ToggleBackup -> {
                 val newValue = !_state.value.isBackupEnabled
                 preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_BACKUP, newValue)
                 _state.update { it.copy(isBackupEnabled = newValue) }
             }
 
-            is ProfileIntent.ToggleHideBalance -> {
+            is SettingsIntent.ToggleHideBalance -> {
                 val newValue = !_state.value.isBalanceHidden
                 // Stored as a string so the app root can observe it reactively via getStringFlow.
                 preferenceUseCases.setStringPreference(
@@ -271,7 +271,7 @@ class ProfileViewModel(
                 _state.update { it.copy(isBalanceHidden = newValue) }
             }
 
-            is ProfileIntent.TogglePushNotifications -> {
+            is SettingsIntent.TogglePushNotifications -> {
                 val newValue = !_state.value.isPushNotificationsEnabled
                 preferenceUseCases.setBooleanPreference(
                     FinTrackPreferences.PREF_PUSH_NOTIF,
@@ -280,7 +280,7 @@ class ProfileViewModel(
                 _state.update { it.copy(isPushNotificationsEnabled = newValue) }
             }
 
-            is ProfileIntent.ToggleTransactionAlerts -> {
+            is SettingsIntent.ToggleTransactionAlerts -> {
                 val newValue = !_state.value.isTransactionAlertsEnabled
                 preferenceUseCases.setBooleanPreference(
                     FinTrackPreferences.PREF_TX_ALERTS,
@@ -289,32 +289,32 @@ class ProfileViewModel(
                 _state.update { it.copy(isTransactionAlertsEnabled = newValue) }
             }
 
-            is ProfileIntent.SelectCurrency -> {
+            is SettingsIntent.SelectCurrency -> {
                 val currencyJson = Json.encodeToString(intent.currency)
                 preferenceUseCases.setStringPreference(PREF_CURRENCY, currencyJson)
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.BaseCurrencyChanged)
                 _state.update { it.copy(selectedCurrency = intent.currency) }
             }
 
-            is ProfileIntent.ToggleLock -> {
+            is SettingsIntent.ToggleLock -> {
                 val mode =
                     if (_state.value.isLockEnabled) LockMode.VERIFY_BEFORE_DISABLE else LockMode.CREATE
                 viewModelScope.launch {
-                    _effect.send(ProfileEffect.ShowLockPIN(mode, false))
+                    _effect.send(SettingsEffect.ShowLockPIN(mode, false))
                 }
             }
 
-            is ProfileIntent.Refresh -> {
+            is SettingsIntent.Refresh -> {
                 loadProfile()
             }
 
-            is ProfileIntent.ShowPremiumInfo -> {
+            is SettingsIntent.ShowPremiumInfo -> {
                 viewModelScope.launch {
                     SnackbarController.showMessage(UiText.StringResourceText(Res.string.premium_all_features_free))
                 }
             }
 
-            is ProfileIntent.SetLockState -> {
+            is SettingsIntent.SetLockState -> {
                 preferenceUseCases.setBooleanPreference(
                     FinTrackPreferences.PREF_LOCK_ENABLED,
                     intent.isEnabled
@@ -331,7 +331,7 @@ class ProfileViewModel(
                 }
             }
 
-            ProfileIntent.CycleTextSize -> {
+            SettingsIntent.CycleTextSize -> {
                 val next = _state.value.textScale.next()
                 preferenceUseCases.setStringPreference(
                     FinTrackPreferences.PREF_TEXT_SCALE,
@@ -340,17 +340,17 @@ class ProfileViewModel(
                 _state.update { it.copy(textScale = next) }
             }
 
-            ProfileIntent.Logout -> {
+            SettingsIntent.Logout -> {
                 preferenceUseCases.clearPreferences()
                 viewModelScope.launch {
-                    _effect.send(ProfileEffect.NavigateToOnboarding)
+                    _effect.send(SettingsEffect.NavigateToOnboarding)
                 }
             }
         }
     }
 }
 
-data class ProfileState(
+data class SettingsState(
     val firstName: String = "",
     val lastName: String = "",
     val nickname: String = "",
@@ -379,23 +379,23 @@ data class ProfileState(
     }
 }
 
-sealed interface ProfileIntent {
-    data object Refresh : ProfileIntent
-    data object ShowPremiumInfo : ProfileIntent
-    data object CycleTextSize : ProfileIntent
-    data object ToggleDarkMode : ProfileIntent
-    data object ToggleFingerprint : ProfileIntent
-    data object ToggleBackup : ProfileIntent
-    data object TogglePushNotifications : ProfileIntent
-    data object ToggleHideBalance : ProfileIntent
-    data object ToggleTransactionAlerts : ProfileIntent
-    data class SelectCurrency(val currency: Currency) : ProfileIntent
-    data object ToggleLock : ProfileIntent
-    data class SetLockState(val isEnabled: Boolean) : ProfileIntent
-    data object Logout : ProfileIntent
+sealed interface SettingsIntent {
+    data object Refresh : SettingsIntent
+    data object ShowPremiumInfo : SettingsIntent
+    data object CycleTextSize : SettingsIntent
+    data object ToggleDarkMode : SettingsIntent
+    data object ToggleFingerprint : SettingsIntent
+    data object ToggleBackup : SettingsIntent
+    data object TogglePushNotifications : SettingsIntent
+    data object ToggleHideBalance : SettingsIntent
+    data object ToggleTransactionAlerts : SettingsIntent
+    data class SelectCurrency(val currency: Currency) : SettingsIntent
+    data object ToggleLock : SettingsIntent
+    data class SetLockState(val isEnabled: Boolean) : SettingsIntent
+    data object Logout : SettingsIntent
 }
 
-sealed interface ProfileEffect {
-    data class ShowLockPIN(val mode: LockMode, val triggerFingerprint: Boolean) : ProfileEffect
-    data object NavigateToOnboarding : ProfileEffect
+sealed interface SettingsEffect {
+    data class ShowLockPIN(val mode: LockMode, val triggerFingerprint: Boolean) : SettingsEffect
+    data object NavigateToOnboarding : SettingsEffect
 }
