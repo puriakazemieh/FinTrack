@@ -93,13 +93,10 @@ fun CurrencySettingsScreen(
         onBack = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize().padding(horizontal = space.large)) {
-            FintrackOutlinedTextField(
-                value = state.searchQuery,
-                onValueChange = { viewModel.onIntent(CurrencySettingsIntent.UpdateSearchQuery(it)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = space.medium),
-                label = { FintrackBodyLargeText(stringResource(Res.string.search_placeholder)) }
+            SearchBar(
+                query = state.searchQuery,
+                onQueryChange = { viewModel.onIntent(CurrencySettingsIntent.UpdateSearchQuery(it)) },
+                modifier = Modifier.padding(vertical = space.medium)
             )
 
             if (!searching) {
@@ -168,26 +165,24 @@ fun CurrencyListItem(
     val primaryColor = MaterialTheme.colorScheme.primary
     val displayName = getCurrencyDisplayName(currency)
 
-    Surface(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        color = if (isSelected) primaryColor.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
-        border = androidx.compose.foundation.BorderStroke(1.dp, if (isSelected) primaryColor.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+    GlassCard(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        padding = 0.dp,
+        borderColor = if (isSelected) primaryColor.copy(alpha = 0.5f) else Color.Transparent
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Surface(
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.size(36.dp),
                 shape = MaterialTheme.shapes.medium,
-                color = if (isSelected) primaryColor else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                color = if (isSelected) primaryColor else MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
+                contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.secondary
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    FintrackLabelMediumText(text = currency.code, fontWeight = FontWeight.Bold, fontSize = 9.sp)
+                    FintrackLabelMediumText(text = currency.code, fontWeight = FontWeight.Bold, fontSize = 10.sp)
                 }
             }
             FintrackBodyMediumText(
@@ -200,7 +195,7 @@ fun CurrencyListItem(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             if (isSelected) {
-                Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(16.dp), tint = primaryColor)
+                Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(20.dp), tint = primaryColor)
             }
         }
     }
