@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 class InstallmentRepositoryImpl(
     private val localDataSource: InstallmentLocalDataSource
+,
+    private val preferenceRepository: com.kazemieh.domain.repository.PreferenceRepository
 ) : InstallmentRepository {
     override fun observeInstallments(): Flow<List<InstallmentWithRelations>> =
         localDataSource.observeInstallments()

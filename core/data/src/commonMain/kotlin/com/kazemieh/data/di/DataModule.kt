@@ -39,18 +39,18 @@ import org.koin.dsl.module
 val dataModule = module {
     single<TransactionRepository> { TransactionRepositoryImpl(get(),get()) }
     single<PreferenceRepository> { PreferenceRepositoryImpl(get(), get()) }
-    single<BudgetRepository> { BudgetRepositoryImpl(get()) }
-    single<InstallmentRepository> { InstallmentRepositoryImpl(get()) }
-    single<DebtRepository> { DebtRepositoryImpl(get()) }
-    single<CheckRepository> { CheckRepositoryImpl(get()) }
-    single<FixedExpenseRepository> { FixedExpenseRepositoryImpl(get()) }
+    single<BudgetRepository> { BudgetRepositoryImpl(get(), get()) }
+    single<InstallmentRepository> { InstallmentRepositoryImpl(get(), get()) }
+    single<DebtRepository> { DebtRepositoryImpl(get(), get()) }
+    single<CheckRepository> { CheckRepositoryImpl(get(), get()) }
+    single<FixedExpenseRepository> { FixedExpenseRepositoryImpl(get(), get()) }
     single<AssetRepository> { AssetRepositoryImpl(get(), get(), get()) }
     single<AiAdvisorRepository> { AiAdvisorRepositoryImpl(get(), get()) }
     single<ShoppingRepository> { ShoppingRepositoryImpl(get()) }
     single<NoteRepository> { NoteRepositoryImpl(get()) }
     single<SmsDraftRepository> { SmsDraftRepositoryImpl(get()) }
     single<AchievementRepository> { AchievementRepositoryImpl(get()) }
-    single<GoalRepository> { GoalRepositoryImpl(get()) }
+    single<GoalRepository> { GoalRepositoryImpl(get(), get()) }
     single<UtilitiesRepository> { UtilitiesRepositoryImpl(get()) }
 
     single<BackupRepository> {

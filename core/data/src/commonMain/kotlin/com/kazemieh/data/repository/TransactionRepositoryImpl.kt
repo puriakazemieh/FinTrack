@@ -68,16 +68,20 @@ class TransactionRepositoryImpl(
         tagIds: List<Long>,
         personIds: List<Long>,
         balanceDeltas: Map<Long, Long>
-    ): Long =
-        localDataSource.addTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
+    ): Long {
+        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
+        return localDataSource.addTransactionWithBalance(transaction.copy(currencyCode = code), tagIds, personIds, balanceDeltas)
+    }
 
     override suspend fun updateTransactionWithBalance(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
         balanceDeltas: Map<Long, Long>
-    ): Long =
-        localDataSource.updateTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
+    ): Long {
+        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
+        return localDataSource.updateTransactionWithBalance(transaction.copy(currencyCode = code), tagIds, personIds, balanceDeltas)
+    }
 
     override suspend fun deleteTransactionWithBalance(
         transaction: Transaction,
@@ -121,7 +125,8 @@ class TransactionRepositoryImpl(
     }
 
     override suspend fun updateSource(source: Source): Int {
-        return localDataSource.updateSource(source)
+        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
+        return localDataSource.updateSource(source.copy(currencyCode = code))
     }
 
     override suspend fun deleteCategory(category: Category, moveCategory: Category?) {
@@ -141,7 +146,8 @@ class TransactionRepositoryImpl(
     }
 
     override suspend fun addSource(source: Source): Long {
-        return localDataSource.addSource(source)
+        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
+        return localDataSource.addSource(source.copy(currencyCode = code))
     }
 
     override fun observeSources(): Flow<List<Source>> {

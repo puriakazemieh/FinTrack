@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.Flow
 
 class GoalRepositoryImpl(
     private val localDataSource: GoalLocalDataSource
+,
+    private val preferenceRepository: com.kazemieh.domain.repository.PreferenceRepository
 ) : GoalRepository {
     override fun observeGoals(): Flow<List<Goal>> {
         return localDataSource.observeGoals()
@@ -19,11 +21,13 @@ class GoalRepositoryImpl(
     }
 
     override suspend fun addGoal(goal: Goal): Long {
-        return localDataSource.addGoal(goal)
+        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
+        return localDataSource.addGoal(goal.copy(currencyCode = code))
     }
 
     override suspend fun updateGoal(goal: Goal): Int {
-        return localDataSource.updateGoal(goal)
+        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
+        return localDataSource.updateGoal(goal.copy(currencyCode = code))
     }
 
     override suspend fun deleteGoal(id: Long) {

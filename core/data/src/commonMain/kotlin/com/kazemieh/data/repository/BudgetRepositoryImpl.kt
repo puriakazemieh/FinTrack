@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 class BudgetRepositoryImpl(
     private val localDataSource: BudgetLocalDataSource
+,
+    private val preferenceRepository: com.kazemieh.domain.repository.PreferenceRepository
 ) : BudgetRepository {
     override fun observeBudgetsWithProgress(from: Long, to: Long): Flow<List<BudgetWithProgress>> {
         return localDataSource.observeBudgetsWithProgress(from, to)
@@ -22,11 +24,13 @@ class BudgetRepositoryImpl(
     }
 
     override suspend fun addBudget(budget: Budget): Long {
-        return localDataSource.addBudget(budget)
+        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
+        return localDataSource.addBudget(budget.copy(currencyCode = code))
     }
 
     override suspend fun updateBudget(budget: Budget): Int {
-        return localDataSource.updateBudget(budget)
+        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
+        return localDataSource.updateBudget(budget.copy(currencyCode = code))
     }
 
     override suspend fun deleteBudget(id: Long) {

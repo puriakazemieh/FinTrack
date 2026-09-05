@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 class DebtRepositoryImpl(
     private val localDataSource: DebtLocalDataSource
+,
+    private val preferenceRepository: com.kazemieh.domain.repository.PreferenceRepository
 ) : DebtRepository {
     override fun observeAllDebts(): Flow<List<DebtWithRelations>> = localDataSource.observeAllDebts()
 

@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 class CheckRepositoryImpl(
     private val localDataSource: CheckLocalDataSource
+,
+    private val preferenceRepository: com.kazemieh.domain.repository.PreferenceRepository
 ) : CheckRepository {
     override suspend fun insertCheck(check: Check): Long = localDataSource.insertCheck(check)
     override suspend fun updateCheck(check: Check) = localDataSource.updateCheck(check)

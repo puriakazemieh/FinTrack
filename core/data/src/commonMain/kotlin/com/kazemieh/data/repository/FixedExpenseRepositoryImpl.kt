@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
 
 class FixedExpenseRepositoryImpl(
     private val localDataSource: FixedExpenseLocalDataSource
+,
+    private val preferenceRepository: com.kazemieh.domain.repository.PreferenceRepository
 ) : FixedExpenseRepository {
     override suspend fun insertFixedExpense(expense: FixedExpense): Long = localDataSource.insertFixedExpense(expense)
     override suspend fun updateFixedExpense(expense: FixedExpense) = localDataSource.updateFixedExpense(expense)
