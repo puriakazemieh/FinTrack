@@ -33,7 +33,9 @@ class CurrencySettingsViewModel(
     init {
         loadSettings()
         loadCustomCurrencies()
-        filterCurrencies("")
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.Default) {
+            filterCurrencies("")
+        }
     }
 
     private fun loadCustomCurrencies() {
@@ -71,7 +73,9 @@ class CurrencySettingsViewModel(
             }
             is CurrencySettingsIntent.UpdateSearchQuery -> {
                 _state.update { it.copy(searchQuery = intent.query) }
-                filterCurrencies(intent.query)
+                viewModelScope.launch(kotlinx.coroutines.Dispatchers.Default) {
+                    filterCurrencies(intent.query)
+                }
             }
             CurrencySettingsIntent.ConfirmSelection -> {
                 _state.update { it.copy(showConfirmSheet = true) }
@@ -183,7 +187,8 @@ class CurrencySettingsViewModel(
         _state.update { 
             it.copy(
                 fiatCurrencies = fiat,
-                cryptoCurrencies = crypto
+                cryptoCurrencies = crypto,
+                isLoading = false
             ) 
         }
     }
@@ -201,7 +206,8 @@ data class CurrencySettingsState(
     val customCurrencies: List<Currency> = emptyList(),
     val isConverting: Boolean = false,
     val isFetchingRate: Boolean = false,
-    val rateError: String? = null
+    val rateError: String? = null,
+    val isLoading: Boolean = true
 )
 
 sealed interface CurrencySettingsIntent {

@@ -66,11 +66,16 @@ class AndroidNotificationManager(
                 toolEnabled(ToolFeature.INSTALLMENT) && notifEnabled(FinTrackPreferences.PREF_NOTIF_INSTALLMENT_ENABLED)
             NotificationManager.CHANNEL_CHEQUE ->
                 toolEnabled(ToolFeature.CHECK) && notifEnabled(FinTrackPreferences.PREF_NOTIF_CHEQUE_ENABLED)
-            NotificationManager.CHANNEL_DEBT -> toolEnabled(ToolFeature.DEBT)
-            NotificationManager.CHANNEL_SHOPPING -> toolEnabled(ToolFeature.SHOPPING)
-            NotificationManager.CHANNEL_NOTE -> toolEnabled(ToolFeature.NOTES)
+            NotificationManager.CHANNEL_DEBT -> 
+                toolEnabled(ToolFeature.DEBT) && notifEnabled(FinTrackPreferences.PREF_NOTIF_DEBT_ENABLED)
+            NotificationManager.CHANNEL_SHOPPING -> 
+                toolEnabled(ToolFeature.SHOPPING) && notifEnabled(FinTrackPreferences.PREF_NOTIF_SHOPPING_ENABLED)
+            NotificationManager.CHANNEL_NOTE -> 
+                toolEnabled(ToolFeature.NOTES) && notifEnabled(FinTrackPreferences.PREF_NOTIF_NOTES_ENABLED)
             NotificationManager.CHANNEL_SMS ->
                 preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_SMS_READING_ENABLED, true)
+            NotificationManager.CHANNEL_QUICK_ADD ->
+                notifEnabled(FinTrackPreferences.PREF_QUICK_ADD_NOTIF_ENABLED)
             else -> true
         }
     } catch (e: Exception) {

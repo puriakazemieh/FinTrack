@@ -96,17 +96,7 @@ fun CurrencySettingsScreen(
     FintrackScreen(
         title = stringResource(Res.string.label_currency),
         onBack = onBack,
-        floatingActionButton = {
-            if (state.pendingCurrency != null && state.pendingCurrency != state.selectedCurrency) {
-                FloatingActionButton(
-                    onClick = { viewModel.onIntent(CurrencySettingsIntent.ConfirmSelection) },
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ) {
-                    Icon(Icons.Default.CheckCircle, contentDescription = "Confirm")
-                }
-            }
-        }
+
     ) {
         // BottomSheet 1: Confirm currency change
         if (state.showConfirmSheet) {
@@ -115,6 +105,7 @@ fun CurrencySettingsScreen(
                 sub = "واحد جدید: ${state.pendingCurrency?.code ?: ""}",
                 onDismiss = { viewModel.onIntent(CurrencySettingsIntent.DismissDialogs) },
                 isFullScreen = false,
+                sheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = false),
                 primaryButtonText = "بله، مبالغ قبلی را تبدیل کن",
                 onPrimaryClick = { viewModel.onIntent(CurrencySettingsIntent.SubmitConfirmDialog(true)) },
                 secondaryButtonText = "خیر، فقط واحد پیش‌فرض عوض شود",
@@ -135,8 +126,8 @@ fun CurrencySettingsScreen(
                 sub = "${state.selectedCurrency.code} → ${state.pendingCurrency?.code ?: ""}",
                 onDismiss = { viewModel.onIntent(CurrencySettingsIntent.DismissDialogs) },
                 isFullScreen = false,
-                primaryButtonText = "تایید و اعمال تبدیل",
-                onPrimaryClick = { viewModel.onIntent(CurrencySettingsIntent.ConfirmRateDialog) }
+                primaryButtonText = if (state.isConverting) "در حال تبدیل..." else "تایید و اعمال تبدیل",
+                onPrimaryClick = if (state.isConverting) null else { { viewModel.onIntent(CurrencySettingsIntent.ConfirmRateDialog) } }
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -209,6 +200,12 @@ fun CurrencySettingsScreen(
                 modifier = Modifier.padding(vertical = space.medium)
             )
 
+            if (state.isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                }
+            } else {
+
             if (!searching) {
                 Tabs(
                     tabs = tabTitles.map { stringResource(it.label) },
@@ -226,7 +223,7 @@ fun CurrencySettingsScreen(
             }
 
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxWidth().weight(1f),
                 verticalArrangement = Arrangement.spacedBy(space.small),
                 contentPadding = PaddingValues(bottom = 100.dp)
             ) {
@@ -240,6 +237,23 @@ fun CurrencySettingsScreen(
 
                 item {
                     AutoConvertCard()
+                }
+            } // End of LazyColumn
+            } // End of else block for isLoading
+
+            if (state.pendingCurrency != null && state.pendingCurrency != state.selectedCurrency) {
+                com.kazemieh.designsystem.component.glass.GlassCard(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = space.large, top = space.small),
+                    onClick = { viewModel.onIntent(CurrencySettingsIntent.ConfirmSelection) },
+                    tone = com.kazemieh.designsystem.component.glass.GlassTone.Strong
+                ) {
+                    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
+                        FintrackBodyLargeText(
+                            text = "تایید و تغییر واحد به ${state.pendingCurrency?.code ?: ""}",
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         }
