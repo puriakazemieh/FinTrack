@@ -129,10 +129,6 @@ class SettingsViewModel(
                     FinTrackPreferences.PREF_BACKUP,
                     true
                 ),
-                isPushNotificationsEnabled = preferenceUseCases.getBooleanPreference(
-                    FinTrackPreferences.PREF_PUSH_NOTIF,
-                    true
-                ),
                 isSyncEnabled = preferenceUseCases.getBooleanPreference(
                     FinTrackPreferences.PREF_SYNC_ENABLED,
                     true
@@ -367,7 +363,6 @@ data class SettingsState(
     val isFingerprintEnabled: Boolean = false,
     val isLockEnabled: Boolean = false,
     val isBackupEnabled: Boolean = true,
-    val isPushNotificationsEnabled: Boolean = true,
 
     val isSyncEnabled: Boolean = true,
     val isBalanceHidden: Boolean = false,
@@ -397,7 +392,6 @@ sealed interface SettingsIntent {
     data object ToggleDarkMode : SettingsIntent
     data object ToggleFingerprint : SettingsIntent
     data object ToggleBackup : SettingsIntent
-    data object TogglePushNotifications : SettingsIntent
     data object ToggleHideBalance : SettingsIntent
 
     data class SelectCurrency(val currency: Currency) : SettingsIntent

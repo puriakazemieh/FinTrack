@@ -335,12 +335,7 @@ fun SettingsScreen(
                         icon = Icons.Default.Notifications,
                         onClick = onNavigateToNotifications
                     )
-                    SettingItem(
-                        title = stringResource(Res.string.setting_push_notifications),
-                        icon = Icons.Default.FlashOn,
-                        on = state.isPushNotificationsEnabled,
-                        onToggle = { viewModel.onIntent(SettingsIntent.TogglePushNotifications) }
-                    )
+
                 }
             }
 
