@@ -56,6 +56,9 @@ fun LockGate(
                 LockEffect.Success -> {
                     // Handled by state change (isLocked = false)
                 }
+                is LockEffect.SuccessWithToast -> {
+                    com.kazemieh.designsystem.component.SnackbarController.showMessage(effect.message)
+                }
                 is LockEffect.Error -> {
                     snackbarHostState.showSnackbar(effect.message)
                 }

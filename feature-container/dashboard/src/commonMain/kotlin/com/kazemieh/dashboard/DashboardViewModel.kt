@@ -87,7 +87,14 @@ class DashboardViewModel(
     private fun observeHideBalance() {
         preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_HIDE_BALANCE, "false")
             .onEach { hidden ->
-                _state.update { it.copy(isBalanceVisible = !hidden.toBoolean()) }
+                val isGlobalHidden = hidden.toBoolean()
+                _state.update {
+                    it.copy(
+                        isGlobalBalanceHidden = isGlobalHidden,
+                        isBalanceLocallyRevealed = false, // Reset local override when global changes
+                        isBalanceVisible = !isGlobalHidden
+                    )
+                }
             }.launchIn(viewModelScope)
     }
 
@@ -242,19 +249,19 @@ class DashboardViewModel(
             }
 
             DashboardIntent.ToggleBalanceVisibility -> {
-                // Persist to the shared "hide balance" preference so every amount across the
-                // app (sources, transactions, totals) masks together and the profile toggle
-                // stays in sync.
-                val nowHidden = _state.value.isBalanceVisible
-                preferenceUseCases.setStringPreference(
-                    FinTrackPreferences.PREF_HIDE_BALANCE,
-                    nowHidden.toString()
-                )
-                if (nowHidden) { // Meaning it was visible and now hiding, or wait: nowHidden is the PREVIOUS state of isBalanceVisible. If it was true, it's becoming hidden.
-                    // Let's track when they toggle it to SHOW balance
+                // Only toggle the LOCAL reveal state — do NOT change the global preference.
+                // This way, navigating away from the dashboard resets the reveal.
+                val currentlyRevealed = _state.value.isBalanceLocallyRevealed
+                val newRevealed = !currentlyRevealed
+                _state.update {
+                    it.copy(
+                        isBalanceLocallyRevealed = newRevealed,
+                        isBalanceVisible = if (_state.value.isGlobalBalanceHidden) newRevealed else true
+                    )
+                }
+                if (newRevealed) {
                     analytics.track(com.kazemieh.common.analytics.ProductEvent.DashboardWalletSummaryViewed)
                 }
-                _state.update { it.copy(isBalanceVisible = !nowHidden) }
             }
 
             DashboardIntent.ToggleSmsDetectionSheet -> _state.update {
@@ -403,6 +410,8 @@ data class DashboardState(
     val transactionWithRelations: TransactionWithRelations? = null,
     val initialTransactionType: TransactionType? = null,
     val isBalanceVisible: Boolean = true,
+    val isGlobalBalanceHidden: Boolean = false,
+    val isBalanceLocallyRevealed: Boolean = false,
     val userName: String = "",
     val userInitial: String = "",
     val smsDrafts: List<SmsDraft> = emptyList(),

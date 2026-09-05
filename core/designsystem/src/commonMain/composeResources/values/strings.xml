@@ -1465,4 +1465,9 @@
     <string name="filter">فیلتر</string>
     <string name="show_purchased">نمایش خریداری‌شده</string>
     <string name="hide_purchased">مخفی‌سازی خریداری‌شده</string>
+    <string name="lock_confirm_pin_desc">برای تایید، رمز عبور را مجدداً وارد کنید</string>
+    <string name="lock_verify_to_disable_desc">برای غیرفعال کردن قفل، رمز فعلی را وارد کنید</string>
+    <string name="lock_security_setup_title">سوال امنیتی</string>
+    <string name="lock_security_setup_desc">برای بازیابی رمز عبور در صورت فراموشی، لطفا یک سوال امنیتی و پاسخ آن را تعیین کنید.</string>
+    <string name="lock_security_question_hint">مثال: نام اولین معلم شما؟</string>
 </resources>

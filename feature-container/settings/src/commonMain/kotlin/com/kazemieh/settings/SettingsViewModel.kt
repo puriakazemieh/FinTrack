@@ -164,6 +164,12 @@ class SettingsViewModel(
                         FinTrackPreferences.PREF_TEXT_SCALE,
                         TextScale.MEDIUM.name
                     )
+                ),
+                textFont = TextFont.fromName(
+                    preferenceUseCases.getStringPreference(
+                        FinTrackPreferences.PREF_TEXT_FONT,
+                        TextFont.VAZIRMATN.name
+                    )
                 )
             )
         }

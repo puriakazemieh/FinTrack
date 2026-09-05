@@ -13,8 +13,11 @@ data class LockState(
     val subtitle: UiText? = null,
     val isInitialized: Boolean = false,
     val securityQuestion: String = "",
-    val showResetDialog: Boolean = false,
-    val resetAnswer: String = ""
+    val showResetSheet: Boolean = false,
+    val resetAnswer: String = "",
+    val showSecuritySetupSheet: Boolean = false,
+    val setupQuestion: String = "",
+    val setupAnswer: String = ""
 )
 
 enum class LockMode {
@@ -52,11 +55,18 @@ sealed interface LockIntent {
     data object ForgotPasswordClicked : LockIntent
     data class SecurityAnswerChanged(val answer: String) : LockIntent
     data object ResetPIN : LockIntent
-    data object DismissResetDialog : LockIntent
+    data object DismissResetSheet : LockIntent
+    
+    // Security Setup
+    data class SetupQuestionChanged(val question: String) : LockIntent
+    data class SetupAnswerChanged(val answer: String) : LockIntent
+    data object SaveSecuritySetup : LockIntent
+    data object DismissSecuritySetup : LockIntent
 }
 
 sealed interface LockEffect {
     data object Success : LockEffect
+    data class SuccessWithToast(val message: UiText) : LockEffect
     data class Error(val message: String) : LockEffect
     data object TriggerBiometric : LockEffect
 }

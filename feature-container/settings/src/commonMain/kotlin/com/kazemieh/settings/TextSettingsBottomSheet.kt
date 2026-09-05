@@ -13,7 +13,7 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.glass.SheetFrame
 
 @OptIn(ExperimentalMaterial3Api::class)
-:Composable
+@Composable
 fun TextSettingsBottomSheet(
     currentScale: TextScale,
     currentFont: TextFont,

@@ -97,6 +97,7 @@ import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.lock.LockIntent
 import com.kazemieh.lock.LockMode
 import com.kazemieh.lock.LockViewModel
+import com.kazemieh.lock.LockEffect
 import com.kazemieh.lock.PINScreen
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.action_logout
@@ -180,6 +181,17 @@ fun SettingsScreen(
                 }
 
                 SettingsEffect.NavigateToOnboarding -> onLoggedOut()
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        lockViewModel.effect.collect { effect ->
+            when (effect) {
+                is LockEffect.SuccessWithToast -> {
+                    com.kazemieh.designsystem.component.SnackbarController.showMessage(effect.message)
+                }
+                else -> {}
             }
         }
     }

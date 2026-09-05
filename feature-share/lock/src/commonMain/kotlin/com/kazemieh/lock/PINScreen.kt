@@ -35,6 +35,7 @@ import com.kazemieh.designsystem.component.model.asString
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PINScreen(
     state: LockState,
@@ -65,8 +66,14 @@ fun PINScreen(
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(space.medium))
+                val subtitleText = state.subtitle?.asString() ?: when (state.mode) {
+                    LockMode.CREATE -> stringResource(Res.string.lock_enter_pin)
+                    LockMode.CONFIRM -> stringResource(Res.string.lock_confirm_pin_desc)
+                    LockMode.VERIFY_BEFORE_DISABLE -> stringResource(Res.string.lock_verify_to_disable_desc)
+                    LockMode.UNLOCK -> stringResource(Res.string.lock_enter_pin)
+                }
                 FintrackBodyLargeText(
-                    text = state.subtitle?.asString() ?: stringResource(Res.string.lock_enter_pin),
+                    text = subtitleText,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
@@ -194,39 +201,64 @@ fun PINScreen(
             )
         }
 
-        if (state.showResetDialog) {
-            AlertDialog(
-                onDismissRequest = { onIntent(LockIntent.DismissResetDialog) },
-                title = { FintrackHeadlineSmallText(stringResource(Res.string.lock_reset_pin_title)) },
-                text = {
-                    Column {
-                        FintrackBodyMediumText(stringResource(Res.string.lock_reset_pin_desc))
-                        Spacer(modifier = Modifier.height(space.medium))
-                        FintrackBodyLargeText(
-                            text = state.securityQuestion,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.height(space.medium))
-                        OutlinedTextField(
-                            value = state.resetAnswer,
-                            onValueChange = { onIntent(LockIntent.SecurityAnswerChanged(it)) },
-                            modifier = Modifier.fillMaxWidth(),
-                            label = { FintrackBodyMediumText(stringResource(Res.string.onboarding_setup_security_answer)) }
-                        )
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = { onIntent(LockIntent.ResetPIN) }) {
-                        FintrackLabelLargeText(stringResource(Res.string.confirm))
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { onIntent(LockIntent.DismissResetDialog) }) {
-                        FintrackLabelLargeText(stringResource(Res.string.cancell_))
-                    }
+        if (state.showResetSheet) {
+            com.kazemieh.designsystem.component.glass.SheetFrame(
+                onDismiss = { onIntent(LockIntent.DismissResetSheet) },
+                title = stringResource(Res.string.lock_reset_pin_title),
+                isFullScreen = false,
+                primaryButtonText = stringResource(Res.string.confirm),
+                onPrimaryClick = { onIntent(LockIntent.ResetPIN) },
+                secondaryButtonText = stringResource(Res.string.cancell_),
+                onSecondaryClick = { onIntent(LockIntent.DismissResetSheet) }
+            ) {
+                Column(modifier = Modifier.padding(space.large)) {
+                    FintrackBodyMediumText(stringResource(Res.string.lock_reset_pin_desc))
+                    Spacer(modifier = Modifier.height(space.medium))
+                    FintrackBodyLargeText(
+                        text = state.securityQuestion,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(space.medium))
+                    OutlinedTextField(
+                        value = state.resetAnswer,
+                        onValueChange = { onIntent(LockIntent.SecurityAnswerChanged(it)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { FintrackBodyMediumText(stringResource(Res.string.onboarding_setup_security_answer)) }
+                    )
                 }
-            )
+            }
+        }
+        
+        if (state.showSecuritySetupSheet) {
+            com.kazemieh.designsystem.component.glass.SheetFrame(
+                onDismiss = { onIntent(LockIntent.DismissSecuritySetup) },
+                title = stringResource(Res.string.lock_security_setup_title),
+                isFullScreen = false,
+                primaryButtonText = stringResource(Res.string.confirm),
+                onPrimaryClick = { onIntent(LockIntent.SaveSecuritySetup) },
+                secondaryButtonText = stringResource(Res.string.cancell_),
+                onSecondaryClick = { onIntent(LockIntent.DismissSecuritySetup) }
+            ) {
+                Column(modifier = Modifier.padding(space.large)) {
+                    FintrackBodyMediumText(stringResource(Res.string.lock_security_setup_desc))
+                    Spacer(modifier = Modifier.height(space.medium))
+                    OutlinedTextField(
+                        value = state.setupQuestion,
+                        onValueChange = { onIntent(LockIntent.SetupQuestionChanged(it)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { FintrackBodyMediumText(stringResource(Res.string.lock_security_setup_title)) },
+                        placeholder = { FintrackBodyMediumText(stringResource(Res.string.lock_security_question_hint)) }
+                    )
+                    Spacer(modifier = Modifier.height(space.medium))
+                    OutlinedTextField(
+                        value = state.setupAnswer,
+                        onValueChange = { onIntent(LockIntent.SetupAnswerChanged(it)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { FintrackBodyMediumText(stringResource(Res.string.onboarding_setup_security_answer)) }
+                    )
+                }
+            }
         }
     }
 }

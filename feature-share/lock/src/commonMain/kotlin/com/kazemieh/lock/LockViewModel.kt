@@ -61,7 +61,7 @@ class LockViewModel(
                 }
             }
             LockIntent.ForgotPasswordClicked -> {
-                _state.update { it.copy(showResetDialog = true, resetAnswer = "", error = null) }
+                _state.update { it.copy(showResetSheet = true, resetAnswer = "", error = null) }
             }
             is LockIntent.SecurityAnswerChanged -> {
                 _state.update { it.copy(resetAnswer = intent.answer, error = null) }
@@ -69,8 +69,21 @@ class LockViewModel(
             LockIntent.ResetPIN -> {
                 verifySecurityAnswer()
             }
-            LockIntent.DismissResetDialog -> {
-                _state.update { it.copy(showResetDialog = false) }
+            LockIntent.DismissResetSheet -> {
+                _state.update { it.copy(showResetSheet = false) }
+            }
+            is LockIntent.SetupQuestionChanged -> {
+                _state.update { it.copy(setupQuestion = intent.question) }
+            }
+            is LockIntent.SetupAnswerChanged -> {
+                _state.update { it.copy(setupAnswer = intent.answer) }
+            }
+            LockIntent.SaveSecuritySetup -> {
+                saveSecuritySetup()
+            }
+            LockIntent.DismissSecuritySetup -> {
+                _state.update { it.copy(showSecuritySetupSheet = false) }
+                unlock() // Only unlock after they dismiss or finish
             }
         }
     }
@@ -81,8 +94,10 @@ class LockViewModel(
             // Reset PIN: Disable lock and clear PIN
             preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_LOCK_ENABLED, false)
             preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_HASHED_PIN, "")
-            _state.update { it.copy(isLockEnabled = false, isLocked = false, showResetDialog = false, pin = "") }
-            viewModelScope.launch { _effect.send(LockEffect.Success) }
+            _state.update { it.copy(isLockEnabled = false, isLocked = false, showResetSheet = false, pin = "") }
+            viewModelScope.launch {
+                _effect.send(LockEffect.SuccessWithToast(com.kazemieh.designsystem.component.model.UiText.DynamicString("قفل برنامه با موفقیت بازنشانی شد")))
+            }
         } else {
             _state.update { it.copy(error = "lock_error_wrong_answer") }
         }
@@ -161,7 +176,27 @@ class LockViewModel(
             analytics.track(com.kazemieh.common.analytics.ProductEvent.AuthPinCreated)
         }
         _state.update { it.copy(isLockEnabled = true) }
-        unlock()
+        
+        // Show success effect and check for security question
+        viewModelScope.launch {
+            _effect.send(LockEffect.SuccessWithToast(com.kazemieh.designsystem.component.model.UiText.DynamicString("قفل برنامه با موفقیت فعال شد")))
+        }
+        
+        val currentQuestion = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_SECURITY_QUESTION, "")
+        if (currentQuestion.isEmpty()) {
+            _state.update { it.copy(showSecuritySetupSheet = true, setupQuestion = "", setupAnswer = "") }
+        } else {
+            unlock()
+        }
+    }
+
+    private fun saveSecuritySetup() {
+        if (_state.value.setupQuestion.isNotBlank() && _state.value.setupAnswer.isNotBlank()) {
+            preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_SECURITY_QUESTION, _state.value.setupQuestion)
+            preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_SECURITY_ANSWER, createHash(_state.value.setupAnswer))
+            _state.update { it.copy(showSecuritySetupSheet = false, securityQuestion = _state.value.setupQuestion) }
+            unlock()
+        }
     }
 
     private fun unlock() {
