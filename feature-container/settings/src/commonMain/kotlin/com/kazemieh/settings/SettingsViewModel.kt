@@ -270,14 +270,7 @@ class SettingsViewModel(
                 _state.update { it.copy(isBalanceHidden = newValue) }
             }
 
-            is SettingsIntent.TogglePushNotifications -> {
-                val newValue = !_state.value.isPushNotificationsEnabled
-                preferenceUseCases.setBooleanPreference(
-                    FinTrackPreferences.PREF_PUSH_NOTIF,
-                    newValue
-                )
-                _state.update { it.copy(isPushNotificationsEnabled = newValue) }
-            }
+
 
             is SettingsIntent.SelectCurrency -> {
                 val currencyJson = Json.encodeToString(intent.currency)
