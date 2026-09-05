@@ -74,6 +74,7 @@ import com.kazemieh.transaction.ui.main.BalanceHero
 import com.kazemieh.budget.ui.add.AddBudgetBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.msg_hello
+import fintrack.core.designsystem.generated.resources.action_delete_all
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -266,6 +267,9 @@ fun DashboardScreen(
                 onDelete = { draft ->
                     viewModel.onIntent(DashboardIntent.ShowDeleteSmsConfirmation(true, draft))
                 },
+                onDeleteAll = {
+                    viewModel.onIntent(DashboardIntent.ShowDeleteAllSmsConfirmation(true))
+                },
                 onUpdateDraft = { viewModel.onIntent(DashboardIntent.UpdateSmsDraft(it)) },
                 onDismiss = { viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet) }
             )
@@ -277,6 +281,16 @@ fun DashboardScreen(
                 dismissClicked = { viewModel.onIntent(DashboardIntent.ShowDeleteSmsConfirmation(false)) },
                 confirmClicked = {
                     viewModel.onIntent(DashboardIntent.IgnoreSmsDraft(state.smsDraftToDelete!!))
+                }
+            )
+        }
+        
+        if (state.showDeleteAllSmsConfirmation) {
+            com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet(
+                itemName = stringResource(Res.string.action_delete_all),
+                dismissClicked = { viewModel.onIntent(DashboardIntent.ShowDeleteAllSmsConfirmation(false)) },
+                confirmClicked = {
+                    viewModel.onIntent(DashboardIntent.IgnoreAllSmsDrafts)
                 }
             )
         }

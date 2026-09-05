@@ -4,6 +4,10 @@ sealed interface NotificationSettingsIntent {
     data object ToggleBudgetNotif : NotificationSettingsIntent
     data object ToggleInstallmentNotif : NotificationSettingsIntent
     data object ToggleChequeNotif : NotificationSettingsIntent
+    data object ToggleFixedExpenseNotif : NotificationSettingsIntent
+    data object ToggleShoppingNotif : NotificationSettingsIntent
+    data object ToggleNotesNotif : NotificationSettingsIntent
+    data object ToggleDebtNotif : NotificationSettingsIntent
     data object ToggleQuickAddNotif : NotificationSettingsIntent
     data object ToggleQuietHours : NotificationSettingsIntent
     data class SetQuietStart(val time: String) : NotificationSettingsIntent

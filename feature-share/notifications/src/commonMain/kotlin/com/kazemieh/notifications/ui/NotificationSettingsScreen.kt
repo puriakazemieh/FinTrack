@@ -14,7 +14,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.EventNote
+import androidx.compose.material.icons.filled.SyncAlt
 import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Paid
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.ConfirmationNumber
@@ -41,6 +45,7 @@ import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackBodySmallText
 import com.kazemieh.designsystem.component.FintrackButton
 import com.kazemieh.designsystem.component.FintrackLabelLargeText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
@@ -54,12 +59,17 @@ import fintrack.core.designsystem.generated.resources.cancell_
 import fintrack.core.designsystem.generated.resources.confirm
 import fintrack.core.designsystem.generated.resources.label_quick_add_notification
 import fintrack.core.designsystem.generated.resources.notif_budget_label
+import fintrack.core.designsystem.generated.resources.notif_fixed_expense_label
+import fintrack.core.designsystem.generated.resources.notif_shopping_label
+import fintrack.core.designsystem.generated.resources.notif_notes_label
+import fintrack.core.designsystem.generated.resources.notif_debt_label
 import fintrack.core.designsystem.generated.resources.notif_channels_title
 import fintrack.core.designsystem.generated.resources.notif_cheque_label
 import fintrack.core.designsystem.generated.resources.notif_installment_label
 import fintrack.core.designsystem.generated.resources.notif_permission_rationale
 import fintrack.core.designsystem.generated.resources.notif_quiet_end_label
 import fintrack.core.designsystem.generated.resources.notif_quiet_hours
+import fintrack.core.designsystem.generated.resources.notif_quiet_hours_desc
 import fintrack.core.designsystem.generated.resources.notif_quiet_start_label
 import fintrack.core.designsystem.generated.resources.setting_push_notifications
 import fintrack.core.designsystem.generated.resources.title_notification_settings
@@ -148,10 +158,34 @@ fun NotificationSettingsScreen(
                         onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleBudgetNotif) }
                     )
                     NotificationSettingItem(
+                        title = stringResource(Res.string.notif_fixed_expense_label),
+                        icon = Icons.Default.Paid,
+                        on = state.isFixedExpenseNotifEnabled,
+                        onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleFixedExpenseNotif) }
+                    )
+                    NotificationSettingItem(
+                        title = stringResource(Res.string.notif_shopping_label),
+                        icon = Icons.Default.ShoppingCart,
+                        on = state.isShoppingNotifEnabled,
+                        onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleShoppingNotif) }
+                    )
+                    NotificationSettingItem(
+                        title = stringResource(Res.string.notif_notes_label),
+                        icon = Icons.Default.EventNote,
+                        on = state.isNotesNotifEnabled,
+                        onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleNotesNotif) }
+                    )
+                    NotificationSettingItem(
                         title = stringResource(Res.string.notif_installment_label),
                         icon = Icons.Default.EventRepeat,
                         on = state.isInstallmentNotifEnabled,
                         onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleInstallmentNotif) }
+                    )
+                    NotificationSettingItem(
+                        title = stringResource(Res.string.notif_debt_label),
+                        icon = Icons.Default.SyncAlt,
+                        on = state.isDebtNotifEnabled,
+                        onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleDebtNotif) }
                     )
                     NotificationSettingItem(
                         title = stringResource(Res.string.notif_cheque_label),
@@ -170,6 +204,12 @@ fun NotificationSettingsScreen(
 
             item {
                 WidgetCard(title = stringResource(Res.string.notif_quiet_hours)) {
+                    Column(modifier = Modifier.padding(horizontal = space.medium, vertical = space.small)) {
+                        FintrackBodySmallText(
+                            text = stringResource(Res.string.notif_quiet_hours_desc),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     NotificationSettingItem(
                         title = stringResource(Res.string.notif_quiet_hours),
                         icon = Icons.Default.Bedtime,

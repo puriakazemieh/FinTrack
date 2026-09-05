@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="date">تاریخ</string>
@@ -45,6 +45,7 @@
     <string name="transaction" > تراکنش</string>
     <string name="move_to_another_category" > انتقال به یک دسته‌بندی دیگر</string>
     <string name="move_to_another_source" > انتقال به یک منبع دیگر</string>
+    <string name="action_delete_all">حذف همه</string>
     <string name="delete_all_transaction" > پاک کردن همه تراکنش‌ها</string>
     <string name="title_delete_category" > با حذف دسته‌بندی همه تراکنش‌ها به طور کامل پاک می شود</string>
     <string name="transaction_delete" >آیا از حذف مطمئن هستید؟</string>
@@ -681,15 +682,20 @@
     <!-- Notifications Settings -->
     <string name="title_notification_settings">تنظیمات اعلان</string>
     <string name="notif_budget_label">بودجه‌بندی</string>
+    <string name="notif_fixed_expense_label">هزینه‌های ثابت</string>
+    <string name="notif_shopping_label">لیست خرید</string>
+    <string name="notif_notes_label">یادداشت‌ها</string>
     <string name="notif_installment_label">اقساط</string>
+    <string name="notif_debt_label">بدهی و طلب</string>
     <string name="notif_cheque_label">چک‌ها</string>
+    <string name="notif_quiet_hours_desc">در این ساعات هیچ نوتیفیکیشنی ارسال نخواهد شد</string>
     <string name="notif_quiet_hours">ساعات سکوت</string>
     <string name="notif_quiet_start_label">زمان شروع</string>
     <string name="notif_quiet_end_label">زمان پایان</string>
     <string name="title_select_time">انتخاب زمان</string>
     <string name="label_hour">ساعت</string>
     <string name="label_minute">دقیقه</string>
-    <string name="notif_permission_rationale">برای دریافت یادآوری‌های بودجه و چک، لطفاً دسترسی به اعلان‌ها را فعال کنید.</string>
+    <string name="notif_permission_rationale">برای دریافت به‌موقع یادآوری‌های مربوط به تراکنش‌ها، اقساط، بودجه‌ها و سایر امور مالی خود، لطفاً دسترسی به اعلان‌ها را فعال کنید.</string>
     <string name="notif_channels_title">کانال‌های اطلاع‌رسانی</string>
     <string name="title_my_budgets">بودجه‌های من</string>
     <string name="label_budget_consumed">مصرف‌شده</string>

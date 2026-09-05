@@ -289,8 +289,19 @@ class DashboardViewModel(
                 _state.update { it.copy(showDeleteSmsConfirmation = false, smsDraftToDelete = null) }
             }
 
+            is DashboardIntent.IgnoreAllSmsDrafts -> viewModelScope.launch {
+                _state.value.smsDrafts.forEach { draft ->
+                    smsDraftRepository.markSmsDraftAsUsed(draft.id)
+                }
+                _state.update { it.copy(showDeleteAllSmsConfirmation = false, showSmsDetection = false) }
+            }
+
             is DashboardIntent.ShowDeleteSmsConfirmation -> _state.update {
                 it.copy(showDeleteSmsConfirmation = intent.show, smsDraftToDelete = intent.draft)
+            }
+
+            is DashboardIntent.ShowDeleteAllSmsConfirmation -> _state.update {
+                it.copy(showDeleteAllSmsConfirmation = intent.show)
             }
 
             is DashboardIntent.UpdateSmsDraft -> viewModelScope.launch {
@@ -421,6 +432,7 @@ data class DashboardState(
     val streak: Streak = Streak(),
     val showSmsDetection: Boolean = false,
     val showDeleteSmsConfirmation: Boolean = false,
+    val showDeleteAllSmsConfirmation: Boolean = false,
     val smsDraftToDelete: SmsDraft? = null,
     val smsDraft: SmsDraft? = null,
     val currency: String = "IRR",
@@ -470,7 +482,9 @@ sealed interface DashboardIntent {
     data object ToggleSmsDetectionSheet : DashboardIntent
     data class OpenSmsDraftTransaction(val draftId: Long) : DashboardIntent
     data class IgnoreSmsDraft(val draft: SmsDraft) : DashboardIntent
+    data object IgnoreAllSmsDrafts : DashboardIntent
     data class ShowDeleteSmsConfirmation(val show: Boolean, val draft: SmsDraft? = null) : DashboardIntent
+    data class ShowDeleteAllSmsConfirmation(val show: Boolean) : DashboardIntent
     data class QuickRegisterSms(val draft: SmsDraft) : DashboardIntent
     data class UpdateSmsDraft(val draft: SmsDraft) : DashboardIntent
     data object ToggleCustomizeSheet : DashboardIntent

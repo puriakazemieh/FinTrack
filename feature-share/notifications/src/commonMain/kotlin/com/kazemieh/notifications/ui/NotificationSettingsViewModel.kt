@@ -37,6 +37,10 @@ class NotificationSettingsViewModel(
                 isBudgetNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_BUDGET_ENABLED, true),
                 isInstallmentNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_INSTALLMENT_ENABLED, true),
                 isChequeNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_CHEQUE_ENABLED, true),
+                isFixedExpenseNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_FIXED_EXPENSE_ENABLED, true),
+                isShoppingNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_SHOPPING_ENABLED, true),
+                isNotesNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_NOTES_ENABLED, true),
+                isDebtNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_DEBT_ENABLED, true),
                 isQuickAddNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_QUICK_ADD_NOTIF_ENABLED, false),
                 isQuietHoursEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_QUIET_HOURS_ENABLED, false),
                 quietStart = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_NOTIF_QUIET_START, "22:00"),
@@ -84,6 +88,50 @@ class NotificationSettingsViewModel(
                     analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingsChanged)
                     _state.update { it.copy(isChequeNotifEnabled = newValue) }
                     analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("cheque", newValue))
+                } else {
+                    _state.update { it.copy(triggerSystemPermissionRequest = true) }
+                }
+            }
+            NotificationSettingsIntent.ToggleFixedExpenseNotif -> {
+                if (notificationManager.hasPermission()) {
+                    val newValue = !_state.value.isFixedExpenseNotifEnabled
+                    preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_FIXED_EXPENSE_ENABLED, newValue)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingsChanged)
+                    _state.update { it.copy(isFixedExpenseNotifEnabled = newValue) }
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("fixed_expense", newValue))
+                } else {
+                    _state.update { it.copy(triggerSystemPermissionRequest = true) }
+                }
+            }
+            NotificationSettingsIntent.ToggleShoppingNotif -> {
+                if (notificationManager.hasPermission()) {
+                    val newValue = !_state.value.isShoppingNotifEnabled
+                    preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_SHOPPING_ENABLED, newValue)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingsChanged)
+                    _state.update { it.copy(isShoppingNotifEnabled = newValue) }
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("shopping", newValue))
+                } else {
+                    _state.update { it.copy(triggerSystemPermissionRequest = true) }
+                }
+            }
+            NotificationSettingsIntent.ToggleNotesNotif -> {
+                if (notificationManager.hasPermission()) {
+                    val newValue = !_state.value.isNotesNotifEnabled
+                    preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_NOTES_ENABLED, newValue)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingsChanged)
+                    _state.update { it.copy(isNotesNotifEnabled = newValue) }
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("notes", newValue))
+                } else {
+                    _state.update { it.copy(triggerSystemPermissionRequest = true) }
+                }
+            }
+            NotificationSettingsIntent.ToggleDebtNotif -> {
+                if (notificationManager.hasPermission()) {
+                    val newValue = !_state.value.isDebtNotifEnabled
+                    preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_DEBT_ENABLED, newValue)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingsChanged)
+                    _state.update { it.copy(isDebtNotifEnabled = newValue) }
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("debt", newValue))
                 } else {
                     _state.update { it.copy(triggerSystemPermissionRequest = true) }
                 }

@@ -133,10 +133,6 @@ class SettingsViewModel(
                     FinTrackPreferences.PREF_PUSH_NOTIF,
                     true
                 ),
-                isTransactionAlertsEnabled = preferenceUseCases.getBooleanPreference(
-                    FinTrackPreferences.PREF_TX_ALERTS,
-                    true
-                ),
                 isSyncEnabled = preferenceUseCases.getBooleanPreference(
                     FinTrackPreferences.PREF_SYNC_ENABLED,
                     true
@@ -287,15 +283,6 @@ class SettingsViewModel(
                 _state.update { it.copy(isPushNotificationsEnabled = newValue) }
             }
 
-            is SettingsIntent.ToggleTransactionAlerts -> {
-                val newValue = !_state.value.isTransactionAlertsEnabled
-                preferenceUseCases.setBooleanPreference(
-                    FinTrackPreferences.PREF_TX_ALERTS,
-                    newValue
-                )
-                _state.update { it.copy(isTransactionAlertsEnabled = newValue) }
-            }
-
             is SettingsIntent.SelectCurrency -> {
                 val currencyJson = Json.encodeToString(intent.currency)
                 preferenceUseCases.setStringPreference(PREF_CURRENCY, currencyJson)
@@ -381,7 +368,7 @@ data class SettingsState(
     val isLockEnabled: Boolean = false,
     val isBackupEnabled: Boolean = true,
     val isPushNotificationsEnabled: Boolean = true,
-    val isTransactionAlertsEnabled: Boolean = true,
+
     val isSyncEnabled: Boolean = true,
     val isBalanceHidden: Boolean = false,
     val lastSyncTime: String = "---",
@@ -412,7 +399,7 @@ sealed interface SettingsIntent {
     data object ToggleBackup : SettingsIntent
     data object TogglePushNotifications : SettingsIntent
     data object ToggleHideBalance : SettingsIntent
-    data object ToggleTransactionAlerts : SettingsIntent
+
     data class SelectCurrency(val currency: Currency) : SettingsIntent
     data object ToggleLock : SettingsIntent
     data class SetLockState(val isEnabled: Boolean) : SettingsIntent

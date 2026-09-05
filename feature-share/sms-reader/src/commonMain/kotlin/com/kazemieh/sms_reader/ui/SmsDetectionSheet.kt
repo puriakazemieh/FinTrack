@@ -45,6 +45,7 @@ import fintrack.core.designsystem.generated.resources.category
 import fintrack.core.designsystem.generated.resources.edit
 import fintrack.core.designsystem.generated.resources.label_most_used
 import fintrack.core.designsystem.generated.resources.notif_action_register
+import fintrack.core.designsystem.generated.resources.action_delete_all
 import fintrack.core.designsystem.generated.resources.select_category
 import fintrack.core.designsystem.generated.resources.select_source
 import fintrack.core.designsystem.generated.resources.sms_sheet_sub
@@ -66,6 +67,7 @@ fun SmsDetectionSheet(
     onQuickRegister: (SmsDraft) -> Unit,
     onEdit: (SmsDraft) -> Unit,
     onDelete: (SmsDraft) -> Unit,
+    onDeleteAll: () -> Unit,
     onUpdateDraft: (SmsDraft) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -94,6 +96,18 @@ fun SmsDetectionSheet(
                     sub = stringResource(Res.string.sms_sheet_sub),
                     onClose = onDismiss
                 )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = onDeleteAll) {
+                        FintrackLabelMediumText(
+                            text = stringResource(Res.string.action_delete_all),
+                            color = GlassRed
+                        )
+                    }
+                }
 
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth().weight(1f),

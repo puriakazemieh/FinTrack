@@ -74,12 +74,17 @@ class FinTrackPreferences(private val settings: Settings) {
         const val PREF_AI_MODEL = "pref_ai_model"
 
         const val PREF_NOTIF_BUDGET_ENABLED = "pref_notif_budget_enabled"
+        const val PREF_NOTIF_FIXED_EXPENSE_ENABLED = "pref_notif_fixed_expense_enabled"
+        const val PREF_NOTIF_SHOPPING_ENABLED = "pref_notif_shopping_enabled"
+        const val PREF_NOTIF_NOTES_ENABLED = "pref_notif_notes_enabled"
         const val PREF_NOTIF_INSTALLMENT_ENABLED = "pref_notif_installment_enabled"
+        const val PREF_NOTIF_DEBT_ENABLED = "pref_notif_debt_enabled"
         const val PREF_NOTIF_CHEQUE_ENABLED = "pref_notif_cheque_enabled"
+        const val PREF_QUICK_ADD_NOTIF_ENABLED = "pref_quick_add_notif_enabled"
+        
         const val PREF_NOTIF_QUIET_HOURS_ENABLED = "pref_notif_quiet_hours_enabled"
         const val PREF_NOTIF_QUIET_START = "pref_notif_quiet_start"
         const val PREF_NOTIF_QUIET_END = "pref_notif_quiet_end"
-        const val PREF_QUICK_ADD_NOTIF_ENABLED = "pref_quick_add_notif_enabled"
 
         const val PREF_ROUNDUP_ENABLED = "pref_roundup_enabled"
         const val PREF_ROUNDUP_GOAL_ID = "pref_roundup_goal_id"
