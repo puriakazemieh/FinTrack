@@ -4,7 +4,7 @@ import com.kazemieh.data_contract.datasource.CurrencyLocalDataSource
 import com.kazemieh.database.FinTrackDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 class CurrencyLocalDataSourceImpl(
     private val db: FinTrackDatabase

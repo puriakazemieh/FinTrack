@@ -109,7 +109,8 @@ class CheckLocalDataSourceImpl(
                 description = check.description,
                 isIncoming = if (check.isIncoming) 1L else 0L,
                 updatedAt = check.updatedAt,
-                syncStatus = check.syncStatus.value.toLong()
+                syncStatus = check.syncStatus.value.toLong(),
+                currencyCode = check.currencyCode
             )
         }
     }

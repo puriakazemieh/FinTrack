@@ -20,7 +20,8 @@ import kotlinx.serialization.json.Json
 class CurrencySettingsViewModel(
     private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val preferenceUseCases: PreferenceUseCases,
-    private val assetRepository: AssetRepository,
+    private val currencyRepository: com.kazemieh.domain.repository.CurrencyRepository,
+    private val assetRepository: AssetRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CurrencySettingsState())
@@ -191,13 +192,16 @@ class CurrencySettingsViewModel(
 data class CurrencySettingsState(
     val selectedCurrency: Currency = Currency.TOMAN,
     val pendingCurrency: Currency? = null,
-    val showConfirmDialog: Boolean = false,
-    val showRateDialog: Boolean = false,
+    val showConfirmSheet: Boolean = false,
+    val showRateSheet: Boolean = false,
     val conversionRate: String = "1.0",
     val searchQuery: String = "",
     val fiatCurrencies: List<Currency> = emptyList(),
     val cryptoCurrencies: List<Currency> = emptyList(),
-    val customCurrencies: List<Currency> = emptyList()
+    val customCurrencies: List<Currency> = emptyList(),
+    val isConverting: Boolean = false,
+    val isFetchingRate: Boolean = false,
+    val rateError: String? = null
 )
 
 sealed interface CurrencySettingsIntent {
@@ -206,6 +210,11 @@ sealed interface CurrencySettingsIntent {
     object ConfirmSelection : CurrencySettingsIntent
     data class SubmitConfirmDialog(val updateOld: Boolean) : CurrencySettingsIntent
     data class UpdateRate(val rateStr: String) : CurrencySettingsIntent
+    object FetchRateFromServer : CurrencySettingsIntent
     object ConfirmRateDialog : CurrencySettingsIntent
     object DismissDialogs : CurrencySettingsIntent
+}
+
+sealed interface CurrencySettingsEffect {
+    object CurrencyChanged : CurrencySettingsEffect
 }

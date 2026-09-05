@@ -57,7 +57,8 @@ class GoalLocalDataSourceImpl(
             templateId = goal.templateId,
             basketId = goal.basketId,
             updatedAt = now,
-            syncStatus = 1
+            syncStatus = 1,
+            currencyCode = goal.currencyCode
         )
         queries.observeGoals().executeAsList().lastOrNull()?.id ?: 0L
     }
@@ -82,7 +83,8 @@ class GoalLocalDataSourceImpl(
             templateId = goal.templateId,
             basketId = goal.basketId,
             updatedAt = now,
-            syncStatus = 1
+            syncStatus = 1,
+            currencyCode = goal.currencyCode
         )
         1
     }
@@ -198,7 +200,8 @@ class GoalLocalDataSourceImpl(
                 templateId = goal.templateId,
                 basketId = goal.basketId,
                 updatedAt = goal.updatedAt,
-                syncStatus = goal.syncStatus.value.toLong()
+                syncStatus = goal.syncStatus.value.toLong(),
+                currencyCode = goal.currencyCode
             )
         }
     }

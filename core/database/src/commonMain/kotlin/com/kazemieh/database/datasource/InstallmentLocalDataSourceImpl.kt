@@ -61,7 +61,8 @@ class InstallmentLocalDataSourceImpl(
                 reminderEnabled = if (installment.reminderEnabled) 1L else 0L,
                 postAsTransaction = if (installment.postAsTransaction) 1L else 0L,
                 updatedAt = now,
-                syncStatus = 1
+                syncStatus = 1,
+            currencyCode = installment.currencyCode
             )
             val id = installmentQueries.lastInsertRowId().executeAsOne()
             tagIds.forEach { tagId ->
@@ -94,6 +95,7 @@ class InstallmentLocalDataSourceImpl(
                 postAsTransaction = if (installment.postAsTransaction) 1L else 0L,
                 updatedAt = now,
                 syncStatus = 1,
+                currencyCode = installment.currencyCode,
                 id = installment.id
             )
             db.installmentTagQueries.deleteTagsByInstallmentId(installment.id)
@@ -134,7 +136,8 @@ class InstallmentLocalDataSourceImpl(
             reminderEnabled = if (installment.reminderEnabled) 1L else 0L,
             postAsTransaction = if (installment.postAsTransaction) 1L else 0L,
             updatedAt = installment.updatedAt,
-            syncStatus = installment.syncStatus.value.toLong()
+            syncStatus = installment.syncStatus.value.toLong(),
+        currencyCode = installment.currencyCode
         )
         Unit
     }

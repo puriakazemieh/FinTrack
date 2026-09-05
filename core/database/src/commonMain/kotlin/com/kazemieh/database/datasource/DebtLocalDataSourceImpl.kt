@@ -124,7 +124,8 @@ class DebtLocalDataSourceImpl(private val db: FinTrackDatabase) : DebtLocalDataS
                 isSettled = if (debt.isSettled) 1L else 0L,
                 reminderEnabled = if (debt.reminderEnabled) 1L else 0L,
                 updatedAt = debt.updatedAt,
-                syncStatus = debt.syncStatus.value.toLong()
+                syncStatus = debt.syncStatus.value.toLong(),
+                currencyCode = debt.currencyCode
             )
         }
     }

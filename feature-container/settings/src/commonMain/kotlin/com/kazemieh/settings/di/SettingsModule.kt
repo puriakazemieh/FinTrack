@@ -11,7 +11,7 @@ import org.koin.dsl.module
 val settingsModule = module {
     viewModel { SettingsViewModel(get(), get(), get(), get()) }
     viewModel { ThemeSettingsViewModel(get(), get()) }
-    viewModel { CurrencySettingsViewModel(get(), get()) }
+    viewModel { CurrencySettingsViewModel(get(), get(), get(), get()) }
     viewModel { ProfileEditViewModel(get(), get()) }
     viewModel { ManageToolsViewModel(get(), get()) }
 }

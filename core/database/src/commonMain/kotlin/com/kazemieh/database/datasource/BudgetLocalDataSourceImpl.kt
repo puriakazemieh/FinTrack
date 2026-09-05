@@ -159,7 +159,8 @@ class BudgetLocalDataSourceImpl(
                 personIds = budget.personIds?.joinToString(","),
                 isAlertEnabled = if (budget.isAlertEnabled) 1L else 0L,
                 updatedAt = budget.updatedAt,
-                syncStatus = budget.syncStatus.value.toLong()
+                syncStatus = budget.syncStatus.value.toLong(),
+                currencyCode = budget.currencyCode
             )
         }
     }
