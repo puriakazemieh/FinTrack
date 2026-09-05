@@ -13,7 +13,7 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.glass.SheetFrame
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable
+:Composable
 fun TextSettingsBottomSheet(
     currentScale: TextScale,
     currentFont: TextFont,
@@ -22,7 +22,7 @@ fun TextSettingsBottomSheet(
     onDismiss: () -> Unit
 ) {
     SheetFrame(
-        title = "تنظیمات متن",
+        title = "تنػیمات متن",
         onDismiss = onDismiss,
         primaryButtonText = "تایید",
         onPrimaryClick = onDismiss,
@@ -35,7 +35,7 @@ fun TextSettingsBottomSheet(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             
-            FintrackBodyMediumText(text = "اندازه متن:")
+            FintrackBodyMediumText(text = "اندازه متق:")
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -67,7 +67,7 @@ fun TextSettingsBottomSheet(
                 TextFont.entries.forEach { font ->
                     val isSelected = font == currentFont
                     val label = when (font) {
-                        TextFont.VAZIRMATN -> "وزیرمتن (Vazirmatn)"
+                        TextFont.VAZIRMATN -> "وزیرمتۆ (Vazirmatn)"
                         TextFont.SHABNAM -> "شبنم (Shabnam)"
                         TextFont.SAHEL -> "ساحل (Sahel)"
                     }

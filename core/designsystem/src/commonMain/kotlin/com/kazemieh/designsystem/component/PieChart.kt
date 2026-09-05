@@ -57,7 +57,7 @@ import com.kazemieh.common.toPersianPrice
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
-import com.kazemieh.designsystem.vazirmatnFontFamily
+import com.kazemieh.designsystem.currentFontFamily
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.currency_toman
 import fintrack.core.designsystem.generated.resources.label_amount_with_unit
@@ -160,8 +160,8 @@ fun PieChart(
     chartBarWidth: Dp = 15.dp,
     textDistanceExtra: Dp = 60.dp,
     animDuration: Int = 500,
-    labelTextStyle: TextStyle = MaterialTheme.typography.bodyMedium.copy(fontFamily = vazirmatnFontFamily()),
-    legendTextStyle: TextStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = vazirmatnFontFamily()),
+    labelTextStyle: TextStyle = MaterialTheme.typography.bodyMedium.copy(fontFamily = currentFontFamily()),
+    legendTextStyle: TextStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = currentFontFamily()),
     showLegend: Boolean = true,
     enableAnimation: Boolean = true,
     onSliceClick: ((PieChartItem) -> Unit)? = null
