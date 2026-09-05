@@ -1,1 +1,18 @@
+import com.kazemieh.common.model.AssetType;
+
 ALTER TABLE shopping_item_table ADD COLUMN note TEXT;
+ALTER TABLE budget ADD COLUMN currencyCode TEXT NOT NULL DEFAULT 'IRT';
+ALTER TABLE check_table ADD COLUMN currencyCode TEXT NOT NULL DEFAULT 'IRT';
+ALTER TABLE debt ADD COLUMN currencyCode TEXT NOT NULL DEFAULT 'IRT';
+ALTER TABLE fixed_expense ADD COLUMN currencyCode TEXT NOT NULL DEFAULT 'IRT';
+ALTER TABLE goal ADD COLUMN currencyCode TEXT NOT NULL DEFAULT 'IRT';
+ALTER TABLE installment ADD COLUMN currencyCode TEXT NOT NULL DEFAULT 'IRT';
+ALTER TABLE source ADD COLUMN currencyCode TEXT NOT NULL DEFAULT 'IRT';
+
+CREATE TABLE IF NOT EXISTS rate_cache (
+    code TEXT PRIMARY KEY NOT NULL,
+    type TEXT AS AssetType NOT NULL,
+    name TEXT NOT NULL,
+    price INTEGER NOT NULL,
+    lastUpdate INTEGER NOT NULL
+);
