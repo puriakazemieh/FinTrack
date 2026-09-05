@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.designsystem.AppTheme
 import com.kazemieh.designsystem.TextScale
+import com.kazemieh.designsystem.TextFont
 import com.kazemieh.designsystem.ThemeMode
 import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
@@ -331,13 +332,25 @@ class SettingsViewModel(
                 }
             }
 
-            SettingsIntent.CycleTextSize -> {
-                val next = _state.value.textScale.next()
+            SettingsIntent.ShowTextSettingsSheet -> {
+                _state.update { it.copy(showTextSettingsSheet = true) }
+            }
+            SettingsIntent.HideTextSettingsSheet -> {
+                _state.update { it.copy(showTextSettingsSheet = false) }
+            }
+            is SettingsIntent.SetTextScale -> {
                 preferenceUseCases.setStringPreference(
                     FinTrackPreferences.PREF_TEXT_SCALE,
-                    next.name
+                    intent.scale.name
                 )
-                _state.update { it.copy(textScale = next) }
+                _state.update { it.copy(textScale = intent.scale) }
+            }
+            is SettingsIntent.SetTextFont -> {
+                preferenceUseCases.setStringPreference(
+                    FinTrackPreferences.PREF_TEXT_FONT,
+                    intent.font.name
+                )
+                _state.update { it.copy(textFont = intent.font) }
             }
 
             SettingsIntent.Logout -> {
@@ -368,6 +381,8 @@ data class SettingsState(
     val lastSyncTime: String = "---",
     val selectedCurrency: Currency = Currency.TOMAN,
     val textScale: TextScale = TextScale.MEDIUM,
+    val textFont: TextFont = TextFont.VAZIRMATN,
+    val showTextSettingsSheet: Boolean = false,
     val transactionCount: Int = 0,
     val activeDays: Int = 0,
     val toolCount: Int = TOOL_COUNT,
@@ -382,7 +397,10 @@ data class SettingsState(
 sealed interface SettingsIntent {
     data object Refresh : SettingsIntent
     data object ShowPremiumInfo : SettingsIntent
-    data object CycleTextSize : SettingsIntent
+    data object ShowTextSettingsSheet : SettingsIntent
+    data object HideTextSettingsSheet : SettingsIntent
+    data class SetTextScale(val scale: TextScale) : SettingsIntent
+    data class SetTextFont(val font: TextFont) : SettingsIntent
     data object ToggleDarkMode : SettingsIntent
     data object ToggleFingerprint : SettingsIntent
     data object ToggleBackup : SettingsIntent

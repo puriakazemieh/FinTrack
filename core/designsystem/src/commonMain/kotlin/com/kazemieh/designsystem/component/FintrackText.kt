@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
-import com.kazemieh.designsystem.vazirmatnFontFamily
+import com.kazemieh.designsystem.currentFontFamily
 
 import com.kazemieh.designsystem.LocalGlassColors
 
@@ -27,7 +27,7 @@ fun FintrackBodyMediumText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
@@ -53,7 +53,7 @@ fun FintrackDisplayLargeText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
@@ -79,7 +79,7 @@ fun FintrackDisplayMediumText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
@@ -105,7 +105,7 @@ fun FintrackDisplaySmallText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
@@ -131,7 +131,7 @@ fun FintrackHeadlineLargeText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
@@ -157,7 +157,7 @@ fun FintrackHeadlineMediumText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
@@ -183,7 +183,7 @@ fun FintrackHeadlineSmallText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
@@ -209,7 +209,7 @@ fun FintrackTitleLargeText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
@@ -235,7 +235,7 @@ fun FintrackTitleMediumText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
@@ -261,7 +261,7 @@ fun FintrackTitleSmallText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
@@ -287,7 +287,7 @@ fun FintrackBodyLargeText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
@@ -313,7 +313,7 @@ fun FintrackBodyMediumText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
@@ -339,7 +339,7 @@ fun FintrackBodySmallText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
@@ -365,7 +365,7 @@ fun FintrackLabelLargeText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
@@ -391,7 +391,7 @@ fun FintrackLabelMediumText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
@@ -417,7 +417,7 @@ fun FintrackLabelSmallText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        fontFamily = vazirmatnFontFamily()
+        fontFamily = currentFontFamily()
     ),
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,

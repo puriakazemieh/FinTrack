@@ -269,16 +269,10 @@ fun SettingsScreen(
                     // rescales every text in the app.
                     // todo disable
                     SettingItem(
-                        title = stringResource(Res.string.label_text_size),
+                        title = "تنظیمات متن",
                         icon = Icons.Default.TextFormat,
-                        value = stringResource(
-                            when (state.textScale) {
-                                com.kazemieh.designsystem.TextScale.SMALL -> Res.string.label_small
-                                com.kazemieh.designsystem.TextScale.MEDIUM -> Res.string.label_medium
-                                com.kazemieh.designsystem.TextScale.LARGE -> Res.string.label_large
-                            }
-                        ),
-                        onClick = { viewModel.onIntent(SettingsIntent.CycleTextSize) }
+                        value = "", // It's clear from clicking
+                        onClick = { viewModel.onIntent(SettingsIntent.ShowTextSettingsSheet) }
                     )
                     // Language and calendar currently ship a single option; shown as honest
                     // non-interactive value rows until full localization / Gregorian support lands.

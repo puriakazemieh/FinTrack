@@ -13,6 +13,12 @@ import fintrack.core.designsystem.generated.resources.vazirmatn_medium
 import fintrack.core.designsystem.generated.resources.vazirmatn_semibold
 import fintrack.core.designsystem.generated.resources.vazirmatn_bold
 import fintrack.core.designsystem.generated.resources.vazirmatn_extrabold
+import fintrack.core.designsystem.generated.resources.shabnam_regular
+import fintrack.core.designsystem.generated.resources.shabnam_medium
+import fintrack.core.designsystem.generated.resources.shabnam_bold
+import fintrack.core.designsystem.generated.resources.sahel_regular
+import fintrack.core.designsystem.generated.resources.sahel_semibold
+import fintrack.core.designsystem.generated.resources.sahel_bold
 import org.jetbrains.compose.resources.Font
 
 
@@ -27,9 +33,41 @@ fun vazirmatnFontFamily(): FontFamily {
     )
 }
 
+
+@Composable
+fun shabnamFontFamily(): FontFamily {
+    return FontFamily(
+        Font(Res.font.shabnam_regular, FontWeight.W400),
+        Font(Res.font.shabnam_medium, FontWeight.W500),
+        Font(Res.font.shabnam_medium, FontWeight.W600), // shabnam doesn't have semibold, use medium
+        Font(Res.font.shabnam_bold, FontWeight.W700),
+        Font(Res.font.shabnam_bold, FontWeight.W800)
+    )
+}
+
+@Composable
+fun sahelFontFamily(): FontFamily {
+    return FontFamily(
+        Font(Res.font.sahel_regular, FontWeight.W400),
+        Font(Res.font.sahel_regular, FontWeight.W500), // sahel doesn't have medium, use regular
+        Font(Res.font.sahel_semibold, FontWeight.W600),
+        Font(Res.font.sahel_bold, FontWeight.W700),
+        Font(Res.font.sahel_bold, FontWeight.W800)
+    )
+}
+
+@Composable
+fun currentFontFamily(): FontFamily {
+    return when (LocalTextFont.current) {
+        TextFont.VAZIRMATN -> vazirmatnFontFamily()
+        TextFont.SHABNAM -> shabnamFontFamily()
+        TextFont.SAHEL -> sahelFontFamily()
+    }
+}
+
 @Composable
 fun fintrackTypography(): Typography {
-    val family = vazirmatnFontFamily()
+    val family = currentFontFamily()
     
     return Typography(
         // Hero balance: 32 / 700 / -0.02em

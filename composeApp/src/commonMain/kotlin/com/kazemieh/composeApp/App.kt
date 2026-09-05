@@ -33,6 +33,8 @@ import com.kazemieh.designsystem.FintrackTheme
 import com.kazemieh.designsystem.LocalCurrency
 import com.kazemieh.designsystem.LocalHideBalance
 import com.kazemieh.designsystem.TextScale
+import com.kazemieh.designsystem.TextFont
+import com.kazemieh.designsystem.LocalTextFont
 import com.kazemieh.designsystem.ThemeMode
 import com.kazemieh.domain.di.domainModule
 import com.kazemieh.domain.usecase.PreferenceUseCases
@@ -129,6 +131,11 @@ fun App() {
         TextScale.MEDIUM.name
     ).collectAsState(TextScale.MEDIUM.name)
 
+    val textFontName by preferenceUseCases.getStringFlow(
+        FinTrackPreferences.PREF_TEXT_FONT,
+        TextFont.VAZIRMATN.name
+    ).collectAsState(TextFont.VAZIRMATN.name)
+
     val isSystemDark = isSystemInDarkTheme()
 
     val calculatedTheme = remember(currentTheme, themeMode, isSystemDark, themeStartTime, themeEndTime) {
@@ -202,6 +209,7 @@ fun App() {
         CompositionLocalProvider(
             LocalCurrency provides Currency.valueOf(currentCurrency),
             LocalHideBalance provides hideBalance.toBoolean(),
+            LocalTextFont provides TextFont.fromName(textFontName),
             androidx.compose.ui.platform.LocalDensity provides scaledDensity
         ) {
             FintrackTheme(
