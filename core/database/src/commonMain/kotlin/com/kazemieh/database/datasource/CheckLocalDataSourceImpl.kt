@@ -35,6 +35,7 @@ class CheckLocalDataSourceImpl(
             description = check.description,
             isIncoming = if (check.isIncoming) 1L else 0L,
             updatedAt = now,
+            currencyCode = check.currencyCode,
             syncStatus = 1
         )
         queries.lastInsertRowId().executeAsOne()
@@ -57,6 +58,7 @@ class CheckLocalDataSourceImpl(
                 description = check.description,
                 isIncoming = if (check.isIncoming) 1L else 0L,
                 updatedAt = now,
+            currencyCode = check.currencyCode,
                 syncStatus = 1,
                 id = check.id
             )

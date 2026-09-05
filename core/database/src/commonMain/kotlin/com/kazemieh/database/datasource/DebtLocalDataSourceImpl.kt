@@ -53,6 +53,7 @@ class DebtLocalDataSourceImpl(private val db: FinTrackDatabase) : DebtLocalDataS
                 isSettled = if (debt.isSettled) 1L else 0L,
                 reminderEnabled = if (debt.reminderEnabled) 1L else 0L,
                 updatedAt = now,
+            currencyCode = debt.currencyCode,
                 syncStatus = 1
             )
             val id = queries.lastInsertRowId().executeAsOne()
@@ -78,6 +79,7 @@ class DebtLocalDataSourceImpl(private val db: FinTrackDatabase) : DebtLocalDataS
                 isSettled = if (debt.isSettled) 1L else 0L,
                 reminderEnabled = if (debt.reminderEnabled) 1L else 0L,
                 updatedAt = now,
+            currencyCode = debt.currencyCode,
                 syncStatus = 1,
                 id = debt.id
             )

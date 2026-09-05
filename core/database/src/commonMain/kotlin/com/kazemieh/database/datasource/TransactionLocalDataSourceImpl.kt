@@ -165,6 +165,7 @@ class TransactionLocalDataSourceImpl(
             position = source.position.toLong(),
             updatedAt = now,
             syncStatus = 1,
+            currencyCode = source.currencyCode,
             id = id
         )
         1
@@ -297,7 +298,8 @@ class TransactionLocalDataSourceImpl(
             branchName = source.branchName,
             position = source.position.toLong(),
             updatedAt = now,
-            syncStatus = 1
+            syncStatus = 1,
+            currencyCode = source.currencyCode
         )
         sourceQueries.lastInsertRowId().awaitAsOne()
     }
@@ -599,7 +601,8 @@ class TransactionLocalDataSourceImpl(
                 branchName = source.branchName,
                 position = source.position.toLong(),
                 updatedAt = source.updatedAt,
-                syncStatus = source.syncStatus.value.toLong()
+                syncStatus = source.syncStatus.value.toLong(),
+                currencyCode = source.currencyCode
             )
         }
     }

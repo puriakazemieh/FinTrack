@@ -76,6 +76,7 @@ data class Goal(
     val description: String = "",
     val templateId: Long? = null,
     val basketId: Long? = null,
+    val currencyCode: String = "IRT",
     override val updatedAt: Long = 0,
     override val syncStatus: SyncStatus = SyncStatus.SYNCED
 ) : SyncableEntity {

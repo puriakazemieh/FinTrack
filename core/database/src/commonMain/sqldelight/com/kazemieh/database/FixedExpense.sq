@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS fixed_expense (
     isActive INTEGER NOT NULL DEFAULT 1,
     updatedAt INTEGER NOT NULL DEFAULT 0,
     syncStatus INTEGER NOT NULL DEFAULT 0,
+    currencyCode TEXT NOT NULL DEFAULT 'IRT',
     FOREIGN KEY (categoryId) REFERENCES category(id) ON DELETE CASCADE,
     FOREIGN KEY (sourceId) REFERENCES source(id) ON DELETE CASCADE
 );
@@ -21,12 +22,12 @@ CREATE INDEX IF NOT EXISTS idx_fixed_expense_category ON fixed_expense(categoryI
 CREATE INDEX IF NOT EXISTS idx_fixed_expense_source ON fixed_expense(sourceId);
 
 insertFixedExpense:
-INSERT INTO fixed_expense(title, amount, categoryId, sourceId, description, recurrence, startDate, nextDueDate, endDate, isAutoPostEnabled, isActive, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO fixed_expense(title, amount, categoryId, sourceId, description, recurrence, startDate, nextDueDate, endDate, isAutoPostEnabled, isActive, updatedAt, syncStatus, currencyCode)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateFixedExpense:
 UPDATE fixed_expense
-SET title = ?, amount = ?, categoryId = ?, sourceId = ?, description = ?, recurrence = ?, startDate = ?, nextDueDate = ?, endDate = ?, isAutoPostEnabled = ?, isActive = ?, updatedAt = ?, syncStatus = ?
+SET title = ?, amount = ?, categoryId = ?, sourceId = ?, description = ?, recurrence = ?, startDate = ?, nextDueDate = ?, endDate = ?, isAutoPostEnabled = ?, isActive = ?, updatedAt = ?, syncStatus = ?, currencyCode = ?
 WHERE id = ?;
 
 deleteFixedExpense:
@@ -90,11 +91,14 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertFullFixedExpense:
-INSERT OR REPLACE INTO fixed_expense(id, title, amount, categoryId, sourceId, description, recurrence, startDate, nextDueDate, endDate, isAutoPostEnabled, isActive, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO fixed_expense(id, title, amount, categoryId, sourceId, description, recurrence, startDate, nextDueDate, endDate, isAutoPostEnabled, isActive, updatedAt, syncStatus, currencyCode)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getModifiedFixedExpenses:
 SELECT * FROM fixed_expense WHERE syncStatus = 1;
 
 markFixedExpenseAsSynced:
 UPDATE fixed_expense SET syncStatus = 0 WHERE id = ?;
+
+batchConvertAmounts:
+UPDATE fixed_expense SET amount = CAST(CAST(amount AS REAL) * :rate AS INTEGER), currencyCode = :newCode, updatedAt = :now, syncStatus = 1 WHERE currencyCode = :oldCode AND syncStatus != 2;

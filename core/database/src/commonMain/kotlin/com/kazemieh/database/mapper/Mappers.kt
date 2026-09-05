@@ -174,6 +174,7 @@ fun SourceDb.toSource() = Source(
     expirationYear = expirationYear,
     branchCode = branchCode,
     branchName = branchName,
+    currencyCode = currencyCode,
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
@@ -211,6 +212,7 @@ fun DebtDb.toDebt() = Debt(
     type = DebtType.fromInt(type.toInt()),
     isSettled = isSettled == 1L,
     reminderEnabled = reminderEnabled == 1L,
+    currencyCode = currencyCode,
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
@@ -367,6 +369,7 @@ fun InstallmentDb.toInstallment() = Installment(
     isCompleted = isCompleted == 1L,
     reminderEnabled = reminderEnabled == 1L,
     postAsTransaction = postAsTransaction == 1L,
+    currencyCode = currencyCode,
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )

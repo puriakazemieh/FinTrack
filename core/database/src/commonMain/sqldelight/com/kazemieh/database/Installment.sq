@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS installment (
     postAsTransaction INTEGER NOT NULL DEFAULT 1,
     updatedAt INTEGER NOT NULL DEFAULT 0,
     syncStatus INTEGER NOT NULL DEFAULT 0,
+    currencyCode TEXT NOT NULL DEFAULT 'IRT',
     FOREIGN KEY (categoryId) REFERENCES category(id) ON DELETE CASCADE,
     FOREIGN KEY (sourceId) REFERENCES source(id) ON DELETE CASCADE
 );
@@ -23,12 +24,12 @@ CREATE TABLE IF NOT EXISTS installment (
 CREATE INDEX IF NOT EXISTS idx_installment_nextDueDate ON installment(nextDueDate);
 
 insertInstallment:
-INSERT INTO installment(title, totalAmount, installmentAmount, totalInstallments, paidInstallments, categoryId, sourceId, startDate, nextDueDate, frequency, description, isCompleted, reminderEnabled, postAsTransaction, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO installment(title, totalAmount, installmentAmount, totalInstallments, paidInstallments, categoryId, sourceId, startDate, nextDueDate, frequency, description, isCompleted, reminderEnabled, postAsTransaction, updatedAt, syncStatus, currencyCode)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateInstallment:
 UPDATE installment
-SET title = ?, totalAmount = ?, installmentAmount = ?, totalInstallments = ?, paidInstallments = ?, categoryId = ?, sourceId = ?, startDate = ?, nextDueDate = ?, frequency = ?, description = ?, isCompleted = ?, reminderEnabled = ?, postAsTransaction = ?, updatedAt = ?, syncStatus = ?
+SET title = ?, totalAmount = ?, installmentAmount = ?, totalInstallments = ?, paidInstallments = ?, categoryId = ?, sourceId = ?, startDate = ?, nextDueDate = ?, frequency = ?, description = ?, isCompleted = ?, reminderEnabled = ?, postAsTransaction = ?, updatedAt = ?, syncStatus = ?, currencyCode = ?
 WHERE id = ?;
 
 deleteInstallment:
@@ -124,11 +125,14 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertFullInstallment:
-INSERT OR REPLACE INTO installment(id, title, totalAmount, installmentAmount, totalInstallments, paidInstallments, categoryId, sourceId, startDate, nextDueDate, frequency, description, isCompleted, reminderEnabled, postAsTransaction, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO installment(id, title, totalAmount, installmentAmount, totalInstallments, paidInstallments, categoryId, sourceId, startDate, nextDueDate, frequency, description, isCompleted, reminderEnabled, postAsTransaction, updatedAt, syncStatus, currencyCode)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getModifiedInstallments:
 SELECT * FROM installment WHERE syncStatus = 1;
 
 markInstallmentAsSynced:
 UPDATE installment SET syncStatus = 0 WHERE id = ?;
+
+batchConvertAmounts:
+UPDATE installment SET totalAmount = CAST(CAST(totalAmount AS REAL) * :rate AS INTEGER), installmentAmount = CAST(CAST(installmentAmount AS REAL) * :rate AS INTEGER), currencyCode = :newCode, updatedAt = :now, syncStatus = 1 WHERE currencyCode = :oldCode AND syncStatus != 2;

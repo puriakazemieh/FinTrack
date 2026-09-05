@@ -18,6 +18,7 @@ data class Debt(
     val reminderEnabled: Boolean = false,
     val personName: String? = null,
     val sourceName: String? = null,
+    val currencyCode: String = "IRT",
     override val updatedAt: Long = 0,
     override val syncStatus: SyncStatus = SyncStatus.SYNCED
 ) : SyncableEntity

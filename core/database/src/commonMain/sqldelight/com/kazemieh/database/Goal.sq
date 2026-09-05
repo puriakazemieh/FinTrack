@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS goal (
     templateId INTEGER REFERENCES goal_template(id),
     basketId INTEGER REFERENCES goal_basket(id),
     updatedAt INTEGER NOT NULL DEFAULT 0,
-    syncStatus INTEGER NOT NULL DEFAULT 0
+    syncStatus INTEGER NOT NULL DEFAULT 0,
+    currencyCode TEXT NOT NULL DEFAULT 'IRT'
 );
 
 CREATE TABLE IF NOT EXISTS goal_template (
@@ -73,12 +74,12 @@ getGoalById:
 SELECT * FROM goal WHERE id = ? AND syncStatus != 2;
 
 insertGoal:
-INSERT INTO goal(name, targetAmount, savedAmount, iconId, colorId, startDate, endDate, recurrence, monthlyTarget, type, category, priority, description, templateId, basketId, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO goal(name, targetAmount, savedAmount, iconId, colorId, startDate, endDate, recurrence, monthlyTarget, type, category, priority, description, templateId, basketId, updatedAt, syncStatus, currencyCode)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateGoal:
 UPDATE goal
-SET name = ?, targetAmount = ?, savedAmount = ?, iconId = ?, colorId = ?, startDate = ?, endDate = ?, recurrence = ?, monthlyTarget = ?, type = ?, category = ?, priority = ?, description = ?, templateId = ?, basketId = ?, updatedAt = ?, syncStatus = ?
+SET name = ?, targetAmount = ?, savedAmount = ?, iconId = ?, colorId = ?, startDate = ?, endDate = ?, recurrence = ?, monthlyTarget = ?, type = ?, category = ?, priority = ?, description = ?, templateId = ?, basketId = ?, updatedAt = ?, syncStatus = ?, currencyCode = ?
 WHERE id = ? AND syncStatus != 2;
 
 deleteGoal:
@@ -88,11 +89,14 @@ physicallyDeleteGoal:
 DELETE FROM goal WHERE id = ?;
 
 insertFullGoal:
-INSERT OR REPLACE INTO goal(id, name, targetAmount, savedAmount, iconId, colorId, startDate, endDate, recurrence, monthlyTarget, type, category, priority, description, templateId, basketId, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO goal(id, name, targetAmount, savedAmount, iconId, colorId, startDate, endDate, recurrence, monthlyTarget, type, category, priority, description, templateId, basketId, updatedAt, syncStatus, currencyCode)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getModifiedGoals:
 SELECT * FROM goal WHERE syncStatus = 1;
 
 markGoalAsSynced:
 UPDATE goal SET syncStatus = 0 WHERE id = ?;
+
+batchConvertAmounts:
+UPDATE goal SET targetAmount = CAST(CAST(targetAmount AS REAL) * :rate AS INTEGER), savedAmount = CAST(CAST(savedAmount AS REAL) * :rate AS INTEGER), monthlyTarget = CAST(CAST(monthlyTarget AS REAL) * :rate AS INTEGER), currencyCode = :newCode, updatedAt = :now, syncStatus = 1 WHERE currencyCode = :oldCode AND syncStatus != 2;

@@ -19,6 +19,7 @@ data class Installment(
     val isCompleted: Boolean = false, // آیا تمام اقساط پرداخت شده؟
     val reminderEnabled: Boolean = true,
     val postAsTransaction: Boolean = true,
+    val currencyCode: String = "IRT",
     override val updatedAt: Long = 0,
     override val syncStatus: SyncStatus = SyncStatus.SYNCED
 ) : SyncableEntity

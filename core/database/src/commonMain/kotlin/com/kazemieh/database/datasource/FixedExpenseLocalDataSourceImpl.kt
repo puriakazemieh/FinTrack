@@ -36,6 +36,7 @@ class FixedExpenseLocalDataSourceImpl(
                 isAutoPostEnabled = if (expense.isAutoPostEnabled) 1L else 0L,
                 isActive = if (expense.isActive) 1L else 0L,
                 updatedAt = now,
+            currencyCode = fixedExpense.currencyCode,
                 syncStatus = 1
             )
             val id = queries.lastInsertRowId().executeAsOne()
@@ -66,6 +67,7 @@ class FixedExpenseLocalDataSourceImpl(
                     isAutoPostEnabled = if (expense.isAutoPostEnabled) 1L else 0L,
                     isActive = if (expense.isActive) 1L else 0L,
                     updatedAt = now,
+            currencyCode = fixedExpense.currencyCode,
                     syncStatus = 1,
                     id = expense.id
                 )

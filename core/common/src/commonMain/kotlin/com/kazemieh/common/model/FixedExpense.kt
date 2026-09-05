@@ -23,6 +23,7 @@ data class FixedExpense(
     val tagNames: List<String> = emptyList(),
     val personIds: List<Long> = emptyList(),
     val personNames: List<String> = emptyList(),
+    val currencyCode: String = "IRT",
     override val updatedAt: Long = 0,
     override val syncStatus: SyncStatus = SyncStatus.SYNCED
 ) : SyncableEntity

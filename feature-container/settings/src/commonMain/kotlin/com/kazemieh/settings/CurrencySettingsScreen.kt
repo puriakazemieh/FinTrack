@@ -1,7 +1,6 @@
 package com.kazemieh.settings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,22 +13,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.Text
 import androidx.compose.material3.Surface
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -38,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
@@ -53,6 +46,8 @@ import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.glass.GlassTone
+import com.kazemieh.designsystem.component.glass.SheetFrame
 import com.kazemieh.designsystem.component.glass.Tabs
 import com.kazemieh.designsystem.component.glass.SearchBar
 import com.kazemieh.money.Currency
@@ -111,45 +106,99 @@ fun CurrencySettingsScreen(
             }
         }
     ) {
-        if (state.showConfirmDialog) {
-            AlertDialog(
-                onDismissRequest = { viewModel.onIntent(CurrencySettingsIntent.DismissDialogs) },
-                title = { androidx.compose.material3.Text(text = "تایید تغییر واحد پول") },
-                text = { androidx.compose.material3.Text(text = "آیا مایلید تراکنش های قبلی با نرخ روز به واحد جدید تبدیل شوند؟ در صورت انتخاب 'خیر'، تراکنش های قبلی با واحد قبلی خود نمایش داده می شوند.") },
-                confirmButton = {
-                    TextButton(onClick = { viewModel.onIntent(CurrencySettingsIntent.SubmitConfirmDialog(true)) }) {
-                        androidx.compose.material3.Text(text = "بله، تبدیل کن")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { viewModel.onIntent(CurrencySettingsIntent.SubmitConfirmDialog(false)) }) {
-                        androidx.compose.material3.Text(text = "خیر، به همان شکل بماند")
-                    }
-                }
-            )
+        // BottomSheet 1: Confirm currency change
+        if (state.showConfirmSheet) {
+            SheetFrame(
+                title = "تایید تغییر واحد پول",
+                sub = "واحد جدید: ${state.pendingCurrency?.code ?: ""}",
+                onDismiss = { viewModel.onIntent(CurrencySettingsIntent.DismissDialogs) },
+                isFullScreen = false,
+                primaryButtonText = "بله، مبالغ قبلی را تبدیل کن",
+                onPrimaryClick = { viewModel.onIntent(CurrencySettingsIntent.SubmitConfirmDialog(true)) },
+                secondaryButtonText = "خیر، فقط واحد پیش‌فرض عوض شود",
+                onSecondaryClick = { viewModel.onIntent(CurrencySettingsIntent.SubmitConfirmDialog(false)) }
+            ) {
+                Spacer(modifier = Modifier.height(8.dp))
+                FintrackBodyMediumText(
+                    text = "آیا مایلید تمام مبالغ قبلی (تراکنش‌ها، منابع مالی، بودجه‌ها، اقساط و ...) با نرخ تبدیل به واحد جدید تغییر کنند؟\n\nدر صورت انتخاب «خیر»، واحد پیش‌فرض عوض می‌شود ولی مبالغ قبلی دست‌نخورده باقی می‌مانند.",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
-        
-        if (state.showRateDialog) {
-            AlertDialog(
-                onDismissRequest = { viewModel.onIntent(CurrencySettingsIntent.DismissDialogs) },
-                title = { androidx.compose.material3.Text(text = "نرخ تبدیل") },
-                text = { 
-                    Column {
-                        androidx.compose.material3.Text(text = "لطفا نرخ تبدیل به واحد جدید را وارد کنید:")
-                        Spacer(modifier = Modifier.height(16.dp))
-                        FintrackOutlinedTextField(
-                            value = state.conversionRate,
-                            onValueChange = { viewModel.onIntent(CurrencySettingsIntent.UpdateRate(it)) },
-                            label = { androidx.compose.material3.Text("نرخ تبدیل") }
+
+        // BottomSheet 2: Exchange rate input
+        if (state.showRateSheet) {
+            SheetFrame(
+                title = "نرخ تبدیل",
+                sub = "${state.selectedCurrency.code} → ${state.pendingCurrency?.code ?: ""}",
+                onDismiss = { viewModel.onIntent(CurrencySettingsIntent.DismissDialogs) },
+                isFullScreen = false,
+                primaryButtonText = "تایید و اعمال تبدیل",
+                onPrimaryClick = { viewModel.onIntent(CurrencySettingsIntent.ConfirmRateDialog) }
+            ) {
+                Spacer(modifier = Modifier.height(8.dp))
+
+                FintrackBodyMediumText(
+                    text = "نرخ تبدیل از ${state.selectedCurrency.code} به ${state.pendingCurrency?.code ?: ""} را وارد کنید.\nتمام مبالغ ذخیره‌شده در این نرخ ضرب خواهند شد.",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                FintrackOutlinedTextField(
+                    value = state.conversionRate,
+                    onValueChange = { viewModel.onIntent(CurrencySettingsIntent.UpdateRate(it)) },
+                    label = { FintrackLabelMediumText("نرخ تبدیل") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Fetch rate from server button
+                GlassCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { viewModel.onIntent(CurrencySettingsIntent.FetchRateFromServer) },
+                    enabled = !state.isFetchingRate
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        if (state.isFetchingRate) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.size(8.dp))
+                        } else {
+                            Icon(
+                                Icons.Default.Refresh,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.size(8.dp))
+                        }
+                        FintrackBodyMediumText(
+                            text = if (state.isFetchingRate) "در حال دریافت..." else "دریافت نرخ از سرور",
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
-                },
-                confirmButton = {
-                    TextButton(onClick = { viewModel.onIntent(CurrencySettingsIntent.ConfirmRateDialog) }) {
-                        androidx.compose.material3.Text(text = "تایید")
-                    }
                 }
-            )
+
+                if (state.rateError != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    FintrackLabelMediumText(
+                        text = state.rateError!!,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
         Column(modifier = Modifier.fillMaxSize().padding(horizontal = space.large)) {
             SearchBar(

@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS budget (
     isAlertEnabled INTEGER NOT NULL DEFAULT 1,
     updatedAt INTEGER NOT NULL DEFAULT 0,
     syncStatus INTEGER NOT NULL DEFAULT 0,
+    currencyCode TEXT NOT NULL DEFAULT 'IRT',
     FOREIGN KEY (categoryId) REFERENCES category(id) ON DELETE CASCADE,
     FOREIGN KEY (sourceId) REFERENCES source(id) ON DELETE SET NULL
 );
@@ -48,12 +49,12 @@ getBudgetById:
 SELECT * FROM budget WHERE id = ? AND syncStatus != 2;
 
 insertBudget:
-INSERT INTO budget(categoryId, amount, period, startAt, tagIds, sourceId, personIds, isAlertEnabled, updatedAt, syncStatus)
-VALUES (:categoryId, :amount, :period, :startAt, :tagIds, :sourceId, :personIds, :isAlertEnabled, :updatedAt, :syncStatus);
+INSERT INTO budget(categoryId, amount, period, startAt, tagIds, sourceId, personIds, isAlertEnabled, updatedAt, syncStatus, currencyCode)
+VALUES (:categoryId, :amount, :period, :startAt, :tagIds, :sourceId, :personIds, :isAlertEnabled, :updatedAt, :syncStatus, :currencyCode);
 
 updateBudget:
 UPDATE budget
-SET categoryId = :categoryId, amount = :amount, period = :period, startAt = :startAt, tagIds = :tagIds, sourceId = :sourceId, personIds = :personIds, isAlertEnabled = :isAlertEnabled, updatedAt = :updatedAt, syncStatus = :syncStatus
+SET categoryId = :categoryId, amount = :amount, period = :period, startAt = :startAt, tagIds = :tagIds, sourceId = :sourceId, personIds = :personIds, isAlertEnabled = :isAlertEnabled, updatedAt = :updatedAt, syncStatus = :syncStatus, currencyCode = :currencyCode
 WHERE id = :id AND syncStatus != 2;
 
 deleteBudget:
@@ -63,8 +64,8 @@ physicallyDeleteBudget:
 DELETE FROM budget WHERE id = ?;
 
 insertFullBudget:
-INSERT OR REPLACE INTO budget(id, categoryId, amount, period, startAt, tagIds, sourceId, personIds, isAlertEnabled, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO budget(id, categoryId, amount, period, startAt, tagIds, sourceId, personIds, isAlertEnabled, updatedAt, syncStatus, currencyCode)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getModifiedBudgets:
 SELECT * FROM budget WHERE syncStatus = 1;
@@ -74,3 +75,6 @@ UPDATE budget SET syncStatus = 0 WHERE id = ?;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
+
+batchConvertAmounts:
+UPDATE budget SET amount = CAST(CAST(amount AS REAL) * :rate AS INTEGER), currencyCode = :newCode, updatedAt = :now, syncStatus = 1 WHERE currencyCode = :oldCode AND syncStatus != 2;

@@ -220,3 +220,6 @@ AND (:personIdsSize = 0 OR EXISTS (
 insertFullTransaction:
 INSERT OR REPLACE INTO transactions(id, amount, amountTransfer, categoryId, sourceId, sourceEndId, relatedDebtId, description, photoPath, timeStamp, type, updatedAt, syncStatus, currencyCode)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+batchConvertAmounts:
+UPDATE transactions SET amount = CAST(CAST(amount AS REAL) * :rate AS INTEGER), amountTransfer = CAST(CAST(COALESCE(amountTransfer, 0) AS REAL) * :rate AS INTEGER), currencyCode = :newCode, updatedAt = :now, syncStatus = 1 WHERE currencyCode = :oldCode AND syncStatus != 2;

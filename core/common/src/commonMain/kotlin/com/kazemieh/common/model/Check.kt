@@ -18,6 +18,7 @@ data class Check(
     val photoPath: String? = null,
     val description: String? = null,
     val isIncoming: Boolean = false, // True if received from others, False if issued by me
+    val currencyCode: String = "IRT",
     override val updatedAt: Long = 0,
     override val syncStatus: SyncStatus = SyncStatus.SYNCED
 ) : SyncableEntity

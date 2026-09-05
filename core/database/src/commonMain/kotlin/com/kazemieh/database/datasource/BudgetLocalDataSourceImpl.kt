@@ -104,6 +104,7 @@ class BudgetLocalDataSourceImpl(
             personIds = budget.personIds?.joinToString(","),
             isAlertEnabled = if (budget.isAlertEnabled) 1L else 0L,
             updatedAt = now,
+            currencyCode = budget.currencyCode,
             syncStatus = 1
         )
         queries.lastInsertRowId().executeAsOne()
@@ -122,6 +123,7 @@ class BudgetLocalDataSourceImpl(
             personIds = budget.personIds?.joinToString(","),
             isAlertEnabled = if (budget.isAlertEnabled) 1L else 0L,
             updatedAt = now,
+            currencyCode = budget.currencyCode,
             syncStatus = 1
         )
         1

@@ -97,4 +97,7 @@ val databaseModule = module {
     single<GoalLocalDataSource> {
         GoalLocalDataSourceImpl(db = get())
     }
+    single<CurrencyLocalDataSource> {
+        CurrencyLocalDataSourceImpl(db = get())
+    }
 }

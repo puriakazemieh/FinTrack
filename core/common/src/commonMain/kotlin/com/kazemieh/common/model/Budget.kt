@@ -13,6 +13,7 @@ data class Budget(
     val sourceId: Long? = null,
     val personIds: List<Long>? = null,
     val isAlertEnabled: Boolean = true,
+    val currencyCode: String = "IRT",
     override val updatedAt: Long = 0,
     override val syncStatus: SyncStatus = SyncStatus.SYNCED
 ) : SyncableEntity
