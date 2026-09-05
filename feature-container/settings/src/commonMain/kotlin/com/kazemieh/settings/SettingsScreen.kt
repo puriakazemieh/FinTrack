@@ -233,6 +233,16 @@ fun SettingsScreen(
         )
     }
 
+    if (state.showTextSettingsSheet) {
+        TextSettingsBottomSheet(
+            currentScale = state.textScale,
+            currentFont = state.textFont,
+            onScaleChanged = { viewModel.onIntent(SettingsIntent.SetTextScale(it)) },
+            onFontChanged = { viewModel.onIntent(SettingsIntent.SetTextFont(it)) },
+            onDismiss = { viewModel.onIntent(SettingsIntent.HideTextSettingsSheet) }
+        )
+    }
+
     FintrackScreen {
         LazyColumn(
             modifier = Modifier

@@ -22,7 +22,7 @@ fun TextSettingsBottomSheet(
     onDismiss: () -> Unit
 ) {
     SheetFrame(
-        title = "تنػیمات متن",
+        title = "تنظیمات متن",
         onDismiss = onDismiss,
         primaryButtonText = "تایید",
         onPrimaryClick = onDismiss,
@@ -35,7 +35,7 @@ fun TextSettingsBottomSheet(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             
-            FintrackBodyMediumText(text = "اندازه متق:")
+            FintrackBodyMediumText(text = "اندازه متن:")
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -67,7 +67,7 @@ fun TextSettingsBottomSheet(
                 TextFont.entries.forEach { font ->
                     val isSelected = font == currentFont
                     val label = when (font) {
-                        TextFont.VAZIRMATN -> "وزیرمتۆ (Vazirmatn)"
+                        TextFont.VAZIRMATN -> "وزیرمتن (Vazirmatn)"
                         TextFont.SHABNAM -> "شبنم (Shabnam)"
                         TextFont.SAHEL -> "ساحل (Sahel)"
                     }
