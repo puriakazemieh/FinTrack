@@ -30,7 +30,9 @@ import com.kazemieh.database.di.databaseModule
 import com.kazemieh.designsystem.AccentPalette
 import com.kazemieh.designsystem.AppTheme
 import com.kazemieh.designsystem.AppLanguage
+import com.kazemieh.designsystem.CalendarSystem
 import com.kazemieh.designsystem.FintrackTheme
+import com.kazemieh.designsystem.LocalCalendarSystem
 import com.kazemieh.designsystem.LocalCurrency
 import com.kazemieh.designsystem.LocalHideBalance
 import com.kazemieh.designsystem.TextScale
@@ -142,6 +144,11 @@ fun App() {
         AppLanguage.PERSIAN.languageTag
     ).collectAsState(AppLanguage.PERSIAN.languageTag)
 
+    val calendarSystemName by preferenceUseCases.getStringFlow(
+        FinTrackPreferences.PREF_CALENDAR_SYSTEM,
+        CalendarSystem.JALALI.name
+    ).collectAsState(CalendarSystem.JALALI.name)
+
     val isSystemDark = isSystemInDarkTheme()
 
     val calculatedTheme = remember(currentTheme, themeMode, isSystemDark, themeStartTime, themeEndTime) {
@@ -220,6 +227,7 @@ fun App() {
             LocalCurrency provides Currency.valueOf(currentCurrency),
             LocalHideBalance provides hideBalance.toBoolean(),
             LocalTextFont provides TextFont.fromName(textFontName),
+            LocalCalendarSystem provides CalendarSystem.fromName(calendarSystemName),
             androidx.compose.ui.platform.LocalDensity provides scaledDensity
         ) {
             FintrackTheme(

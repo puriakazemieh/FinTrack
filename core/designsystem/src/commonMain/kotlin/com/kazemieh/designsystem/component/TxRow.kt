@@ -160,7 +160,7 @@ fun TxRowMinimal(item: TransactionWithRelations, onClick: () -> Unit, onLongClic
 
         TransactionAmountAndDate(
             amount = if (item.transaction.type == TransactionType.TRANSFER) item.transaction.amountTransfer.toLong() else item.transaction.amount.toLong(),
-            date = item.transaction.date,
+            timestamp = item.transaction.timeStamp,
             color = color
         )
     }
@@ -242,7 +242,7 @@ fun TxRow(
 
             TransactionAmountAndDate(
                 amount = if (isTransfer) item.transaction.amountTransfer.toLong() else item.transaction.amount.toLong(),
-                date = item.transaction.date,
+                timestamp = item.transaction.timeStamp,
                 color = color
             )
         }
@@ -275,8 +275,9 @@ private fun TransactionIconBox(iconRes: DrawableResource, color: Color, bgColor:
 }
 
 @Composable
-private fun TransactionAmountAndDate(amount: Long, date: String, color: Color) {
+private fun TransactionAmountAndDate(amount: Long, timestamp: Long, color: Color) {
     val hidden = LocalHideBalance.current
+    val calendarSystem = com.kazemieh.designsystem.LocalCalendarSystem.current
     Column(horizontalAlignment = Alignment.End) {
         FintrackTitleSmallText(
             text = if (hidden) "••••••" else stringResource(
@@ -288,7 +289,7 @@ private fun TransactionAmountAndDate(amount: Long, date: String, color: Color) {
             color = color
         )
         FintrackLabelSmallText(
-            text = date,
+            text = com.kazemieh.designsystem.formatCalendarDate(timestamp, calendarSystem),
             fontSize = 10.sp,
             modifier = Modifier.padding(top = 2.dp)
         )

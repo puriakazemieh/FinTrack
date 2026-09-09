@@ -76,6 +76,8 @@ import org.jetbrains.compose.resources.stringResource
 
 
 import com.kazemieh.designsystem.LocalGlassColors
+import com.kazemieh.designsystem.CalendarSystem
+import com.kazemieh.designsystem.LocalCalendarSystem
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,6 +91,7 @@ fun JalaliDatePickerBottomSheet(
 ) {
     if (openSheet.value) {
         val glassColors = LocalGlassColors.current
+        val calendarSystem = LocalCalendarSystem.current
         val initial = remember(initialDate) { initialDate ?: JalaliCalendar() }
         var tempSelectedDate by remember { mutableStateOf(initial) }
 
@@ -97,7 +100,15 @@ fun JalaliDatePickerBottomSheet(
             onDismiss = { openSheet.value = false },
             isFullScreen = false
         ) {
-            JalaliCalendarView(
+            if (calendarSystem == CalendarSystem.GREGORIAN) {
+                GregorianCalendarView(
+                    openSheet = openSheet,
+                    initialDate = initial,
+                    disableBeforeDate = disableBeforeDate,
+                    disableAfterDate = disableAfterDate,
+                    onConfirm = onConfirm,
+                )
+            } else JalaliCalendarView(
                 openDialog = openSheet,
                 initialDate = initial,
                 disableBeforeDate = disableBeforeDate,

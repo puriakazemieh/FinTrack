@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.designsystem.AppTheme
 import com.kazemieh.designsystem.AppLanguage
+import com.kazemieh.designsystem.CalendarSystem
 import com.kazemieh.designsystem.TextScale
 import com.kazemieh.designsystem.TextFont
 import com.kazemieh.designsystem.ThemeMode
@@ -168,6 +169,12 @@ class SettingsViewModel(
                     preferenceUseCases.getStringPreference(
                         FinTrackPreferences.PREF_LANGUAGE,
                         AppLanguage.PERSIAN.languageTag
+                    )
+                ),
+                selectedCalendarSystem = CalendarSystem.fromName(
+                    preferenceUseCases.getStringPreference(
+                        FinTrackPreferences.PREF_CALENDAR_SYSTEM,
+                        CalendarSystem.JALALI.name
                     )
                 )
             )
@@ -359,6 +366,24 @@ class SettingsViewModel(
                     )
                 }
             }
+            SettingsIntent.ShowCalendarSettingsSheet -> {
+                _state.update { it.copy(showCalendarSettingsSheet = true) }
+            }
+            SettingsIntent.HideCalendarSettingsSheet -> {
+                _state.update { it.copy(showCalendarSettingsSheet = false) }
+            }
+            is SettingsIntent.SetCalendarSystem -> {
+                preferenceUseCases.setStringPreference(
+                    FinTrackPreferences.PREF_CALENDAR_SYSTEM,
+                    intent.calendarSystem.name
+                )
+                _state.update {
+                    it.copy(
+                        selectedCalendarSystem = intent.calendarSystem,
+                        showCalendarSettingsSheet = false
+                    )
+                }
+            }
 
             SettingsIntent.Logout -> {
                 preferenceUseCases.clearPreferences()
@@ -391,6 +416,8 @@ data class SettingsState(
     val showTextSettingsSheet: Boolean = false,
     val selectedLanguage: AppLanguage = AppLanguage.PERSIAN,
     val showLanguageSettingsSheet: Boolean = false,
+    val selectedCalendarSystem: CalendarSystem = CalendarSystem.JALALI,
+    val showCalendarSettingsSheet: Boolean = false,
     val transactionCount: Int = 0,
     val activeDays: Int = 0,
     val toolCount: Int = TOOL_COUNT,
@@ -412,6 +439,9 @@ sealed interface SettingsIntent {
     data object ShowLanguageSettingsSheet : SettingsIntent
     data object HideLanguageSettingsSheet : SettingsIntent
     data class SetLanguage(val language: AppLanguage) : SettingsIntent
+    data object ShowCalendarSettingsSheet : SettingsIntent
+    data object HideCalendarSettingsSheet : SettingsIntent
+    data class SetCalendarSystem(val calendarSystem: CalendarSystem) : SettingsIntent
     data object ToggleDarkMode : SettingsIntent
     data object ToggleFingerprint : SettingsIntent
     data object ToggleBackup : SettingsIntent

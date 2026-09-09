@@ -154,7 +154,10 @@ private fun DetailAmountCard(item: TransactionWithRelations) {
                 )
                 Spacer(Modifier.width(6.dp))
                 FintrackBodyMediumText(
-                    text = item.transaction.date,
+                    text = com.kazemieh.designsystem.formatCalendarDate(
+                        item.transaction.timeStamp,
+                        com.kazemieh.designsystem.LocalCalendarSystem.current,
+                    ),
                     color = LocalGlassColors.current.text2
                 )
             }

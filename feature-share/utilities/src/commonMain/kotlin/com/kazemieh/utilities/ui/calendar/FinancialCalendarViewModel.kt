@@ -10,12 +10,21 @@ import com.kazemieh.common.persiandatetime.domain.PersianDateTime
 import com.kazemieh.common.persiandatetime.extensions.monthLength
 import com.kazemieh.common.persiandatetime.extensions.persianMonth
 import com.kazemieh.common.persiandatetime.extensions.toEpochMilliseconds
+import com.kazemieh.designsystem.CalendarSystem
+import com.kazemieh.designsystem.gregorianMonthLength
 import com.kazemieh.domain.usecase.ObserveTransactionsUseCase
 import com.kazemieh.jalali.JalaliCalendar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /** Net income/expense total for a single day of the viewed month. */
 data class DayTotal(
@@ -32,15 +41,20 @@ data class FinancialCalendarState(
     val isLoading: Boolean = false,
     val dayTotals: Map<Int, DayTotal> = emptyMap(),
     val selectedDay: Int? = null,
-    val selectedDayTransactions: List<TransactionWithRelations> = emptyList()
+    val selectedDayTransactions: List<TransactionWithRelations> = emptyList(),
+    val calendarSystem: CalendarSystem = CalendarSystem.JALALI,
 ) {
-    val monthLabel: String get() = PersianDateTime(year, month, 1).persianMonth().displayName
+    val monthLabel: String get() = when (calendarSystem) {
+        CalendarSystem.JALALI -> PersianDateTime(year, month, 1).persianMonth().displayName
+        CalendarSystem.GREGORIAN -> month.toString().padStart(2, '0')
+    }
 }
 
 sealed interface FinancialCalendarIntent {
     data object PreviousMonth : FinancialCalendarIntent
     data object NextMonth : FinancialCalendarIntent
     data class SelectDay(val day: Int) : FinancialCalendarIntent
+    data class SetCalendarSystem(val calendarSystem: CalendarSystem) : FinancialCalendarIntent
     data object ClearSelection : FinancialCalendarIntent
 }
 
@@ -53,6 +67,7 @@ class FinancialCalendarViewModel(
     val state: StateFlow<FinancialCalendarState> = _state.asStateFlow()
 
     private var allMonthTransactions: List<TransactionWithRelations> = emptyList()
+    private var monthLoadingJob: Job? = null
 
     init {
         analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("calendar"))
@@ -74,8 +89,36 @@ class FinancialCalendarViewModel(
             }
 
             is FinancialCalendarIntent.SelectDay -> {
-                val dayTx = allMonthTransactions.filter { runCatching { PersianDateTime.parse(it.transaction.date).day }.getOrNull() == intent.day }
+                val dayTx = allMonthTransactions.filter { item ->
+                    dayForTimestamp(item.transaction.timeStamp, _state.value.calendarSystem) == intent.day
+                }
                 _state.value = _state.value.copy(selectedDay = intent.day, selectedDayTransactions = dayTx)
+            }
+
+            is FinancialCalendarIntent.SetCalendarSystem -> {
+                if (intent.calendarSystem == _state.value.calendarSystem) return
+                val currentJalali = JalaliCalendar.today()
+                val isInitialMonth = _state.value.calendarSystem == CalendarSystem.JALALI &&
+                    _state.value.year == currentJalali.year && _state.value.month == currentJalali.month &&
+                    _state.value.selectedDay == null
+                val timestamp = if (isInitialMonth) {
+                    Clock.System.now().toEpochMilliseconds()
+                } else {
+                    monthStartTimestamp(
+                        _state.value.year,
+                        _state.value.month,
+                        _state.value.calendarSystem,
+                    )
+                }
+                val (year, month) = yearMonthForTimestamp(timestamp, intent.calendarSystem)
+                _state.value = _state.value.copy(
+                    year = year,
+                    month = month,
+                    calendarSystem = intent.calendarSystem,
+                    selectedDay = null,
+                    selectedDayTransactions = emptyList(),
+                )
+                loadMonth()
             }
 
             FinancialCalendarIntent.ClearSelection -> {
@@ -95,11 +138,13 @@ class FinancialCalendarViewModel(
     private fun loadMonth() {
         val year = _state.value.year
         val month = _state.value.month
-        val monthLength = PersianDateTime(year, month, 1).monthLength()
-        val from = PersianDateTime(year, month, 1, 0, 0, 0).toEpochMilliseconds()
-        val to = PersianDateTime(year, month, monthLength, 23, 59, 59).toEpochMilliseconds()
+        val calendarSystem = _state.value.calendarSystem
+        val monthLength = monthLength(year, month, calendarSystem)
+        val from = monthStartTimestamp(year, month, calendarSystem)
+        val to = monthStartTimestamp(year, month, calendarSystem, monthLength).plus(86_399_999)
 
-        viewModelScope.launch {
+        monthLoadingJob?.cancel()
+        monthLoadingJob = viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
             observeTransactions(
                 TransactionFilterParams(fromTimestamp = from, toTimestamp = to),
@@ -108,7 +153,7 @@ class FinancialCalendarViewModel(
                 allMonthTransactions = page.items
                 val totals = mutableMapOf<Int, DayTotal>()
                 page.items.forEach { item ->
-                    val day = runCatching { PersianDateTime.parse(item.transaction.date).day }.getOrNull() ?: return@forEach
+                    val day = dayForTimestamp(item.transaction.timeStamp, calendarSystem) ?: return@forEach
                     val current = totals[day] ?: DayTotal()
                     totals[day] = when (item.transaction.type) {
                         TransactionType.INCOME -> current.copy(income = current.income + item.transaction.amount)
@@ -120,4 +165,30 @@ class FinancialCalendarViewModel(
             }
         }
     }
+
+    private fun monthLength(year: Int, month: Int, calendarSystem: CalendarSystem): Int = when (calendarSystem) {
+        CalendarSystem.JALALI -> PersianDateTime(year, month, 1).monthLength()
+        CalendarSystem.GREGORIAN -> gregorianMonthLength(year, month)
+    }
+
+    private fun monthStartTimestamp(year: Int, month: Int, calendarSystem: CalendarSystem, day: Int = 1): Long =
+        when (calendarSystem) {
+            CalendarSystem.JALALI -> PersianDateTime(year, month, day, 0, 0, 0).toEpochMilliseconds()
+            CalendarSystem.GREGORIAN -> LocalDate(year, month, day)
+                .atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+        }
+
+    private fun yearMonthForTimestamp(timestamp: Long, calendarSystem: CalendarSystem): Pair<Int, Int> = when (calendarSystem) {
+        CalendarSystem.JALALI -> PersianDateTime.parse(timestamp).let { it.year to it.month }
+        CalendarSystem.GREGORIAN -> Instant.fromEpochMilliseconds(timestamp)
+            .toLocalDateTime(TimeZone.currentSystemDefault()).date.let { it.year to it.monthNumber }
+    }
+
+    private fun dayForTimestamp(timestamp: Long, calendarSystem: CalendarSystem): Int? = runCatching {
+        when (calendarSystem) {
+            CalendarSystem.JALALI -> PersianDateTime.parse(timestamp).day
+            CalendarSystem.GREGORIAN -> Instant.fromEpochMilliseconds(timestamp)
+                .toLocalDateTime(TimeZone.currentSystemDefault()).dayOfMonth
+        }
+    }.getOrNull()
 }

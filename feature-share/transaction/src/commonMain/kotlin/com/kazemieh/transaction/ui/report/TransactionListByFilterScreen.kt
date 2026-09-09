@@ -41,7 +41,9 @@ import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalGlassColors
+import com.kazemieh.designsystem.LocalCalendarSystem
 import com.kazemieh.designsystem.LocalSpacing
+import com.kazemieh.designsystem.formatCalendarDate
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
@@ -138,8 +140,9 @@ fun TransactionListByFilterContent(
             }
     }
 
-    val groupedItems = remember(state.items) {
-        state.items.groupBy { it.transaction.date }
+    val calendarSystem = LocalCalendarSystem.current
+    val groupedItems = remember(state.items, calendarSystem) {
+        state.items.groupBy { formatCalendarDate(it.transaction.timeStamp, calendarSystem) }
     }
 
     LazyColumn(

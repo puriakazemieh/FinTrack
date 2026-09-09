@@ -9,6 +9,7 @@
     <string name="label_language">Sprache</string>
     <string name="label_calendar_fa">Kalender</string>
     <string name="label_jalali">Jalali</string>
+    <string name="label_gregorian">Gregorian</string>
     <string name="label_persian">فارسی</string>
     <string name="label_english">English</string>
     <string name="label_german">Deutsch</string>

@@ -98,44 +98,26 @@ dependencies {
     implementation(libs.firebase.crashlytics)
 }
 
-afterEvaluate {
-    // ---------- :composeApp ----------
-    val composeAppProject = project(":composeApp")
-    val composeParentResources =
-        File(composeAppProject.buildDir, "processedResources/jvm/main")
-    android.sourceSets["main"].assets.srcDir(composeParentResources.absolutePath)
+/**
+ * Compose resources from KMP libraries are runtime assets on Android. A normal Android app does
+ * not merge them automatically, so copy both generated trees before every variant's asset merge.
+ */
+val copyKmpComposeResourcesForAndroid by tasks.registering(org.gradle.api.tasks.Copy::class) {
+    dependsOn(
+        ":composeApp:jvmProcessResources",
+        ":core:designsystem:jvmProcessResources",
+    )
+    from(project(":composeApp").layout.buildDirectory.dir("processedResources/jvm/main"))
+    from(project(":core:designsystem").layout.buildDirectory.dir("processedResources/jvm/main"))
+    into(layout.buildDirectory.dir("generated/kmpComposeResources/android"))
+}
 
-    tasks.matching { 
-        (it.name.startsWith("merge") && it.name.endsWith("Assets")) ||
-        it.name.contains("Lint", ignoreCase = true)
+android.sourceSets["main"].assets.srcDir(
+    layout.buildDirectory.dir("generated/kmpComposeResources/android").get().asFile
+)
+
+tasks.configureEach {
+    if (name.startsWith("merge") && name.endsWith("Assets")) {
+        dependsOn(copyKmpComposeResourcesForAndroid)
     }
-        .configureEach {
-            dependsOn(
-                composeAppProject.tasks.matching {
-                    it.name.equals("copyJvmMainComposeResourcesForAndroid", ignoreCase = true) ||
-                            it.name.equals("processJvmMainResources", ignoreCase = true) ||
-                            it.name.equals("jvmProcessResources", ignoreCase = true)
-                }
-            )
-        }
-
-    // ---------- :core:designsystem ----------
-    val designSystemProject = project(":core:designsystem")
-    val designSystemParentResources =
-        File(designSystemProject.buildDir, "processedResources/jvm/main")
-    android.sourceSets["main"].assets.srcDir(designSystemParentResources.absolutePath)
-
-    tasks.matching { 
-        (it.name.startsWith("merge") && it.name.endsWith("Assets")) ||
-        it.name.contains("Lint", ignoreCase = true)
-    }
-        .configureEach {
-            dependsOn(
-                designSystemProject.tasks.matching {
-                    it.name.equals("copyJvmMainComposeResourcesForAndroid", ignoreCase = true) ||
-                            it.name.equals("processJvmMainResources", ignoreCase = true) ||
-                            it.name.equals("jvmProcessResources", ignoreCase = true)
-                }
-            )
-        }
 }

@@ -297,7 +297,10 @@ fun TransactionItem(
                 FintrackBodySmallText(
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.End,
-                    text = trx.date + " • " + com.kazemieh.common.util.DateUtils.formatTime(trx.timeStamp),
+                    text = com.kazemieh.designsystem.formatCalendarDate(
+                        trx.timeStamp,
+                        com.kazemieh.designsystem.LocalCalendarSystem.current,
+                    ) + " • " + com.kazemieh.common.util.DateUtils.formatTime(trx.timeStamp),
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }

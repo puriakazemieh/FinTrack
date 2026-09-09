@@ -305,6 +305,7 @@ private fun BottomSheetContent(
 
         AddTransactionSheet.DatePicker -> {
             val openSheet = remember { mutableStateOf(true) }
+            val calendarSystem = com.kazemieh.designsystem.LocalCalendarSystem.current
             LaunchedEffect(openSheet.value) {
                 if (!openSheet.value) {
                     onIntent(AddTransactionIntent.PopSheet)
@@ -315,7 +316,10 @@ private fun BottomSheetContent(
                 onConfirm = { jalaliCalendar ->
                     onIntent(
                         AddTransactionIntent.SetDate(
-                            date = "${jalaliCalendar.day.toPersianDigits()} / ${jalaliCalendar.monthString} / ${jalaliCalendar.year.toPersianDigits()}",
+                            date = com.kazemieh.designsystem.formatCalendarDate(
+                                jalaliCalendar.toTimestamp(),
+                                calendarSystem
+                            ),
                             timeStamp = jalaliCalendar.toTimestamp()
                         )
                     )

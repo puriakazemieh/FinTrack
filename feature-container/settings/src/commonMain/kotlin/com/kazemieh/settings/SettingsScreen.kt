@@ -107,6 +107,7 @@ import fintrack.core.designsystem.generated.resources.label_calendar_fa
 import fintrack.core.designsystem.generated.resources.label_currency
 import fintrack.core.designsystem.generated.resources.label_english
 import fintrack.core.designsystem.generated.resources.label_german
+import fintrack.core.designsystem.generated.resources.label_gregorian
 import fintrack.core.designsystem.generated.resources.label_google_drive_backup
 import fintrack.core.designsystem.generated.resources.label_jalali
 import fintrack.core.designsystem.generated.resources.label_language
@@ -255,6 +256,14 @@ fun SettingsScreen(
         )
     }
 
+    if (state.showCalendarSettingsSheet) {
+        CalendarSettingsBottomSheet(
+            selectedCalendarSystem = state.selectedCalendarSystem,
+            onCalendarSelected = { viewModel.onIntent(SettingsIntent.SetCalendarSystem(it)) },
+            onDismiss = { viewModel.onIntent(SettingsIntent.HideCalendarSettingsSheet) },
+        )
+    }
+
     FintrackScreen {
         LazyColumn(
             modifier = Modifier
@@ -320,7 +329,11 @@ fun SettingsScreen(
                     SettingItem(
                         title = stringResource(Res.string.label_calendar_fa),
                         icon = Icons.Default.CalendarMonth,
-                        value = stringResource(Res.string.label_jalali)
+                        value = when (state.selectedCalendarSystem) {
+                            com.kazemieh.designsystem.CalendarSystem.JALALI -> stringResource(Res.string.label_jalali)
+                            com.kazemieh.designsystem.CalendarSystem.GREGORIAN -> stringResource(Res.string.label_gregorian)
+                        },
+                        onClick = { viewModel.onIntent(SettingsIntent.ShowCalendarSettingsSheet) }
                     )
                 }
             }

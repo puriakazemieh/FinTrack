@@ -22,6 +22,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,6 +37,9 @@ import com.kazemieh.common.toPersianPrice
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalGlassColors
+import com.kazemieh.designsystem.CalendarSystem
+import com.kazemieh.designsystem.LocalCalendarSystem
+import com.kazemieh.designsystem.gregorianMonthLength
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
@@ -44,6 +48,11 @@ import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.jalali.JalaliCalendar
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.isoDayNumber
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.dp_dow_fri
 import fintrack.core.designsystem.generated.resources.dp_dow_mon
@@ -68,6 +77,11 @@ fun FinancialCalendarScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
     val glassColors = LocalGlassColors.current
+    val calendarSystem = LocalCalendarSystem.current
+
+    LaunchedEffect(calendarSystem) {
+        viewModel.onIntent(FinancialCalendarIntent.SetCalendarSystem(calendarSystem))
+    }
 
     FintrackScreen(
         title = stringResource(Res.string.financial_calendar_title),
@@ -77,7 +91,11 @@ fun FinancialCalendarScreen(
         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = space.large)) {
 
             MonthHeader(
-                label = "${state.monthLabel} ${state.year.toString().toPersianDigits()}",
+                label = if (state.calendarSystem == CalendarSystem.JALALI) {
+                    "${state.monthLabel} ${state.year.toString().toPersianDigits()}"
+                } else {
+                    "${state.year} / ${state.monthLabel}"
+                },
                 onPrevious = { viewModel.onIntent(FinancialCalendarIntent.PreviousMonth) },
                 onNext = { viewModel.onIntent(FinancialCalendarIntent.NextMonth) }
             )
@@ -106,7 +124,7 @@ fun FinancialCalendarScreen(
 
             Spacer(Modifier.height(space.large))
 
-            WeekdayHeader()
+            WeekdayHeader(state.calendarSystem)
             Spacer(Modifier.height(space.small))
 
             if (state.isLoading && state.dayTotals.isEmpty()) {
@@ -117,6 +135,7 @@ fun FinancialCalendarScreen(
                 CalendarGrid(
                     year = state.year,
                     month = state.month,
+                    calendarSystem = state.calendarSystem,
                     dayTotals = state.dayTotals,
                     selectedDay = state.selectedDay,
                     onDayClick = { viewModel.onIntent(FinancialCalendarIntent.SelectDay(it)) }
@@ -127,7 +146,11 @@ fun FinancialCalendarScreen(
 
             if (state.selectedDay != null) {
                 FintrackLabelMediumText(
-                    text = "${state.selectedDay.toString().toPersianDigits()} ${state.monthLabel}",
+                    text = if (state.calendarSystem == CalendarSystem.JALALI) {
+                        "${state.selectedDay.toString().toPersianDigits()} ${state.monthLabel}"
+                    } else {
+                        "${state.selectedDay.toString().padStart(2, '0')} / ${state.monthLabel}"
+                    },
                     fontWeight = FontWeight.Bold,
                     color = glassColors.text
                 )
@@ -184,10 +207,13 @@ private fun MonthSummaryChip(modifier: Modifier = Modifier, label: String, amoun
 }
 
 @Composable
-private fun WeekdayHeader() {
-    val labels = listOf(
+private fun WeekdayHeader(calendarSystem: CalendarSystem) {
+    val labels = if (calendarSystem == CalendarSystem.JALALI) listOf(
         Res.string.dp_dow_sat, Res.string.dp_dow_sun, Res.string.dp_dow_mon, Res.string.dp_dow_tue,
         Res.string.dp_dow_wed, Res.string.dp_dow_thu, Res.string.dp_dow_fri
+    ) else listOf(
+        Res.string.dp_dow_sun, Res.string.dp_dow_mon, Res.string.dp_dow_tue, Res.string.dp_dow_wed,
+        Res.string.dp_dow_thu, Res.string.dp_dow_fri, Res.string.dp_dow_sat
     )
     Row(modifier = Modifier.fillMaxWidth()) {
         labels.forEach { res ->
@@ -205,10 +231,15 @@ private fun WeekdayHeader() {
 private fun CalendarGrid(
     year: Int,
     month: Int,
+    calendarSystem: CalendarSystem,
     dayTotals: Map<Int, DayTotal>,
     selectedDay: Int?,
     onDayClick: (Int) -> Unit
 ) {
+    if (calendarSystem == CalendarSystem.GREGORIAN) {
+        GregorianCalendarGrid(year, month, dayTotals, selectedDay, onDayClick)
+        return
+    }
     val firstDay = remember(year, month) { JalaliCalendar(year, month, 1) }
     val today = remember { JalaliCalendar.today() }
     val leadingBlanks = firstDay.dayOfWeek
@@ -245,12 +276,56 @@ private fun CalendarGrid(
 }
 
 @Composable
+private fun GregorianCalendarGrid(
+    year: Int,
+    month: Int,
+    dayTotals: Map<Int, DayTotal>,
+    selectedDay: Int?,
+    onDayClick: (Int) -> Unit,
+) {
+    val firstDay = remember(year, month) { LocalDate(year, month, 1) }
+    val today = remember { Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date }
+    val leadingBlanks = firstDay.dayOfWeek.isoDayNumber % 7
+    val cells = remember(year, month, leadingBlanks) {
+        buildList {
+            repeat(leadingBlanks) { add(null) }
+            for (day in 1..gregorianMonthLength(year, month)) add(day)
+        }
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        cells.chunked(7).forEach { week ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                week.forEach { day ->
+                    Box(modifier = Modifier.weight(1f).aspectRatio(1f)) {
+                        if (day != null) {
+                            DayCell(
+                                day = day,
+                                total = dayTotals[day],
+                                isToday = today.year == year && today.monthNumber == month && today.dayOfMonth == day,
+                                isSelected = selectedDay == day,
+                                onClick = { onDayClick(day) },
+                                usePersianDigits = false,
+                            )
+                        }
+                    }
+                }
+                repeat(7 - week.size) { Spacer(modifier = Modifier.weight(1f)) }
+            }
+        }
+    }
+}
+
+@Composable
 private fun DayCell(
     day: Int,
     total: DayTotal?,
     isToday: Boolean,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    usePersianDigits: Boolean = true,
 ) {
     val glassColors = LocalGlassColors.current
     val dotColor = when {
@@ -275,7 +350,7 @@ private fun DayCell(
         verticalArrangement = Arrangement.Center
     ) {
         FintrackLabelSmallText(
-            text = day.toString().toPersianDigits(),
+            text = if (usePersianDigits) day.toString().toPersianDigits() else day.toString(),
             color = if (isSelected) glassColors.accent else glassColors.text,
             fontWeight = if (isToday || isSelected) FontWeight.Bold else FontWeight.Normal
         )

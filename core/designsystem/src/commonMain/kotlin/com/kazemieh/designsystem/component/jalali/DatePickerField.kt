@@ -19,7 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
-import com.kazemieh.common.toPersianDigits
+import com.kazemieh.designsystem.LocalCalendarSystem
+import com.kazemieh.designsystem.formatCalendarDate
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalGlassColors
@@ -35,7 +36,7 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerField(
-    selectedDate: String? = "${JalaliCalendar().day.toPersianDigits()} / ${JalaliCalendar().monthString} / ${JalaliCalendar().year.toPersianDigits()}",
+    selectedDate: String? = null,
     labelText: String = stringResource(Res.string.date),
     isError: Boolean = false,
     clickable: Boolean = true,
@@ -43,6 +44,8 @@ fun DatePickerField(
     onDateSelected: (String, Long) -> Unit
 ) {
     val openSheet = remember { mutableStateOf(false) }
+    val calendarSystem = LocalCalendarSystem.current
+    val todayTimestamp = JalaliCalendar().toTimestamp()
 
     JalaliDatePickerBottomSheet(
         openSheet = openSheet,
@@ -50,15 +53,13 @@ fun DatePickerField(
             JalaliCalendar.fromTimestamp(disableBeforeDate) else null,
         onConfirm = {
             val timestamp = it.toTimestamp()
-            val date =
-                "${it.day.toPersianDigits()} / ${it.monthString} / ${it.year.toPersianDigits()}"
-            onDateSelected(date, timestamp)
+            onDateSelected(formatCalendarDate(timestamp, calendarSystem), timestamp)
         },
     )
 
     FintrackOutlinedTextField(
         value = selectedDate
-            ?: "${JalaliCalendar().day.toPersianDigits()} / ${JalaliCalendar().monthString} / ${JalaliCalendar().year.toPersianDigits()}",
+            ?: formatCalendarDate(todayTimestamp, calendarSystem),
         onClick = { if (clickable) openSheet.value = true },
         readOnly = true,
         enabled = false,
