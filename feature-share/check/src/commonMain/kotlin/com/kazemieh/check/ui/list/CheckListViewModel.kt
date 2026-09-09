@@ -14,6 +14,8 @@ import com.kazemieh.domain.usecase.CheckUseCaseGroup
 import com.kazemieh.domain.usecase.AddTransactionUseCase
 import com.kazemieh.domain.usecase.GetDefaultCategoryUseCase
 import com.kazemieh.domain.usecase.GetDefaultFinancialSourceUseCase
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.check_passed_transaction_description
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,6 +23,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
+import org.jetbrains.compose.resources.getString
 
 class CheckListViewModel(
     private val analytics: com.kazemieh.common.analytics.AnalyticsService,
@@ -139,7 +142,10 @@ class CheckListViewModel(
                         categoryId = check.categoryId ?: defaultCat ?: 0L,
                         sourceId = check.sourceId ?: defaultSrc ?: 0L,
                         type = if (check.isIncoming) TransactionType.INCOME else TransactionType.EXPENSE,
-                        description = "پاس شدن چک: ${check.description ?: ""}"
+                        description = getString(
+                            Res.string.check_passed_transaction_description,
+                            check.description.orEmpty()
+                        )
                     )
                     addTransactionUseCase(
                         transaction = transaction,

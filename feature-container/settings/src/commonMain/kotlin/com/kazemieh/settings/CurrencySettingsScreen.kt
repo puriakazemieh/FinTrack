@@ -46,6 +46,7 @@ import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
+import com.kazemieh.designsystem.component.model.asString
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.GlassTone
@@ -101,19 +102,19 @@ fun CurrencySettingsScreen(
         // BottomSheet 1: Confirm currency change
         if (state.showConfirmSheet) {
             SheetFrame(
-                title = "تایید تغییر واحد پول",
-                sub = "واحد جدید: ${state.pendingCurrency?.code ?: ""}",
+                title = stringResource(Res.string.currency_change_confirm_title),
+                sub = stringResource(Res.string.currency_new_unit, state.pendingCurrency?.code ?: ""),
                 onDismiss = { viewModel.onIntent(CurrencySettingsIntent.DismissDialogs) },
                 isFullScreen = false,
                 sheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = false),
-                primaryButtonText = "بله، مبالغ قبلی را تبدیل کن",
+                primaryButtonText = stringResource(Res.string.currency_convert_previous),
                 onPrimaryClick = { viewModel.onIntent(CurrencySettingsIntent.SubmitConfirmDialog(true)) },
-                secondaryButtonText = "خیر، فقط واحد پیش‌فرض عوض شود",
+                secondaryButtonText = stringResource(Res.string.currency_change_default_only),
                 onSecondaryClick = { viewModel.onIntent(CurrencySettingsIntent.SubmitConfirmDialog(false)) }
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
                 FintrackBodyMediumText(
-                    text = "آیا مایلید تمام مبالغ قبلی (تراکنش‌ها، منابع مالی، بودجه‌ها، اقساط و ...) با نرخ تبدیل به واحد جدید تغییر کنند؟\n\nدر صورت انتخاب «خیر»، واحد پیش‌فرض عوض می‌شود ولی مبالغ قبلی دست‌نخورده باقی می‌مانند.",
+                    text = stringResource(Res.string.currency_change_confirm_message),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -122,17 +123,25 @@ fun CurrencySettingsScreen(
         // BottomSheet 2: Exchange rate input
         if (state.showRateSheet) {
             SheetFrame(
-                title = "نرخ تبدیل",
+                title = stringResource(Res.string.currency_conversion_rate),
                 sub = "${state.selectedCurrency.code} → ${state.pendingCurrency?.code ?: ""}",
                 onDismiss = { viewModel.onIntent(CurrencySettingsIntent.DismissDialogs) },
                 isFullScreen = false,
-                primaryButtonText = if (state.isConverting) "در حال تبدیل..." else "تایید و اعمال تبدیل",
+                primaryButtonText = if (state.isConverting) {
+                    stringResource(Res.string.currency_conversion_in_progress)
+                } else {
+                    stringResource(Res.string.currency_confirm_conversion)
+                },
                 onPrimaryClick = if (state.isConverting) null else { { viewModel.onIntent(CurrencySettingsIntent.ConfirmRateDialog) } }
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 FintrackBodyMediumText(
-                    text = "نرخ تبدیل از ${state.selectedCurrency.code} به ${state.pendingCurrency?.code ?: ""} را وارد کنید.\nتمام مبالغ ذخیره‌شده در این نرخ ضرب خواهند شد.",
+                    text = stringResource(
+                        Res.string.currency_conversion_rate_description,
+                        state.selectedCurrency.code,
+                        state.pendingCurrency?.code ?: ""
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
@@ -141,7 +150,11 @@ fun CurrencySettingsScreen(
                 FintrackOutlinedTextField(
                     value = state.conversionRate,
                     onValueChange = { viewModel.onIntent(CurrencySettingsIntent.UpdateRate(it)) },
-                    label = { FintrackLabelMediumText("نرخ تبدیل") },
+                    label = {
+                        FintrackLabelMediumText(
+                            stringResource(Res.string.currency_conversion_rate)
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -175,7 +188,11 @@ fun CurrencySettingsScreen(
                             Spacer(modifier = Modifier.size(8.dp))
                         }
                         FintrackBodyMediumText(
-                            text = if (state.isFetchingRate) "در حال دریافت..." else "دریافت نرخ از سرور",
+                            text = if (state.isFetchingRate) {
+                                stringResource(Res.string.currency_fetching_rate)
+                            } else {
+                                stringResource(Res.string.currency_fetch_rate)
+                            },
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -185,7 +202,7 @@ fun CurrencySettingsScreen(
                 if (state.rateError != null) {
                     Spacer(modifier = Modifier.height(8.dp))
                     FintrackLabelMediumText(
-                        text = state.rateError!!,
+                        text = state.rateError!!.asString(),
                         color = MaterialTheme.colorScheme.error
                     )
                 }
@@ -249,7 +266,10 @@ fun CurrencySettingsScreen(
                 ) {
                     Box(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
                         FintrackBodyLargeText(
-                            text = "تایید و تغییر واحد به ${state.pendingCurrency?.code ?: ""}",
+                            text = stringResource(
+                                Res.string.currency_confirm_change_to,
+                                state.pendingCurrency?.code ?: ""
+                            ),
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
                         )

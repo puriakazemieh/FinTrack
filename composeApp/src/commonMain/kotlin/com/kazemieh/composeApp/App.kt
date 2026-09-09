@@ -29,6 +29,7 @@ import com.kazemieh.database.DatabaseInitializer
 import com.kazemieh.database.di.databaseModule
 import com.kazemieh.designsystem.AccentPalette
 import com.kazemieh.designsystem.AppTheme
+import com.kazemieh.designsystem.AppLanguage
 import com.kazemieh.designsystem.FintrackTheme
 import com.kazemieh.designsystem.LocalCurrency
 import com.kazemieh.designsystem.LocalHideBalance
@@ -136,6 +137,11 @@ fun App() {
         TextFont.VAZIRMATN.name
     ).collectAsState(TextFont.VAZIRMATN.name)
 
+    val languageTag by preferenceUseCases.getStringFlow(
+        FinTrackPreferences.PREF_LANGUAGE,
+        AppLanguage.PERSIAN.languageTag
+    ).collectAsState(AppLanguage.PERSIAN.languageTag)
+
     val isSystemDark = isSystemInDarkTheme()
 
     val calculatedTheme = remember(currentTheme, themeMode, isSystemDark, themeStartTime, themeEndTime) {
@@ -191,6 +197,10 @@ fun App() {
         analytics.track(com.kazemieh.common.analytics.ProductEvent.AppOpened)
         
         isReady = true
+    }
+
+    LaunchedEffect(languageTag) {
+        applyAppLanguage(AppLanguage.fromLanguageTag(languageTag))
     }
 
     if (isReady) {

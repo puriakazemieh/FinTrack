@@ -3,6 +3,7 @@ package com.kazemieh.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.designsystem.AppTheme
+import com.kazemieh.designsystem.AppLanguage
 import com.kazemieh.designsystem.TextScale
 import com.kazemieh.designsystem.TextFont
 import com.kazemieh.designsystem.ThemeMode
@@ -161,6 +162,12 @@ class SettingsViewModel(
                     preferenceUseCases.getStringPreference(
                         FinTrackPreferences.PREF_TEXT_FONT,
                         TextFont.VAZIRMATN.name
+                    )
+                ),
+                selectedLanguage = AppLanguage.fromLanguageTag(
+                    preferenceUseCases.getStringPreference(
+                        FinTrackPreferences.PREF_LANGUAGE,
+                        AppLanguage.PERSIAN.languageTag
                     )
                 )
             )
@@ -334,6 +341,24 @@ class SettingsViewModel(
                 )
                 _state.update { it.copy(textFont = intent.font) }
             }
+            SettingsIntent.ShowLanguageSettingsSheet -> {
+                _state.update { it.copy(showLanguageSettingsSheet = true) }
+            }
+            SettingsIntent.HideLanguageSettingsSheet -> {
+                _state.update { it.copy(showLanguageSettingsSheet = false) }
+            }
+            is SettingsIntent.SetLanguage -> {
+                preferenceUseCases.setStringPreference(
+                    FinTrackPreferences.PREF_LANGUAGE,
+                    intent.language.languageTag
+                )
+                _state.update {
+                    it.copy(
+                        selectedLanguage = intent.language,
+                        showLanguageSettingsSheet = false
+                    )
+                }
+            }
 
             SettingsIntent.Logout -> {
                 preferenceUseCases.clearPreferences()
@@ -364,6 +389,8 @@ data class SettingsState(
     val textScale: TextScale = TextScale.MEDIUM,
     val textFont: TextFont = TextFont.VAZIRMATN,
     val showTextSettingsSheet: Boolean = false,
+    val selectedLanguage: AppLanguage = AppLanguage.PERSIAN,
+    val showLanguageSettingsSheet: Boolean = false,
     val transactionCount: Int = 0,
     val activeDays: Int = 0,
     val toolCount: Int = TOOL_COUNT,
@@ -382,6 +409,9 @@ sealed interface SettingsIntent {
     data object HideTextSettingsSheet : SettingsIntent
     data class SetTextScale(val scale: TextScale) : SettingsIntent
     data class SetTextFont(val font: TextFont) : SettingsIntent
+    data object ShowLanguageSettingsSheet : SettingsIntent
+    data object HideLanguageSettingsSheet : SettingsIntent
+    data class SetLanguage(val language: AppLanguage) : SettingsIntent
     data object ToggleDarkMode : SettingsIntent
     data object ToggleFingerprint : SettingsIntent
     data object ToggleBackup : SettingsIntent

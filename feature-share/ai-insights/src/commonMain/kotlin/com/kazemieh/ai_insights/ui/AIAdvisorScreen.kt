@@ -82,6 +82,7 @@ import fintrack.core.designsystem.generated.resources.ai_cloud_insight_title
 import fintrack.core.designsystem.generated.resources.ai_empty_title
 import fintrack.core.designsystem.generated.resources.ai_month_summary_title
 import fintrack.core.designsystem.generated.resources.ai_month_top_category
+import fintrack.core.designsystem.generated.resources.label_percentage
 import fintrack.core.designsystem.generated.resources.ai_settings_api_key
 import fintrack.core.designsystem.generated.resources.ai_settings_base_url
 import fintrack.core.designsystem.generated.resources.ai_settings_enable
@@ -429,7 +430,10 @@ private fun AnalysisCard(state: AIAdvisorState) {
                             enableAnimation = true
                         )
                         Text(
-                            text = "٪${animatedPercentage.value.toInt().toPersianDigits()}",
+                            text = stringResource(
+                                Res.string.label_percentage,
+                                animatedPercentage.value.toInt().toPersianDigits()
+                            ),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.tertiary
@@ -442,7 +446,10 @@ private fun AnalysisCard(state: AIAdvisorState) {
                 Text(
                     text = stringResource(
                         Res.string.ai_analysis_body,
-                        "٪${state.savingPotentialPercentage.toPersianDigits()}",
+                        stringResource(
+                            Res.string.label_percentage,
+                            state.savingPotentialPercentage.toPersianDigits()
+                        ),
                         state.savingPotentialAmount.toPersianPrice()
                     ),
                     style = MaterialTheme.typography.bodyMedium,

@@ -4,6 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.preferences.FinTrackPreferences
+import com.kazemieh.designsystem.component.model.UiText
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.lock_reset_success
+import fintrack.core.designsystem.generated.resources.lock_enabled_success
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -96,7 +100,11 @@ class LockViewModel(
             preferenceUseCases.setStringPreference(FinTrackPreferences.PREF_HASHED_PIN, "")
             _state.update { it.copy(isLockEnabled = false, isLocked = false, showResetSheet = false, pin = "") }
             viewModelScope.launch {
-                _effect.send(LockEffect.SuccessWithToast(com.kazemieh.designsystem.component.model.UiText.DynamicString("قفل برنامه با موفقیت بازنشانی شد")))
+                _effect.send(
+                    LockEffect.SuccessWithToast(
+                        UiText.StringResourceText(Res.string.lock_reset_success)
+                    )
+                )
             }
         } else {
             _state.update { it.copy(error = "lock_error_wrong_answer") }
@@ -179,7 +187,11 @@ class LockViewModel(
         
         // Show success effect and check for security question
         viewModelScope.launch {
-            _effect.send(LockEffect.SuccessWithToast(com.kazemieh.designsystem.component.model.UiText.DynamicString("قفل برنامه با موفقیت فعال شد")))
+            _effect.send(
+                LockEffect.SuccessWithToast(
+                    UiText.StringResourceText(Res.string.lock_enabled_success)
+                )
+            )
         }
         
         val currentQuestion = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_SECURITY_QUESTION, "")

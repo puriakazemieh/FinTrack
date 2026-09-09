@@ -272,7 +272,7 @@ fun WelcomeStep() {
         contentAlignment = Alignment.Center
     ) {
         FintrackHeadlineMediumText(
-            text = "پ",
+            text = stringResource(Res.string.default_profile_initial),
             color = GlassGreen,
             fontWeight = FontWeight.Bold
         )

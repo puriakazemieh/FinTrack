@@ -64,7 +64,10 @@ fun AIAdvisorWidget(
                     contentAlignment = Alignment.Center
                 ) {
                     androidx.compose.material3.Text(
-                        text = "٪${state.savingPotentialPercentage.toPersianDigits()}",
+                        text = stringResource(
+                            Res.string.label_percentage,
+                            state.savingPotentialPercentage.toPersianDigits()
+                        ),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.tertiary

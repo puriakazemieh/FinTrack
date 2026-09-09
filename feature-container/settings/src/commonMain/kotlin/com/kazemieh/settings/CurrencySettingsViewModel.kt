@@ -6,8 +6,14 @@ import com.kazemieh.domain.repository.AssetRepository
 import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.money.Currency
 import com.kazemieh.money.CurrencyProvider
+import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.preferences.FinTrackPreferences.Companion.PREF_CURRENCY
 import com.kazemieh.preferences.FinTrackPreferences.Companion.PREF_CUSTOM_CURRENCIES
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.currency_error_conversion_failed
+import fintrack.core.designsystem.generated.resources.currency_error_invalid_rate
+import fintrack.core.designsystem.generated.resources.currency_error_rate_fetch_failed
+import fintrack.core.designsystem.generated.resources.currency_error_rate_not_found
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -117,20 +123,40 @@ class CurrencySettingsViewModel(
             try {
                 val rates = assetRepository.syncRates()
                 if (rates.isEmpty()) {
-                    _state.update { it.copy(isFetchingRate = false, rateError = "دریافت نرخ ارز ناموفق بود. لطفاً نرخ را دستی وارد کنید.") }
+                    _state.update {
+                        it.copy(
+                            isFetchingRate = false,
+                            rateError = UiText.StringResourceText(Res.string.currency_error_rate_fetch_failed)
+                        )
+                    }
                     return@launch
                 }
                 val oldPrice = findPriceInToman(oldCurrency.code, rates)
                 val newPrice = findPriceInToman(newCurrency.code, rates)
                 if (oldPrice == null || newPrice == null) {
                     val missing = if (oldPrice == null) oldCurrency.code else newCurrency.code
-                    _state.update { it.copy(isFetchingRate = false, rateError = "نرخ $missing در سرور موجود نیست. لطفاً نرخ را دستی وارد کنید.") }
+                    _state.update {
+                        it.copy(
+                            isFetchingRate = false,
+                            rateError = UiText.StringResourceText(
+                                Res.string.currency_error_rate_not_found,
+                                listOf(missing)
+                            )
+                        )
+                    }
                     return@launch
                 }
                 val rate = oldPrice.toDouble() / newPrice.toDouble()
                 _state.update { it.copy(conversionRate = String.format("%.6f", rate), isFetchingRate = false, rateError = null) }
             } catch (e: Exception) {
-                _state.update { it.copy(isFetchingRate = false, rateError = "خطا در دریافت نرخ: ${e.message}") }
+                _state.update {
+                    it.copy(
+                        isFetchingRate = false,
+                        rateError = UiText.StringResourceText(
+                            Res.string.currency_error_rate_fetch_failed
+                        )
+                    )
+                }
             }
         }
     }
@@ -144,7 +170,9 @@ class CurrencySettingsViewModel(
     private fun confirmAndConvert() {
         val rate = _state.value.conversionRate.toDoubleOrNull()
         if (rate == null || rate <= 0) {
-            _state.update { it.copy(rateError = "نرخ تبدیل نامعتبر است.") }
+            _state.update {
+                it.copy(rateError = UiText.StringResourceText(Res.string.currency_error_invalid_rate))
+            }
             return
         }
         val newCurrency = _state.value.pendingCurrency ?: return
@@ -160,7 +188,12 @@ class CurrencySettingsViewModel(
                 }
                 _effect.send(CurrencySettingsEffect.CurrencyChanged)
             } catch (e: Exception) {
-                _state.update { it.copy(isConverting = false, rateError = "خطا در تبدیل مبالغ: ${e.message}") }
+                _state.update {
+                    it.copy(
+                        isConverting = false,
+                        rateError = UiText.StringResourceText(Res.string.currency_error_conversion_failed)
+                    )
+                }
             }
         }
     }
@@ -206,7 +239,7 @@ data class CurrencySettingsState(
     val customCurrencies: List<Currency> = emptyList(),
     val isConverting: Boolean = false,
     val isFetchingRate: Boolean = false,
-    val rateError: String? = null,
+    val rateError: UiText? = null,
     val isLoading: Boolean = true
 )
 

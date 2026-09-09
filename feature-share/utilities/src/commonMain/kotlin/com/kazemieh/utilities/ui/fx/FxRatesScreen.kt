@@ -55,7 +55,10 @@ fun FxRatesScreen(
         onBack = onBackClick,
         floatingActionButton = {
             IconButton(onClick = { viewModel.onIntent(FxRatesIntent.RefreshRates) }) {
-                Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                Icon(
+                    Icons.Default.Refresh,
+                    contentDescription = stringResource(Res.string.action_refresh)
+                )
             }
         }
     ) {

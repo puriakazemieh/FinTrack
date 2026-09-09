@@ -131,8 +131,8 @@ fun CalculatorBottomSheet(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         val helpers = listOf(
-                            "+9" to "+۹٪ مالیات",
-                            "-10" to "−۱۰٪ تخفیف",
+                            "+9" to stringResource(Res.string.calculator_add_tax),
+                            "-10" to stringResource(Res.string.calculator_apply_discount),
                             "/2" to "÷ ۲",
                             "*3" to "× ۳"
                         )

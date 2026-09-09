@@ -11,6 +11,20 @@ import com.kazemieh.designsystem.TextScale
 import com.kazemieh.designsystem.TextFont
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.glass.SheetFrame
+import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.confirm
+import fintrack.core.designsystem.generated.resources.label_font_app
+import fintrack.core.designsystem.generated.resources.label_font_sahel
+import fintrack.core.designsystem.generated.resources.label_font_shabnam
+import fintrack.core.designsystem.generated.resources.label_font_vazirmatn
+import fintrack.core.designsystem.generated.resources.label_text_size
+import fintrack.core.designsystem.generated.resources.text_scale_extra_large
+import fintrack.core.designsystem.generated.resources.text_scale_extra_small
+import fintrack.core.designsystem.generated.resources.text_scale_large
+import fintrack.core.designsystem.generated.resources.text_scale_medium
+import fintrack.core.designsystem.generated.resources.text_scale_small
+import fintrack.core.designsystem.generated.resources.title_text_settings
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,9 +36,9 @@ fun TextSettingsBottomSheet(
     onDismiss: () -> Unit
 ) {
     SheetFrame(
-        title = "تنظیمات متن",
+        title = stringResource(Res.string.title_text_settings),
         onDismiss = onDismiss,
-        primaryButtonText = "تایید",
+        primaryButtonText = stringResource(Res.string.confirm),
         onPrimaryClick = onDismiss,
         isFullScreen = false
     ) {
@@ -35,7 +49,7 @@ fun TextSettingsBottomSheet(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             
-            FintrackBodyMediumText(text = "اندازه متن:")
+            FintrackBodyMediumText(text = stringResource(Res.string.label_text_size))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -43,11 +57,11 @@ fun TextSettingsBottomSheet(
                 TextScale.entries.forEach { scale ->
                     val isSelected = scale == currentScale
                     val label = when (scale) {
-                        TextScale.EXTRA_SMALL -> "XS"
-                        TextScale.SMALL -> "S"
-                        TextScale.MEDIUM -> "M"
-                        TextScale.LARGE -> "L"
-                        TextScale.EXTRA_LARGE -> "XL"
+                        TextScale.EXTRA_SMALL -> stringResource(Res.string.text_scale_extra_small)
+                        TextScale.SMALL -> stringResource(Res.string.text_scale_small)
+                        TextScale.MEDIUM -> stringResource(Res.string.text_scale_medium)
+                        TextScale.LARGE -> stringResource(Res.string.text_scale_large)
+                        TextScale.EXTRA_LARGE -> stringResource(Res.string.text_scale_extra_large)
                     }
                     FilterChip(
                         selected = isSelected,
@@ -59,7 +73,7 @@ fun TextSettingsBottomSheet(
             
             HorizontalDivider()
             
-            FintrackBodyMediumText(text = "فونت برنامه:")
+            FintrackBodyMediumText(text = stringResource(Res.string.label_font_app))
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -67,9 +81,9 @@ fun TextSettingsBottomSheet(
                 TextFont.entries.forEach { font ->
                     val isSelected = font == currentFont
                     val label = when (font) {
-                        TextFont.VAZIRMATN -> "وزیرمتن (Vazirmatn)"
-                        TextFont.SHABNAM -> "شبنم (Shabnam)"
-                        TextFont.SAHEL -> "ساحل (Sahel)"
+                        TextFont.VAZIRMATN -> stringResource(Res.string.label_font_vazirmatn)
+                        TextFont.SHABNAM -> stringResource(Res.string.label_font_shabnam)
+                        TextFont.SAHEL -> stringResource(Res.string.label_font_sahel)
                     }
                     Row(
                         modifier = Modifier

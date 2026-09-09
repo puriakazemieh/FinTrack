@@ -105,6 +105,8 @@ import fintrack.core.designsystem.generated.resources.label_app_lock
 import fintrack.core.designsystem.generated.resources.label_backup_size
 import fintrack.core.designsystem.generated.resources.label_calendar_fa
 import fintrack.core.designsystem.generated.resources.label_currency
+import fintrack.core.designsystem.generated.resources.label_english
+import fintrack.core.designsystem.generated.resources.label_german
 import fintrack.core.designsystem.generated.resources.label_google_drive_backup
 import fintrack.core.designsystem.generated.resources.label_jalali
 import fintrack.core.designsystem.generated.resources.label_language
@@ -133,6 +135,8 @@ import fintrack.core.designsystem.generated.resources.setting_fingerprint
 import fintrack.core.designsystem.generated.resources.setting_hide_balance
 import fintrack.core.designsystem.generated.resources.setting_push_notifications
 import fintrack.core.designsystem.generated.resources.title_notification_settings
+import fintrack.core.designsystem.generated.resources.title_text_settings
+import fintrack.core.designsystem.generated.resources.default_profile_initial
 import fintrack.core.designsystem.generated.resources.user_email_default
 import fintrack.core.designsystem.generated.resources.user_name_default
 import org.jetbrains.compose.resources.decodeToImageBitmap
@@ -243,6 +247,14 @@ fun SettingsScreen(
         )
     }
 
+    if (state.showLanguageSettingsSheet) {
+        LanguageSettingsBottomSheet(
+            selectedLanguage = state.selectedLanguage,
+            onLanguageSelected = { viewModel.onIntent(SettingsIntent.SetLanguage(it)) },
+            onDismiss = { viewModel.onIntent(SettingsIntent.HideLanguageSettingsSheet) }
+        )
+    }
+
     FintrackScreen {
         LazyColumn(
             modifier = Modifier
@@ -291,17 +303,19 @@ fun SettingsScreen(
                     // rescales every text in the app.
                     // todo disable
                     SettingItem(
-                        title = "تنظیمات متن",
+                        title = stringResource(Res.string.title_text_settings),
                         icon = Icons.Default.TextFormat,
-                        value = "", // It's clear from clicking
                         onClick = { viewModel.onIntent(SettingsIntent.ShowTextSettingsSheet) }
                     )
-                    // Language and calendar currently ship a single option; shown as honest
-                    // non-interactive value rows until full localization / Gregorian support lands.
                     SettingItem(
                         title = stringResource(Res.string.label_language),
                         icon = Icons.Default.Language,
-                        value = stringResource(Res.string.label_persian)
+                        value = when (state.selectedLanguage) {
+                            com.kazemieh.designsystem.AppLanguage.PERSIAN -> stringResource(Res.string.label_persian)
+                            com.kazemieh.designsystem.AppLanguage.ENGLISH -> stringResource(Res.string.label_english)
+                            com.kazemieh.designsystem.AppLanguage.GERMAN -> stringResource(Res.string.label_german)
+                        },
+                        onClick = { viewModel.onIntent(SettingsIntent.ShowLanguageSettingsSheet) }
                     )
                     SettingItem(
                         title = stringResource(Res.string.label_calendar_fa),
@@ -475,7 +489,8 @@ fun ProfileHero(
                             )
                         } else {
                             FintrackTitleLargeText(
-                                text = state.firstName.firstOrNull()?.toString() ?: "پ",
+                                text = state.firstName.firstOrNull()?.toString()
+                                    ?: stringResource(Res.string.default_profile_initial),
                                 color = MaterialTheme.colorScheme.onPrimary,
                                 fontWeight = FontWeight.Bold
                             )

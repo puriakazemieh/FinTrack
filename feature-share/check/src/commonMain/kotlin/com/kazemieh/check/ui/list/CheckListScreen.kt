@@ -209,8 +209,8 @@ private fun CheckTransactionConfirmBottomSheet(
     onConfirm: (Boolean) -> Unit
 ) {
     SheetFrame(
-        title = "ثبت تراکنش",
-        sub = "آیا می‌خواهید پاس شدن این چک به عنوان یک تراکنش در برنامه ثبت شود؟",
+        title = stringResource(Res.string.check_record_transaction_title),
+        sub = stringResource(Res.string.check_record_transaction_message),
         onDismiss = onDismiss,
         isFullScreen = false
     ) {
@@ -226,13 +226,19 @@ private fun CheckTransactionConfirmBottomSheet(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                FintrackLabelMediumText("بله، به عنوان تراکنش ثبت شود", color = MaterialTheme.colorScheme.onPrimary)
+                FintrackLabelMediumText(
+                    stringResource(Res.string.check_record_transaction_yes),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
             androidx.compose.material3.TextButton(
                 onClick = { onConfirm(false) },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                FintrackLabelMediumText("خیر، فقط وضعیت تغییر کند", color = LocalGlassColors.current.text)
+                FintrackLabelMediumText(
+                    stringResource(Res.string.check_record_transaction_no),
+                    color = LocalGlassColors.current.text
+                )
             }
         }
     }

@@ -50,6 +50,7 @@ class FinTrackPreferences(private val settings: Settings) {
         const val PREF_SMS_READING_ENABLED = "pref_sms_reading_enabled"
         const val PREF_TEXT_SCALE = "pref_text_scale"
         const val PREF_TEXT_FONT = "pref_text_font"
+        const val PREF_LANGUAGE = "pref_language"
 
         const val PREF_THEME = "pref_theme"
         const val PREF_ACCENT = "pref_accent"

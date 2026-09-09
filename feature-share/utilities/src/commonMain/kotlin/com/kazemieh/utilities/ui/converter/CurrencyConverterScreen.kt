@@ -160,7 +160,7 @@ fun CurrencyConverterScreen(
                         IconButton(onClick = { viewModel.onIntent(CurrencyConverterIntent.SwapRates) }) {
                             Icon(
                                 Icons.Default.SwapVert,
-                                contentDescription = "Swap",
+                                contentDescription = stringResource(Res.string.action_swap_currencies),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -212,8 +212,19 @@ fun CurrencyConverterScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column {
-                            FintrackBodySmallText(text = "نرخ تبدیل", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            FintrackTitleMediumText(text = "۱ ${state.fromRate!!.code.uppercase()} = ${rate.toString().toPersianDigits()} ${state.toRate!!.name}", fontWeight = FontWeight.Bold)
+                            FintrackBodySmallText(
+                                text = stringResource(Res.string.currency_conversion_rate),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            FintrackTitleMediumText(
+                                text = stringResource(
+                                    Res.string.currency_converter_rate_equation,
+                                    state.fromRate!!.code.uppercase(),
+                                    rate.toString().toPersianDigits(),
+                                    state.toRate!!.name
+                                ),
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }
@@ -221,7 +232,7 @@ fun CurrencyConverterScreen(
 
             // Quick Amounts
             FintrackLabelMediumText(
-                text = "مبلغ‌های پرکاربرد",
+                text = stringResource(Res.string.currency_converter_quick_amounts),
                 modifier = Modifier.padding(space.medium),
                 fontWeight = FontWeight.Bold
             )
@@ -244,7 +255,7 @@ fun CurrencyConverterScreen(
 
             // Favorite Pairs
             FintrackLabelMediumText(
-                text = "جفت‌های مورد علاقه",
+                text = stringResource(Res.string.currency_converter_favorite_pairs),
                 modifier = Modifier.padding(space.medium),
                 fontWeight = FontWeight.Bold
             )
@@ -263,7 +274,14 @@ fun CurrencyConverterScreen(
                             horizontalArrangement = Arrangement.spacedBy(space.small)
                         ) {
                             FintrackBodyMediumText(text = "${pair.fromCode.uppercase()} → ${pair.toCode.uppercase()}", fontWeight = FontWeight.Bold)
-                            FintrackBodySmallText(text = "${pair.fromName} به ${pair.toName}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            FintrackBodySmallText(
+                                text = stringResource(
+                                    Res.string.currency_converter_pair_names,
+                                    pair.fromName,
+                                    pair.toName
+                                ),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                             Spacer(modifier = Modifier.weight(1f))
                             Icon(Icons.Default.Star, contentDescription = null, tint = Color.Yellow, modifier = Modifier.size(16.dp))
                         }

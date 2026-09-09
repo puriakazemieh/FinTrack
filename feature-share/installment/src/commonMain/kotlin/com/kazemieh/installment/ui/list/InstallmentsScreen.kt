@@ -303,7 +303,11 @@ private fun CompactSummaryCard(total: Long) {
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            FintrackLabelSmallText(text = "مجموع اقساط", fontSize = 8.sp, color = glassColors.text3)
+            FintrackLabelSmallText(
+                text = stringResource(Res.string.installments_total),
+                fontSize = 8.sp,
+                color = glassColors.text3
+            )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 FintrackLabelMediumText(
                     text = total.toSignedPersianPrice(),

@@ -66,7 +66,10 @@ fun LoanCalculatorCard(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Icon(Icons.Default.Calculate, null, tint = GlassGreen, modifier = Modifier.size(20.dp))
-                    FintrackLabelMediumText(text = "محاسبه‌گر وام", fontWeight = FontWeight.Bold)
+                    FintrackLabelMediumText(
+                        text = stringResource(Res.string.loan_calculator),
+                        fontWeight = FontWeight.Bold
+                    )
                 }
                 Icon(
                     if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
@@ -80,7 +83,7 @@ fun LoanCalculatorCard(
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         LoanField(
                             value = amount,
-                            label = "مبلغ وام",
+                            label = stringResource(Res.string.loan_amount),
                             onValueChange = onAmountChange,
                             modifier = Modifier.weight(1f),
                             visualTransformation = NumberCommaTransformation()
@@ -104,17 +107,23 @@ fun LoanCalculatorCard(
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Column {
-                            FintrackLabelSmallText(text = "کل بازپرداخت", color = glassColors.text3)
+                            FintrackLabelSmallText(
+                                text = stringResource(Res.string.loan_total_repayment),
+                                color = glassColors.text3
+                            )
                             FintrackLabelMediumText(text = totalPayment.toPersianPrice() + " " + stringResource(Res.string.currency_toman), fontWeight = FontWeight.Bold)
                         }
                         Column(horizontalAlignment = Alignment.End) {
-                            FintrackLabelSmallText(text = "سود کل", color = glassColors.text3)
+                            FintrackLabelSmallText(
+                                text = stringResource(Res.string.loan_total_interest),
+                                color = glassColors.text3
+                            )
                             FintrackLabelMediumText(text = totalInterest.toPersianPrice() + " " + stringResource(Res.string.currency_toman), color = GlassGreen, fontWeight = FontWeight.Bold)
                         }
                     }
 
                     FintrackLabelMediumText(
-                        text = "اعمال در فرم",
+                        text = stringResource(Res.string.loan_apply_to_form),
                         color = GlassGreen,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
