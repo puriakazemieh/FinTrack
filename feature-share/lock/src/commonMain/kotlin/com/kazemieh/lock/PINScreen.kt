@@ -236,9 +236,7 @@ fun PINScreen(
                 title = stringResource(Res.string.lock_security_setup_title),
                 isFullScreen = false,
                 primaryButtonText = stringResource(Res.string.confirm),
-                onPrimaryClick = { onIntent(LockIntent.SaveSecuritySetup) },
-                secondaryButtonText = stringResource(Res.string.cancell_),
-                onSecondaryClick = { onIntent(LockIntent.DismissSecuritySetup) }
+                onPrimaryClick = { onIntent(LockIntent.SaveSecuritySetup) }
             ) {
                 Column(modifier = Modifier.padding(space.large)) {
                     FintrackBodyMediumText(stringResource(Res.string.lock_security_setup_desc))

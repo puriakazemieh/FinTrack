@@ -13,6 +13,7 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
 import com.kazemieh.domain.repository.PreferenceRepository
+import com.kazemieh.money.Currency
 import com.kazemieh.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -69,7 +70,7 @@ class TransactionRepositoryImpl(
         personIds: List<Long>,
         balanceDeltas: Map<Long, Long>
     ): Long {
-        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
+        val code = selectedCurrencyCode()
         return localDataSource.addTransactionWithBalance(transaction.copy(currencyCode = code), tagIds, personIds, balanceDeltas)
     }
 
@@ -79,8 +80,9 @@ class TransactionRepositoryImpl(
         personIds: List<Long>,
         balanceDeltas: Map<Long, Long>
     ): Long {
-        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
-        return localDataSource.updateTransactionWithBalance(transaction.copy(currencyCode = code), tagIds, personIds, balanceDeltas)
+        // Preserve the currency stored with an existing transaction. This is
+        // essential when the user chooses not to convert historical data.
+        return localDataSource.updateTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
     }
 
     override suspend fun deleteTransactionWithBalance(
@@ -125,8 +127,7 @@ class TransactionRepositoryImpl(
     }
 
     override suspend fun updateSource(source: Source): Int {
-        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
-        return localDataSource.updateSource(source.copy(currencyCode = code))
+        return localDataSource.updateSource(source)
     }
 
     override suspend fun deleteCategory(category: Category, moveCategory: Category?) {
@@ -146,7 +147,7 @@ class TransactionRepositoryImpl(
     }
 
     override suspend fun addSource(source: Source): Long {
-        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
+        val code = selectedCurrencyCode()
         return localDataSource.addSource(source.copy(currencyCode = code))
     }
 
@@ -261,4 +262,7 @@ class TransactionRepositoryImpl(
     override suspend fun getAllTransactions(): List<Transaction> {
         return localDataSource.getAllTransactions()
     }
+
+    private fun selectedCurrencyCode(): String =
+        Currency.valueOf(preferenceRepository.getString("PREF_CURRENCY", "IRT")).code
 }

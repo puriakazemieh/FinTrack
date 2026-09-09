@@ -765,7 +765,7 @@ private fun GoalCard(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = goal.targetAmount.toPersianPrice() + " " + stringResource(Res.string.unit_toman_short),
+                    text = goal.targetAmount.toPersianPrice() + " " + com.kazemieh.designsystem.LocalCurrency.current.symbol,
                     style = MaterialTheme.typography.labelSmall,
                     color = glassColors.text3
                 )

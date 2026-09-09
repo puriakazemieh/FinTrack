@@ -12,6 +12,7 @@ data class ShoppingItem(
     val isChecked: Boolean = false,
     val priority: Int = 0, // 0: Normal, 1: High
     val estimatedPrice: Double = 0.0,
+    val currencyCode: String = "IRT",
     val reminderTime: Long? = null,
     val categoryId: Long? = null,
     val note: String? = null,

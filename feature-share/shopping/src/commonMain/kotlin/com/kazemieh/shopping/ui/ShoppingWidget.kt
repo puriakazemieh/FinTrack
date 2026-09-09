@@ -89,7 +89,8 @@ fun ShoppingWidget(
                         )
                         if (item.estimatedPrice > 0) {
                             FintrackLabelSmallText(
-                                text = item.estimatedPrice.toLong().toPersianPrice(),
+                                text = item.estimatedPrice.toLong().toPersianPrice() + " " +
+                                    com.kazemieh.money.Currency.valueOf(item.currencyCode).symbol,
                                 color = LocalGlassColors.current.text2
                             )
                         }
@@ -131,7 +132,7 @@ fun ShoppingWidget(
                             fontSize = 12.sp
                         )
                         FintrackLabelSmallText(
-                            text = " " + stringResource(Res.string.currency_toman),
+                            text = " " + com.kazemieh.designsystem.LocalCurrency.current.symbol,
                             fontSize = 9.sp,
                             color = LocalGlassColors.current.text3
                         )

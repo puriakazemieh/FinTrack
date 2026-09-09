@@ -83,7 +83,7 @@ fun TransactionsScreen(
     val space = LocalSpacing.current
 
     val colors = FinTrackPickerColors.rainbow()
-    val tomanUnit = stringResource(Res.string.unit_toman_short)
+    val tomanUnit = com.kazemieh.designsystem.LocalCurrency.current.symbol
     val labelTo = stringResource(Res.string.label_to)
 
     val incomeLabel = stringResource(Res.string.income)

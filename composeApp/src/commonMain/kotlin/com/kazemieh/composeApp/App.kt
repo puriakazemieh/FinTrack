@@ -8,6 +8,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.setValue
 import com.kazemieh.asset.di.assetModule
 import com.kazemieh.budget.di.budgetModule
@@ -16,6 +17,7 @@ import com.kazemieh.category.di.transactionCategoryModule
 import com.kazemieh.category.di.transactionDeleteCategoryModule
 import com.kazemieh.check.di.checkModule
 import com.kazemieh.common.di.commonModule
+import com.kazemieh.common.MoneyPrivacy
 import com.kazemieh.dashboard.di.dashboardModule
 import com.kazemieh.onboarding.di.onboardingModule
 import com.kazemieh.notifications.di.notificationModule
@@ -128,6 +130,10 @@ fun App() {
         FinTrackPreferences.PREF_HIDE_BALANCE,
         "false"
     ).collectAsState("false")
+
+    // Older UI elements format amounts outside the shared MoneyText component.
+    // Keep those paths subject to the same persisted privacy preference.
+    SideEffect { MoneyPrivacy.maskAmounts = hideBalance.toBoolean() }
 
     val textScaleName by preferenceUseCases.getStringFlow(
         FinTrackPreferences.PREF_TEXT_SCALE,

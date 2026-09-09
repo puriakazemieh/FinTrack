@@ -81,7 +81,7 @@ fun BalanceHero(
                     )
                     Spacer(Modifier.width(space.small))
                     FintrackTitleLargeText(
-                        text = stringResource(Res.string.currency_toman),
+                        text = com.kazemieh.designsystem.LocalCurrency.current.symbol,
                         fontWeight = FontWeight.Bold
                     )
                 }

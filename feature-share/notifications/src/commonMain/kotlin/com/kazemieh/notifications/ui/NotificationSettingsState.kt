@@ -4,6 +4,7 @@ data class NotificationSettingsState(
     val isBudgetNotifEnabled: Boolean = true,
     val isInstallmentNotifEnabled: Boolean = true,
     val isChequeNotifEnabled: Boolean = true,
+    val isBankReceiptNotifEnabled: Boolean = true,
     val isFixedExpenseNotifEnabled: Boolean = true,
     val isShoppingNotifEnabled: Boolean = true,
     val isNotesNotifEnabled: Boolean = true,

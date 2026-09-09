@@ -36,13 +36,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
+import com.kazemieh.designsystem.LocalCurrency
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackOutlinedTextField
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.amount
-import fintrack.core.designsystem.generated.resources.currency_toman
 import fintrack.core.designsystem.generated.resources.label_calculator
 import fintrack.core.designsystem.generated.resources.label_required_marker
 import org.jetbrains.compose.resources.stringResource
@@ -61,6 +61,7 @@ fun LargeAmountCard(
     modifier: Modifier = Modifier
 ) {
     val glassColors = LocalGlassColors.current
+    val currency = LocalCurrency.current
     val focusRequester = remember { FocusRequester() }
     var focusRequested by rememberSaveable { mutableStateOf(false) }
 
@@ -148,7 +149,7 @@ fun LargeAmountCard(
                     keyboardActions = keyboardActions,
                     suffix = {
                         FintrackBodyMediumText(
-                            text = stringResource(Res.string.currency_toman),
+                            text = currency.symbol,
                             color = glassColors.text3
                         )
                     },

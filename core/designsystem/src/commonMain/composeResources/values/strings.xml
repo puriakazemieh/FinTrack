@@ -1529,4 +1529,5 @@
     <string name="lock_security_setup_title">سوال امنیتی</string>
     <string name="lock_security_setup_desc">برای بازیابی رمز عبور در صورت فراموشی، لطفا یک سوال امنیتی و پاسخ آن را تعیین کنید.</string>
     <string name="lock_security_question_hint">مثال: نام اولین معلم شما؟</string>
+    <string name="notif_bank_receipt_label">دریافت‌های بانکی</string>
 </resources>

@@ -111,14 +111,14 @@ fun LoanCalculatorCard(
                                 text = stringResource(Res.string.loan_total_repayment),
                                 color = glassColors.text3
                             )
-                            FintrackLabelMediumText(text = totalPayment.toPersianPrice() + " " + stringResource(Res.string.currency_toman), fontWeight = FontWeight.Bold)
+                            FintrackLabelMediumText(text = totalPayment.toPersianPrice() + " " + com.kazemieh.designsystem.LocalCurrency.current.symbol, fontWeight = FontWeight.Bold)
                         }
                         Column(horizontalAlignment = Alignment.End) {
                             FintrackLabelSmallText(
                                 text = stringResource(Res.string.loan_total_interest),
                                 color = glassColors.text3
                             )
-                            FintrackLabelMediumText(text = totalInterest.toPersianPrice() + " " + stringResource(Res.string.currency_toman), color = GlassGreen, fontWeight = FontWeight.Bold)
+                            FintrackLabelMediumText(text = totalInterest.toPersianPrice() + " " + com.kazemieh.designsystem.LocalCurrency.current.symbol, color = GlassGreen, fontWeight = FontWeight.Bold)
                         }
                     }
 

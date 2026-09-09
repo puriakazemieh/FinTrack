@@ -4,6 +4,7 @@ import com.kazemieh.common.model.Budget
 import com.kazemieh.common.model.BudgetWithProgress
 import com.kazemieh.data_contract.datasource.BudgetLocalDataSource
 import com.kazemieh.domain.repository.BudgetRepository
+import com.kazemieh.money.Currency
 import kotlinx.coroutines.flow.Flow
 
 class BudgetRepositoryImpl(
@@ -24,13 +25,12 @@ class BudgetRepositoryImpl(
     }
 
     override suspend fun addBudget(budget: Budget): Long {
-        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
+        val code = selectedCurrencyCode()
         return localDataSource.addBudget(budget.copy(currencyCode = code))
     }
 
     override suspend fun updateBudget(budget: Budget): Int {
-        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
-        return localDataSource.updateBudget(budget.copy(currencyCode = code))
+        return localDataSource.updateBudget(budget)
     }
 
     override suspend fun deleteBudget(id: Long) {
@@ -44,4 +44,7 @@ class BudgetRepositoryImpl(
     override suspend fun hasAnyBudgets(): Boolean {
         return localDataSource.hasAnyBudgets()
     }
+
+    private fun selectedCurrencyCode(): String =
+        Currency.valueOf(preferenceRepository.getString("PREF_CURRENCY", "IRT")).code
 }

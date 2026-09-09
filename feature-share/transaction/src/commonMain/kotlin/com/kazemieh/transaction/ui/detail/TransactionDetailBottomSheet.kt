@@ -138,7 +138,7 @@ private fun DetailAmountCard(item: TransactionWithRelations) {
                 text = stringResource(
                     Res.string.label_amount_with_unit,
                     amount.toPersianPrice(),
-                    stringResource(Res.string.unit_toman_short)
+                    com.kazemieh.designsystem.LocalCurrency.current.symbol
                 ),
                 color = color,
                 fontWeight = FontWeight.Bold,

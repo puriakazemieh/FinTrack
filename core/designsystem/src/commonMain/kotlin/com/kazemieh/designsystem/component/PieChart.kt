@@ -484,7 +484,7 @@ private fun PieChartLegend(
                     text = stringResource(
                         Res.string.label_amount_with_unit,
                         item.value.toPersianPrice(),
-                        stringResource(Res.string.currency_toman)
+                        com.kazemieh.designsystem.LocalCurrency.current.symbol
                     ),
                     color = MaterialTheme.colorScheme.onSurface
                 )

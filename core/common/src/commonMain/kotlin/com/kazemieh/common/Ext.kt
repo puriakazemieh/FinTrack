@@ -38,7 +38,8 @@ fun Int.separateWithCommas(): String = toString().separateWithCommas()
  * Formats a value as a currency/price with Persian digits and comma separators.
  * Example: 1250000 -> ۱,۲۵۰,۰۰۰
  */
-fun Long.toPersianPrice(): String = separateWithCommas().toPersianDigits()
+fun Long.toPersianPrice(): String =
+    if (MoneyPrivacy.maskAmounts) "••••••" else separateWithCommas().toPersianDigits()
 fun Int.toPersianPrice(): String = toLong().toPersianPrice()
 fun String.toPersianPrice(): String = separateWithCommas().toPersianDigits()
 

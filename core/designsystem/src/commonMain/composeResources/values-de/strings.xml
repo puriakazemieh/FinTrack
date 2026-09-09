@@ -71,4 +71,5 @@
     <string name="setting_fingerprint">Entsperren per Fingerabdruck</string>
     <string name="setting_hide_balance">Kontostände ausblenden</string>
     <string name="title_notification_settings">Benachrichtigungseinstellungen</string>
+    <string name="notif_bank_receipt_label">Bankeingänge</string>
 </resources>

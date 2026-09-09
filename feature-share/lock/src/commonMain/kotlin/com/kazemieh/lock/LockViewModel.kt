@@ -86,8 +86,13 @@ class LockViewModel(
                 saveSecuritySetup()
             }
             LockIntent.DismissSecuritySetup -> {
-                _state.update { it.copy(showSecuritySetupSheet = false) }
-                unlock() // Only unlock after they dismiss or finish
+                // The recovery question is part of first-time lock setup. Do not
+                // activate an unrecoverable lock merely because the sheet was
+                // dismissed by a swipe or the back gesture.
+                if (_state.value.securityQuestion.isNotBlank()) {
+                    _state.update { it.copy(showSecuritySetupSheet = false) }
+                    unlock()
+                }
             }
         }
     }

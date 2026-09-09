@@ -283,7 +283,7 @@ private fun TransactionAmountAndDate(amount: Long, timestamp: Long, color: Color
             text = if (hidden) "••••••" else stringResource(
                 Res.string.label_amount_with_unit,
                 amount.toPersianPrice(),
-                stringResource(Res.string.unit_toman_short)
+                com.kazemieh.designsystem.LocalCurrency.current.symbol
             ),
             fontWeight = FontWeight.W700,
             color = color

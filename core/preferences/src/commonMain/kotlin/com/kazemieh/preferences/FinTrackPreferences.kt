@@ -82,6 +82,7 @@ class FinTrackPreferences(private val settings: Settings) {
         const val PREF_NOTIF_INSTALLMENT_ENABLED = "pref_notif_installment_enabled"
         const val PREF_NOTIF_DEBT_ENABLED = "pref_notif_debt_enabled"
         const val PREF_NOTIF_CHEQUE_ENABLED = "pref_notif_cheque_enabled"
+        const val PREF_NOTIF_BANK_RECEIPT_ENABLED = "pref_notif_bank_receipt_enabled"
         const val PREF_NOTIF_QUICK_ADD_ENABLED = "pref_notif_quick_add_enabled"
         const val PREF_QUICK_ADD_NOTIF_ENABLED = "pref_quick_add_notif_enabled"
         

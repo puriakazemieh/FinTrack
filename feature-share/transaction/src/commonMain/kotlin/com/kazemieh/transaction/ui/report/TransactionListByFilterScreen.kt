@@ -273,7 +273,7 @@ private fun DayHeader(date: String, count: Int, netAmount: Long) {
             text = stringResource(
                 Res.string.label_amount_with_unit,
                 netAmount.toSignedPersianPrice(),
-                stringResource(Res.string.unit_toman_short)
+                com.kazemieh.designsystem.LocalCurrency.current.symbol
             ),
             fontWeight = FontWeight.W700,
             color = if (netAmount >= 0) GlassGreen else GlassRed

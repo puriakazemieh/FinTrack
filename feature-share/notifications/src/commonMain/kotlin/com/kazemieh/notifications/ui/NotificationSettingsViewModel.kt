@@ -37,6 +37,7 @@ class NotificationSettingsViewModel(
                 isBudgetNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_BUDGET_ENABLED, true),
                 isInstallmentNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_INSTALLMENT_ENABLED, true),
                 isChequeNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_CHEQUE_ENABLED, true),
+                isBankReceiptNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_BANK_RECEIPT_ENABLED, true),
                 isFixedExpenseNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_FIXED_EXPENSE_ENABLED, true),
                 isShoppingNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_SHOPPING_ENABLED, true),
                 isNotesNotifEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_NOTIF_NOTES_ENABLED, true),
@@ -88,6 +89,17 @@ class NotificationSettingsViewModel(
                     analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingsChanged)
                     _state.update { it.copy(isChequeNotifEnabled = newValue) }
                     analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("cheque", newValue))
+                } else {
+                    _state.update { it.copy(triggerSystemPermissionRequest = true) }
+                }
+            }
+            NotificationSettingsIntent.ToggleBankReceiptNotif -> {
+                if (notificationManager.hasPermission()) {
+                    val newValue = !_state.value.isBankReceiptNotifEnabled
+                    preferenceUseCases.setBooleanPreference(FinTrackPreferences.PREF_NOTIF_BANK_RECEIPT_ENABLED, newValue)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingsChanged)
+                    _state.update { it.copy(isBankReceiptNotifEnabled = newValue) }
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("bank_receipt", newValue))
                 } else {
                     _state.update { it.copy(triggerSystemPermissionRequest = true) }
                 }
@@ -178,7 +190,9 @@ class NotificationSettingsViewModel(
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationSettingToggled("quiet_end", true))
             }
             is NotificationSettingsIntent.RefreshPermissionStatus -> {
-                if (!notificationManager.hasPermission() && intent.shouldShowRationale) {
+                // Explain the reason before the first Android permission prompt too,
+                // not only after Android reports that a rationale is required.
+                if (!notificationManager.hasPermission()) {
                     _state.update { it.copy(showPermissionRationale = true) }
                 }
             }

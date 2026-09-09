@@ -112,13 +112,13 @@ fun DebtsScreen(
                     EntitySummary(
                         label = UiText.StringResourceText(Res.string.total_credits),
                         value = state.totalCredits.toPersianPrice(),
-                        unit = stringResource(Res.string.currency_toman),
+                        unit = com.kazemieh.designsystem.LocalCurrency.current.symbol,
                         color = GlassGreen
                     ),
                     EntitySummary(
                         label = UiText.StringResourceText(Res.string.total_debts),
                         value = state.totalDebts.toPersianPrice(),
-                        unit = stringResource(Res.string.currency_toman),
+                        unit = com.kazemieh.designsystem.LocalCurrency.current.symbol,
                         color = GlassRed
                     )
                 )

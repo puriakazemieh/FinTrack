@@ -59,7 +59,8 @@ fun SourcesScreen(
                         id = source.id ?: 0L,
                         name = source.name,
                         sub = if (source.type == 1) source.cardNumber else source.description,
-                        badge = source.formattedBalance + " " + stringResource(Res.string.currency_toman),
+                        badge = source.formattedBalance + " " +
+                            com.kazemieh.money.Currency.valueOf(source.currencyCode).symbol,
                         iconId = source.iconId,
                         colorId = source.colorId
                     )

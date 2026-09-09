@@ -137,7 +137,7 @@ fun SummaryCard(
                         )
                         SummaryRow(
                             label = stringResource(Res.string.label_net),
-                            valueStr = state.balance + " " + stringResource(Res.string.unit_toman_short),
+                            valueStr = state.balance + " " + com.kazemieh.designsystem.LocalCurrency.current.symbol,
                             color = if (state.isPositiveBalance) GlassGreen else GlassRed,
                             isBold = true
                         )
@@ -182,7 +182,7 @@ fun SummaryCard(
                         text = stringResource(
                             Res.string.label_amount_with_unit,
                             value.toPersianPrice(),
-                            stringResource(Res.string.unit_toman_short)
+                            com.kazemieh.designsystem.LocalCurrency.current.symbol
                         ),
                         color = color,
                         fontWeight = FontWeight.W700
@@ -215,7 +215,7 @@ private fun SummaryRow(
         val text = valueStr ?: stringResource(
             Res.string.label_amount_with_unit,
             value.toPersianPrice(),
-            stringResource(Res.string.unit_toman_short)
+            com.kazemieh.designsystem.LocalCurrency.current.symbol
         )
         FintrackTitleSmallText(
             text = text,
@@ -327,7 +327,7 @@ fun CategoryStrip(
                             text = stringResource(
                                 Res.string.label_amount_with_unit,
                                 cat.totalAmount.toPersianPrice(),
-                                stringResource(Res.string.unit_toman_short)
+                                com.kazemieh.designsystem.LocalCurrency.current.symbol
                             ),
                             fontWeight = FontWeight.Bold,
                             color = amountColor

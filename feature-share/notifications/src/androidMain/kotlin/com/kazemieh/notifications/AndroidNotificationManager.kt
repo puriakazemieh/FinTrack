@@ -73,7 +73,8 @@ class AndroidNotificationManager(
             NotificationManager.CHANNEL_NOTE -> 
                 toolEnabled(ToolFeature.NOTES) && notifEnabled(FinTrackPreferences.PREF_NOTIF_NOTES_ENABLED)
             NotificationManager.CHANNEL_SMS ->
-                preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_SMS_READING_ENABLED, true)
+                preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_SMS_READING_ENABLED, true) &&
+                    notifEnabled(FinTrackPreferences.PREF_NOTIF_BANK_RECEIPT_ENABLED)
             NotificationManager.CHANNEL_QUICK_ADD ->
                 notifEnabled(FinTrackPreferences.PREF_QUICK_ADD_NOTIF_ENABLED)
             else -> true

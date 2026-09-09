@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.EventRepeat
 import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.Sms
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -59,6 +60,7 @@ import fintrack.core.designsystem.generated.resources.cancell_
 import fintrack.core.designsystem.generated.resources.confirm
 import fintrack.core.designsystem.generated.resources.label_quick_add_notification
 import fintrack.core.designsystem.generated.resources.notif_budget_label
+import fintrack.core.designsystem.generated.resources.notif_bank_receipt_label
 import fintrack.core.designsystem.generated.resources.notif_fixed_expense_label
 import fintrack.core.designsystem.generated.resources.notif_shopping_label
 import fintrack.core.designsystem.generated.resources.notif_notes_label
@@ -192,6 +194,12 @@ fun NotificationSettingsScreen(
                         icon = Icons.Default.ConfirmationNumber,
                         on = state.isChequeNotifEnabled,
                         onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleChequeNotif) }
+                    )
+                    NotificationSettingItem(
+                        title = stringResource(Res.string.notif_bank_receipt_label),
+                        icon = Icons.Default.Sms,
+                        on = state.isBankReceiptNotifEnabled,
+                        onToggle = { viewModel.onIntent(NotificationSettingsIntent.ToggleBankReceiptNotif) }
                     )
                     NotificationSettingItem(
                         title = stringResource(Res.string.label_quick_add_notification),

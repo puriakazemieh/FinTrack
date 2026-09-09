@@ -5,6 +5,7 @@ import com.kazemieh.common.model.GoalBasket
 import com.kazemieh.common.model.GoalTemplate
 import com.kazemieh.data_contract.datasource.GoalLocalDataSource
 import com.kazemieh.domain.repository.GoalRepository
+import com.kazemieh.money.Currency
 import kotlinx.coroutines.flow.Flow
 
 class GoalRepositoryImpl(
@@ -21,13 +22,12 @@ class GoalRepositoryImpl(
     }
 
     override suspend fun addGoal(goal: Goal): Long {
-        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
+        val code = selectedCurrencyCode()
         return localDataSource.addGoal(goal.copy(currencyCode = code))
     }
 
     override suspend fun updateGoal(goal: Goal): Int {
-        val code = preferenceRepository.getString("PREF_CURRENCY", "IRT")
-        return localDataSource.updateGoal(goal.copy(currencyCode = code))
+        return localDataSource.updateGoal(goal)
     }
 
     override suspend fun deleteGoal(id: Long) {
@@ -65,4 +65,7 @@ class GoalRepositoryImpl(
     override suspend fun deleteGoalBasket(id: Long) {
         localDataSource.deleteGoalBasket(id)
     }
+
+    private fun selectedCurrencyCode(): String =
+        Currency.valueOf(preferenceRepository.getString("PREF_CURRENCY", "IRT")).code
 }

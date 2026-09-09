@@ -254,7 +254,7 @@ private fun InstallmentItemRow(
             badge = "$percentage%",
             color = mainColor,
             sub2 = DateUtils.formatDate(scheduledInstallment.dueDate) + "  |  " +
-                    installment.installmentAmount.toInt().toSignedPersianPrice() + " " + stringResource(Res.string.currency_toman),
+                    installment.installmentAmount.toInt().toSignedPersianPrice() + " " + com.kazemieh.designsystem.LocalCurrency.current.symbol,
             trailingContent = {
                 if (scheduledInstallment.isPayable && !installment.isCompleted) {
                     Box(
@@ -315,7 +315,7 @@ private fun CompactSummaryCard(total: Long) {
                     color = MaterialTheme.colorScheme.primary
                 )
                 FintrackLabelSmallText(
-                    text = stringResource(Res.string.currency_toman),
+                    text = com.kazemieh.designsystem.LocalCurrency.current.symbol,
                     fontSize = 8.sp,
                     color = glassColors.text3,
                     modifier = Modifier.padding(start = 2.dp)

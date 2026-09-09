@@ -27,6 +27,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,8 +49,10 @@ import com.kazemieh.check.ui.widget.CheckWidget
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.dashboard.component.QuickActions
 import com.kazemieh.dashboard.component.RecentTransactionsWidget
+import com.kazemieh.common.MoneyPrivacy
 import com.kazemieh.designsystem.GlassGreenDark
 import com.kazemieh.designsystem.LocalGlassColors
+import com.kazemieh.designsystem.LocalHideBalance
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
@@ -101,6 +105,11 @@ fun DashboardScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
+    val globallyHidden = LocalHideBalance.current
+    DisposableEffect(globallyHidden, state.isBalanceVisible) {
+        MoneyPrivacy.maskAmounts = globallyHidden && !state.isBalanceVisible
+        onDispose { MoneyPrivacy.maskAmounts = globallyHidden }
+    }
     val listState = rememberLazyListState()
     var repeatTemplate by remember {
         mutableStateOf<com.kazemieh.common.model.TransactionWithRelations?>(null)
@@ -115,8 +124,13 @@ fun DashboardScreen(
     }
 
 
-    FintrackScreen {
-        LazyColumn(
+    // Revealing the balance from the dashboard is deliberately scoped to this
+    // composition. Leaving the screen restores the persisted privacy choice.
+    CompositionLocalProvider(
+        LocalHideBalance provides (globallyHidden && !state.isBalanceVisible)
+    ) {
+        FintrackScreen {
+            LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 100.dp) // Space for NavigationBar
@@ -242,7 +256,7 @@ fun DashboardScreen(
             }
         }
 
-        // The global add-transaction FAB lives in the bottom navigation bar; the dashboard
+            // The global add-transaction FAB lives in the bottom navigation bar; the dashboard
         // no longer draws its own to avoid two overlapping add buttons.
 
         if (state.showSmsDetection) {
@@ -411,6 +425,7 @@ fun DashboardScreen(
                     viewModel.onIntent(DashboardIntent.AnimationEnabled)
                 }
             )
+        }
         }
     }
 }

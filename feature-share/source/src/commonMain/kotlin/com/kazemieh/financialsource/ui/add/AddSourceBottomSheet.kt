@@ -274,7 +274,7 @@ fun AddSourceContent(
                         modifier = Modifier.fillMaxWidth(),
                         suffix = {
                             FintrackLabelSmallText(
-                                text = stringResource(Res.string.currency_toman),
+                                text = com.kazemieh.designsystem.LocalCurrency.current.symbol,
                                 color = glassColors.text3
                             )
                         }

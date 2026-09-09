@@ -98,19 +98,19 @@ fun PersonDetailScreen(
                         EntitySummary(
                             label = UiText.StringResourceText(Res.string.total_credits),
                             value = state.totalCredits.toPersianPrice(),
-                            unit = stringResource(Res.string.currency_toman),
+                            unit = com.kazemieh.designsystem.LocalCurrency.current.symbol,
                             color = MaterialTheme.colorScheme.primary
                         ),
                         EntitySummary(
                             label = UiText.StringResourceText(Res.string.total_debts),
                             value = state.totalDebts.toPersianPrice(),
-                            unit = stringResource(Res.string.currency_toman),
+                            unit = com.kazemieh.designsystem.LocalCurrency.current.symbol,
                             color = MaterialTheme.colorScheme.error
                         ),
                         EntitySummary(
                             label = UiText.StringResourceText(Res.string.balance_total),
                             value = state.balance.toPersianPrice(),
-                            unit = stringResource(Res.string.currency_toman),
+                            unit = com.kazemieh.designsystem.LocalCurrency.current.symbol,
                             color = if (state.balance >= 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                         )
                     ),

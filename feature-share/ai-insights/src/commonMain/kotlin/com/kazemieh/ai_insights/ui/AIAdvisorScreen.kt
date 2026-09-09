@@ -515,7 +515,7 @@ private fun CloudInsightCard(state: AIAdvisorState) {
 private fun MonthSummaryCard(state: AIAdvisorState) {
     val glassColors = LocalGlassColors.current
     val net = state.monthIncome - state.monthExpense
-    val tomanShort = stringResource(Res.string.unit_toman_short)
+    val tomanShort = com.kazemieh.designsystem.LocalCurrency.current.symbol
 
     GlassCard(padding = 16.dp) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {

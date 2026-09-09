@@ -100,7 +100,7 @@ fun AssetsListScreen(
                     EntitySummary(
                         label = UiText.StringResourceText(Res.string.label_total_assets_value),
                         value = state.totalValue.toPersianPrice(),
-                        unit = stringResource(Res.string.currency_toman),
+                        unit = com.kazemieh.designsystem.LocalCurrency.current.symbol,
                         color = MaterialTheme.colorScheme.primary
                     )
                 ),
@@ -111,7 +111,7 @@ fun AssetsListScreen(
                         sub = stringResource(Res.string.label_units_count, asset.quantity.toString()),
                         badge = stringResource(Res.string.label_percentage_value, asset.profitOrLossPercentage),
                         color = if (asset.profitOrLoss >= 0) GlassGreen else GlassRed,
-                        sub2 = asset.totalCurrentValue.toSignedPersianPrice() + " " + stringResource(Res.string.currency_toman)
+                        sub2 = asset.totalCurrentValue.toSignedPersianPrice() + " " + com.kazemieh.designsystem.LocalCurrency.current.symbol
                     )
                 },
                 onItemClick = { item ->
@@ -170,7 +170,7 @@ private fun AssetHero(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             FintrackBodyMediumText(
-                text = totalValue.toPersianPrice() + " " + stringResource(Res.string.currency_toman),
+                text = totalValue.toPersianPrice() + " " + com.kazemieh.designsystem.LocalCurrency.current.symbol,
                 style = MaterialTheme.typography.headlineMedium
             )
 

@@ -300,7 +300,7 @@ private fun CompactSummaryCard(total: Long) {
                     color = MaterialTheme.colorScheme.primary
                 )
                 FintrackLabelSmallText(
-                    text = stringResource(Res.string.currency_toman),
+                    text = com.kazemieh.designsystem.LocalCurrency.current.symbol,
                     fontSize = 8.sp,
                     color = glassColors.text3,
                     modifier = Modifier.padding(start = 2.dp)
@@ -373,7 +373,8 @@ private fun ShoppingRow(
 
                 if (item.estimatedPrice > 0) {
                     FintrackBodySmallText(
-                        text = item.estimatedPrice.toLong().toPersianPrice() + " " + stringResource(Res.string.currency_toman),
+                        text = item.estimatedPrice.toLong().toPersianPrice() + " " +
+                            com.kazemieh.money.Currency.valueOf(item.currencyCode).symbol,
                         color = glassColors.text3,
                         maxLines = 1
                     )

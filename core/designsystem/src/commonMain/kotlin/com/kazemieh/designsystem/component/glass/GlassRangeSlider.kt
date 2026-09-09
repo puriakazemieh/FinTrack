@@ -44,12 +44,12 @@ fun GlassRangeSlider(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             FintrackTitleSmallText(
-                text = value.start.toLong().toSignedPersianPrice() + " " + stringResource(Res.string.unit_toman_short),
+                text = value.start.toLong().toSignedPersianPrice() + " " + com.kazemieh.designsystem.LocalCurrency.current.symbol,
                 color = GlassGreen,
                 fontWeight = FontWeight.Bold
             )
             FintrackTitleSmallText(
-                text = value.endInclusive.toLong().toSignedPersianPrice() + " " + stringResource(Res.string.unit_toman_short),
+                text = value.endInclusive.toLong().toSignedPersianPrice() + " " + com.kazemieh.designsystem.LocalCurrency.current.symbol,
                 color = GlassGreen,
                 fontWeight = FontWeight.Bold
             )

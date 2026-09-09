@@ -20,6 +20,7 @@ class CurrencyLocalDataSourceImpl(
             db.fixedExpenseQueries.batchConvertAmounts(rate, newCurrencyCode, now, oldCurrencyCode)
             db.goalQueries.batchConvertAmounts(rate, newCurrencyCode, now, oldCurrencyCode)
             db.installmentQueries.batchConvertAmounts(rate, newCurrencyCode, now, oldCurrencyCode)
+            db.shoppingQueries.batchConvertAmounts(rate, newCurrencyCode, now, oldCurrencyCode)
         }
     }
 }
