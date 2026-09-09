@@ -50,6 +50,7 @@ kotlin {
                 implementation(libs.kotlinx.datetime)
                 implementation(project(":core:common"))
                 implementation(project(":core:domain"))
+                implementation(project(":core:money"))
                 implementation(project(":feature-share:source"))
 
                 implementation(project(":core:designsystem"))

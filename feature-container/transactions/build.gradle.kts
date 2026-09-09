@@ -52,6 +52,7 @@ kotlin {
                 implementation(project(":core:domain"))
                 implementation(project(":core:common"))
                 implementation(project(":core:jalali"))
+                implementation(project(":core:money"))
                 implementation(project(":core:designsystem"))
                 implementation(project(":core:preferences"))
 

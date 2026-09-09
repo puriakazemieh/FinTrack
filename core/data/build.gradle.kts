@@ -47,6 +47,7 @@ kotlin {
                 implementation(libs.kotlinx.datetime)
                 implementation(project(":core:common"))
                 implementation(project(":core:domain"))
+                implementation(project(":core:money"))
                 implementation(project(":core:network"))
                 implementation(project(":core:preferences"))
                 implementation(project(":core:data-contract"))

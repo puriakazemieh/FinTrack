@@ -51,6 +51,7 @@ kotlin {
                 implementation(project(":core:common"))
                 implementation(project(":core:domain"))
 
+                implementation(project(":core:money"))
                 implementation(project(":core:designsystem"))
 
                 implementation(libs.compose.runtime)
