@@ -3,14 +3,16 @@ package com.kazemieh.data.repository
 import com.kazemieh.common.model.FixedExpense
 import com.kazemieh.data_contract.datasource.FixedExpenseLocalDataSource
 import com.kazemieh.domain.repository.FixedExpenseRepository
+import com.kazemieh.domain.repository.PreferenceRepository
+import com.kazemieh.money.Currency
 import kotlinx.coroutines.flow.Flow
 
 class FixedExpenseRepositoryImpl(
-    private val localDataSource: FixedExpenseLocalDataSource
-,
-    private val preferenceRepository: com.kazemieh.domain.repository.PreferenceRepository
+    private val localDataSource: FixedExpenseLocalDataSource,
+    private val preferenceRepository: PreferenceRepository
 ) : FixedExpenseRepository {
-    override suspend fun insertFixedExpense(expense: FixedExpense): Long = localDataSource.insertFixedExpense(expense)
+    override suspend fun insertFixedExpense(expense: FixedExpense): Long =
+        localDataSource.insertFixedExpense(expense.copy(currencyCode = selectedCurrencyCode()))
     override suspend fun updateFixedExpense(expense: FixedExpense) = localDataSource.updateFixedExpense(expense)
     override suspend fun deleteFixedExpense(id: Long) = localDataSource.deleteFixedExpense(id)
     override suspend fun getFixedExpenseById(id: Long): FixedExpense? = localDataSource.getFixedExpenseById(id)
@@ -26,4 +28,7 @@ class FixedExpenseRepositoryImpl(
     )
 
     override suspend fun updateNextDueDate(id: Long, nextDueDate: Long) = localDataSource.updateNextDueDate(id, nextDueDate)
+
+    private fun selectedCurrencyCode(): String =
+        Currency.valueOf(preferenceRepository.getString("PREF_CURRENCY", "IRT")).code
 }
