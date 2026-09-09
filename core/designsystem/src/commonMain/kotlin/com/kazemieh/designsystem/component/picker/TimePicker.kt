@@ -1,163 +1,155 @@
 package com.kazemieh.designsystem.component.picker
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.KeyboardArrowDown
-import androidx.compose.material.icons.outlined.KeyboardArrowUp
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.toPersianDigits
-import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.LocalGlassColors
-import com.kazemieh.designsystem.component.FintrackDisplaySmallText
-import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.SheetFrame
-import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.dp_cancel
-import fintrack.core.designsystem.generated.resources.dp_confirm
-import fintrack.core.designsystem.generated.resources.label_hour
-import fintrack.core.designsystem.generated.resources.label_minute
-import fintrack.core.designsystem.generated.resources.title_select_time
+import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
+
+import com.kazemieh.designsystem.LocalGlassColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FintrackTimePickerBottomSheet(
     openSheet: MutableState<Boolean>,
     initialTime: String = "00:00",
-    onConfirm: (String) -> Unit,
+    onConfirm: (String) -> Unit
 ) {
-    if (!openSheet.value) return
+    if (openSheet.value) {
+        val glassColors = LocalGlassColors.current
+        val initialParts = initialTime.split(":")
+        val initialHour = initialParts.getOrNull(0)?.toIntOrNull() ?: 0
+        val initialMinute = initialParts.getOrNull(1)?.toIntOrNull() ?: 0
 
-    val initialParts = initialTime.split(":")
-    var selectedHour by remember(initialTime) {
-        mutableStateOf((initialParts.getOrNull(0)?.toIntOrNull() ?: 0).coerceIn(0, 23))
-    }
-    var selectedMinute by remember(initialTime) {
-        mutableStateOf((initialParts.getOrNull(1)?.toIntOrNull() ?: 0).coerceIn(0, 59))
-    }
+        var selectedHour by remember { mutableStateOf(initialHour) }
+        var selectedMinute by remember { mutableStateOf(initialMinute) }
 
-    SheetFrame(
-        title = stringResource(Res.string.title_select_time),
-        onDismiss = { openSheet.value = false },
-        isFullScreen = false,
-        primaryButtonText = stringResource(Res.string.dp_confirm),
-        onPrimaryClick = {
-            onConfirm("${selectedHour.toString().padStart(2, '0')}:${selectedMinute.toString().padStart(2, '0')}")
-            openSheet.value = false
-        },
-        secondaryButtonText = stringResource(Res.string.dp_cancel),
-        onSecondaryClick = { openSheet.value = false },
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+        SheetFrame(
+            title = stringResource(Res.string.title_select_time),
+            onDismiss = { openSheet.value = false },
+            isFullScreen = false,
+            primaryButtonText = stringResource(Res.string.dp_confirm),
+            onPrimaryClick = {
+                val time = "${selectedHour.toString().padStart(2, '0')}:${selectedMinute.toString().padStart(2, '0')}"
+                onConfirm(time)
+                openSheet.value = false
+            },
+            secondaryButtonText = stringResource(Res.string.dp_cancel),
+            onSecondaryClick = { openSheet.value = false }
         ) {
-            FintrackDisplaySmallText(
-                text = "${selectedHour.toString().padStart(2, '0').toPersianDigits()} : ${selectedMinute.toString().padStart(2, '0').toPersianDigits()}",
-                color = GlassGreen,
-            )
-            Spacer(Modifier.height(12.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.Top,
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TimeSelector(
-                    modifier = Modifier.weight(0.9f),
-                    label = stringResource(Res.string.label_hour),
-                    range = 0..23,
-                    value = selectedHour,
-                    onValueChange = { selectedHour = it },
-                )
-                TimeSelector(
-                    modifier = Modifier.weight(1.5f),
-                    label = stringResource(Res.string.label_minute),
-                    range = 0..59,
-                    value = selectedMinute,
-                    onValueChange = { selectedMinute = it },
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TimeColumn(
+                        label = stringResource(Res.string.label_minute),
+                        range = 0..59,
+                        initialValue = initialMinute,
+                        onValueChange = { selectedMinute = it }
+                    )
+
+                    Text(
+                        text = ":",
+                        style = MaterialTheme.typography.displaySmall,
+                        color = glassColors.text,
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp)
+                    )
+
+                    TimeColumn(
+                        label = stringResource(Res.string.label_hour),
+                        range = 0..23,
+                        initialValue = initialHour,
+                        onValueChange = { selectedHour = it }
+                    )
+                }
             }
         }
     }
 }
 
-/** Direct number selection plus one-step increase/decrease controls. */
 @Composable
-private fun TimeSelector(
-    modifier: Modifier,
+private fun TimeColumn(
     label: String,
     range: IntRange,
-    value: Int,
-    onValueChange: (Int) -> Unit,
+    initialValue: Int,
+    onValueChange: (Int) -> Unit
 ) {
     val glassColors = LocalGlassColors.current
-    val columns = if (range.last <= 23) 4 else 6
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         FintrackTitleMediumText(text = label, color = glassColors.text3)
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = {
-                onValueChange(if (value == range.first) range.last else value - 1)
-            }) {
-                Icon(Icons.Outlined.KeyboardArrowDown, null, tint = glassColors.text)
-            }
-            FintrackTitleLargeText(
-                text = value.toString().padStart(2, '0').toPersianDigits(),
-                color = GlassGreen,
-                fontWeight = FontWeight.Bold,
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialValue)
+        
+        // Simple implementation of a "wheel" using LazyColumn
+        // For a more advanced version, we would use snapping and infinite scroll
+        Box(
+            modifier = Modifier
+                .height(150.dp)
+                .width(80.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            // Highlight background
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(glassColors.text.copy(alpha = 0.1f), MaterialTheme.shapes.medium)
             )
-            IconButton(onClick = {
-                onValueChange(if (value == range.last) range.first else value + 1)
-            }) {
-                Icon(Icons.Outlined.KeyboardArrowUp, null, tint = glassColors.text)
-            }
-        }
-        range.toList().chunked(columns).forEach { row ->
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                row.forEach { number ->
-                    val selected = number == value
+
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                contentPadding = PaddingValues(vertical = 50.dp)
+            ) {
+                items(range.last - range.first + 1) { index ->
+                    val value = range.first + index
+                    val isSelected = listState.firstVisibleItemIndex == index
+                    
+                    LaunchedEffect(listState.firstVisibleItemIndex) {
+                        onValueChange(listState.firstVisibleItemIndex + range.first)
+                    }
+
                     Box(
                         modifier = Modifier
-                            .size(26.dp)
-                            .clip(MaterialTheme.shapes.small)
-                            .clickable { onValueChange(number) },
-                        contentAlignment = Alignment.Center,
+                            .height(50.dp)
+                            .fillMaxWidth()
+                            .clickable {
+                                // Scroll to this item
+                            },
+                        contentAlignment = Alignment.Center
                     ) {
-                        FintrackLabelSmallText(
-                            text = number.toString().padStart(2, '0').toPersianDigits(),
-                            color = if (selected) GlassGreen else glassColors.text2,
-                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                            fontSize = 11.sp,
+                        FintrackTitleLargeText(
+                            text = value.toString().padStart(2, '0').toPersianDigits(),
+                            color = if (isSelected) com.kazemieh.designsystem.GlassGreen else glassColors.text,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            fontSize = if (isSelected) 28.sp else 20.sp
                         )
                     }
                 }
-                repeat(columns - row.size) { Spacer(Modifier.width(26.dp)) }
             }
         }
     }
