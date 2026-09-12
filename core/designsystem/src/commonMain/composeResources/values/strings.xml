@@ -15,7 +15,7 @@
     <string name="category_name_label">نام دسته‌بندی</string>
     <string name="category_name"> دسته‌بندی</string>
     <string name="save_category">ذخیره</string>
-    <string name="app_name">FinTrack</string>
+    <string name="app_name">مدیریت مالی</string>
     <string name="add_transaction">افزودن تراکنش</string>
     <string name="add_source">افزودن منبع</string>
     <string name="label_balance">موجودی</string>
@@ -1530,4 +1530,16 @@
     <string name="lock_security_setup_desc">برای بازیابی رمز عبور در صورت فراموشی، لطفا یک سوال امنیتی و پاسخ آن را تعیین کنید.</string>
     <string name="lock_security_question_hint">مثال: نام اولین معلم شما؟</string>
     <string name="notif_bank_receipt_label">دریافت‌های بانکی</string>
+
+    <!-- Onboarding: Theme Selection -->
+    <string name="onboarding_theme_title">انتخاب تم</string>
+    <string name="onboarding_theme_desc">ظاهر دلخواه خود را انتخاب کنید</string>
+    <string name="onboarding_theme_glass_dark">شیشه‌ای تیره</string>
+    <string name="onboarding_theme_glass_light">شیشه‌ای روشن</string>
+    <string name="onboarding_theme_plain_dark">ساده تیره</string>
+    <string name="onboarding_theme_plain_light">ساده روشن</string>
+
+    <!-- Default badge -->
+    <string name="label_default">پیش‌فرض</string>
+    <string name="msg_cannot_delete_default">این مورد پیش‌فرض است و قابل حذف نیست</string>
 </resources>

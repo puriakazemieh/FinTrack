@@ -429,7 +429,7 @@ fun EntityRow(
                         )
                     }
                     ActionIcon(icon = Icons.Default.Edit, onClick = onEdit, color = glassColors.text2)
-                    ActionIcon(icon = Icons.Default.Delete, onClick = onDelete, color = GlassRed)
+                    if (!item.isDefault) { ActionIcon(icon = Icons.Default.Delete, onClick = onDelete, color = GlassRed) }
                 }
             }
         }
@@ -480,6 +480,7 @@ data class EntityItem(
     val parentId: Long? = null,
     val isExpandable: Boolean = false,
     val isExpanded: Boolean = false,
+    val isDefault: Boolean = false,
     val trailingContent: (@Composable () -> Unit)? = null
 )
 

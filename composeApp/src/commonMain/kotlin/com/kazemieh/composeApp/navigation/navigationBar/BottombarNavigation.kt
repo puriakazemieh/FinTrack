@@ -136,8 +136,7 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onNavigateToNews = { navController.navigate(Screen.News) },
                 onNavigateToFAQ = { navController.navigate(Screen.FAQ) },
                 onNavigateToSupport = { navController.navigate(Screen.Support) },
-                onNavigateToEvents = { navController.navigate(Screen.Events) },
-                onNavigateToFinancialCalendar = { navController.navigate(Screen.FinancialCalendar) }
+                onNavigateToEvents = { navController.navigate(Screen.Events) }
             )
         }
 
@@ -183,12 +182,6 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
         composable<Screen.Events> {
             EventsScreen(
                 onBackClick = { navController.popBackStack() }
-            )
-        }
-
-        composable<Screen.FinancialCalendar> {
-            FinancialCalendarScreen(
-                onBack = { navController.popBackStack() }
             )
         }
 

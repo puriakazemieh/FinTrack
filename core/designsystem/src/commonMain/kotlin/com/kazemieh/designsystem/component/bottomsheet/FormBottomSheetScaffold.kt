@@ -13,6 +13,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.kazemieh.designsystem.LocalSpacing
@@ -22,7 +23,7 @@ import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormBottomSheetScaffold(
-    sheetState: SheetState,
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     onDismissRequest: () -> Unit,
     primaryButtonText: String,
     onPrimaryClick: () -> Unit,

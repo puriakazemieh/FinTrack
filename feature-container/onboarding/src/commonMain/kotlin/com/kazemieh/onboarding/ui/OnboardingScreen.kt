@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fingerprint
@@ -18,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -37,7 +39,7 @@ import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-private const val ONBOARDING_TOTAL_STEPS = 1 // todo disable change to 3
+private const val ONBOARDING_TOTAL_STEPS = 4
 
 @Composable
 fun OnboardingScreen(
@@ -74,9 +76,7 @@ fun OnboardingScreen(
                 }
             } else {
                 // Skip button at top right
-
-                // todo disable
-               /* TextButton(
+                TextButton(
                     onClick = { viewModel.onIntent(OnboardingIntent.Skip) },
                     modifier = Modifier.align(Alignment.TopEnd)
                 ) {
@@ -84,7 +84,7 @@ fun OnboardingScreen(
                         text = stringResource(Res.string.onboarding_skip)
                     )
                 }
-*/
+
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -107,6 +107,12 @@ fun OnboardingScreen(
                         },
                         onSmsReadingResult = { granted ->
                             viewModel.onIntent(OnboardingIntent.SetSmsReading(granted))
+                        },
+                        onSelectTheme = { theme ->
+                            viewModel.onIntent(OnboardingIntent.SelectTheme(theme))
+                        },
+                        onSelectAccent = { accent ->
+                            viewModel.onIntent(OnboardingIntent.SelectAccent(accent))
                         },
                         modifier = Modifier.weight(1f)
                     )
@@ -226,6 +232,8 @@ fun StepContent(
     onUpdateSource: (String, String) -> Unit,
     onUpdateSecurity: (String, String) -> Unit,
     onSmsReadingResult: (Boolean) -> Unit,
+    onSelectTheme: (String) -> Unit,
+    onSelectAccent: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     AnimatedContent(targetState = state.currentStep, modifier = modifier) { currentStep ->
@@ -234,19 +242,14 @@ fun StepContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            SetupStep(
-                name = state.sourceName,
-                balance = state.sourceBalance,
-                securityQuestion = state.securityQuestion,
-                securityAnswer = state.securityAnswer,
-                onUpdate = onUpdateSource,
-                onUpdateSecurity = onUpdateSecurity
-            )
-            // todo disable
-            /*when (currentStep) {
+            when (currentStep) {
                 1 -> WelcomeStep()
-                2 -> PermissionsStep(onSmsReadingResult = onSmsReadingResult)
-                3 -> SetupStep(
+                2 -> ThemeSelectionStep(
+                    selectedTheme = state.selectedTheme,
+                    onSelectTheme = onSelectTheme
+                )
+                3 -> PermissionsStep(onSmsReadingResult = onSmsReadingResult)
+                4 -> SetupStep(
                     name = state.sourceName,
                     balance = state.sourceBalance,
                     securityQuestion = state.securityQuestion,
@@ -254,7 +257,7 @@ fun StepContent(
                     onUpdate = onUpdateSource,
                     onUpdateSecurity = onUpdateSecurity
                 )
-            }*/
+            }
         }
     }
 }
@@ -295,6 +298,84 @@ fun WelcomeStep() {
         FeatureItem(stringResource(Res.string.onboarding_feature_sms_title), Icons.Default.Sms)
         FeatureItem(stringResource(Res.string.onboarding_feature_budget_title), Icons.Default.Notifications)
         FeatureItem(stringResource(Res.string.onboarding_feature_sync_title), Icons.Default.Sync)
+    }
+}
+
+@Composable
+fun ThemeSelectionStep(
+    selectedTheme: String,
+    onSelectTheme: (String) -> Unit
+) {
+    val glassColors = LocalGlassColors.current
+
+    FintrackHeadlineMediumText(
+        text = stringResource(Res.string.onboarding_theme_title),
+        textAlign = TextAlign.Center
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    FintrackBodyLargeText(
+        text = stringResource(Res.string.onboarding_theme_desc),
+        textAlign = TextAlign.Center,
+        color = glassColors.text3
+    )
+
+    Spacer(modifier = Modifier.height(24.dp))
+
+    // Theme cards - 2x2 grid
+    val themes = listOf(
+        "GLASS_DARK" to Res.string.onboarding_theme_glass_dark,
+        "GLASS_LIGHT" to Res.string.onboarding_theme_glass_light,
+        "PLAIN_DARK" to Res.string.onboarding_theme_plain_dark,
+        "PLAIN_LIGHT" to Res.string.onboarding_theme_plain_light
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        themes.chunked(2).forEach { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                row.forEach { (themeKey, labelRes) ->
+                    val isSelected = selectedTheme == themeKey
+                    val isDark = themeKey.contains("DARK")
+                    val bgColor = if (isDark) Color(0xFF0D1117) else Color(0xFFF0F4F3)
+                    val textColor = if (isDark) Color.White else Color(0xFF06100E)
+                    val borderColor = if (isSelected) GlassGreen else glassColors.glassHairline
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(80.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(bgColor)
+                            .border(
+                                width = if (isSelected) 2.dp else 1.dp,
+                                color = borderColor,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .clickable { onSelectTheme(themeKey) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            FintrackBodyMediumText(
+                                text = stringResource(labelRes),
+                                color = textColor,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                            )
+                            if (isSelected) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .clip(CircleShape)
+                                        .background(GlassGreen)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -453,29 +534,4 @@ fun SetupStep(
             keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
         )
     )
-
-    Spacer(modifier = Modifier.height(24.dp))
-
-    // todo disable
-    /*HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
-    Spacer(modifier = Modifier.height(16.dp))
-
-    FintrackBodyMediumText(
-        text = stringResource(Res.string.onboarding_setup_security_question),
-        fontWeight = FontWeight.Bold
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    FintrackOutlinedTextField(
-        value = securityQuestion,
-        onValueChange = { onUpdateSecurity(it, securityAnswer) },
-        label = { FintrackBodySmallText(stringResource(Res.string.onboarding_setup_security_hint)) },
-        modifier = Modifier.fillMaxWidth()
-    )
-    Spacer(modifier = Modifier.height(12.dp))
-    FintrackOutlinedTextField(
-        value = securityAnswer,
-        onValueChange = { onUpdateSecurity(securityQuestion, it) },
-        label = { FintrackBodySmallText(stringResource(Res.string.onboarding_setup_security_answer)) },
-        modifier = Modifier.fillMaxWidth()
-    )*/
 }

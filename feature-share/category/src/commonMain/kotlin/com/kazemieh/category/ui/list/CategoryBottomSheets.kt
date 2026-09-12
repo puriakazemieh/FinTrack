@@ -148,10 +148,12 @@ fun CategoryPickerBottomSheet(
                             EntityItem(
                                 id = it.id ?: 0,
                                 name = it.name,
+                                sub2 = if (it.isDefault) stringResource(Res.string.label_default) else null,
                                 iconId = it.iconId,
                                 colorId = it.colorId,
                                 parentId = it.parentId,
-                                badge = if (hasChildren && it.parentId == null) (if (isExpanded) "−" else "+") else null
+                                badge = if (hasChildren && it.parentId == null) (if (isExpanded) "−" else "+") else null,
+                                isDefault = it.isDefault
                             )
                         }
                     }

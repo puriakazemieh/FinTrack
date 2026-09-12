@@ -159,10 +159,12 @@ private fun SourceBottomSheetCore(
                             id = source.id ?: 0L,
                             name = source.name,
                             sub = if (source.type == 1) source.cardNumber else source.description,
+                            sub2 = if (source.isDefault) stringResource(Res.string.label_default) else null,
                             badge = source.formattedBalance + " " +
                                 com.kazemieh.money.Currency.valueOf(source.currencyCode).symbol,
                             iconId = source.iconId,
-                            colorId = source.colorId
+                            colorId = source.colorId,
+                            isDefault = source.isDefault
                         )
                     },
                     onItemClick = { item ->

@@ -29,7 +29,8 @@ class SeedDataUseCase(
             balance = 0,
             colorId = 34, // Blue
             iconId = 22, // ic_source_default
-            position = 0
+            position = 0,
+            isDefault = true
         )
         transactionRepository.addSource(sourceToSave)
 
@@ -65,7 +66,8 @@ class SeedDataUseCase(
                     colorId = colorId,
                     iconId = iconId,
                     position = 0,
-                    parentId = null
+                    parentId = null,
+                    isDefault = true
                 )
             )
         }

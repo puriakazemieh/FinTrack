@@ -102,6 +102,7 @@ private fun TimeColumn(
         Spacer(modifier = Modifier.height(8.dp))
         
         val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialValue)
+        val flingBehavior = androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior(lazyListState = listState)
         
         // Simple implementation of a "wheel" using LazyColumn
         // For a more advanced version, we would use snapping and infinite scroll
@@ -121,16 +122,22 @@ private fun TimeColumn(
 
             LazyColumn(
                 state = listState,
+                flingBehavior = flingBehavior,
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 contentPadding = PaddingValues(vertical = 50.dp)
             ) {
                 items(range.last - range.first + 1) { index ->
                     val value = range.first + index
+                    
+                    // We determine the active item based on what is laid out at the center.
+                    // The simplest proxy in a 50dp-item, 150dp-box with 50dp vertical padding is the first visible index.
                     val isSelected = listState.firstVisibleItemIndex == index
                     
-                    LaunchedEffect(listState.firstVisibleItemIndex) {
-                        onValueChange(listState.firstVisibleItemIndex + range.first)
+                    LaunchedEffect(listState.isScrollInProgress, listState.firstVisibleItemIndex) {
+                        if (!listState.isScrollInProgress) {
+                            onValueChange(listState.firstVisibleItemIndex + range.first)
+                        }
                     }
 
                     Box(

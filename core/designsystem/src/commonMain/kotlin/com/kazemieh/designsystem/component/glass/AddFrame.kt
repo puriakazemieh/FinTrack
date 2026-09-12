@@ -165,7 +165,7 @@ fun AddFrame(
 
                 // Form Content
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().weight(1f),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     content()

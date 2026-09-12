@@ -91,12 +91,17 @@ class TransactionReportViewModel(
         refresh()
     }
 
-    // The trend spans a fixed window of recent months and ignores the active filters, so it's
-    // recomputed on each manual refresh rather than reacting to filter changes.
+    // The trend is now shown in year-view, so it should react to the filter's year
     private fun observeMonthlyTrend() {
         viewModelScope.launch {
-            refreshTrigger.onStart { emit(Unit) }.collectLatest {
-                val trend = runCatching { getMonthlyTrendUseCase() }.getOrDefault(emptyList())
+            kotlinx.coroutines.flow.combine(
+                refreshTrigger.onStart { emit(Unit) },
+                filterParamsFlow
+            ) { _, params -> params }.collectLatest { params ->
+                val year = params.fromTimestamp?.let { 
+                    com.kazemieh.common.persiandatetime.domain.PersianDateTime.parse(it).year 
+                }
+                val trend = runCatching { getMonthlyTrendUseCase(year = year) }.getOrDefault(emptyList())
                 _state.update { it.copy(monthlyTrend = trend) }
             }
         }

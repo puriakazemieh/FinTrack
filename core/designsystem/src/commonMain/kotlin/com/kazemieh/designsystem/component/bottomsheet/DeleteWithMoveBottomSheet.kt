@@ -45,7 +45,7 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeleteWithMoveBottomSheetContent(
-    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     title: String? = null,
     itemName: String? = null,
     itemType: String? = null,

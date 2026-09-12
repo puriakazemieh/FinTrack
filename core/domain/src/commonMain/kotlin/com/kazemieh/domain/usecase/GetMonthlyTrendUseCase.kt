@@ -23,7 +23,7 @@ data class MonthlyTrendPoint(
 class GetMonthlyTrendUseCase(
     private val repository: TransactionRepository
 ) {
-    suspend operator fun invoke(monthsBack: Int = 6): List<MonthlyTrendPoint> {
+    suspend operator fun invoke(monthsBack: Int = 6, year: Int? = null): List<MonthlyTrendPoint> {
         val transactions = repository.getAllTransactions()
             .filter { it.syncStatus != SyncStatus.DELETED }
 
@@ -41,16 +41,29 @@ class GetMonthlyTrendUseCase(
             }
         }
 
+        if (year != null) {
+            return (1..12).map { month ->
+                val key = year * 12 + (month - 1)
+                MonthlyTrendPoint(
+                    year = year,
+                    month = month,
+                    label = PersianMonth.entries.getOrElse(month) { PersianMonth.UNKNOWN }.displayName,
+                    income = incomeByKey[key] ?: 0L,
+                    expense = expenseByKey[key] ?: 0L
+                )
+            }
+        }
+
         val now = PersianDateTime.parse(kotlin.time.Clock.System.now().toEpochMilliseconds())
         val currentKey = now.year * 12 + (now.month - 1)
 
         // Oldest first so the chart reads left-to-right through time.
         return (monthsBack - 1 downTo 0).map { offset ->
             val key = currentKey - offset
-            val year = key / 12
+            val y = key / 12
             val month = key % 12 + 1
             MonthlyTrendPoint(
-                year = year,
+                year = y,
                 month = month,
                 label = PersianMonth.entries.getOrElse(month) { PersianMonth.UNKNOWN }.displayName,
                 income = incomeByKey[key] ?: 0L,

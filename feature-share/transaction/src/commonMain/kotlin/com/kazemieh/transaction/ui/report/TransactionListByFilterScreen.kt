@@ -58,9 +58,11 @@ import fintrack.core.designsystem.generated.resources.unit_toman_short
 import fintrack.core.designsystem.generated.resources.unit_transaction
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import com.kazemieh.common.DateFilterType
 
 @Composable
 fun TransactionListByFilterScreen(
+    dateFilterType: DateFilterType = DateFilterType.THIS_MONTH,
     selectedSources: Set<Source>,
     isAllSources: Boolean = true,
     selectedCategories: Set<Category>,
@@ -109,6 +111,7 @@ fun TransactionListByFilterScreen(
     val listState = rememberLazyListState()
 
     TransactionListByFilterContent(
+        dateFilterType = dateFilterType,
         state = state,
         listState = listState,
         onDelete = onDelete,
@@ -122,6 +125,7 @@ fun TransactionListByFilterScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TransactionListByFilterContent(
+    dateFilterType: com.kazemieh.common.DateFilterType,
     state: TransactionReportState,
     listState: LazyListState,
     onDelete: (TransactionWithRelations) -> Unit = {},
@@ -153,10 +157,25 @@ fun TransactionListByFilterContent(
         item {
             SummaryCard()
             Spacer(Modifier.height(14.dp))
-            MonthlyTrendCard()
-            Spacer(Modifier.height(14.dp))
-            CashflowCalendarCard()
-            Spacer(Modifier.height(14.dp))
+            
+            if (dateFilterType in setOf(
+                    com.kazemieh.common.DateFilterType.THIS_YEAR, 
+                    com.kazemieh.common.DateFilterType.LAST_YEAR, 
+                    com.kazemieh.common.DateFilterType.NEXT_YEAR
+                )) {
+                MonthlyTrendCard()
+                Spacer(Modifier.height(14.dp))
+            }
+            
+            if (dateFilterType in setOf(
+                    com.kazemieh.common.DateFilterType.THIS_MONTH, 
+                    com.kazemieh.common.DateFilterType.LAST_MONTH, 
+                    com.kazemieh.common.DateFilterType.NEXT_MONTH
+                )) {
+                CashflowCalendarCard()
+                Spacer(Modifier.height(14.dp))
+            }
+            
             CategoryStrip()
             Spacer(Modifier.height(24.dp))
         }

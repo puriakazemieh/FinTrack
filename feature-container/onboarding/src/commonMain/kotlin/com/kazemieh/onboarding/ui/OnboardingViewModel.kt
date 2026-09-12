@@ -36,13 +36,11 @@ class OnboardingViewModel(
         when (intent) {
             OnboardingIntent.NextStep -> {
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("onboarding_step_completed"))
-                // todo disable
-               /* if (_state.value.currentStep < 3) {
+                if (_state.value.currentStep < 4) {
                     _state.update { it.copy(currentStep = it.currentStep + 1) }
                 } else {
                     finishOnboarding()
-                }*/
-                finishOnboarding()
+                }
             }
             OnboardingIntent.PreviousStep -> {
                 if (_state.value.currentStep > 1) {
@@ -63,6 +61,12 @@ class OnboardingViewModel(
                     intent.enabled
                 )
             }
+            is OnboardingIntent.SelectTheme -> {
+                _state.update { it.copy(selectedTheme = intent.theme) }
+            }
+            is OnboardingIntent.SelectAccent -> {
+                _state.update { it.copy(selectedAccent = intent.accent) }
+            }
         }
     }
 
@@ -70,6 +74,16 @@ class OnboardingViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             try {
+                // Save theme preference
+                preferenceUseCases.setStringPreference(
+                    FinTrackPreferences.PREF_THEME,
+                    _state.value.selectedTheme
+                )
+                preferenceUseCases.setStringPreference(
+                    FinTrackPreferences.PREF_ACCENT,
+                    _state.value.selectedAccent
+                )
+
                 // ... logic to build customSource and localizedNames ...
                 val customSource = if (useDefault || _state.value.sourceName.isBlank()) {
                     null
@@ -109,7 +123,9 @@ data class OnboardingState(
     val sourceName: String = "",
     val sourceBalance: String = "",
     val securityQuestion: String = "",
-    val securityAnswer: String = ""
+    val securityAnswer: String = "",
+    val selectedTheme: String = "GLASS_DARK",
+    val selectedAccent: String = "Default"
 )
 
 sealed interface OnboardingIntent {
@@ -120,6 +136,8 @@ sealed interface OnboardingIntent {
     data class UpdateSourceDetails(val name: String, val balance: String) : OnboardingIntent
     data class UpdateSecurityDetails(val question: String, val answer: String) : OnboardingIntent
     data class SetSmsReading(val enabled: Boolean) : OnboardingIntent
+    data class SelectTheme(val theme: String) : OnboardingIntent
+    data class SelectAccent(val accent: String) : OnboardingIntent
 }
 
 sealed interface OnboardingEffect {

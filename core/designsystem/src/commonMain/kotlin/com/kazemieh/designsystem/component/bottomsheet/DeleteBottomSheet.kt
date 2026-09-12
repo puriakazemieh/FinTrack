@@ -52,7 +52,7 @@ fun DeleteBottomSheet(
     ),
     dismissClicked: () -> Unit,
     confirmClicked: () -> Unit,
-    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
 
     confirmEnabled: Boolean = true,
     dismissEnabled: Boolean = true,

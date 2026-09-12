@@ -1530,4 +1530,16 @@
     <string name="lock_security_setup_desc">To recover the password in case of forgetfulness, please specify a security question and its answer.</string>
     <string name="lock_security_question_hint">Example: the name of your first teacher?</string>
     <string name="notif_bank_receipt_label">Bank receipts</string>
+
+    <!-- Onboarding: Theme Selection -->
+    <string name="onboarding_theme_title">Choose Theme</string>
+    <string name="onboarding_theme_desc">Select your preferred appearance</string>
+    <string name="onboarding_theme_glass_dark">Glass Dark</string>
+    <string name="onboarding_theme_glass_light">Glass Light</string>
+    <string name="onboarding_theme_plain_dark">Plain Dark</string>
+    <string name="onboarding_theme_plain_light">Plain Light</string>
+
+    <!-- Default badge -->
+    <string name="label_default">Default</string>
+    <string name="msg_cannot_delete_default">This is a default item and cannot be deleted</string>
 </resources>

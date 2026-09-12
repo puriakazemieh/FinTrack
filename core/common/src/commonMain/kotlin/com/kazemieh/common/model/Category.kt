@@ -13,6 +13,7 @@ data class Category(
     val iconId: Int,
     val position: Int = 0,
     val parentId: Long? = null,
+    val isDefault: Boolean = false,
     override val updatedAt: Long = 0,
     override val syncStatus: SyncStatus = SyncStatus.SYNCED
 ) : SyncableEntity

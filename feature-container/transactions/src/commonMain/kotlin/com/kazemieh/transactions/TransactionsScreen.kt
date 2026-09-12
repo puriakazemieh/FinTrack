@@ -293,6 +293,7 @@ fun TransactionsScreen(
             )
 
             TransactionListByFilterScreen(
+                dateFilterType = state.dateFilterType,
                 selectedSources = state.selectedSources,
                 isAllSources = state.isAllSourceSelected,
                 selectedCategories = state.selectedCategories,
