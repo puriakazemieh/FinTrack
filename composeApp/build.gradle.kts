@@ -93,7 +93,7 @@ kotlin {
             implementation(project(":core:network"))
             implementation(project(":core:money"))
             implementation(project(":feature-share:asset"))
-            implementation(project(":feature-share:transaction"))
+            implementation(project(":feature-share:ledger"))
             implementation(project(":feature-share:category"))
             implementation(project(":feature-share:installment"))
             implementation(project(":feature-share:goals"))

@@ -49,7 +49,7 @@ kotlin {
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.kotlinx.datetime)
                 implementation(project(":core:common"))
-                implementation(project(":feature-share:transaction"))
+                implementation(project(":feature-share:ledger"))
                 implementation(project(":feature-share:source"))
                 implementation(project(":feature-share:goals"))
                 implementation(project(":feature-share:budget"))

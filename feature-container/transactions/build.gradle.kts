@@ -60,7 +60,7 @@ kotlin {
                 implementation(project(":feature-share:category"))
                 implementation(project(":feature-share:tags"))
                 implementation(project(":feature-share:person"))
-                implementation(project(":feature-share:transaction"))
+                implementation(project(":feature-share:ledger"))
 
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)

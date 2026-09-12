@@ -53,7 +53,7 @@ kotlin {
                 implementation(project(":core:preferences"))
 
                 implementation(project(":core:designsystem"))
-                implementation(project(":feature-share:transaction"))
+                implementation(project(":feature-share:ledger"))
 
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)

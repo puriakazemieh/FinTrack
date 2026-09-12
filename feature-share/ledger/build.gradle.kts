@@ -10,7 +10,7 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "com.kazemieh.transaction"
+        namespace = "com.kazemieh.ledger"
         compileSdk {
             version = release(36)
         }
