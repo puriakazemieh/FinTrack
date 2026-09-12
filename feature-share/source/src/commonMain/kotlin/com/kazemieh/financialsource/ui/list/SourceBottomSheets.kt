@@ -54,6 +54,7 @@ import com.kazemieh.designsystem.component.model.toSource
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.financialsource.ui.delete.DeleteSourceBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.label_default
 import fintrack.core.designsystem.generated.resources.add_source
 import fintrack.core.designsystem.generated.resources.balance
 import fintrack.core.designsystem.generated.resources.cancell_
@@ -358,4 +359,5 @@ fun SourceList(
         }
     }
 }
+
 

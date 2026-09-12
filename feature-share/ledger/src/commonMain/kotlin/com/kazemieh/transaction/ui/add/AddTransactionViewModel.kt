@@ -104,12 +104,38 @@ class AddTransactionViewModel(
                 )
             }
 
-            is AddTransactionIntent.SetSource -> _state.update {
+                                    is AddTransactionIntent.ApplySmsDraft -> _state.update {
                 it.copy(
-                    source = intent.source,
-                    isSourceError = false,
-                    sheetStack = it.sheetStack.dropLast(1)
+                    amount = intent.draft.amount.toString(),
+                    description = intent.draft.body,
+                    timeStamp = intent.draft.timeStamp,
+                    date = intent.draft.date,
+                    transactionType = intent.draft.type,
+                    relatedSmsDrafts = emptyList() // clear banner
                 )
+            }
+            is AddTransactionIntent.SetSource -> {
+                _state.update {
+                    it.copy(
+                        source = intent.source,
+                        isSourceError = false,
+                        sheetStack = it.sheetStack.dropLast(1)
+                    )
+                }
+                viewModelScope.launch {
+                    val unusedDrafts = smsDraftRepository.observeUnusedSmsDrafts().firstOrNull() ?: emptyList()
+                    val matchingDrafts = unusedDrafts.filter { draft ->
+                        val card = intent.source?.cardNumber
+                        val desc = intent.source?.description
+                        val ident = draft.sourceIdentifier
+                        (card != null && draft.body.contains(card)) ||
+                        (desc != null && desc.isNotBlank() && draft.bankName.contains(desc, ignoreCase = true)) ||
+                        (draft.sourceId != null && draft.sourceId == intent.source?.id) ||
+                        (ident != null && card != null && card.endsWith(ident))
+                    }
+                    _state.update { it.copy(relatedSmsDrafts = matchingDrafts) }
+                    // if (matchingDrafts.isNotEmpty()) { // We will show a banner or sheet }
+                }
             }
 
             is AddTransactionIntent.SetSourceEnd -> _state.update {
@@ -473,6 +499,7 @@ data class AddTransactionState(
     val sheetStack: List<AddTransactionSheet> = emptyList(),
     val oldTransaction: Transaction? = null,
     val smsDraft: SmsDraft? = null,
+    val relatedSmsDrafts: List<SmsDraft> = emptyList(),
     val listTransactionType: List<TransactionType> = TransactionType.entries,
     val mostUsedCategories: List<Category> = emptyList(),
     val mostUsedSources: List<Source> = emptyList(),
@@ -508,6 +535,7 @@ sealed interface AddTransactionIntent {
     data object PopSheet : AddTransactionIntent
     data object ClearSheets : AddTransactionIntent
     data object Delete : AddTransactionIntent
+    data class ApplySmsDraft(val draft: SmsDraft) : AddTransactionIntent
 }
 
 sealed interface AddTransactionSheet {
@@ -520,9 +548,13 @@ sealed interface AddTransactionSheet {
     data object TimePicker : AddTransactionSheet
     data object DeleteConfirmation : AddTransactionSheet
     data object Calculator : AddTransactionSheet
+    data object SmsPicker : AddTransactionSheet
 }
 
 sealed interface AddTransactionEffect {
     data object AddedTransaction : AddTransactionEffect
     data object OnDismiss : AddTransactionEffect
 }
+
+
+

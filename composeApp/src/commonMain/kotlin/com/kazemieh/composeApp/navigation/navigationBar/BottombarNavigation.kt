@@ -56,8 +56,8 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
         val route = when (data) {
             is Category -> Screen.Transactions(categoryId = data.id)
             is Source -> Screen.Transactions(sourceId = data.id)
-            is Tag -> Screen.Transactions(tagId = data.id)
-            is Person -> Screen.Transactions(personId = data.id)
+            is Tag -> Screen.TagDetail(tagId = data.id ?: 0L)
+            is Person -> Screen.PersonDetail(personId = data.id ?: 0L)
             is TransactionType -> Screen.Transactions(transactionType = data.name)
             is String -> Screen.Transactions(query = data)
             is Boolean -> Screen.Transactions(resetFilters = data)
@@ -228,6 +228,17 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onBack = { navController.popBackStack() },
                 onNavigateToTransactions = { tag ->
                     navigateToTransactions(tag)
+                }
+            )
+        }
+
+        composable<Screen.TagDetail> { backStackEntry ->
+            val args = backStackEntry.toRoute<Screen.TagDetail>()
+            com.kazemieh.tag.ui.detail.TagDetailScreen(
+                tagId = args.tagId,
+                onBack = { navController.popBackStack() },
+                onNavigateToNoteEdit = { noteId ->
+                    navController.navigate(Screen.NoteEdit(noteId))
                 }
             )
         }
@@ -413,3 +424,5 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
 
     }
 }
+
+

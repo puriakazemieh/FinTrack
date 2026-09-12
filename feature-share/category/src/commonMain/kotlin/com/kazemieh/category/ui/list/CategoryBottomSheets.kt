@@ -51,6 +51,7 @@ import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.component.model.toCategory
 import com.kazemieh.designsystem.component.model.toItemUi
 import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.label_default
 import fintrack.core.designsystem.generated.resources.cancell_
 import fintrack.core.designsystem.generated.resources.category
 import fintrack.core.designsystem.generated.resources.edit
@@ -139,6 +140,7 @@ fun CategoryPickerBottomSheet(
                     }
                 )
 
+                val defaultLabel = stringResource(Res.string.label_default)
                 val entityItems =
                     remember(state.categories, state.expandedCategoryIds, state.allCategories) {
                         state.categories.map {
@@ -148,7 +150,7 @@ fun CategoryPickerBottomSheet(
                             EntityItem(
                                 id = it.id ?: 0,
                                 name = it.name,
-                                sub2 = if (it.isDefault) stringResource(Res.string.label_default) else null,
+                                sub2 = if (it.isDefault) defaultLabel else null,
                                 iconId = it.iconId,
                                 colorId = it.colorId,
                                 parentId = it.parentId,
@@ -286,6 +288,7 @@ fun CategoryManageBottomSheet(
                     }
                 )
 
+                val defaultLabel = stringResource(Res.string.label_default)
                 val entityItems =
                     remember(state.categories, state.expandedCategoryIds, state.allCategories) {
                         state.categories.map {
@@ -455,3 +458,5 @@ fun CategorySelectionBottomSheet(
         }
     )
 }
+
+

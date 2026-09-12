@@ -3,6 +3,15 @@ package com.kazemieh.transaction.ui.add
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import com.kazemieh.designsystem.component.FintrackLabelMediumText
+import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.common.toPersianDigits
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -372,7 +381,7 @@ private fun BottomSheetContent(
             )
         }
 
-        null -> Unit
+        else -> Unit
     }
 }
 
@@ -437,7 +446,7 @@ fun AddTransactionContent(
                         icon = FinTrackIcons.findIcon(state.source?.iconId).resource
                     )
                 }
-                if (state.mostUsedSources.isNotEmpty()) {
+                                if (state.mostUsedSources.isNotEmpty()) {
                     MostUsedSourceChips(
                         items = state.mostUsedSources,
                         onItemClick = {
@@ -446,6 +455,25 @@ fun AddTransactionContent(
                             onIntent(AddTransactionIntent.SetSource(it))
                         }
                     )
+                }
+
+                if (state.relatedSmsDrafts.isNotEmpty()) {
+                    Spacer(Modifier.height(8.dp))
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(state.relatedSmsDrafts) { draft ->
+                            com.kazemieh.designsystem.component.glass.GlassCard(
+                                onClick = { onIntent(AddTransactionIntent.ApplySmsDraft(draft)) }
+                            ) {
+                                Column(modifier = Modifier.padding(8.dp)) {
+                                    FintrackLabelMediumText(text = "????? ????? ?????: " + draft.bankName)
+                                    FintrackLabelSmallText(text = draft.amount.toString() + " " + draft.date.toPersianDigits())
+                                }
+                            }
+                        }
+                    }
                 }
             }
             item {
@@ -510,7 +538,7 @@ fun AddTransactionContent(
                         icon = FinTrackIcons.findIcon(state.source?.iconId).resource
                     )
                 }
-                if (state.mostUsedSources.isNotEmpty()) {
+                                if (state.mostUsedSources.isNotEmpty()) {
                     MostUsedSourceChips(
                         items = state.mostUsedSources,
                         onItemClick = {
@@ -519,6 +547,25 @@ fun AddTransactionContent(
                             onIntent(AddTransactionIntent.SetSource(it))
                         }
                     )
+                }
+
+                if (state.relatedSmsDrafts.isNotEmpty()) {
+                    Spacer(Modifier.height(8.dp))
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(state.relatedSmsDrafts) { draft ->
+                            com.kazemieh.designsystem.component.glass.GlassCard(
+                                onClick = { onIntent(AddTransactionIntent.ApplySmsDraft(draft)) }
+                            ) {
+                                Column(modifier = Modifier.padding(8.dp)) {
+                                    FintrackLabelMediumText(text = "????? ????? ?????: " + draft.bankName)
+                                    FintrackLabelSmallText(text = draft.amount.toString() + " " + draft.date.toPersianDigits())
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -887,3 +934,5 @@ private fun MostUsedPersonChips(
         }
     }
 }
+
+

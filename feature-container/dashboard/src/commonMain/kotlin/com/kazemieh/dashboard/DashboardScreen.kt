@@ -305,7 +305,8 @@ fun DashboardScreen(
                 dismissClicked = { viewModel.onIntent(DashboardIntent.ShowDeleteAllSmsConfirmation(false)) },
                 confirmClicked = {
                     viewModel.onIntent(DashboardIntent.IgnoreAllSmsDrafts)
-                }
+                },
+                isLoading = state.isSmsDeleting
             )
         }
 
@@ -629,3 +630,4 @@ private fun HeaderIconButton(
         )
     }
 }
+

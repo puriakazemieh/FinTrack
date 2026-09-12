@@ -1540,6 +1540,5 @@
     <string name="onboarding_theme_plain_light">ساده روشن</string>
 
     <!-- Default badge -->
-    <string name="label_default">پیش‌فرض</string>
     <string name="msg_cannot_delete_default">این مورد پیش‌فرض است و قابل حذف نیست</string>
 </resources>

@@ -120,7 +120,8 @@ class TransactionLocalDataSourceImpl(
             position = category.position.toLong(),
             parentId = category.parentId,
             updatedAt = now,
-            syncStatus = 1
+            syncStatus = 1,
+            isDefault = if (category.isDefault) 1L else 0L
         )
         categoryQueries.lastInsertRowId().awaitAsOne()
     }
@@ -138,6 +139,7 @@ class TransactionLocalDataSourceImpl(
                 parentId = category.parentId,
                 updatedAt = now,
                 syncStatus = 1,
+                isDefault = if (category.isDefault) 1L else 0L,
                 id = category.id ?: 0
             )
             1
@@ -166,6 +168,7 @@ class TransactionLocalDataSourceImpl(
             updatedAt = now,
             syncStatus = 1,
             currencyCode = source.currencyCode,
+            isDefault = if (source.isDefault) 1L else 0L,
             id = id
         )
         1
@@ -299,7 +302,8 @@ class TransactionLocalDataSourceImpl(
             position = source.position.toLong(),
             updatedAt = now,
             syncStatus = 1,
-            currencyCode = source.currencyCode
+            currencyCode = source.currencyCode,
+            isDefault = if (source.isDefault) 1L else 0L
         )
         sourceQueries.lastInsertRowId().awaitAsOne()
     }
@@ -572,7 +576,8 @@ class TransactionLocalDataSourceImpl(
                 position = category.position.toLong(),
                 parentId = category.parentId,
                 updatedAt = category.updatedAt,
-                syncStatus = category.syncStatus.value.toLong()
+                syncStatus = category.syncStatus.value.toLong(),
+                isDefault = if (category.isDefault) 1L else 0L
             )
         }
     }
@@ -602,7 +607,8 @@ class TransactionLocalDataSourceImpl(
                 position = source.position.toLong(),
                 updatedAt = source.updatedAt,
                 syncStatus = source.syncStatus.value.toLong(),
-                currencyCode = source.currencyCode
+                currencyCode = source.currencyCode,
+                isDefault = if (source.isDefault) 1L else 0L
             )
         }
     }
@@ -812,3 +818,6 @@ class TransactionLocalDataSourceImpl(
         personQueries.physicallyDeletePerson(id)
     }
 }
+
+
+

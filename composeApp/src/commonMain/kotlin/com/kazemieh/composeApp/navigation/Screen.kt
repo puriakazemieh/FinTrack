@@ -74,6 +74,9 @@ sealed class Screen {
     data class PersonDetail(val personId: Long) : Screen()
 
     @Serializable
+    data class TagDetail(val tagId: Long) : Screen()
+
+    @Serializable
     data object Debt : Screen()
 
     @Serializable
@@ -137,3 +140,4 @@ sealed class Screen {
     data object BottomBarGraph : Screen()
 
 }
+
