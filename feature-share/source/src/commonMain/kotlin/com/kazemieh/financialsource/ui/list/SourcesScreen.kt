@@ -62,7 +62,8 @@ fun SourcesScreen(
                         badge = source.formattedBalance + " " +
                             com.kazemieh.money.Currency.valueOf(source.currencyCode).symbol,
                         iconId = source.iconId,
-                        colorId = source.colorId
+                        colorId = source.colorId,
+                        isDefault = source.isDefault
                     )
                 },
                 onAddClick = { viewModel.onIntent(SourceIntent.OnAddSourceClick) },
@@ -74,6 +75,11 @@ fun SourcesScreen(
                 onEditClick = { item ->
                     state.sources.find { it.id == item.id }?.let {
                         viewModel.onIntent(SourceIntent.OnEditClick(it))
+                    }
+                },
+                onSetDefaultClick = { item ->
+                    state.sources.find { it.id == item.id }?.let {
+                        viewModel.onIntent(SourceIntent.SetDefaultSource(it))
                     }
                 },
                 onDeleteClick = { item ->

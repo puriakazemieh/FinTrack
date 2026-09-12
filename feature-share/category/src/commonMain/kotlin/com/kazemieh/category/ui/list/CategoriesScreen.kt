@@ -75,7 +75,8 @@ fun CategoriesScreen(
                             colorId = it.colorId,
                             parentId = it.parentId,
                             isExpandable = hasChildren && it.parentId == null,
-                            isExpanded = isExpanded
+                            isExpanded = isExpanded,
+                            isDefault = it.isDefault
                         )
                     }
                 }
@@ -101,6 +102,11 @@ fun CategoriesScreen(
                 },
                 onEditClick = { viewModel.onIntent(CategoryIntent.OnEditClick(state.categories.find { c -> c.id == it.id })) },
                 onDeleteClick = { viewModel.onIntent(CategoryIntent.OnDeleteClick(state.categories.find { c -> c.id == it.id })) },
+                onSetDefaultClick = { item -> 
+                    state.categories.find { c -> c.id == item.id }?.let { 
+                        viewModel.onIntent(CategoryIntent.SetDefaultCategory(it))
+                    }
+                },
                 onExpandClick = { item ->
                     viewModel.onIntent(CategoryIntent.ToggleExpand(item.id))
                 },

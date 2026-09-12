@@ -28,7 +28,8 @@ class CategoryViewModel(
     private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val observeCategoriesUseCase: ObserveCategoriesUseCase,
     private val observeCategoriesFlatUseCase: ObserveCategoriesFlatUseCase,
-    private val updateCategoryPositionsUseCase: UpdateCategoryPositionsUseCase
+    private val updateCategoryPositionsUseCase: UpdateCategoryPositionsUseCase,
+    private val updateCategoryUseCase: com.kazemieh.domain.usecase.UpdateCategoryUseCase
 ) : ViewModel() {
 
     init {
@@ -110,7 +111,16 @@ class CategoryViewModel(
                     selectedCategory = intent.category
                 )
             }
-
+            is CategoryIntent.SetDefaultCategory -> {
+                viewModelScope.launch {
+                    val previousDefault = _state.value.categories.find { it.isDefault }
+                    if (previousDefault != null && previousDefault.id != intent.category.id) {
+                        updateCategoryUseCase(previousDefault.copy(isDefault = false))
+                    }
+                    updateCategoryUseCase(intent.category.copy(isDefault = true))
+                }
+            }
+            
             CategoryIntent.OnDismiss -> {
                 viewModelScope.launch {
                     _effect.send(CategoryEffect.OnDismiss)
@@ -258,6 +268,7 @@ sealed interface CategoryIntent {
     data object OnAddCategoryClick : CategoryIntent
     data class OnDeleteClick(val category: Category? = null) : CategoryIntent
     data class OnEditClick(val category: Category? = null) : CategoryIntent
+    data class SetDefaultCategory(val category: Category) : CategoryIntent
     data object OnDismiss : CategoryIntent
     data object ResetFlags : CategoryIntent
     data object OnToggleReorder : CategoryIntent

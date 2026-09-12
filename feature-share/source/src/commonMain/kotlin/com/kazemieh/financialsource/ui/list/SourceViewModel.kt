@@ -18,7 +18,8 @@ import kotlinx.coroutines.launch
 class SourceViewModel(
     private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val observeSourcesUseCase: ObserveSourcesUseCase,
-    private val updateSourcePositionsUseCase: UpdateSourcePositionsUseCase
+    private val updateSourcePositionsUseCase: UpdateSourcePositionsUseCase,
+    private val updateSourceUseCase: com.kazemieh.domain.usecase.UpdateSourceUseCase
 ) : ViewModel() {
 
     init {
@@ -94,6 +95,15 @@ class SourceViewModel(
                     selectedSources = intent.source
                 )
             }
+            is SourceIntent.SetDefaultSource -> {
+                viewModelScope.launch {
+                    val previousDefault = _state.value.sources.find { it.isDefault }
+                    if (previousDefault != null && previousDefault.id != intent.source.id) {
+                        updateSourceUseCase(previousDefault.copy(isDefault = false))
+                    }
+                    updateSourceUseCase(intent.source.copy(isDefault = true))
+                }
+            }
         }
     }
 
@@ -146,6 +156,7 @@ sealed interface SourceIntent {
     data class SelectedSource(val selectedSources: Source) : SourceIntent
     data class OnEditClick(val source: Source) : SourceIntent
     data class OnDeleteClick(val source: Source? = null) : SourceIntent
+    data class SetDefaultSource(val source: Source) : SourceIntent
     data object ResetFlags : SourceIntent
     data object OnToggleReorder : SourceIntent
     data class UpdatePositions(val positions: Map<Long, Int>) : SourceIntent

@@ -30,6 +30,8 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Reorder
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -84,6 +86,7 @@ fun EntityList(
     items: List<EntityItem>,
     onEditClick: (EntityItem) -> Unit,
     onDeleteClick: (EntityItem) -> Unit,
+    onSetDefaultClick: ((EntityItem) -> Unit)? = null,
     onFilterClick: ((EntityItem) -> Unit)? = null,
     onItemClick: (EntityItem) -> Unit = {},
     onExpandClick: ((EntityItem) -> Unit)? = null,
@@ -134,6 +137,7 @@ fun EntityList(
                                 showActions = false,
                                 onEdit = {},
                                 onDelete = {},
+                                onSetDefault = null,
                                 onClick = {},
                                 isReorderMode = true,
                                 onMoveUp = {
@@ -196,6 +200,7 @@ fun EntityList(
                                         showActions = showActions,
                                         onEdit = { onEditClick(item) },
                                         onDelete = { onDeleteClick(item) },
+                                        onSetDefault = onSetDefaultClick?.let { callback -> { callback(item) } },
                                         onFilter = onFilterClick?.let { callback -> { callback(item) } },
                                         onClick = { onItemClick(item) },
                                         onExpand = onExpandClick?.let { callback -> { callback(item) } },
@@ -311,6 +316,7 @@ fun EntityRow(
     showActions: Boolean,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    onSetDefault: (() -> Unit)? = null,
     onFilter: (() -> Unit)? = null,
     onClick: () -> Unit,
     onExpand: (() -> Unit)? = null,
@@ -421,6 +427,13 @@ fun EntityRow(
                 }
             } else if (showActions) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    onSetDefault?.let {
+                        ActionIcon(
+                            icon = if (item.isDefault) Icons.Default.Star else Icons.Default.StarBorder,
+                            onClick = it,
+                            color = if (item.isDefault) GlassGreen else glassColors.text2
+                        )
+                    }
                     onFilter?.let {
                         ActionIcon(
                             icon = Icons.Default.FilterList,

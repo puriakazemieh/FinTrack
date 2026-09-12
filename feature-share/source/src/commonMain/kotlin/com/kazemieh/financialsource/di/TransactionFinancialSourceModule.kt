@@ -11,7 +11,8 @@ val transactionFinancialSourceModule = module {
         SourceViewModel(
             analytics = get(),
             observeSourcesUseCase = get(),
-            updateSourcePositionsUseCase = get()
+            updateSourcePositionsUseCase = get(),
+            updateSourceUseCase = get()
         )
     }
 }
