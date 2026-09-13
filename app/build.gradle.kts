@@ -72,6 +72,10 @@ android {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
     }
+
+    firebaseCrashlytics {
+        mappingFileUploadEnabled = true
+    }
 }
 
 dependencies {
@@ -98,15 +102,11 @@ dependencies {
     implementation(libs.firebase.crashlytics)
 }
 
-firebaseCrashlytics {
-    mappingFileUploadEnabled = true
-}
-
 /**
  * Compose resources from KMP libraries are runtime assets on Android. A normal Android app does
  * not merge them automatically, so copy both generated trees before every variant's asset merge.
  */
-val copyKmpComposeResourcesForAndroid by tasks.registering(org.gradle.api.tasks.Copy::class) {
+val copyKmpComposeResourcesForAndroid = tasks.register<org.gradle.api.tasks.Copy>("copyKmpComposeResourcesForAndroid") {
     dependsOn(
         ":composeApp:jvmProcessResources",
         ":core:designsystem:jvmProcessResources",
@@ -116,8 +116,8 @@ val copyKmpComposeResourcesForAndroid by tasks.registering(org.gradle.api.tasks.
     into(layout.buildDirectory.dir("generated/kmpComposeResources/android"))
 }
 
-android.sourceSets["main"].assets.srcDir(
-    layout.buildDirectory.dir("generated/kmpComposeResources/android").get().asFile
+android.sourceSets["main"].assets.directories.add(
+    layout.buildDirectory.dir("generated/kmpComposeResources/android")
 )
 
 tasks.configureEach {
