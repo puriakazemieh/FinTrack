@@ -240,6 +240,7 @@ fun App() {
                     .fillMaxSize()
                     .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
             ) {
+                com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs()
                 if (isReady) {
                     val isFirstRun = preferenceUseCases.getBooleanPreference(
                         com.kazemieh.domain.usecase.SeedDataUseCase.PREF_IS_FIRST_RUN,
