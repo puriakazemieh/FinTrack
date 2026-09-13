@@ -63,7 +63,7 @@ fun AddFrame(
     onFilterClick: (() -> Unit)? = null,
     trailingContent: @Composable RowScope.() -> Unit = {},
     hero: @Composable (() -> Unit)? = null,
-    preventSwipeDismiss: Boolean = true,
+    preventSwipeDismiss: Boolean = false,
     horizontalPadding: androidx.compose.ui.unit.Dp = 24.dp,
     content: @Composable ColumnScope.() -> Unit,
 ) {
