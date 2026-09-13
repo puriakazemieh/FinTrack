@@ -507,8 +507,7 @@ fun ShoppingItemSheet(
                     tags = emptySet()
                     focusRequester.requestFocus()
                 }
-            },
-            preventSwipeDismiss = false
+            }
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),

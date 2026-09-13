@@ -1,8 +1,13 @@
 package com.kazemieh.designsystem
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
 @Composable
-actual fun SystemBarsAppearance(darkTheme: Boolean) {
+actual fun SystemBarsAppearance(
+    darkTheme: Boolean,
+    statusBarColor: Color,
+    navigationBarColor: Color,
+) {
     // No system bars to manage on desktop.
 }

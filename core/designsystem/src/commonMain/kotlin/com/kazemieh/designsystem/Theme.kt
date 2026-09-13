@@ -149,7 +149,11 @@ fun FintrackTheme(
         onAccent = accent.onAccent
     )
 
-    SystemBarsAppearance(darkTheme = !isLight)
+    SystemBarsAppearance(
+        darkTheme = !isLight,
+        statusBarColor = colorScheme.background,
+        navigationBarColor = colorScheme.background,
+    )
 
     CompositionLocalProvider(
         LocalSpacing provides Dimensions(),

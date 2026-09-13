@@ -22,7 +22,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -31,7 +34,11 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,36 +70,65 @@ fun AddFrame(
     onFilterClick: (() -> Unit)? = null,
     trailingContent: @Composable RowScope.() -> Unit = {},
     hero: @Composable (() -> Unit)? = null,
-    preventSwipeDismiss: Boolean = false,
+    preventSwipeDismiss: Boolean = true,
     horizontalPadding: androidx.compose.ui.unit.Dp = 24.dp,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    // Keeps the enclosing ModalBottomSheet from being dismissed by the residual
-    // drag/fling that leaks out of the form's scrollable content when it reaches
-    // the top edge. Scrolling the form is unaffected (that delta is consumed by the
-    // list itself); only the leftover that would otherwise pull the sheet toward its
-    // Hidden state is absorbed here. The sheet can still be closed via the header
-    // button, the scrim, or the system back gesture.
+    // A form's residual drag must not dismiss its enclosing sheet before the form
+    // reaches its top edge. The first top-edge pull is consumed and arms dismissal;
+    // a later, separate pull is handed to ModalBottomSheet. This keeps normal
+    // scrolling stable while preserving the familiar pull-to-dismiss gesture.
+    var dismissArmed by remember { mutableStateOf(false) }
+    var consumedTopEdgePullInGesture by remember { mutableStateOf(false) }
     val keepSheetOpenConnection = remember {
         object : NestedScrollConnection {
             override fun onPostScroll(
                 consumed: Offset,
                 available: Offset,
                 source: NestedScrollSource
-            ): Offset = available.copy(x = 0f)
+            ): Offset {
+                if (consumed.y != 0f) {
+                    dismissArmed = false
+                }
+                if (available.y <= 0f) return Offset.Zero
+
+                return if (dismissArmed) {
+                    Offset.Zero
+                } else {
+                    consumedTopEdgePullInGesture = true
+                    available.copy(x = 0f)
+                }
+            }
 
             override suspend fun onPostFling(
                 consumed: Velocity,
                 available: Velocity
-            ): Velocity = available.copy(x = 0f)
+            ): Velocity {
+                // A release can still carry velocity from the first edge pull.
+                // Never pass that velocity to the sheet: dismissal must require a
+                // new drag, not the fling from the gesture that armed it.
+                return available.copy(x = 0f)
+            }
         }
     }
+    val dismissGestureGate = Modifier
+        .nestedScroll(keepSheetOpenConnection)
+        .pointerInput(Unit) {
+            awaitEachGesture {
+                awaitFirstDown(requireUnconsumed = false)
+                waitForUpOrCancellation()
+                if (consumedTopEdgePullInGesture) {
+                    dismissArmed = true
+                    consumedTopEdgePullInGesture = false
+                }
+            }
+        }
     Box(
         modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight(0.9f)
             .then(
-                if (preventSwipeDismiss) Modifier.nestedScroll(keepSheetOpenConnection)
+                if (preventSwipeDismiss) dismissGestureGate
                 else Modifier
             )
             .then(

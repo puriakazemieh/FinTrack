@@ -1,12 +1,17 @@
 package com.kazemieh.designsystem
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
 /**
- * Keeps the platform status/navigation bar icons legible against the current theme:
- * dark icons on light themes, light icons on dark themes. Applied eagerly so the bars
- * recolor in lock-step with theme (and tab) changes instead of lagging a frame behind.
+ * Keeps the platform status/navigation bars and icons in sync with the current theme.
+ * Applying their background color explicitly prevents the previous screen from showing
+ * through the bars during navigation transitions.
  * No-op on non-Android targets.
  */
 @Composable
-expect fun SystemBarsAppearance(darkTheme: Boolean)
+expect fun SystemBarsAppearance(
+    darkTheme: Boolean,
+    statusBarColor: Color,
+    navigationBarColor: Color,
+)
