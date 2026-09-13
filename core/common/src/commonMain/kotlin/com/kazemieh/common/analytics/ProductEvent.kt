@@ -42,6 +42,8 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     data object SourceUpdated : ProductEvent("source_updated")
     data object SourceDeleted : ProductEvent("source_deleted")
     data object SourceTransferInitiated : ProductEvent("source_transfer_initiated")
+    data object SourceDefaultChanged : ProductEvent("source_default_changed")
+    data object SourceReordered : ProductEvent("source_reordered")
 
     // 5. Categories
     data object CategoryListViewed : ProductEvent("category_list_viewed")
@@ -51,6 +53,7 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     data object CategoryParentChanged : ProductEvent("category_parent_changed")
     data object CategoryIconChanged : ProductEvent("category_icon_changed")
     data object CategoryReordered : ProductEvent("category_reordered")
+    data object CategoryDefaultChanged : ProductEvent("category_default_changed")
 
     // 6. Tags & Persons
     data object TagListViewed : ProductEvent("tag_list_viewed")
@@ -61,6 +64,8 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     data object PersonCreated : ProductEvent("person_created")
     data object PersonUpdated : ProductEvent("person_updated")
     data object PersonDeleted : ProductEvent("person_deleted")
+    data object PersonReordered : ProductEvent("person_reordered")
+    data object TagReordered : ProductEvent("tag_reordered")
 
     // 8. Budgets
     data object BudgetListViewed : ProductEvent("budget_list_viewed")
@@ -111,6 +116,14 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     data object NoteUpdated : ProductEvent("note_updated")
     data object NoteDeleted : ProductEvent("note_deleted")
     data object NoteListViewed : ProductEvent("note_list_viewed")
+    data class SmsDraftDetected(val sourceMatched: Boolean) : ProductEvent(
+        "sms_draft_detected",
+        mapOf("source_matched" to sourceMatched)
+    )
+    data object SmsDraftIgnored : ProductEvent("sms_draft_ignored")
+    data object SmsDraftsBulkDeleted : ProductEvent("sms_drafts_bulk_deleted")
+    data object SmsDraftQuickRegistered : ProductEvent("sms_draft_quick_registered")
+    data object SmsDraftApplied : ProductEvent("sms_draft_applied")
 
     // 13. Gamification & Achievements
     data object GamificationHubViewed : ProductEvent("gamification_hub_viewed")
@@ -134,6 +147,15 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     data class ThemeChanged(val themeName: String) : ProductEvent("theme_changed", mapOf("theme" to themeName))
     data object BaseCurrencyChanged : ProductEvent("base_currency_changed")
     data object NotificationSettingsChanged : ProductEvent("notification_settings_changed")
+    data object NotificationPermissionRequested : ProductEvent("notification_permission_requested")
+    data class NotificationPermissionResult(val granted: Boolean) : ProductEvent(
+        "notification_permission_result",
+        mapOf("granted" to granted)
+    )
+    data class SmsPermissionResult(val granted: Boolean) : ProductEvent(
+        "sms_permission_result",
+        mapOf("granted" to granted)
+    )
     data class NotificationSettingToggled(val settingType: String, val enabled: Boolean) : ProductEvent("notification_setting_toggled", mapOf("setting_type" to settingType, "enabled" to enabled))
     
     // 15. Lifecycle & Notifications

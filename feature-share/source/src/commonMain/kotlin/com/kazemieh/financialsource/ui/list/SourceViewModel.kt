@@ -77,6 +77,7 @@ class SourceViewModel(
             }
 
             is SourceIntent.UpdatePositions -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.SourceReordered)
                 viewModelScope.launch {
                     updateSourcePositionsUseCase(intent.positions)
                 }
@@ -102,6 +103,7 @@ class SourceViewModel(
                         updateSourceUseCase(previousDefault.copy(isDefault = false))
                     }
                     updateSourceUseCase(intent.source.copy(isDefault = true))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.SourceDefaultChanged)
                 }
             }
         }

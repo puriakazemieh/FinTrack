@@ -269,6 +269,7 @@ class DashboardViewModel(
             }
 
             is DashboardIntent.OpenSmsDraftTransaction -> viewModelScope.launch {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("sms_draft_opened"))
                 // Tapped a bank-SMS notification: load that specific draft and open the add sheet
                 // pre-filled with its amount / type / source, instead of a blank sheet.
                 val draft = smsDraftRepository.getSmsDraftById(intent.draftId)
@@ -286,6 +287,7 @@ class DashboardViewModel(
 
             is DashboardIntent.IgnoreSmsDraft -> viewModelScope.launch {
                 smsDraftRepository.markSmsDraftAsUsed(intent.draft.id)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsDraftIgnored)
                 _state.update { it.copy(showDeleteSmsConfirmation = false, smsDraftToDelete = null) }
             }
 
@@ -293,6 +295,7 @@ class DashboardViewModel(
                 _state.update { it.copy(isSmsDeleting = true) }
                 try {
                     smsDraftRepository.deleteUnusedSmsDrafts()
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsDraftsBulkDeleted)
                     _state.update {
                         it.copy(showDeleteAllSmsConfirmation = false, showSmsDetection = false)
                     }
@@ -338,6 +341,7 @@ class DashboardViewModel(
                 val id = transactionUseCaseGroup.addTransactionUseCase(transaction, emptyList(), emptyList())
                 if (id > 0) {
                     smsDraftRepository.markSmsDraftAsUsed(draft.id)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsDraftQuickRegistered)
                 }
                 _state.update { it.copy(isLoading = false) }
             }

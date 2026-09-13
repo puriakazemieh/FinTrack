@@ -118,6 +118,7 @@ class CategoryViewModel(
                         updateCategoryUseCase(previousDefault.copy(isDefault = false))
                     }
                     updateCategoryUseCase(intent.category.copy(isDefault = true))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.CategoryDefaultChanged)
                 }
             }
             

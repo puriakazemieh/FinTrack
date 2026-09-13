@@ -108,6 +108,12 @@ fun OnboardingScreen(
                         onSmsReadingResult = { granted ->
                             viewModel.onIntent(OnboardingIntent.SetSmsReading(granted))
                         },
+                        onNotificationPermissionResult = { granted ->
+                            viewModel.onIntent(OnboardingIntent.NotificationPermissionResult(granted))
+                        },
+                        onNotificationPermissionRequest = {
+                            viewModel.onIntent(OnboardingIntent.NotificationPermissionRequested)
+                        },
                         onSelectTheme = { theme ->
                             viewModel.onIntent(OnboardingIntent.SelectTheme(theme))
                         },
@@ -232,6 +238,8 @@ fun StepContent(
     onUpdateSource: (String, String) -> Unit,
     onUpdateSecurity: (String, String) -> Unit,
     onSmsReadingResult: (Boolean) -> Unit,
+    onNotificationPermissionResult: (Boolean) -> Unit,
+    onNotificationPermissionRequest: () -> Unit,
     onSelectTheme: (String) -> Unit,
     onSelectAccent: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -248,7 +256,11 @@ fun StepContent(
                     selectedTheme = state.selectedTheme,
                     onSelectTheme = onSelectTheme
                 )
-                3 -> PermissionsStep(onSmsReadingResult = onSmsReadingResult)
+                3 -> PermissionsStep(
+                    onSmsReadingResult = onSmsReadingResult,
+                    onNotificationPermissionResult = onNotificationPermissionResult,
+                    onNotificationPermissionRequest = onNotificationPermissionRequest
+                )
                 4 -> SetupStep(
                     name = state.sourceName,
                     balance = state.sourceBalance,
@@ -397,7 +409,11 @@ fun FeatureItem(text: String, icon: ImageVector) {
 }
 
 @Composable
-fun PermissionsStep(onSmsReadingResult: (Boolean) -> Unit = {}) {
+fun PermissionsStep(
+    onSmsReadingResult: (Boolean) -> Unit = {},
+    onNotificationPermissionResult: (Boolean) -> Unit = {},
+    onNotificationPermissionRequest: () -> Unit = {}
+) {
     val glassColors = LocalGlassColors.current
     var triggerPermission by remember { mutableStateOf(false) }
     var triggerSmsPermission by remember { mutableStateOf(false) }
@@ -409,6 +425,7 @@ fun PermissionsStep(onSmsReadingResult: (Boolean) -> Unit = {}) {
         onResult = { granted ->
             triggerPermission = false
             notificationsEnabled = granted
+            onNotificationPermissionResult(granted)
         }
     )
 
@@ -455,7 +472,13 @@ fun PermissionsStep(onSmsReadingResult: (Boolean) -> Unit = {}) {
             color = GlassAmber,
             checked = notificationsEnabled,
             onToggle = { enabled ->
-                if (enabled) triggerPermission = true else notificationsEnabled = false
+                if (enabled) {
+                    onNotificationPermissionRequest()
+                    triggerPermission = true
+                } else {
+                    notificationsEnabled = false
+                    onNotificationPermissionResult(false)
+                }
             }
         )
         PermissionToggleItem(

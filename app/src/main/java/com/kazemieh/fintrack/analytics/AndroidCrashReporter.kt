@@ -7,6 +7,10 @@ import com.kazemieh.common.analytics.CrashReporter
 class AndroidCrashReporter : CrashReporter {
     private val crashlytics = FirebaseCrashlytics.getInstance()
 
+    init {
+        crashlytics.setCrashlyticsCollectionEnabled(true)
+    }
+
     override fun recordException(error: Throwable, safeMessage: String?) {
         safeMessage?.let {
             crashlytics.log("Safe Context: $it")

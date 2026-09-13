@@ -103,6 +103,7 @@ class PersonViewModel(
             }
 
             is PersonIntent.UpdatePositions -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.PersonReordered)
                 viewModelScope.launch {
                     updatePersonPositionsUseCase(intent.positions)
                 }

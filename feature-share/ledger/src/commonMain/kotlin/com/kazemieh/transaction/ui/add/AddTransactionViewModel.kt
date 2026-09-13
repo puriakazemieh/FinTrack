@@ -105,20 +105,23 @@ class AddTransactionViewModel(
                 )
             }
 
-            is AddTransactionIntent.ApplySmsDraft -> _state.update {
-                val currency = Currency.valueOf(
-                    preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_CURRENCY, "")
-                )
-                val amount = if (currency.code == "IRT") intent.draft.amount / 10 else intent.draft.amount
-                it.copy(
-                    amount = amount.toString(),
-                    description = intent.draft.body,
-                    timeStamp = intent.draft.timeStamp,
-                    date = intent.draft.date,
-                    transactionType = intent.draft.type,
-                    smsDraft = intent.draft,
-                    relatedSmsDrafts = emptyList() // clear banner
-                )
+            is AddTransactionIntent.ApplySmsDraft -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsDraftApplied)
+                _state.update {
+                    val currency = Currency.valueOf(
+                        preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_CURRENCY, "")
+                    )
+                    val amount = if (currency.code == "IRT") intent.draft.amount / 10 else intent.draft.amount
+                    it.copy(
+                        amount = amount.toString(),
+                        description = intent.draft.body,
+                        timeStamp = intent.draft.timeStamp,
+                        date = intent.draft.date,
+                        transactionType = intent.draft.type,
+                        smsDraft = intent.draft,
+                        relatedSmsDrafts = emptyList() // clear banner
+                    )
+                }
             }
             is AddTransactionIntent.SetSource -> {
                 _state.update {

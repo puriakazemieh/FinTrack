@@ -197,6 +197,7 @@ class NotificationSettingsViewModel(
                 }
             }
             is NotificationSettingsIntent.RequestPermission -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationPermissionRequested)
                 if (intent.isRationaleShown) {
                     _state.update { it.copy(triggerSystemPermissionRequest = true, showPermissionRationale = false) }
                 } else {
@@ -212,6 +213,7 @@ class NotificationSettingsViewModel(
             }
             is NotificationSettingsIntent.OnPermissionResult -> {
                 _state.update { it.copy(triggerSystemPermissionRequest = false) }
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationPermissionResult(intent.granted))
                 if (intent.granted) {
                     _state.update { it.copy(showPermissionRationale = false) }
                 }

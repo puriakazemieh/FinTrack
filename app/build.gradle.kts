@@ -98,6 +98,10 @@ dependencies {
     implementation(libs.firebase.crashlytics)
 }
 
+firebaseCrashlytics {
+    mappingFileUploadEnabled = true
+}
+
 /**
  * Compose resources from KMP libraries are runtime assets on Android. A normal Android app does
  * not merge them automatically, so copy both generated trees before every variant's asset merge.

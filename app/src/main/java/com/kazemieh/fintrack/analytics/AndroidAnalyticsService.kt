@@ -2,6 +2,7 @@
 
 import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 
 import com.kazemieh.common.analytics.AnalyticsConsent
@@ -10,6 +11,7 @@ import com.kazemieh.common.analytics.ProductEvent
 
 class AndroidAnalyticsService(private val context: android.content.Context) : AnalyticsService {
     private val firebaseAnalytics = FirebaseAnalytics.getInstance(context)
+    private val crashlytics = FirebaseCrashlytics.getInstance()
 
     override fun track(event: ProductEvent) {
         val bundle = Bundle().apply {
@@ -25,6 +27,11 @@ class AndroidAnalyticsService(private val context: android.content.Context) : An
             }
         }
         firebaseAnalytics.logEvent(event.eventName, bundle)
+        if (event is ProductEvent.FeatureActionFailed) {
+            crashlytics.log(
+                "feature_action_failed:${event.params["feature_key"]}:${event.params["safe_error_code"]}"
+            )
+        }
     }
 
     override fun setConsent(consent: AnalyticsConsent) {

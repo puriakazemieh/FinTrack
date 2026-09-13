@@ -100,6 +100,7 @@ class TagViewModel(
             }
 
             is TagIntent.UpdatePositions -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.TagReordered)
                 viewModelScope.launch {
                     updateTagPositionsUseCase(intent.positions)
                 }

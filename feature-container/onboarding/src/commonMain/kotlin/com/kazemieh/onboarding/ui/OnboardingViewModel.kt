@@ -18,6 +18,7 @@ import org.jetbrains.compose.resources.getString
 
 class OnboardingViewModel(
     private val analytics: com.kazemieh.common.analytics.AnalyticsService,
+    private val crashReporter: com.kazemieh.common.analytics.CrashReporter,
     private val seedDataUseCase: SeedDataUseCase,
     private val preferenceUseCases: PreferenceUseCases
 ) : ViewModel() {
@@ -60,12 +61,21 @@ class OnboardingViewModel(
                     FinTrackPreferences.PREF_SMS_READING_ENABLED,
                     intent.enabled
                 )
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsPermissionResult(intent.enabled))
             }
             is OnboardingIntent.SelectTheme -> {
                 _state.update { it.copy(selectedTheme = intent.theme) }
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.ThemeChanged(intent.theme))
             }
             is OnboardingIntent.SelectAccent -> {
                 _state.update { it.copy(selectedAccent = intent.accent) }
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("onboarding_accent_selected"))
+            }
+            is OnboardingIntent.NotificationPermissionResult -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationPermissionResult(intent.granted))
+            }
+            OnboardingIntent.NotificationPermissionRequested -> {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationPermissionRequested)
             }
         }
     }
@@ -109,6 +119,8 @@ class OnboardingViewModel(
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.OnboardingCompleted)
                 _effect.send(OnboardingEffect.NavigateToDashboard)
             } catch (e: Exception) {
+                crashReporter.recordException(e, "onboarding_seed_failed")
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionFailed("onboarding", "seed_failed"))
                 _effect.send(OnboardingEffect.ShowError(e.message ?: "Unknown Error"))
             } finally {
                 _state.update { it.copy(isLoading = false) }
@@ -136,6 +148,8 @@ sealed interface OnboardingIntent {
     data class UpdateSourceDetails(val name: String, val balance: String) : OnboardingIntent
     data class UpdateSecurityDetails(val question: String, val answer: String) : OnboardingIntent
     data class SetSmsReading(val enabled: Boolean) : OnboardingIntent
+    data object NotificationPermissionRequested : OnboardingIntent
+    data class NotificationPermissionResult(val granted: Boolean) : OnboardingIntent
     data class SelectTheme(val theme: String) : OnboardingIntent
     data class SelectAccent(val accent: String) : OnboardingIntent
 }

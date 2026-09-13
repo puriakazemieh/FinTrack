@@ -26,6 +26,8 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
     private val transactionRepository: TransactionRepository by inject()
     private val notificationManager: NotificationManager by inject()
     private val preferenceUseCases: PreferenceUseCases by inject()
+    private val analytics: com.kazemieh.common.analytics.AnalyticsService by inject()
+    private val crashReporter: com.kazemieh.common.analytics.CrashReporter by inject()
     private val scope = CoroutineScope(Dispatchers.IO)
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -38,19 +40,23 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                 true
             )
         } catch (e: Exception) {
+            crashReporter.recordException(e, "sms_preference_read_failed")
             true
         }
         if (!smsReadingEnabled) return
 
         if (intent.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
             val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
-            for (message in messages) {
-                val sender = message.displayOriginatingAddress ?: ""
-                val body = message.displayMessageBody ?: ""
+            val pendingResult = goAsync()
+            scope.launch {
+                try {
+                    for (message in messages) {
+                        val sender = message.displayOriginatingAddress ?: ""
+                        val body = message.displayMessageBody ?: ""
 
-                val draft = BankParserRegistry.parse(sender, body)
-                if (draft != null) {
-                    scope.launch {
+                        val draft = BankParserRegistry.parse(sender, body)
+                        if (draft == null) continue
+
                         val sources = transactionRepository.observeSources().first()
                         val detectedSource = sources.find {
                             it.smsSender?.equals(sender, ignoreCase = true) == true
@@ -60,8 +66,12 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                             } ?: sources.find { it.matchesBankName(draft.bankName) }
                         
                         val finalDraft = draft.copy(sourceId = detectedSource?.id)
-                        
                         val draftId = smsDraftRepository.addSmsDraft(finalDraft)
+                        analytics.track(
+                            com.kazemieh.common.analytics.ProductEvent.SmsDraftDetected(
+                                sourceMatched = detectedSource != null
+                            )
+                        )
 
                         val title = getString(Res.string.sms_detection_title)
                         val messageStr = getString(Res.string.sms_detection_desc, finalDraft.bankName)
@@ -75,6 +85,16 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                             smsDraftId = draftId
                         )
                     }
+                } catch (e: Exception) {
+                    crashReporter.recordException(e, "sms_draft_processing_failed")
+                    analytics.track(
+                        com.kazemieh.common.analytics.ProductEvent.FeatureActionFailed(
+                            "sms_draft_processing",
+                            "processing_failed"
+                        )
+                    )
+                } finally {
+                    pendingResult.finish()
                 }
             }
         }
