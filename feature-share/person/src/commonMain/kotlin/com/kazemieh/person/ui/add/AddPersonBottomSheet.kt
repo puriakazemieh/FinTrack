@@ -127,7 +127,7 @@ fun AddPersonContent(
         } else null
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().weight(1f),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(bottom = 24.dp)
         ) {

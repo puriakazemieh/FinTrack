@@ -103,7 +103,7 @@ fun AddGoalContent(
         showHero = false
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().weight(1f),
             verticalArrangement = Arrangement.spacedBy(10.dp),
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
