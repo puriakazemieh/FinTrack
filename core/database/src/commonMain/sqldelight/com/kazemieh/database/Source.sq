@@ -18,12 +18,13 @@ CREATE TABLE IF NOT EXISTS source (
     updatedAt INTEGER NOT NULL DEFAULT 0,
     syncStatus INTEGER NOT NULL DEFAULT 0,
     currencyCode TEXT NOT NULL DEFAULT 'IRT',
-    isDefault INTEGER NOT NULL DEFAULT 0
+    isDefault INTEGER NOT NULL DEFAULT 0,
+    smsSender TEXT
 );
 
 addSource:
-INSERT INTO source(name, balance, cardNumber, description, type, colorId, iconId, shabaNumber, accountNumber, cvv2, expirationMonth, expirationYear, branchCode, branchName, position, updatedAt, syncStatus, currencyCode, isDefault)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO source(name, balance, cardNumber, description, type, colorId, iconId, shabaNumber, accountNumber, cvv2, expirationMonth, expirationYear, branchCode, branchName, position, updatedAt, syncStatus, currencyCode, isDefault, smsSender)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 observeSources:
 SELECT * FROM source WHERE syncStatus != 2 ORDER BY position ASC;
@@ -44,14 +45,22 @@ DELETE FROM source WHERE id = ?;
 
 updateSource:
 UPDATE source
-SET name = ?, balance = ?, cardNumber = ?, description = ?, type = ?, colorId = ?, iconId = ?, shabaNumber = ?, accountNumber = ?, cvv2 = ?, expirationMonth = ?, expirationYear = ?, branchCode = ?, branchName = ?, position = ?, updatedAt = ?, syncStatus = ?, currencyCode = ?, isDefault = ?
+SET name = ?, balance = ?, cardNumber = ?, description = ?, type = ?, colorId = ?, iconId = ?, shabaNumber = ?, accountNumber = ?, cvv2 = ?, expirationMonth = ?, expirationYear = ?, branchCode = ?, branchName = ?, position = ?, updatedAt = ?, syncStatus = ?, currencyCode = ?, isDefault = ?, smsSender = ?
 WHERE id = ?;
 
 updateSourcePosition:
 UPDATE source SET position = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
 
+clearDefaultSource:
+UPDATE source
+SET isDefault = 0, updatedAt = ?, syncStatus = ?
+WHERE id != ? AND isDefault = 1;
+
 getDefaultSource:
-SELECT * FROM source ORDER BY id LIMIT 1;
+SELECT * FROM source
+WHERE syncStatus != 2
+ORDER BY isDefault DESC, position ASC, id ASC
+LIMIT 1;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
@@ -66,8 +75,8 @@ AND syncStatus != 2
 LIMIT 1;
 
 insertFullSource:
-INSERT OR REPLACE INTO source(id, name, balance, cardNumber, description, type, colorId, iconId, shabaNumber, accountNumber, cvv2, expirationMonth, expirationYear, branchCode, branchName, position, updatedAt, syncStatus, currencyCode, isDefault)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO source(id, name, balance, cardNumber, description, type, colorId, iconId, shabaNumber, accountNumber, cvv2, expirationMonth, expirationYear, branchCode, branchName, position, updatedAt, syncStatus, currencyCode, isDefault, smsSender)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getMostUsedSources:
 SELECT * FROM source
@@ -100,3 +109,4 @@ UPDATE source SET syncStatus = 0 WHERE id = ?;
 
 batchConvertBalances:
 UPDATE source SET balance = CAST(CAST(balance AS REAL) * :rate AS INTEGER), currencyCode = :newCode, updatedAt = :now, syncStatus = 1 WHERE currencyCode = :oldCode AND syncStatus != 2;
+

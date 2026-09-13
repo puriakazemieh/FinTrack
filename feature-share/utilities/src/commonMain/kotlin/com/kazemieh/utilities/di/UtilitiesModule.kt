@@ -1,6 +1,5 @@
 package com.kazemieh.utilities.di
 
-import com.kazemieh.utilities.ui.calendar.FinancialCalendarViewModel
 import com.kazemieh.utilities.ui.converter.CurrencyConverterViewModel
 import com.kazemieh.utilities.ui.events.EventsViewModel
 import com.kazemieh.utilities.ui.faq.FAQViewModel
@@ -17,5 +16,4 @@ val utilitiesModule = module {
     viewModelOf(::FAQViewModel)
     viewModelOf(::SupportViewModel)
     viewModelOf(::EventsViewModel)
-    viewModelOf(::FinancialCalendarViewModel)
 }

@@ -75,7 +75,7 @@ class PersonDetailViewModel(
                 persons = setOf(Person(id = personId, name = "")),
                 isAllPersons = false
             )
-            observeTransactionsUseCase(filter, PageRequest(limit = 100, offset = 0))
+            observeTransactionsUseCase(filter, PageRequest(limit = Int.MAX_VALUE, offset = 0))
                 .map { it.items }
                 .combine(_searchQuery) { transactions, query ->
                     if (query.isBlank()) {

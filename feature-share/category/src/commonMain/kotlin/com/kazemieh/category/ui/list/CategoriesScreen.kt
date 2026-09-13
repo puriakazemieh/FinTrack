@@ -21,6 +21,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun CategoriesScreen(
     onBack: () -> Unit,
     onNavigateToTransactions: ((com.kazemieh.common.model.Category) -> Unit)? = null,
+    onNavigateToDetail: ((com.kazemieh.common.model.Category) -> Unit)? = null,
     viewModel: CategoryViewModel = koinViewModel()
 ) {
     LaunchedEffect(Unit) {
@@ -113,6 +114,7 @@ fun CategoriesScreen(
                 onItemClick = { item ->
                     state.categories.find { it.id == item.id }?.let { category ->
                         viewModel.onIntent(CategoryIntent.SelectedCategory(category))
+                        onNavigateToDetail?.invoke(category)
                     }
                 }
             )

@@ -8,6 +8,7 @@ interface SmsDraftLocalDataSource {
     fun observeUnusedSmsDrafts(): Flow<List<SmsDraft>>
     suspend fun markSmsDraftAsUsed(id: Long)
     suspend fun deleteSmsDraft(id: Long)
+    suspend fun deleteUnusedSmsDrafts()
     suspend fun getSmsDraftById(id: Long): SmsDraft?
     suspend fun updateSmsDraft(smsDraft: SmsDraft)
 }

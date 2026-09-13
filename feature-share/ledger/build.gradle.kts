@@ -17,7 +17,7 @@ kotlin {
         minSdk = 24
     }
 
-    val xcfName = "core:transactionKit"
+    val xcfName = "core:ledgerKit"
 
     iosX64 {
         binaries.framework {

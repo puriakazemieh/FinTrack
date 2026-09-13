@@ -70,6 +70,10 @@ class SmsDraftLocalDataSourceImpl(
         smsDraftQueries.deleteSmsDraft(id)
     }
 
+    override suspend fun deleteUnusedSmsDrafts(): Unit = withContext(Dispatchers.Default) {
+        smsDraftQueries.deleteUnusedSmsDrafts()
+    }
+
     override suspend fun getSmsDraftById(id: Long): SmsDraft? = withContext(Dispatchers.Default) {
         smsDraftQueries.getSmsDraftById(id)
             .awaitAsOneOrNull()

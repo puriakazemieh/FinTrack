@@ -52,12 +52,10 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                 if (draft != null) {
                     scope.launch {
                         val sources = transactionRepository.observeSources().first()
-                        val detectedSource = draft.sourceIdentifier?.let { identifier ->
-                            transactionRepository.getSourceByIdentifier(identifier)
-                        } ?: sources.find { 
-                            it.name.contains(draft.bankName, ignoreCase = true) || 
-                            draft.bankName.contains(it.name, ignoreCase = true)
-                        }
+                        val detectedSource = sources.find { it.smsSender == sender }
+                            ?: draft.sourceIdentifier?.let { identifier ->
+                                transactionRepository.getSourceByIdentifier(identifier)
+                            } ?: sources.find { it.matchesBankName(draft.bankName) }
                         
                         val finalDraft = draft.copy(sourceId = detectedSource?.id)
                         
@@ -80,3 +78,24 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
         }
     }
 }
+
+private fun com.kazemieh.common.model.Source.matchesBankName(bankName: String): Boolean {
+    val aliases = mapOf(
+        "mellat" to setOf("mellat", "ملت"),
+        "saderat" to setOf("saderat", "صادرات"),
+        "pasargad" to setOf("pasargad", "پاسارگاد"),
+        "saman" to setOf("saman", "سامان"),
+        "blu" to setOf("blu", "بلو", "بلوبانک")
+    )
+    val normalizedSource = name.normalizeBankText()
+    val normalizedBank = bankName.normalizeBankText()
+    val candidates = aliases.entries.firstOrNull { (key, values) ->
+        normalizedBank == key || normalizedBank in values
+    }?.value ?: setOf(normalizedBank)
+    return candidates.any { candidate ->
+        candidate.isNotBlank() && normalizedSource.contains(candidate)
+    }
+}
+
+private fun String.normalizeBankText(): String =
+    lowercase().replace('ي', 'ی').replace('ك', 'ک').replace(" ", "")

@@ -19,6 +19,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun SourcesScreen(
     onBack: () -> Unit,
     onNavigateToTransactions: ((Source) -> Unit)? = null,
+    onNavigateToDetail: ((Source) -> Unit)? = null,
     viewModel: SourceViewModel = koinViewModel()
 ) {
     LaunchedEffect(Unit) { viewModel.onIntent(SourceIntent.LoadAllSource) }
@@ -85,6 +86,11 @@ fun SourcesScreen(
                 onDeleteClick = { item ->
                     state.sources.find { it.id == item.id }?.let {
                         viewModel.onIntent(SourceIntent.OnDeleteClick(it))
+                    }
+                },
+                onItemClick = { item ->
+                    state.sources.find { it.id == item.id }?.let {
+                        onNavigateToDetail?.invoke(it)
                     }
                 }
             )

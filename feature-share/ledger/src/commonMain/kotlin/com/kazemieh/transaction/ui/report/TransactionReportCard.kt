@@ -1,6 +1,7 @@
 package com.kazemieh.transaction.ui.report
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +15,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -460,8 +468,8 @@ private fun TrendLegend(color: Color, label: String) {
 }
 
 /**
- * A calendar of the current Persian month where each day is tinted by its net cashflow — green when
- * income beat expense, red when it didn't. Gives an at-a-glance read of which days cost the user.
+ * A compact cashflow entry point for the selected Persian month. Expanding it reveals the
+ * per-day calendar, keeping the transaction page focused while preserving calendar detail.
  */
 @Composable
 fun CashflowCalendarCard(
@@ -470,48 +478,64 @@ fun CashflowCalendarCard(
     val glassColors = LocalGlassColors.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val cashflow = state.monthlyCashflow ?: return
-    if (cashflow.netByDay.isEmpty()) return
+    var expanded by remember(cashflow.year, cashflow.month) { mutableStateOf(false) }
 
     val weekdays = stringResource(Res.string.weekday_initials).split(",")
     // Leading blanks for the offset, then one cell per day, padded to a full final week.
     val totalCells = cashflow.firstWeekdayOffset + cashflow.daysInMonth
     val rows = ((totalCells + 6) / 7)
 
-    GlassCard(modifier = Modifier.fillMaxWidth(), padding = 14.dp) {
+    GlassCard(
+        modifier = Modifier.fillMaxWidth().clickable { expanded = !expanded },
+        padding = 14.dp
+    ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            FintrackLabelMediumText(
-                text = stringResource(Res.string.label_cashflow_calendar, cashflow.monthLabel),
-                color = glassColors.text2
-            )
-
-            Row(modifier = Modifier.fillMaxWidth()) {
-                weekdays.forEach { wd ->
-                    FintrackLabelSmallText(
-                        text = wd,
-                        fontSize = 10.sp,
-                        color = glassColors.text3,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                FintrackLabelMediumText(
+                    text = stringResource(Res.string.label_cashflow_calendar, cashflow.monthLabel),
+                    color = glassColors.text2
+                )
+                Icon(
+                    imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = null,
+                    tint = glassColors.text3
+                )
             }
 
-            for (row in 0 until rows) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    for (col in 0 until 7) {
-                        val cellIndex = row * 7 + col
-                        val day = cellIndex - cashflow.firstWeekdayOffset + 1
-                        if (day in 1..cashflow.daysInMonth) {
-                            CashflowDayCell(
-                                day = day,
-                                net = cashflow.netByDay[day],
-                                modifier = Modifier.weight(1f)
-                            )
-                        } else {
-                            Spacer(Modifier.weight(1f))
+            if (expanded) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    weekdays.forEach { wd ->
+                        FintrackLabelSmallText(
+                            text = wd,
+                            fontSize = 10.sp,
+                            color = glassColors.text3,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+
+                for (row in 0 until rows) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        for (col in 0 until 7) {
+                            val cellIndex = row * 7 + col
+                            val day = cellIndex - cashflow.firstWeekdayOffset + 1
+                            if (day in 1..cashflow.daysInMonth) {
+                                CashflowDayCell(
+                                    day = day,
+                                    net = cashflow.netByDay[day],
+                                    modifier = Modifier.weight(1f)
+                                )
+                            } else {
+                                Spacer(Modifier.weight(1f))
+                            }
                         }
                     }
                 }

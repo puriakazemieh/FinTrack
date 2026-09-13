@@ -28,6 +28,8 @@ object BankParserRegistry {
         return specificParser?.parse(sender, body) ?: fallbackParser?.parse(sender, body)
     }
 
+    fun getParsers(): List<BankParser> = parsers.toList()
+
     fun init(defaultParsers: List<BankParser>, fallback: BankParser? = null) {
         parsers.clear()
         parsers.addAll(defaultParsers)

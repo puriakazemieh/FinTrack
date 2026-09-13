@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AddTransactionViewModel(
@@ -104,13 +105,18 @@ class AddTransactionViewModel(
                 )
             }
 
-                                    is AddTransactionIntent.ApplySmsDraft -> _state.update {
+            is AddTransactionIntent.ApplySmsDraft -> _state.update {
+                val currency = Currency.valueOf(
+                    preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_CURRENCY, "")
+                )
+                val amount = if (currency.code == "IRT") intent.draft.amount / 10 else intent.draft.amount
                 it.copy(
-                    amount = intent.draft.amount.toString(),
+                    amount = amount.toString(),
                     description = intent.draft.body,
                     timeStamp = intent.draft.timeStamp,
                     date = intent.draft.date,
                     transactionType = intent.draft.type,
+                    smsDraft = intent.draft,
                     relatedSmsDrafts = emptyList() // clear banner
                 )
             }
@@ -126,12 +132,15 @@ class AddTransactionViewModel(
                     val unusedDrafts = smsDraftRepository.observeUnusedSmsDrafts().firstOrNull() ?: emptyList()
                     val matchingDrafts = unusedDrafts.filter { draft ->
                         val card = intent.source?.cardNumber
+                        val account = intent.source?.accountNumber
                         val desc = intent.source?.description
                         val ident = draft.sourceIdentifier
                         (card != null && draft.body.contains(card)) ||
+                        (account != null && draft.body.contains(account)) ||
                         (desc != null && desc.isNotBlank() && draft.bankName.contains(desc, ignoreCase = true)) ||
                         (draft.sourceId != null && draft.sourceId == intent.source?.id) ||
-                        (ident != null && card != null && card.endsWith(ident))
+                        (ident != null && card != null && card.endsWith(ident)) ||
+                        (ident != null && account != null && account.endsWith(ident))
                     }
                     _state.update { it.copy(relatedSmsDrafts = matchingDrafts) }
                     // if (matchingDrafts.isNotEmpty()) { // We will show a banner or sheet }
@@ -161,9 +170,16 @@ class AddTransactionViewModel(
             }
 
             is AddTransactionIntent.SetDate -> _state.update {
+                val timeZone = TimeZone.currentSystemDefault()
+                val selectedDate = Instant.fromEpochMilliseconds(intent.timeStamp).toPersianDateTime(timeZone)
+                val currentDateTime = Instant.fromEpochMilliseconds(it.timeStamp).toPersianDateTime(timeZone)
                 it.copy(
                     date = intent.date,
-                    timeStamp = intent.timeStamp,
+                    timeStamp = selectedDate.copy(
+                        hour = currentDateTime.hour,
+                        minute = currentDateTime.minute,
+                        second = currentDateTime.second
+                    ).toEpochMilliseconds(timeZone),
                     sheetStack = it.sheetStack.dropLast(1)
                 )
             }
@@ -235,7 +251,7 @@ class AddTransactionViewModel(
             _state.update { 
                 it.copy(
                     date = "${today.day.toPersianDigits()} / ${today.monthString} / ${today.year.toPersianDigits()}",
-                    timeStamp = today.toTimestamp(),
+                    timeStamp = Clock.System.now().toEpochMilliseconds(),
                     smsDraft = smsDraft,
                     amount = prefilledAmount,
                     transactionType = smsDraft?.type ?: TransactionType.EXPENSE

@@ -129,19 +129,31 @@ class TransactionLocalDataSourceImpl(
     override suspend fun updateCategory(category: Category): Int =
         withContext(Dispatchers.Default) {
             val now = Clock.System.now().toEpochMilliseconds()
-            categoryQueries.updateCategory(
-                name = category.name,
-                description = category.description,
-                type = category.type.count.toLong(),
-                colorId = category.colorId.toLong(),
-                iconId = category.iconId.toLong(),
-                position = category.position.toLong(),
-                parentId = category.parentId,
-                updatedAt = now,
-                syncStatus = 1,
-                isDefault = if (category.isDefault) 1L else 0L,
-                id = category.id ?: 0
-            )
+            val id = category.id ?: throw IllegalArgumentException("Category ID cannot be null")
+            db.transaction {
+                if (category.isDefault) {
+                    categoryQueries.clearDefaultCategory(
+                        updatedAt = now,
+                        syncStatus = 1,
+                        type = category.type.count.toLong(),
+                        parentId = category.parentId,
+                        id = id
+                    )
+                }
+                categoryQueries.updateCategory(
+                    name = category.name,
+                    description = category.description,
+                    type = category.type.count.toLong(),
+                    colorId = category.colorId.toLong(),
+                    iconId = category.iconId.toLong(),
+                    position = category.position.toLong(),
+                    parentId = category.parentId,
+                    updatedAt = now,
+                    syncStatus = 1,
+                    isDefault = if (category.isDefault) 1L else 0L,
+                    id = id
+                )
+            }
             1
         }
 
@@ -149,28 +161,34 @@ class TransactionLocalDataSourceImpl(
         val id = source.id ?: throw IllegalArgumentException("Source ID cannot be null")
         val now = Clock.System.now().toEpochMilliseconds()
 
-        sourceQueries.updateSource(
-            name = source.name,
-            balance = source.balance.toLong(),
-            cardNumber = source.cardNumber,
-            description = source.description,
-            type = source.type.toLong(),
-            colorId = source.colorId.toLong(),
-            iconId = source.iconId.toLong(),
-            shabaNumber = source.shabaNumber,
-            accountNumber = source.accountNumber,
-            cvv2 = source.cvv2,
-            expirationMonth = source.expirationMonth,
-            expirationYear = source.expirationYear,
-            branchCode = source.branchCode,
-            branchName = source.branchName,
-            position = source.position.toLong(),
-            updatedAt = now,
-            syncStatus = 1,
-            currencyCode = source.currencyCode,
-            isDefault = if (source.isDefault) 1L else 0L,
-            id = id
-        )
+        db.transaction {
+            if (source.isDefault) {
+                sourceQueries.clearDefaultSource(updatedAt = now, syncStatus = 1, id = id)
+            }
+            sourceQueries.updateSource(
+                name = source.name,
+                balance = source.balance.toLong(),
+                cardNumber = source.cardNumber,
+                description = source.description,
+                type = source.type.toLong(),
+                colorId = source.colorId.toLong(),
+                iconId = source.iconId.toLong(),
+                shabaNumber = source.shabaNumber,
+                accountNumber = source.accountNumber,
+                cvv2 = source.cvv2,
+                expirationMonth = source.expirationMonth,
+                expirationYear = source.expirationYear,
+                branchCode = source.branchCode,
+                branchName = source.branchName,
+                position = source.position.toLong(),
+                updatedAt = now,
+                syncStatus = 1,
+                currencyCode = source.currencyCode,
+                isDefault = if (source.isDefault) 1L else 0L,
+                smsSender = source.smsSender,
+                id = id
+            )
+        }
         1
     }
 
@@ -204,6 +222,7 @@ class TransactionLocalDataSourceImpl(
 
     override suspend fun deleteCategory(category: Category, moveCategory: Category?) =
         withContext(Dispatchers.Default) {
+            require(!category.isDefault) { "Default categories cannot be deleted" }
             db.transaction {
                 val fromId = requireNotNull(category.id)
                 val toId = moveCategory?.id
@@ -261,6 +280,7 @@ class TransactionLocalDataSourceImpl(
 
     override suspend fun deleteSource(deleteSource: Source, moveSource: Source?) =
         withContext(Dispatchers.Default) {
+            require(!deleteSource.isDefault) { "Default sources cannot be deleted" }
             db.transaction {
                 val fromId = requireNotNull(deleteSource.id)
                 val toId = moveSource?.id
@@ -303,7 +323,8 @@ class TransactionLocalDataSourceImpl(
             updatedAt = now,
             syncStatus = 1,
             currencyCode = source.currencyCode,
-            isDefault = if (source.isDefault) 1L else 0L
+            isDefault = if (source.isDefault) 1L else 0L,
+                smsSender = source.smsSender
         )
         sourceQueries.lastInsertRowId().awaitAsOne()
     }
@@ -608,7 +629,8 @@ class TransactionLocalDataSourceImpl(
                 updatedAt = source.updatedAt,
                 syncStatus = source.syncStatus.value.toLong(),
                 currencyCode = source.currencyCode,
-                isDefault = if (source.isDefault) 1L else 0L
+                isDefault = if (source.isDefault) 1L else 0L,
+                smsSender = source.smsSender
             )
         }
     }

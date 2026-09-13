@@ -42,7 +42,6 @@ import com.kazemieh.tag.ui.list.TagsScreen
 import com.kazemieh.tools.ToolsScreen
 import com.kazemieh.transactions.TransactionsScreen
 import com.kazemieh.utilities.ui.converter.CurrencyConverterScreen
-import com.kazemieh.utilities.ui.calendar.FinancialCalendarScreen
 import com.kazemieh.utilities.ui.events.EventsScreen
 import com.kazemieh.utilities.ui.faq.FAQScreen
 import com.kazemieh.utilities.ui.fx.FxRatesScreen
@@ -54,8 +53,8 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
     val navigateToTransactions: (Any?) -> Unit = { data ->
         navController.popBackStack()
         val route = when (data) {
-            is Category -> Screen.Transactions(categoryId = data.id)
-            is Source -> Screen.Transactions(sourceId = data.id)
+            is Category -> Screen.CategoryDetail(categoryId = data.id ?: 0L)
+            is Source -> Screen.SourceDetail(sourceId = data.id ?: 0L)
             is Tag -> Screen.TagDetail(tagId = data.id ?: 0L)
             is Person -> Screen.PersonDetail(personId = data.id ?: 0L)
             is TransactionType -> Screen.Transactions(transactionType = data.name)
@@ -210,6 +209,9 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onBack = { navController.popBackStack() },
                 onNavigateToTransactions = { source ->
                     navigateToTransactions(source)
+                },
+                onNavigateToDetail = { source ->
+                    source.id?.let { navController.navigate(Screen.SourceDetail(it)) }
                 }
             )
         }
@@ -219,6 +221,9 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onBack = { navController.popBackStack() },
                 onNavigateToTransactions = { category ->
                     navigateToTransactions(category)
+                },
+                onNavigateToDetail = { category ->
+                    category.id?.let { navController.navigate(Screen.CategoryDetail(it)) }
                 }
             )
         }
@@ -240,6 +245,22 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onNavigateToNoteEdit = { noteId ->
                     navController.navigate(Screen.NoteEdit(noteId))
                 }
+            )
+        }
+
+        composable<Screen.CategoryDetail> { backStackEntry ->
+            val args = backStackEntry.toRoute<Screen.CategoryDetail>()
+            com.kazemieh.category.ui.detail.CategoryDetailScreen(
+                categoryId = args.categoryId,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.SourceDetail> { backStackEntry ->
+            val args = backStackEntry.toRoute<Screen.SourceDetail>()
+            com.kazemieh.financialsource.ui.detail.SourceDetailScreen(
+                sourceId = args.sourceId,
+                onBack = { navController.popBackStack() }
             )
         }
 

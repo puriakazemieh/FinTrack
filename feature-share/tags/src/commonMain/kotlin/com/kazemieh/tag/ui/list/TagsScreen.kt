@@ -19,6 +19,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun TagsScreen(
     onBack: () -> Unit,
     onNavigateToTransactions: ((Tag) -> Unit)? = null,
+    onNavigateToDetail: ((Tag) -> Unit)? = null,
     viewModel: TagViewModel = koinViewModel()
 ) {
     LaunchedEffect(Unit) {
@@ -84,7 +85,7 @@ fun TagsScreen(
                 },
                 onItemClick = { item ->
                     state.tags.find { it.id == item.id }?.let {
-                        viewModel.onIntent(TagIntent.OnEditClick(it))
+                        onNavigateToDetail?.invoke(it)
                     }
                 }
             )

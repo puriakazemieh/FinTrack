@@ -176,7 +176,8 @@ fun SourceDb.toSource() = Source(
     branchName = branchName,
     currencyCode = currencyCode,
     updatedAt = updatedAt,
-    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt()),
+    smsSender = smsSender
 )
 
 // Tag Mappers

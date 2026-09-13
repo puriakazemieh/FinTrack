@@ -41,7 +41,7 @@ fun SheetFrame(
     modifier: Modifier = Modifier,
     sub: String? = null,
     horizontalPadding: Dp = 24.dp,
-    isFullScreen: Boolean = true,
+    isFullScreen: Boolean = false,
     primaryButtonText: String? = null,
     onPrimaryClick: (() -> Unit)? = null,
     secondaryButtonText: String? = null,

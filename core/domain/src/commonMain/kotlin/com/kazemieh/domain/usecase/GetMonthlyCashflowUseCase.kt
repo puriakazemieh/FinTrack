@@ -21,19 +21,19 @@ data class MonthlyCashflow(
 )
 
 /**
- * Buckets the current Persian month's transactions into a per-day net (income − expense) so the
+ * Buckets the requested Persian month's transactions into a per-day net (income − expense) so the
  * report can draw a cashflow calendar — green days earned more than they spent, red days the
  * opposite.
  */
 class GetMonthlyCashflowUseCase(
     private val repository: TransactionRepository
 ) {
-    suspend operator fun invoke(): MonthlyCashflow {
+    suspend operator fun invoke(year: Int? = null, month: Int? = null): MonthlyCashflow {
         val now = PersianDateTime.parse(kotlin.time.Clock.System.now().toEpochMilliseconds())
-        val year = now.year
-        val month = now.month
+        val selectedYear = year ?: now.year
+        val selectedMonth = month ?: now.month
 
-        val firstDay = PersianDateTime(year, month, 1)
+        val firstDay = PersianDateTime(selectedYear, selectedMonth, 1)
         val daysInMonth = firstDay.monthLength()
         val offset = firstDay.dayOfWeekIndex
 
@@ -43,7 +43,7 @@ class GetMonthlyCashflowUseCase(
             .filter { it.syncStatus != SyncStatus.DELETED }
             .forEach { tx ->
                 val pdt = PersianDateTime.parse(tx.timeStamp)
-                if (pdt.year == year && pdt.month == month) {
+                if (pdt.year == selectedYear && pdt.month == selectedMonth) {
                     val delta = when (tx.type) {
                         TransactionType.INCOME -> tx.amount.toLong()
                         TransactionType.EXPENSE -> -tx.amount.toLong()
@@ -54,9 +54,9 @@ class GetMonthlyCashflowUseCase(
             }
 
         return MonthlyCashflow(
-            year = year,
-            month = month,
-            monthLabel = PersianMonth.entries.getOrElse(month) { PersianMonth.UNKNOWN }.displayName,
+            year = selectedYear,
+            month = selectedMonth,
+            monthLabel = PersianMonth.entries.getOrElse(selectedMonth) { PersianMonth.UNKNOWN }.displayName,
             daysInMonth = daysInMonth,
             firstWeekdayOffset = offset,
             netByDay = netByDay

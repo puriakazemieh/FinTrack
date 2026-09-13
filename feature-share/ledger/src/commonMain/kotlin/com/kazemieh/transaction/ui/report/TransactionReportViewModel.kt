@@ -107,11 +107,19 @@ class TransactionReportViewModel(
         }
     }
 
-    // Current-month cashflow calendar — likewise filter-independent, refreshed with the screen.
+    // The cashflow calendar follows the selected month, including previous/next-month filters.
     private fun observeMonthlyCashflow() {
         viewModelScope.launch {
-            refreshTrigger.onStart { emit(Unit) }.collectLatest {
-                val cashflow = runCatching { getMonthlyCashflowUseCase() }.getOrNull()
+            combine(
+                refreshTrigger.onStart { emit(Unit) },
+                filterParamsFlow
+            ) { _, params -> params }.collectLatest { params ->
+                val selectedDate = params.fromTimestamp?.let {
+                    com.kazemieh.common.persiandatetime.domain.PersianDateTime.parse(it)
+                }
+                val cashflow = runCatching {
+                    getMonthlyCashflowUseCase(selectedDate?.year, selectedDate?.month)
+                }.getOrNull()
                 _state.update { it.copy(monthlyCashflow = cashflow) }
             }
         }

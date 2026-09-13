@@ -26,7 +26,6 @@ enum class ToolFeature {
     AI_ADVISOR,
     ACHIEVEMENTS,
     EVENTS,
-    FINANCIAL_CALENDAR,
     FAQ,
     SUPPORT;
 

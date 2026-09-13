@@ -1,0 +1,31 @@
+-- Preserve a deterministic default for existing installations upgraded from v28.
+UPDATE source
+SET isDefault = 1
+WHERE id = (
+    SELECT id FROM source
+    WHERE syncStatus != 2
+    ORDER BY position ASC, id ASC
+    LIMIT 1
+)
+AND NOT EXISTS (SELECT 1 FROM source WHERE isDefault = 1 AND syncStatus != 2);
+
+UPDATE category
+SET isDefault = 1
+WHERE parentId IS NULL
+  AND syncStatus != 2
+  AND isDefault = 0
+  AND NOT EXISTS (
+      SELECT 1 FROM category existing
+      WHERE existing.type = category.type
+        AND existing.parentId IS NULL
+        AND existing.syncStatus != 2
+        AND existing.isDefault = 1
+  )
+  AND id = (
+      SELECT candidate.id FROM category candidate
+      WHERE candidate.type = category.type
+        AND candidate.parentId IS NULL
+        AND candidate.syncStatus != 2
+      ORDER BY candidate.position ASC, candidate.id ASC
+      LIMIT 1
+  );

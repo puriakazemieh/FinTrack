@@ -54,6 +54,7 @@ class AddSourceViewModel(
             is AddSourceIntent.UpdateAccountNumber -> updateDraft { it.copy(accountNumber = intent.value) }
             is AddSourceIntent.UpdateBranchCode -> updateDraft { it.copy(branchCode = intent.value) }
             is AddSourceIntent.UpdateBranchName -> updateDraft { it.copy(branchName = intent.value) }
+            is AddSourceIntent.UpdateSmsSender -> updateDraft { it.copy(smsSender = intent.value) }
             is AddSourceIntent.UpdateCvv2 -> updateDraft { it.copy(cvv2 = intent.value?.take(4)) }
             is AddSourceIntent.UpdateExpirationMonth -> updateDraft { it.copy(expirationMonth = intent.value?.take(2)) }
             is AddSourceIntent.UpdateExpirationYear -> updateDraft { it.copy(expirationYear = intent.value?.take(2)) }
@@ -208,6 +209,7 @@ data class SourceDraft(
     val expirationYear: String? = null,
     val branchCode: String? = null,
     val branchName: String? = null,
+    val smsSender: String? = null,
     val isIconManuallySelected: Boolean = false
 )
 
@@ -215,7 +217,7 @@ private fun Source.toDraft(): SourceDraft = SourceDraft(
     name = this.name.orEmpty(),
     description = this.description,
     balance = this.balance,
-    type = if (this.type == 1) TypeSource.CREDIT else TypeSource.CASH,
+    type = TypeSource.entries.getOrNull(this.type) ?: TypeSource.CASH,
     cardNumber = this.cardNumber,
     colorId = this.colorId,
     iconId = this.iconId,
@@ -225,7 +227,47 @@ private fun Source.toDraft(): SourceDraft = SourceDraft(
     expirationMonth = this.expirationMonth,
     expirationYear = this.expirationYear,
     branchCode = this.branchCode,
-    branchName = this.branchName
+    branchName = this.branchName,
+    smsSender = this.smsSender,
+    isIconManuallySelected = true
+)
+
+private fun Source.Companion.fromDraft(draft: SourceDraft): Source = Source(
+    name = draft.name,
+    description = draft.description,
+    balance = draft.balance,
+    type = draft.type.ordinal,
+    cardNumber = draft.cardNumber,
+    colorId = draft.colorId ?: 1,
+    iconId = draft.iconId ?: 1,
+    shabaNumber = draft.shabaNumber,
+    accountNumber = draft.accountNumber,
+    cvv2 = draft.cvv2,
+    expirationMonth = draft.expirationMonth,
+    expirationYear = draft.expirationYear,
+    branchCode = draft.branchCode,
+    branchName = draft.branchName,
+    smsSender = draft.smsSender,
+    position = 0
+)
+
+private fun Source.applyDraft(draft: SourceDraft): Source = this.copy(
+    name = draft.name,
+    description = draft.description,
+    balance = draft.balance,
+    type = draft.type.ordinal,
+    cardNumber = draft.cardNumber,
+    colorId = draft.colorId ?: this.colorId,
+    iconId = draft.iconId ?: this.iconId,
+    shabaNumber = draft.shabaNumber,
+    accountNumber = draft.accountNumber,
+    cvv2 = draft.cvv2,
+    expirationMonth = draft.expirationMonth,
+    expirationYear = draft.expirationYear,
+    branchCode = draft.branchCode,
+    branchName = draft.branchName,
+    smsSender = draft.smsSender,
+    position = this.position
 )
 
 private fun SourceDraft.toSource(id: Long?): Source = Source(
@@ -234,7 +276,7 @@ private fun SourceDraft.toSource(id: Long?): Source = Source(
     balance = balance,
     cardNumber = cardNumber,
     description = description,
-    type = type.count,
+    type = type.ordinal,
     colorId = colorId ?: 1,
     iconId = iconId ?: 1,
     shabaNumber = shabaNumber,
@@ -243,7 +285,9 @@ private fun SourceDraft.toSource(id: Long?): Source = Source(
     expirationMonth = expirationMonth,
     expirationYear = expirationYear,
     branchCode = branchCode,
-    branchName = branchName
+    branchName = branchName,
+    smsSender = smsSender,
+    position = 0
 )
 
 /** --- Intent / Effect --- */
@@ -264,6 +308,7 @@ sealed interface AddSourceIntent {
     data class UpdateExpirationYear(val value: String?) : AddSourceIntent
     data class UpdateBranchCode(val value: String?) : AddSourceIntent
     data class UpdateBranchName(val value: String?) : AddSourceIntent
+    data class UpdateSmsSender(val value: String?) : AddSourceIntent
 
     // ✅ Picker
     data object OpenPicker : AddSourceIntent

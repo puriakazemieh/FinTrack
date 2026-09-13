@@ -401,12 +401,14 @@ fun PermissionsStep(onSmsReadingResult: (Boolean) -> Unit = {}) {
     val glassColors = LocalGlassColors.current
     var triggerPermission by remember { mutableStateOf(false) }
     var triggerSmsPermission by remember { mutableStateOf(false) }
+    var notificationsEnabled by remember { mutableStateOf(false) }
+    var smsReadingEnabled by remember { mutableStateOf(false) }
 
     NotificationPermissionLauncher(
         trigger = triggerPermission,
         onResult = { granted ->
             triggerPermission = false
-            // Handle result if needed
+            notificationsEnabled = granted
         }
     )
 
@@ -414,6 +416,7 @@ fun PermissionsStep(onSmsReadingResult: (Boolean) -> Unit = {}) {
         trigger = triggerSmsPermission,
         onResult = { granted ->
             triggerSmsPermission = false
+            smsReadingEnabled = granted
             onSmsReadingResult(granted)
         }
     )
@@ -437,8 +440,12 @@ fun PermissionsStep(onSmsReadingResult: (Boolean) -> Unit = {}) {
             desc = stringResource(Res.string.onboarding_perm_sms_desc),
             icon = Icons.Default.Sms,
             color = GlassGreen,
+            checked = smsReadingEnabled,
             onToggle = { enabled ->
-                if (enabled) triggerSmsPermission = true else onSmsReadingResult(false)
+                if (enabled) triggerSmsPermission = true else {
+                    smsReadingEnabled = false
+                    onSmsReadingResult(false)
+                }
             }
         )
         PermissionToggleItem(
@@ -446,7 +453,10 @@ fun PermissionsStep(onSmsReadingResult: (Boolean) -> Unit = {}) {
             desc = stringResource(Res.string.onboarding_perm_notif_desc),
             icon = Icons.Default.Notifications,
             color = GlassAmber,
-            onToggle = { triggerPermission = true }
+            checked = notificationsEnabled,
+            onToggle = { enabled ->
+                if (enabled) triggerPermission = true else notificationsEnabled = false
+            }
         )
         PermissionToggleItem(
             title = stringResource(Res.string.onboarding_perm_biometric_title),
@@ -463,6 +473,7 @@ fun PermissionToggleItem(
     desc: String,
     icon: ImageVector,
     color: androidx.compose.ui.graphics.Color,
+    checked: Boolean = false,
     onToggle: (Boolean) -> Unit = {}
 ) {
     val glassColors = LocalGlassColors.current
@@ -487,13 +498,9 @@ fun PermissionToggleItem(
             FintrackBodySmallText(text = desc, color = glassColors.text3)
         }
 
-        var checked by remember { mutableStateOf(false) }
         Switch(
             on = checked,
-            onToggle = {
-                checked = it
-                onToggle(it)
-            }
+            onToggle = onToggle
         )
     }
 }

@@ -29,6 +29,11 @@ WHERE id = ?;
 updateCategoryPosition:
 UPDATE category SET position = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
 
+clearDefaultCategory:
+UPDATE category
+SET isDefault = 0, updatedAt = ?, syncStatus = ?
+WHERE type = ? AND parentId IS ? AND id != ? AND isDefault = 1;
+
 observeCategories:
 SELECT * FROM category
 WHERE (:type IS NULL OR type = :type)
@@ -40,10 +45,16 @@ observeCategoriesFlat:
 SELECT * FROM category WHERE (:type IS NULL OR type = :type) AND syncStatus != 2 ORDER BY position ASC;
 
 getFirstByType:
-SELECT * FROM category WHERE type = ? AND parentId IS NULL ORDER BY id LIMIT 1;
+SELECT * FROM category
+WHERE type = ? AND parentId IS NULL AND syncStatus != 2
+ORDER BY isDefault DESC, position ASC, id ASC
+LIMIT 1;
 
 getTransferCategoryOrNull:
-SELECT * FROM category WHERE type = 3 AND parentId IS NULL ORDER BY id LIMIT 1;
+SELECT * FROM category
+WHERE type = 3 AND parentId IS NULL AND syncStatus != 2
+ORDER BY isDefault DESC, position ASC, id ASC
+LIMIT 1;
 
 createTransferCategory:
 INSERT INTO category(name, type, updatedAt, syncStatus)

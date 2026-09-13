@@ -115,6 +115,7 @@ import fintrack.core.designsystem.generated.resources.select_source
 import fintrack.core.designsystem.generated.resources.source
 import fintrack.core.designsystem.generated.resources.source_from
 import fintrack.core.designsystem.generated.resources.source_to
+import fintrack.core.designsystem.generated.resources.sms_ref_label
 import fintrack.core.designsystem.generated.resources.tags
 import fintrack.core.designsystem.generated.resources.title_new_transaction
 import fintrack.core.designsystem.generated.resources.title_person_management
@@ -468,7 +469,9 @@ fun AddTransactionContent(
                                 onClick = { onIntent(AddTransactionIntent.ApplySmsDraft(draft)) }
                             ) {
                                 Column(modifier = Modifier.padding(8.dp)) {
-                                    FintrackLabelMediumText(text = "????? ????? ?????: " + draft.bankName)
+                                    FintrackLabelMediumText(
+                                        text = stringResource(Res.string.sms_ref_label, draft.bankName)
+                                    )
                                     FintrackLabelSmallText(text = draft.amount.toString() + " " + draft.date.toPersianDigits())
                                 }
                             }
@@ -560,7 +563,9 @@ fun AddTransactionContent(
                                 onClick = { onIntent(AddTransactionIntent.ApplySmsDraft(draft)) }
                             ) {
                                 Column(modifier = Modifier.padding(8.dp)) {
-                                    FintrackLabelMediumText(text = "????? ????? ?????: " + draft.bankName)
+                                    FintrackLabelMediumText(
+                                        text = stringResource(Res.string.sms_ref_label, draft.bankName)
+                                    )
                                     FintrackLabelSmallText(text = draft.amount.toString() + " " + draft.date.toPersianDigits())
                                 }
                             }

@@ -78,7 +78,7 @@ include(":feature-share:sync")
 include(":feature-share:utilities")
 include(":server")
 
-include(":feature-container:transactions")
+include(":feature-container:ledger")
 include(":feature-container:onboarding")
 include(":feature-container:dashboard")
 include(":feature-container:settings")

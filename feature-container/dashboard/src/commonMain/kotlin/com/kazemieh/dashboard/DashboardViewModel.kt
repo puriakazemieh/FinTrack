@@ -291,11 +291,14 @@ class DashboardViewModel(
 
             is DashboardIntent.IgnoreAllSmsDrafts -> viewModelScope.launch {
                 _state.update { it.copy(isSmsDeleting = true) }
-                kotlinx.coroutines.delay(600) // Show a good loading animation
-                _state.value.smsDrafts.forEach { draft ->
-                    smsDraftRepository.markSmsDraftAsUsed(draft.id)
+                try {
+                    smsDraftRepository.deleteUnusedSmsDrafts()
+                    _state.update {
+                        it.copy(showDeleteAllSmsConfirmation = false, showSmsDetection = false)
+                    }
+                } finally {
+                    _state.update { it.copy(isSmsDeleting = false) }
                 }
-                _state.update { it.copy(showDeleteAllSmsConfirmation = false, showSmsDetection = false, isSmsDeleting = false) }
             }
 
             is DashboardIntent.ShowDeleteSmsConfirmation -> _state.update {

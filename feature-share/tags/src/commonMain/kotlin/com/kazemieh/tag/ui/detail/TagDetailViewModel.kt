@@ -47,7 +47,7 @@ class TagDetailViewModel(
         viewModelScope.launch {
             observeTransactionsUseCase(
                 TransactionFilterParams(tags = setOf(Tag(id = tagId, name = "", colorId = 1, iconId = 1)), isAllTags = false),
-                PageRequest(limit = 100, offset = 0)
+                PageRequest(limit = Int.MAX_VALUE, offset = 0)
             ).collect { page ->
                 _state.update { it.copy(transactions = page.items, isLoading = false) }
             }

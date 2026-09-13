@@ -34,6 +34,9 @@ UPDATE sms_draft SET isUsed = 1 WHERE id = ?;
 deleteSmsDraft:
 DELETE FROM sms_draft WHERE id = ?;
 
+deleteUnusedSmsDrafts:
+DELETE FROM sms_draft WHERE isUsed = 0;
+
 getSmsDraftById:
 SELECT * FROM sms_draft WHERE id = ?;
 

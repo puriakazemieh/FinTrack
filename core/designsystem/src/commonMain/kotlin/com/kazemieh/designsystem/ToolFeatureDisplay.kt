@@ -6,7 +6,6 @@ import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Autorenew
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.EmojiEvents
@@ -54,7 +53,6 @@ fun ToolFeature.displayLabel(): String = when (this) {
     ToolFeature.AI_ADVISOR -> stringResource(Res.string.ai_advisor_title)
     ToolFeature.ACHIEVEMENTS -> stringResource(Res.string.achievements_title)
     ToolFeature.EVENTS -> stringResource(Res.string.title_events)
-    ToolFeature.FINANCIAL_CALENDAR -> stringResource(Res.string.financial_calendar_title)
     ToolFeature.FAQ -> stringResource(Res.string.title_faq)
     ToolFeature.SUPPORT -> stringResource(Res.string.title_support)
 }
@@ -80,7 +78,6 @@ val ToolFeature.displayIcon: ImageVector
         ToolFeature.AI_ADVISOR -> Icons.Default.AutoAwesome
         ToolFeature.ACHIEVEMENTS -> Icons.Default.EmojiEvents
         ToolFeature.EVENTS -> Icons.Default.Event
-        ToolFeature.FINANCIAL_CALENDAR -> Icons.Default.CalendarMonth
         ToolFeature.FAQ -> Icons.Default.Quiz
         ToolFeature.SUPPORT -> Icons.Default.SupportAgent
     }

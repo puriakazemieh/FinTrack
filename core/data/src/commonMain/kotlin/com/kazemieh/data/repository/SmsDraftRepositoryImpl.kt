@@ -24,6 +24,10 @@ class SmsDraftRepositoryImpl(
         localDataSource.deleteSmsDraft(id)
     }
 
+    override suspend fun deleteUnusedSmsDrafts() {
+        localDataSource.deleteUnusedSmsDrafts()
+    }
+
     override suspend fun getSmsDraftById(id: Long): SmsDraft? {
         return localDataSource.getSmsDraftById(id)
     }

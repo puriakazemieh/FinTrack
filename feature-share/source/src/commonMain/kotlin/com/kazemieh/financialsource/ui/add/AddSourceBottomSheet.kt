@@ -139,6 +139,7 @@ fun AddSourceContent(
     onIntent: (AddSourceIntent) -> Unit,
     onNavigateToTransactions: ((Source) -> Unit)? = null
 ) {
+    val showSmsSenderPicker = remember { androidx.compose.runtime.mutableStateOf(false) }
     val glassColors = LocalGlassColors.current
     val rainbowColors = FinTrackPickerColors.rainbow()
     val colors = rainbowColors.map { it.color }
@@ -409,6 +410,26 @@ fun AddSourceContent(
                 item {
                     GlassCard(padding = 16.dp) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            val hardcodedBanks = listOf(
+                                "blubank" to "بلوبانک",
+                                "BankMellat" to "بانک ملت",
+                                "SaderatBank" to "بانک صادرات",
+                                "Pasargad" to "بانک پاسارگاد",
+                                "SamanBank" to "بانک سامان"
+                            )
+                            val selectedBankParser = remember(state.draft.smsSender) {
+                                hardcodedBanks.find { it.first == state.draft.smsSender }
+                            }
+                            Field(
+                                label = "پیامک بانکی",
+                                onClick = { showSmsSenderPicker.value = true }
+                            ) {
+                                FintrackBodyMediumText(
+                                    text = selectedBankParser?.second ?: "تشخیص خودکار",
+                                    color = glassColors.text3
+                                )
+                            }
+                            
                             FintrackLabelSmallText(
                                 text = stringResource(Res.string.label_branch) + " (" + stringResource(
                                     Res.string.label_optional
@@ -497,6 +518,43 @@ fun AddSourceContent(
             }
         }
     }
+
+    if (showSmsSenderPicker.value) {
+        val hardcodedBanks = listOf(
+            "blubank" to "بلوبانک",
+            "BankMellat" to "بانک ملت",
+            "SaderatBank" to "بانک صادرات",
+            "Pasargad" to "بانک پاسارگاد",
+            "SamanBank" to "بانک سامان"
+        )
+        val items = remember {
+            val list = mutableListOf(com.kazemieh.designsystem.component.model.ItemUi(id = -1, title = com.kazemieh.designsystem.component.model.UiText.DynamicString("تشخیص خودکار")))
+            list.addAll(hardcodedBanks.map { (sender, name) ->
+                com.kazemieh.designsystem.component.model.ItemUi(id = sender.hashCode().toLong(), title = com.kazemieh.designsystem.component.model.UiText.DynamicString("$name ($sender)"))
+            })
+            list.toSet()
+        }
+        com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet(
+            title = "انتخاب پیامک بانکی",
+            items = items,
+            initialSelection = items.filter { 
+                if (state.draft.smsSender == null) it.id == -1L else it.id == state.draft.smsSender.hashCode().toLong() 
+            }.toSet(),
+            onConfirm = { selected, _ ->
+                val selectedItem = selected.firstOrNull()
+                if (selectedItem?.id == -1L) {
+                    onIntent(AddSourceIntent.UpdateSmsSender(null))
+                } else {
+                    val sender = hardcodedBanks.find { 
+                        it.first.hashCode().toLong() == selectedItem?.id 
+                    }?.first
+                    onIntent(AddSourceIntent.UpdateSmsSender(sender))
+                }
+                showSmsSenderPicker.value = false
+            },
+            onDismiss = { showSmsSenderPicker.value = false }
+        )
+    }
 }
 
 @Composable
@@ -505,7 +563,8 @@ private fun SourceTypeSelector(
     onTypeSelected: (TypeSource) -> Unit
 ) {
     GlassCard(padding = 14.dp) {
-        val glassColors = LocalGlassColors.current
+        val showSmsSenderPicker = remember { androidx.compose.runtime.mutableStateOf(false) }
+    val glassColors = LocalGlassColors.current
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             FintrackLabelSmallText(
                 text = stringResource(Res.string.label_type),

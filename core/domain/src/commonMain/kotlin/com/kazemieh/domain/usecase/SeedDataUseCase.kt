@@ -99,7 +99,6 @@ class SeedDataUseCase(
         }
 
         // 4. Seed Theme and Currency
-        preferenceRepository.putString("pref_theme", "GLASS_DARK")
         preferenceRepository.putString("pref_currency", "TOMAN")
 
         // 5. Seed Security Details

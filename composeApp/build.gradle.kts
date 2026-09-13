@@ -99,7 +99,7 @@ kotlin {
             implementation(project(":feature-share:goals"))
             implementation(project(":feature-share:source"))
             implementation(project(":feature-share:tags"))
-            implementation(project(":feature-container:transactions"))
+            implementation(project(":feature-container:ledger"))
             implementation(project(":feature-share:person"))
             implementation(project(":feature-share:ai-insights"))
             implementation(project(":feature-share:debt"))
