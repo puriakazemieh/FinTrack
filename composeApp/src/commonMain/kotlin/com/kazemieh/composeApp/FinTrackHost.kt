@@ -85,29 +85,7 @@ fun FinTrackHost(
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            bottomBar = {
-                AnimatedVisibility(
-                    visible = showBottomBar && !showGlobalAddTransaction && !showBottomBarCustomize,
-                    enter = fadeIn(animationSpec = tween(400)) +
-                            slideInVertically(
-                                animationSpec = tween(400, easing = FastOutSlowInEasing),
-                                initialOffsetY = { it }
-                            ),
-                    exit = fadeOut(animationSpec = tween(400)) +
-                            slideOutVertically(
-                                animationSpec = tween(400, easing = FastOutSlowInEasing),
-                                targetOffsetY = { it }
-                            )
-                ) {
-                    FintrackNavigationBar(
-                        navController = navController,
-                        tabs = tabs,
-                        onFabClick = { showGlobalAddTransaction = true },
-                        onCustomize = { showBottomBarCustomize = true }
-                    )
-                }
-            }
+            modifier = Modifier.fillMaxSize()
         ) { innerPadding ->
             Box(
                 modifier = Modifier.fillMaxSize().padding(
@@ -121,6 +99,28 @@ fun FinTrackHost(
                     modifier = Modifier.fillMaxSize(),
                     startDestination = startDestination
                 )
+
+                AnimatedVisibility(
+                    visible = showBottomBar && !showGlobalAddTransaction && !showBottomBarCustomize,
+                    enter = fadeIn(animationSpec = tween(400)) +
+                            slideInVertically(
+                                animationSpec = tween(400, easing = FastOutSlowInEasing),
+                                initialOffsetY = { it }
+                            ),
+                    exit = fadeOut(animationSpec = tween(400)) +
+                            slideOutVertically(
+                                animationSpec = tween(400, easing = FastOutSlowInEasing),
+                                targetOffsetY = { it }
+                            ),
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                ) {
+                    FintrackNavigationBar(
+                        navController = navController,
+                        tabs = tabs,
+                        onFabClick = { showGlobalAddTransaction = true },
+                        onCustomize = { showBottomBarCustomize = true }
+                    )
+                }
 
                 if (showBottomBarCustomize) {
                     BottomBarCustomizeSheet(
