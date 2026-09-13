@@ -121,6 +121,7 @@ class AddSourceViewModel(
             AddSourceState(
                 mode = AddSourceMode.Edit(id),
                 draft = source.toDraft(),
+                existingSource = source,
                 isPickerOpen = false
             )
         }
@@ -132,7 +133,8 @@ class AddSourceViewModel(
                     _state.update { st ->
                         st.copy(
                             mode = AddSourceMode.Edit(it.id ?: id),
-                            draft = it.toDraft()
+                            draft = it.toDraft(),
+                            existingSource = it
                         )
                     }
                 }
@@ -155,23 +157,28 @@ class AddSourceViewModel(
                 return@launch
             }
 
-            val source = draft.toSource(id = mode.sourceIdOrNull)
+            val newSource = draft.toSource(id = mode.sourceIdOrNull)
+            val mappedSource = newSource.copy(
+                position = existingSource?.position ?: 0,
+                isDefault = existingSource?.isDefault ?: false,
+                currencyCode = existingSource?.currencyCode ?: newSource.currencyCode
+            )
 
             val sourceId = when (mode) {
                 AddSourceMode.Add -> {
-                    val id = sourceUseCases.addSource(source)
-                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.SourceCreated(source.type.toString()))
+                    val id = sourceUseCases.addSource(mappedSource)
+                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.SourceCreated(mappedSource.type.toString()))
                     id
                 }
                 is AddSourceMode.Edit -> {
-                    val id = sourceUseCases.updateSourceUseCase(source).toLong()
+                    val id = sourceUseCases.updateSourceUseCase(mappedSource).toLong()
                     if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.SourceUpdated)
                     id
                 }
             }
 
             if (sourceId >= 0) {
-                _effect.send(AddSourceEffect.SavedSource(source.copy(id = sourceId)))
+                _effect.send(AddSourceEffect.SavedSource(mappedSource.copy(id = sourceId)))
                 _state.update { AddSourceState() }
             }
         }
@@ -183,6 +190,7 @@ class AddSourceViewModel(
 data class AddSourceState(
     val mode: AddSourceMode = AddSourceMode.Add,
     val draft: SourceDraft = SourceDraft(),
+    val existingSource: Source? = null,
     val isPickerOpen: Boolean = false
 )
 

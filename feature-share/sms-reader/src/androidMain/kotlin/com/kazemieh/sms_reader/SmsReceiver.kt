@@ -52,7 +52,9 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                 if (draft != null) {
                     scope.launch {
                         val sources = transactionRepository.observeSources().first()
-                        val detectedSource = sources.find { it.smsSender == sender }
+                        val detectedSource = sources.find {
+                            it.smsSender?.equals(sender, ignoreCase = true) == true
+                        }
                             ?: draft.sourceIdentifier?.let { identifier ->
                                 transactionRepository.getSourceByIdentifier(identifier)
                             } ?: sources.find { it.matchesBankName(draft.bankName) }

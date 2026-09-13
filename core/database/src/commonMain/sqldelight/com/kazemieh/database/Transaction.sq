@@ -135,7 +135,7 @@ LEFT JOIN person ON tp.personId = person.id
 WHERE
     (:type IS NULL OR t.type = :type)
     AND (:categoryIdsSize = 0 OR t.categoryId IN :categoryIds)
-    AND (:sourceIdsSize = 0 OR t.sourceId IN :sourceIds)
+    AND (:sourceIdsSize = 0 OR t.sourceId IN :sourceIds OR t.sourceEndId IN :sourceIds)
     AND (:tagIdsSize = 0 OR EXISTS (
         SELECT 1 FROM transaction_tag WHERE transactionId = t.id AND tagId IN :tagIds
     ))
@@ -178,7 +178,7 @@ FROM transactions t
 LEFT JOIN category c ON t.categoryId = c.id
 WHERE (:type IS NULL OR t.type = :type)
   AND (:categoryIdsSize = 0 OR t.categoryId IN :categoryIds)
-  AND (:sourceIdsSize = 0 OR t.sourceId IN :sourceIds)
+  AND (:sourceIdsSize = 0 OR t.sourceId IN :sourceIds OR t.sourceEndId IN :sourceIds)
   AND (:tagIdsSize = 0 OR t.id IN (
       SELECT transactionId FROM transaction_tag WHERE tagId IN :tagIds
   ))

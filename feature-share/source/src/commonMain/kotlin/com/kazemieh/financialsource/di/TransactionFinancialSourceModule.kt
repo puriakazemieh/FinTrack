@@ -21,7 +21,12 @@ val transactionFinancialSourceModule = module {
             analytics = get(),
             sourceId = sourceId,
             observeTransactionsUseCase = get(),
-            observeSourceUseCase = get()
+            observeSourceUseCase = get(),
+            debtRepository = get(),
+            installmentRepository = get(),
+            checkRepository = get(),
+            fixedExpenseRepository = get(),
+            budgetRepository = get()
         )
     }
 }

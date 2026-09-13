@@ -88,7 +88,7 @@ fun FinTrackHost(
             modifier = Modifier.fillMaxSize(),
             bottomBar = {
                 AnimatedVisibility(
-                    visible = showBottomBar,
+                    visible = showBottomBar && !showGlobalAddTransaction && !showBottomBarCustomize,
                     enter = fadeIn(animationSpec = tween(400)) +
                             slideInVertically(
                                 animationSpec = tween(400, easing = FastOutSlowInEasing),

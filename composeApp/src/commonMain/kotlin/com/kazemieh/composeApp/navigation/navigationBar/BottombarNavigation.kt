@@ -53,8 +53,8 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
     val navigateToTransactions: (Any?) -> Unit = { data ->
         navController.popBackStack()
         val route = when (data) {
-            is Category -> Screen.CategoryDetail(categoryId = data.id ?: 0L)
-            is Source -> Screen.SourceDetail(sourceId = data.id ?: 0L)
+            is Category -> Screen.Transactions(categoryId = data.id)
+            is Source -> Screen.Transactions(sourceId = data.id)
             is Tag -> Screen.TagDetail(tagId = data.id ?: 0L)
             is Person -> Screen.PersonDetail(personId = data.id ?: 0L)
             is TransactionType -> Screen.Transactions(transactionType = data.name)

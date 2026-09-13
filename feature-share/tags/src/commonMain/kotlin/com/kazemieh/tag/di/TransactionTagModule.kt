@@ -21,7 +21,13 @@ val transactionTagModule = module {
             tagId = tagId,
             observeTagsUseCase = get(),
             observeTransactionsUseCase = get(),
-            noteRepository = get()
+            noteRepository = get(),
+            shoppingRepository = get(),
+            debtRepository = get(),
+            installmentRepository = get(),
+            checkRepository = get(),
+            fixedExpenseRepository = get(),
+            budgetRepository = get()
         )
     }
 }

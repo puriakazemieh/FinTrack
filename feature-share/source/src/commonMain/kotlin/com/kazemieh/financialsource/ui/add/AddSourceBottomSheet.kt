@@ -51,18 +51,25 @@ import com.kazemieh.designsystem.component.glass.Field
 import com.kazemieh.designsystem.component.glass.GlassCard
 import com.kazemieh.designsystem.component.glass.IconGrid
 import com.kazemieh.designsystem.component.glassTextFieldColors
+import com.kazemieh.designsystem.component.model.ItemUi
+import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.designsystem.component.model.asString
 import com.kazemieh.designsystem.model.Bank
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
 import com.kazemieh.designsystem.picker.FinTrackSourceIcons
 import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.bank_blu
+import fintrack.core.designsystem.generated.resources.bank_mellat
+import fintrack.core.designsystem.generated.resources.bank_pasargad
+import fintrack.core.designsystem.generated.resources.bank_saderat
+import fintrack.core.designsystem.generated.resources.bank_saman
 import fintrack.core.designsystem.generated.resources.btn_save_source
-import fintrack.core.designsystem.generated.resources.currency_toman
 import fintrack.core.designsystem.generated.resources.hint_source_name_placeholder
 import fintrack.core.designsystem.generated.resources.initial_balance_label
 import fintrack.core.designsystem.generated.resources.label_account_number
 import fintrack.core.designsystem.generated.resources.label_account_shaba
+import fintrack.core.designsystem.generated.resources.label_auto_detect
 import fintrack.core.designsystem.generated.resources.label_branch
 import fintrack.core.designsystem.generated.resources.label_branch_code
 import fintrack.core.designsystem.generated.resources.label_branch_name
@@ -77,6 +84,7 @@ import fintrack.core.designsystem.generated.resources.label_optional
 import fintrack.core.designsystem.generated.resources.label_shaba_no_ir
 import fintrack.core.designsystem.generated.resources.label_type
 import fintrack.core.designsystem.generated.resources.label_zero
+import fintrack.core.designsystem.generated.resources.onboarding_perm_sms_title
 import fintrack.core.designsystem.generated.resources.source_name_label
 import fintrack.core.designsystem.generated.resources.title_edit_source
 import fintrack.core.designsystem.generated.resources.title_new_source
@@ -168,7 +176,7 @@ fun AddSourceContent(
                         name = state.draft.name,
                         description = state.draft.description,
                         balance = state.draft.balance,
-                        type = state.draft.type.ordinal + 1, // TypeSource mapping might need verification
+                        type = state.draft.type.count,
                         cardNumber = state.draft.cardNumber,
                         colorId = state.draft.colorId ?: 1,
                         iconId = state.draft.iconId ?: 1
@@ -410,26 +418,27 @@ fun AddSourceContent(
                 item {
                     GlassCard(padding = 16.dp) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            val hardcodedBanks = listOf(
-                                "blubank" to "بلوبانک",
-                                "BankMellat" to "بانک ملت",
-                                "SaderatBank" to "بانک صادرات",
-                                "Pasargad" to "بانک پاسارگاد",
-                                "SamanBank" to "بانک سامان"
+                            val bankSenders = listOf(
+                                "blubank" to stringResource(Res.string.bank_blu),
+                                "BankMellat" to stringResource(Res.string.bank_mellat),
+                                "SaderatBank" to stringResource(Res.string.bank_saderat),
+                                "Pasargad" to stringResource(Res.string.bank_pasargad),
+                                "SamanBank" to stringResource(Res.string.bank_saman)
                             )
                             val selectedBankParser = remember(state.draft.smsSender) {
-                                hardcodedBanks.find { it.first == state.draft.smsSender }
+                                bankSenders.find { it.first == state.draft.smsSender }
                             }
                             Field(
-                                label = "پیامک بانکی",
+                                label = stringResource(Res.string.onboarding_perm_sms_title),
                                 onClick = { showSmsSenderPicker.value = true }
                             ) {
                                 FintrackBodyMediumText(
-                                    text = selectedBankParser?.second ?: "تشخیص خودکار",
+                                    text = selectedBankParser?.second
+                                        ?: stringResource(Res.string.label_auto_detect),
                                     color = glassColors.text3
                                 )
                             }
-                            
+
                             FintrackLabelSmallText(
                                 text = stringResource(Res.string.label_branch) + " (" + stringResource(
                                     Res.string.label_optional
@@ -520,33 +529,43 @@ fun AddSourceContent(
     }
 
     if (showSmsSenderPicker.value) {
-        val hardcodedBanks = listOf(
-            "blubank" to "بلوبانک",
-            "BankMellat" to "بانک ملت",
-            "SaderatBank" to "بانک صادرات",
-            "Pasargad" to "بانک پاسارگاد",
-            "SamanBank" to "بانک سامان"
+        val bankSenders = listOf(
+            "blubank" to stringResource(Res.string.bank_blu),
+            "BankMellat" to stringResource(Res.string.bank_mellat),
+            "SaderatBank" to stringResource(Res.string.bank_saderat),
+            "Pasargad" to stringResource(Res.string.bank_pasargad),
+            "SamanBank" to stringResource(Res.string.bank_saman)
         )
         val items = remember {
-            val list = mutableListOf(com.kazemieh.designsystem.component.model.ItemUi(id = -1, title = com.kazemieh.designsystem.component.model.UiText.DynamicString("تشخیص خودکار")))
-            list.addAll(hardcodedBanks.map { (sender, name) ->
-                com.kazemieh.designsystem.component.model.ItemUi(id = sender.hashCode().toLong(), title = com.kazemieh.designsystem.component.model.UiText.DynamicString("$name ($sender)"))
+            val list = mutableListOf(
+                ItemUi(
+                    id = -1, title = UiText.StringResourceText(
+                        Res.string.label_auto_detect
+                    )
+                )
+            )
+            list.addAll(bankSenders.map { (sender, name) ->
+                ItemUi(
+                    id = sender.hashCode().toLong(),
+                    title = UiText.DynamicString("$name ($sender)")
+                )
             })
             list.toSet()
         }
         com.kazemieh.designsystem.component.bottomsheet.SelectableListBottomSheet(
-            title = "انتخاب پیامک بانکی",
+            title = stringResource(Res.string.onboarding_perm_sms_title),
             items = items,
-            initialSelection = items.filter { 
-                if (state.draft.smsSender == null) it.id == -1L else it.id == state.draft.smsSender.hashCode().toLong() 
+            initialSelection = items.filter {
+                if (state.draft.smsSender == null) it.id == -1L else it.id == state.draft.smsSender.hashCode()
+                    .toLong()
             }.toSet(),
             onConfirm = { selected, _ ->
                 val selectedItem = selected.firstOrNull()
                 if (selectedItem?.id == -1L) {
                     onIntent(AddSourceIntent.UpdateSmsSender(null))
                 } else {
-                    val sender = hardcodedBanks.find { 
-                        it.first.hashCode().toLong() == selectedItem?.id 
+                    val sender = bankSenders.find {
+                        it.first.hashCode().toLong() == selectedItem?.id
                     }?.first
                     onIntent(AddSourceIntent.UpdateSmsSender(sender))
                 }
@@ -563,8 +582,7 @@ private fun SourceTypeSelector(
     onTypeSelected: (TypeSource) -> Unit
 ) {
     GlassCard(padding = 14.dp) {
-        val showSmsSenderPicker = remember { androidx.compose.runtime.mutableStateOf(false) }
-    val glassColors = LocalGlassColors.current
+        val glassColors = LocalGlassColors.current
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             FintrackLabelSmallText(
                 text = stringResource(Res.string.label_type),

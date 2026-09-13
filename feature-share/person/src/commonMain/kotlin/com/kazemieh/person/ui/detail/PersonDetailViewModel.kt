@@ -3,6 +3,7 @@ package com.kazemieh.person.ui.detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.DebtType
+import com.kazemieh.common.model.BudgetWithProgress
 import com.kazemieh.common.model.DebtWithRelations
 import com.kazemieh.common.model.PageRequest
 import com.kazemieh.common.model.Person
@@ -11,6 +12,10 @@ import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.domain.usecase.DebtUseCaseGroup
 import com.kazemieh.domain.usecase.ObservePersonsUseCase
 import com.kazemieh.domain.usecase.ObserveTransactionsUseCase
+import com.kazemieh.domain.repository.CheckRepository
+import com.kazemieh.domain.repository.FixedExpenseRepository
+import com.kazemieh.domain.repository.InstallmentRepository
+import com.kazemieh.domain.repository.BudgetRepository
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.settle_debt_desc
 import kotlinx.coroutines.flow.*
@@ -22,7 +27,11 @@ class PersonDetailViewModel(
     private val personId: Long,
     private val observePersonsUseCase: ObservePersonsUseCase,
     private val debtUseCases: DebtUseCaseGroup,
-    private val observeTransactionsUseCase: ObserveTransactionsUseCase
+    private val observeTransactionsUseCase: ObserveTransactionsUseCase,
+    private val installmentRepository: InstallmentRepository,
+    private val checkRepository: CheckRepository,
+    private val fixedExpenseRepository: FixedExpenseRepository,
+    private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PersonDetailState())
@@ -68,6 +77,40 @@ class PersonDetailViewModel(
                         )
                     }
                 }
+        }
+
+        viewModelScope.launch {
+            installmentRepository.observeInstallments().collect { installments ->
+                _state.update {
+                    it.copy(installments = installments.filter { item ->
+                        item.persons.any { person -> person.id == personId }
+                    })
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            checkRepository.observeAllChecks().collect { checks ->
+                _state.update { it.copy(checks = checks.filter { check -> check.personId == personId }) }
+            }
+        }
+
+        viewModelScope.launch {
+            fixedExpenseRepository.observeFixedExpensesFiltered(
+                query = null,
+                categoryIds = emptyList(),
+                sourceIds = emptyList(),
+                tagIds = emptyList(),
+                personIds = listOf(personId)
+            ).collect { expenses ->
+                _state.update { it.copy(fixedExpenses = expenses) }
+            }
+        }
+
+        viewModelScope.launch {
+            budgetRepository.observeBudgetsWithProgress(0L, Long.MAX_VALUE).collect { budgets ->
+                _state.update { it.copy(budgets = budgets.filter { it.budget.personIds?.contains(personId) == true }) }
+            }
         }
 
         viewModelScope.launch {
@@ -120,6 +163,10 @@ data class PersonDetailState(
     val debts: List<DebtWithRelations> = emptyList(),
     val filteredDebts: List<DebtWithRelations> = emptyList(),
     val transactions: List<TransactionWithRelations> = emptyList(),
+    val installments: List<com.kazemieh.common.model.InstallmentWithRelations> = emptyList(),
+    val checks: List<com.kazemieh.common.model.Check> = emptyList(),
+    val fixedExpenses: List<com.kazemieh.common.model.FixedExpense> = emptyList(),
+    val budgets: List<BudgetWithProgress> = emptyList(),
     val totalCredits: Long = 0,
     val totalDebts: Long = 0,
     val balance: Long = 0,

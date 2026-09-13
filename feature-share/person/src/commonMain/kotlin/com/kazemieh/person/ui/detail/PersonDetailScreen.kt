@@ -10,7 +10,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.common.model.CheckStatus
 import com.kazemieh.common.model.DebtType
 import com.kazemieh.common.toPersianPrice
 import com.kazemieh.common.toSignedPersianPrice
@@ -47,7 +48,7 @@ fun PersonDetailScreen(
     addTransactionSheet: @Composable (onDismiss: () -> Unit) -> Unit,
     viewModel: PersonDetailViewModel = koinViewModel { parametersOf(personId) }
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
 
     var showAddDebt by remember { mutableStateOf(false) }
@@ -57,7 +58,11 @@ fun PersonDetailScreen(
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabs = listOf(
         stringResource(Res.string.navigation_debts),
-        stringResource(Res.string.recent_transactions)
+        stringResource(Res.string.recent_transactions),
+        stringResource(Res.string.navigation_installment),
+        stringResource(Res.string.title_check_management),
+        stringResource(Res.string.title_fixed_expense_management),
+        stringResource(Res.string.label_budgets)
     )
 
     FintrackScreen(
@@ -66,7 +71,7 @@ fun PersonDetailScreen(
         onClose = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            SecondaryTabRow(
+            ScrollableTabRow(
                 selectedTabIndex = selectedTabIndex,
                 containerColor = Color.Transparent,
                 divider = {}
@@ -164,7 +169,7 @@ fun PersonDetailScreen(
                     },
                     showActions = true
                 )
-            } else {
+            } else if (selectedTabIndex == 1) {
                 EntityList(
                     title = stringResource(Res.string.recent_transactions),
                     query = state.searchQuery,
@@ -184,6 +189,100 @@ fun PersonDetailScreen(
                     onEditClick = {},
                     onDeleteClick = {},
                     showActions = false
+                )
+            } else if (selectedTabIndex == 2) {
+                EntityList(
+                    title = stringResource(Res.string.navigation_installment),
+                    query = "",
+                    onQueryChange = {},
+                    onAddClick = {},
+                    items = state.installments.map { item ->
+                        EntityItem(
+                            id = item.installment.id,
+                            name = item.installment.title,
+                            sub = item.category?.name ?: item.source?.name,
+                            badge = item.installment.installmentAmount.toPersianPrice(),
+                            color = if (item.installment.isCompleted) {
+                                LocalGlassColors.current.text3
+                            } else {
+                                GlassGreen
+                            }
+                        )
+                    },
+                    onEditClick = {},
+                    onDeleteClick = {},
+                    showActions = false,
+                    showAddFab = false
+                )
+            } else if (selectedTabIndex == 3) {
+                EntityList(
+                    title = stringResource(Res.string.title_check_management),
+                    query = "",
+                    onQueryChange = {},
+                    onAddClick = {},
+                    items = state.checks.map { check ->
+                        val statusText = when (check.status) {
+                            CheckStatus.PENDING -> stringResource(Res.string.label_check_status_ongoing)
+                            CheckStatus.PASSED -> stringResource(Res.string.label_check_status_passed)
+                            CheckStatus.REJECTED -> stringResource(Res.string.label_check_status_returned)
+                            CheckStatus.CANCELLED -> stringResource(Res.string.label_check_status_cancelled)
+                        }
+                        EntityItem(
+                            id = check.id,
+                            name = check.description ?: state.person?.name.orEmpty(),
+                            sub = statusText,
+                            badge = check.amount.toPersianPrice(),
+                            color = when (check.status) {
+                                CheckStatus.PENDING -> MaterialTheme.colorScheme.primary
+                                CheckStatus.PASSED -> GlassGreen
+                                CheckStatus.REJECTED -> MaterialTheme.colorScheme.error
+                                CheckStatus.CANCELLED -> LocalGlassColors.current.text3
+                            }
+                        )
+                    },
+                    onEditClick = {},
+                    onDeleteClick = {},
+                    showActions = false,
+                    showAddFab = false
+                )
+            } else if (selectedTabIndex == 4) {
+                EntityList(
+                    title = stringResource(Res.string.title_fixed_expense_management),
+                    query = "",
+                    onQueryChange = {},
+                    onAddClick = {},
+                    items = state.fixedExpenses.map { expense ->
+                        EntityItem(
+                            id = expense.id,
+                            name = expense.title,
+                            sub = expense.description ?: expense.categoryName,
+                            badge = expense.amount.toPersianPrice(),
+                            color = if (expense.isActive) GlassGreen else LocalGlassColors.current.text3
+                        )
+                    },
+                    onEditClick = {},
+                    onDeleteClick = {},
+                    showActions = false,
+                    showAddFab = false
+                )
+            } else {
+                EntityList(
+                    title = stringResource(Res.string.label_budgets),
+                    query = "",
+                    onQueryChange = {},
+                    onAddClick = {},
+                    items = state.budgets.map { budget ->
+                        EntityItem(
+                            id = budget.budget.id ?: 0L,
+                            name = budget.category?.name ?: stringResource(Res.string.label_budgets),
+                            badge = budget.budget.amount.toPersianPrice(),
+                            color = GlassGreen
+                        )
+                    },
+                    onEditClick = {},
+                    onDeleteClick = {},
+                    showActions = false,
+                    showAddFab = false
                 )
             }
         }

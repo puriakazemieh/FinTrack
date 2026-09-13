@@ -143,7 +143,8 @@ fun CategoryDb.toCategory() = Category(
     iconId = iconId.toInt(),
     parentId = parentId,
     updatedAt = updatedAt,
-    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt()),
+    isDefault = isDefault != 0L
 )
 
 fun ObserveCategorySumsByFilter.toCategorySum(): CategorySum {
@@ -177,6 +178,7 @@ fun SourceDb.toSource() = Source(
     currencyCode = currencyCode,
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt()),
+    isDefault = isDefault != 0L,
     smsSender = smsSender
 )
 

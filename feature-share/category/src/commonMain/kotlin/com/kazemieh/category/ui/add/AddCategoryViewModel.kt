@@ -101,6 +101,7 @@ class AddCategoryViewModel(
             it.copy(
                 mode = AddCategoryMode.Add,
                 draft = CategoryDraft(type = type),
+                existingCategory = null,
                 isPickerOpen = false
             )
         }
@@ -111,6 +112,7 @@ class AddCategoryViewModel(
             it.copy(
                 mode = AddCategoryMode.Edit(category.id ?: 0),
                 draft = category.toDraft(),
+                existingCategory = category,
                 isPickerOpen = false
             )
         }
@@ -118,7 +120,7 @@ class AddCategoryViewModel(
 
     private fun dismiss() {
         viewModelScope.launch {
-            _state.update { it.copy(mode = AddCategoryMode.Add, draft = CategoryDraft()) }
+            _state.update { it.copy(mode = AddCategoryMode.Add, draft = CategoryDraft(), existingCategory = null) }
             _effect.send(AddCategoryEffect.OnDismiss)
         }
     }
@@ -131,7 +133,10 @@ class AddCategoryViewModel(
                 return@launch
             }
 
-            val category = draft.toCategory(id = mode.categoryIdOrNull)
+            val category = draft.toCategory(id = mode.categoryIdOrNull).copy(
+                position = existingCategory?.position ?: 0,
+                isDefault = existingCategory?.isDefault ?: false
+            )
 
             val categoryId = when (mode) {
                 is AddCategoryMode.Add -> {
@@ -149,7 +154,7 @@ class AddCategoryViewModel(
             if (categoryId >= 0) {
                 val saved = category.copy(id = categoryId)
                 _effect.send(AddCategoryEffect.SavedCategory(saved))
-                _state.update { it.copy(mode = AddCategoryMode.Add, draft = CategoryDraft()) }
+                _state.update { it.copy(mode = AddCategoryMode.Add, draft = CategoryDraft(), existingCategory = null) }
             }
         }
     }
@@ -160,6 +165,7 @@ class AddCategoryViewModel(
 data class AddCategoryState(
     val mode: AddCategoryMode = AddCategoryMode.Add,
     val draft: CategoryDraft = CategoryDraft(),
+    val existingCategory: Category? = null,
     val isPickerOpen: Boolean = false,
     val parentCategories: List<Category> = emptyList()
 )

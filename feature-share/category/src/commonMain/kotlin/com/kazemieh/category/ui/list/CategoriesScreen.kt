@@ -113,7 +113,6 @@ fun CategoriesScreen(
                 },
                 onItemClick = { item ->
                     state.categories.find { it.id == item.id }?.let { category ->
-                        viewModel.onIntent(CategoryIntent.SelectedCategory(category))
                         onNavigateToDetail?.invoke(category)
                     }
                 }

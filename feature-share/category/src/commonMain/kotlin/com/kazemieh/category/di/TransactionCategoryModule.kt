@@ -22,7 +22,13 @@ val transactionCategoryModule = module {
             analytics = get(),
             categoryId = categoryId,
             observeTransactionsUseCase = get(),
-            getCategoryUseCase = get()
+            getCategoryUseCase = get(),
+            debtRepository = get(),
+            installmentRepository = get(),
+            checkRepository = get(),
+            fixedExpenseRepository = get(),
+            shoppingRepository = get(),
+            budgetRepository = get()
         )
     }
 }

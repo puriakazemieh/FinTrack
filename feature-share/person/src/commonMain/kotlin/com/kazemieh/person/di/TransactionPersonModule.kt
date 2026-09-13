@@ -21,7 +21,11 @@ val transactionPersonModule = module {
             personId = personId,
             observePersonsUseCase = get(),
             debtUseCases = get(),
-            observeTransactionsUseCase = get()
+            observeTransactionsUseCase = get(),
+            installmentRepository = get(),
+            checkRepository = get(),
+            fixedExpenseRepository = get(),
+            budgetRepository = get()
         )
     }
 }
