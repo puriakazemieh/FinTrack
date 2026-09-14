@@ -90,31 +90,34 @@ fun ManageToolsScreen(
                 WidgetCard(title = stringResource(Res.string.navigation_tools)) {
                     // todo disable
                     ToolFeature.entries - setOf(
-                                ToolFeature.SOURCES,
-                                ToolFeature.CATEGORIES,
-                                ToolFeature.PERSONS,
-                                ToolFeature.TAGS,
-                                ToolFeature.BUDGETS,
-                                ToolFeature.FIXED_EXPENSE,
-                                ToolFeature.SHOPPING,
-                                ToolFeature.NOTES,
-                                ToolFeature.INSTALLMENT,
-                                ToolFeature.DEBT,
-                                ToolFeature.CHECK,
-                            )
-                                .forEach { feature ->
-                        SettingItem(
-                            title = feature.displayLabel(),
-                            icon = feature.displayIcon,
-                            on = feature !in state.disabledTools,
-                        onToggle = {
-                            if (feature in state.disabledTools) {
-                                requestNotifPermission = true
-                            }
-                            viewModel.onIntent(ManageToolsIntent.ToggleTool(feature))
-                        }
+                        ToolFeature.SOURCES,
+                        ToolFeature.CATEGORIES,
+                        ToolFeature.PERSONS,
+                        ToolFeature.TAGS,
+                        ToolFeature.BUDGETS,
+                        ToolFeature.FIXED_EXPENSE,
+                        ToolFeature.SHOPPING,
+                        ToolFeature.NOTES,
+                        ToolFeature.INSTALLMENT,
+                        ToolFeature.DEBT,
+                        ToolFeature.CHECK,
+                        ToolFeature.ASSETS,
+                        ToolFeature.FX_RATES,
+                        ToolFeature.CONVERTER,
                     )
-                    }
+                        .forEach { feature ->
+                            SettingItem(
+                                title = feature.displayLabel(),
+                                icon = feature.displayIcon,
+                                on = feature !in state.disabledTools,
+                                onToggle = {
+                                    if (feature in state.disabledTools) {
+                                        requestNotifPermission = true
+                                    }
+                                    viewModel.onIntent(ManageToolsIntent.ToggleTool(feature))
+                                }
+                            )
+                        }
                 }
             }
         }

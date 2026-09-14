@@ -3,10 +3,10 @@ package com.kazemieh.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Achievement
-import com.kazemieh.common.model.Streak
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.SmsDraft
 import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.Streak
 import com.kazemieh.common.model.ToolFeature
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
@@ -123,6 +123,9 @@ class DashboardViewModel(
                             ToolFeature.INSTALLMENT,
                             ToolFeature.DEBT,
                             ToolFeature.CHECK,
+                            ToolFeature.ASSETS,
+                            ToolFeature.FX_RATES,
+                            ToolFeature.CONVERTER,
                         )
             )
         )
@@ -288,7 +291,12 @@ class DashboardViewModel(
             is DashboardIntent.IgnoreSmsDraft -> viewModelScope.launch {
                 smsDraftRepository.markSmsDraftAsUsed(intent.draft.id)
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsDraftIgnored)
-                _state.update { it.copy(showDeleteSmsConfirmation = false, smsDraftToDelete = null) }
+                _state.update {
+                    it.copy(
+                        showDeleteSmsConfirmation = false,
+                        smsDraftToDelete = null
+                    )
+                }
             }
 
             is DashboardIntent.IgnoreAllSmsDrafts -> viewModelScope.launch {
@@ -320,14 +328,20 @@ class DashboardViewModel(
                 val draft = intent.draft
                 if (draft.categoryId == null || draft.sourceId == null) {
                     // Fallback to manual registration if data is missing
-                    onIntent(DashboardIntent.ShowTransactionBottomSheet(smsDraft = draft, type = draft.type))
+                    onIntent(
+                        DashboardIntent.ShowTransactionBottomSheet(
+                            smsDraft = draft,
+                            type = draft.type
+                        )
+                    )
                     return@launch
                 }
 
                 _state.update { it.copy(isLoading = true) }
-                
-                val finalAmount = if (_state.value.currency == "IRT") draft.amount / 10 else draft.amount
-                
+
+                val finalAmount =
+                    if (_state.value.currency == "IRT") draft.amount / 10 else draft.amount
+
                 val transaction = com.kazemieh.common.model.Transaction(
                     id = 0,
                     amount = finalAmount,
@@ -338,7 +352,11 @@ class DashboardViewModel(
                     type = draft.type,
                     date = draft.date
                 )
-                val id = transactionUseCaseGroup.addTransactionUseCase(transaction, emptyList(), emptyList())
+                val id = transactionUseCaseGroup.addTransactionUseCase(
+                    transaction,
+                    emptyList(),
+                    emptyList()
+                )
                 if (id > 0) {
                     smsDraftRepository.markSmsDraftAsUsed(draft.id)
                     analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsDraftQuickRegistered)
@@ -493,16 +511,22 @@ sealed interface DashboardIntent {
     data class OpenSmsDraftTransaction(val draftId: Long) : DashboardIntent
     data class IgnoreSmsDraft(val draft: SmsDraft) : DashboardIntent
     data object IgnoreAllSmsDrafts : DashboardIntent
-    data class ShowDeleteSmsConfirmation(val show: Boolean, val draft: SmsDraft? = null) : DashboardIntent
+    data class ShowDeleteSmsConfirmation(val show: Boolean, val draft: SmsDraft? = null) :
+        DashboardIntent
+
     data class ShowDeleteAllSmsConfirmation(val show: Boolean) : DashboardIntent
     data class QuickRegisterSms(val draft: SmsDraft) : DashboardIntent
     data class UpdateSmsDraft(val draft: SmsDraft) : DashboardIntent
     data object ToggleCustomizeSheet : DashboardIntent
     data class SetWidgetLayout(val items: List<DashboardWidgetItem>) : DashboardIntent
 
-    data class ToggleBudgetSheet(val budget: com.kazemieh.common.model.BudgetWithProgress? = null) : DashboardIntent
+    data class ToggleBudgetSheet(val budget: com.kazemieh.common.model.BudgetWithProgress? = null) :
+        DashboardIntent
+
     data class ToggleNoteSheet(val note: com.kazemieh.common.model.Note? = null) : DashboardIntent
-    data class ToggleShoppingSheet(val item: com.kazemieh.common.model.ShoppingItem? = null) : DashboardIntent
+    data class ToggleShoppingSheet(val item: com.kazemieh.common.model.ShoppingItem? = null) :
+        DashboardIntent
+
     data class ToggleFixedExpenseSheet(val fixedExpenseId: Long? = null) : DashboardIntent
     data class ToggleGoalSheet(val goalId: Long? = null) : DashboardIntent
     data class ToggleInstallmentSheet(val installmentId: Long? = null) : DashboardIntent
