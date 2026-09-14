@@ -14,8 +14,8 @@ android {
         applicationId = "com.kazemieh.fintrack"
         minSdk = 24
         targetSdk = 36
-        versionCode = 12
-        versionName = "5.5.0"
+        versionCode = 13
+        versionName = "6.0.0"
     }
 
     signingConfigs {
