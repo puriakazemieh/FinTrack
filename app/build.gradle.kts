@@ -14,8 +14,8 @@ android {
         applicationId = "com.kazemieh.fintrack"
         minSdk = 24
         targetSdk = 36
-        versionCode = 11
-        versionName = "5.1.0"
+        versionCode = 12
+        versionName = "5.5.0"
     }
 
     signingConfigs {
@@ -122,7 +122,13 @@ android.sourceSets["main"].assets.srcDir(
 )
 
 tasks.configureEach {
-    if (name.startsWith("merge") && name.endsWith("Assets")) {
+    // Android Lint also reads the asset source set while constructing its models. Wire the
+    // generated KMP resources to every lint task, not only asset-merging tasks, so Gradle 9
+    // can safely order the producer before lint's model and analysis tasks.
+    if (
+        (name.startsWith("merge") && name.endsWith("Assets")) ||
+        name.contains("lint", ignoreCase = true)
+    ) {
         dependsOn(copyKmpComposeResourcesForAndroid)
     }
 }

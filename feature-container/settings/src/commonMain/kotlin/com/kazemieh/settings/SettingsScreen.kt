@@ -308,9 +308,6 @@ fun SettingsScreen(
                         onClick = onNavigateToManageTools
                     )
 
-                    // Text size is a real setting: tapping cycles small → medium → large and
-                    // rescales every text in the app.
-                    // todo disable
                     SettingItem(
                         title = stringResource(Res.string.title_text_settings),
                         icon = Icons.Default.TextFormat,
