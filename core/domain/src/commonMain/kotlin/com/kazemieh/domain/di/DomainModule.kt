@@ -136,6 +136,7 @@ val domainModule = module {
     factory { ObserveAssetHistoryUseCase(get()) }
     factory { ObserveAssetsUseCase(get()) }
     factory { SyncAssetRatesUseCase(get()) }
+    factory { ObserveAssetRatesUseCase(get()) }
     factory { UpdateAssetUseCase(get()) }
 
     single {
@@ -145,6 +146,7 @@ val domainModule = module {
             updateAsset = get(),
             deleteAsset = get(),
             syncAssetRates = get(),
+            observeAssetRates = get(),
             observeAssetHistory = get()
         )
     }

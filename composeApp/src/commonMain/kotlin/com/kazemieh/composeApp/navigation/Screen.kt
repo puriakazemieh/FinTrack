@@ -9,7 +9,10 @@ sealed class Screen {
     data class Dashboard(
         val showAddTransaction: Boolean = false,
         // -1 means "no draft"; set when opened from a bank-SMS notification deep link.
-        val smsDraftId: Long = -1L
+        val smsDraftId: Long = -1L,
+        /** Optional prefill used when recording the purchase of a newly created asset. */
+        val initialTransactionAmount: Long? = null,
+        val initialTransactionDescription: String? = null
     ) : Screen()
 
     @Serializable

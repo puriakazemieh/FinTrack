@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS asset (
     purchasePrice INTEGER NOT NULL,
     currentPrice INTEGER,
     currency TEXT NOT NULL DEFAULT 'IRR',
+    marketCode TEXT,
     description TEXT,
     colorId INTEGER NOT NULL,
     iconId INTEGER NOT NULL,
@@ -27,8 +28,8 @@ CREATE TABLE IF NOT EXISTS asset_history (
 );
 
 addAsset:
-INSERT INTO asset(name, type, quantity, purchasePrice, currentPrice, currency, description, colorId, iconId, lastUpdate, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO asset(name, type, quantity, purchasePrice, currentPrice, currency, marketCode, description, colorId, iconId, lastUpdate, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 observeAssets:
 SELECT * FROM asset WHERE syncStatus != 2 ORDER BY id DESC;
@@ -38,7 +39,7 @@ SELECT * FROM asset WHERE id = ? AND syncStatus != 2;
 
 updateAsset:
 UPDATE asset
-SET name = ?, type = ?, quantity = ?, purchasePrice = ?, currentPrice = ?, currency = ?, description = ?, colorId = ?, iconId = ?, lastUpdate = ?, updatedAt = ?, syncStatus = ?
+SET name = ?, type = ?, quantity = ?, purchasePrice = ?, currentPrice = ?, currency = ?, marketCode = ?, description = ?, colorId = ?, iconId = ?, lastUpdate = ?, updatedAt = ?, syncStatus = ?
 WHERE id = ? AND syncStatus != 2;
 
 updateAssetPrice:
@@ -73,5 +74,5 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertFullAsset:
-INSERT OR REPLACE INTO asset(id, name, type, quantity, purchasePrice, currentPrice, currency, description, colorId, iconId, lastUpdate, updatedAt, syncStatus)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO asset(id, name, type, quantity, purchasePrice, currentPrice, currency, marketCode, description, colorId, iconId, lastUpdate, updatedAt, syncStatus)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);

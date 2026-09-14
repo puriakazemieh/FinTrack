@@ -734,6 +734,7 @@ fun AssetDb.toAsset() = Asset(
     purchasePrice = purchasePrice,
     currentPrice = currentPrice,
     currency = currency,
+    marketCode = marketCode,
     description = description,
     colorId = colorId.toInt(),
     iconId = iconId.toInt(),

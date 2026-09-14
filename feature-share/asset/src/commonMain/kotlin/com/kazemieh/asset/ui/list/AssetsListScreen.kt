@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +43,7 @@ import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.EntitySummary
 import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.GlassCard
+import com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.designsystem.GlassAmber
 import com.kazemieh.designsystem.GlassBlue
@@ -62,6 +64,7 @@ import fintrack.core.designsystem.generated.resources.asset_type_custom
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AssetsListScreen(
     onAddAsset: (Long?) -> Unit,
@@ -72,6 +75,7 @@ fun AssetsListScreen(
     val state by viewModel.state.collectAsState()
     var selectedAssetForActions by remember { mutableStateOf<Asset?>(null) }
     var selectedAssetForHistory by remember { mutableStateOf<Asset?>(null) }
+    var assetPendingDeletion by remember { mutableStateOf<Asset?>(null) }
 
     FintrackScreen(
         title = stringResource(Res.string.title_assets_management),
@@ -126,7 +130,7 @@ fun AssetsListScreen(
                     onAddAsset(item.id)
                 },
                 onDeleteClick = { item ->
-                    viewModel.onIntent(AssetIntent.DeleteAsset(item.id))
+                    assetPendingDeletion = state.assets.find { it.id == item.id }
                 },
                 showActions = true
             )
@@ -143,7 +147,8 @@ fun AssetsListScreen(
             onViewHistory = { 
                 selectedAssetForHistory = it
                 selectedAssetForActions = null
-            }
+            },
+            onDelete = { assetPendingDeletion = it }
         )
     }
 
@@ -151,6 +156,18 @@ fun AssetsListScreen(
         AssetHistorySheet(
             asset = asset,
             onDismiss = { selectedAssetForHistory = null }
+        )
+    }
+
+    assetPendingDeletion?.let { asset ->
+        DeleteBottomSheet(
+            itemName = asset.name,
+            itemType = stringResource(Res.string.title_assets_management),
+            dismissClicked = { assetPendingDeletion = null },
+            confirmClicked = {
+                asset.id?.let { viewModel.onIntent(AssetIntent.DeleteAsset(it)) }
+                assetPendingDeletion = null
+            }
         )
     }
 }

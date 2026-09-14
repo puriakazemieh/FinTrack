@@ -25,6 +25,7 @@ class FxRatesViewModel(
 
     init {
         analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("fx_rates"))
+        analytics.track(com.kazemieh.common.analytics.ProductEvent.FxRatesViewed)
         // The cached rates are the source of truth for what's on screen, so a failed live refresh
         // never blanks the list — the last successful snapshot stays visible.
         assetRepository.observeRates()
@@ -49,15 +50,20 @@ class FxRatesViewModel(
     private fun refresh() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.FxRatesRefreshRequested)
             try {
                 val rates = assetRepository.syncRates()
                 if (rates.isEmpty()) {
                     _state.update { it.copy(error = "empty") }
                     _effect.send(FxRatesEffect.ShowError("empty"))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FxRatesRefreshFailed)
+                } else {
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FxRatesRefreshCompleted(rates.size))
                 }
             } catch (e: Exception) {
                 _state.update { it.copy(error = e.message) }
                 _effect.send(FxRatesEffect.ShowError(e.message ?: "Unknown error"))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FxRatesRefreshFailed)
             } finally {
                 _state.update { it.copy(isLoading = false) }
             }

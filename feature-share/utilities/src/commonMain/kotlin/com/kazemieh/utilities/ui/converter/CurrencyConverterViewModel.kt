@@ -28,27 +28,37 @@ class CurrencyConverterViewModel(
     private fun loadRates() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            val rates = assetRepository.syncRates().toMutableList()
-            
-            // Add IRR (Toman) as base rate if not present
-            if (rates.none { it.code == "irr" }) {
-                rates.add(0, AssetRate(AssetType.FX, "irr", "تومان", 1, Clock.System.now()))
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyRatesRefreshRequested)
+            try {
+                val rates = assetRepository.syncRates().toMutableList()
+                val hasMarketRates = rates.isNotEmpty()
+                // All market prices are normalized to toman, so IRT is the converter base unit.
+                if (rates.none { it.code == "irt" }) {
+                    rates.add(0, AssetRate(AssetType.FX, "irt", "تومان", 1, Clock.System.now()))
+                }
+                _state.update {
+                    it.copy(
+                        availableRates = rates,
+                        fromRate = rates.find { r -> r.code == "usd" } ?: rates.firstOrNull(),
+                        toRate = rates.find { r -> r.code == "irt" } ?: rates.lastOrNull(),
+                        favoritePairs = listOf(
+                            FavoritePair("usd", "irt", "دلار", "تومان", 0.0, "🇺🇸"),
+                            FavoritePair("eur", "irt", "یورو", "تومان", 0.0, "🇪🇺"),
+                            FavoritePair("btc", "usd", "بیت‌کوین", "دلار", 0.0, "₿")
+                        ),
+                        isLoading = false
+                    )
+                }
+                if (hasMarketRates) {
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyRatesRefreshCompleted(rates.size))
+                } else {
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyRatesRefreshFailed)
+                }
+                calculate()
+            } catch (_: Exception) {
+                _state.update { it.copy(isLoading = false) }
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyRatesRefreshFailed)
             }
-            
-            _state.update { 
-                it.copy(
-                    availableRates = rates,
-                    fromRate = rates.find { r -> r.code == "usd" } ?: rates.firstOrNull(),
-                    toRate = rates.find { r -> r.code == "irr" } ?: rates.lastOrNull(),
-                    favoritePairs = listOf(
-                        FavoritePair("usd", "irr", "دلار", "تومان", 0.0, "🇺🇸"),
-                        FavoritePair("eur", "irr", "یورو", "تومان", 0.0, "🇪🇺"),
-                        FavoritePair("btc", "usd", "بیت‌کوین", "دلار", 0.0, "₿")
-                    ),
-                    isLoading = false
-                )
-            }
-            calculate()
         }
     }
 
@@ -74,14 +84,17 @@ class CurrencyConverterViewModel(
             }
             is CurrencyConverterIntent.SelectFromRate -> {
                 _state.update { it.copy(fromRate = intent.rate) }
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyPairSelected("from", intent.rate.code))
                 calculate()
             }
             is CurrencyConverterIntent.SelectToRate -> {
                 _state.update { it.copy(toRate = intent.rate) }
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyPairSelected("to", intent.rate.code))
                 calculate()
             }
             CurrencyConverterIntent.SwapRates -> {
                 _state.update { it.copy(fromRate = it.toRate, toRate = it.fromRate) }
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyPairSwapped)
                 calculate()
             }
             CurrencyConverterIntent.RefreshRates -> loadRates()
@@ -94,6 +107,12 @@ class CurrencyConverterViewModel(
                 val to = _state.value.availableRates.find { it.code == intent.pair.toCode }
                 if (from != null && to != null) {
                     _state.update { it.copy(fromRate = from, toRate = to) }
+                    analytics.track(
+                        com.kazemieh.common.analytics.ProductEvent.CurrencyFavoritePairSelected(
+                            intent.pair.fromCode,
+                            intent.pair.toCode
+                        )
+                    )
                     calculate()
                 }
             }

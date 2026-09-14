@@ -387,6 +387,14 @@
     <string name="label_asset_name_hint">نام دارایی (مثلاً دلار یا طلای ۱۸)</string>
     <string name="label_quantity">مقدار / تعداد</string>
     <string name="label_purchase_price">قیمت خرید هر واحد</string>
+    <string name="label_asset_market_code">کد بازار برای به‌روزرسانی قیمت</string>
+    <string name="hint_asset_market_code">از لیست طلا، ارز و رمزارز انتخاب کنید</string>
+    <string name="title_select_asset_market">انتخاب بازار دارایی</string>
+    <string name="msg_market_rates_unavailable">نرخ قابل‌دریافتی برای این نوع دارایی وجود ندارد. دوباره تلاش کنید.</string>
+    <string name="title_asset_transaction_prompt">ثبت خرید دارایی</string>
+    <string name="msg_asset_transaction_prompt">مایل هستید خرید «%1$s» را هم به‌عنوان تراکنش ثبت کنید؟</string>
+    <string name="asset_purchase_transaction_description">خرید دارایی: %1$s</string>
+    <string name="label_asset_profit_loss">سود / زیان بر اساس قیمت خرید</string>
     <string name="btn_add_custom_asset">افزودن دارایی سفارشی / ارزهای دیگر</string>
     <string name="title_price_history">تاریخچه قیمت: %1$s</string>
     <string name="title_add_custom_asset">افزودن دارایی سفارشی</string>

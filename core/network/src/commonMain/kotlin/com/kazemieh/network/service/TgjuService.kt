@@ -45,7 +45,7 @@ class TgjuService(private val client: HttpClient) {
             JSON_KEYS.mapNotNull { (key, meta) ->
                 response.current[key]?.p?.let { priceStr ->
                     val price = cleanPrice(priceStr)
-                    if (price > 0) AssetRate(meta.type, meta.code, meta.name, price, now) else null
+                    if (price > 0) AssetRate(meta.type, meta.code, meta.name, price.toToman(), now) else null
                 }
             }
         } catch (e: Exception) {
@@ -82,10 +82,10 @@ class TgjuService(private val client: HttpClient) {
                 .toRegex(RegexOption.DOT_MATCHES_ALL)
                 .find(html)?.groupValues?.get(1)
 
-        extract("gold_18k")?.let { rates.add(AssetRate(AssetType.GOLD, "gold_18k", "طلای ۱۸ عیار", cleanPrice(it), now)) }
-        extract("price_dollar_rl")?.let { rates.add(AssetRate(AssetType.FX, "usd", "دلار آمریکا", cleanPrice(it), now)) }
-        extract("price_eur")?.let { rates.add(AssetRate(AssetType.FX, "eur", "یورو", cleanPrice(it), now)) }
-        extract("price_aed")?.let { rates.add(AssetRate(AssetType.FX, "aed", "درهم امارات", cleanPrice(it), now)) }
+        extract("gold_18k")?.let { rates.add(AssetRate(AssetType.GOLD, "gold_18k", "طلای ۱۸ عیار", cleanPrice(it).toToman(), now)) }
+        extract("price_dollar_rl")?.let { rates.add(AssetRate(AssetType.FX, "usd", "دلار آمریکا", cleanPrice(it).toToman(), now)) }
+        extract("price_eur")?.let { rates.add(AssetRate(AssetType.FX, "eur", "یورو", cleanPrice(it).toToman(), now)) }
+        extract("price_aed")?.let { rates.add(AssetRate(AssetType.FX, "aed", "درهم امارات", cleanPrice(it).toToman(), now)) }
 
         return rates
     }
@@ -101,6 +101,9 @@ class TgjuService(private val client: HttpClient) {
             .substringBefore('.')
         return normalized.toLongOrNull() ?: 0L
     }
+
+    /** TGJU publishes rial values; all FinTrack market rates are normalized to toman. */
+    private fun Long.toToman(): Long = this / 10
 
     private data class RateMeta(val type: AssetType, val code: String, val name: String)
 

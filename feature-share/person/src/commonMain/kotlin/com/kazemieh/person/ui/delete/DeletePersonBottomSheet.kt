@@ -28,7 +28,7 @@ fun DeletePersonBottomSheet(
     deleted: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(person) {

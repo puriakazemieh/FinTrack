@@ -82,6 +82,8 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
             DashboardScreen(
                 showAddTransaction = args.showAddTransaction,
                 smsDraftId = args.smsDraftId,
+                initialTransactionAmount = args.initialTransactionAmount,
+                initialTransactionDescription = args.initialTransactionDescription,
                 onNavigateToTransactions = navigateToTransactions,
                 onNavigateToSearch = { navController.navigate(Screen.Search) },
                 onNavigateToBudget = { navController.navigate(Screen.Budget) },
@@ -357,7 +359,18 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
             val args = backStackEntry.toRoute<Screen.AddAsset>()
             AddAssetScreen(
                 assetId = args.assetId,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onRegisterTransaction = { asset, description ->
+                    // Remove the completed editor before opening the prefilled transaction form.
+                    navController.popBackStack()
+                    navController.navigate(
+                        Screen.Dashboard(
+                            showAddTransaction = true,
+                            initialTransactionAmount = asset.totalPurchaseValue,
+                            initialTransactionDescription = description
+                        )
+                    )
+                }
             )
         }
 

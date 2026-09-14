@@ -10,6 +10,8 @@ import com.kazemieh.network.service.TgjuService
 import com.kazemieh.network.service.NobitexService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 class AssetRepositoryImpl(
     private val localDataSource: AssetLocalDataSource,
@@ -26,8 +28,11 @@ class AssetRepositoryImpl(
     override suspend fun deleteAsset(assetId: Long) = localDataSource.deleteAsset(assetId)
 
     override suspend fun syncRates(): List<AssetRate> {
-        val tgjuRates = tgjuService.getLatestRates()
-        val nobitexRates = nobitexService.getLatestRates()
+        val (tgjuRates, nobitexRates) = coroutineScope {
+            val tgju = async { tgjuService.getLatestRates() }
+            val nobitex = async { nobitexService.getLatestRates() }
+            tgju.await() to nobitex.await()
+        }
         
         // Merge the lists. If a rate is available from Nobitex, prefer it (for crypto).
         val nobitexCodes = nobitexRates.map { it.code }
@@ -43,14 +48,12 @@ class AssetRepositoryImpl(
 
         val assets = localDataSource.observeAssets().first()
         assets.forEach { asset ->
-            val rate = when (asset.type) {
-                AssetType.GOLD -> rates.find { it.type == AssetType.GOLD }
-                AssetType.FX -> rates.find { it.code.lowercase() == asset.name.lowercase() || it.type == AssetType.FX } // Simplified
-                else -> null
-            }
+            val assetId = asset.id
+            val code = asset.marketCode ?: asset.legacyMarketCode()
+            val rate = code?.let { wantedCode -> rates.find { it.code.equals(wantedCode, ignoreCase = true) } }
 
-            rate?.let { foundRate ->
-                localDataSource.updateAssetPrice(asset.id ?: 0, foundRate.price)
+            if (assetId != null && rate != null && asset.currentPrice != rate.price) {
+                localDataSource.updateAssetPrice(assetId, rate.price)
             }
         }
         return rates
@@ -60,4 +63,25 @@ class AssetRepositoryImpl(
 
     override fun observeAssetHistory(assetId: Long): Flow<List<AssetHistory>> =
         localDataSource.observeAssetHistory(assetId)
+
+    /** Best-effort compatibility for assets created before `marketCode` existed. */
+    private fun Asset.legacyMarketCode(): String? {
+        val normalized = name.lowercase()
+            .replace('ي', 'ی')
+            .replace('ك', 'ک')
+            .replace(" ", "")
+        return when {
+            type == AssetType.GOLD && ("18" in normalized || "۱۸" in normalized) -> "gold_18k"
+            type == AssetType.GOLD && ("24" in normalized || "۲۴" in normalized) -> "gold_24k"
+            type == AssetType.GOLD && "سکه" in normalized -> "coin_emami"
+            type == AssetType.FX && (normalized == "usd" || "دلار" in normalized) -> "usd"
+            type == AssetType.FX && (normalized == "eur" || "یورو" in normalized) -> "eur"
+            type == AssetType.FX && (normalized == "gbp" || "پوند" in normalized) -> "gbp"
+            type == AssetType.FX && (normalized == "aed" || "درهم" in normalized) -> "aed"
+            type == AssetType.FX && (normalized == "btc" || "بیتکوین" in normalized) -> "btc"
+            type == AssetType.FX && (normalized == "eth" || "اتریوم" in normalized) -> "eth"
+            type == AssetType.FX && (normalized == "usdt" || "تتر" in normalized) -> "usdt"
+            else -> null
+        }
+    }
 }

@@ -13,14 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.kazemieh.asset.ui.AssetIntent
-import com.kazemieh.asset.ui.AssetViewModel
 import com.kazemieh.common.model.Asset
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
 import com.kazemieh.designsystem.component.FintrackTitleLargeText
 import com.kazemieh.designsystem.component.glass.FintrackBackgroundBlobs
-import org.koin.compose.viewmodel.koinViewModel
-
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 
@@ -31,7 +27,7 @@ fun AssetActionsSheet(
     onDismiss: () -> Unit,
     onEdit: (Asset) -> Unit,
     onViewHistory: (Asset) -> Unit,
-    viewModel: AssetViewModel = koinViewModel()
+    onDelete: (Asset) -> Unit
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -79,7 +75,7 @@ fun AssetActionsSheet(
                     title = stringResource(Res.string.action_delete_asset),
                     color = MaterialTheme.colorScheme.error,
                     onClick = {
-                        viewModel.onIntent(AssetIntent.DeleteAsset(asset.id ?: 0L))
+                        onDelete(asset)
                         onDismiss()
                     }
                 )

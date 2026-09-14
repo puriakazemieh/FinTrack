@@ -104,10 +104,40 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     data object AssetUpdated : ProductEvent("asset_updated")
     data object AssetDeleted : ProductEvent("asset_deleted")
     data object FxRatesViewed : ProductEvent("fx_rates_viewed")
+    data object FxRatesRefreshRequested : ProductEvent("fx_rates_refresh_requested")
+    data class FxRatesRefreshCompleted(val rateCount: Int) : ProductEvent(
+        "fx_rates_refresh_completed", mapOf("rate_count" to rateCount)
+    )
+    data object FxRatesRefreshFailed : ProductEvent("fx_rates_refresh_failed")
+    data object AssetDashboardPerformanceViewed : ProductEvent("asset_dashboard_performance_viewed")
+    data object AssetHistoryViewed : ProductEvent("asset_history_viewed")
+    data object AssetRateRefreshRequested : ProductEvent("asset_rate_refresh_requested")
+    data class AssetRateRefreshCompleted(val rateCount: Int) : ProductEvent(
+        "asset_rate_refresh_completed", mapOf("rate_count" to rateCount)
+    )
+    data object AssetRateRefreshFailed : ProductEvent("asset_rate_refresh_failed")
+    data class AssetMarketSelected(val assetType: String, val marketCode: String) : ProductEvent(
+        "asset_market_selected", mapOf("asset_type" to assetType, "market_code" to marketCode)
+    )
+    data class AssetTransactionPromptAnswered(val accepted: Boolean) : ProductEvent(
+        "asset_transaction_prompt_answered", mapOf("accepted" to accepted)
+    )
 
     // 12. Utilities & Tools
     data object ToolsHubViewed : ProductEvent("tools_hub_viewed")
     data object CurrencyConverterUsed : ProductEvent("currency_converter_used")
+    data class CurrencyPairSelected(val side: String, val currencyCode: String) : ProductEvent(
+        "currency_pair_selected", mapOf("side" to side, "currency_code" to currencyCode)
+    )
+    data class CurrencyFavoritePairSelected(val fromCode: String, val toCode: String) : ProductEvent(
+        "currency_favorite_pair_selected", mapOf("from_code" to fromCode, "to_code" to toCode)
+    )
+    data object CurrencyPairSwapped : ProductEvent("currency_pair_swapped")
+    data object CurrencyRatesRefreshRequested : ProductEvent("currency_rates_refresh_requested")
+    data class CurrencyRatesRefreshCompleted(val rateCount: Int) : ProductEvent(
+        "currency_rates_refresh_completed", mapOf("rate_count" to rateCount)
+    )
+    data object CurrencyRatesRefreshFailed : ProductEvent("currency_rates_refresh_failed")
     data object AiAdvisorOpened : ProductEvent("ai_advisor_opened")
     data object AiInsightGenerated : ProductEvent("ai_insight_generated")
     data object ShoppingItemAdded : ProductEvent("shopping_item_added")

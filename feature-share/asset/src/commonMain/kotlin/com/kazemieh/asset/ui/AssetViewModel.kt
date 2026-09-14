@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Asset
 import com.kazemieh.common.model.AssetHistory
+import com.kazemieh.common.model.AssetRate
 import com.kazemieh.common.model.AssetType
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.AssetUseCases
@@ -21,6 +22,7 @@ data class AssetState(
     val filteredAssets: List<Asset> = emptyList(),
     val selectedAsset: Asset? = null,
     val history: List<AssetHistory> = emptyList(),
+    val marketRates: List<AssetRate> = emptyList(),
     val isLoading: Boolean = false,
     val totalValue: Long = 0,
     val composition: Map<AssetType, Double> = emptyMap(),
@@ -35,11 +37,14 @@ sealed interface AssetIntent {
     data class DeleteAsset(val id: Long) : AssetIntent
     data class UpdateAsset(val asset: Asset) : AssetIntent
     data class LoadHistory(val id: Long) : AssetIntent
+    data class MarketRateSelected(val rate: AssetRate) : AssetIntent
+    data class AssetTransactionPromptAnswered(val accepted: Boolean) : AssetIntent
     data object SyncRates : AssetIntent
 }
 
 sealed interface AssetEffect {
     data class ShowMessage(val message: UiText) : AssetEffect
+    data class AssetAdded(val asset: Asset) : AssetEffect
 }
 
 class AssetViewModel(
@@ -50,7 +55,7 @@ class AssetViewModel(
     private val _state = MutableStateFlow(AssetState())
     val state = _state.asStateFlow()
 
-    private val _effect = Channel<AssetEffect>()
+    private val _effect = Channel<AssetEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
     private val _searchQuery = MutableStateFlow("")
@@ -58,6 +63,7 @@ class AssetViewModel(
     init {
         analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetListViewed)
         onIntent(AssetIntent.LoadAssets)
+        observeMarketRates()
     }
 
     fun onIntent(intent: AssetIntent) {
@@ -69,6 +75,15 @@ class AssetViewModel(
             is AssetIntent.DeleteAsset -> deleteAsset(intent.id)
             is AssetIntent.UpdateAsset -> updateAsset(intent.asset)
             is AssetIntent.LoadHistory -> loadHistory(intent.id)
+            is AssetIntent.MarketRateSelected -> analytics.track(
+                com.kazemieh.common.analytics.ProductEvent.AssetMarketSelected(
+                    intent.rate.type.name,
+                    intent.rate.code
+                )
+            )
+            is AssetIntent.AssetTransactionPromptAnswered -> analytics.track(
+                com.kazemieh.common.analytics.ProductEvent.AssetTransactionPromptAnswered(intent.accepted)
+            )
             AssetIntent.SyncRates -> syncRates()
         }
     }
@@ -80,6 +95,7 @@ class AssetViewModel(
 
     private fun loadHistory(id: Long) {
         viewModelScope.launch {
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetHistoryViewed)
             assetUseCases.observeAssetHistory(id).collect { history ->
                 _state.update { it.copy(history = history) }
             }
@@ -115,11 +131,23 @@ class AssetViewModel(
         }
     }
 
+    private fun observeMarketRates() {
+        viewModelScope.launch {
+            assetUseCases.observeAssetRates().collect { rates ->
+                _state.update { it.copy(marketRates = rates) }
+            }
+        }
+    }
+
     private fun addAsset(asset: Asset) {
         viewModelScope.launch {
-            assetUseCases.addAsset(asset)
+            val id = assetUseCases.addAsset(asset)
+            // A newly tracked market asset should receive a quote immediately when possible,
+            // without holding the post-save confirmation hostage to an external request.
+            viewModelScope.launch { assetUseCases.syncAssetRates() }
             analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetCreated(asset.type.name))
             _effect.send(AssetEffect.ShowMessage(UiText.StringResourceText(Res.string.msg_asset_added)))
+            _effect.send(AssetEffect.AssetAdded(asset.copy(id = id)))
         }
     }
 
@@ -142,9 +170,19 @@ class AssetViewModel(
     private fun syncRates() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            assetUseCases.syncAssetRates()
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.FxRatesViewed)
-            _state.update { it.copy(isLoading = false) }
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetRateRefreshRequested)
+            try {
+                val rates = assetUseCases.syncAssetRates()
+                if (rates.isEmpty()) {
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetRateRefreshFailed)
+                } else {
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetRateRefreshCompleted(rates.size))
+                }
+            } catch (_: Exception) {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetRateRefreshFailed)
+            } finally {
+                _state.update { it.copy(isLoading = false) }
+            }
         }
     }
 }

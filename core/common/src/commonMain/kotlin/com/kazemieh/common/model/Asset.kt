@@ -21,6 +21,8 @@ data class Asset(
     val purchasePrice: Long, // Price per unit at purchase
     val currentPrice: Long? = null, // Latest known price per unit
     val currency: String = "IRR",
+    /** Stable market identifier (for example `usd`, `gold_18k`, or `btc`). */
+    val marketCode: String? = null,
     val description: String? = null,
     val colorId: Int,
     val iconId: Int,

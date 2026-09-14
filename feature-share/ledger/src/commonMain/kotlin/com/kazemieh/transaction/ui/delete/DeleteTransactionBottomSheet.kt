@@ -22,7 +22,7 @@ fun DeleteTransactionBottomSheet(
     onDismiss: () -> Unit,
     transactionDeleted: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
     LaunchedEffect(transactionWithRelations?.transaction?.id) {
         viewModel.onIntent(DeleteTransactionIntent.SetData(transactionWithRelations))

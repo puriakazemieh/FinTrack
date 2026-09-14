@@ -1,6 +1,7 @@
 package com.kazemieh.domain.usecase
 
 import com.kazemieh.common.model.Asset
+import com.kazemieh.common.model.AssetRate
 import com.kazemieh.domain.repository.AssetRepository
 import kotlinx.coroutines.flow.Flow
 
@@ -10,6 +11,7 @@ data class AssetUseCases(
     val updateAsset: UpdateAssetUseCase,
     val deleteAsset: DeleteAssetUseCase,
     val syncAssetRates: SyncAssetRatesUseCase,
+    val observeAssetRates: ObserveAssetRatesUseCase,
     val observeAssetHistory: ObserveAssetHistoryUseCase
 )
 
@@ -31,6 +33,10 @@ class DeleteAssetUseCase(private val repository: AssetRepository) {
 
 class SyncAssetRatesUseCase(private val repository: AssetRepository) {
     suspend operator fun invoke() = repository.syncRates()
+}
+
+class ObserveAssetRatesUseCase(private val repository: AssetRepository) {
+    operator fun invoke(): Flow<List<AssetRate>> = repository.observeRates()
 }
 
 class ObserveAssetHistoryUseCase(private val repository: AssetRepository) {

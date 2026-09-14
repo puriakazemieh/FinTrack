@@ -87,6 +87,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun DashboardScreen(
     showAddTransaction: Boolean = false,
     smsDraftId: Long = -1L,
+    initialTransactionAmount: Long? = null,
+    initialTransactionDescription: String? = null,
     viewModel: DashboardViewModel = koinViewModel(),
     onNavigateToTransactions: (Any?) -> Unit = {},
     onNavigateToSearch: () -> Unit = {},
@@ -315,6 +317,8 @@ fun DashboardScreen(
                 transactionWithRelations = state.transactionWithRelations,
                 template = repeatTemplate,
                 initialType = state.initialTransactionType,
+                initialAmount = initialTransactionAmount?.toString(),
+                initialDescription = initialTransactionDescription,
                 smsDraft = state.smsDraft,
                 onDismiss = {
                     repeatTemplate = null

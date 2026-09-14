@@ -396,7 +396,7 @@ private fun getFlag(code: String): String {
         "usd" -> "🇺🇸"
         "eur" -> "🇪🇺"
         "gbp" -> "🇬🇧"
-        "irr" -> "🇮🇷"
+        "irt", "irr" -> "🇮🇷"
         "btc" -> "₿"
         "eth" -> "Ξ"
         "gold_18k" -> "🟡"

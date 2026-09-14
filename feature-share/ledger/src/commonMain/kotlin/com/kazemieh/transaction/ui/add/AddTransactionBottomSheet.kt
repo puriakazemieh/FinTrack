@@ -137,6 +137,8 @@ fun AddTransactionBottomSheet(
     transactionWithRelations: TransactionWithRelations? = null,
     template: TransactionWithRelations? = null,
     initialType: TransactionType? = null,
+    initialAmount: String? = null,
+    initialDescription: String? = null,
     smsDraft: SmsDraft? = null,
     onDismiss: () -> Unit,
     transactionAdded: () -> Unit
@@ -155,7 +157,7 @@ fun AddTransactionBottomSheet(
         }
     }
 
-    LaunchedEffect(transactionWithRelations, template, initialType, smsDraft) {
+    LaunchedEffect(transactionWithRelations, template, initialType, initialAmount, initialDescription, smsDraft) {
         if (template != null) {
             viewModel.onIntent(AddTransactionIntent.PrefillFromTemplate(template))
         } else {
@@ -167,6 +169,8 @@ fun AddTransactionBottomSheet(
             )
         }
         initialType?.let { viewModel.onIntent(AddTransactionIntent.SelectedType(it)) }
+        initialAmount?.let { viewModel.onIntent(AddTransactionIntent.SetAmount(it)) }
+        initialDescription?.let { viewModel.onIntent(AddTransactionIntent.SetDescription(it)) }
     }
 
     LaunchedEffect(Unit) {

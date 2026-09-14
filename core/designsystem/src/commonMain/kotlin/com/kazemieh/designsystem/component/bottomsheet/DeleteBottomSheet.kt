@@ -52,7 +52,8 @@ fun DeleteBottomSheet(
     ),
     dismissClicked: () -> Unit,
     confirmClicked: () -> Unit,
-    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    // Destructive confirmations are intentionally compact: they should not read like a screen.
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
 
     confirmEnabled: Boolean = true,
     dismissEnabled: Boolean = true,
