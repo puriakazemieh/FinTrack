@@ -44,7 +44,22 @@ class FxRatesViewModel(
     fun onIntent(intent: FxRatesIntent) {
         when (intent) {
             FxRatesIntent.RefreshRates -> refresh()
+            is FxRatesIntent.SelectRate -> selectRate(intent.rate)
+            FxRatesIntent.DismissRateDetails -> _state.update {
+                it.copy(selectedRate = null, selectedRateHistory = emptyList())
+            }
         }
+    }
+
+    private fun selectRate(rate: com.kazemieh.common.model.AssetRate) {
+        _state.update { it.copy(selectedRate = rate, selectedRateHistory = emptyList()) }
+        assetRepository.observeRateHistory(rate.code)
+            .onEach { history ->
+                _state.update { current ->
+                    if (current.selectedRate?.code == rate.code) current.copy(selectedRateHistory = history) else current
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun refresh() {

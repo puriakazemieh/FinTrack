@@ -89,6 +89,7 @@ fun DashboardScreen(
     smsDraftId: Long = -1L,
     initialTransactionAmount: Long? = null,
     initialTransactionDescription: String? = null,
+    initialTransactionType: String? = null,
     viewModel: DashboardViewModel = koinViewModel(),
     onNavigateToTransactions: (Any?) -> Unit = {},
     onNavigateToSearch: () -> Unit = {},
@@ -117,11 +118,17 @@ fun DashboardScreen(
         mutableStateOf<com.kazemieh.common.model.TransactionWithRelations?>(null)
     }
 
-    LaunchedEffect(showAddTransaction, smsDraftId) {
+    LaunchedEffect(showAddTransaction, smsDraftId, initialTransactionType) {
         if (smsDraftId > 0L) {
             viewModel.onIntent(DashboardIntent.OpenSmsDraftTransaction(smsDraftId))
         } else if (showAddTransaction) {
-            viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet())
+            viewModel.onIntent(
+                DashboardIntent.ShowTransactionBottomSheet(
+                    type = initialTransactionType?.let { name ->
+                        com.kazemieh.common.model.TransactionType.entries.find { it.name == name }
+                    }
+                )
+            )
         }
     }
 

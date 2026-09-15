@@ -1,0 +1,6 @@
+CREATE TABLE market_rate_history (
+    code TEXT NOT NULL,
+    price INTEGER NOT NULL,
+    date INTEGER NOT NULL,
+    PRIMARY KEY (code, date)
+);

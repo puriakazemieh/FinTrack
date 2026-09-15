@@ -4,6 +4,7 @@ import com.kazemieh.common.model.Asset
 import com.kazemieh.common.model.AssetHistory
 import com.kazemieh.common.model.AssetRate
 import com.kazemieh.common.model.AssetType
+import com.kazemieh.common.model.MarketRateHistory
 import com.kazemieh.data_contract.datasource.AssetLocalDataSource
 import com.kazemieh.domain.repository.AssetRepository
 import com.kazemieh.network.service.TgjuService
@@ -60,6 +61,9 @@ class AssetRepositoryImpl(
     }
 
     override fun observeRates(): Flow<List<AssetRate>> = localDataSource.observeCachedRates()
+
+    override fun observeRateHistory(code: String): Flow<List<MarketRateHistory>> =
+        localDataSource.observeRateHistory(code)
 
     override fun observeAssetHistory(assetId: Long): Flow<List<AssetHistory>> =
         localDataSource.observeAssetHistory(assetId)

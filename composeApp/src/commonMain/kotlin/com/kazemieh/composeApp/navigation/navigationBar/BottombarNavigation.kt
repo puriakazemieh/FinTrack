@@ -84,6 +84,7 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 smsDraftId = args.smsDraftId,
                 initialTransactionAmount = args.initialTransactionAmount,
                 initialTransactionDescription = args.initialTransactionDescription,
+                initialTransactionType = args.initialTransactionType,
                 onNavigateToTransactions = navigateToTransactions,
                 onNavigateToSearch = { navController.navigate(Screen.Search) },
                 onNavigateToBudget = { navController.navigate(Screen.Budget) },
@@ -143,7 +144,10 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
 
         composable<Screen.FxRates> {
             FxRatesScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() },
+                onAddAssetClick = { rate ->
+                    navController.navigate(Screen.AddAsset(marketCode = rate.code))
+                }
             )
         }
 
@@ -359,15 +363,17 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
             val args = backStackEntry.toRoute<Screen.AddAsset>()
             AddAssetScreen(
                 assetId = args.assetId,
+                initialMarketCode = args.marketCode,
                 onBack = { navController.popBackStack() },
-                onRegisterTransaction = { asset, description ->
+                onRegisterTransaction = { asset, description, transactionType ->
                     // Remove the completed editor before opening the prefilled transaction form.
                     navController.popBackStack()
                     navController.navigate(
                         Screen.Dashboard(
                             showAddTransaction = true,
                             initialTransactionAmount = asset.totalPurchaseValue,
-                            initialTransactionDescription = description
+                            initialTransactionDescription = description,
+                            initialTransactionType = transactionType.name
                         )
                     )
                 }

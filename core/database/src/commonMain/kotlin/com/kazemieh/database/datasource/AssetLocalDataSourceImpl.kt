@@ -7,6 +7,7 @@ import app.cash.sqldelight.coroutines.mapToList
 import com.kazemieh.common.model.Asset
 import com.kazemieh.common.model.AssetHistory
 import com.kazemieh.common.model.AssetRate
+import com.kazemieh.common.model.MarketRateHistory
 import com.kazemieh.data_contract.datasource.AssetLocalDataSource
 import com.kazemieh.database.FinTrackDatabase
 import com.kazemieh.database.mapper.toAsset
@@ -109,21 +110,45 @@ class AssetLocalDataSourceImpl(
         rateCacheQueries.getAllRates().awaitAsList().map { it.toAssetRate() }
     }
 
+    private suspend fun insertRateAndHistory(rate: AssetRate) {
+        rateCacheQueries.upsertRate(
+            code = rate.code,
+            type = rate.type,
+            name = rate.name,
+            price = rate.price,
+            lastUpdate = rate.lastUpdate.toEpochMilliseconds()
+        )
+        rateCacheQueries.cacheRateHistory(
+            code = rate.code,
+            price = rate.price,
+            date = rate.lastUpdate.toEpochMilliseconds()
+        )
+    }
+
     override suspend fun cacheRates(rates: List<AssetRate>) {
         if (rates.isEmpty()) return
         withContext(Dispatchers.Default) {
             db.transaction {
-                rates.forEach { rate ->
-                    rateCacheQueries.upsertRate(
-                        code = rate.code,
-                        type = rate.type,
-                        name = rate.name,
-                        price = rate.price,
-                        lastUpdate = rate.lastUpdate.toEpochMilliseconds()
-                    )
+                for (rate in rates) {
+                    insertRateAndHistory(rate)
                 }
             }
         }
+    }
+
+    override fun observeRateHistory(code: String): Flow<List<MarketRateHistory>> {
+        return rateCacheQueries.observeRateHistory(code)
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+            .map { history ->
+                history.map { item ->
+                    MarketRateHistory(
+                        code = item.code,
+                        price = item.price,
+                        date = kotlin.time.Instant.fromEpochMilliseconds(item.date)
+                    )
+                }
+            }
     }
 
     override suspend fun getAllAssets(): List<Asset> = withContext(Dispatchers.Default) {

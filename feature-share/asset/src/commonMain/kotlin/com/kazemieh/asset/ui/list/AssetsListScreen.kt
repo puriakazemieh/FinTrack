@@ -90,24 +90,12 @@ fun AssetsListScreen(
         onBack = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            AssetHero(
-                totalValue = state.totalValue,
-                composition = state.composition
-            )
-
             EntityList(
                 title = stringResource(Res.string.title_assets_management),
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(AssetIntent.UpdateSearchQuery(it)) },
                 onAddClick = { onAddAsset(null) },
-                summary = listOf(
-                    EntitySummary(
-                        label = UiText.StringResourceText(Res.string.label_total_assets_value),
-                        value = state.totalValue.toPersianPrice(),
-                        unit = com.kazemieh.designsystem.LocalCurrency.current.symbol,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                ),
+                summary = emptyList(),
                 items = state.filteredAssets.map { asset ->
                     EntityItem(
                         id = asset.id ?: 0L,
@@ -169,78 +157,5 @@ fun AssetsListScreen(
                 assetPendingDeletion = null
             }
         )
-    }
-}
-
-@Composable
-private fun AssetHero(
-    totalValue: Long,
-    composition: Map<AssetType, Double>,
-    modifier: Modifier = Modifier
-) {
-    GlassCard(
-        modifier = modifier.padding(16.dp).fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            FintrackLabelSmallText(
-                text = stringResource(Res.string.label_total_assets_value),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            FintrackBodyMediumText(
-                text = totalValue.toPersianPrice() + " " + com.kazemieh.designsystem.LocalCurrency.current.symbol,
-                style = MaterialTheme.typography.headlineMedium
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            CompositionBar(composition)
-        }
-    }
-}
-
-@Composable
-private fun CompositionBar(
-    composition: Map<AssetType, Double>,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(6.dp)
-                .clip(CircleShape)
-        ) {
-            val gold = composition[AssetType.GOLD] ?: 0.0
-            val fx = composition[AssetType.FX] ?: 0.0
-            val stock = composition[AssetType.STOCK] ?: 0.0
-            val custom = composition[AssetType.CUSTOM] ?: 0.0
-
-            if (gold > 0) Box(Modifier.weight(gold.toFloat()).fillMaxSize().background(GlassAmber))
-            if (fx > 0) Box(Modifier.weight(fx.toFloat()).fillMaxSize().background(GlassGreen))
-            if (stock > 0) Box(Modifier.weight(stock.toFloat()).fillMaxSize().background(GlassBlue))
-            if (custom > 0) Box(Modifier.weight(custom.toFloat()).fillMaxSize().background(GlassPurple))
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            composition.forEach { (type, percentage) ->
-                if (percentage > 0) {
-                    val label = when (type) {
-                        AssetType.GOLD -> stringResource(Res.string.asset_type_gold)
-                        AssetType.FX -> stringResource(Res.string.asset_type_fx)
-                        AssetType.STOCK -> stringResource(Res.string.asset_type_stock)
-                        AssetType.CUSTOM -> stringResource(Res.string.asset_type_custom)
-                    }
-                    FintrackLabelSmallText(
-                        text = "$label ${(percentage * 100).toInt()}%",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-        }
     }
 }

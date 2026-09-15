@@ -22,11 +22,8 @@ data class FavoritePair(
 )
 
 sealed interface CurrencyConverterIntent {
-    data class InputChar(val char: String) : CurrencyConverterIntent
-    data class SelectQuickAmount(val amount: String) : CurrencyConverterIntent
+    data class InputAmount(val amount: String) : CurrencyConverterIntent
     data class SelectFavoritePair(val pair: FavoritePair) : CurrencyConverterIntent
-    data object Clear : CurrencyConverterIntent
-    data object Delete : CurrencyConverterIntent
     data class SelectFromRate(val rate: AssetRate) : CurrencyConverterIntent
     data class SelectToRate(val rate: AssetRate) : CurrencyConverterIntent
     data object SwapRates : CurrencyConverterIntent

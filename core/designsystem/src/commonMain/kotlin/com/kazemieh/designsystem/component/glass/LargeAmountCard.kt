@@ -53,6 +53,7 @@ fun LargeAmountCard(
     onAmountChange: (String) -> Unit,
     onCalcClick: () -> Unit,
     label: String? = null,
+    suffixLabel: String? = null,
     required: Boolean = true,
     autoFocus: Boolean = true,
     enabled: Boolean = true,
@@ -149,7 +150,7 @@ fun LargeAmountCard(
                     keyboardActions = keyboardActions,
                     suffix = {
                         FintrackBodyMediumText(
-                            text = currency.symbol,
+                            text = suffixLabel ?: currency.symbol,
                             color = glassColors.text3
                         )
                     },

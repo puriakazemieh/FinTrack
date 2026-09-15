@@ -130,7 +130,8 @@ fun CurrencyConverterScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { showFromPicker = true },
+                            .clickable { showFromPicker = true }
+                            .padding(bottom = space.small),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -145,11 +146,15 @@ fun CurrencyConverterScreen(
                                 fontWeight = FontWeight.Bold
                             )
                         }
-                        FintrackHeadlineSmallText(
-                            text = state.amount.toPersianDigits(),
-                            fontWeight = FontWeight.Bold
-                        )
                     }
+
+                    com.kazemieh.designsystem.component.FintrackOutlinedTextField(
+                        value = state.amount,
+                        onValueChange = { viewModel.onIntent(CurrencyConverterIntent.InputAmount(it)) },
+                        isPrice = true,
+                        label = { FintrackBodyMediumText(stringResource(Res.string.amount)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
                     Box(
                         modifier = Modifier
@@ -230,28 +235,7 @@ fun CurrencyConverterScreen(
                 }
             }
 
-            // Quick Amounts
-            FintrackLabelMediumText(
-                text = stringResource(Res.string.currency_converter_quick_amounts),
-                modifier = Modifier.padding(space.medium),
-                fontWeight = FontWeight.Bold
-            )
-            val quickAmounts = listOf("10", "50", "100", "500", "1000", "5000")
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = space.medium),
-                horizontalArrangement = Arrangement.spacedBy(space.small)
-            ) {
-                items(quickAmounts) { amount ->
-                    GlassCard(
-                        onClick = { viewModel.onIntent(CurrencyConverterIntent.SelectQuickAmount(amount)) }
-                    ) {
-                        FintrackLabelMediumText(
-                            text = amount.toPersianDigits(),
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                        )
-                    }
-                }
-            }
+
 
             // Favorite Pairs
             FintrackLabelMediumText(
@@ -291,36 +275,7 @@ fun CurrencyConverterScreen(
 
             Spacer(modifier = Modifier.height(space.medium))
 
-            // Keypad
-            val keys = listOf(
-                "7", "8", "9", "⌫",
-                "4", "5", "6", "C",
-                "1", "2", "3", "0",
-                "000", "."
-            )
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp) // Fixed height for keypad in scrollable view
-                    .padding(space.medium),
-                horizontalArrangement = Arrangement.spacedBy(space.small),
-                verticalArrangement = Arrangement.spacedBy(space.small)
-            ) {
-                items(keys) { key ->
-                    KeyButton(
-                        key = key,
-                        onClick = {
-                            when (key) {
-                                "C" -> viewModel.onIntent(CurrencyConverterIntent.Clear)
-                                "⌫" -> viewModel.onIntent(CurrencyConverterIntent.Delete)
-                                else -> viewModel.onIntent(CurrencyConverterIntent.InputChar(key))
-                            }
-                        }
-                    )
-                }
-            }
         }
     }
 
@@ -404,39 +359,4 @@ private fun getFlag(code: String): String {
     }
 }
 
-@Composable
-private fun KeyButton(
-    key: String,
-    onClick: () -> Unit
-) {
-    val glassColors = LocalGlassColors.current
-    val isAction = key in listOf("C", "⌫")
 
-    val containerColor = if (isAction) glassColors.glass else Color.Transparent
-    val textColor = if (key == "C" || key == "⌫") GlassRed else glassColors.text
-
-    Box(
-        modifier = Modifier
-            .size(64.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(containerColor)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        if (key == "⌫") {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Backspace,
-                contentDescription = null,
-                tint = textColor,
-                modifier = Modifier.size(24.dp)
-            )
-        } else {
-            FintrackLabelMediumText(
-                text = key.toPersianDigits(),
-                color = textColor,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}

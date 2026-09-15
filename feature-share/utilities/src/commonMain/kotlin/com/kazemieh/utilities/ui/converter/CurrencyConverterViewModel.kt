@@ -64,22 +64,8 @@ class CurrencyConverterViewModel(
 
     fun onIntent(intent: CurrencyConverterIntent) {
         when (intent) {
-            is CurrencyConverterIntent.InputChar -> {
-                _state.update { 
-                    val newAmount = if (it.amount == "0") intent.char else it.amount + intent.char
-                    it.copy(amount = newAmount)
-                }
-                calculate()
-            }
-            CurrencyConverterIntent.Clear -> {
-                _state.update { it.copy(amount = "0") }
-                calculate()
-            }
-            CurrencyConverterIntent.Delete -> {
-                _state.update { 
-                    val newAmount = if (it.amount.length > 1) it.amount.dropLast(1) else "0"
-                    it.copy(amount = newAmount)
-                }
+            is CurrencyConverterIntent.InputAmount -> {
+                _state.update { it.copy(amount = intent.amount) }
                 calculate()
             }
             is CurrencyConverterIntent.SelectFromRate -> {
@@ -98,10 +84,6 @@ class CurrencyConverterViewModel(
                 calculate()
             }
             CurrencyConverterIntent.RefreshRates -> loadRates()
-            is CurrencyConverterIntent.SelectQuickAmount -> {
-                _state.update { it.copy(amount = intent.amount) }
-                calculate()
-            }
             is CurrencyConverterIntent.SelectFavoritePair -> {
                 val from = _state.value.availableRates.find { it.code == intent.pair.fromCode }
                 val to = _state.value.availableRates.find { it.code == intent.pair.toCode }

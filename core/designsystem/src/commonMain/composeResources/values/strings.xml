@@ -381,12 +381,18 @@
     <!-- Assets -->
     <string name="title_add_asset">افزودن دارایی</string>
     <string name="asset_type_gold">طلا</string>
+    <string name="asset_type_gold_extended">طلا، سکه و نقره</string>
     <string name="asset_type_fx">ارز</string>
+    <string name="asset_type_fx_physical">ارز فیزیکی</string>
     <string name="asset_type_stock">بورس</string>
+    <string name="asset_type_crypto">ارز دیجیتال</string>
     <string name="asset_type_custom">سفارشی</string>
     <string name="label_asset_name_hint">نام دارایی (مثلاً دلار یا طلای ۱۸)</string>
+    <string name="label_asset_type">نوع دارایی</string>
     <string name="label_quantity">مقدار / تعداد</string>
+    <string name="label_asset_unit">واحد</string>
     <string name="label_purchase_price">قیمت خرید هر واحد</string>
+    <string name="label_sale_price">قیمت فروش هر واحد</string>
     <string name="label_asset_market_code">کد بازار برای به‌روزرسانی قیمت</string>
     <string name="hint_asset_market_code">از لیست طلا، ارز و رمزارز انتخاب کنید</string>
     <string name="title_select_asset_market">انتخاب بازار دارایی</string>
@@ -395,6 +401,18 @@
     <string name="msg_asset_transaction_prompt">مایل هستید خرید «%1$s» را هم به‌عنوان تراکنش ثبت کنید؟</string>
     <string name="asset_purchase_transaction_description">خرید دارایی: %1$s</string>
     <string name="label_asset_profit_loss">سود / زیان بر اساس قیمت خرید</string>
+    <string name="title_select_asset_type">انتخاب نوع دارایی</string>
+    <string name="label_asset_purchase">خرید</string>
+    <string name="label_asset_sale">فروش</string>
+    <string name="asset_transaction_description">%1$s دارایی: %2$s</string>
+    <string name="title_rate_history">تغییرات قیمت %1$s</string>
+    <string name="msg_rate_history_unavailable">هنوز دادهٔ کافی برای نمودار این بازار ثبت نشده است.</string>
+    <string name="btn_add_rate_as_asset">افزودن به دارایی‌ها</string>
+    <string name="label_current_price">قیمت فعلی</string>
+    <string name="msg_no_rate_results">نرخی در این گروه پیدا نشد.</string>
+    <string name="tab_crypto_currency">ارز دیجیتال</string>
+    <string name="tab_physical_currency">ارز فیزیکی</string>
+    <string name="tab_gold_and_silver">طلا و نقره</string>
     <string name="btn_add_custom_asset">افزودن دارایی سفارشی / ارزهای دیگر</string>
     <string name="title_price_history">تاریخچه قیمت: %1$s</string>
     <string name="title_add_custom_asset">افزودن دارایی سفارشی</string>

@@ -47,6 +47,14 @@ data class AssetRate(
     val lastUpdate: Instant
 )
 
+/** A locally recorded market quote, used to render real rate movement over time. */
+@Serializable
+data class MarketRateHistory(
+    val code: String,
+    val price: Long,
+    val date: Instant
+)
+
 @Serializable
 data class AssetHistory(
     val id: Long? = null,

@@ -3,6 +3,7 @@ package com.kazemieh.domain.repository
 import com.kazemieh.common.model.Asset
 import com.kazemieh.common.model.AssetHistory
 import com.kazemieh.common.model.AssetRate
+import com.kazemieh.common.model.MarketRateHistory
 import kotlinx.coroutines.flow.Flow
 
 interface AssetRepository {
@@ -20,5 +21,6 @@ interface AssetRepository {
 
     /** Last cached market rates, emitted immediately and on every successful [syncRates]. */
     fun observeRates(): Flow<List<AssetRate>>
+    fun observeRateHistory(code: String): Flow<List<MarketRateHistory>>
     fun observeAssetHistory(assetId: Long): Flow<List<AssetHistory>>
 }

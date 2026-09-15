@@ -12,7 +12,8 @@ sealed class Screen {
         val smsDraftId: Long = -1L,
         /** Optional prefill used when recording the purchase of a newly created asset. */
         val initialTransactionAmount: Long? = null,
-        val initialTransactionDescription: String? = null
+        val initialTransactionDescription: String? = null,
+        val initialTransactionType: String? = null
     ) : Screen()
 
     @Serializable
@@ -104,7 +105,11 @@ sealed class Screen {
     data object Achievements : Screen()
 
     @Serializable
-    data class AddAsset(val assetId: Long? = null) : Screen()
+    data class AddAsset(
+        val assetId: Long? = null,
+        /** Market selected from the live-rates tool; consumed by the add-asset form. */
+        val marketCode: String? = null
+    ) : Screen()
 
     @Serializable
     data object Shopping : Screen()

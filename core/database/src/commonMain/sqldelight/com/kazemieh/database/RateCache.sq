@@ -8,6 +8,13 @@ CREATE TABLE IF NOT EXISTS rate_cache (
     lastUpdate INTEGER NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS market_rate_history (
+    code TEXT NOT NULL,
+    price INTEGER NOT NULL,
+    date INTEGER NOT NULL,
+    PRIMARY KEY (code, date)
+);
+
 upsertRate:
 INSERT OR REPLACE INTO rate_cache(code, type, name, price, lastUpdate)
 VALUES (?, ?, ?, ?, ?);
@@ -20,3 +27,13 @@ SELECT * FROM rate_cache ORDER BY type ASC, code ASC;
 
 deleteAllRates:
 DELETE FROM rate_cache;
+
+cacheRateHistory:
+INSERT OR REPLACE INTO market_rate_history(code, price, date)
+VALUES (?, ?, ?);
+
+observeRateHistory:
+SELECT * FROM market_rate_history
+WHERE code = ?
+ORDER BY date ASC
+LIMIT 90;
