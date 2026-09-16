@@ -82,9 +82,9 @@ class AssetRepositoryImpl(
             type == AssetType.FX && (normalized == "eur" || "یورو" in normalized) -> "eur"
             type == AssetType.FX && (normalized == "gbp" || "پوند" in normalized) -> "gbp"
             type == AssetType.FX && (normalized == "aed" || "درهم" in normalized) -> "aed"
-            type == AssetType.FX && (normalized == "btc" || "بیتکوین" in normalized) -> "btc"
-            type == AssetType.FX && (normalized == "eth" || "اتریوم" in normalized) -> "eth"
-            type == AssetType.FX && (normalized == "usdt" || "تتر" in normalized) -> "usdt"
+            type == AssetType.STOCK && (normalized == "btc" || "بیتکوین" in normalized) -> "btc"
+            type == AssetType.STOCK && (normalized == "eth" || "اتریوم" in normalized) -> "eth"
+            type == AssetType.STOCK && (normalized == "usdt" || "تتر" in normalized) -> "usdt"
             else -> null
         }
     }

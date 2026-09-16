@@ -1405,7 +1405,7 @@
     <string name="label_add_goal_type">افزودن نوع هدف جدید</string>
 
     <!-- Utilities -->
-    <string name="title_fx_rates">نرخ ارز و طلا</string>
+    <string name="title_fx_rates">نرخ ارز، طلا و رمزارز</string>
     <string name="sub_fx_rates">آخرین قیمت‌های بازار</string>
     <string name="title_currency_converter">تبدیل ارز</string>
     <string name="sub_currency_converter">ماشین‌حساب هوشمند تبدیل</string>

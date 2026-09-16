@@ -84,7 +84,7 @@ fun FxRatesScreen(
     val space = LocalSpacing.current
     val glassColors = LocalGlassColors.current
 
-    var selectedTab by remember { mutableStateOf(AssetType.STOCK) }
+    var selectedTab by remember { mutableStateOf(AssetType.CRYPTO) }
 
     FintrackScreen(
         title = stringResource(Res.string.title_fx_rates),
@@ -122,7 +122,7 @@ fun FxRatesScreen(
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         val tabs = listOf(
-                            AssetType.STOCK to stringResource(Res.string.tab_crypto_currency),
+                            AssetType.CRYPTO to stringResource(Res.string.tab_crypto_currency),
                             AssetType.FX to stringResource(Res.string.tab_physical_currency),
                             AssetType.GOLD to stringResource(Res.string.tab_gold_and_silver)
                         )

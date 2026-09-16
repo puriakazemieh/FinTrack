@@ -49,16 +49,16 @@ class NobitexService(private val client: HttpClient) {
 
     private companion object {
         val NOBITEX_ASSETS: Map<String, RateMeta> = mapOf(
-            "btc" to RateMeta(AssetType.FX, "btc", "بیت‌کوین"),
-            "eth" to RateMeta(AssetType.FX, "eth", "اتریوم"),
-            "usdt" to RateMeta(AssetType.FX, "usdt", "تتر"),
-            "trx" to RateMeta(AssetType.FX, "trx", "ترون"),
-            "doge" to RateMeta(AssetType.FX, "doge", "دوج‌کوین"),
-            "shib" to RateMeta(AssetType.FX, "shib", "شیبا"),
-            "ada" to RateMeta(AssetType.FX, "ada", "کاردانو"),
-            "xrp" to RateMeta(AssetType.FX, "xrp", "ریپل"),
-            "ton" to RateMeta(AssetType.FX, "ton", "تون‌کوین"),
-            "sol" to RateMeta(AssetType.FX, "sol", "سولانا")
+            "btc" to RateMeta(AssetType.CRYPTO, "btc", "بیت‌کوین"),
+            "eth" to RateMeta(AssetType.CRYPTO, "eth", "اتریوم"),
+            "usdt" to RateMeta(AssetType.CRYPTO, "usdt", "تتر"),
+            "trx" to RateMeta(AssetType.CRYPTO, "trx", "ترون"),
+            "doge" to RateMeta(AssetType.CRYPTO, "doge", "دوج‌کوین"),
+            "shib" to RateMeta(AssetType.CRYPTO, "shib", "شیبا"),
+            "ada" to RateMeta(AssetType.CRYPTO, "ada", "کاردانو"),
+            "xrp" to RateMeta(AssetType.CRYPTO, "xrp", "ریپل"),
+            "ton" to RateMeta(AssetType.CRYPTO, "ton", "تون‌کوین"),
+            "sol" to RateMeta(AssetType.CRYPTO, "sol", "سولانا")
         )
     }
 }

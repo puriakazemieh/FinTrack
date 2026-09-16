@@ -9,6 +9,7 @@ enum class AssetType {
     GOLD,
     FX,
     STOCK,
+    CRYPTO,
     CUSTOM
 }
 
