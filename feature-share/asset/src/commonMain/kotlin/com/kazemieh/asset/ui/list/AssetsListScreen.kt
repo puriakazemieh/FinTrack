@@ -61,8 +61,23 @@ import fintrack.core.designsystem.generated.resources.asset_type_gold
 import fintrack.core.designsystem.generated.resources.asset_type_fx
 import fintrack.core.designsystem.generated.resources.asset_type_stock
 import fintrack.core.designsystem.generated.resources.asset_type_custom
+import com.kazemieh.common.toPersianDigits
+import fintrack.core.designsystem.generated.resources.asset_type_gold_extended
+import fintrack.core.designsystem.generated.resources.asset_type_fx_physical
+import fintrack.core.designsystem.generated.resources.asset_type_crypto
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+
+@Composable
+fun AssetType.getLabel(): String = stringResource(
+    when (this) {
+        AssetType.GOLD -> Res.string.asset_type_gold_extended
+        AssetType.FX -> Res.string.asset_type_fx_physical
+        AssetType.STOCK -> Res.string.asset_type_stock
+        AssetType.CRYPTO -> Res.string.asset_type_crypto
+        AssetType.CUSTOM -> Res.string.asset_type_custom
+    }
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,6 +91,7 @@ fun AssetsListScreen(
     var selectedAssetForActions by remember { mutableStateOf<Asset?>(null) }
     var selectedAssetForHistory by remember { mutableStateOf<Asset?>(null) }
     var assetPendingDeletion by remember { mutableStateOf<Asset?>(null) }
+    var transactionToDelete by remember { mutableStateOf<Asset?>(null) }
 
     FintrackScreen(
         title = stringResource(Res.string.title_assets_management),
@@ -90,20 +106,33 @@ fun AssetsListScreen(
         onBack = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
+            val totalValueStr = state.totalValue.toSignedPersianPrice()
+            val currencySymbol = com.kazemieh.designsystem.LocalCurrency.current.symbol
+            val totalSummary = remember(state.totalValue, currencySymbol) {
+                listOf(
+                    EntitySummary(
+                        label = UiText.StringResourceText(Res.string.label_total_assets_value),
+                        value = totalValueStr,
+                        unit = currencySymbol
+                    )
+                )
+            }
+
             EntityList(
                 title = stringResource(Res.string.title_assets_management),
                 query = state.searchQuery,
                 onQueryChange = { viewModel.onIntent(AssetIntent.UpdateSearchQuery(it)) },
                 onAddClick = { onAddAsset(null) },
-                summary = emptyList(),
+                summary = totalSummary,
                 items = state.filteredAssets.map { asset ->
+                    val displayName = if (asset.name.isNotBlank()) "${asset.name} (${asset.type.getLabel()})" else asset.type.getLabel()
                     EntityItem(
                         id = asset.id ?: 0L,
-                        name = asset.name,
-                        sub = stringResource(Res.string.label_units_count, asset.quantity.toString()),
-                        badge = stringResource(Res.string.label_percentage_value, asset.profitOrLossPercentage),
+                        name = displayName,
+                        sub = stringResource(Res.string.label_units_count, asset.quantity.toString().toPersianDigits()),
+                        badge = stringResource(Res.string.label_percentage_value, asset.profitOrLossPercentage).toPersianDigits(),
                         color = if (asset.profitOrLoss >= 0) GlassGreen else GlassRed,
-                        sub2 = asset.totalCurrentValue.toSignedPersianPrice() + " " + com.kazemieh.designsystem.LocalCurrency.current.symbol
+                        sub2 = asset.totalCurrentValue.toSignedPersianPrice() + " " + currencySymbol
                     )
                 },
                 onItemClick = { item ->
@@ -153,8 +182,26 @@ fun AssetsListScreen(
             itemType = stringResource(Res.string.title_assets_management),
             dismissClicked = { assetPendingDeletion = null },
             confirmClicked = {
-                asset.id?.let { viewModel.onIntent(AssetIntent.DeleteAsset(it)) }
                 assetPendingDeletion = null
+                transactionToDelete = asset
+            }
+        )
+    }
+
+    transactionToDelete?.let { asset ->
+        DeleteBottomSheet(
+            title = "پاک کردن تراکنش مرتبط",
+            itemName = asset.name,
+            itemType = "تراکنش مربوط به دارایی",
+            confirmButtonText = "بله، پاک شود",
+            dismissButtonText = "خیر، فقط دارایی",
+            dismissClicked = {
+                viewModel.onIntent(AssetIntent.DeleteAsset(asset.id ?: 0L, deleteTransaction = false))
+                transactionToDelete = null
+            },
+            confirmClicked = {
+                viewModel.onIntent(AssetIntent.DeleteAsset(asset.id ?: 0L, deleteTransaction = true))
+                transactionToDelete = null
             }
         )
     }

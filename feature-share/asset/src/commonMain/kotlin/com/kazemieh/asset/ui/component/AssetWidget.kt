@@ -95,10 +95,12 @@ fun AssetWidget(
                 val gold = state.composition[AssetType.GOLD] ?: 0.0
                 val fx = state.composition[AssetType.FX] ?: 0.0
                 val stock = state.composition[AssetType.STOCK] ?: 0.0
+                val crypto = state.composition[AssetType.CRYPTO] ?: 0.0
                 val custom = state.composition[AssetType.CUSTOM] ?: 0.0
 
                 if (gold > 0) Box(Modifier.weight(gold.toFloat()).fillMaxHeight().background(GlassAmber))
                 if (fx > 0) Box(Modifier.weight(fx.toFloat()).fillMaxHeight().background(GlassGreen))
+                if (crypto > 0) Box(Modifier.weight(crypto.toFloat()).fillMaxHeight().background(com.kazemieh.designsystem.GlassGold))
                 if (stock > 0) Box(Modifier.weight(stock.toFloat()).fillMaxHeight().background(GlassBlue))
                 if (custom > 0) Box(Modifier.weight(custom.toFloat()).fillMaxHeight().background(GlassPurple))
             }
@@ -116,6 +118,7 @@ fun AssetWidget(
                             AssetType.FX -> GlassGreen
                             AssetType.STOCK -> GlassBlue
                             AssetType.CUSTOM -> GlassPurple
+                            AssetType.CRYPTO -> com.kazemieh.designsystem.GlassGold
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(

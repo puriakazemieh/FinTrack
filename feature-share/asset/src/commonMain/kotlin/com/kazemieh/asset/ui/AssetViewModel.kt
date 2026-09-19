@@ -6,8 +6,16 @@ import com.kazemieh.common.model.Asset
 import com.kazemieh.common.model.AssetHistory
 import com.kazemieh.common.model.AssetRate
 import com.kazemieh.common.model.AssetType
+import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.Source
+import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.TransactionType
+import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.Tag
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.AssetUseCases
+import com.kazemieh.domain.usecase.AddTransactionUseCase
+import com.kazemieh.domain.repository.TransactionRepository
 import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 data class AssetState(
@@ -26,15 +35,31 @@ data class AssetState(
     val isLoading: Boolean = false,
     val totalValue: Long = 0,
     val composition: Map<AssetType, Double> = emptyMap(),
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val defaultIncomeCategory: Category? = null,
+    val defaultExpenseCategory: Category? = null,
+    val defaultSource: Source? = null,
+    val mostUsedIncomeCategories: List<Category> = emptyList(),
+    val mostUsedExpenseCategories: List<Category> = emptyList(),
+    val mostUsedSources: List<Source> = emptyList(),
+    val mostUsedPersons: List<Person> = emptyList(),
+    val mostUsedTags: List<Tag> = emptyList()
 )
 
 sealed interface AssetIntent {
     data object LoadAssets : AssetIntent
     data class LoadAsset(val id: Long) : AssetIntent
     data class UpdateSearchQuery(val query: String) : AssetIntent
-    data class AddAsset(val asset: Asset) : AssetIntent
-    data class DeleteAsset(val id: Long) : AssetIntent
+    data class AddAsset(
+        val asset: Asset,
+        val registerTransaction: Boolean = false,
+        val category: Category? = null,
+        val source: Source? = null,
+        val persons: Set<Person>? = null,
+        val tags: Set<Tag>? = null,
+        val isBuy: Boolean = true
+    ) : AssetIntent
+    data class DeleteAsset(val id: Long, val deleteTransaction: Boolean = false) : AssetIntent
     data class UpdateAsset(val asset: Asset) : AssetIntent
     data class LoadHistory(val id: Long) : AssetIntent
     data class MarketRateSelected(val rate: AssetRate) : AssetIntent
@@ -49,7 +74,9 @@ sealed interface AssetEffect {
 
 class AssetViewModel(
     private val analytics: com.kazemieh.common.analytics.AnalyticsService,
-    private val assetUseCases: AssetUseCases
+    private val assetUseCases: AssetUseCases,
+    private val transactionRepository: TransactionRepository,
+    private val addTransactionUseCase: AddTransactionUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AssetState())
@@ -64,6 +91,7 @@ class AssetViewModel(
         analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetListViewed)
         onIntent(AssetIntent.LoadAssets)
         observeMarketRates()
+        loadTransactionDefaults()
     }
 
     fun onIntent(intent: AssetIntent) {
@@ -71,8 +99,8 @@ class AssetViewModel(
             AssetIntent.LoadAssets -> observeAssets()
             is AssetIntent.LoadAsset -> loadAsset(intent.id)
             is AssetIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
-            is AssetIntent.AddAsset -> addAsset(intent.asset)
-            is AssetIntent.DeleteAsset -> deleteAsset(intent.id)
+            is AssetIntent.AddAsset -> addAsset(intent.asset, intent.registerTransaction, intent.category, intent.source, intent.persons, intent.tags, intent.isBuy)
+            is AssetIntent.DeleteAsset -> deleteAsset(intent.id, intent.deleteTransaction)
             is AssetIntent.UpdateAsset -> updateAsset(intent.asset)
             is AssetIntent.LoadHistory -> loadHistory(intent.id)
             is AssetIntent.MarketRateSelected -> analytics.track(
@@ -88,9 +116,42 @@ class AssetViewModel(
         }
     }
 
+    private fun loadTransactionDefaults() {
+        viewModelScope.launch {
+            val defInc = transactionRepository.getDefaultCategory(TransactionType.INCOME)
+            val defExp = transactionRepository.getDefaultCategory(TransactionType.EXPENSE)
+            val defSrc = transactionRepository.getDefaultSource()
+            _state.update {
+                it.copy(
+                    defaultIncomeCategory = defInc,
+                    defaultExpenseCategory = defExp,
+                    defaultSource = defSrc
+                )
+            }
+            launch {
+                transactionRepository.observeMostUsedCategories(TransactionType.INCOME, 5).collect { list ->
+                    _state.update { it.copy(mostUsedIncomeCategories = list) }
+                }
+            }
+            launch {
+                transactionRepository.observeMostUsedCategories(TransactionType.EXPENSE, 5).collect { list ->
+                    _state.update { it.copy(mostUsedExpenseCategories = list) }
+                }
+            }
+            launch {
+                transactionRepository.observeMostUsedSources(5).collect { list ->
+                    _state.update { it.copy(mostUsedSources = list) }
+                }
+            }
+        }
+    }
+
     private fun loadAsset(id: Long) {
-        val asset = _state.value.assets.find { it.id == id }
-        _state.update { it.copy(selectedAsset = asset) }
+        viewModelScope.launch {
+            val assets = assetUseCases.observeAssets().first()
+            val asset = assets.find { it.id == id }
+            _state.update { it.copy(selectedAsset = asset) }
+        }
     }
 
     private fun loadHistory(id: Long) {
@@ -139,21 +200,51 @@ class AssetViewModel(
         }
     }
 
-    private fun addAsset(asset: Asset) {
+    private fun addAsset(asset: Asset, registerTransaction: Boolean, category: Category?, source: Source?, persons: Set<Person>?, tags: Set<Tag>?, isBuy: Boolean) {
         viewModelScope.launch {
             val id = assetUseCases.addAsset(asset)
             // A newly tracked market asset should receive a quote immediately when possible,
             // without holding the post-save confirmation hostage to an external request.
             viewModelScope.launch { assetUseCases.syncAssetRates() }
             analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetCreated(asset.type.name))
+            
+            if (registerTransaction && category != null && source != null) {
+                try {
+                    val tx = Transaction(
+                        id = 0L,
+                        amount = asset.totalPurchaseValue,
+                        categoryId = category.id ?: 0L,
+                        sourceId = source.id ?: 0L,
+                        description = if (isBuy) "خرید دارایی ${asset.name}" else "فروش دارایی ${asset.name}",
+                        type = if (isBuy) TransactionType.EXPENSE else TransactionType.INCOME
+                    )
+                    addTransactionUseCase(tx, persons?.mapNotNull { it.id } ?: emptyList(), tags?.mapNotNull { it.id } ?: emptyList())
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionCreated("Asset Registration"))
+                } catch (e: Exception) {
+                    // Ignore errors for transaction saving in this context
+                }
+            }
+            
             _effect.send(AssetEffect.ShowMessage(UiText.StringResourceText(Res.string.msg_asset_added)))
             _effect.send(AssetEffect.AssetAdded(asset.copy(id = id)))
         }
     }
 
-    private fun deleteAsset(id: Long) {
+    private fun deleteAsset(id: Long, deleteTransaction: Boolean) {
         viewModelScope.launch {
+            val asset = _state.value.assets.find { it.id == id }
             assetUseCases.deleteAsset(id)
+            if (deleteTransaction && asset != null) {
+                try {
+                    val allTx = transactionRepository.getAllTransactions()
+                    val targetTx = allTx.find { it.description == "خرید دارایی ${asset.name}" || it.description == "فروش دارایی ${asset.name}" }
+                    if (targetTx != null) {
+                        transactionRepository.deleteTransactionWithBalance(targetTx, emptyMap())
+                    }
+                } catch (e: Exception) {
+                    // Ignore errors
+                }
+            }
             analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetDeleted)
             _effect.send(AssetEffect.ShowMessage(UiText.StringResourceText(Res.string.msg_asset_deleted)))
         }

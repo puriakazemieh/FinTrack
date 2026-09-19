@@ -77,9 +77,11 @@ class TgjuService(private val client: HttpClient) {
         val rates = mutableListOf<AssetRate>()
         val now = Clock.System.now()
 
+        // Uses [\s\S] instead of . with DOT_MATCHES_ALL because RegexOption.DOT_MATCHES_ALL
+        // is not available in Kotlin common source sets (KT-67574).
         fun extract(row: String): String? =
-            """<tr data-market-row="$row">.*?<td class="info-price">.*?<span class="value">(.*?)</span>"""
-                .toRegex(RegexOption.DOT_MATCHES_ALL)
+            """<tr data-market-row="$row">[\s\S]*?<td class="info-price">[\s\S]*?<span class="value">([\s\S]*?)</span>"""
+                .toRegex()
                 .find(html)?.groupValues?.get(1)
 
         extract("gold_18k")?.let { rates.add(AssetRate(AssetType.GOLD, "gold_18k", "طلای ۱۸ عیار", cleanPrice(it).toToman(), now)) }
