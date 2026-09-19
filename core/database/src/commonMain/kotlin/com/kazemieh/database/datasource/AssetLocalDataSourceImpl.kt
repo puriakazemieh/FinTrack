@@ -110,27 +110,23 @@ class AssetLocalDataSourceImpl(
         rateCacheQueries.getAllRates().awaitAsList().map { it.toAssetRate() }
     }
 
-    private suspend fun insertRateAndHistory(rate: AssetRate) {
-        rateCacheQueries.upsertRate(
-            code = rate.code,
-            type = rate.type,
-            name = rate.name,
-            price = rate.price,
-            lastUpdate = rate.lastUpdate.toEpochMilliseconds()
-        )
-        rateCacheQueries.cacheRateHistory(
-            code = rate.code,
-            price = rate.price,
-            date = rate.lastUpdate.toEpochMilliseconds()
-        )
-    }
-
     override suspend fun cacheRates(rates: List<AssetRate>) {
         if (rates.isEmpty()) return
         withContext(Dispatchers.Default) {
             db.transaction {
                 for (rate in rates) {
-                    insertRateAndHistory(rate)
+                    rateCacheQueries.upsertRate(
+                        code = rate.code,
+                        type = rate.type,
+                        name = rate.name,
+                        price = rate.price,
+                        lastUpdate = rate.lastUpdate.toEpochMilliseconds()
+                    )
+                    rateCacheQueries.cacheRateHistory(
+                        code = rate.code,
+                        price = rate.price,
+                        date = rate.lastUpdate.toEpochMilliseconds()
+                    )
                 }
             }
         }
