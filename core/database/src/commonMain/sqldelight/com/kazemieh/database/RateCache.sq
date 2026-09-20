@@ -28,6 +28,9 @@ SELECT * FROM rate_cache ORDER BY type ASC, code ASC;
 deleteAllRates:
 DELETE FROM rate_cache;
 
+deleteRatesByCodes:
+DELETE FROM rate_cache WHERE code IN ?;
+
 cacheRateHistory:
 INSERT OR REPLACE INTO market_rate_history(code, price, date)
 VALUES (?, ?, ?);

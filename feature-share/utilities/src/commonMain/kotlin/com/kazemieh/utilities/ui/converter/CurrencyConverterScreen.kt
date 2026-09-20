@@ -29,6 +29,7 @@ import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -84,9 +85,17 @@ fun CurrencyConverterScreen(
         sub = stringResource(Res.string.sub_currency_converter),
         onBack = onBackClick
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
-        ) {
+        if (state.isLoading && state.availableRates.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            }
+        } else {
+            Column(
+                modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+            ) {
             // Live market rates come from an online source; when only the built-in Toman
             // fallback is present, conversions aren't meaningful, so we say so and offer retry
             // instead of showing a misleading 1:1 rate.
@@ -276,6 +285,7 @@ fun CurrencyConverterScreen(
             Spacer(modifier = Modifier.height(space.medium))
 
 
+            }
         }
     }
 

@@ -18,6 +18,7 @@ interface AssetLocalDataSource {
     fun observeCachedRates(): Flow<List<AssetRate>>
     suspend fun getCachedRates(): List<AssetRate>
     suspend fun cacheRates(rates: List<AssetRate>)
+    suspend fun deleteCachedRates(codes: List<String>)
     fun observeRateHistory(code: String): Flow<List<MarketRateHistory>>
 
     suspend fun getAllAssets(): List<Asset>

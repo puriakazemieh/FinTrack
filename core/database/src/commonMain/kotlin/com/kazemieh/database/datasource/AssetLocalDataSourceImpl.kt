@@ -132,6 +132,13 @@ class AssetLocalDataSourceImpl(
         }
     }
 
+    override suspend fun deleteCachedRates(codes: List<String>) {
+        if (codes.isEmpty()) return
+        withContext(Dispatchers.Default) {
+            rateCacheQueries.deleteRatesByCodes(codes)
+        }
+    }
+
     override fun observeRateHistory(code: String): Flow<List<MarketRateHistory>> {
         return rateCacheQueries.observeRateHistory(code)
             .asFlow()

@@ -16,7 +16,7 @@ class TgjuService(private val client: HttpClient) {
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
     /**
-     * Fetches live gold / currency / crypto prices. It walks a chain of sources in order of
+     * Fetches live gold and physical-currency prices. It walks a chain of sources in order of
      * reliability — the structured JSON endpoints first, then an HTML scrape — and returns the
      * first non-empty result. Every source is sent browser-like headers, since tgju rejects
      * requests that don't look like a real browser. An empty list means "couldn't reach any
@@ -85,6 +85,7 @@ class TgjuService(private val client: HttpClient) {
                 .find(html)?.groupValues?.get(1)
 
         extract("gold_18k")?.let { rates.add(AssetRate(AssetType.GOLD, "gold_18k", "طلای ۱۸ عیار", cleanPrice(it).toToman(), now)) }
+        extract("silver_999")?.let { rates.add(AssetRate(AssetType.GOLD, "silver_999", "نقره ۹۹۹", cleanPrice(it).toToman(), now)) }
         extract("price_dollar_rl")?.let { rates.add(AssetRate(AssetType.FX, "usd", "دلار آمریکا", cleanPrice(it).toToman(), now)) }
         extract("price_eur")?.let { rates.add(AssetRate(AssetType.FX, "eur", "یورو", cleanPrice(it).toToman(), now)) }
         extract("price_aed")?.let { rates.add(AssetRate(AssetType.FX, "aed", "درهم امارات", cleanPrice(it).toToman(), now)) }
@@ -128,8 +129,7 @@ class TgjuService(private val client: HttpClient) {
             "price_eur" to RateMeta(AssetType.FX, "eur", "یورو"),
             "price_gbp" to RateMeta(AssetType.FX, "gbp", "پوند انگلیس"),
             "price_aed" to RateMeta(AssetType.FX, "aed", "درهم امارات"),
-            "crypto-bitcoin" to RateMeta(AssetType.FX, "btc", "بیت‌کوین"),
-            "crypto-ethereum" to RateMeta(AssetType.FX, "eth", "اتریوم")
+            "silver_999" to RateMeta(AssetType.GOLD, "silver_999", "نقره ۹۹۹")
         )
     }
 }

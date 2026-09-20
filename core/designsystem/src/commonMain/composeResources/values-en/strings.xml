@@ -386,7 +386,11 @@
     <string name="asset_type_custom">Customized</string>
     <string name="label_asset_name_hint">Asset name (e.g. dollar or gold 18)</string>
     <string name="label_quantity">Quantity / number</string>
+    <string name="asset_unit_gram">Gram</string>
+    <string name="asset_unit_count">Unit</string>
+    <string name="asset_unit_share">Share</string>
     <string name="label_purchase_price">Purchase price per unit</string>
+    <string name="label_asset_profit_loss_short">Profit / loss</string>
     <string name="btn_add_custom_asset">Adding custom assets / other currencies</string>
     <string name="title_price_history">Price history: %1 s s %1$s</string>
     <string name="title_add_custom_asset">Adding custom assets</string>

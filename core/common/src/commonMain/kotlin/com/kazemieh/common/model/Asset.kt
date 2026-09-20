@@ -39,6 +39,31 @@ data class Asset(
     val profitOrLossPercentage: Double = if (totalPurchaseValue != 0L) (profitOrLoss.toDouble() / totalPurchaseValue) * 100 else 0.0
 }
 
+/**
+ * Combines purchase and sale lots of the same market into one current position.
+ * A negative quantity represents a sale, so summing quantities produces the user's
+ * remaining holding while the summed cost basis keeps profit/loss meaningful.
+ */
+fun List<Asset>.aggregateByMarket(): List<Asset> =
+    groupBy { asset ->
+        asset.type to (asset.marketCode?.trim()?.lowercase()?.takeIf { it.isNotEmpty() }
+            ?: asset.name.trim().lowercase())
+    }.mapNotNull { (_, lots) ->
+        val quantity = lots.sumOf { it.quantity }
+        // A fully sold position should not continue to appear as an active asset.
+        if (kotlin.math.abs(quantity) < 0.0000001) return@mapNotNull null
+
+        val totalCostBasis = lots.sumOf { it.totalPurchaseValue }
+        val latestLot = lots.maxByOrNull { it.lastUpdate?.toEpochMilliseconds() ?: Long.MIN_VALUE }
+            ?: return@mapNotNull null
+        val latestPrice = latestLot.currentPrice ?: latestLot.purchasePrice
+        latestLot.copy(
+            quantity = quantity,
+            purchasePrice = (totalCostBasis / quantity).toLong(),
+            currentPrice = latestPrice
+        )
+    }.sortedBy { it.name }
+
 @Serializable
 data class AssetRate(
     val type: AssetType,

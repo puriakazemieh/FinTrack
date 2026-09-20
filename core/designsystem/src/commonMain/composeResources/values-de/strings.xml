@@ -386,7 +386,11 @@
     <string name="asset_type_custom">Anpassen</string>
     <string name="label_asset_name_hint">Name des Vermögenswerts (z. B. Dollar oder Gold 18)</string>
     <string name="label_quantity">Menge / Anzahl</string>
+    <string name="asset_unit_gram">Gramm</string>
+    <string name="asset_unit_count">Einheit</string>
+    <string name="asset_unit_share">Anteil</string>
     <string name="label_purchase_price">Kaufpreis pro Stück</string>
+    <string name="label_asset_profit_loss_short">Gewinn / Verlust</string>
     <string name="btn_add_custom_asset">Benutzerdefinierte Assets / andere Währungen hinzufügen</string>
     <string name="title_price_history">Preisentwicklung: %1 s s %1$s</string>
     <string name="title_add_custom_asset">Benutzerdefinierte Assets hinzufügen</string>

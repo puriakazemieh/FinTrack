@@ -152,7 +152,12 @@ fun FxRatesScreen(
                         }
                     }
 
-                    val filteredRates = state.rates.filter { it.type == selectedTab }
+                    val filteredRates = state.rates
+                        .filter { rate ->
+                            rate.type == selectedTab &&
+                                (selectedTab != AssetType.FX || rate.code !in setOf("btc", "eth", "usdt"))
+                        }
+                        .sortedWith(compareBy<AssetRate> { if (it.code == "usd") 0 else 1 }.thenBy { it.name })
 
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth().weight(1f),

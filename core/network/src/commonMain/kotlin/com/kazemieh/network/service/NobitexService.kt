@@ -4,6 +4,7 @@ import com.kazemieh.common.model.AssetRate
 import com.kazemieh.common.model.AssetType
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -15,26 +16,23 @@ class NobitexService(private val client: HttpClient) {
 
     suspend fun getLatestRates(): List<AssetRate> {
         return try {
-            val srcCurrencies = NOBITEX_ASSETS.keys.joinToString(",")
-            val url = "https://api.nobitex.ir/market/stats?srcCurrency=$srcCurrencies&dstCurrency=rls"
-            
-            val text = client.get(url).bodyAsText()
-            val response = json.decodeFromString<NobitexStatsResponse>(text)
-            
+            // Nobitex returns all Rial markets when only dstCurrency is supplied. This keeps
+            // every displayed quote in one consistent response and avoids per-symbol requests.
+            val response = fetchRialMarkets()
             if (response.status != "ok") return emptyList()
+            val stats = response.stats
 
             val now = Clock.System.now()
             val rates = mutableListOf<AssetRate>()
 
             NOBITEX_ASSETS.forEach { (src, meta) ->
                 val key = "$src-rls"
-                val stat = response.stats[key]
+                val stat = stats[key]
                 if (stat != null && stat.latest.isNotEmpty()) {
-                    // Sometimes the latest value could have decimal points (like 0.5) but for Rials it's an integer mostly.
                     val priceRls = stat.latest.toDoubleOrNull()?.toLong() ?: 0L
                     if (priceRls > 0) {
-                        // Nobitex returns Rials, but we store Tomans in FinTrack
-                        val priceIrt = priceRls / 10 
+                        // `latest` is returned by Nobitex in Rial; FinTrack displays Toman.
+                        val priceIrt = priceRls / 10
                         rates.add(AssetRate(meta.type, meta.code, meta.name, priceIrt, now))
                     }
                 }
@@ -43,6 +41,15 @@ class NobitexService(private val client: HttpClient) {
         } catch (e: Exception) {
             emptyList()
         }
+    }
+
+    private suspend fun fetchRialMarkets(): NobitexStatsResponse {
+        val url = "https://api.nobitex.ir/market/stats?dstCurrency=rls"
+        val text = client.get(url) {
+            header("Accept", "application/json")
+            header("User-Agent", "FinTrack/1.0")
+        }.bodyAsText()
+        return json.decodeFromString(text)
     }
 
     private data class RateMeta(val type: AssetType, val code: String, val name: String)

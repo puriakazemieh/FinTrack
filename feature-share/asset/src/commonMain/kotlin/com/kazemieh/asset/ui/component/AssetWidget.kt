@@ -16,12 +16,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.asset.ui.AssetViewModel
 import com.kazemieh.common.model.AssetType
 import com.kazemieh.common.model.Asset
+import com.kazemieh.common.model.aggregateByMarket
 import com.kazemieh.designsystem.GlassAmber
 import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassPurple
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
+import com.kazemieh.designsystem.component.FintrackTitleSmallText
 import com.kazemieh.designsystem.component.glass.MoneyText
 import com.kazemieh.designsystem.component.glass.WidgetCard
 import fintrack.core.designsystem.generated.resources.*
@@ -40,7 +42,8 @@ fun AssetWidget(
     LaunchedEffect(Unit) {
         analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetDashboardPerformanceViewed)
     }
-    val totalPurchaseValue = state.assets.sumOf { it.totalPurchaseValue }
+    val positions = state.assets.aggregateByMarket()
+    val totalPurchaseValue = positions.sumOf { it.totalPurchaseValue }
     val profitOrLoss = state.totalValue - totalPurchaseValue
     val profitOrLossPercentage = if (totalPurchaseValue == 0L) 0.0 else {
         profitOrLoss.toDouble() / totalPurchaseValue * 100
@@ -62,27 +65,24 @@ fun AssetWidget(
                     FintrackLabelSmallText(text = stringResource(Res.string.label_total_value))
                     MoneyText(amount = state.totalValue, size = 18)
                 }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    FintrackLabelSmallText(text = stringResource(Res.string.label_asset_profit_loss))
-                    MoneyText(amount = profitOrLoss, size = 15, color = performanceColor)
+                Column(horizontalAlignment = Alignment.End) {
+                    FintrackLabelSmallText(text = stringResource(Res.string.label_asset_return))
+                    FintrackTitleSmallText(
+                        text = stringResource(
+                            Res.string.label_percentage,
+                            String.format("%.1f", profitOrLossPercentage)
+                        ),
+                        color = performanceColor
+                    )
                 }
-                FintrackLabelSmallText(
-                    text = stringResource(
-                        Res.string.label_percentage_value,
-                        String.format("%.1f", profitOrLossPercentage)
-                    ),
-                    color = performanceColor
-                )
             }
 
-            PortfolioProfitLossChart(assets = state.assets, color = performanceColor)
+            Column {
+                FintrackLabelSmallText(text = stringResource(Res.string.label_asset_profit_loss))
+                MoneyText(amount = profitOrLoss, size = 15, color = performanceColor)
+            }
+
+            PortfolioProfitLossChart(assets = positions, color = performanceColor)
 
             // Mini Composition Bar
             Row(
@@ -129,7 +129,7 @@ fun AssetWidget(
                             )
                             Spacer(Modifier.width(4.dp))
                             FintrackLabelSmallText(
-                                text = "${(percentage * 100).toInt()}%"
+                                text = "${type.dashboardLabel()} ${"%.0f".format(percentage * 100)}%"
                             )
                         }
                     }
@@ -138,6 +138,17 @@ fun AssetWidget(
         }
     }
 }
+
+@Composable
+private fun AssetType.dashboardLabel(): String = stringResource(
+    when (this) {
+        AssetType.GOLD -> Res.string.asset_type_gold
+        AssetType.FX -> Res.string.asset_type_fx
+        AssetType.STOCK -> Res.string.asset_type_stock
+        AssetType.CRYPTO -> Res.string.asset_type_crypto
+        AssetType.CUSTOM -> Res.string.asset_type_custom
+    }
+)
 
 /** A zero-centred chart of each position's actual gain/loss, including fractional holdings. */
 @Composable

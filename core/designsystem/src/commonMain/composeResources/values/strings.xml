@@ -388,9 +388,13 @@
     <string name="asset_type_crypto">ارز دیجیتال</string>
     <string name="asset_type_custom">سفارشی</string>
     <string name="label_asset_name_hint">نام دارایی (مثلاً دلار یا طلای ۱۸)</string>
+    <string name="label_asset_name">نام دارایی</string>
     <string name="label_asset_type">نوع دارایی</string>
     <string name="label_quantity">مقدار / تعداد</string>
     <string name="label_asset_unit">واحد</string>
+    <string name="asset_unit_gram">گرم</string>
+    <string name="asset_unit_count">عدد</string>
+    <string name="asset_unit_share">سهم</string>
     <string name="label_purchase_price">قیمت خرید هر واحد</string>
     <string name="label_sale_price">قیمت فروش هر واحد</string>
     <string name="label_asset_market_code">کد بازار برای به‌روزرسانی قیمت</string>
@@ -401,6 +405,8 @@
     <string name="msg_asset_transaction_prompt">مایل هستید خرید «%1$s» را هم به‌عنوان تراکنش ثبت کنید؟</string>
     <string name="asset_purchase_transaction_description">خرید دارایی: %1$s</string>
     <string name="label_asset_profit_loss">سود / زیان بر اساس قیمت خرید</string>
+    <string name="label_asset_profit_loss_short">سود / زیان</string>
+    <string name="label_asset_return">بازدهی</string>
     <string name="title_select_asset_type">انتخاب نوع دارایی</string>
     <string name="label_asset_purchase">خرید</string>
     <string name="label_asset_sale">فروش</string>

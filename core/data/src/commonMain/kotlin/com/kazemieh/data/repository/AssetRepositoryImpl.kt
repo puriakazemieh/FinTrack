@@ -9,6 +9,7 @@ import com.kazemieh.data_contract.datasource.AssetLocalDataSource
 import com.kazemieh.domain.repository.AssetRepository
 import com.kazemieh.network.service.TgjuService
 import com.kazemieh.network.service.NobitexService
+import com.kazemieh.network.service.BitpinService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.async
@@ -17,7 +18,8 @@ import kotlinx.coroutines.coroutineScope
 class AssetRepositoryImpl(
     private val localDataSource: AssetLocalDataSource,
     private val tgjuService: TgjuService,
-    private val nobitexService: NobitexService
+    private val nobitexService: NobitexService,
+    private val bitpinService: BitpinService
 ) : AssetRepository {
 
     override fun observeAssets(): Flow<List<Asset>> = localDataSource.observeAssets()
@@ -29,17 +31,29 @@ class AssetRepositoryImpl(
     override suspend fun deleteAsset(assetId: Long) = localDataSource.deleteAsset(assetId)
 
     override suspend fun syncRates(): List<AssetRate> {
-        val (tgjuRates, nobitexRates) = coroutineScope {
+        val (tgjuRates, nobitexRates, bitpinRates) = coroutineScope {
             val tgju = async { tgjuService.getLatestRates() }
             val nobitex = async { nobitexService.getLatestRates() }
-            tgju.await() to nobitex.await()
+            val bitpin = async { bitpinService.getLatestRates() }
+            Triple(tgju.await(), nobitex.await(), bitpin.await())
         }
         
-        // Merge the lists. If a rate is available from Nobitex, prefer it (for crypto).
+        // Prefer Nobitex for its supported coins, then fill unavailable coins from Bitpin's
+        // public Toman market feed. This also handles networks where api.nobitex.ir cannot
+        // be resolved at all without falling back to unsafe/incorrect USD crypto quotes.
         val nobitexCodes = nobitexRates.map { it.code }
-        val filteredTgju = tgjuRates.filter { it.code !in nobitexCodes }
+        val cryptoRates = nobitexRates + bitpinRates.filter { it.code !in nobitexCodes }
+        val cryptoCodes = cryptoRates.map { it.code }.toSet()
+        val filteredTgju = tgjuRates.filter { it.code !in cryptoCodes }
         
-        val fresh = filteredTgju + nobitexRates
+        val fresh = filteredTgju + cryptoRates
+        // TGJU's crypto rows are quoted in USD, not Iranian Rial. Never retain an old
+        // non-Nobitex crypto quote: it would be displayed as Toman and look plausibly,
+        // but catastrophically, wrong (for example BTC around 8,000 instead of billions).
+        val unavailableCryptoCodes = CRYPTO_CODES - cryptoCodes
+        if (unavailableCryptoCodes.isNotEmpty()) {
+            localDataSource.deleteCachedRates(unavailableCryptoCodes.toList())
+        }
         // Persist a successful fetch so the UI keeps showing the last known prices even when the
         // remote source is later unreachable; fall back to the cached snapshot otherwise.
         if (fresh.isNotEmpty()) {
@@ -82,10 +96,14 @@ class AssetRepositoryImpl(
             type == AssetType.FX && (normalized == "eur" || "یورو" in normalized) -> "eur"
             type == AssetType.FX && (normalized == "gbp" || "پوند" in normalized) -> "gbp"
             type == AssetType.FX && (normalized == "aed" || "درهم" in normalized) -> "aed"
-            type == AssetType.STOCK && (normalized == "btc" || "بیتکوین" in normalized) -> "btc"
-            type == AssetType.STOCK && (normalized == "eth" || "اتریوم" in normalized) -> "eth"
-            type == AssetType.STOCK && (normalized == "usdt" || "تتر" in normalized) -> "usdt"
+            type == AssetType.CRYPTO && (normalized == "btc" || "بیتکوین" in normalized) -> "btc"
+            type == AssetType.CRYPTO && (normalized == "eth" || "اتریوم" in normalized) -> "eth"
+            type == AssetType.CRYPTO && (normalized == "usdt" || "تتر" in normalized) -> "usdt"
             else -> null
         }
+    }
+
+    private companion object {
+        val CRYPTO_CODES = setOf("btc", "eth", "usdt", "trx", "doge", "shib", "ada", "xrp", "ton", "sol")
     }
 }

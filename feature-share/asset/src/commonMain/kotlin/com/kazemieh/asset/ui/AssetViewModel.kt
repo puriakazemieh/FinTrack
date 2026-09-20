@@ -6,24 +6,31 @@ import com.kazemieh.common.model.Asset
 import com.kazemieh.common.model.AssetHistory
 import com.kazemieh.common.model.AssetRate
 import com.kazemieh.common.model.AssetType
+import com.kazemieh.common.model.aggregateByMarket
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.Person
+import com.kazemieh.common.model.PageRequest
 import com.kazemieh.common.model.Tag
+import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.AssetUseCases
 import com.kazemieh.domain.usecase.AddTransactionUseCase
 import com.kazemieh.domain.repository.TransactionRepository
 import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 data class AssetState(
@@ -36,6 +43,7 @@ data class AssetState(
     val totalValue: Long = 0,
     val composition: Map<AssetType, Double> = emptyMap(),
     val searchQuery: String = "",
+    val filter: AssetFilter = AssetFilter(),
     val defaultIncomeCategory: Category? = null,
     val defaultExpenseCategory: Category? = null,
     val defaultSource: Source? = null,
@@ -46,10 +54,38 @@ data class AssetState(
     val mostUsedTags: List<Tag> = emptyList()
 )
 
+/**
+ * Transaction-related filters are applied only to assets that have a linked
+ * purchase/sale transaction. An empty selection means that dimension is not
+ * constrained, matching the transaction screen's filter behaviour.
+ */
+data class AssetFilter(
+    val types: Set<AssetType> = emptySet(),
+    val categories: Set<Category> = emptySet(),
+    val sources: Set<Source> = emptySet(),
+    val tags: Set<Tag> = emptySet(),
+    val persons: Set<Person> = emptySet()
+) {
+    val hasTransactionCriteria: Boolean
+        get() = categories.isNotEmpty() || sources.isNotEmpty() || tags.isNotEmpty() || persons.isNotEmpty()
+
+    fun toTransactionFilterParams() = TransactionFilterParams(
+        categories = categories,
+        isAllCategories = categories.isEmpty(),
+        sources = sources,
+        isAllSources = sources.isEmpty(),
+        tags = tags,
+        isAllTags = tags.isEmpty(),
+        persons = persons,
+        isAllPersons = persons.isEmpty()
+    )
+}
+
 sealed interface AssetIntent {
     data object LoadAssets : AssetIntent
     data class LoadAsset(val id: Long) : AssetIntent
     data class UpdateSearchQuery(val query: String) : AssetIntent
+    data class UpdateFilter(val filter: AssetFilter) : AssetIntent
     data class AddAsset(
         val asset: Asset,
         val registerTransaction: Boolean = false,
@@ -86,6 +122,7 @@ class AssetViewModel(
     val effect = _effect.receiveAsFlow()
 
     private val _searchQuery = MutableStateFlow("")
+    private val _filter = MutableStateFlow(AssetFilter())
 
     init {
         analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetListViewed)
@@ -99,6 +136,11 @@ class AssetViewModel(
             AssetIntent.LoadAssets -> observeAssets()
             is AssetIntent.LoadAsset -> loadAsset(intent.id)
             is AssetIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
+            is AssetIntent.UpdateFilter -> {
+                _filter.value = intent.filter
+                _state.update { it.copy(filter = intent.filter) }
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FilterApplied("asset"))
+            }
             is AssetIntent.AddAsset -> addAsset(intent.asset, intent.registerTransaction, intent.category, intent.source, intent.persons, intent.tags, intent.isBuy)
             is AssetIntent.DeleteAsset -> deleteAsset(intent.id, intent.deleteTransaction)
             is AssetIntent.UpdateAsset -> updateAsset(intent.asset)
@@ -163,19 +205,50 @@ class AssetViewModel(
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeAssets() {
         viewModelScope.launch {
-            assetUseCases.observeAssets()
-                .combine(_searchQuery) { assets, query ->
-                    val filtered = assets.filter {
-                        it.name.contains(query, ignoreCase = true)
+            val matchedAssetIds = _filter.flatMapLatest { filter ->
+                if (!filter.hasTransactionCriteria) {
+                    flowOf(AssetTransactionMatches())
+                } else {
+                    transactionRepository.observeTransactions(
+                        transactionFilterParams = filter.toTransactionFilterParams(),
+                        request = PageRequest(limit = ASSET_FILTER_TRANSACTION_LIMIT, offset = 0)
+                    ).map { page ->
+                        AssetTransactionMatches(
+                            linkedIds = page.items.mapNotNull { transactionWithRelations ->
+                                transactionWithRelations.transaction.description.extractLinkedAssetId()
+                            }.toSet(),
+                            // Assets created before a stable link was added can still be filtered
+                            // through the previous, human-readable transaction description.
+                            legacyNames = page.items.mapNotNull { transactionWithRelations ->
+                                transactionWithRelations.transaction.description.extractLegacyAssetName()
+                            }.toSet()
+                        )
+                    }
+                }
+            }
+
+            combine(
+                assetUseCases.observeAssets(),
+                _searchQuery,
+                _filter,
+                matchedAssetIds
+            ) { assets, query, filter, transactionMatches ->
+                    val filtered = assets.filter { asset ->
+                        asset.name.contains(query, ignoreCase = true) &&
+                            (filter.types.isEmpty() || asset.type in filter.types) &&
+                            (!filter.hasTransactionCriteria ||
+                                asset.id in transactionMatches.linkedIds ||
+                                asset.name in transactionMatches.legacyNames)
                     }
                     val total = assets.sumOf { it.totalCurrentValue }
                     val comp = assets.groupBy { it.type }
                         .mapValues { (_, list) ->
                             if (total != 0L) (list.sumOf { it.totalCurrentValue }.toDouble() / total) else 0.0
                         }
-                    AssetData(assets, filtered, total, comp)
+                    AssetData(assets, filtered.aggregateByMarket(), total, comp)
                 }
                 .collect { data ->
                     _state.update {
@@ -215,7 +288,7 @@ class AssetViewModel(
                         amount = asset.totalPurchaseValue,
                         categoryId = category.id ?: 0L,
                         sourceId = source.id ?: 0L,
-                        description = if (isBuy) "خرید دارایی ${asset.name}" else "فروش دارایی ${asset.name}",
+                        description = assetTransactionDescription(asset.name, id, isBuy),
                         type = if (isBuy) TransactionType.EXPENSE else TransactionType.INCOME
                     )
                     addTransactionUseCase(tx, persons?.mapNotNull { it.id } ?: emptyList(), tags?.mapNotNull { it.id } ?: emptyList())
@@ -237,7 +310,11 @@ class AssetViewModel(
             if (deleteTransaction && asset != null) {
                 try {
                     val allTx = transactionRepository.getAllTransactions()
-                    val targetTx = allTx.find { it.description == "خرید دارایی ${asset.name}" || it.description == "فروش دارایی ${asset.name}" }
+                    val targetTx = allTx.find { it.description.extractLinkedAssetId() == id }
+                        ?: allTx.find {
+                            it.description == "خرید دارایی ${asset.name}" ||
+                                it.description == "فروش دارایی ${asset.name}"
+                        }
                     if (targetTx != null) {
                         transactionRepository.deleteTransactionWithBalance(targetTx, emptyMap())
                     }
@@ -284,3 +361,37 @@ private data class AssetData(
     val total: Long,
     val comp: Map<AssetType, Double>
 )
+
+private data class AssetTransactionMatches(
+    val linkedIds: Set<Long> = emptySet(),
+    val legacyNames: Set<String> = emptySet()
+)
+
+private const val ASSET_FILTER_TRANSACTION_LIMIT = 1_000
+private const val ASSET_LINK_PREFIX = "\u2063asset:"
+private const val ASSET_LINK_SUFFIX = "\u2063"
+
+private fun assetTransactionDescription(name: String, assetId: Long, isBuy: Boolean): String {
+    val title = if (isBuy) "خرید دارایی $name" else "فروش دارایی $name"
+    // The marker keeps the relationship stable without exposing technical text in the UI.
+    return "$title$ASSET_LINK_PREFIX$assetId$ASSET_LINK_SUFFIX"
+}
+
+private fun String?.extractLinkedAssetId(): Long? {
+    val value = this ?: return null
+    val start = value.indexOf(ASSET_LINK_PREFIX)
+    if (start < 0) return null
+    val numberStart = start + ASSET_LINK_PREFIX.length
+    val end = value.indexOf(ASSET_LINK_SUFFIX, numberStart)
+    if (end < 0) return null
+    return value.substring(numberStart, end).toLongOrNull()
+}
+
+private fun String?.extractLegacyAssetName(): String? {
+    val value = this ?: return null
+    return when {
+        value.startsWith("خرید دارایی ") -> value.removePrefix("خرید دارایی ").substringBefore(ASSET_LINK_PREFIX)
+        value.startsWith("فروش دارایی ") -> value.removePrefix("فروش دارایی ").substringBefore(ASSET_LINK_PREFIX)
+        else -> null
+    }.takeIf { !it.isNullOrBlank() }
+}

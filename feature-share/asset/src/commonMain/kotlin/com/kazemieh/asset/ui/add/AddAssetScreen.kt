@@ -92,11 +92,17 @@ import fintrack.core.designsystem.generated.resources.asset_type_stock
 import fintrack.core.designsystem.generated.resources.btn_add_person
 import fintrack.core.designsystem.generated.resources.btn_add_tag
 import fintrack.core.designsystem.generated.resources.category
+import fintrack.core.designsystem.generated.resources.hint_asset_market_code
 import fintrack.core.designsystem.generated.resources.label_asset_type
+import fintrack.core.designsystem.generated.resources.label_quantity
+import fintrack.core.designsystem.generated.resources.label_asset_name
 import fintrack.core.designsystem.generated.resources.label_related_persons
 import fintrack.core.designsystem.generated.resources.label_retry
 import fintrack.core.designsystem.generated.resources.label_tag_prefix
 import fintrack.core.designsystem.generated.resources.label_units_count
+import fintrack.core.designsystem.generated.resources.asset_unit_count
+import fintrack.core.designsystem.generated.resources.asset_unit_gram
+import fintrack.core.designsystem.generated.resources.asset_unit_share
 import fintrack.core.designsystem.generated.resources.msg_market_rates_unavailable
 import fintrack.core.designsystem.generated.resources.select_category
 import fintrack.core.designsystem.generated.resources.select_source
@@ -133,6 +139,8 @@ fun AddAssetScreen(
     var showPriceCalc by remember { mutableStateOf(false) }
     var showTypePicker by remember { mutableStateOf(false) }
 
+    val selectedMarketRate = state.marketRates.firstOrNull { it.code == marketCode }
+
     // Transaction Registration
     var registerTransaction by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf<Category?>(null) }
@@ -166,6 +174,20 @@ fun AddAssetScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(AssetIntent.SyncRates)
+    }
+
+    LaunchedEffect(initialMarketCode, state.marketRates) {
+        if ((assetId != null && assetId != 0L) || initialMarketCode == null) return@LaunchedEffect
+        state.marketRates.firstOrNull { it.code.equals(initialMarketCode, ignoreCase = true) }?.let { rate ->
+            type = rate.type
+            marketCode = rate.code
+            if (name.isBlank()) name = rate.name
+            if (purchasePrice.isBlank()) purchasePrice = rate.price.toString()
+        }
+    }
+
     LaunchedEffect(state.selectedAsset) {
         state.selectedAsset?.let { asset ->
             name = asset.name
@@ -192,6 +214,7 @@ fun AddAssetScreen(
     val q = quantity.toDoubleOrNull() ?: 0.0
     val p = purchasePrice.toLongOrNull() ?: 0L
     val totalPrice = (q * p).toLong()
+    val quantityUnit = type.quantityUnit(marketCode)
 
     ModalBottomSheet(
         onDismissRequest = onBack,
@@ -207,6 +230,7 @@ fun AddAssetScreen(
             iconId = 1,
             colorId = 1,
             heroName = name,
+            hero = { AssetSymbolBadge(marketCode = marketCode, type = type) },
             primaryLabel = "ذخیره",
             onPrimaryClick = {
                 val asset = Asset(
@@ -305,16 +329,26 @@ fun AddAssetScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                FintrackBodyMediumText(
-                                    text = marketCode ?: "انتخاب نماد بازار (اختیاری)"
-                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    AssetSymbolBadge(marketCode = marketCode, type = type, size = 30.dp)
+                                    Spacer(Modifier.size(8.dp))
+                                    FintrackBodyMediumText(
+                                        text = selectedMarketRate?.name
+                                            ?: stringResource(Res.string.hint_asset_market_code)
+                                    )
+                                }
                             }
                         }
                     }
                 }
 
                 item {
-                    Field(label = "نام دارایی (اختیاری)", required = false) {
+                    GlassCard(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            FintrackLabelMediumText(
+                                text = stringResource(Res.string.label_asset_name),
+                                color = glassColors.text3
+                            )
                         TextField(
                             value = name,
                             onValueChange = { name = it },
@@ -331,15 +365,17 @@ fun AddAssetScreen(
                             ),
                             modifier = Modifier.fillMaxWidth()
                         )
+                        }
                     }
                 }
 
                 item {
-                    FintrackTitleSmallText(stringResource(Res.string.label_units_count, ""))
                     LargeAmountCard(
                         amount = quantity,
                         onAmountChange = { quantity = it },
-                        onCalcClick = { showQuantityCalc = true }
+                        onCalcClick = { showQuantityCalc = true },
+                        label = stringResource(Res.string.label_quantity),
+                        suffixLabel = quantityUnit
                     )
                 }
 
@@ -636,7 +672,15 @@ fun AddAssetScreen(
 
     if (showTypePicker) {
         AssetTypePickerBottomSheet(
-            onSelect = { type = it; showTypePicker = false },
+            onSelect = { selectedType ->
+                if (type != selectedType) {
+                    type = selectedType
+                    marketCode = null
+                    name = ""
+                    purchasePrice = ""
+                }
+                showTypePicker = false
+            },
             onDismiss = { showTypePicker = false }
         )
     }
@@ -650,8 +694,8 @@ fun AddAssetScreen(
             onRefresh = { viewModel.onIntent(AssetIntent.SyncRates) },
             onSelect = {
                 marketCode = it.code
-                if (name.isBlank()) name = it.name
-                if (purchasePrice.isBlank()) purchasePrice = it.price.toString()
+                name = it.name
+                purchasePrice = it.price.toString()
                 showMarketPicker = false
             }
         )
@@ -704,6 +748,8 @@ fun MarketRatePickerSheet(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                AssetSymbolBadge(marketCode = rate.code, type = rate.type, size = 30.dp)
+                                Spacer(Modifier.size(10.dp))
                                 Column {
                                     FintrackBodyMediumText(rate.name)
                                     FintrackLabelMediumText(
@@ -727,6 +773,47 @@ fun MarketRatePickerSheet(
 }
 
 @Composable
+private fun AssetSymbolBadge(
+    marketCode: String?,
+    type: AssetType,
+    size: androidx.compose.ui.unit.Dp = 64.dp
+) {
+    val symbol = when (marketCode?.lowercase()) {
+        "btc" -> "₿"
+        "eth" -> "Ξ"
+        "usdt" -> "₮"
+        "trx" -> "TRX"
+        "doge" -> "Ð"
+        "xrp" -> "XRP"
+        "ton" -> "TON"
+        "sol" -> "SOL"
+        "gold_18k", "gold_24k", "coin_emami" -> "Au"
+        "silver_999", "silver_925" -> "Ag"
+        "usd" -> "$"
+        "eur" -> "€"
+        "gbp" -> "£"
+        else -> when (type) {
+            AssetType.GOLD -> "Au"
+            AssetType.FX -> "¤"
+            AssetType.CRYPTO -> "₿"
+            AssetType.STOCK -> "▥"
+            AssetType.CUSTOM -> "•"
+        }
+    }
+    Box(
+        modifier = Modifier.size(size).clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primaryContainer),
+        contentAlignment = Alignment.Center
+    ) {
+        FintrackTitleMediumText(
+            text = symbol,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
 private fun AssetType.label(): String = stringResource(
     when (this) {
         AssetType.GOLD -> Res.string.asset_type_gold
@@ -736,6 +823,15 @@ private fun AssetType.label(): String = stringResource(
         AssetType.CUSTOM -> Res.string.asset_type_custom
     }
 )
+
+@Composable
+private fun AssetType.quantityUnit(marketCode: String?): String = when {
+    this == AssetType.GOLD && marketCode?.lowercase()?.startsWith("coin_") == true ->
+        stringResource(Res.string.asset_unit_count)
+    this == AssetType.GOLD -> stringResource(Res.string.asset_unit_gram)
+    this == AssetType.STOCK -> stringResource(Res.string.asset_unit_share)
+    else -> marketCode?.uppercase() ?: stringResource(Res.string.asset_unit_count)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
