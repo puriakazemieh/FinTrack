@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.AssetRate
 import com.kazemieh.common.model.AssetType
+import com.kazemieh.common.analytics.RefreshTrigger
 import com.kazemieh.domain.repository.AssetRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,17 +19,19 @@ class CurrencyConverterViewModel(
 
     private val _state = MutableStateFlow(CurrencyConverterState())
     val state = _state.asStateFlow()
+    private var hasTrackedAmountInput = false
+    private var hasTrackedCalculation = false
 
     init {
         analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyConverterUsed)
         analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("currency_converter"))
-        loadRates()
+        loadRates(RefreshTrigger.INITIAL)
     }
 
-    private fun loadRates() {
+    private fun loadRates(trigger: RefreshTrigger) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyRatesRefreshRequested)
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyRatesRefreshRequested(trigger))
             try {
                 val rates = assetRepository.syncRates().toMutableList()
                 val hasMarketRates = rates.isNotEmpty()
@@ -50,14 +53,14 @@ class CurrencyConverterViewModel(
                     )
                 }
                 if (hasMarketRates) {
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyRatesRefreshCompleted(rates.size))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyRatesRefreshCompleted(rates.size, trigger))
                 } else {
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyRatesRefreshFailed)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyRatesRefreshFailed(trigger))
                 }
                 calculate()
             } catch (_: Exception) {
                 _state.update { it.copy(isLoading = false) }
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyRatesRefreshFailed)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyRatesRefreshFailed(trigger))
             }
         }
     }
@@ -65,9 +68,16 @@ class CurrencyConverterViewModel(
     fun onIntent(intent: CurrencyConverterIntent) {
         when (intent) {
             is CurrencyConverterIntent.InputAmount -> {
+                if (!hasTrackedAmountInput && intent.amount.toDoubleOrNull()?.let { it > 0.0 } == true) {
+                    hasTrackedAmountInput = true
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyConverterInputStarted)
+                }
                 _state.update { it.copy(amount = intent.amount) }
                 calculate()
             }
+            is CurrencyConverterIntent.OpenPicker -> analytics.track(
+                com.kazemieh.common.analytics.ProductEvent.CurrencyPickerOpened(intent.side)
+            )
             is CurrencyConverterIntent.SelectFromRate -> {
                 _state.update { it.copy(fromRate = intent.rate) }
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyPairSelected("from", intent.rate.code))
@@ -83,7 +93,7 @@ class CurrencyConverterViewModel(
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.CurrencyPairSwapped)
                 calculate()
             }
-            CurrencyConverterIntent.RefreshRates -> loadRates()
+            CurrencyConverterIntent.RefreshRates -> loadRates(RefreshTrigger.MANUAL)
             is CurrencyConverterIntent.SelectFavoritePair -> {
                 val from = _state.value.availableRates.find { it.code == intent.pair.fromCode }
                 val to = _state.value.availableRates.find { it.code == intent.pair.toCode }
@@ -109,5 +119,13 @@ class CurrencyConverterViewModel(
         // Simple logic: convert everything to IRR first then to target
         val result = if (toRate != 0L) (amount * fromRate) / toRate else 0.0
         _state.update { it.copy(result = result) }
+        val fromCode = _state.value.fromRate?.code
+        val toCode = _state.value.toRate?.code
+        if (!hasTrackedCalculation && amount > 0.0 && fromCode != null && toCode != null) {
+            hasTrackedCalculation = true
+            analytics.track(
+                com.kazemieh.common.analytics.ProductEvent.CurrencyConversionCalculated(fromCode, toCode)
+            )
+        }
     }
 }

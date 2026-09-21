@@ -2,6 +2,9 @@ package com.kazemieh.domain.usecase
 
 import com.kazemieh.common.model.Transaction
 import com.kazemieh.common.model.TransactionType
+import com.kazemieh.common.analytics.AnalyticsService
+import com.kazemieh.common.analytics.NoOpAnalyticsService
+import com.kazemieh.common.analytics.ProductEvent
 import com.kazemieh.domain.notification.NotificationManager
 import com.kazemieh.domain.repository.BudgetRepository
 import com.kazemieh.domain.repository.TransactionRepository
@@ -13,7 +16,8 @@ class AddTransactionUseCase(
     private val notificationManager: NotificationManager,
     private val updateStreak: UpdateStreakUseCase,
     private val checkAchievements: CheckAchievementsUseCase,
-    private val updateXP: UpdateXPUseCase
+    private val updateXP: UpdateXPUseCase,
+    private val analytics: AnalyticsService = NoOpAnalyticsService()
 ) {
     suspend operator fun invoke(
         transaction: Transaction,
@@ -26,6 +30,12 @@ class AddTransactionUseCase(
 
         val impact = transaction.balanceImpact()
         val resultId = repository.addTransactionWithBalance(transaction, tagIds, personIds, impact)
+
+        // This is deliberately checked after the insert and lives in the common creation path,
+        // so SMS, asset, cheque and scheduled transaction flows cannot emit it prematurely.
+        if (resultId > 0L && repository.getTransactionCount() == 1L) {
+            analytics.track(ProductEvent.FirstTransactionCompleted)
+        }
 
         // Check budget threshold for expenses
         if (transaction.type == TransactionType.EXPENSE) {

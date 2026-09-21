@@ -1220,6 +1220,7 @@
     <string name="label_rate_app">امتیاز به اپ</string>
     <string name="label_terms">شرایط استفاده</string>
     <string name="label_privacy">حریم خصوصی</string>
+    <string name="setting_analytics">ارسال آمار ناشناس برای بهبود برنامه</string>
     <string name="label_version_history">نسخه‌ها و تاریخچه</string>
     <string name="footer_made_with_love">FinTrack · ساخته‌شده با ❤ در ایران</string>
 

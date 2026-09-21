@@ -139,6 +139,10 @@ class SettingsViewModel(
                     FinTrackPreferences.PREF_HIDE_BALANCE,
                     "false"
                 ).toBoolean(),
+                isAnalyticsEnabled = preferenceUseCases.getStringPreference(
+                    FinTrackPreferences.PREF_ANALYTICS_CONSENT,
+                    com.kazemieh.common.analytics.AnalyticsConsent.DENIED.name
+                ) == com.kazemieh.common.analytics.AnalyticsConsent.GRANTED.name,
                 lastSyncTime = preferenceUseCases.getStringPreference(
                     FinTrackPreferences.PREF_LAST_SYNC_TIME,
                     "---"
@@ -284,6 +288,22 @@ class SettingsViewModel(
                 _state.update { it.copy(isBalanceHidden = newValue) }
             }
 
+            is SettingsIntent.ToggleAnalytics -> {
+                val enabled = !_state.value.isAnalyticsEnabled
+                val consent = if (enabled) {
+                    com.kazemieh.common.analytics.AnalyticsConsent.GRANTED
+                } else {
+                    com.kazemieh.common.analytics.AnalyticsConsent.DENIED
+                }
+                preferenceUseCases.setStringPreference(
+                    FinTrackPreferences.PREF_ANALYTICS_CONSENT,
+                    consent.name
+                )
+                // Apply immediately; the app-level preference observer keeps it current later.
+                analytics.setConsent(consent)
+                _state.update { it.copy(isAnalyticsEnabled = enabled) }
+            }
+
 
 
             is SettingsIntent.SelectCurrency -> {
@@ -409,6 +429,7 @@ data class SettingsState(
 
     val isSyncEnabled: Boolean = true,
     val isBalanceHidden: Boolean = false,
+    val isAnalyticsEnabled: Boolean = false,
     val lastSyncTime: String = "---",
     val selectedCurrency: Currency = Currency.TOMAN,
     val textScale: TextScale = TextScale.MEDIUM,
@@ -446,6 +467,7 @@ sealed interface SettingsIntent {
     data object ToggleFingerprint : SettingsIntent
     data object ToggleBackup : SettingsIntent
     data object ToggleHideBalance : SettingsIntent
+    data object ToggleAnalytics : SettingsIntent
 
     data class SelectCurrency(val currency: Currency) : SettingsIntent
     data object ToggleLock : SettingsIntent

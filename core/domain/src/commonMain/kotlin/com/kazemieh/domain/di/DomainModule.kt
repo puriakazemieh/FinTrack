@@ -4,7 +4,7 @@ import com.kazemieh.domain.usecase.*
 import org.koin.dsl.module
 
 val domainModule = module {
-    factory { AddTransactionUseCase(get(), get(), get(), get(),get(),get()) }
+    factory { AddTransactionUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory { DeleteTransactionUseCase(get()) }
     factory { UpdateTransactionUseCase(get()) }
     factory { ObserveTransactionsUseCase(get()) }

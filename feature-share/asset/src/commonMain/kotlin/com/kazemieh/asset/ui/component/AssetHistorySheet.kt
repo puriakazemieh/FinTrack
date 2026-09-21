@@ -34,7 +34,7 @@ fun AssetHistorySheet(
 
     LaunchedEffect(asset.id) {
         asset.id?.let {
-            viewModel.onIntent(AssetIntent.LoadHistory(it))
+            viewModel.onIntent(AssetIntent.LoadHistory(it, asset.type))
         }
     }
 

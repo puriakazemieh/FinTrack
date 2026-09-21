@@ -100,22 +100,94 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
 
     // 11. Assets & Gold/Crypto
     data object AssetListViewed : ProductEvent("asset_list_viewed")
-    data class AssetCreated(val type: String) : ProductEvent("asset_created", mapOf("type" to type))
-    data object AssetUpdated : ProductEvent("asset_updated")
-    data object AssetDeleted : ProductEvent("asset_deleted")
+    data class AssetFormOpened(val isEdit: Boolean) : ProductEvent(
+        "asset_form_opened", mapOf("is_edit" to isEdit)
+    )
+    data class AssetFormDismissed(val isEdit: Boolean) : ProductEvent(
+        "asset_form_dismissed", mapOf("is_edit" to isEdit)
+    )
+    data class AssetTypeSelected(val assetType: String) : ProductEvent(
+        "asset_type_selected", mapOf("asset_type" to assetType)
+    )
+    data class AssetMarketPickerOpened(val assetType: String) : ProductEvent(
+        "asset_market_picker_opened", mapOf("asset_type" to assetType)
+    )
+    data class AssetCreated(
+        val type: String,
+        val operation: String,
+        val linkedTransaction: Boolean
+    ) : ProductEvent(
+        "asset_created",
+        mapOf("asset_type" to type, "operation" to operation, "linked_transaction" to linkedTransaction)
+    )
+    data class AssetUpdated(val type: String) : ProductEvent("asset_updated", mapOf("asset_type" to type))
+    data class AssetDeleted(val deleteLinkedTransaction: Boolean) : ProductEvent(
+        "asset_deleted", mapOf("delete_linked_transaction" to deleteLinkedTransaction)
+    )
+    data object AssetSearchStarted : ProductEvent("asset_search_started")
+    data object AssetFilterOpened : ProductEvent("asset_filter_opened")
+    data class AssetFilterApplied(
+        val typeCount: Int,
+        val categoryCount: Int,
+        val sourceCount: Int,
+        val tagCount: Int,
+        val personCount: Int
+    ) : ProductEvent(
+        "asset_filter_applied",
+        mapOf(
+            "type_count" to typeCount,
+            "category_count" to categoryCount,
+            "source_count" to sourceCount,
+            "tag_count" to tagCount,
+            "person_count" to personCount
+        )
+    )
+    data object AssetFilterCleared : ProductEvent("asset_filter_cleared")
+    data class AssetActionsOpened(val assetType: String) : ProductEvent(
+        "asset_actions_opened", mapOf("asset_type" to assetType)
+    )
+    data class AssetActionSelected(val action: String) : ProductEvent(
+        "asset_action_selected", mapOf("action" to action)
+    )
+    data class AssetHistoryViewed(val assetType: String) : ProductEvent(
+        "asset_history_viewed", mapOf("asset_type" to assetType)
+    )
+    data object AssetDashboardMoreClicked : ProductEvent("asset_dashboard_more_clicked")
+    data class AssetLinkedTransactionCreated(val operation: String) : ProductEvent(
+        "asset_linked_transaction_created", mapOf("operation" to operation)
+    )
+    data class AssetLinkedTransactionFailed(val operation: String) : ProductEvent(
+        "asset_linked_transaction_failed", mapOf("operation" to operation)
+    )
     data object FxRatesViewed : ProductEvent("fx_rates_viewed")
-    data object FxRatesRefreshRequested : ProductEvent("fx_rates_refresh_requested")
-    data class FxRatesRefreshCompleted(val rateCount: Int) : ProductEvent(
-        "fx_rates_refresh_completed", mapOf("rate_count" to rateCount)
+    data class FxRatesTabSelected(val assetType: String) : ProductEvent(
+        "fx_rates_tab_selected", mapOf("asset_type" to assetType)
     )
-    data object FxRatesRefreshFailed : ProductEvent("fx_rates_refresh_failed")
+    data class FxRateDetailsViewed(val assetType: String, val marketCode: String) : ProductEvent(
+        "fx_rate_details_viewed", mapOf("asset_type" to assetType, "market_code" to marketCode)
+    )
+    data class FxRateAddAssetStarted(val assetType: String, val marketCode: String) : ProductEvent(
+        "fx_rate_add_asset_started", mapOf("asset_type" to assetType, "market_code" to marketCode)
+    )
+    data class FxRatesRefreshRequested(val trigger: RefreshTrigger) : ProductEvent(
+        "fx_rates_refresh_requested", mapOf("trigger" to trigger.analyticsValue)
+    )
+    data class FxRatesRefreshCompleted(val rateCount: Int, val trigger: RefreshTrigger) : ProductEvent(
+        "fx_rates_refresh_completed", mapOf("rate_count" to rateCount, "trigger" to trigger.analyticsValue)
+    )
+    data class FxRatesRefreshFailed(val trigger: RefreshTrigger) : ProductEvent(
+        "fx_rates_refresh_failed", mapOf("trigger" to trigger.analyticsValue)
+    )
     data object AssetDashboardPerformanceViewed : ProductEvent("asset_dashboard_performance_viewed")
-    data object AssetHistoryViewed : ProductEvent("asset_history_viewed")
-    data object AssetRateRefreshRequested : ProductEvent("asset_rate_refresh_requested")
-    data class AssetRateRefreshCompleted(val rateCount: Int) : ProductEvent(
-        "asset_rate_refresh_completed", mapOf("rate_count" to rateCount)
+    data class AssetRateRefreshRequested(val trigger: RefreshTrigger) : ProductEvent(
+        "asset_rate_refresh_requested", mapOf("trigger" to trigger.analyticsValue)
     )
-    data object AssetRateRefreshFailed : ProductEvent("asset_rate_refresh_failed")
+    data class AssetRateRefreshCompleted(val rateCount: Int, val trigger: RefreshTrigger) : ProductEvent(
+        "asset_rate_refresh_completed", mapOf("rate_count" to rateCount, "trigger" to trigger.analyticsValue)
+    )
+    data class AssetRateRefreshFailed(val trigger: RefreshTrigger) : ProductEvent(
+        "asset_rate_refresh_failed", mapOf("trigger" to trigger.analyticsValue)
+    )
     data class AssetMarketSelected(val assetType: String, val marketCode: String) : ProductEvent(
         "asset_market_selected", mapOf("asset_type" to assetType, "market_code" to marketCode)
     )
@@ -126,6 +198,13 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     // 12. Utilities & Tools
     data object ToolsHubViewed : ProductEvent("tools_hub_viewed")
     data object CurrencyConverterUsed : ProductEvent("currency_converter_used")
+    data object CurrencyConverterInputStarted : ProductEvent("currency_converter_input_started")
+    data class CurrencyPickerOpened(val side: String) : ProductEvent(
+        "currency_picker_opened", mapOf("side" to side)
+    )
+    data class CurrencyConversionCalculated(val fromCode: String, val toCode: String) : ProductEvent(
+        "currency_conversion_calculated", mapOf("from_code" to fromCode, "to_code" to toCode)
+    )
     data class CurrencyPairSelected(val side: String, val currencyCode: String) : ProductEvent(
         "currency_pair_selected", mapOf("side" to side, "currency_code" to currencyCode)
     )
@@ -133,11 +212,15 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
         "currency_favorite_pair_selected", mapOf("from_code" to fromCode, "to_code" to toCode)
     )
     data object CurrencyPairSwapped : ProductEvent("currency_pair_swapped")
-    data object CurrencyRatesRefreshRequested : ProductEvent("currency_rates_refresh_requested")
-    data class CurrencyRatesRefreshCompleted(val rateCount: Int) : ProductEvent(
-        "currency_rates_refresh_completed", mapOf("rate_count" to rateCount)
+    data class CurrencyRatesRefreshRequested(val trigger: RefreshTrigger) : ProductEvent(
+        "currency_rates_refresh_requested", mapOf("trigger" to trigger.analyticsValue)
     )
-    data object CurrencyRatesRefreshFailed : ProductEvent("currency_rates_refresh_failed")
+    data class CurrencyRatesRefreshCompleted(val rateCount: Int, val trigger: RefreshTrigger) : ProductEvent(
+        "currency_rates_refresh_completed", mapOf("rate_count" to rateCount, "trigger" to trigger.analyticsValue)
+    )
+    data class CurrencyRatesRefreshFailed(val trigger: RefreshTrigger) : ProductEvent(
+        "currency_rates_refresh_failed", mapOf("trigger" to trigger.analyticsValue)
+    )
     data object AiAdvisorOpened : ProductEvent("ai_advisor_opened")
     data object AiInsightGenerated : ProductEvent("ai_insight_generated")
     data object ShoppingItemAdded : ProductEvent("shopping_item_added")
@@ -190,7 +273,6 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
     
     // 15. Lifecycle & Notifications
     data object AppInstalled : ProductEvent("app_installed")
-    data object AppUninstalled : ProductEvent("app_uninstalled")
     data object AppUpdated : ProductEvent("app_updated")
     data object AppOpened : ProductEvent("app_opened")
     data class CampaignAttributed(val source: String, val campaign: String) : ProductEvent("campaign_attributed", mapOf("source" to source, "campaign" to campaign))
@@ -222,4 +304,10 @@ sealed class ProductEvent(val eventName: String, val params: Map<String, Any> = 
         eventName = "feature_action_failed", 
         params = mapOf("feature_key" to featureKey, "safe_error_code" to safeErrorCode)
     )
+}
+
+/** Identifies whether a market-rate refresh was automatic or explicitly requested by the user. */
+enum class RefreshTrigger(val analyticsValue: String) {
+    INITIAL("initial"),
+    MANUAL("manual")
 }

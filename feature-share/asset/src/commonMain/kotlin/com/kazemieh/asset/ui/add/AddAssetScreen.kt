@@ -127,6 +127,11 @@ fun AddAssetScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val glassColors = LocalGlassColors.current
+    val isEdit = assetId != null && assetId != 0L
+    val dismissForm = {
+        viewModel.onIntent(AssetIntent.AssetFormDismissed(isEdit))
+        onBack()
+    }
 
     var name by remember { mutableStateOf("") }
     var type by remember { mutableStateOf(AssetType.GOLD) }
@@ -169,18 +174,20 @@ fun AddAssetScreen(
     }
 
     LaunchedEffect(assetId) {
+        viewModel.onIntent(AssetIntent.AssetFormOpened(isEdit))
         if (assetId != null && assetId != 0L) {
             viewModel.onIntent(AssetIntent.LoadAsset(assetId))
         }
     }
 
     LaunchedEffect(Unit) {
-        viewModel.onIntent(AssetIntent.SyncRates)
+        viewModel.onIntent(AssetIntent.SyncRates(com.kazemieh.common.analytics.RefreshTrigger.INITIAL))
     }
 
     LaunchedEffect(initialMarketCode, state.marketRates) {
         if ((assetId != null && assetId != 0L) || initialMarketCode == null) return@LaunchedEffect
         state.marketRates.firstOrNull { it.code.equals(initialMarketCode, ignoreCase = true) }?.let { rate ->
+            viewModel.onIntent(AssetIntent.MarketRateSelected(rate))
             type = rate.type
             marketCode = rate.code
             if (name.isBlank()) name = rate.name
@@ -217,7 +224,7 @@ fun AddAssetScreen(
     val quantityUnit = type.quantityUnit(marketCode)
 
     ModalBottomSheet(
-        onDismissRequest = onBack,
+        onDismissRequest = dismissForm,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = Color.Transparent,
         dragHandle = null
@@ -255,7 +262,7 @@ fun AddAssetScreen(
                     )
                 )
             },
-            onClose = onBack,
+            onClose = dismissForm,
             onFilterClick = {
                 if (assetId != null) {
                     viewModel.onIntent(AssetIntent.DeleteAsset(assetId, deleteTransaction = false))
@@ -322,7 +329,10 @@ fun AddAssetScreen(
                     item {
                         GlassCard(
                             modifier = Modifier.fillMaxWidth(),
-                            onClick = { showMarketPicker = true }
+                            onClick = {
+                                viewModel.onIntent(AssetIntent.MarketPickerOpened(type))
+                                showMarketPicker = true
+                            }
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(12.dp),
@@ -413,7 +423,10 @@ fun AddAssetScreen(
                             FintrackTitleMediumText("ثبت به عنوان تراکنش")
                             Switch(
                                 checked = registerTransaction,
-                                onCheckedChange = { registerTransaction = it })
+                                onCheckedChange = {
+                                    registerTransaction = it
+                                    viewModel.onIntent(AssetIntent.AssetTransactionPromptAnswered(it))
+                                })
                         }
                     }
 
@@ -673,6 +686,7 @@ fun AddAssetScreen(
     if (showTypePicker) {
         AssetTypePickerBottomSheet(
             onSelect = { selectedType ->
+                viewModel.onIntent(AssetIntent.AssetTypeSelected(selectedType))
                 if (type != selectedType) {
                     type = selectedType
                     marketCode = null
@@ -691,8 +705,9 @@ fun AddAssetScreen(
             rates = state.marketRates,
             isLoading = state.isLoading,
             onDismiss = { showMarketPicker = false },
-            onRefresh = { viewModel.onIntent(AssetIntent.SyncRates) },
+            onRefresh = { viewModel.onIntent(AssetIntent.SyncRates(com.kazemieh.common.analytics.RefreshTrigger.MANUAL)) },
             onSelect = {
+                viewModel.onIntent(AssetIntent.MarketRateSelected(it))
                 marketCode = it.code
                 name = it.name
                 purchasePrice = it.price.toString()

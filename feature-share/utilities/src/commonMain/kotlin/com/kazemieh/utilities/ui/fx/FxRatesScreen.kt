@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.common.analytics.RefreshTrigger
 import com.kazemieh.common.model.AssetRate
 import com.kazemieh.common.model.AssetType
 import com.kazemieh.common.model.MarketRateHistory
@@ -91,7 +92,7 @@ fun FxRatesScreen(
         sub = stringResource(Res.string.sub_fx_rates),
         onBack = onBackClick,
         trailingContent = {
-            IconButton(onClick = { viewModel.onIntent(FxRatesIntent.RefreshRates) }) {
+            IconButton(onClick = { viewModel.onIntent(FxRatesIntent.RefreshRates(RefreshTrigger.MANUAL)) }) {
                 Icon(
                     Icons.Default.Refresh,
                     contentDescription = stringResource(Res.string.action_refresh)
@@ -107,7 +108,7 @@ fun FxRatesScreen(
             }
 
             state.rates.isEmpty() && !state.isLoading -> {
-                RatesUnavailable(onRetry = { viewModel.onIntent(FxRatesIntent.RefreshRates) })
+                RatesUnavailable(onRetry = { viewModel.onIntent(FxRatesIntent.RefreshRates(RefreshTrigger.MANUAL)) })
             }
 
             else -> {
@@ -139,7 +140,10 @@ fun FxRatesScreen(
                                             )
                                         ) else Modifier
                                     )
-                                    .clickable { selectedTab = type }
+                                    .clickable {
+                                        selectedTab = type
+                                        viewModel.onIntent(FxRatesIntent.SelectTab(type))
+                                    }
                                     .padding(vertical = 10.dp),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -216,6 +220,7 @@ fun FxRatesScreen(
             history = state.selectedRateHistory,
             onDismiss = { viewModel.onIntent(FxRatesIntent.DismissRateDetails) },
             onAddAsset = {
+                viewModel.onIntent(FxRatesIntent.AddRateAsAsset(selectedRate))
                 onAddAssetClick(selectedRate)
                 viewModel.onIntent(FxRatesIntent.DismissRateDetails)
             }

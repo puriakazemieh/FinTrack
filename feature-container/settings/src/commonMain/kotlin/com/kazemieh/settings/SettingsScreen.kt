@@ -134,6 +134,7 @@ import fintrack.core.designsystem.generated.resources.section_notifications
 import fintrack.core.designsystem.generated.resources.section_security
 import fintrack.core.designsystem.generated.resources.setting_fingerprint
 import fintrack.core.designsystem.generated.resources.setting_hide_balance
+import fintrack.core.designsystem.generated.resources.setting_analytics
 import fintrack.core.designsystem.generated.resources.setting_push_notifications
 import fintrack.core.designsystem.generated.resources.title_notification_settings
 import fintrack.core.designsystem.generated.resources.title_text_settings
@@ -358,6 +359,12 @@ fun SettingsScreen(
                         icon = Icons.Default.VisibilityOff,
                         on = state.isBalanceHidden,
                         onToggle = { viewModel.onIntent(SettingsIntent.ToggleHideBalance) }
+                    )
+                    SettingItem(
+                        title = stringResource(Res.string.setting_analytics),
+                        icon = Icons.Default.Public,
+                        on = state.isAnalyticsEnabled,
+                        onToggle = { viewModel.onIntent(SettingsIntent.ToggleAnalytics) }
                     )
                 }
             }

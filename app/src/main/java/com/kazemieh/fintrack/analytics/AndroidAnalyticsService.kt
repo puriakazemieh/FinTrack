@@ -27,14 +27,20 @@ class AndroidAnalyticsService(private val context: android.content.Context) : An
             }
         }
         firebaseAnalytics.logEvent(event.eventName, bundle)
-        if (event is ProductEvent.FeatureActionFailed) {
-            crashlytics.log(
+        when (event) {
+            is ProductEvent.FeatureActionFailed -> crashlytics.log(
                 "feature_action_failed:${event.params["feature_key"]}:${event.params["safe_error_code"]}"
             )
+            is ProductEvent.AssetLinkedTransactionFailed -> crashlytics.log(
+                "asset_linked_transaction_failed:${event.params["operation"]}"
+            )
+            else -> Unit
         }
     }
 
     override fun setConsent(consent: AnalyticsConsent) {
+        val isGranted = consent == AnalyticsConsent.GRANTED
+        firebaseAnalytics.setAnalyticsCollectionEnabled(isGranted)
         val consentMap = mapOf(
             FirebaseAnalytics.ConsentType.ANALYTICS_STORAGE to when (consent) {
                 AnalyticsConsent.GRANTED -> FirebaseAnalytics.ConsentStatus.GRANTED

@@ -52,7 +52,10 @@ fun AssetWidget(
 
     WidgetCard(
         title = stringResource(Res.string.title_assets_management),
-        onMore = onMore,
+        onMore = {
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetDashboardMoreClicked)
+            onMore()
+        },
         modifier = modifier
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {

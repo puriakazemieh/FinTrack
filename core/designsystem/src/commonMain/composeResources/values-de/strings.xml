@@ -1192,6 +1192,7 @@
     <string name="label_rate_app">Zeigt auf die App</string>
     <string name="label_terms">Nutzungsbedingungen</string>
     <string name="label_privacy">Datenschutz</string>
+    <string name="setting_analytics">Anonyme Nutzungsanalysen teilen</string>
     <string name="label_version_history">Versionen und Geschichte</string>
     <string name="footer_made_with_love">FinTrack * hergestellt mit ❤ im Iran</string>
 

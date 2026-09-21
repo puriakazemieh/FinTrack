@@ -44,6 +44,8 @@ class FinTrackPreferences(private val settings: Settings) {
         const val PREF_SECURITY_QUESTION = "pref_security_question"
         const val PREF_SECURITY_ANSWER = "pref_security_answer"
         const val PREF_HIDE_BALANCE = "pref_hide_balance"
+        /** Stored separately from financial privacy preferences; defaults to denied until opted in. */
+        const val PREF_ANALYTICS_CONSENT = "pref_analytics_consent"
         const val PREF_DASHBOARD_WIDGETS = "pref_dashboard_widgets"
         const val PREF_BOTTOM_BAR_TABS = "pref_bottom_bar_tabs"
         const val PREF_DISABLED_TOOLS = "pref_disabled_tools"

@@ -20,6 +20,7 @@ import com.kazemieh.category.di.transactionDeleteCategoryModule
 import com.kazemieh.check.di.checkModule
 import com.kazemieh.common.di.commonModule
 import com.kazemieh.common.MoneyPrivacy
+import com.kazemieh.common.analytics.AnalyticsConsent
 import com.kazemieh.dashboard.di.dashboardModule
 import com.kazemieh.onboarding.di.onboardingModule
 import com.kazemieh.notifications.di.notificationModule
@@ -133,9 +134,18 @@ fun App() {
         "false"
     ).collectAsState("false")
 
+    val analyticsConsentName by preferenceUseCases.getStringFlow(
+        FinTrackPreferences.PREF_ANALYTICS_CONSENT,
+        AnalyticsConsent.DENIED.name
+    ).collectAsState(AnalyticsConsent.DENIED.name)
+
     // Older UI elements format amounts outside the shared MoneyText component.
     // Keep those paths subject to the same persisted privacy preference.
     SideEffect { MoneyPrivacy.maskAmounts = hideBalance.toBoolean() }
+
+    LaunchedEffect(analyticsConsentName) {
+        analytics.setConsent(analyticsConsentName.toAnalyticsConsent())
+    }
 
     val textScaleName by preferenceUseCases.getStringFlow(
         FinTrackPreferences.PREF_TEXT_SCALE,
@@ -186,6 +196,14 @@ fun App() {
 
     LaunchedEffect(Unit) {
         initializer.initialize()
+        // Set the persisted choice before any lifecycle event is logged. Older installs without
+        // a choice are denied by default and can opt in from Settings.
+        analytics.setConsent(
+            preferenceUseCases.getStringPreference(
+                FinTrackPreferences.PREF_ANALYTICS_CONSENT,
+                AnalyticsConsent.DENIED.name
+            ).toAnalyticsConsent()
+        )
         notificationManager.createChannels()
         val quickAddEnabled = preferenceUseCases.getBooleanPreference(
             FinTrackPreferences.PREF_QUICK_ADD_NOTIF_ENABLED,
@@ -256,6 +274,9 @@ fun App() {
         }
     }
 }
+
+private fun String.toAnalyticsConsent(): AnalyticsConsent =
+    runCatching { AnalyticsConsent.valueOf(this) }.getOrDefault(AnalyticsConsent.DENIED)
 
 private fun isTimeInRange(start: String, end: String): Boolean {
     return try {

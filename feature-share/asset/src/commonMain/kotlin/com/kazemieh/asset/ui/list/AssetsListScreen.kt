@@ -19,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.kazemieh.asset.ui.AssetFilter
 import com.kazemieh.asset.ui.AssetIntent
 import com.kazemieh.asset.ui.AssetViewModel
+import com.kazemieh.common.analytics.RefreshTrigger
 import com.kazemieh.asset.ui.component.AssetActionsSheet
 import com.kazemieh.asset.ui.component.AssetHistorySheet
 import com.kazemieh.asset.ui.component.StocksPortfolio
@@ -101,10 +103,14 @@ fun AssetsListScreen(
     var transactionToDelete by remember { mutableStateOf<Asset?>(null) }
     var showAssetFilter by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(AssetIntent.AssetListOpened)
+    }
+
     FintrackScreen(
         title = stringResource(Res.string.title_assets_management),
         trailingContent = {
-            IconButton(onClick = { viewModel.onIntent(AssetIntent.SyncRates) }) {
+            IconButton(onClick = { viewModel.onIntent(AssetIntent.SyncRates(RefreshTrigger.MANUAL)) }) {
                 Icon(
                     Icons.Default.Refresh,
                     contentDescription = stringResource(Res.string.label_retry)
@@ -167,7 +173,10 @@ fun AssetsListScreen(
                     )
                 },
                 onItemClick = { item ->
-                    selectedAssetForActions = state.assets.find { it.id == item.id }
+                    state.assets.find { it.id == item.id }?.let { asset ->
+                        viewModel.onIntent(AssetIntent.ActionsOpened(asset.type))
+                        selectedAssetForActions = asset
+                    }
                 },
                 onFilterClick = null,
                 onEditClick = { item ->
@@ -177,7 +186,10 @@ fun AssetsListScreen(
                     assetPendingDeletion = state.assets.find { it.id == item.id }
                 },
                 searchTrailing = {
-                    IconButton(onClick = { showAssetFilter = true }) {
+                    IconButton(onClick = {
+                        viewModel.onIntent(AssetIntent.FilterOpened)
+                        showAssetFilter = true
+                    }) {
                         Icon(
                             imageVector = Icons.Default.FilterList,
                             contentDescription = stringResource(Res.string.title_quick_filters),
@@ -196,12 +208,19 @@ fun AssetsListScreen(
         AssetActionsSheet(
             asset = asset,
             onDismiss = { selectedAssetForActions = null },
-            onEdit = { onAddAsset(it.id) },
+            onEdit = {
+                viewModel.onIntent(AssetIntent.ActionSelected("edit"))
+                onAddAsset(it.id)
+            },
             onViewHistory = {
+                viewModel.onIntent(AssetIntent.ActionSelected("view_history"))
                 selectedAssetForHistory = it
                 selectedAssetForActions = null
             },
-            onDelete = { assetPendingDeletion = it }
+            onDelete = {
+                viewModel.onIntent(AssetIntent.ActionSelected("delete"))
+                assetPendingDeletion = it
+            }
         )
     }
 

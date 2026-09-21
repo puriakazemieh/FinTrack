@@ -23,6 +23,7 @@ data class FavoritePair(
 
 sealed interface CurrencyConverterIntent {
     data class InputAmount(val amount: String) : CurrencyConverterIntent
+    data class OpenPicker(val side: String) : CurrencyConverterIntent
     data class SelectFavoritePair(val pair: FavoritePair) : CurrencyConverterIntent
     data class SelectFromRate(val rate: AssetRate) : CurrencyConverterIntent
     data class SelectToRate(val rate: AssetRate) : CurrencyConverterIntent

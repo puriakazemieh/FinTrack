@@ -139,7 +139,10 @@ fun CurrencyConverterScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { showFromPicker = true }
+                            .clickable {
+                                viewModel.onIntent(CurrencyConverterIntent.OpenPicker("from"))
+                                showFromPicker = true
+                            }
                             .padding(bottom = space.small),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
@@ -189,7 +192,10 @@ fun CurrencyConverterScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { showToPicker = true },
+                            .clickable {
+                                viewModel.onIntent(CurrencyConverterIntent.OpenPicker("to"))
+                                showToPicker = true
+                            },
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {

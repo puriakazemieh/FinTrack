@@ -18,6 +18,7 @@ import com.kazemieh.common.model.TransactionFilterParams
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.AssetUseCases
 import com.kazemieh.domain.usecase.AddTransactionUseCase
+import com.kazemieh.common.analytics.RefreshTrigger
 import com.kazemieh.domain.repository.TransactionRepository
 import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.channels.Channel
@@ -82,9 +83,16 @@ data class AssetFilter(
 }
 
 sealed interface AssetIntent {
+    /** Sent only by the full asset-list screen, not dashboard widgets or forms sharing this VM. */
+    data object AssetListOpened : AssetIntent
     data object LoadAssets : AssetIntent
     data class LoadAsset(val id: Long) : AssetIntent
+    data class AssetFormOpened(val isEdit: Boolean) : AssetIntent
+    data class AssetFormDismissed(val isEdit: Boolean) : AssetIntent
+    data class AssetTypeSelected(val type: AssetType) : AssetIntent
+    data class MarketPickerOpened(val type: AssetType) : AssetIntent
     data class UpdateSearchQuery(val query: String) : AssetIntent
+    data object FilterOpened : AssetIntent
     data class UpdateFilter(val filter: AssetFilter) : AssetIntent
     data class AddAsset(
         val asset: Asset,
@@ -97,10 +105,12 @@ sealed interface AssetIntent {
     ) : AssetIntent
     data class DeleteAsset(val id: Long, val deleteTransaction: Boolean = false) : AssetIntent
     data class UpdateAsset(val asset: Asset) : AssetIntent
-    data class LoadHistory(val id: Long) : AssetIntent
+    data class LoadHistory(val id: Long, val type: AssetType) : AssetIntent
+    data class ActionsOpened(val type: AssetType) : AssetIntent
+    data class ActionSelected(val action: String) : AssetIntent
     data class MarketRateSelected(val rate: AssetRate) : AssetIntent
     data class AssetTransactionPromptAnswered(val accepted: Boolean) : AssetIntent
-    data object SyncRates : AssetIntent
+    data class SyncRates(val trigger: RefreshTrigger) : AssetIntent
 }
 
 sealed interface AssetEffect {
@@ -125,7 +135,6 @@ class AssetViewModel(
     private val _filter = MutableStateFlow(AssetFilter())
 
     init {
-        analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetListViewed)
         onIntent(AssetIntent.LoadAssets)
         observeMarketRates()
         loadTransactionDefaults()
@@ -133,18 +142,61 @@ class AssetViewModel(
 
     fun onIntent(intent: AssetIntent) {
         when (intent) {
+            AssetIntent.AssetListOpened -> analytics.track(
+                com.kazemieh.common.analytics.ProductEvent.AssetListViewed
+            )
             AssetIntent.LoadAssets -> observeAssets()
             is AssetIntent.LoadAsset -> loadAsset(intent.id)
-            is AssetIntent.UpdateSearchQuery -> _searchQuery.value = intent.query
+            is AssetIntent.AssetFormOpened -> analytics.track(
+                com.kazemieh.common.analytics.ProductEvent.AssetFormOpened(intent.isEdit)
+            )
+            is AssetIntent.AssetFormDismissed -> analytics.track(
+                com.kazemieh.common.analytics.ProductEvent.AssetFormDismissed(intent.isEdit)
+            )
+            is AssetIntent.AssetTypeSelected -> analytics.track(
+                com.kazemieh.common.analytics.ProductEvent.AssetTypeSelected(intent.type.name)
+            )
+            is AssetIntent.MarketPickerOpened -> analytics.track(
+                com.kazemieh.common.analytics.ProductEvent.AssetMarketPickerOpened(intent.type.name)
+            )
+            is AssetIntent.UpdateSearchQuery -> {
+                if (_searchQuery.value.isBlank() && intent.query.isNotBlank()) {
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetSearchStarted)
+                }
+                _searchQuery.value = intent.query
+            }
+            AssetIntent.FilterOpened -> analytics.track(
+                com.kazemieh.common.analytics.ProductEvent.AssetFilterOpened
+            )
             is AssetIntent.UpdateFilter -> {
+                val previous = _filter.value
                 _filter.value = intent.filter
                 _state.update { it.copy(filter = intent.filter) }
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.FilterApplied("asset"))
+                if (intent.filter == AssetFilter() && previous != AssetFilter()) {
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetFilterCleared)
+                } else if (intent.filter != AssetFilter()) {
+                    analytics.track(
+                        com.kazemieh.common.analytics.ProductEvent.AssetFilterApplied(
+                            typeCount = intent.filter.types.size,
+                            categoryCount = intent.filter.categories.size,
+                            sourceCount = intent.filter.sources.size,
+                            tagCount = intent.filter.tags.size,
+                            personCount = intent.filter.persons.size
+                        )
+                    )
+                }
             }
             is AssetIntent.AddAsset -> addAsset(intent.asset, intent.registerTransaction, intent.category, intent.source, intent.persons, intent.tags, intent.isBuy)
             is AssetIntent.DeleteAsset -> deleteAsset(intent.id, intent.deleteTransaction)
             is AssetIntent.UpdateAsset -> updateAsset(intent.asset)
-            is AssetIntent.LoadHistory -> loadHistory(intent.id)
+            is AssetIntent.LoadHistory -> loadHistory(intent.id, intent.type)
+            is AssetIntent.ActionsOpened -> analytics.track(
+                com.kazemieh.common.analytics.ProductEvent.AssetActionsOpened(intent.type.name)
+            )
+            is AssetIntent.ActionSelected -> analytics.track(
+                com.kazemieh.common.analytics.ProductEvent.AssetActionSelected(intent.action)
+            )
             is AssetIntent.MarketRateSelected -> analytics.track(
                 com.kazemieh.common.analytics.ProductEvent.AssetMarketSelected(
                     intent.rate.type.name,
@@ -154,7 +206,7 @@ class AssetViewModel(
             is AssetIntent.AssetTransactionPromptAnswered -> analytics.track(
                 com.kazemieh.common.analytics.ProductEvent.AssetTransactionPromptAnswered(intent.accepted)
             )
-            AssetIntent.SyncRates -> syncRates()
+            is AssetIntent.SyncRates -> syncRates(intent.trigger)
         }
     }
 
@@ -196,9 +248,9 @@ class AssetViewModel(
         }
     }
 
-    private fun loadHistory(id: Long) {
+    private fun loadHistory(id: Long, type: AssetType) {
         viewModelScope.launch {
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetHistoryViewed)
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetHistoryViewed(type.name))
             assetUseCases.observeAssetHistory(id).collect { history ->
                 _state.update { it.copy(history = history) }
             }
@@ -275,13 +327,30 @@ class AssetViewModel(
 
     private fun addAsset(asset: Asset, registerTransaction: Boolean, category: Category?, source: Source?, persons: Set<Person>?, tags: Set<Tag>?, isBuy: Boolean) {
         viewModelScope.launch {
-            val id = assetUseCases.addAsset(asset)
+            val existingAssetId = asset.id
+            val isUpdate = existingAssetId != null && existingAssetId != 0L
+            val id = if (isUpdate) {
+                assetUseCases.updateAsset(asset)
+                existingAssetId ?: return@launch
+            } else {
+                assetUseCases.addAsset(asset)
+            }
             // A newly tracked market asset should receive a quote immediately when possible,
             // without holding the post-save confirmation hostage to an external request.
             viewModelScope.launch { assetUseCases.syncAssetRates() }
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetCreated(asset.type.name))
+            if (isUpdate) {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetUpdated(asset.type.name))
+            } else {
+                analytics.track(
+                    com.kazemieh.common.analytics.ProductEvent.AssetCreated(
+                        type = asset.type.name,
+                        operation = if (isBuy) "buy" else "sell",
+                        linkedTransaction = registerTransaction
+                    )
+                )
+            }
             
-            if (registerTransaction && category != null && source != null) {
+            if (!isUpdate && registerTransaction && category != null && source != null) {
                 try {
                     val tx = Transaction(
                         id = 0L,
@@ -293,12 +362,27 @@ class AssetViewModel(
                     )
                     addTransactionUseCase(tx, persons?.mapNotNull { it.id } ?: emptyList(), tags?.mapNotNull { it.id } ?: emptyList())
                     analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionCreated("Asset Registration"))
+                    analytics.track(
+                        com.kazemieh.common.analytics.ProductEvent.AssetLinkedTransactionCreated(
+                            if (isBuy) "buy" else "sell"
+                        )
+                    )
                 } catch (e: Exception) {
-                    // Ignore errors for transaction saving in this context
+                    analytics.track(
+                        com.kazemieh.common.analytics.ProductEvent.AssetLinkedTransactionFailed(
+                            if (isBuy) "buy" else "sell"
+                        )
+                    )
                 }
             }
             
-            _effect.send(AssetEffect.ShowMessage(UiText.StringResourceText(Res.string.msg_asset_added)))
+            _effect.send(
+                AssetEffect.ShowMessage(
+                    UiText.StringResourceText(
+                        if (isUpdate) Res.string.msg_asset_updated else Res.string.msg_asset_added
+                    )
+                )
+            )
             _effect.send(AssetEffect.AssetAdded(asset.copy(id = id)))
         }
     }
@@ -322,7 +406,7 @@ class AssetViewModel(
                     // Ignore errors
                 }
             }
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetDeleted)
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetDeleted(deleteTransaction))
             _effect.send(AssetEffect.ShowMessage(UiText.StringResourceText(Res.string.msg_asset_deleted)))
         }
     }
@@ -330,24 +414,24 @@ class AssetViewModel(
     private fun updateAsset(asset: Asset) {
         viewModelScope.launch {
             assetUseCases.updateAsset(asset)
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetUpdated)
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetUpdated(asset.type.name))
             _effect.send(AssetEffect.ShowMessage(UiText.StringResourceText(Res.string.msg_asset_updated)))
         }
     }
 
-    private fun syncRates() {
+    private fun syncRates(trigger: RefreshTrigger) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetRateRefreshRequested)
+            analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetRateRefreshRequested(trigger))
             try {
                 val rates = assetUseCases.syncAssetRates()
                 if (rates.isEmpty()) {
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetRateRefreshFailed)
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetRateRefreshFailed(trigger))
                 } else {
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetRateRefreshCompleted(rates.size))
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetRateRefreshCompleted(rates.size, trigger))
                 }
             } catch (_: Exception) {
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetRateRefreshFailed)
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetRateRefreshFailed(trigger))
             } finally {
                 _state.update { it.copy(isLoading = false) }
             }

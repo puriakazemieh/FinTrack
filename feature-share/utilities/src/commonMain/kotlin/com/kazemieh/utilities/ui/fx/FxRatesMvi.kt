@@ -1,7 +1,9 @@
 package com.kazemieh.utilities.ui.fx
 
 import com.kazemieh.common.model.AssetRate
+import com.kazemieh.common.model.AssetType
 import com.kazemieh.common.model.MarketRateHistory
+import com.kazemieh.common.analytics.RefreshTrigger
 import kotlin.time.Instant
 
 data class FxRatesState(
@@ -15,8 +17,10 @@ data class FxRatesState(
 )
 
 sealed interface FxRatesIntent {
-    data object RefreshRates : FxRatesIntent
+    data class RefreshRates(val trigger: RefreshTrigger) : FxRatesIntent
+    data class SelectTab(val type: AssetType) : FxRatesIntent
     data class SelectRate(val rate: AssetRate) : FxRatesIntent
+    data class AddRateAsAsset(val rate: AssetRate) : FxRatesIntent
     data object DismissRateDetails : FxRatesIntent
 }
 
