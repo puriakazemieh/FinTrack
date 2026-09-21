@@ -136,8 +136,8 @@ fun App() {
 
     val analyticsConsentName by preferenceUseCases.getStringFlow(
         FinTrackPreferences.PREF_ANALYTICS_CONSENT,
-        AnalyticsConsent.DENIED.name
-    ).collectAsState(AnalyticsConsent.DENIED.name)
+        AnalyticsConsent.GRANTED.name
+    ).collectAsState(AnalyticsConsent.GRANTED.name)
 
     // Older UI elements format amounts outside the shared MoneyText component.
     // Keep those paths subject to the same persisted privacy preference.
@@ -196,12 +196,12 @@ fun App() {
 
     LaunchedEffect(Unit) {
         initializer.initialize()
-        // Set the persisted choice before any lifecycle event is logged. Older installs without
-        // a choice are denied by default and can opt in from Settings.
+        // Set the persisted choice before any lifecycle event is logged. Analytics is enabled by
+        // default, while the Settings toggle can disable it at any time.
         analytics.setConsent(
             preferenceUseCases.getStringPreference(
                 FinTrackPreferences.PREF_ANALYTICS_CONSENT,
-                AnalyticsConsent.DENIED.name
+                AnalyticsConsent.GRANTED.name
             ).toAnalyticsConsent()
         )
         notificationManager.createChannels()
@@ -276,7 +276,7 @@ fun App() {
 }
 
 private fun String.toAnalyticsConsent(): AnalyticsConsent =
-    runCatching { AnalyticsConsent.valueOf(this) }.getOrDefault(AnalyticsConsent.DENIED)
+    runCatching { AnalyticsConsent.valueOf(this) }.getOrDefault(AnalyticsConsent.GRANTED)
 
 private fun isTimeInRange(start: String, end: String): Boolean {
     return try {

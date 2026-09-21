@@ -141,7 +141,7 @@ class SettingsViewModel(
                 ).toBoolean(),
                 isAnalyticsEnabled = preferenceUseCases.getStringPreference(
                     FinTrackPreferences.PREF_ANALYTICS_CONSENT,
-                    com.kazemieh.common.analytics.AnalyticsConsent.DENIED.name
+                    com.kazemieh.common.analytics.AnalyticsConsent.GRANTED.name
                 ) == com.kazemieh.common.analytics.AnalyticsConsent.GRANTED.name,
                 lastSyncTime = preferenceUseCases.getStringPreference(
                     FinTrackPreferences.PREF_LAST_SYNC_TIME,
