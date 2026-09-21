@@ -360,12 +360,13 @@ fun SettingsScreen(
                         on = state.isBalanceHidden,
                         onToggle = { viewModel.onIntent(SettingsIntent.ToggleHideBalance) }
                     )
-                    SettingItem(
+                    // todo disable
+                   /* SettingItem(
                         title = stringResource(Res.string.setting_analytics),
                         icon = Icons.Default.Public,
                         on = state.isAnalyticsEnabled,
                         onToggle = { viewModel.onIntent(SettingsIntent.ToggleAnalytics) }
-                    )
+                    )*/
                 }
             }
 
