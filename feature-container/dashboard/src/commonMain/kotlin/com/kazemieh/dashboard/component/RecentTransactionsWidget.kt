@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 fun RecentTransactionsWidget(
     viewModel: TransactionViewModel = koinViewModel(),
     onMore: () -> Unit,
+    onMenu: () -> Unit = {},
     onAdd: () -> Unit = {},
     onEdit: (TransactionWithRelations) -> Unit = {},
     onDelete: (TransactionWithRelations) -> Unit = {},
@@ -41,6 +42,7 @@ fun RecentTransactionsWidget(
     WidgetCard(
         title = stringResource(Res.string.recent_transactions),
         onMore = onMore,
+        onMenu = onMenu,
         onAdd = onAdd,
         modifier = modifier
     ) {

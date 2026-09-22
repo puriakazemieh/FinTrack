@@ -54,6 +54,9 @@ class ManageToolsViewModel(
                     FinTrackPreferences.PREF_SMS_READING_ENABLED,
                     intent.enabled
                 )
+                analytics.track(
+                    com.kazemieh.common.analytics.ProductEvent.SmsPermissionResult(intent.enabled)
+                )
                 _state.update { it.copy(smsReadingEnabled = intent.enabled) }
             }
         }

@@ -252,17 +252,21 @@ class DashboardViewModel(
             }
 
             DashboardIntent.ToggleBalanceVisibility -> {
-                // Only toggle the LOCAL reveal state — do NOT change the global preference.
-                // This way, navigating away from the dashboard resets the reveal.
-                val currentlyRevealed = _state.value.isBalanceLocallyRevealed
-                val newRevealed = !currentlyRevealed
+                // The dashboard eye is temporary: it never modifies the privacy preference.
+                // When privacy is enabled it reveals the value locally; otherwise it simply
+                // toggles the currently visible value, as users expect from the eye button.
+                val nextVisible = if (_state.value.isGlobalBalanceHidden) {
+                    !_state.value.isBalanceLocallyRevealed
+                } else {
+                    !_state.value.isBalanceVisible
+                }
                 _state.update {
                     it.copy(
-                        isBalanceLocallyRevealed = newRevealed,
-                        isBalanceVisible = if (_state.value.isGlobalBalanceHidden) newRevealed else true
+                        isBalanceLocallyRevealed = if (it.isGlobalBalanceHidden) nextVisible else false,
+                        isBalanceVisible = nextVisible
                     )
                 }
-                if (newRevealed) {
+                if (nextVisible) {
                     analytics.track(com.kazemieh.common.analytics.ProductEvent.DashboardWalletSummaryViewed)
                 }
             }
@@ -368,6 +372,17 @@ class DashboardViewModel(
                 it.copy(showCustomizeSheet = !it.showCustomizeSheet)
             }
 
+            is DashboardIntent.ShowWidgetMenu -> {
+                if (intent.widget != null) {
+                    analytics.track(
+                        com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted(
+                            "dashboard_widget_menu_opened"
+                        )
+                    )
+                }
+                _state.update { it.copy(widgetMenu = intent.widget) }
+            }
+
             is DashboardIntent.SetWidgetLayout -> {
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.DashboardWidgetReordered)
                 val oldItems = _state.value.dashboardWidgets.associateBy { it.widget }
@@ -468,6 +483,7 @@ data class DashboardState(
     val mostUsedSources: List<Source> = emptyList(),
     val dashboardWidgets: List<DashboardWidgetItem> = DashboardWidget.defaultConfig(),
     val showCustomizeSheet: Boolean = false,
+    val widgetMenu: DashboardWidget? = null,
     val isLoading: Boolean = false,
     val disabledTools: Set<ToolFeature> = emptySet(),
 
@@ -518,6 +534,7 @@ sealed interface DashboardIntent {
     data class QuickRegisterSms(val draft: SmsDraft) : DashboardIntent
     data class UpdateSmsDraft(val draft: SmsDraft) : DashboardIntent
     data object ToggleCustomizeSheet : DashboardIntent
+    data class ShowWidgetMenu(val widget: DashboardWidget? = null) : DashboardIntent
     data class SetWidgetLayout(val items: List<DashboardWidgetItem>) : DashboardIntent
 
     data class ToggleBudgetSheet(val budget: com.kazemieh.common.model.BudgetWithProgress? = null) :

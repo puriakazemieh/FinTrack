@@ -38,6 +38,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun NotesWidget(
     modifier: Modifier = Modifier,
     onMore: () -> Unit,
+    onMenu: () -> Unit = {},
     onAdd: () -> Unit = {},
     onEditNote: (Note) -> Unit = {},
     viewModel: NotesViewModel = koinViewModel()
@@ -51,6 +52,7 @@ fun NotesWidget(
         title = stringResource(Res.string.notes),
         count = state.notes.size.takeIf { it > 0 },
         onMore = onMore,
+        onMenu = onMenu,
         onAdd = onAdd,
         modifier = modifier
     ) {

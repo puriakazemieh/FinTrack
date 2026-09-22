@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,12 +65,14 @@ fun DashboardCustomizeSheet(
         title = stringResource(Res.string.dashboard_customize_title),
         sub = stringResource(Res.string.dashboard_customize_hint),
         onDismiss = onDismiss,
-        isFullScreen = false
+        isFullScreen = false,
+        // Keep this as a compact, draggable sheet instead of expanding it to the full screen.
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(max = 460.dp)
+                .heightIn(max = 360.dp)
                 .verticalScroll(rememberScrollState())
                 .padding(bottom = 24.dp)
         ) {

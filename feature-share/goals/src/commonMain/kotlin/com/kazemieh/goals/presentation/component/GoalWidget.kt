@@ -21,6 +21,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun GoalWidget(
     viewModel: GoalViewModel = koinViewModel(),
     onMore: () -> Unit,
+    onMenu: () -> Unit = {},
     onAdd: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -29,6 +30,7 @@ fun GoalWidget(
     WidgetCard(
         title = stringResource(Res.string.title_savings_goals),
         onMore = onMore,
+        onMenu = onMenu,
         onAdd = onAdd,
         modifier = modifier
     ) {

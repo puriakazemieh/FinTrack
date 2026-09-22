@@ -239,6 +239,9 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
                 onBack = { navController.popBackStack() },
                 onNavigateToTransactions = { tag ->
                     navigateToTransactions(tag)
+                },
+                onNavigateToDetail = { tag ->
+                    tag.id?.let { navController.navigate(Screen.TagDetail(it)) }
                 }
             )
         }

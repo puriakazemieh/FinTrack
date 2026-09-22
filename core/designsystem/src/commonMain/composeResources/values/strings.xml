@@ -580,6 +580,7 @@
     <!-- Dashboard customization -->
     <string name="dashboard_customize_title">چیدمان داشبورد</string>
     <string name="dashboard_customize_hint">ویجت‌ها را جابه‌جا یا پنهان کنید</string>
+    <string name="dashboard_widget_hide">پنهان کردن از داشبورد</string>
 
     <!-- Bottom bar customization -->
     <string name="bottombar_customize_title">نوار پایین</string>

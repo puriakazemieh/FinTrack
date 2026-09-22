@@ -35,6 +35,7 @@ import org.koin.compose.koinInject
 fun AssetWidget(
     viewModel: AssetViewModel = koinViewModel(),
     onMore: () -> Unit,
+    onMenu: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -56,6 +57,7 @@ fun AssetWidget(
             analytics.track(com.kazemieh.common.analytics.ProductEvent.AssetDashboardMoreClicked)
             onMore()
         },
+        onMenu = onMenu,
         modifier = modifier
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {

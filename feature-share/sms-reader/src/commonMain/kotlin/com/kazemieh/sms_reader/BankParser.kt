@@ -10,7 +10,10 @@ interface BankParser {
 
 object BankParserRegistry {
     private val parsers = mutableListOf<BankParser>()
-    private var fallbackParser: BankParser? = null
+    // A broadcast can start the app process before Koin has eagerly created the parser
+    // initializer. Keep a safe generic parser from process start so a valid bank SMS is
+    // never discarded solely because dependency initialization was late.
+    private var fallbackParser: BankParser? = GenericBankParser()
 
     fun register(parser: BankParser) {
         parsers.add(parser)

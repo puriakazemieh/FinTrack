@@ -22,6 +22,7 @@ import com.kazemieh.common.toPersianDigits
 fun AIAdvisorWidget(
     viewModel: AIAdvisorViewModel = koinViewModel(),
     onMore: () -> Unit,
+    onMenu: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -30,6 +31,7 @@ fun AIAdvisorWidget(
     WidgetCard(
         title = stringResource(Res.string.ai_advisor_title),
         onMore = onMore,
+        onMenu = onMenu,
         modifier = modifier
     ) {
         if (state.isEmpty) {

@@ -22,10 +22,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -43,13 +45,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.ai_insights.ui.AIAdvisorWidget
 import com.kazemieh.asset.ui.component.AssetWidget
+import com.kazemieh.budget.ui.add.AddBudgetBottomSheet
 import com.kazemieh.budget.ui.component.BudgetWidget
 import com.kazemieh.check.ui.add.AddCheckBottomSheet
 import com.kazemieh.check.ui.widget.CheckWidget
-import com.kazemieh.common.toPersianDigits
-import com.kazemieh.dashboard.component.QuickActions
-import com.kazemieh.dashboard.component.RecentTransactionsWidget
 import com.kazemieh.common.MoneyPrivacy
+import com.kazemieh.common.toPersianDigits
+import com.kazemieh.dashboard.component.RecentTransactionsWidget
 import com.kazemieh.designsystem.GlassGreenDark
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.LocalHideBalance
@@ -58,6 +60,7 @@ import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.FintrackScreen
+import com.kazemieh.designsystem.component.glass.SheetFrame
 import com.kazemieh.financialsource.ui.add.AddSourceBottomSheet
 import com.kazemieh.fixed_expense.ui.detail.AddFixedExpenseBottomSheet
 import com.kazemieh.fixed_expense.ui.widget.FixedExpenseWidget
@@ -75,10 +78,13 @@ import com.kazemieh.sms_reader.ui.SmsDetectionSheet
 import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.BalanceHero
-import com.kazemieh.budget.ui.add.AddBudgetBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.msg_hello
 import fintrack.core.designsystem.generated.resources.action_delete_all
+import fintrack.core.designsystem.generated.resources.dashboard_customize_hint
+import fintrack.core.designsystem.generated.resources.dashboard_customize_title
+import fintrack.core.designsystem.generated.resources.dashboard_widget_hide
+import fintrack.core.designsystem.generated.resources.more_details
+import fintrack.core.designsystem.generated.resources.msg_hello
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -109,8 +115,10 @@ fun DashboardScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
     val globallyHidden = LocalHideBalance.current
-    DisposableEffect(globallyHidden, state.isBalanceVisible) {
-        MoneyPrivacy.maskAmounts = globallyHidden && !state.isBalanceVisible
+    // The dashboard eye is a page-level privacy control: hiding it must mask every
+    // financial amount rendered by dashboard widgets, not only the balance hero.
+    DisposableEffect(state.isBalanceVisible) {
+        MoneyPrivacy.maskAmounts = !state.isBalanceVisible
         onDispose { MoneyPrivacy.maskAmounts = globallyHidden }
     }
     val listState = rememberLazyListState()
@@ -136,57 +144,57 @@ fun DashboardScreen(
     // Revealing the balance from the dashboard is deliberately scoped to this
     // composition. Leaving the screen restores the persisted privacy choice.
     CompositionLocalProvider(
-        LocalHideBalance provides (globallyHidden && !state.isBalanceVisible)
+        LocalHideBalance provides (!state.isBalanceVisible)
     ) {
         FintrackScreen {
             LazyColumn(
-            state = listState,
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 100.dp) // Space for NavigationBar
-        ) {
-            // todo disable
-            /*item {
-                DashboardHeader(
-                    userName = state.userName,
-                    userInitial = state.userInitial,
-                    level = state.streak.level,
-                    onNavigateToSearch = onNavigateToSearch,
-                    onNotificationsClick = onNavigateToNotifications,
-                    onProfileClick = onNavigateToProfileEdit,
-                    onCustomizeClick = { viewModel.onIntent(DashboardIntent.ToggleCustomizeSheet) },
-                    modifier = Modifier.padding(
-                        horizontal = space.large,
-                        vertical = space.mediumSmall
-                    )
-                )
-            }*/
-
-            item {
-                BalanceHero(
-                    isBalanceVisible = state.isBalanceVisible,
-                    onToggleVisibility = { viewModel.onIntent(DashboardIntent.ToggleBalanceVisibility) },
-                    onAddSourceClick = { viewModel.onIntent(DashboardIntent.ShowAddSource()) },
-                    onSourceClick = { source ->
-                        viewModel.onIntent(DashboardIntent.ShowAddSource(source))
-                    },
-                    modifier = Modifier.padding(horizontal = space.large)
-                )
-            }
-
-            if (state.smsDrafts.isNotEmpty()) {
-
-                item { Spacer(Modifier.height(space.mediumSmall)) }
-                item {
-                    SmsBanner(
-                        count = state.smsDrafts.size,
-                        onClick = { viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet) },
+                state = listState,
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 100.dp) // Space for NavigationBar
+            ) {
+                // todo disable
+                /*item {
+                    DashboardHeader(
+                        userName = state.userName,
+                        userInitial = state.userInitial,
+                        level = state.streak.level,
+                        onNavigateToSearch = onNavigateToSearch,
+                        onNotificationsClick = onNavigateToNotifications,
+                        onProfileClick = onNavigateToProfileEdit,
+                        onCustomizeClick = { viewModel.onIntent(DashboardIntent.ToggleCustomizeSheet) },
                         modifier = Modifier.padding(
                             horizontal = space.large,
-                            vertical = space.small
+                            vertical = space.mediumSmall
                         )
                     )
+                }*/
+
+                item {
+                    BalanceHero(
+                        isBalanceVisible = state.isBalanceVisible,
+                        onToggleVisibility = { viewModel.onIntent(DashboardIntent.ToggleBalanceVisibility) },
+                        onAddSourceClick = { viewModel.onIntent(DashboardIntent.ShowAddSource()) },
+                        onSourceClick = { source ->
+                            viewModel.onIntent(DashboardIntent.ShowAddSource(source))
+                        },
+                        modifier = Modifier.padding(horizontal = space.large)
+                    )
                 }
-            }
+
+                if (state.smsDrafts.isNotEmpty()) {
+
+                    item { Spacer(Modifier.height(space.mediumSmall)) }
+                    item {
+                        SmsBanner(
+                            count = state.smsDrafts.size,
+                            onClick = { viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet) },
+                            modifier = Modifier.padding(
+                                horizontal = space.large,
+                                vertical = space.small
+                            )
+                        )
+                    }
+                }
 
 //            item { Spacer(Modifier.height(space.large)) }
 
@@ -202,242 +210,300 @@ fun DashboardScreen(
 //                )
 //            }
 
-            item { Spacer(Modifier.height(space.mediumSmall)) }
+                item { Spacer(Modifier.height(space.mediumSmall)) }
 
-            state.dashboardWidgets.forEach { cfg ->
-                if (!cfg.visible) return@forEach
-                if (cfg.widget.toolFeature()
-                        ?.let { it in state.disabledTools } == true
-                ) return@forEach
-                item(key = cfg.widget.name) {
-                    DashboardWidgetContent(
-                        widget = cfg.widget,
-                        state = state,
-                        onEditTransaction = { twr ->
-                            viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet(twr))
-                        },
-                        onDeleteTransaction = { twr ->
-                            viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet(twr))
-                        },
-                        onRepeatTransaction = { twr ->
-                            repeatTemplate = twr
-                            viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet())
-                        },
-                        onAdd = {
-                            when (it) {
-                                DashboardWidget.RECENT_TRANSACTIONS -> viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet())
-                                DashboardWidget.BUDGET -> viewModel.onIntent(DashboardIntent.ToggleBudgetSheet())
-                                DashboardWidget.NOTES -> viewModel.onIntent(DashboardIntent.ToggleNoteSheet())
-                                DashboardWidget.SHOPPING -> viewModel.onIntent(DashboardIntent.ToggleShoppingSheet())
-                                DashboardWidget.FIXED_EXPENSE -> viewModel.onIntent(DashboardIntent.ToggleFixedExpenseSheet())
-                                DashboardWidget.GOAL -> viewModel.onIntent(DashboardIntent.ToggleGoalSheet())
-                                DashboardWidget.INSTALLMENT -> viewModel.onIntent(DashboardIntent.ToggleInstallmentSheet())
-                                DashboardWidget.CHECK -> viewModel.onIntent(DashboardIntent.ToggleCheckSheet())
-                                else -> {}
-                            }
-                        },
-                        onEditBudget = { budget ->
-                            viewModel.onIntent(DashboardIntent.ToggleBudgetSheet(budget))
-                        },
-                        onEditNote = { note ->
-                            viewModel.onIntent(DashboardIntent.ToggleNoteSheet(note))
-                        },
-                        onEditFixedExpense = { id ->
-                            viewModel.onIntent(DashboardIntent.ToggleFixedExpenseSheet(id))
-                        },
-                        onEditShopping = { item ->
-                            viewModel.onIntent(DashboardIntent.ToggleShoppingSheet(item))
-                        },
-                        onNavigateToTransactions = onNavigateToTransactions,
-                        onNavigateToBudget = onNavigateToBudget,
-                        onNavigateToGoal = onNavigateToGoal,
-                        onNavigateToInstallment = onNavigateToInstallment,
-                        onNavigateToCheck = onNavigateToCheck,
-                        onNavigateToFixedExpense = onNavigateToFixedExpense,
-                        onNavigateToAIAdvisor = onNavigateToAIAdvisor,
-                        onNavigateToAssets = onNavigateToAssets,
-                        onNavigateToShopping = onNavigateToShopping,
-                        onNavigateToNotes = onNavigateToNotes,
-                        onNavigateToAchievements = onNavigateToAchievements
-                    )
-                    Spacer(Modifier.height(space.large))
+                state.dashboardWidgets.forEach { cfg ->
+                    if (!cfg.visible) return@forEach
+                    if (cfg.widget.toolFeature()
+                            ?.let { it in state.disabledTools } == true
+                    ) return@forEach
+                    item(key = cfg.widget.name) {
+                        DashboardWidgetContent(
+                            widget = cfg.widget,
+                            state = state,
+                            onEditTransaction = { twr ->
+                                viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet(twr))
+                            },
+                            onDeleteTransaction = { twr ->
+                                viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet(twr))
+                            },
+                            onRepeatTransaction = { twr ->
+                                repeatTemplate = twr
+                                viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet())
+                            },
+                            onAdd = {
+                                when (it) {
+                                    DashboardWidget.RECENT_TRANSACTIONS -> viewModel.onIntent(
+                                        DashboardIntent.ShowTransactionBottomSheet()
+                                    )
+
+                                    DashboardWidget.BUDGET -> viewModel.onIntent(DashboardIntent.ToggleBudgetSheet())
+                                    DashboardWidget.NOTES -> viewModel.onIntent(DashboardIntent.ToggleNoteSheet())
+                                    DashboardWidget.SHOPPING -> viewModel.onIntent(DashboardIntent.ToggleShoppingSheet())
+                                    DashboardWidget.FIXED_EXPENSE -> viewModel.onIntent(
+                                        DashboardIntent.ToggleFixedExpenseSheet()
+                                    )
+
+                                    DashboardWidget.GOAL -> viewModel.onIntent(DashboardIntent.ToggleGoalSheet())
+                                    DashboardWidget.INSTALLMENT -> viewModel.onIntent(
+                                        DashboardIntent.ToggleInstallmentSheet()
+                                    )
+
+                                    DashboardWidget.CHECK -> viewModel.onIntent(DashboardIntent.ToggleCheckSheet())
+                                    else -> {}
+                                }
+                            },
+                            onEditBudget = { budget ->
+                                viewModel.onIntent(DashboardIntent.ToggleBudgetSheet(budget))
+                            },
+                            onEditNote = { note ->
+                                viewModel.onIntent(DashboardIntent.ToggleNoteSheet(note))
+                            },
+                            onEditFixedExpense = { id ->
+                                viewModel.onIntent(DashboardIntent.ToggleFixedExpenseSheet(id))
+                            },
+                            onEditShopping = { item ->
+                                viewModel.onIntent(DashboardIntent.ToggleShoppingSheet(item))
+                            },
+                            onNavigateToTransactions = onNavigateToTransactions,
+                            onNavigateToBudget = onNavigateToBudget,
+                            onNavigateToGoal = onNavigateToGoal,
+                            onNavigateToInstallment = onNavigateToInstallment,
+                            onNavigateToCheck = onNavigateToCheck,
+                            onNavigateToFixedExpense = onNavigateToFixedExpense,
+                            onNavigateToAIAdvisor = onNavigateToAIAdvisor,
+                            onNavigateToAssets = onNavigateToAssets,
+                            onNavigateToShopping = onNavigateToShopping,
+                            onNavigateToNotes = onNavigateToNotes,
+                            onNavigateToAchievements = onNavigateToAchievements,
+                            onMenu = { viewModel.onIntent(DashboardIntent.ShowWidgetMenu(cfg.widget)) }
+                        )
+                        Spacer(Modifier.height(space.large))
+                    }
                 }
             }
-        }
 
             // The global add-transaction FAB lives in the bottom navigation bar; the dashboard
-        // no longer draws its own to avoid two overlapping add buttons.
+            // no longer draws its own to avoid two overlapping add buttons.
 
-        if (state.showSmsDetection) {
-            SmsDetectionSheet(
-                drafts = state.smsDrafts,
-                categories = state.categories,
-                sources = state.sources,
-                mostUsedCategories = state.mostUsedCategories,
-                mostUsedSources = state.mostUsedSources,
-                currency = state.currency,
-                onQuickRegister = { draft ->
-                    viewModel.onIntent(DashboardIntent.QuickRegisterSms(draft))
-                },
-                onEdit = { draft ->
-                    viewModel.onIntent(
-                        DashboardIntent.ShowTransactionBottomSheet(
-                            smsDraft = draft,
-                            type = draft.type
+            if (state.showSmsDetection) {
+                SmsDetectionSheet(
+                    drafts = state.smsDrafts,
+                    categories = state.categories,
+                    sources = state.sources,
+                    mostUsedCategories = state.mostUsedCategories,
+                    mostUsedSources = state.mostUsedSources,
+                    currency = state.currency,
+                    onQuickRegister = { draft ->
+                        viewModel.onIntent(DashboardIntent.QuickRegisterSms(draft))
+                    },
+                    onEdit = { draft ->
+                        viewModel.onIntent(
+                            DashboardIntent.ShowTransactionBottomSheet(
+                                smsDraft = draft,
+                                type = draft.type
+                            )
                         )
-                    )
-                },
-                onDelete = { draft ->
-                    viewModel.onIntent(DashboardIntent.ShowDeleteSmsConfirmation(true, draft))
-                },
-                onDeleteAll = {
-                    viewModel.onIntent(DashboardIntent.ShowDeleteAllSmsConfirmation(true))
-                },
-                onUpdateDraft = { viewModel.onIntent(DashboardIntent.UpdateSmsDraft(it)) },
-                onDismiss = { viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet) }
-            )
-        }
+                    },
+                    onDelete = { draft ->
+                        viewModel.onIntent(DashboardIntent.ShowDeleteSmsConfirmation(true, draft))
+                    },
+                    onDeleteAll = {
+                        viewModel.onIntent(DashboardIntent.ShowDeleteAllSmsConfirmation(true))
+                    },
+                    onUpdateDraft = { viewModel.onIntent(DashboardIntent.UpdateSmsDraft(it)) },
+                    onDismiss = { viewModel.onIntent(DashboardIntent.ToggleSmsDetectionSheet) }
+                )
+            }
 
-        if (state.showDeleteSmsConfirmation && state.smsDraftToDelete != null) {
-            com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet(
-                itemName = state.smsDraftToDelete!!.bankName,
-                dismissClicked = { viewModel.onIntent(DashboardIntent.ShowDeleteSmsConfirmation(false)) },
-                confirmClicked = {
-                    viewModel.onIntent(DashboardIntent.IgnoreSmsDraft(state.smsDraftToDelete!!))
-                }
-            )
-        }
-        
-        if (state.showDeleteAllSmsConfirmation) {
-            com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet(
-                itemName = stringResource(Res.string.action_delete_all),
-                dismissClicked = { viewModel.onIntent(DashboardIntent.ShowDeleteAllSmsConfirmation(false)) },
-                confirmClicked = {
-                    viewModel.onIntent(DashboardIntent.IgnoreAllSmsDrafts)
-                },
-                isLoading = state.isSmsDeleting
-            )
-        }
+            if (state.showDeleteSmsConfirmation && state.smsDraftToDelete != null) {
+                com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet(
+                    itemName = state.smsDraftToDelete!!.bankName,
+                    dismissClicked = {
+                        viewModel.onIntent(
+                            DashboardIntent.ShowDeleteSmsConfirmation(
+                                false
+                            )
+                        )
+                    },
+                    confirmClicked = {
+                        viewModel.onIntent(DashboardIntent.IgnoreSmsDraft(state.smsDraftToDelete!!))
+                    }
+                )
+            }
 
-        if (state.showAddTransaction) {
-            AddTransactionBottomSheet(
-                transactionWithRelations = state.transactionWithRelations,
-                template = repeatTemplate,
-                initialType = state.initialTransactionType,
-                initialAmount = initialTransactionAmount?.toString(),
-                initialDescription = initialTransactionDescription,
-                smsDraft = state.smsDraft,
-                onDismiss = {
-                    repeatTemplate = null
-                    viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet())
-                },
-                transactionAdded = {
-                    repeatTemplate = null
-                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
-                },
-            )
-        }
+            if (state.showDeleteAllSmsConfirmation) {
+                com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet(
+                    itemName = stringResource(Res.string.action_delete_all),
+                    dismissClicked = {
+                        viewModel.onIntent(
+                            DashboardIntent.ShowDeleteAllSmsConfirmation(
+                                false
+                            )
+                        )
+                    },
+                    confirmClicked = {
+                        viewModel.onIntent(DashboardIntent.IgnoreAllSmsDrafts)
+                    },
+                    isLoading = state.isSmsDeleting
+                )
+            }
 
-        if (state.showDeleteTransaction) {
-            DeleteTransactionBottomSheet(
-                transactionWithRelations = state.transactionWithRelations,
-                onDismiss = { viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet()) },
-                transactionDeleted = { viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet()) },
-            )
-        }
+            if (state.showAddTransaction) {
+                AddTransactionBottomSheet(
+                    transactionWithRelations = state.transactionWithRelations,
+                    template = repeatTemplate,
+                    initialType = state.initialTransactionType,
+                    initialAmount = initialTransactionAmount?.toString(),
+                    initialDescription = initialTransactionDescription,
+                    smsDraft = state.smsDraft,
+                    onDismiss = {
+                        repeatTemplate = null
+                        viewModel.onIntent(DashboardIntent.ShowTransactionBottomSheet())
+                    },
+                    transactionAdded = {
+                        repeatTemplate = null
+                        viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                    },
+                )
+            }
 
-        // todo disable
-        /*if (state.showCustomizeSheet) {
-            DashboardCustomizeSheet(
-                items = state.dashboardWidgets,
-                onApply = { viewModel.onIntent(DashboardIntent.SetWidgetLayout(it)) },
-                onDismiss = { viewModel.onIntent(DashboardIntent.ToggleCustomizeSheet) }
-            )
-        }*/
+            if (state.showDeleteTransaction) {
+                DeleteTransactionBottomSheet(
+                    transactionWithRelations = state.transactionWithRelations,
+                    onDismiss = { viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet()) },
+                    transactionDeleted = { viewModel.onIntent(DashboardIntent.DeleteTransactionBottomSheet()) },
+                )
+            }
 
-        if (state.showAddSource) {
-            AddSourceBottomSheet(
-                selectedSource = state.selectedSource,
-                onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddSource()) },
-                onNavigateToTransactions = { source ->
-                    viewModel.onIntent(DashboardIntent.ShowAddSource())
-                    onNavigateToTransactions(source)
-                },
-                setSource = { viewModel.onIntent(DashboardIntent.ShowAddSource()) }
-            )
-        }
+            if (state.showCustomizeSheet) {
+                DashboardCustomizeSheet(
+                    items = state.dashboardWidgets,
+                    onApply = { viewModel.onIntent(DashboardIntent.SetWidgetLayout(it)) },
+                    onDismiss = { viewModel.onIntent(DashboardIntent.ToggleCustomizeSheet) }
+                )
+            }
 
-        if (state.showBudgetSheet) {
-            AddBudgetBottomSheet(
-                budgetWithProgress = state.selectedBudget,
-                onDismiss = {
-                    viewModel.onIntent(DashboardIntent.ToggleBudgetSheet())
-                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
-                }
-            )
-        }
+            state.widgetMenu?.let { widget ->
+                DashboardWidgetMenu(
+                    widget = widget,
+                    onDismiss = { viewModel.onIntent(DashboardIntent.ShowWidgetMenu()) },
+                    onOpenList = {
+                        viewModel.onIntent(DashboardIntent.ShowWidgetMenu())
+                        when (widget) {
+                            DashboardWidget.RECENT_TRANSACTIONS -> onNavigateToTransactions(true)
+                            DashboardWidget.ACHIEVEMENTS -> onNavigateToAchievements()
+                            DashboardWidget.BUDGET -> onNavigateToBudget()
+                            DashboardWidget.GOAL -> onNavigateToGoal()
+                            DashboardWidget.INSTALLMENT -> onNavigateToInstallment()
+                            DashboardWidget.CHECK -> onNavigateToCheck()
+                            DashboardWidget.FIXED_EXPENSE -> onNavigateToFixedExpense()
+                            DashboardWidget.AI_ADVISOR -> onNavigateToAIAdvisor()
+                            DashboardWidget.ASSET -> onNavigateToAssets()
+                            DashboardWidget.SHOPPING -> onNavigateToShopping()
+                            DashboardWidget.NOTES -> onNavigateToNotes()
+                        }
+                    },
+                    onOpenSettings = {
+                        viewModel.onIntent(DashboardIntent.ShowWidgetMenu())
+                        viewModel.onIntent(DashboardIntent.ToggleCustomizeSheet)
+                    },
+                    onHide = {
+                        viewModel.onIntent(DashboardIntent.ShowWidgetMenu())
+                        viewModel.onIntent(
+                            DashboardIntent.SetWidgetLayout(
+                                state.dashboardWidgets.map {
+                                    if (it.widget == widget) it.copy(visible = false) else it
+                                }
+                            )
+                        )
+                    }
+                )
+            }
 
-        if (state.showGoalSheet) {
-            AddGoalBottomSheet(
-                goal = state.selectedGoal,
-                onDismiss = {
-                    viewModel.onIntent(DashboardIntent.ToggleGoalSheet())
-                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
-                }
-            )
-        }
+            if (state.showAddSource) {
+                AddSourceBottomSheet(
+                    selectedSource = state.selectedSource,
+                    onDismiss = { viewModel.onIntent(DashboardIntent.ShowAddSource()) },
+                    onNavigateToTransactions = { source ->
+                        viewModel.onIntent(DashboardIntent.ShowAddSource())
+                        onNavigateToTransactions(source)
+                    },
+                    setSource = { viewModel.onIntent(DashboardIntent.ShowAddSource()) }
+                )
+            }
 
-        if (state.showInstallmentSheet) {
-            AddInstallmentBottomSheet(
-                installmentId = state.selectedInstallmentId,
-                onDismiss = {
-                    viewModel.onIntent(DashboardIntent.ToggleInstallmentSheet())
-                },
-                onSuccess = {
-                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
-                }
-            )
-        }
+            if (state.showBudgetSheet) {
+                AddBudgetBottomSheet(
+                    budgetWithProgress = state.selectedBudget,
+                    onDismiss = {
+                        viewModel.onIntent(DashboardIntent.ToggleBudgetSheet())
+                        viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                    }
+                )
+            }
 
-        if (state.showCheckSheet) {
-            AddCheckBottomSheet(
-                checkId = state.selectedCheckId,
-                onDismiss = {
-                    viewModel.onIntent(DashboardIntent.ToggleCheckSheet())
-                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
-                }
-            )
-        }
+            if (state.showGoalSheet) {
+                AddGoalBottomSheet(
+                    goal = state.selectedGoal,
+                    onDismiss = {
+                        viewModel.onIntent(DashboardIntent.ToggleGoalSheet())
+                        viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                    }
+                )
+            }
 
-        if (state.showFixedExpenseSheet) {
-            AddFixedExpenseBottomSheet(
-                expenseId = state.selectedFixedExpenseId,
-                onDismiss = {
-                    viewModel.onIntent(DashboardIntent.ToggleFixedExpenseSheet())
-                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
-                }
-            )
-        }
+            if (state.showInstallmentSheet) {
+                AddInstallmentBottomSheet(
+                    installmentId = state.selectedInstallmentId,
+                    onDismiss = {
+                        viewModel.onIntent(DashboardIntent.ToggleInstallmentSheet())
+                    },
+                    onSuccess = {
+                        viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                    }
+                )
+            }
 
-        if (state.showNoteSheet) {
-            AddNoteBottomSheet(
-                note = state.selectedNote,
-                onDismiss = {
-                    viewModel.onIntent(DashboardIntent.ToggleNoteSheet())
-                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
-                }
-            )
-        }
+            if (state.showCheckSheet) {
+                AddCheckBottomSheet(
+                    checkId = state.selectedCheckId,
+                    onDismiss = {
+                        viewModel.onIntent(DashboardIntent.ToggleCheckSheet())
+                        viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                    }
+                )
+            }
 
-        if (state.showShoppingSheet) {
-            AddShoppingBottomSheet(
-                item = state.selectedShoppingItem,
-                onDismiss = {
-                    viewModel.onIntent(DashboardIntent.ToggleShoppingSheet())
-                    viewModel.onIntent(DashboardIntent.AnimationEnabled)
-                }
-            )
-        }
+            if (state.showFixedExpenseSheet) {
+                AddFixedExpenseBottomSheet(
+                    expenseId = state.selectedFixedExpenseId,
+                    onDismiss = {
+                        viewModel.onIntent(DashboardIntent.ToggleFixedExpenseSheet())
+                        viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                    }
+                )
+            }
+
+            if (state.showNoteSheet) {
+                AddNoteBottomSheet(
+                    note = state.selectedNote,
+                    onDismiss = {
+                        viewModel.onIntent(DashboardIntent.ToggleNoteSheet())
+                        viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                    }
+                )
+            }
+
+            if (state.showShoppingSheet) {
+                AddShoppingBottomSheet(
+                    item = state.selectedShoppingItem,
+                    onDismiss = {
+                        viewModel.onIntent(DashboardIntent.ToggleShoppingSheet())
+                        viewModel.onIntent(DashboardIntent.AnimationEnabled)
+                    }
+                )
+            }
         }
     }
 }
@@ -464,12 +530,14 @@ private fun DashboardWidgetContent(
     onNavigateToAssets: () -> Unit,
     onNavigateToShopping: () -> Unit,
     onNavigateToNotes: () -> Unit,
-    onNavigateToAchievements: () -> Unit
+    onNavigateToAchievements: () -> Unit,
+    onMenu: () -> Unit
 ) {
     val padding = Modifier.padding(horizontal = LocalSpacing.current.large)
     when (widget) {
         DashboardWidget.RECENT_TRANSACTIONS -> RecentTransactionsWidget(
             onMore = { onNavigateToTransactions(true) },
+            onMenu = onMenu,
             onAdd = { onAdd(DashboardWidget.RECENT_TRANSACTIONS) },
             onEdit = onEditTransaction,
             onDelete = onDeleteTransaction,
@@ -486,6 +554,7 @@ private fun DashboardWidgetContent(
 
         DashboardWidget.BUDGET -> BudgetWidget(
             onMore = onNavigateToBudget,
+            onMenu = onMenu,
             onAdd = { onAdd(DashboardWidget.BUDGET) },
             onEditBudget = onEditBudget,
             modifier = padding
@@ -493,24 +562,28 @@ private fun DashboardWidgetContent(
 
         DashboardWidget.GOAL -> GoalWidget(
             onMore = onNavigateToGoal,
+            onMenu = onMenu,
             onAdd = { onAdd(DashboardWidget.GOAL) },
             modifier = padding
         )
 
         DashboardWidget.INSTALLMENT -> InstallmentWidget(
             onMore = onNavigateToInstallment,
+            onMenu = onMenu,
             onAdd = { onAdd(DashboardWidget.INSTALLMENT) },
             modifier = padding
         )
 
         DashboardWidget.CHECK -> CheckWidget(
             onMore = onNavigateToCheck,
+            onMenu = onMenu,
             onAdd = { onAdd(DashboardWidget.CHECK) },
             modifier = padding
         )
 
         DashboardWidget.FIXED_EXPENSE -> FixedExpenseWidget(
             onMore = onNavigateToFixedExpense,
+            onMenu = onMenu,
             onAdd = { onAdd(DashboardWidget.FIXED_EXPENSE) },
             onEdit = onEditFixedExpense,
             modifier = padding
@@ -518,16 +591,19 @@ private fun DashboardWidgetContent(
 
         DashboardWidget.AI_ADVISOR -> AIAdvisorWidget(
             onMore = onNavigateToAIAdvisor,
+            onMenu = onMenu,
             modifier = padding
         )
 
         DashboardWidget.ASSET -> AssetWidget(
             onMore = onNavigateToAssets,
+            onMenu = onMenu,
             modifier = padding
         )
 
         DashboardWidget.SHOPPING -> ShoppingWidget(
             onMore = onNavigateToShopping,
+            onMenu = onMenu,
             onAdd = { onAdd(DashboardWidget.SHOPPING) },
             onEdit = onEditShopping,
             modifier = padding
@@ -535,10 +611,63 @@ private fun DashboardWidgetContent(
 
         DashboardWidget.NOTES -> NotesWidget(
             onMore = onNavigateToNotes,
+            onMenu = onMenu,
             onAdd = { onAdd(DashboardWidget.NOTES) },
             onEditNote = onEditNote,
             modifier = padding
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DashboardWidgetMenu(
+    widget: DashboardWidget,
+    onDismiss: () -> Unit,
+    onOpenList: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onHide: () -> Unit
+) {
+    SheetFrame(
+        title = stringResource(widget.label),
+        sub = stringResource(Res.string.dashboard_customize_hint),
+        onDismiss = onDismiss,
+        isFullScreen = false,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            TextButton(
+                onClick = onOpenList,
+                modifier = Modifier.fillMaxWidth().height(56.dp)
+            ) {
+                Text(
+                    text = stringResource(Res.string.more_details),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+            TextButton(
+                onClick = onOpenSettings,
+                modifier = Modifier.fillMaxWidth().height(56.dp)
+            ) {
+                Text(
+                    text = stringResource(Res.string.dashboard_customize_title),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+            TextButton(
+                onClick = onHide,
+                modifier = Modifier.fillMaxWidth().height(56.dp)
+            ) {
+                Text(
+                    text = stringResource(Res.string.dashboard_widget_hide),
+                    color = MaterialTheme.colorScheme.error,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
     }
 }
 

@@ -26,6 +26,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun BudgetWidget(
     viewModel: BudgetViewModel = koinViewModel(),
     onMore: () -> Unit,
+    onMenu: () -> Unit = {},
     onAdd: () -> Unit = {},
     onEditBudget: (com.kazemieh.common.model.BudgetWithProgress) -> Unit = {},
     modifier: Modifier = Modifier
@@ -46,6 +47,7 @@ fun BudgetWidget(
         accent = if (overCount > 0) GlassRed else null,
         badge = if (overCount > 0) stringResource(Res.string.label_over_count, overCount) else null,
         onMore = onMore,
+        onMenu = onMenu,
         onAdd = onAdd,
         modifier = modifier
     ) {

@@ -35,6 +35,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun InstallmentWidget(
     viewModel: InstallmentViewModel = koinViewModel(),
     onMore: () -> Unit,
+    onMenu: () -> Unit = {},
     onAdd: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -47,6 +48,7 @@ fun InstallmentWidget(
     WidgetCard(
         title = stringResource(Res.string.installment_widget_title),
         onMore = onMore,
+        onMenu = onMenu,
         onAdd = onAdd,
         modifier = modifier
     ) {

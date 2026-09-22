@@ -552,6 +552,7 @@
     <!-- Dashboard customization -->
     <string name="dashboard_customize_title">Dashboard layout</string>
     <string name="dashboard_customize_hint">Move or hide widgets</string>
+    <string name="dashboard_widget_hide">Hide from dashboard</string>
 
     <!-- Bottom bar customization -->
     <string name="bottombar_customize_title">Bottom bar</string>

@@ -27,6 +27,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun FixedExpenseWidget(
     onMore: () -> Unit,
+    onMenu: () -> Unit = {},
     onAdd: () -> Unit = {},
     onEdit: (Long) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -44,6 +45,7 @@ fun FixedExpenseWidget(
         title = stringResource(Res.string.title_upcoming_fixed_expenses_label),
         count = activeExpenses.size.takeIf { it > 0 },
         onMore = onMore,
+        onMenu = onMenu,
         onAdd = onAdd,
         modifier = modifier
     ) {

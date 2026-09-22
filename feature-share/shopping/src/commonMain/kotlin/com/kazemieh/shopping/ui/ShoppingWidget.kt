@@ -49,6 +49,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ShoppingWidget(
     modifier: Modifier = Modifier,
     onMore: () -> Unit,
+    onMenu: () -> Unit = {},
     onAdd: () -> Unit = {},
     onEdit: (com.kazemieh.common.model.ShoppingItem) -> Unit = {},
     viewModel: ShoppingViewModel = koinViewModel()
@@ -61,6 +62,7 @@ fun ShoppingWidget(
         title = stringResource(Res.string.shopping_list),
         count = uncheckedItems.size.takeIf { it > 0 },
         onMore = onMore,
+        onMenu = onMenu,
         onAdd = onAdd,
         modifier = modifier
     ) {
