@@ -95,7 +95,7 @@ double-entry اضافه شد، postingهای آن جای این فرمول را 
 
 **فایل‌ها/ماژول‌ها:**
 
-- `core/domain/src/commonTest/`
+- `../../core/domain/src/commonTest`
 - `core/database/src/commonTest/` یا `jvmTest/`
 - fixture builders جدید زیر test source set
 
@@ -155,7 +155,7 @@ double-entry اضافه شد، postingهای آن جای این فرمول را 
 ### FCR-003 — Update delta اتمیک
 
 **فایل اصلی:**  
-`core/database/src/commonMain/kotlin/com/kazemieh/database/datasource/TransactionLocalDataSourceImpl.kt`
+`../../core/database/src/commonMain/kotlin/com/kazemieh/database/datasource/TransactionLocalDataSourceImpl.kt`
 
 **مراحل:**
 

@@ -203,11 +203,11 @@ FeatureInteractor.kt  // orchestration قابل تست
 
 ## AQ-012 — Documentation و Release truth
 
-- `README.md` با capability matrix واقعی؛
+- `../../README.md` با capability matrix واقعی؛
 - version source واحد؛
 - LICENSE واقعاً track شود یا ادعا حذف؛
 - `RTK.md` و `HANDOFF-v2.md` پیدا/بازیابی یا reference حذف؛
-- module map از `settings.gradle.kts` تولید/به‌روز؛
+- module map از `../../settings.gradle.kts` تولید/به‌روز؛
 - ADR برای Ledger، Migration، Feature Gate، Adaptive و Sync؛
 - release checklist و changelog خودکار.
 

@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "000-fintrack-master-roadmap.md",
+                "file": "2026-11-15-gitnexus-plan-fintrack-design-unification.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "000-fintrack-master-roadmap"
+              "title": "2026-11-15-gitnexus-plan-fintrack-design-unification"
             }
           }
         ]
@@ -190,8 +190,8 @@
   },
   "active": "e10d3defae3f159f",
   "lastOpenFiles": [
-    "010-comprehensive-event-taxonomy.md",
     "000-fintrack-master-roadmap.md",
+    "010-comprehensive-event-taxonomy.md",
     "README.md",
     "001-financial-core-release-gate.md",
     "008-architecture-quality-backlog.md",

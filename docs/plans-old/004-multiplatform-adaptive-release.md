@@ -23,7 +23,7 @@
 ## Blockerهای build
 
 - `composeApp/build.gradle.kts:137` main class برابر `com.kazemieh.composeApp.MainKt` است،
-  ولی `composeApp/src/jvmMain/kotlin/com/kazemieh/fintrack/Main.kt` package دیگری دارد.
+  ولی `../../composeApp/src/jvmMain/kotlin/com/kazemieh/fintrack/Main.kt` package دیگری دارد.
 - Web copy task از `src/jsMain/resources/sql-wasm.wasm` می‌خواند؛ asset در source set دیگری track شده و production task پوشش روشن ندارد.
 - repository یک iOS host app/Xcode project ندارد.
 - server source از domain model استفاده می‌کند ولی dependency آن کامل نیست.

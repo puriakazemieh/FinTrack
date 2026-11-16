@@ -140,12 +140,12 @@ FinTrack از نظر گستره قابلیت‌ها جلوتر از یک MVP س�
   - [x] ساخت `NoOpAnalytics` برای پیش‌گیری از کرش سیستم
 - [x] **فاز ۱: تنظیمات پنل فایربیس (توسط کاربر)**
   - [x] ساخت پروژه در Firebase Console
-  - [x] ثبت اپلیکیشن Android و قرار دادن `google-services.json` در پوشه `app/`
+  - [x] ثبت اپلیکیشن Android و قرار دادن `../../google-services.json` در پوشه `app/`
   - [ ] ثبت اپلیکیشن Web و دریافت کلیدهای کانفیگ
   - [ ] ثبت یک اپلیکیشن موقت برای دریافت Secret Key بخش Measurement Protocol (برای دسکتاپ)
 - [x] **فاز ۲: پیکربندی Gradle و وابستگی‌ها در KMP (توسط هوش مصنوعی)**
   - [x] اضافه کردن پلاگین‌ها و کتابخانه‌های `firebase-analytics`
-  - [x] اعمال پلاگین‌ها در `build.gradle.kts` ماژول `:app` و `androidMain`
+  - [x] اعمال پلاگین‌ها در `../../build.gradle.kts` ماژول `:app` و `androidMain`
 - [x] **فاز ۳: پیاده‌سازی لایه اندروید و DI (توسط هوش مصنوعی)**
   - [x] ساخت `AndroidAnalyticsService` و `AndroidCrashReporter`
   - [x] معرفی کلاس‌ها به Koin در `CommonModule.android.kt` یا `AppModule`
