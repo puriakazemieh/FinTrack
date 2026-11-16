@@ -18,7 +18,12 @@ class NotificationWorker(
     override suspend fun doWork(): Result {
         val title = inputData.getString(KEY_TITLE) ?: return Result.failure()
         val message = inputData.getString(KEY_MESSAGE) ?: return Result.failure()
-        val channelId = inputData.getString(KEY_CHANNEL_ID) ?: return Result.failure()
+        val savedChannelId = inputData.getString(KEY_CHANNEL_ID) ?: return Result.failure()
+        val channelId = if (savedChannelId == "installment_reminders") {
+            NotificationManager.CHANNEL_INSTALLMENT
+        } else {
+            savedChannelId
+        }
         val notificationId = inputData.getInt(KEY_NOTIFICATION_ID, 0)
         val extraId = inputData.getLong(KEY_EXTRA_ID, -1L)
 

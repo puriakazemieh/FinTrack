@@ -1130,7 +1130,7 @@
     <string name="notif_quick_add_message">برای ثبت یک تراکنش جدید ضربه بزنید</string>
     <string name="notif_quick_add_action">افزودن</string>
     <string name="label_quick_add_notification">نوتیفیکیشن ثبت سریع</string>
-    <string name="label_quick_add_notification_desc">نوتیفیکیشن دائمی با دکمه‌ی افزودن تراکنش</string>
+    <string name="label_quick_add_notification_desc">اعلان افزودن تراکنش با امکان کنار گذاشتن</string>
     <string name="notif_channel_installment">یادآور اقساط</string>
     <string name="notif_channel_cheque">یادآور چک‌ها</string>
     <string name="notif_channel_debt">یادآور بدهی و طلب</string>

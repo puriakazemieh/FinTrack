@@ -9,6 +9,10 @@ interface BankParser {
 }
 
 object BankParserRegistry {
+    private val authenticationMessage = Regex(
+        "رمز[\\s\u200c]*(?:پویا|دوم|یک[\\s\u200c]*بار[\\s\u200c]*مصرف)|\\b(?:otp|one[ -]?time[ -]?password)\\b",
+        RegexOption.IGNORE_CASE
+    )
     private val parsers = mutableListOf<BankParser>()
     // A broadcast can start the app process before Koin has eagerly created the parser
     // initializer. Keep a safe generic parser from process start so a valid bank SMS is
@@ -24,11 +28,14 @@ object BankParserRegistry {
     }
 
     fun parse(sender: String, body: String): SmsDraft? {
+        val normalizedBody = body.replace('ي', 'ی').replace('ك', 'ک')
+        if (authenticationMessage.containsMatchIn(normalizedBody)) return null
         val specificParser = parsers.firstOrNull { parser ->
             parser.senderNumbers.any { it.equals(sender, ignoreCase = true) }
         }
         
-        return specificParser?.parse(sender, body) ?: fallbackParser?.parse(sender, body)
+        return (specificParser?.parse(sender, body)?.takeIf { it.amount > 0L }
+            ?: fallbackParser?.parse(sender, body))?.takeIf { it.amount > 0L }
     }
 
     fun getParsers(): List<BankParser> = parsers.toList()

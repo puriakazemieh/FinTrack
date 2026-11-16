@@ -9,6 +9,7 @@ import com.kazemieh.common.persiandatetime.domain.PersianDateTime
 import com.kazemieh.common.persiandatetime.extensions.plus
 import com.kazemieh.common.persiandatetime.extensions.toEpochMilliseconds
 import com.kazemieh.domain.notification.NotificationScheduler
+import com.kazemieh.domain.notification.NotificationManager
 import com.kazemieh.domain.repository.InstallmentRepository
 import com.kazemieh.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
@@ -50,7 +51,8 @@ class UpdateInstallmentUseCase(
                 title = reminderTitle,
                 message = reminderMessage,
                 scheduledTime = nextDueInstant.toLocalDateTime(TimeZone.currentSystemDefault()),
-                channelId = "installment_reminders"
+                channelId = NotificationManager.CHANNEL_INSTALLMENT,
+                extraId = installment.id
             )
         } else {
             notificationScheduler.cancelReminder("installment_${installment.id}")
@@ -86,7 +88,8 @@ class AddInstallmentUseCase(
             title = reminderTitle,
             message = reminderMessage,
             scheduledTime = nextDueInstant.toLocalDateTime(TimeZone.currentSystemDefault()),
-            channelId = "installment_reminders"
+            channelId = NotificationManager.CHANNEL_INSTALLMENT,
+            extraId = installment.id
         )
     }
 }
@@ -180,7 +183,8 @@ class MarkInstallmentAsPaidUseCase(
             title = reminderTitle,
             message = reminderMessage,
             scheduledTime = nextDueInstant.toLocalDateTime(TimeZone.currentSystemDefault()),
-            channelId = "installment_reminders"
+            channelId = NotificationManager.CHANNEL_INSTALLMENT,
+            extraId = installment.id
         )
     }
 

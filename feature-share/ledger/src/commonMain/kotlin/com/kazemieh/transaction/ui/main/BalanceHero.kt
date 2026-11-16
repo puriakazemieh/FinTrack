@@ -22,6 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Source
+import com.kazemieh.common.withLRM
+import com.kazemieh.money.MoneyFormatter
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalSpacing
@@ -47,10 +49,12 @@ fun BalanceHero(
 ) {
     val space = LocalSpacing.current
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val balance = state.balanceAmount
     val color = when {
-        state.balance < 0.toString() -> GlassRed
-        state.balance > 0.toString() -> GlassGreen
-        else -> GlassGreen
+        !isBalanceVisible -> MaterialTheme.colorScheme.onSurfaceVariant
+        balance != null && balance < 0L -> GlassRed
+        balance != null && balance > 0L -> GlassGreen
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
     LaunchedEffect(Unit) {
         viewModel.onIntent(TransactionIntent.Init)
@@ -75,7 +79,15 @@ fun BalanceHero(
                     )
                     Spacer(Modifier.width(space.medium))
                     FintrackDisplayLargeText(
-                        text = if (isBalanceVisible) state.balance else "****",
+                        text = when {
+                            !isBalanceVisible -> "••••••"
+                            balance == null -> "—"
+                            else -> MoneyFormatter.format(
+                                balance,
+                                includeSymbol = false,
+                                showPositiveSign = true
+                            ).withLRM()
+                        },
                         color = color,
                         fontWeight = FontWeight.Bold
                     )

@@ -55,6 +55,10 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             }
             "com.kazemieh.notifications.ACTION_DISMISSED" -> {
                 val channelId = intent.getStringExtra("channel_id") ?: "unknown"
+                if (channelId == com.kazemieh.domain.notification.NotificationManager.CHANNEL_QUICK_ADD) {
+                    context.getSharedPreferences(AndroidNotificationManager.DELIVERY_PREFERENCES, Context.MODE_PRIVATE)
+                        .edit().putBoolean(AndroidNotificationManager.QUICK_ADD_DISMISSED, true).apply()
+                }
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationDismissed(channelId))
             }
             "com.kazemieh.check.ACTION_IGNORE",

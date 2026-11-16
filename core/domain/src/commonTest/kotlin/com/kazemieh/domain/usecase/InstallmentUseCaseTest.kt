@@ -12,6 +12,48 @@ import kotlin.test.assertTrue
 class InstallmentUseCaseTest {
 
     @Test
+    fun remindersKeepTheCanonicalChannelAndInstallmentIdAfterEveryChange() = runTest {
+        val scheduled = mutableListOf<Pair<String, Long?>>()
+        val scheduler = object : FakeNotificationManager() {
+            override fun scheduleReminder(
+                id: String,
+                title: String,
+                message: String,
+                scheduledTime: kotlinx.datetime.LocalDateTime,
+                channelId: String,
+                extraId: Long?
+            ) {
+                scheduled.add(channelId to extraId)
+            }
+        }
+        val repository = FakeInstallmentRepository()
+        val installment = Installment(
+            id = 1L,
+            title = "Reminder",
+            installmentAmount = 5_000L,
+            totalAmount = 15_000L,
+            startDate = 1_700_000_000_000L,
+            totalInstallments = 3,
+            paidInstallments = 0,
+            nextDueDate = 1_700_000_000_000L,
+            frequency = InstallmentFrequency.MONTHLY,
+            categoryId = 1L,
+            sourceId = 1L,
+            postAsTransaction = false,
+            reminderEnabled = true,
+            isCompleted = false
+        )
+        AddInstallmentUseCase(repository, scheduler)(installment, emptyList(), emptyList(), "Title", "Message")
+        UpdateInstallmentUseCase(repository, scheduler)(installment, emptyList(), emptyList(), "Title", "Message")
+        MarkInstallmentAsPaidUseCase(repository, FakeTransactionRepository(), scheduler)(1L, "Payment", "Title", "Message")
+
+        assertEquals(
+            List<Pair<String, Long?>>(3) { com.kazemieh.domain.notification.NotificationManager.CHANNEL_INSTALLMENT to 1L },
+            scheduled
+        )
+    }
+
+    @Test
     fun `add, get, update, and delete installment`() = runTest {
         val repo = FakeInstallmentRepository()
         val notifManager = FakeNotificationManager()

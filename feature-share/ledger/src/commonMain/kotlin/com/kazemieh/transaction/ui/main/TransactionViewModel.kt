@@ -43,6 +43,7 @@ sealed interface TransactionEffect {
 data class TransactionState(
     // ===== summary =====
     val balance: String = "0",
+    val balanceAmount: Long? = null,
     val isPositiveBalance: Boolean = true,
     val formatedTotalIncome: String = "0",
     val totalIncome: Long = 0,
@@ -82,6 +83,7 @@ class TransactionViewModel(
     private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1)
 
     private var listJob: Job? = null
+    private var summaryJob: Job? = null
 
     fun onIntent(intent: TransactionIntent) {
         when (intent) {
@@ -198,7 +200,8 @@ class TransactionViewModel(
     }
 
     private fun observeSummary() {
-        viewModelScope.launch {
+        if (summaryJob?.isActive == true) return
+        summaryJob = viewModelScope.launch {
             combine(
                 transactionUseCaseGroup.observeCategorySumsUseCase(TransactionFilterParams()),
                 transactionUseCaseGroup.observeSourcesUseCase()
@@ -223,6 +226,7 @@ class TransactionViewModel(
                         formatedTotalTransfer = totalTransfer.toInt().toSignedPersianPrice(),
                         totalTransfer = totalTransfer,
                         balance = balance.toLong().toSignedPersianPrice(),
+                        balanceAmount = balance,
                         isPositiveBalance = balance >= 0L
                     )
                 }

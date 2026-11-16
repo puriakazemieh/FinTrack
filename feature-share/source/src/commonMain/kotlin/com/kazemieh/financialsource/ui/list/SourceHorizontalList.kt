@@ -32,7 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.common.model.Source
-import com.kazemieh.common.toSignedPersianPrice
+import com.kazemieh.common.withLRM
+import com.kazemieh.money.MoneyFormatter
 import com.kazemieh.designsystem.*
 import com.kazemieh.designsystem.LocalSpacing
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
@@ -83,9 +84,10 @@ private fun SourceTile(
     val glassColors = LocalGlassColors.current
 
     val color = when {
+        LocalHideBalance.current -> glassColors.text2
         source.balance < 0 -> GlassRed
         source.balance > 0 -> GlassGreen
-        else -> GlassGreen
+        else -> glassColors.text2
     }
 
     Box(
@@ -122,7 +124,11 @@ private fun SourceTile(
 
             }
             FintrackTitleSmallText(
-                text = if (LocalHideBalance.current) "••••" else source.balance.toSignedPersianPrice(),
+                text = if (LocalHideBalance.current) "••••••" else MoneyFormatter.format(
+                    source.balance,
+                    includeSymbol = false,
+                    showPositiveSign = true
+                ).withLRM(),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.W700,
                 color = color
