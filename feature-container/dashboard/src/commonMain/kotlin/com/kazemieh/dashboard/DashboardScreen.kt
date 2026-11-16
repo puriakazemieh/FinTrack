@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LifecycleStartEffect
 import com.kazemieh.ai_insights.ui.AIAdvisorWidget
 import com.kazemieh.asset.ui.component.AssetWidget
 import com.kazemieh.budget.ui.add.AddBudgetBottomSheet
@@ -115,6 +116,11 @@ fun DashboardScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val space = LocalSpacing.current
     val globallyHidden = LocalHideBalance.current
+    LifecycleStartEffect(viewModel) {
+        onStopOrDispose {
+            viewModel.onIntent(DashboardIntent.ResetTemporaryBalanceReveal)
+        }
+    }
     // The dashboard eye is a page-level privacy control: hiding it must mask every
     // financial amount rendered by dashboard widgets, not only the balance hero.
     DisposableEffect(state.isBalanceVisible) {

@@ -22,13 +22,17 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,7 +48,6 @@ import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.FourDigitGroupingTransformation
 import com.kazemieh.designsystem.component.LeadingIconStyle
-import com.kazemieh.designsystem.component.NumberCommaTransformation
 import com.kazemieh.designsystem.component.glass.AddFrame
 import com.kazemieh.designsystem.component.glass.ColorSwatches
 import com.kazemieh.designsystem.component.glass.Field
@@ -148,6 +151,16 @@ fun AddSourceContent(
     onNavigateToTransactions: ((Source) -> Unit)? = null
 ) {
     val showSmsSenderPicker = remember { androidx.compose.runtime.mutableStateOf(false) }
+    var balanceInput by remember(state.mode) {
+        val text = state.draft.balance.takeUnless { it == 0L }?.toString().orEmpty()
+        mutableStateOf(TextFieldValue(text, TextRange(text.length)))
+    }
+    LaunchedEffect(state.draft.balance) {
+        if (parseSourceBalance(balanceInput.text) != state.draft.balance) {
+            val text = state.draft.balance.takeUnless { it == 0L }?.toString().orEmpty()
+            balanceInput = TextFieldValue(text, TextRange(text.length))
+        }
+    }
     val glassColors = LocalGlassColors.current
     val rainbowColors = FinTrackPickerColors.rainbow()
     val colors = rainbowColors.map { it.color }
@@ -256,12 +269,14 @@ fun AddSourceContent(
             item {
                 Field(label = stringResource(Res.string.initial_balance_label)) {
                     TextField(
-                        value = if (state.draft.balance == 0L) "" else state.draft.balance.toString(),
+                        value = balanceInput,
                         onValueChange = { input ->
-                            val newValue = input.toLongOrNull() ?: 0L
-                            onIntent(AddSourceIntent.UpdateBalance(newValue))
+                            parseSourceBalance(input.text)?.let { amount ->
+                                balanceInput = input
+                                onIntent(AddSourceIntent.UpdateBalance(amount))
+                            }
                         },
-                        visualTransformation = NumberCommaTransformation(),
+                        visualTransformation = SourceBalanceTransformation(),
                         placeholder = {
                             FintrackBodyMediumText(
                                 text = stringResource(Res.string.label_zero),

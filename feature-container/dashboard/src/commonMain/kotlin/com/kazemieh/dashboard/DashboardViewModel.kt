@@ -271,6 +271,12 @@ class DashboardViewModel(
                 }
             }
 
+            DashboardIntent.ResetTemporaryBalanceReveal -> _state.update {
+                if (it.isGlobalBalanceHidden) {
+                    it.copy(isBalanceVisible = false, isBalanceLocallyRevealed = false)
+                } else it
+            }
+
             DashboardIntent.ToggleSmsDetectionSheet -> _state.update {
                 it.copy(showSmsDetection = !it.showSmsDetection)
             }
@@ -523,6 +529,7 @@ sealed interface DashboardIntent {
     data object AnimationEnabled : DashboardIntent
     data class ShowAddSource(val source: Source? = null) : DashboardIntent
     data object ToggleBalanceVisibility : DashboardIntent
+    data object ResetTemporaryBalanceReveal : DashboardIntent
     data object ToggleSmsDetectionSheet : DashboardIntent
     data class OpenSmsDraftTransaction(val draftId: Long) : DashboardIntent
     data class IgnoreSmsDraft(val draft: SmsDraft) : DashboardIntent
