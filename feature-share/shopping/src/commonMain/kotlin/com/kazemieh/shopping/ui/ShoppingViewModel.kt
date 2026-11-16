@@ -200,20 +200,27 @@ class ShoppingViewModel(
     }
 
     private suspend fun scheduleReminder(id: Long, item: ShoppingItem) {
-        val reminderTime = item.reminderTime ?: return
+        val reminderTime = item.reminderTime
+        if (reminderTime == null || item.isChecked) {
+            notificationScheduler.cancelReminder("shopping_$id")
+            return
+        }
         notificationScheduler.scheduleReminder(
             id = "shopping_$id",
             title = getString(Res.string.shopping_list),
             message = item.name,
             scheduledTime = Instant.fromEpochMilliseconds(reminderTime)
                 .toLocalDateTime(TimeZone.currentSystemDefault()),
-            channelId = NotificationManager.CHANNEL_SHOPPING
+            channelId = NotificationManager.CHANNEL_SHOPPING,
+            extraId = id
         )
     }
 
     private fun toggleItem(item: ShoppingItem) {
         viewModelScope.launch {
-            updateShoppingItem(item.copy(isChecked = !item.isChecked))
+            val updatedItem = item.copy(isChecked = !item.isChecked)
+            updateShoppingItem(updatedItem)
+            scheduleReminder(updatedItem.id, updatedItem)
             if (!item.isChecked) {
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.ShoppingItemPurchased)
             }
@@ -223,6 +230,7 @@ class ShoppingViewModel(
     private fun deleteItem(id: Long) {
         viewModelScope.launch {
             deleteShoppingItem(id)
+            notificationScheduler.cancelReminder("shopping_$id")
         }
     }
 
