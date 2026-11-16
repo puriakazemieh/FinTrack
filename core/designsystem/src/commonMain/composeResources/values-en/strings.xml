@@ -1548,4 +1548,5 @@
     <!-- Default badge -->
     <string name="msg_cannot_delete_default">This is a default item and cannot be deleted</string>
     <string name="sms_detection_amount">%1$s transaction: %2$s</string>
+    <string name="sms_source_currency_incompatible">To register a bank SMS, choose a rial or toman account whose currency matches the current app currency. Currency conversion is not automatic.</string>
 </resources>

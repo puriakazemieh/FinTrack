@@ -1,6 +1,8 @@
 package com.kazemieh.dashboard
 
 import androidx.lifecycle.ViewModel
+import com.kazemieh.domain.usecase.resolveSmsSource
+import com.kazemieh.domain.usecase.isSmsSourceCurrencyCompatible
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Achievement
 import com.kazemieh.common.model.Category
@@ -27,6 +29,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -168,21 +173,13 @@ class DashboardViewModel(
     }
 
     private fun observeSmsDrafts() {
-        smsDraftRepository.observeUnusedSmsDrafts()
+        combine(smsDraftRepository.observeUnusedSmsDrafts(), flow { emitAll(observeSources()) }) { drafts, sources ->
+            drafts.map { draft ->
+                // Presentation can suggest a unique source; opening the dashboard never rewrites drafts.
+                if (draft.sourceId == null) draft.copy(sourceId = resolveSmsSource(draft, sources)?.id) else draft
+            }
+        }
             .onEach { drafts ->
-                drafts.forEach { draft ->
-                    if (draft.sourceId == null && draft.bankName.isNotBlank()) {
-                        val source = _state.value.sources.find {
-                            it.name.contains(draft.bankName, ignoreCase = true) ||
-                                    draft.bankName.contains(it.name, ignoreCase = true)
-                        }
-                        if (source != null) {
-                            viewModelScope.launch {
-                                smsDraftRepository.updateSmsDraft(draft.copy(sourceId = source.id))
-                            }
-                        }
-                    }
-                }
                 _state.update { it.copy(smsDrafts = drafts) }
             }.launchIn(viewModelScope)
     }
@@ -335,8 +332,12 @@ class DashboardViewModel(
             }
 
             is DashboardIntent.QuickRegisterSms -> viewModelScope.launch {
-                val draft = intent.draft
-                if (draft.categoryId == null || draft.sourceId == null) {
+                val draft = smsDraftRepository.getSmsDraftById(intent.draft.id) ?: return@launch
+                if (draft.isUsed) return@launch
+                val source = resolveSmsSource(draft, observeSources().first())
+                val currency = Currency.valueOf(preferenceUseCases.getStringPreference(
+                    FinTrackPreferences.PREF_CURRENCY, "")).code
+                if (draft.categoryId == null || source == null || !isSmsSourceCurrencyCompatible(source, currency)) {
                     // Fallback to manual registration if data is missing
                     onIntent(
                         DashboardIntent.ShowTransactionBottomSheet(
@@ -350,13 +351,13 @@ class DashboardViewModel(
                 _state.update { it.copy(isLoading = true) }
 
                 val finalAmount =
-                    if (_state.value.currency == "IRT") draft.amount / 10 else draft.amount
+                    if (currency == "IRT") draft.amount / 10 else draft.amount
 
                 val transaction = com.kazemieh.common.model.Transaction(
                     id = 0,
                     amount = finalAmount,
                     categoryId = draft.categoryId!!,
-                    sourceId = draft.sourceId!!,
+                    sourceId = source.id!!,
                     description = draft.body,
                     timeStamp = draft.timeStamp,
                     type = draft.type,

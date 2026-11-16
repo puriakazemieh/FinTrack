@@ -20,12 +20,15 @@ import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.repository.SmsDraftRepository
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
+import com.kazemieh.domain.usecase.resolveSmsSource
+import com.kazemieh.domain.usecase.isSmsSourceCurrencyCompatible
 import com.kazemieh.jalali.JalaliCalendar
 import com.kazemieh.money.Currency
 import com.kazemieh.preferences.FinTrackPreferences
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.msg_mandatory_fields_error
 import fintrack.core.designsystem.generated.resources.transaction_failed
+import fintrack.core.designsystem.generated.resources.sms_source_currency_incompatible
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -127,25 +130,20 @@ class AddTransactionViewModel(
                 _state.update {
                     it.copy(
                         source = intent.source,
+                        isSourceManuallySelected = true,
                         isSourceError = false,
                         sheetStack = it.sheetStack.dropLast(1)
                     )
                 }
                 viewModelScope.launch {
                     val unusedDrafts = smsDraftRepository.observeUnusedSmsDrafts().firstOrNull() ?: emptyList()
+                    val sources = transactionUseCaseGroup.observeSourcesUseCase().firstOrNull().orEmpty()
                     val matchingDrafts = unusedDrafts.filter { draft ->
-                        val card = intent.source?.cardNumber
-                        val account = intent.source?.accountNumber
-                        val desc = intent.source?.description
-                        val ident = draft.sourceIdentifier
-                        (card != null && draft.body.contains(card)) ||
-                        (account != null && draft.body.contains(account)) ||
-                        (desc != null && desc.isNotBlank() && draft.bankName.contains(desc, ignoreCase = true)) ||
-                        (draft.sourceId != null && draft.sourceId == intent.source?.id) ||
-                        (ident != null && card != null && card.endsWith(ident)) ||
-                        (ident != null && account != null && account.endsWith(ident))
+                        intent.source?.id != null && resolveSmsSource(draft, sources)?.id == intent.source.id
                     }
-                    _state.update { it.copy(relatedSmsDrafts = matchingDrafts) }
+                    _state.update {
+                        if (it.source?.id == intent.source?.id) it.copy(relatedSmsDrafts = matchingDrafts) else it
+                    }
                     // if (matchingDrafts.isNotEmpty()) { // We will show a banner or sheet }
                 }
             }
@@ -200,8 +198,10 @@ class AddTransactionViewModel(
                 if (validateAndUpdateErrors()) {
                     submitTransaction()
                 } else {
+                    val message = if (_state.value.smsDraft != null && _state.value.source != null && _state.value.isSourceError)
+                        Res.string.sms_source_currency_incompatible else Res.string.msg_mandatory_fields_error
                     viewModelScope.launch {
-                        SnackbarController.showMessage(UiText.StringResourceText(Res.string.msg_mandatory_fields_error))
+                        SnackbarController.showMessage(UiText.StringResourceText(message))
                     }
                 }
             }
@@ -256,18 +256,15 @@ class AddTransactionViewModel(
                     date = "${today.day.toPersianDigits()} / ${today.monthString} / ${today.year.toPersianDigits()}",
                     timeStamp = Clock.System.now().toEpochMilliseconds(),
                     smsDraft = smsDraft,
+                    isSourceManuallySelected = false,
                     amount = prefilledAmount,
                     transactionType = smsDraft?.type ?: TransactionType.EXPENSE
                 )
             }
             viewModelScope.launch {
                 val defaultSource = transactionUseCaseGroup.getDefaultFinancialSourceUseCase()
-                val detectedSource = if (smsDraft?.sourceId != null) {
-                    transactionUseCaseGroup.observeSourceUseCase(smsDraft.sourceId!!).firstOrNull()
-                } else {
-                    smsDraft?.sourceIdentifier?.let { 
-                        transactionUseCaseGroup.getSourceByIdentifierUseCase(it)
-                    }
+                val detectedSource = smsDraft?.let { draft ->
+                    resolveSmsSource(draft, transactionUseCaseGroup.observeSourcesUseCase().firstOrNull().orEmpty())
                 }
                 
                 val defaultCategory =
@@ -279,7 +276,8 @@ class AddTransactionViewModel(
                 
                 _state.update {
                     it.copy(
-                        source = detectedSource ?: defaultSource,
+                        source = if (it.isSourceManuallySelected) it.source else
+                            if (smsDraft != null) detectedSource else defaultSource,
                         category = detectedCategory ?: defaultCategory
                     )
                 }
@@ -463,7 +461,10 @@ class AddTransactionViewModel(
         val isAmountError = amountLong == null || amountLong <= 0L
         val isCategoryError =
             current.transactionType != TransactionType.TRANSFER && current.category == null
-        val isSourceError = current.source == null
+        val incompatibleSmsCurrency = current.smsDraft != null && current.source != null &&
+            !isSmsSourceCurrencyCompatible(current.source, Currency.valueOf(
+                preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_CURRENCY, "")).code)
+        val isSourceError = current.source == null || incompatibleSmsCurrency
         val isSourceEndError =
             current.transactionType == TransactionType.TRANSFER && current.sourceEnd == null
 
@@ -506,6 +507,7 @@ data class AddTransactionState(
     val transactionType: TransactionType = TransactionType.EXPENSE,
     val category: Category? = null,
     val source: Source? = null,
+    val isSourceManuallySelected: Boolean = false,
     val sourceEnd: Source? = null,
     val tags: Set<Tag>? = emptySet(),
     val persons: Set<Person>? = emptySet(),

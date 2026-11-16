@@ -61,6 +61,7 @@ import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Person
 import com.kazemieh.designsystem.model.bankForSms
 import com.kazemieh.common.model.SmsDraft
+import fintrack.core.designsystem.generated.resources.sms_source_currency_incompatible
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
@@ -410,10 +411,15 @@ fun ColumnScope.AddTransactionContent(
     ) {
         state.smsDraft?.let { draft ->
             item {
-                SmsReferenceBanner(
-                    draft = draft,
-                    modifier = Modifier.padding(bottom = 6.dp)
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    SmsReferenceBanner(draft = draft)
+                    if (state.isSourceError && state.source != null) {
+                        FintrackLabelSmallText(
+                            text = stringResource(Res.string.sms_source_currency_incompatible),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
             }
         }
 

@@ -1576,4 +1576,5 @@
     <!-- Default badge -->
     <string name="msg_cannot_delete_default">این مورد پیش‌فرض است و قابل حذف نیست</string>
     <string name="sms_detection_amount">تراکنش %1$s: %2$s</string>
+    <string name="sms_source_currency_incompatible">برای ثبت پیامک بانکی، منبع ریالی یا تومانی انتخاب کنید که ارز آن با واحد فعلی برنامه یکسان باشد. تبدیل خودکار ارز انجام نمی‌شود.</string>
 </resources>

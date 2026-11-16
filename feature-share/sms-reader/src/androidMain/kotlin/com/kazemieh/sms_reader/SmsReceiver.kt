@@ -8,6 +8,7 @@ import com.kazemieh.domain.repository.SmsDraftRepository
 import com.kazemieh.domain.repository.TransactionRepository
 import com.kazemieh.domain.notification.NotificationManager
 import com.kazemieh.domain.usecase.PreferenceUseCases
+import com.kazemieh.domain.usecase.resolveSmsSource
 import com.kazemieh.preferences.FinTrackPreferences
 import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
 import com.kazemieh.common.persiandatetime.extensions.toDateString
@@ -65,12 +66,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         if (draft == null) continue
 
                         val sources = transactionRepository.observeSources().first()
-                        val detectedSource = sources.find {
-                            it.smsSender?.equals(sender, ignoreCase = true) == true
-                        }
-                            ?: draft.sourceIdentifier?.let { identifier ->
-                                transactionRepository.getSourceByIdentifier(identifier)
-                            } ?: sources.find { it.matchesBankName(draft.bankName) }
+                        val detectedSource = resolveSmsSource(draft, sources)
                         
                         val finalDraft = draft.copy(
                             sourceId = detectedSource?.id,
@@ -122,24 +118,3 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
         }
     }
 }
-
-private fun com.kazemieh.common.model.Source.matchesBankName(bankName: String): Boolean {
-    val aliases = mapOf(
-        "mellat" to setOf("mellat", "ملت"),
-        "saderat" to setOf("saderat", "صادرات"),
-        "pasargad" to setOf("pasargad", "پاسارگاد"),
-        "saman" to setOf("saman", "سامان"),
-        "blu" to setOf("blu", "بلو", "بلوبانک")
-    )
-    val normalizedSource = name.normalizeBankText()
-    val normalizedBank = bankName.normalizeBankText()
-    val candidates = aliases.entries.firstOrNull { (key, values) ->
-        normalizedBank == key || normalizedBank in values
-    }?.value ?: setOf(normalizedBank)
-    return candidates.any { candidate ->
-        candidate.isNotBlank() && normalizedSource.contains(candidate)
-    }
-}
-
-private fun String.normalizeBankText(): String =
-    lowercase().replace('ي', 'ی').replace('ك', 'ک').replace(" ", "")

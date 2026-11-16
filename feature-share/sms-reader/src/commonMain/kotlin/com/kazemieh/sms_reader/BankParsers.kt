@@ -17,7 +17,7 @@ abstract class BaseBankParser : BankParser {
     protected fun extractSourceIdentifier(body: String): String? {
         // Look for 4 digits after keywords like "کارت", "حساب", "به", "از"
         val regex = """(?:کارت|حساب|به|از)[:\s]*[\d\*]*(\d{4})""".toRegex()
-        return regex.find(body)?.groupValues?.get(1)
+        return regex.find(body.toEnglishDigits())?.groupValues?.get(1)
     }
 
     protected fun createDraft(

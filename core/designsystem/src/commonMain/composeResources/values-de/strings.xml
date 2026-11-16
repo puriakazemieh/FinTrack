@@ -1536,4 +1536,5 @@
     <string name="lock_security_question_hint">Beispiel: Der Name Ihres ersten Lehrers?</string>
     <string name="notif_bank_receipt_label">Bankeingänge</string>
     <string name="sms_detection_amount">Transaktion bei %1$s: %2$s</string>
+    <string name="sms_source_currency_incompatible">Wählen Sie für eine Bank-SMS ein Rial- oder Toman-Konto mit derselben Währung wie die App. Währungen werden nicht automatisch umgerechnet.</string>
 </resources>
