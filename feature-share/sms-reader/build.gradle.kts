@@ -52,6 +52,7 @@ kotlin {
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.kotlinx.datetime)
                 implementation(project(":core:common"))
+                implementation(project(":core:money"))
                 implementation(project(":core:domain"))
                 implementation(project(":core:designsystem"))
                 implementation(project(":core:preferences"))

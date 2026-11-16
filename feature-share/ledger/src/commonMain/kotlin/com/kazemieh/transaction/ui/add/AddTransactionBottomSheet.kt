@@ -59,6 +59,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.category.ui.list.CategoryPickerBottomSheet
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.Person
+import com.kazemieh.designsystem.model.bankForSms
 import com.kazemieh.common.model.SmsDraft
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
@@ -475,7 +476,7 @@ fun ColumnScope.AddTransactionContent(
                             ) {
                                 Column(modifier = Modifier.padding(8.dp)) {
                                     FintrackLabelMediumText(
-                                        text = stringResource(Res.string.sms_ref_label, draft.bankName)
+                                        text = stringResource(Res.string.sms_ref_label, stringResource(bankForSms(draft.bankName).title))
                                     )
                                     FintrackLabelSmallText(text = draft.amount.toString() + " " + draft.date.toPersianDigits())
                                 }
@@ -569,7 +570,7 @@ fun ColumnScope.AddTransactionContent(
                             ) {
                                 Column(modifier = Modifier.padding(8.dp)) {
                                     FintrackLabelMediumText(
-                                        text = stringResource(Res.string.sms_ref_label, draft.bankName)
+                                        text = stringResource(Res.string.sms_ref_label, stringResource(bankForSms(draft.bankName).title))
                                     )
                                     FintrackLabelSmallText(text = draft.amount.toString() + " " + draft.date.toPersianDigits())
                                 }

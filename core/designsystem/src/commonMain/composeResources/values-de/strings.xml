@@ -1087,7 +1087,7 @@
 
     <!-- SMS Reader -->
     <string name="sms_detection_title">Die Banktextnachricht wurde identifiziert.</string>
-    <string name="sms_detection_desc">Es wurde eine Transaktion identifiziert, die sich auf die Bank %1$s bezieht.</string>
+    <string name="sms_detection_desc">Eine Transaktion von %1$s wurde erkannt.</string>
     <string name="sms_banner_text">1% $ s neue Bank-SMS wurde identifiziert. %1$s</string>
     <string name="sms_sheet_title">Erkannte Textnachrichten</string>
     <string name="sms_sheet_sub">Auswählen, eine Transaktion zu registrieren</string>
@@ -1535,4 +1535,5 @@
     <string name="lock_security_setup_desc">Um das Passwort bei Vergesslichkeit wiederherzustellen, geben Sie bitte eine Sicherheitsfrage und deren Antwort an.</string>
     <string name="lock_security_question_hint">Beispiel: Der Name Ihres ersten Lehrers?</string>
     <string name="notif_bank_receipt_label">Bankeingänge</string>
+    <string name="sms_detection_amount">Transaktion bei %1$s: %2$s</string>
 </resources>

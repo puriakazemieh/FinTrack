@@ -16,6 +16,9 @@ import kotlinx.datetime.TimeZone
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.sms_detection_desc
 import fintrack.core.designsystem.generated.resources.sms_detection_title
+import fintrack.core.designsystem.generated.resources.sms_detection_amount
+import fintrack.core.designsystem.generated.resources.currency_toman_full
+import fintrack.core.designsystem.generated.resources.currency_rial_full
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -83,7 +86,17 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         )
 
                         val title = getString(Res.string.sms_detection_title)
-                        val messageStr = getString(Res.string.sms_detection_desc, finalDraft.bankName)
+                        val bankTitle = getString(smsBank(finalDraft.bankName).title)
+                        val displayCurrency = smsDisplayCurrency(preferenceUseCases.getStringPreference(
+                            FinTrackPreferences.PREF_CURRENCY, ""))
+                        val unitLabel = getString(if (displayCurrency.code == "IRT")
+                            Res.string.currency_toman_full else Res.string.currency_rial_full)
+                        val hideAmount = preferenceUseCases.getStringPreference(
+                            FinTrackPreferences.PREF_HIDE_BALANCE, "false").toBoolean()
+                        val messageStr = if (hideAmount) {
+                            getString(Res.string.sms_detection_desc, bankTitle)
+                        } else getString(Res.string.sms_detection_amount, bankTitle,
+                            smsFormattedAmount(finalDraft.amount, displayCurrency, unitLabel))
 
                         // Use the persisted draft id as the notification id so both the deep link
                         // (pre-fill) and the "ignore" action target the correct draft row.

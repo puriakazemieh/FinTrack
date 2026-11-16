@@ -1,6 +1,7 @@
 package com.kazemieh.transaction.ui.add
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +29,7 @@ import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalGlassColors
+import com.kazemieh.designsystem.model.bankForSms
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.GlassCard
@@ -41,6 +43,7 @@ import fintrack.core.designsystem.generated.resources.type_income
 import fintrack.core.designsystem.generated.resources.type_transfer
 import fintrack.core.designsystem.generated.resources.sms_ref_label
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun SmsReferenceBanner(
@@ -48,6 +51,7 @@ fun SmsReferenceBanner(
     modifier: Modifier = Modifier
 ) {
     val glassColors = LocalGlassColors.current
+    val bank = bankForSms(draft.bankName)
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -66,14 +70,13 @@ fun SmsReferenceBanner(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Message,
+                    Image(
+                        painter = painterResource(bank.logo),
                         contentDescription = null,
-                        tint = GlassBlue,
-                        modifier = Modifier.size(14.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                     FintrackLabelSmallText(
-                        text = stringResource(Res.string.sms_ref_label, draft.bankName),
+                        text = stringResource(Res.string.sms_ref_label, stringResource(bank.title)),
                         color = GlassBlue,
                         fontWeight = FontWeight.Bold
                     )

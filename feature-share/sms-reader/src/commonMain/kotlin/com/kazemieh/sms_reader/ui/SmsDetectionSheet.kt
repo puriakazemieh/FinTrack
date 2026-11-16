@@ -8,7 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Message
+import androidx.compose.foundation.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,7 +23,10 @@ import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.SmsDraft
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.TransactionType
-import com.kazemieh.common.toPersianPrice
+import com.kazemieh.designsystem.LocalHideBalance
+import com.kazemieh.sms_reader.smsBank
+import com.kazemieh.sms_reader.smsDisplayCurrency
+import com.kazemieh.sms_reader.smsFormattedAmount
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalGlassColors
@@ -39,7 +42,8 @@ import com.kazemieh.designsystem.component.glass.ScreenHeader
 import com.kazemieh.designsystem.picker.FinTrackIcons
 import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.bank_label
+import fintrack.core.designsystem.generated.resources.currency_toman_full
+import fintrack.core.designsystem.generated.resources.currency_rial_full
 import fintrack.core.designsystem.generated.resources.card_suffix_label
 import fintrack.core.designsystem.generated.resources.category
 import fintrack.core.designsystem.generated.resources.edit
@@ -187,7 +191,11 @@ fun SmsDraftItem(
 ) {
     val glassColors = LocalGlassColors.current
 
-    val displayAmount = if (currency == "IRT") draft.amount / 10 else draft.amount
+    val displayCurrency = smsDisplayCurrency(currency)
+    val unitLabel = stringResource(if (displayCurrency.code == "IRT")
+        Res.string.currency_toman_full else Res.string.currency_rial_full)
+    val bank = smsBank(draft.bankName)
+    val hideBalance = LocalHideBalance.current
 
     GlassCard(
         modifier = Modifier.fillMaxWidth(),
@@ -205,11 +213,10 @@ fun SmsDraftItem(
                         .background(GlassGreen.copy(alpha = 0.15f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Message,
+                    Image(
+                        painter = painterResource(bank.logo),
                         contentDescription = null,
-                        tint = GlassGreen,
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.size(32.dp)
                     )
                 }
 
@@ -220,13 +227,14 @@ fun SmsDraftItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         FintrackLabelMediumText(
-                            text = stringResource(Res.string.bank_label, draft.bankName),
+                            text = stringResource(bank.title),
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
                             modifier = Modifier.weight(1f)
                         )
                         FintrackLabelMediumText(
-                            text = displayAmount.toPersianPrice(),
+                            text = if (hideBalance) "••••••" else
+                                smsFormattedAmount(draft.amount, displayCurrency, unitLabel),
                             color = if (draft.type == TransactionType.INCOME) GlassGreen else GlassRed,
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 17.sp,
@@ -240,7 +248,7 @@ fun SmsDraftItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         FintrackLabelSmallText(
-                            text = (draft.sourceIdentifier?.let {
+                            text = if (hideBalance) "••••••" else (draft.sourceIdentifier?.let {
                                 stringResource(
                                     Res.string.card_suffix_label,
                                     it

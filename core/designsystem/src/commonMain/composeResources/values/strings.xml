@@ -1116,7 +1116,7 @@
 
     <!-- SMS Reader -->
     <string name="sms_detection_title">پیامک بانکی شناسایی شد</string>
-    <string name="sms_detection_desc">یک تراکنش مربوط به بانک %1$s شناسایی شد.</string>
+    <string name="sms_detection_desc">یک تراکنش مربوط به %1$s شناسایی شد.</string>
     <string name="sms_banner_text">%1$s پیامک بانکی جدید شناسایی شد</string>
     <string name="sms_sheet_title">پیامک‌های شناسایی شده</string>
     <string name="sms_sheet_sub">انتخاب برای ثبت تراکنش</string>
@@ -1575,4 +1575,5 @@
 
     <!-- Default badge -->
     <string name="msg_cannot_delete_default">این مورد پیش‌فرض است و قابل حذف نیست</string>
+    <string name="sms_detection_amount">تراکنش %1$s: %2$s</string>
 </resources>
