@@ -3,6 +3,7 @@ package com.kazemieh.sms_reader
 import com.kazemieh.common.model.SmsDraft
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.toEnglishDigits
+import com.kazemieh.common.sms.SmsAmountParser
 import kotlin.time.Clock
 
 abstract class BaseBankParser : BankParser {
@@ -11,7 +12,7 @@ abstract class BaseBankParser : BankParser {
         val amountGroup = match.groups[1] ?: return 0L
         val unit = Regex("""^\s*(ریال|تومان|تومن)""")
             .find(body.substring(amountGroup.range.last + 1))?.groupValues?.get(1)
-        return smsAmountInRials(amountGroup.value, unit) ?: 0L
+        return SmsAmountParser.amountInRials(amountGroup.value, unit) ?: 0L
     }
 
     protected fun extractSourceIdentifier(body: String): String? {
@@ -51,7 +52,6 @@ class GenericBankParser : BaseBankParser() {
     // "مبلغ", so we key off the verb, not a fixed "مبلغ: <n>" layout.
     private val incomeKeywords = listOf("واریز", "نشست", "بستانکار", "دریافت", "وصول")
     private val expenseKeywords = listOf("برداشت", "خرید", "پرداخت", "کسر", "خرج", "حواله", "بدهکار")
-    private val balanceKeywords = listOf("موجودی", "مانده")
 
     // Friendly names so the notification/sheet shows the bank instead of a raw shortcode.
     private val bankNameHints = mapOf(
@@ -76,36 +76,7 @@ class GenericBankParser : BaseBankParser() {
         // Must look like an actual transaction, not a balance/OTP/promo message.
         if (!isIncome && !isExpense) return null
 
-        // Collect every "<number> ریال|تومان" amount with its position in the text.
-        val amountRegex = """([\d,]+)\s*(ریال|تومان|تومن)""".toRegex()
-        var amounts = amountRegex.findAll(text)
-            .map { m ->
-                m.range.first to smsAmountInRials(m.groupValues[1], m.groupValues[2])
-            }
-            .toList()
-        // Fallback for banks that omit the currency word: a comma-grouped number (e.g. 500,000)
-        // is almost always the amount, and we already know this is a transaction message.
-        if (amounts.isEmpty()) {
-            val groupedRegex = """\d{1,3}(?:,\d{3})+""".toRegex()
-            amounts = groupedRegex.findAll(text)
-                .mapNotNull { m ->
-                    val value = m.value.replace(",", "").toLongOrNull()
-                    if (value != null && value > 0) m.range.first to value else null
-                }
-                .toList()
-        }
-        if (amounts.isEmpty()) return null
-
-        // The balance figure (after موجودی/مانده) must not be mistaken for the transaction amount;
-        // prefer the first amount that appears before the balance keyword.
-        val balancePos = balanceKeywords.mapNotNull { kw ->
-            text.indexOf(kw).takeIf { it >= 0 }
-        }.minOrNull()
-
-        val txAmount = amounts.firstOrNull { (pos, _) ->
-            balancePos == null || pos < balancePos
-        }?.second ?: return null
-        if (txAmount <= 0) return null
+        val txAmount = SmsAmountParser.transactionAmountInRials(text) ?: return null
 
         val type = when {
             isIncome && !isExpense -> TransactionType.INCOME
@@ -121,16 +92,6 @@ class GenericBankParser : BaseBankParser() {
 
         return createDraft(sender, body, amountLong, type, bankDisplayName, sourceIdentifier, confidence = 75)
     }
-}
-
-// SmsDraft.amount is always rial. Convert only the unit adjacent to the transaction amount;
-// a balance later in the message may use another unit. Reject overflow rather than wrap money.
-private fun smsAmountInRials(raw: String, unit: String?): Long? {
-    val value = raw.replace(",", "").replace("،", "").replace("٬", "")
-        .toEnglishDigits().toLongOrNull()?.takeIf { it > 0 } ?: return null
-    return if (unit == "تومان" || unit == "تومن") {
-        value.takeIf { it <= Long.MAX_VALUE / 10 }?.times(10)
-    } else value
 }
 
 // Keeping specific parsers for better accuracy on major banks

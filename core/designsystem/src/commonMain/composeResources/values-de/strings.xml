@@ -1537,4 +1537,8 @@
     <string name="notif_bank_receipt_label">Bankeingänge</string>
     <string name="sms_detection_amount">Transaktion bei %1$s: %2$s</string>
     <string name="sms_source_currency_incompatible">Wählen Sie für eine Bank-SMS ein Rial- oder Toman-Konto mit derselben Währung wie die App. Währungen werden nicht automatisch umgerechnet.</string>
+    <string name="sms_amount_review_required">Der gespeicherte Betrag weicht von der SMS ab. Prüfen und bestätigen Sie den Betrag vor dem Buchen.</string>
+    <string name="sms_use_detected_amount">SMS-Betrag verwenden</string>
+    <string name="sms_confirm_entered_amount">Eingegebenen Betrag bestätigen</string>
+    <string name="sms_review_amount">Betrag prüfen</string>
 </resources>

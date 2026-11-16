@@ -27,6 +27,7 @@ import com.kazemieh.designsystem.LocalHideBalance
 import com.kazemieh.sms_reader.smsBank
 import com.kazemieh.sms_reader.smsDisplayCurrency
 import com.kazemieh.sms_reader.smsFormattedAmount
+import com.kazemieh.domain.usecase.reviewSmsAmount
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalGlassColors
@@ -44,6 +45,7 @@ import com.kazemieh.financialsource.ui.list.SourcePickerBottomSheet
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.currency_toman_full
 import fintrack.core.designsystem.generated.resources.currency_rial_full
+import fintrack.core.designsystem.generated.resources.sms_review_amount
 import fintrack.core.designsystem.generated.resources.card_suffix_label
 import fintrack.core.designsystem.generated.resources.category
 import fintrack.core.designsystem.generated.resources.edit
@@ -196,6 +198,7 @@ fun SmsDraftItem(
         Res.string.currency_toman_full else Res.string.currency_rial_full)
     val bank = smsBank(draft.bankName)
     val hideBalance = LocalHideBalance.current
+    val amountReview = reviewSmsAmount(draft)
 
     GlassCard(
         modifier = Modifier.fillMaxWidth(),
@@ -279,6 +282,9 @@ fun SmsDraftItem(
             }
 
             // Quick Pickers - Matching AddTransaction UI style
+            if (amountReview != null) {
+                FintrackLabelSmallText(text = stringResource(Res.string.sms_review_amount), color = GlassRed)
+            }
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 // Category Selection
                 val selectedCategory = categories.find { it.id == draft.categoryId }
@@ -324,7 +330,7 @@ fun SmsDraftItem(
                     contentPadding = PaddingValues(0.dp)
                 ) {
                     FintrackLabelMediumText(
-                        text = stringResource(Res.string.notif_action_register),
+                        text = stringResource(if (amountReview != null) Res.string.sms_review_amount else Res.string.notif_action_register),
                         color = Color.White,
                         fontWeight = FontWeight.Bold
                     )

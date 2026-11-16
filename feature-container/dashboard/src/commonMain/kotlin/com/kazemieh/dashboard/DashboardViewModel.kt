@@ -2,6 +2,7 @@ package com.kazemieh.dashboard
 
 import androidx.lifecycle.ViewModel
 import com.kazemieh.domain.usecase.resolveSmsSource
+import com.kazemieh.domain.usecase.reviewSmsAmount
 import com.kazemieh.domain.usecase.isSmsSourceCurrencyCompatible
 import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.Achievement
@@ -337,7 +338,7 @@ class DashboardViewModel(
                 val source = resolveSmsSource(draft, observeSources().first())
                 val currency = Currency.valueOf(preferenceUseCases.getStringPreference(
                     FinTrackPreferences.PREF_CURRENCY, "")).code
-                if (draft.categoryId == null || source == null || !isSmsSourceCurrencyCompatible(source, currency)) {
+                if (draft.categoryId == null || source == null || !isSmsSourceCurrencyCompatible(source, currency) || reviewSmsAmount(draft) != null) {
                     // Fallback to manual registration if data is missing
                     onIntent(
                         DashboardIntent.ShowTransactionBottomSheet(

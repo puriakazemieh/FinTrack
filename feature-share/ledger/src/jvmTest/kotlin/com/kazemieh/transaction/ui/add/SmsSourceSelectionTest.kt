@@ -116,6 +116,53 @@ class SmsSourceSelectionTest {
         assertTrue(vm.state.value.isSourceError)
     }
 
+    @Test
+    fun legacyTomanDraftRequiresAmountReviewBeforePosting() = runTest(dispatcher) {
+        val legacy = draft.copy(sourceId = 1, amount = 50_000,
+            body = "بلوبانک برداشت مبلغ: 50,000 تومان موجودی 900,000 ریال")
+        vm.onIntent(AddTransactionIntent.FetchDefaultData(null, legacy))
+        runCurrent()
+        assertEquals("5000", vm.state.value.amount)
+        vm.onIntent(AddTransactionIntent.Submit)
+        runCurrent()
+        assertTrue(vm.state.value.isAmountError)
+    }
+
+    @Test
+    fun acceptingDetectedAmountPreservesSourceAndDraftUntilSave() = runTest(dispatcher) {
+        val legacy = draft.copy(sourceId = 1, amount = 50_000, body = "برداشت مبلغ: 50,000 تومان")
+        vm.onIntent(AddTransactionIntent.FetchDefaultData(null, legacy))
+        runCurrent()
+        vm.onIntent(AddTransactionIntent.UseSuggestedSmsAmount)
+        assertEquals("50000", vm.state.value.amount)
+        assertNull(vm.state.value.smsAmountReview)
+        assertEquals(a, vm.state.value.source)
+        assertEquals(legacy, vm.state.value.smsDraft)
+    }
+
+    @Test
+    fun explicitlyConfirmingEnteredAmountDoesNotRewriteIt() = runTest(dispatcher) {
+        vm.onIntent(AddTransactionIntent.FetchDefaultData(null,
+            draft.copy(sourceId = 1, amount = 50_000, body = "برداشت مبلغ: 50,000 تومان")))
+        runCurrent()
+        vm.onIntent(AddTransactionIntent.ConfirmEnteredSmsAmount)
+        assertEquals("5000", vm.state.value.amount)
+        assertNull(vm.state.value.smsAmountReview)
+    }
+
+    @Test
+    fun editingAmountIsAnExplicitReviewAndKeepsTheSelectedSource() = runTest(dispatcher) {
+        vm.onIntent(AddTransactionIntent.FetchDefaultData(null,
+            draft.copy(sourceId = 1, amount = 50_000, body = "برداشت مبلغ: 50,000 تومان")))
+        runCurrent()
+        vm.onIntent(AddTransactionIntent.SetSource(b))
+        vm.onIntent(AddTransactionIntent.SetAmount("42000"))
+        runCurrent()
+        assertEquals("42000", vm.state.value.amount)
+        assertNull(vm.state.value.smsAmountReview)
+        assertEquals(b, vm.state.value.source)
+    }
+
     private inline fun <reified T> proxy(crossinline call: (String, Array<out Any?>) -> Any? = { name, _ ->
         error("Unexpected dependency call: $name")
     }): T = Proxy.newProxyInstance(T::class.java.classLoader, arrayOf(T::class.java)) { _, method, args ->

@@ -22,6 +22,8 @@ import com.kazemieh.domain.repository.SmsDraftRepository
 import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import com.kazemieh.domain.usecase.resolveSmsSource
 import com.kazemieh.domain.usecase.isSmsSourceCurrencyCompatible
+import com.kazemieh.domain.usecase.reviewSmsAmount
+import com.kazemieh.domain.usecase.SmsAmountReview
 import com.kazemieh.jalali.JalaliCalendar
 import com.kazemieh.money.Currency
 import com.kazemieh.preferences.FinTrackPreferences
@@ -29,6 +31,7 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.msg_mandatory_fields_error
 import fintrack.core.designsystem.generated.resources.transaction_failed
 import fintrack.core.designsystem.generated.resources.sms_source_currency_incompatible
+import fintrack.core.designsystem.generated.resources.sms_amount_review_required
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -95,11 +98,25 @@ class AddTransactionViewModel(
             is AddTransactionIntent.SetAmount -> _state.update {
                 it.copy(
                     amount = intent.amount,
+                    smsAmountReview = null,
                     isAmountError = false
                 )
             }
 
             is AddTransactionIntent.SetAmountTransfer -> _state.update { it.copy(amountTransfer = intent.amount) }
+            AddTransactionIntent.UseSuggestedSmsAmount -> {
+                val suggested = _state.value.smsAmountReview?.suggestedAmountInRials
+                if (suggested != null) {
+                    val currency = Currency.valueOf(preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_CURRENCY, ""))
+                    _state.update { it.copy(
+                        amount = (if (currency.code == "IRT") suggested / 10 else suggested).toString(),
+                        smsAmountReview = null, isAmountError = false
+                    ) }
+                }
+            }
+            AddTransactionIntent.ConfirmEnteredSmsAmount -> _state.update {
+                it.copy(smsAmountReview = null, isAmountError = false)
+            }
             is AddTransactionIntent.SetCategory -> _state.update {
                 it.copy(
                     category = intent.category,
@@ -122,6 +139,7 @@ class AddTransactionViewModel(
                         date = intent.draft.date,
                         transactionType = intent.draft.type,
                         smsDraft = intent.draft,
+                        smsAmountReview = reviewSmsAmount(intent.draft),
                         relatedSmsDrafts = emptyList() // clear banner
                     )
                 }
@@ -198,8 +216,11 @@ class AddTransactionViewModel(
                 if (validateAndUpdateErrors()) {
                     submitTransaction()
                 } else {
-                    val message = if (_state.value.smsDraft != null && _state.value.source != null && _state.value.isSourceError)
-                        Res.string.sms_source_currency_incompatible else Res.string.msg_mandatory_fields_error
+                    val message = when {
+                        _state.value.smsAmountReview != null -> Res.string.sms_amount_review_required
+                        _state.value.smsDraft != null && _state.value.source != null && _state.value.isSourceError -> Res.string.sms_source_currency_incompatible
+                        else -> Res.string.msg_mandatory_fields_error
+                    }
                     viewModelScope.launch {
                         SnackbarController.showMessage(UiText.StringResourceText(message))
                     }
@@ -256,6 +277,7 @@ class AddTransactionViewModel(
                     date = "${today.day.toPersianDigits()} / ${today.monthString} / ${today.year.toPersianDigits()}",
                     timeStamp = Clock.System.now().toEpochMilliseconds(),
                     smsDraft = smsDraft,
+                    smsAmountReview = smsDraft?.let(::reviewSmsAmount),
                     isSourceManuallySelected = false,
                     amount = prefilledAmount,
                     transactionType = smsDraft?.type ?: TransactionType.EXPENSE
@@ -458,7 +480,7 @@ class AddTransactionViewModel(
         // Amount is stored as Int; reject values that don't fit so they aren't silently
         // truncated to 0 on save (toIntOrNull returns null for out-of-range values).
         val amountLong = current.amount.toLongOrNull()
-        val isAmountError = amountLong == null || amountLong <= 0L
+        val isAmountError = amountLong == null || amountLong <= 0L || current.smsAmountReview != null
         val isCategoryError =
             current.transactionType != TransactionType.TRANSFER && current.category == null
         val incompatibleSmsCurrency = current.smsDraft != null && current.source != null &&
@@ -520,6 +542,7 @@ data class AddTransactionState(
     val sheetStack: List<AddTransactionSheet> = emptyList(),
     val oldTransaction: Transaction? = null,
     val smsDraft: SmsDraft? = null,
+    val smsAmountReview: SmsAmountReview? = null,
     val relatedSmsDrafts: List<SmsDraft> = emptyList(),
     val listTransactionType: List<TransactionType> = TransactionType.entries,
     val mostUsedCategories: List<Category> = emptyList(),
@@ -532,6 +555,8 @@ val AddTransactionState.topSheet: AddTransactionSheet?
     get() = sheetStack.lastOrNull()
 
 sealed interface AddTransactionIntent {
+    data object UseSuggestedSmsAmount : AddTransactionIntent
+    data object ConfirmEnteredSmsAmount : AddTransactionIntent
     data class SetAmount(val amount: String) : AddTransactionIntent
     data class SetAmountTransfer(val amount: String) : AddTransactionIntent
     data class SetCategory(val category: Category?) : AddTransactionIntent

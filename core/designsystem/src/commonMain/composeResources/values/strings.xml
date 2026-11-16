@@ -1577,4 +1577,8 @@
     <string name="msg_cannot_delete_default">این مورد پیش‌فرض است و قابل حذف نیست</string>
     <string name="sms_detection_amount">تراکنش %1$s: %2$s</string>
     <string name="sms_source_currency_incompatible">برای ثبت پیامک بانکی، منبع ریالی یا تومانی انتخاب کنید که ارز آن با واحد فعلی برنامه یکسان باشد. تبدیل خودکار ارز انجام نمی‌شود.</string>
+    <string name="sms_amount_review_required">مبلغ ذخیره‌شده با متن پیامک همخوانی ندارد. پیش از ثبت، مبلغ را بازبینی و تأیید کنید.</string>
+    <string name="sms_use_detected_amount">استفاده از مبلغ پیامک</string>
+    <string name="sms_confirm_entered_amount">تأیید مبلغ واردشده</string>
+    <string name="sms_review_amount">بازبینی مبلغ</string>
 </resources>

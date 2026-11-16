@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -62,6 +63,9 @@ import com.kazemieh.common.model.Person
 import com.kazemieh.designsystem.model.bankForSms
 import com.kazemieh.common.model.SmsDraft
 import fintrack.core.designsystem.generated.resources.sms_source_currency_incompatible
+import fintrack.core.designsystem.generated.resources.sms_amount_review_required
+import fintrack.core.designsystem.generated.resources.sms_use_detected_amount
+import fintrack.core.designsystem.generated.resources.sms_confirm_entered_amount
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.model.Tag
 import com.kazemieh.common.model.TransactionType
@@ -413,6 +417,20 @@ fun ColumnScope.AddTransactionContent(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     SmsReferenceBanner(draft = draft)
+                    state.smsAmountReview?.let { review ->
+                        FintrackLabelSmallText(
+                            text = stringResource(Res.string.sms_amount_review_required),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                        if (review.suggestedAmountInRials != null) {
+                            TextButton(onClick = { onIntent(AddTransactionIntent.UseSuggestedSmsAmount) }) {
+                                FintrackLabelSmallText(text = stringResource(Res.string.sms_use_detected_amount))
+                            }
+                        }
+                        TextButton(onClick = { onIntent(AddTransactionIntent.ConfirmEnteredSmsAmount) }) {
+                            FintrackLabelSmallText(text = stringResource(Res.string.sms_confirm_entered_amount))
+                        }
+                    }
                     if (state.isSourceError && state.source != null) {
                         FintrackLabelSmallText(
                             text = stringResource(Res.string.sms_source_currency_incompatible),
