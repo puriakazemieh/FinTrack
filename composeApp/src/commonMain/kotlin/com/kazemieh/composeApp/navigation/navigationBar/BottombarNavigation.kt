@@ -273,7 +273,9 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
             )
         }
 
-        composable<Screen.Budget> {
+        composable<Screen.Budget>(
+            deepLinks = listOf(navDeepLink { uriPattern = "fintrack://budget" })
+        ) {
             BudgetScreen(
                 onBack = { navController.popBackStack() },
                 onNavigateToTransactions = { category ->
@@ -331,7 +333,9 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
             )
         }
 
-        composable<Screen.Debt> {
+        composable<Screen.Debt>(
+            deepLinks = listOf(navDeepLink { uriPattern = "fintrack://debt" })
+        ) {
             DebtsScreen(
                 onBack = { navController.popBackStack() },
                 onNavigateToPersonDetail = { personId ->
@@ -340,13 +344,17 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
             )
         }
 
-        composable<Screen.Check> {
+        composable<Screen.Check>(
+            deepLinks = listOf(navDeepLink { uriPattern = "fintrack://check" })
+        ) {
             CheckListScreen(
                 onBack = { navController.popBackStack() }
             )
         }
 
-        composable<Screen.FixedExpense> {
+        composable<Screen.FixedExpense>(
+            deepLinks = listOf(navDeepLink { uriPattern = "fintrack://fixed-expense" })
+        ) {
             FixedExpenseListScreen(
                 onBack = { navController.popBackStack() }
             )
@@ -383,13 +391,17 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
             )
         }
 
-        composable<Screen.Shopping> {
+        composable<Screen.Shopping>(
+            deepLinks = listOf(navDeepLink { uriPattern = "fintrack://shopping" })
+        ) {
             ShoppingListScreen(
                 onBack = { navController.popBackStack() }
             )
         }
 
-        composable<Screen.Notes> {
+        composable<Screen.Notes>(
+            deepLinks = listOf(navDeepLink { uriPattern = "fintrack://notes" })
+        ) {
             NotesListScreen(
                 onAddNote = { navController.navigate(Screen.NoteEdit(0L)) },
                 onEditNote = { id: Long -> navController.navigate(Screen.NoteEdit(id)) },

@@ -28,6 +28,7 @@ import fintrack.core.designsystem.generated.resources.notif_channel_quick_add
 import fintrack.core.designsystem.generated.resources.notif_channel_shopping
 import fintrack.core.designsystem.generated.resources.notif_channel_sms
 import fintrack.core.designsystem.generated.resources.edit
+import fintrack.core.designsystem.generated.resources.title_fixed_expense_management
 import android.net.Uri
 import com.kazemieh.common.model.ToolFeature
 import com.kazemieh.domain.usecase.PreferenceUseCases
@@ -70,6 +71,8 @@ class AndroidNotificationManager(
                 toolEnabled(ToolFeature.BUDGETS) && notifEnabled(FinTrackPreferences.PREF_NOTIF_BUDGET_ENABLED)
             NotificationManager.CHANNEL_INSTALLMENT ->
                 toolEnabled(ToolFeature.INSTALLMENT) && notifEnabled(FinTrackPreferences.PREF_NOTIF_INSTALLMENT_ENABLED)
+            NotificationManager.CHANNEL_FIXED_EXPENSE ->
+                toolEnabled(ToolFeature.FIXED_EXPENSE) && notifEnabled(FinTrackPreferences.PREF_NOTIF_FIXED_EXPENSE_ENABLED)
             NotificationManager.CHANNEL_CHEQUE ->
                 toolEnabled(ToolFeature.CHECK) && notifEnabled(FinTrackPreferences.PREF_NOTIF_CHEQUE_ENABLED)
             NotificationManager.CHANNEL_DEBT -> 
@@ -130,6 +133,11 @@ class AndroidNotificationManager(
             createChannel(
                 NotificationManager.CHANNEL_QUICK_ADD,
                 getString(Res.string.notif_channel_quick_add),
+                importance = AndroidNotificationManagerSystem.IMPORTANCE_HIGH
+            )
+            createChannel(
+                NotificationManager.CHANNEL_FIXED_EXPENSE,
+                getString(Res.string.title_fixed_expense_management),
                 importance = AndroidNotificationManagerSystem.IMPORTANCE_HIGH
             )
         }
@@ -211,6 +219,10 @@ class AndroidNotificationManager(
 
         val defaultUri = when (channelId) {
             NotificationManager.CHANNEL_INSTALLMENT -> "fintrack://installment"
+            NotificationManager.CHANNEL_FIXED_EXPENSE -> "fintrack://fixed-expense"
+            NotificationManager.CHANNEL_BUDGET -> "fintrack://budget"
+            NotificationManager.CHANNEL_SHOPPING -> "fintrack://shopping"
+            NotificationManager.CHANNEL_NOTE -> "fintrack://notes"
             else -> "fintrack://dashboard"
         }
         val builder = NotificationCompat.Builder(context, postingChannelId(channelId))

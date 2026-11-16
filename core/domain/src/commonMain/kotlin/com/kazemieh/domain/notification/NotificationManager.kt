@@ -11,7 +11,7 @@ interface NotificationManager {
 
     fun showInstallmentNotification(id: Int, title: String, message: String, installmentId: Long)
 
-    /** Shows a persistent one-tap "add transaction" notification, deep-linking into the add sheet. */
+    /** Shows a dismissible one-tap "add transaction" notification, deep-linking into the add sheet. */
     fun showQuickAddNotification(title: String, message: String, actionLabel: String)
     fun cancelNotification(id: Int)
 
@@ -24,6 +24,7 @@ interface NotificationManager {
         const val CHANNEL_SMS = "sms_detection"
         const val CHANNEL_DEBT = "debt_reminders"
         const val CHANNEL_QUICK_ADD = "quick_add"
+        const val CHANNEL_FIXED_EXPENSE = "fixed_expense_reminders"
         const val ID_QUICK_ADD = 9001
     }
 }

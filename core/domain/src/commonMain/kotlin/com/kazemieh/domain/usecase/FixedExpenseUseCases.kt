@@ -31,7 +31,8 @@ class AddFixedExpenseUseCase(
             title = title,
             message = message,
             scheduledTime = nextDueInstant.toLocalDateTime(TimeZone.currentSystemDefault()),
-            channelId = NotificationManager.CHANNEL_INSTALLMENT // Use installment channel or add a new one
+            channelId = NotificationManager.CHANNEL_FIXED_EXPENSE,
+            extraId = expense.id
         )
     }
 }
