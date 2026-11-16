@@ -59,3 +59,41 @@ N-03 برای اصلاح و تست مشاهده‌شده بسته شد. تأیی
 هزینهٔ ثابت اکنون کانال اختصاصی fixed_expense_reminders، تنظیم اعلان و ابزار مستقل خود و extraId همان رکورد را دارد. تست جدید دامنه، کانال، reminderId و extraId را کنترل کرد و پاس شد. مجموع آزمون‌ها ۲۱ است. یادآورهای قدیمی هزینهٔ ثابت که با کانال اقساط در صف مانده‌اند و بازکردن مستقیم هر رکورد از فهرست مقصد، همچنان در N-05/06 باز هستند.
 
 برای تأیید روی گوشی واقعی، APK فعلی در app/build/outputs/apk/direct/debug/app-direct-debug.apk است. مورد دستی باز، شنیده‌شدن صدای اعلان و تجربهٔ بنر روی گوشی واقعی با مجوز روشن، حالت صدادار و DND خاموش است. کاربر می‌تواند یک پیام بانکی دریافت کند و سپس با قفل‌کردن صفحه، حذف همان کارت با سوایپ را هم تکرار کند و مدل گوشی، نسخهٔ اندروید و نتیجهٔ صدا/سوایپ را اعلام کند. سایر تست‌های قابل خودکارسازی و اصلاحات باز از چک‌لیست ادامه پیدا می‌کنند.
+
+## لغو یادآور خرید و ادامهٔ مبنا
+
+مبنای این نوبت `428d3d7b` بود. ادامه روی شاخهٔ `codex/fintrack-design-unification` و همان Pixel_9_Pro_XL/API 35 با زبان فارسی و تم شیشه‌ای تیره انجام شد. دو هزینهٔ ماهانهٔ QA-Rent با ۱۲۰۰۰۰ تومان و QA-Internet با ۲۵۰۰۰ تومان از فرم واقعی ثبت شدند. فرم فعلی هزینهٔ ثابت کنترل زمان یادآور ندارد و هم‌پوشانی عنوان سوییچ با توضیح نیز بازتولید شد؛ FIX-01 باز است. BASE-01 تا پروندهٔ کامل تصاویر و داده‌های باقیمانده بسته نشده است.
+
+### QA-N7a؛ خطا، اصلاح و آزمون
+
+روی نسخهٔ قبل از اصلاح، QA-Milk از فرم خرید با یادآور نزدیک ساخته و سپس از شیت حذف پاک شد. رکورد به‌صورت soft delete با syncStatus=2 باقی ماند، اما کار زمان‌بندی‌شده لغو نشد. در موعد ۱۴:۰۶، NotificationWorker اعلان «QA-Milk» را ساخت و کارت آن در پنل مشاهده شد. `shopping-deleted-alert-panel.xml` و `shopping-deleted-notifications.txt` شاهد این خطا هستند.
+
+در `a250b4e7`، حذف آیتم، تیک خرید و برداشتن موعد در ویرایش به لغو همان reminderId متصل شدند. خریدن آیتم زمان ذخیره‌شده را پاک نمی‌کند؛ برداشتن تیک، در صورت آینده‌بودن موعد، دوباره زمان‌بندی می‌کند. زمان‌بندی جدید extraId واقعی آیتم را هم حمل می‌کند. قرارداد سازندهٔ ViewModel و Koin تغییر نکرده است؛ فراخوانندهٔ مستقیم Intent و مسیر مشترک فرم، فهرست و ویجت با سورس و impact تطبیق داده شدند.
+
+سه آزمون JVM در ShoppingReminderTest، حذف، لغو موعد و خریدشدن را با اثر روی Repository و Scheduler کنترل می‌کنند. هر سه با سورس HEAD قبل از اصلاح شکست خوردند (`shopping-tests-before-fix.log`) و بعد از بازگرداندن اصلاح پاس شدند. دستور نهایی زیر موفق بود؛ ۲۴ آزمون شامل ۱۶ دامنه، ۳ پیامک، ۲ پول و ۳ خرید، بدون شکست:
+
+```powershell
+.\gradlew.bat :app:assembleDirectDebug :feature-share:shopping:jvmTest :core:domain:jvmTest :core:money:jvmTest :feature-share:sms-reader:jvmTest --offline --max-workers=2 --console=plain
+```
+
+APK همان اصلاح نصب شد. در اجرای دستگاهی بعدی، QA-Cancel با موعد ۱۴:۳۰ همان روز از فرم ساخته شد. کار `shopping_3` با UUID برابر `b111fa8f-0fec-46db-819c-2905ed06f4b4` ابتدا state=0/ENQUEUED داشت. حذف از UI، آن را پیش از موعد به state=5/CANCELLED برد. شواهد: `shopping-cancel-future-form.xml`، `shopping-cancel-after.xml` و `shopping-work-state-after-delete.json`. این داده‌ها شاهد چرخهٔ لغو هستند؛ تأیید صدا، heads-up، تحویل هم‌زمان با لغو و همهٔ نسخه‌ها در این زیرکار ادعا نمی‌شود و QA-N7/10 باز هستند. برای زیرکار انجام‌شده کار دستی کاربر لازم نیست.
+
+پس از بازگرداندن snapshot داده‌دار و cold boot، ساعت دستگاه ۱۴:۴۶ بود؛ کار همان UUID همچنان CANCELLED بود و اعلان QA-Cancel در فهرست فعال وجود نداشت (`shopping-work-state-after-due.json` و `shopping-cancel-after-due-notifications.txt`). منبع TestBank با ماندهٔ منفی ۱۵۰۰۰۰، هر ۱۱ پیش‌نویس و هر دو هزینهٔ ماهانه دوباره از دیتابیس خوانده شدند. SHA-256 فایل base.apk نصب‌شده با APK اصلاح‌شده برابر بود: `3a0155bab62611c431526cf1c01cc08fee152ad5667b2a5e1408f1b0d4b2a1fb`. امولاتور در پایان با داده‌های آزمایشی قبلی و همین بیلد باقی ماند.
+
+### محیط و GitNexus
+
+نمایهٔ باقی‌مانده از تحلیل قطع‌شده، incomplete-in-progress داشت. بازسازی کامل آن را بازیابی کرد. در تحلیل بعدی، ساخت FTS با خطای جابه‌جایی WAL شکست خورد؛ `--repair-fts` هم همان خطا را داد. بازسازی با `gitnexus.cmd analyze --index-only --pdg --force --wal-checkpoint-threshold 67108864` موفق شد؛ status و MCP، runner schema 4، incomplete_reasons خالی و FTS قابل استفاده گزارش کردند. هشدار محدودبودن پیمایش کل flows همچنان وجود دارد؛ نبود edge به‌عنوان نبود مسیر تلقی نشده است. قبل از کامیت، detect_changes برای سه فایل ۴۱ symbol و ۱۲ flow مرتبط خرید را نشان داد و خروجی partial/truncated نداشت.
+
+برای خواندن و snapshot امن provenance، ابزار مهارت gitnexus-work روی Windows کار نمی‌کند؛ همان helper بدون تغییر از WSL و Node لینوکس اجرا شد. رسید plan و snapshot جاری در `.artifacts/plan-read-receipt.json` و `.artifacts/current-provenance.json` ذخیره شدند؛ digest پلن `sha256:f37769b4e9bb7e3b772a0c55345ddecb319b808cfba5fd295ef6f85286c6ca6d` است. پلن اصلی تغییر نکرد.
+
+نصب تازه پس از حذف و نصب مجدد APK روی همین serial تا صفحهٔ خوشامد تعاملی بررسی شد؛ تصویر `fresh-install-onboarding.png` و XML متناظر ثبت شدند. snapshotهای `fintrack-fresh-install-20261116` و `fintrack-upgrade-data-20261116` جدا ذخیره شدند. بازیابی snapshot یک بار ADB را offline نگه داشت و امولاتور با cold boot بازیابی شد؛ نتیجهٔ ارتقا جدا ثبت می‌شود.
+
+### BASE-02؛ ارتقای APK قدیم با داده و کانال واقعی
+
+نسخهٔ انتشار `69c0f531` در worktree جدا `.artifacts/fintrack-release-baseline` ساخته شد. فقط `local.properties` ماشین و تنظیم مخزن Maven فعلی برای resolve وابستگی‌ها به آن کپی شد؛ سورس برنامهٔ مبنا دست‌نخورده ماند. ساخت DirectDebug با offline/max-workers=2 در ۲ دقیقه و ۱۸ ثانیه، ۵۹۱ task، موفق بود. APK قدیم و جدید هر دو 6.9.0/versionCode 15 هستند، اما سورس متفاوت دارند. SHA-256 گواهی امضای هر دو برابر `c43f3931098d306d697129a53d84ad14ba3db35b55f6ce2970b8e15c559e7405` است.
+
+APK قدیم روی نصب پاک نصب و آنبوردینگ تکمیل شد. مجوزهای SMS و اعلان روشن بودند. پیام ۹۴۰۰۰۰ ریالی از 989100001255 با ورودی تلفنی امولاتور دریافت شد؛ draft شمارهٔ ۱ و منبع پیش‌فرض «نقد» در دیتابیس واقعی ساخته شدند. کانال sms_detection با importance=3، صدای پیش‌فرض و userLockedFields=0 وجود داشت و کانال alerts هنوز ساخته نشده بود. سپس APK جدید با `adb -s emulator-5554 install -r`، بدون حذف یا پاک‌کردن داده، نصب شد.
+
+مقایسهٔ تمام ردیف‌های sms_draft، source و transactions در `upgrade-before.db` و `upgrade-after.db` برای هر سه جدول برابر بود؛ داشبورد جدید همان یک پیام را نمایش داد (`upgrade-new-dashboard.xml`). پس از SMS تازه، sms_detection_alerts_v1 با importance=4 ساخته شد. بنر جدید روی launcher در `upgrade-headsup.png` مشاهده شد و دو ضبط `upgrade-headsup.mp4` و `upgrade-headsup-2.mp4` ثبت شدند. ضبط اول به‌علت محدودیت codec از اندازهٔ کامل به 720x1280 برگشت؛ ضبط دوم صریحاً 672x1496 است. صدا در این اجرا شنیداری تأیید نشده است.
+
+برای جداسازی بنر، مجوز اعلان Messages موقتاً روی همین امولاتور بسته و پس از گرفتن مدرک به حالت روشن برگردانده شد. خطای موقت نبود Package Manager در ابتدای cold boot با صبر و بررسی sys.boot_completed=1 و pm path android رفع و نصب تکرار شد. این خطا مربوط به آماده‌نبودن سیستم بود؛ بیلد یا برنامه خطا نداشت. BASE-02 بسته شد؛ QA-N10 و مهاجرت همهٔ کانال‌ها/نسخه‌ها در N-04 باز هستند.
