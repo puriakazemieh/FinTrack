@@ -2,6 +2,8 @@ package com.kazemieh.notifications
 
 import android.Manifest
 import com.kazemieh.domain.notification.NotificationManager
+import com.kazemieh.domain.notification.notificationTag
+import com.kazemieh.domain.notification.canonicalNotificationChannel
 import android.app.NotificationChannel
 import android.app.NotificationManager as AndroidNotificationManagerSystem
 import android.app.PendingIntent
@@ -47,9 +49,34 @@ class AndroidNotificationManager(
         const val QUICK_ADD_DISMISSED = "quick_add_dismissed"
         const val EXTRA_NOTIFICATION_ID = "fintrack_notification_id"
         const val EXTRA_NOTIFICATION_CHANNEL = "fintrack_notification_channel"
+        const val EXTRA_NOTIFICATION_TAG = "fintrack_notification_tag"
+
+        /** New cards are exact; legacy untagged cards are removed only when their channel matches. */
+        fun cancelDeliveredNotification(context: Context, id: Int, channelId: String?, tag: String?) {
+            val manager = context.getSystemService(AndroidNotificationManagerSystem::class.java) ?: return
+            if (tag != null) {
+                manager.cancel(tag, id)
+                return
+            }
+            if (channelId == null) return
+            val expected = canonicalNotificationChannel(channelId)
+            val legacy = manager.activeNotifications.any { card ->
+                card.id == id && card.tag == null && if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    canonicalNotificationChannel(card.notification.channelId) == expected
+                } else {
+                    card.notification.extras.getString(EXTRA_NOTIFICATION_CHANNEL) == expected
+                }
+            }
+            if (legacy) manager.cancel(null, id)
+        }
     }
 
     private val notificationManagerCompat = NotificationManagerCompat.from(context)
+
+    private fun postNotification(id: Int, tag: String, channelId: String, notification: android.app.Notification) {
+        cancelDeliveredNotification(context, id, channelId, null)
+        notificationManagerCompat.notify(tag, id, notification)
+    }
 
     private val appIcon: Int
         get() = context.applicationInfo.icon.takeIf { it != 0 } ?: android.R.drawable.ic_dialog_info
@@ -182,15 +209,18 @@ class AndroidNotificationManager(
         return alertId
     }
 
-    private fun getClickPendingIntent(id: Int, uri: String, channelId: String): PendingIntent {
+    private fun getClickPendingIntent(id: Int, uri: String, channelId: String, recordId: Long? = null): PendingIntent {
+        val tag = notificationTag(channelId, id, recordId)
         val intent = requireNotNull(context.packageManager.getLaunchIntentForPackage(context.packageName)).apply {
             action = Intent.ACTION_VIEW
             data = Uri.parse(uri).buildUpon()
                 .appendQueryParameter("notificationId", id.toString())
                 .appendQueryParameter("notificationChannel", channelId)
+                .appendQueryParameter("notificationTag", tag)
                 .build()
             putExtra(EXTRA_NOTIFICATION_ID, id)
             putExtra(EXTRA_NOTIFICATION_CHANNEL, channelId)
+            putExtra(EXTRA_NOTIFICATION_TAG, tag)
             removeCategory(Intent.CATEGORY_LAUNCHER)
             addCategory(Intent.CATEGORY_BROWSABLE)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -201,8 +231,12 @@ class AndroidNotificationManager(
         )
     }
 
-    private fun getDismissPendingIntent(id: Int, channelId: String): PendingIntent {
-        val intent = Intent("com.kazemieh.notifications.ACTION_DISMISSED").apply {
+    private fun getDismissPendingIntent(id: Int, channelId: String, recordId: Long? = null): PendingIntent {
+        val tag = notificationTag(channelId, id, recordId)
+        val intent = Intent(context, NotificationActionReceiver::class.java).apply {
+            action = "com.kazemieh.notifications.ACTION_DISMISSED"
+            data = Uri.parse("fintrack-notification://dismiss").buildUpon().appendPath(tag).build()
+            putExtra(EXTRA_NOTIFICATION_TAG, tag)
             putExtra("notification_id", id)
             putExtra("channel_id", channelId)
             `package` = context.packageName
@@ -217,6 +251,8 @@ class AndroidNotificationManager(
         if (!hasPermission()) return
         if (!isChannelAllowed(channelId)) return
 
+        val recordId = extraId.takeIf { it > 0 }
+        val tag = notificationTag(channelId, id, recordId)
         val defaultUri = when (channelId) {
             NotificationManager.CHANNEL_INSTALLMENT -> "fintrack://installment"
             NotificationManager.CHANNEL_FIXED_EXPENSE -> "fintrack://fixed-expense"
@@ -234,31 +270,39 @@ class AndroidNotificationManager(
             .setOnlyAlertOnce(true)
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .setAutoCancel(true)
-            .setDeleteIntent(getDismissPendingIntent(id, channelId))
-            .setContentIntent(getClickPendingIntent(id, defaultUri, channelId))
+            .setDeleteIntent(getDismissPendingIntent(id, channelId, recordId))
+            .setContentIntent(getClickPendingIntent(id, defaultUri, channelId, recordId))
 
         when (channelId) {
             NotificationManager.CHANNEL_CHEQUE -> {
-                builder.setContentIntent(getClickPendingIntent(id, "fintrack://check", channelId))
+                builder.setContentIntent(getClickPendingIntent(id, "fintrack://check", channelId, recordId))
 
-                val managePendingIntent = getClickPendingIntent(id, "fintrack://check", channelId)
+                val managePendingIntent = getClickPendingIntent(id, "fintrack://check", channelId, recordId)
                 builder.addAction(0, runBlocking { getString(Res.string.notif_action_manage) }, managePendingIntent)
 
                 val ignoreIntent = Intent("com.kazemieh.check.ACTION_IGNORE").apply {
+                    setClass(context, NotificationActionReceiver::class.java)
                     putExtra("notification_id", id)
+                    putExtra(EXTRA_NOTIFICATION_TAG, tag)
+                    putExtra(EXTRA_NOTIFICATION_CHANNEL, channelId)
+                    data = Uri.parse("fintrack-notification://ignore").buildUpon().appendPath(tag).build()
                     `package` = context.packageName
                 }
                 val ignorePendingIntent = PendingIntent.getBroadcast(context, id + 1000, ignoreIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 builder.addAction(0, runBlocking { getString(Res.string.notif_action_ignore) }, ignorePendingIntent)
             }
             NotificationManager.CHANNEL_DEBT -> {
-                builder.setContentIntent(getClickPendingIntent(id, "fintrack://debt", channelId))
+                builder.setContentIntent(getClickPendingIntent(id, "fintrack://debt", channelId, recordId))
 
-                val managePendingIntent = getClickPendingIntent(id, "fintrack://debt", channelId)
+                val managePendingIntent = getClickPendingIntent(id, "fintrack://debt", channelId, recordId)
                 builder.addAction(0, runBlocking { getString(Res.string.notif_action_manage) }, managePendingIntent)
 
                 val ignoreIntent = Intent("com.kazemieh.debt.ACTION_IGNORE").apply {
+                    setClass(context, NotificationActionReceiver::class.java)
                     putExtra("notification_id", id)
+                    putExtra(EXTRA_NOTIFICATION_TAG, tag)
+                    putExtra(EXTRA_NOTIFICATION_CHANNEL, channelId)
+                    data = Uri.parse("fintrack-notification://ignore").buildUpon().appendPath(tag).build()
                     `package` = context.packageName
                 }
                 val ignorePendingIntent = PendingIntent.getBroadcast(context, id + 1000, ignoreIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
@@ -266,12 +310,14 @@ class AndroidNotificationManager(
             }
         }
         analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationReceived(channelId))
-        notificationManagerCompat.notify(id, builder.build())
+        postNotification(id, tag, channelId, builder.build())
     }
 
     override fun showStickyNotification(id: Int, title: String, message: String, smsDraftId: Long) {
         if (!hasPermission()) return
         if (!isChannelAllowed(NotificationManager.CHANNEL_SMS)) return
+
+        val tag = notificationTag(NotificationManager.CHANNEL_SMS, id, smsDraftId)
 
         // Deep-link straight into the add-transaction sheet, carrying the SMS draft id so the sheet
         // opens pre-filled with the detected amount / type / source instead of a blank form.
@@ -280,12 +326,15 @@ class AndroidNotificationManager(
         val editLabel = runBlocking { getString(Res.string.edit) }
         val ignoreLabel = runBlocking { getString(Res.string.notif_action_ignore) }
 
-        val managePendingIntent = getClickPendingIntent(id, deepLinkUri, NotificationManager.CHANNEL_SMS)
+        val managePendingIntent = getClickPendingIntent(id, deepLinkUri, NotificationManager.CHANNEL_SMS, smsDraftId)
         val editAction = NotificationCompat.Action.Builder(0, editLabel, managePendingIntent).build()
 
         // Action for Ignore (Broadcast)
         val ignoreIntent = Intent("com.kazemieh.sms_reader.ACTION_IGNORE").apply {
-            putExtra("sms_id", id.toLong())
+            setClassName(context, "com.kazemieh.sms_reader.SmsActionReceiver")
+            putExtra("sms_id", smsDraftId)
+            putExtra("notification_id", id)
+            data = Uri.parse("fintrack-notification://sms-ignore").buildUpon().appendPath(tag).build()
             `package` = context.packageName
         }
         val ignorePendingIntent = PendingIntent.getBroadcast(
@@ -305,13 +354,13 @@ class AndroidNotificationManager(
             .setOnlyAlertOnce(true)
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .setContentIntent(managePendingIntent)
-            .setDeleteIntent(getDismissPendingIntent(id, NotificationManager.CHANNEL_SMS))
+            .setDeleteIntent(getDismissPendingIntent(id, NotificationManager.CHANNEL_SMS, smsDraftId))
             .addAction(editAction)
             .addAction(ignoreAction)
             .setAutoCancel(true)
             .build()
         analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationReceived(NotificationManager.CHANNEL_SMS))
-        notificationManagerCompat.notify(id, notification)
+        postNotification(id, tag, NotificationManager.CHANNEL_SMS, notification)
     }
 
     override fun showBudgetAlert(categoryId: Int, categoryName: String, progressPercentage: Int) {
@@ -326,16 +375,21 @@ class AndroidNotificationManager(
         if (!hasPermission()) return
         if (!isChannelAllowed(NotificationManager.CHANNEL_INSTALLMENT)) return
 
+        val tag = notificationTag(NotificationManager.CHANNEL_INSTALLMENT, id, installmentId)
         val deepLinkUri = "fintrack://installment"
-        val pendingIntent = getClickPendingIntent(id, deepLinkUri, NotificationManager.CHANNEL_INSTALLMENT)
+        val pendingIntent = getClickPendingIntent(id, deepLinkUri, NotificationManager.CHANNEL_INSTALLMENT, installmentId)
 
         val registerLabel = runBlocking { getString(Res.string.notif_action_register) }
         val ignoreLabel = runBlocking { getString(Res.string.notif_action_ignore) }
 
         // Action for Mark as Paid (Broadcast)
         val registerIntent = Intent("com.kazemieh.installment.ACTION_MARK_PAID").apply {
+            setClass(context, NotificationActionReceiver::class.java)
             putExtra("installment_id", installmentId)
             putExtra("notification_id", id)
+            putExtra(EXTRA_NOTIFICATION_TAG, tag)
+            putExtra(EXTRA_NOTIFICATION_CHANNEL, NotificationManager.CHANNEL_INSTALLMENT)
+            data = Uri.parse("fintrack-notification://installment-action").buildUpon().appendPath(tag).build()
             `package` = context.packageName
         }
         val registerPendingIntent = PendingIntent.getBroadcast(
@@ -348,7 +402,11 @@ class AndroidNotificationManager(
 
         // Action for Ignore (Broadcast)
         val ignoreIntent = Intent("com.kazemieh.installment.ACTION_IGNORE").apply {
+            setClass(context, NotificationActionReceiver::class.java)
             putExtra("notification_id", id)
+            putExtra(EXTRA_NOTIFICATION_TAG, tag)
+            putExtra(EXTRA_NOTIFICATION_CHANNEL, NotificationManager.CHANNEL_INSTALLMENT)
+            data = Uri.parse("fintrack-notification://installment-action").buildUpon().appendPath(tag).build()
             `package` = context.packageName
         }
         val ignorePendingIntent = PendingIntent.getBroadcast(
@@ -367,7 +425,7 @@ class AndroidNotificationManager(
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .setContentIntent(pendingIntent)
-            .setDeleteIntent(getDismissPendingIntent(id, NotificationManager.CHANNEL_INSTALLMENT))
+            .setDeleteIntent(getDismissPendingIntent(id, NotificationManager.CHANNEL_INSTALLMENT, installmentId))
             .addAction(registerAction)
             .addAction(ignoreAction)
             .setAutoCancel(true)
@@ -375,7 +433,7 @@ class AndroidNotificationManager(
             .setOnlyAlertOnce(true)
             .build()
         analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationReceived(NotificationManager.CHANNEL_INSTALLMENT))
-        notificationManagerCompat.notify(id, notification)
+        postNotification(id, tag, NotificationManager.CHANNEL_INSTALLMENT, notification)
     }
 
     override fun showQuickAddNotification(title: String, message: String, actionLabel: String) {
@@ -402,15 +460,20 @@ class AndroidNotificationManager(
             .addAction(action)
             .build()
         analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationReceived(NotificationManager.CHANNEL_QUICK_ADD))
-        notificationManagerCompat.notify(id, notification)
+        postNotification(id, notificationTag(NotificationManager.CHANNEL_QUICK_ADD, id), NotificationManager.CHANNEL_QUICK_ADD, notification)
     }
 
     override fun cancelNotification(id: Int) {
-        notificationManagerCompat.cancel(id)
         if (id == NotificationManager.ID_QUICK_ADD) {
+            cancelNotification(id, NotificationManager.CHANNEL_QUICK_ADD)
             context.getSharedPreferences(DELIVERY_PREFERENCES, Context.MODE_PRIVATE)
                 .edit().remove(QUICK_ADD_DISMISSED).apply()
-        }
+        } else notificationManagerCompat.cancel(id)
+    }
+
+    override fun cancelNotification(id: Int, channelId: String, recordId: Long?) {
+        cancelDeliveredNotification(context, id, channelId, notificationTag(channelId, id, recordId))
+        cancelDeliveredNotification(context, id, channelId, null)
     }
 
     override fun hasPermission(): Boolean {

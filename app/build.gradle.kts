@@ -16,6 +16,7 @@ android {
         targetSdk = 36
         versionCode = 15
         versionName = "6.9.0"
+        testInstrumentationRunner = "com.kazemieh.fintrack.NotificationIdentityInstrumentation"
     }
 
     signingConfigs {

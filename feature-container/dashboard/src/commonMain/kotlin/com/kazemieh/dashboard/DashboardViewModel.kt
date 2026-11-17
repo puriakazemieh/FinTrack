@@ -14,6 +14,7 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.domain.repository.GoalRepository
 import com.kazemieh.domain.repository.SmsDraftRepository
+import com.kazemieh.domain.notification.NotificationManager
 import com.kazemieh.domain.usecase.ObserveAchievementsUseCase
 import com.kazemieh.domain.usecase.ObserveCategoriesFlatUseCase
 import com.kazemieh.domain.usecase.RegisterSmsDraftsUseCase
@@ -59,7 +60,8 @@ class DashboardViewModel(
     private val observeStreak: ObserveStreakUseCase,
     private val transactionUseCaseGroup: TransactionUseCaseGroup,
     private val goalRepository: GoalRepository,
-    private val registerSmsDrafts: RegisterSmsDraftsUseCase
+    private val registerSmsDrafts: RegisterSmsDraftsUseCase,
+    private val notificationManager: NotificationManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DashboardState())
@@ -353,6 +355,8 @@ class DashboardViewModel(
                 viewModelScope.launch {
                     try {
                         smsDraftRepository.markSmsDraftAsUsed(intent.draft.id)
+                        runCatching { notificationManager.cancelNotification(intent.draft.id.toInt(),
+                            NotificationManager.CHANNEL_SMS, intent.draft.id) }
                         _state.update { it.copy(showDeleteSmsConfirmation = false, smsDraftToDelete = null) }
                         runCatching { analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsDraftIgnored) }
                     } catch (e: CancellationException) { throw e
@@ -369,6 +373,9 @@ class DashboardViewModel(
                 viewModelScope.launch {
                     try {
                         val deleted = smsDraftRepository.deleteUnusedSmsDrafts(ids)
+                        deleted.forEach { id -> runCatching {
+                            notificationManager.cancelNotification(id.toInt(), NotificationManager.CHANNEL_SMS, id)
+                        } }
                         _state.update { it.copy(showDeleteAllSmsConfirmation = false, smsDeleteIds = emptyList(),
                             smsDeletedCount = deleted.size, smsBatchProgress = null, smsGeneralError = null,
                             smsRegistrationErrors = it.smsRegistrationErrors - deleted.toSet()) }

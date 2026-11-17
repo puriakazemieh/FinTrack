@@ -25,7 +25,18 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
 
     override fun onReceive(context: Context, intent: Intent) {
         val notificationId = intent.getIntExtra("notification_id", -1)
-        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as AndroidNotificationManagerSystem
+        val channel = intent.getStringExtra(AndroidNotificationManager.EXTRA_NOTIFICATION_CHANNEL)
+            ?: intent.getStringExtra("channel_id") ?: when (intent.action) {
+                "com.kazemieh.check.ACTION_IGNORE" -> com.kazemieh.domain.notification.NotificationManager.CHANNEL_CHEQUE
+                "com.kazemieh.debt.ACTION_IGNORE" -> com.kazemieh.domain.notification.NotificationManager.CHANNEL_DEBT
+                "com.kazemieh.installment.ACTION_IGNORE", "com.kazemieh.installment.ACTION_MARK_PAID" ->
+                    com.kazemieh.domain.notification.NotificationManager.CHANNEL_INSTALLMENT
+                else -> null
+            }
+        fun cancelCard() {
+            if (intent.hasExtra("notification_id")) AndroidNotificationManager.cancelDeliveredNotification(
+                context, notificationId, channel, intent.getStringExtra(AndroidNotificationManager.EXTRA_NOTIFICATION_TAG))
+        }
 
         when (intent.action) {
             "com.kazemieh.notifications.ACTION_MANAGE" -> {
@@ -38,7 +49,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
                     }
                     context.startActivity(launchIntent)
                 }
-                if (notificationId != -1) nm.cancel(notificationId)
+                cancelCard()
             }
             "com.kazemieh.notifications.ACTION_CONTENT_CLICK" -> {
                 val channelId = intent.getStringExtra("channel_id") ?: "unknown"
@@ -51,7 +62,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
                     }
                     context.startActivity(launchIntent)
                 }
-                if (notificationId != -1) nm.cancel(notificationId)
+                cancelCard()
             }
             "com.kazemieh.notifications.ACTION_DISMISSED" -> {
                 val channelId = intent.getStringExtra("channel_id") ?: "unknown"
@@ -65,7 +76,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             "com.kazemieh.debt.ACTION_IGNORE",
             "com.kazemieh.installment.ACTION_IGNORE" -> {
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationDismissed("ignore"))
-                if (notificationId != -1) nm.cancel(notificationId)
+                cancelCard()
             }
             "com.kazemieh.installment.ACTION_MARK_PAID" -> {
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationClicked("mark_paid"))
@@ -85,7 +96,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
                         reminderTitle = reminderTitle,
                         reminderMessage = reminderMsg
                     )
-                    if (notificationId != -1) nm.cancel(notificationId)
+                    cancelCard()
                 }
             }
         }

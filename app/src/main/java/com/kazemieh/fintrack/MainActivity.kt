@@ -35,14 +35,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleIntent(intent: android.content.Intent) {
         val notificationId = intent.getIntExtra(AndroidNotificationManager.EXTRA_NOTIFICATION_ID, -1)
-        if (notificationId != -1) {
+        if (intent.hasExtra(AndroidNotificationManager.EXTRA_NOTIFICATION_ID)) {
             if (intent.getStringExtra(AndroidNotificationManager.EXTRA_NOTIFICATION_CHANNEL) ==
                 com.kazemieh.domain.notification.NotificationManager.CHANNEL_QUICK_ADD
             ) {
                 getSharedPreferences(AndroidNotificationManager.DELIVERY_PREFERENCES, MODE_PRIVATE)
                     .edit().putBoolean(AndroidNotificationManager.QUICK_ADD_DISMISSED, true).apply()
             }
-            getSystemService(android.app.NotificationManager::class.java).cancel(notificationId)
+            AndroidNotificationManager.cancelDeliveredNotification(this, notificationId,
+                intent.getStringExtra(AndroidNotificationManager.EXTRA_NOTIFICATION_CHANNEL),
+                intent.getStringExtra(AndroidNotificationManager.EXTRA_NOTIFICATION_TAG))
             intent.removeExtra(AndroidNotificationManager.EXTRA_NOTIFICATION_ID)
         }
         val intentData = intent?.data

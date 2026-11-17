@@ -14,6 +14,8 @@ interface NotificationManager {
     /** Shows a dismissible one-tap "add transaction" notification, deep-linking into the add sheet. */
     fun showQuickAddNotification(title: String, message: String, actionLabel: String)
     fun cancelNotification(id: Int)
+    /** Cancels only the owning type and record, even when another type uses the same integer ID. */
+    fun cancelNotification(id: Int, channelId: String, recordId: Long? = null) = cancelNotification(id)
 
     companion object {
         const val CHANNEL_BUDGET = "budget_reminders"

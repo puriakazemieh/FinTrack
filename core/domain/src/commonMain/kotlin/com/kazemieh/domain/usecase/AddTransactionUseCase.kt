@@ -39,6 +39,10 @@ class AddTransactionUseCase(
         } else repository.addTransactionWithBalance(transaction, tagIds, personIds, impact)
         if (resultId <= 0L) return resultId
 
+        if (smsDraftId != null) postCommitEffect("sms_notification_cleanup_failed") {
+            notificationManager.cancelNotification(smsDraftId.toInt(), NotificationManager.CHANNEL_SMS, smsDraftId)
+        }
+
         // This is deliberately checked after the insert and lives in the common creation path,
         // so SMS, asset, cheque and scheduled transaction flows cannot emit it prematurely.
         postCommitEffect("transaction_first_event_failed") {

@@ -1,6 +1,6 @@
 package com.kazemieh.sms_reader
 
-import android.app.NotificationManager
+import com.kazemieh.domain.notification.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -16,6 +16,7 @@ class SmsActionReceiver : BroadcastReceiver(), KoinComponent {
     private val smsDraftRepository: SmsDraftRepository by inject()
     private val analytics: com.kazemieh.common.analytics.AnalyticsService by inject()
     private val crashReporter: com.kazemieh.common.analytics.CrashReporter by inject()
+    private val notificationManager: NotificationManager by inject()
     private val scope = CoroutineScope(Dispatchers.IO)
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -25,9 +26,9 @@ class SmsActionReceiver : BroadcastReceiver(), KoinComponent {
         scope.launch {
             try {
                 smsDraftRepository.markSmsDraftAsUsed(id)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationDismissed("ignore"))
-                val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                nm.cancel(id.toInt())
+                notificationManager.cancelNotification(intent.getIntExtra("notification_id", id.toInt()),
+                    NotificationManager.CHANNEL_SMS, id)
+                runCatching { analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationDismissed("ignore")) }
             } catch (e: Exception) {
                 crashReporter.recordException(e, "sms_ignore_failed")
             } finally {
