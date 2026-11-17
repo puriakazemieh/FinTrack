@@ -14,6 +14,7 @@ import com.kazemieh.common.toPersianDigits
 import com.kazemieh.common.ImageStorage
 import com.kazemieh.common.persiandatetime.extensions.toEpochMilliseconds
 import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
+import com.kazemieh.common.persiandatetime.extensions.toDateString
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import com.kazemieh.designsystem.component.SnackbarController
@@ -63,6 +64,7 @@ class AddTransactionViewModel(
     val effect = _effect.receiveAsFlow()
 
     private val _typeFlow = MutableStateFlow<TransactionType?>(TransactionType.EXPENSE)
+    private var prefillGeneration = 0
 
     init {
         _typeFlow
@@ -264,6 +266,7 @@ class AddTransactionViewModel(
         transactionWithRelations: TransactionWithRelations?,
         smsDraft: SmsDraft? = null
     ) {
+        val generation = ++prefillGeneration
         if (transactionWithRelations == null) {
             val today = JalaliCalendar()
             val currencyValue = preferenceUseCases.getStringPreference(FinTrackPreferences.PREF_CURRENCY, "")
@@ -273,9 +276,13 @@ class AddTransactionViewModel(
             } ?: ""
             
             _state.update { 
-                it.copy(
-                    date = "${today.day.toPersianDigits()} / ${today.monthString} / ${today.year.toPersianDigits()}",
-                    timeStamp = Clock.System.now().toEpochMilliseconds(),
+                freshFormState(it).copy(
+                    date = smsDraft?.date?.takeIf(String::isNotBlank)
+                        ?: smsDraft?.let { draft -> Instant.fromEpochMilliseconds(draft.timeStamp)
+                            .toPersianDateTime(TimeZone.currentSystemDefault()).toDateString() }
+                        ?: "${today.day.toPersianDigits()} / ${today.monthString} / ${today.year.toPersianDigits()}",
+                    timeStamp = smsDraft?.timeStamp ?: Clock.System.now().toEpochMilliseconds(),
+                    description = smsDraft?.body.orEmpty(),
                     smsDraft = smsDraft,
                     smsAmountReview = smsDraft?.let(::reviewSmsAmount),
                     isSourceManuallySelected = false,
@@ -283,6 +290,7 @@ class AddTransactionViewModel(
                     transactionType = smsDraft?.type ?: TransactionType.EXPENSE
                 )
             }
+            _typeFlow.value = smsDraft?.type ?: TransactionType.EXPENSE
             viewModelScope.launch {
                 val defaultSource = transactionUseCaseGroup.getDefaultFinancialSourceUseCase()
                 val detectedSource = smsDraft?.let { draft ->
@@ -297,7 +305,7 @@ class AddTransactionViewModel(
                 }
                 
                 _state.update {
-                    it.copy(
+                    if (generation != prefillGeneration) it else it.copy(
                         source = if (it.isSourceManuallySelected) it.source else
                             if (smsDraft != null) detectedSource else defaultSource,
                         category = detectedCategory ?: defaultCategory
@@ -307,7 +315,7 @@ class AddTransactionViewModel(
             return
         }
         _state.update {
-            it.copy(
+            freshFormState(it).copy(
                 oldTransaction = transactionWithRelations.transaction,
                 amount = transactionWithRelations.transaction.amount.toString(),
                 amountTransfer = transactionWithRelations.transaction.amountTransfer.toString(),
@@ -328,14 +336,22 @@ class AddTransactionViewModel(
         transactionWithRelations.transaction.photoPath?.let { path ->
             viewModelScope.launch {
                 val bytes = imageStorage.loadImage(path)
-                _state.update { it.copy(photoBytes = bytes) }
+                _state.update { if (generation == prefillGeneration) it.copy(photoBytes = bytes) else it }
             }
         }
     }
 
+    private fun freshFormState(current: AddTransactionState) = AddTransactionState(
+        mostUsedCategories = current.mostUsedCategories,
+        mostUsedSources = current.mostUsedSources,
+        mostUsedTags = current.mostUsedTags,
+        mostUsedPersons = current.mostUsedPersons
+    )
+
     /** Prefills the form from a past transaction as a starting point for a *new* entry
      *  (today's date, no [AddTransactionState.oldTransaction]) rather than editing it. */
     private fun prefillFromTemplate(template: TransactionWithRelations) {
+        ++prefillGeneration
         val today = JalaliCalendar()
         _state.value = AddTransactionState(
             date = "${today.day.toPersianDigits()} / ${today.monthString} / ${today.year.toPersianDigits()}",

@@ -163,6 +163,56 @@ class SmsSourceSelectionTest {
         assertEquals(b, vm.state.value.source)
     }
 
+    @Test
+    fun openingSmsUsesItsOriginalTimestampDateAndDescription() = runTest(dispatcher) {
+        vm.onIntent(AddTransactionIntent.FetchDefaultData(null, draft))
+        runCurrent()
+        assertEquals(draft.timeStamp, vm.state.value.timeStamp)
+        assertEquals(draft.date, vm.state.value.date)
+        assertEquals(draft.body, vm.state.value.description)
+    }
+
+    @Test
+    fun openingExistingTransactionClearsSmsContext() = runTest(dispatcher) {
+        vm.onIntent(AddTransactionIntent.FetchDefaultData(null,
+            draft.copy(amount = 50_000, body = "برداشت 50,000 تومان")))
+        runCurrent()
+        val existing = existingTransaction()
+        vm.onIntent(AddTransactionIntent.FetchDefaultData(existing, null))
+        runCurrent()
+        assertNull(vm.state.value.smsDraft)
+        assertNull(vm.state.value.smsAmountReview)
+        assertEquals(existing.transaction, vm.state.value.oldTransaction)
+    }
+
+    @Test
+    fun openingNewEntryAfterEditingDoesNotUpdateTheOldTransaction() = runTest(dispatcher) {
+        vm.onIntent(AddTransactionIntent.FetchDefaultData(existingTransaction(), null))
+        runCurrent()
+        vm.onIntent(AddTransactionIntent.FetchDefaultData(null, null))
+        runCurrent()
+        assertNull(vm.state.value.oldTransaction)
+        assertNull(vm.state.value.smsDraft)
+        assertEquals("", vm.state.value.amount)
+    }
+
+    @Test
+    fun staleDefaultLoadingCannotOverwriteAnExistingTransaction() = runTest(dispatcher) {
+        vm.onIntent(AddTransactionIntent.FetchDefaultData(null, draft.copy(sourceId = 1)))
+        val existing = existingTransaction()
+        vm.onIntent(AddTransactionIntent.FetchDefaultData(existing, null))
+        runCurrent()
+        assertEquals(existing.source, vm.state.value.source)
+        assertEquals(existing.category, vm.state.value.category)
+    }
+
+    private fun existingTransaction() = TransactionWithRelations(
+        transaction = Transaction(id = 42, amount = 1_000, sourceId = 2, categoryId = 1,
+            type = TransactionType.EXPENSE, timeStamp = 123_000, date = "1405/08/24"),
+        category = Category(id = 1, name = "Existing", type = TransactionType.EXPENSE, colorId = 0, iconId = 0),
+        source = b, sourceEnd = null, tags = emptyList(), persons = emptyList()
+    )
+
     private inline fun <reified T> proxy(crossinline call: (String, Array<out Any?>) -> Any? = { name, _ ->
         error("Unexpected dependency call: $name")
     }): T = Proxy.newProxyInstance(T::class.java.classLoader, arrayOf(T::class.java)) { _, method, args ->

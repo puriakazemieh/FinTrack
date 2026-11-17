@@ -9,6 +9,8 @@ import com.kazemieh.domain.repository.TransactionRepository
 import com.kazemieh.domain.notification.NotificationManager
 import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.domain.usecase.resolveSmsSource
+import com.kazemieh.domain.usecase.isBankSmsCandidate
+import com.kazemieh.domain.usecase.smsTransactionTimestamp
 import com.kazemieh.preferences.FinTrackPreferences
 import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
 import com.kazemieh.common.persiandatetime.extensions.toDateString
@@ -66,13 +68,19 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         if (draft == null) continue
 
                         val sources = transactionRepository.observeSources().first()
+                        val registeredSender = BankParserRegistry.getParsers().any { parser ->
+                            parser.senderNumbers.any { it.equals(sender, ignoreCase = true) }
+                        }
+                        if (!isBankSmsCandidate(draft, sources, registeredSender)) continue
                         val detectedSource = resolveSmsSource(draft, sources)
+                        val timeZone = TimeZone.currentSystemDefault()
+                        val transactionTime = smsTransactionTimestamp(body, receivedAt, timeZone)
                         
                         val finalDraft = draft.copy(
                             sourceId = detectedSource?.id,
-                            timeStamp = receivedAt,
-                            date = Instant.fromEpochMilliseconds(receivedAt)
-                                .toPersianDateTime(TimeZone.currentSystemDefault()).toDateString()
+                            timeStamp = transactionTime,
+                            date = Instant.fromEpochMilliseconds(transactionTime)
+                                .toPersianDateTime(timeZone).toDateString()
                         )
                         val draftId = smsDraftRepository.addSmsDraft(finalDraft)
                         analytics.track(

@@ -335,7 +335,7 @@ fun PersianDateTime.toDateTimeString(): String = "${toDateString()} ${toTimeStri
          * @return The corresponding PersianDateTime.
          */
 fun Instant.toPersianDateTime(timeZone: TimeZone): PersianDateTime =
-    Main.persianDateConverter.fromGregorian(this.toLocalDateTime(timeZone).date)
+    this.toLocalDateTime(timeZone).toPersianDateTime()
 
 
 /**
