@@ -284,7 +284,7 @@ class DashboardViewModel(
                 // Tapped a bank-SMS notification: load that specific draft and open the add sheet
                 // pre-filled with its amount / type / source, instead of a blank sheet.
                 val draft = smsDraftRepository.getSmsDraftById(intent.draftId)
-                if (draft != null) {
+                if (draft != null && !draft.isUsed) {
                     _state.update {
                         it.copy(
                             showAddTransaction = true,

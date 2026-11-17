@@ -99,6 +99,7 @@ fun FinTrackHost(
                     modifier = Modifier.fillMaxSize(),
                     startDestination = startDestination
                 )
+                BindIncomingDeepLinks(navController)
 
                 AnimatedVisibility(
                     visible = showBottomBar && !showGlobalAddTransaction && !showBottomBarCustomize,

@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         handleIntent(intent)
+        com.kazemieh.composeApp.dispatchIncomingDeepLink(intent)
     }
 
     private fun handleIntent(intent: android.content.Intent) {
