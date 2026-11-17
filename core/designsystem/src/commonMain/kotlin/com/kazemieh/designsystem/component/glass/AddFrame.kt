@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +21,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
@@ -44,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
 import com.kazemieh.designsystem.component.FintrackBodyLargeText
+import com.kazemieh.designsystem.component.FintrackInlineFeedback
 import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
 import com.kazemieh.designsystem.component.LeadingIconStyle
 
@@ -72,6 +77,9 @@ fun AddFrame(
     hero: @Composable (() -> Unit)? = null,
     preventSwipeDismiss: Boolean = true,
     horizontalPadding: androidx.compose.ui.unit.Dp = 24.dp,
+    feedbackText: String? = null,
+    isLoading: Boolean = false,
+    primaryEnabled: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     // A form's residual drag must not dismiss its enclosing sheet before the form
@@ -145,7 +153,7 @@ fun AddFrame(
             ScreenHeader(
                 title = title,
                 sub = sub,
-                onClose = onClose,
+                onClose = if (isLoading) null else onClose,
                 trailingContent = trailingContent,
                 actions = if (onFilterClick != null) {
                     listOf(
@@ -213,6 +221,10 @@ fun AddFrame(
             }
 
             // Fixed CTA at bottom
+            feedbackText?.let {
+                FintrackInlineFeedback(text = it, isError = true,
+                    modifier = Modifier.padding(horizontal = horizontalPadding))
+            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -222,9 +234,10 @@ fun AddFrame(
                 if ((tertiaryLabel != null) && (onTertiaryClick != null)) {
                     OutlinedButton(
                         onClick = onTertiaryClick,
+                        enabled = !isLoading,
                         modifier = Modifier
                             .weight(0.5f)
-                            .height(48.dp),
+                            .heightIn(min = 48.dp),
                         shape = RoundedCornerShape(16.dp),
                         border = androidx.compose.foundation.BorderStroke(
                             1.dp,
@@ -236,6 +249,7 @@ fun AddFrame(
                     ) {
                         FintrackBodyLargeText(
                             text = tertiaryLabel,
+                            color = LocalContentColor.current,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.W700,
                             maxLines = 1
@@ -245,17 +259,24 @@ fun AddFrame(
 
                 Button(
                     onClick = onPrimaryClick,
+                    enabled = primaryEnabled && !isLoading,
                     modifier = Modifier
                         .weight(if (secondaryLabel != null || tertiaryLabel != null) 0.6f else 1f)
-                        .height(48.dp),
+                        .heightIn(min = 48.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp, color = LocalContentColor.current)
+                        Spacer(Modifier.width(8.dp))
+                    }
                     FintrackBodyLargeText(
                         text = primaryLabel,
+                        color = LocalContentColor.current,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.W700
                     )
@@ -264,9 +285,10 @@ fun AddFrame(
                 if ((secondaryLabel != null) && (onSecondaryClick != null)) {
                     OutlinedButton(
                         onClick = onSecondaryClick,
+                        enabled = !isLoading,
                         modifier = Modifier
                             .weight(0.4f)
-                            .height(48.dp),
+                            .heightIn(min = 48.dp),
                         shape = RoundedCornerShape(16.dp),
                         border = androidx.compose.foundation.BorderStroke(
                             1.dp,
@@ -278,6 +300,7 @@ fun AddFrame(
                     ) {
                         FintrackBodyLargeText(
                             text = secondaryLabel,
+                            color = LocalContentColor.current,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.W700
                         )

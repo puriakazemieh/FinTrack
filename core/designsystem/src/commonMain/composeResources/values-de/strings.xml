@@ -1541,4 +1541,27 @@
     <string name="sms_use_detected_amount">SMS-Betrag verwenden</string>
     <string name="sms_confirm_entered_amount">Eingegebenen Betrag bestätigen</string>
     <string name="sms_review_amount">Betrag prüfen</string>
+    <string name="number_digits">0123456789</string>
+    <string name="sms_ready_count">%1$s Nachrichten · %2$s bereit</string>
+    <string name="sms_register_all">Alle buchen (%1$s bereit)</string>
+    <string name="sms_registration_progress">Prüfung %1$s von %2$s</string>
+    <string name="sms_registration_summary">Gebucht: %1$s · Angaben fehlen: %2$s · Fehlgeschlagen: %3$s · Bereits verarbeitet: %4$s</string>
+    <string name="sms_dismiss_summary">Bericht schließen</string>
+    <string name="sms_registration_failed">Buchung fehlgeschlagen. Erneut versuchen; die Nachricht bleibt erhalten.</string>
+    <string name="sms_missing_category">Wählen Sie eine Kategorie für diese Nachricht.</string>
+    <string name="sms_missing_source">Wählen Sie ein Konto für diese Nachricht.</string>
+    <string name="sms_review_details">Prüfen Sie Betrag und Buchungsart im Formular.</string>
+    <string name="sms_unavailable">Diese Nachricht wurde bereits verarbeitet oder ist nicht mehr verfügbar.</string>
+    <string name="sms_complete_details">Angaben ergänzen</string>
+    <string name="sms_retry">Erneut versuchen</string>
+    <string name="sms_show_text">SMS-Text anzeigen</string>
+    <string name="sms_hide_text">SMS-Text ausblenden</string>
+    <string name="sms_delete_messages">Nachrichten löschen</string>
+    <string name="sms_delete_question">%1$s erkannte Nachrichten löschen?</string>
+    <string name="sms_delete_note">Gebuchte Transaktionen bleiben erhalten.</string>
+    <string name="sms_delete_complete">%1$s Nachrichten gelöscht.</string>
+    <string name="sms_cancel">Abbrechen</string>
+    <string name="sms_no_pending">Keine Nachrichten warten auf die Buchung.</string>
+    <string name="sms_delete_failed">Löschen fehlgeschlagen. Erneut versuchen.</string>
+    <string name="sms_confidence">%1$s%</string>
 </resources>

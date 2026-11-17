@@ -1581,4 +1581,27 @@
     <string name="sms_use_detected_amount">استفاده از مبلغ پیامک</string>
     <string name="sms_confirm_entered_amount">تأیید مبلغ واردشده</string>
     <string name="sms_review_amount">بازبینی مبلغ</string>
+    <string name="number_digits">۰۱۲۳۴۵۶۷۸۹</string>
+    <string name="sms_ready_count">%1$s پیامک · %2$s آمادهٔ ثبت</string>
+    <string name="sms_register_all">ثبت سریع همه (%1$s آماده)</string>
+    <string name="sms_registration_progress">در حال بررسی %1$s از %2$s</string>
+    <string name="sms_registration_summary">ثبت‌شده: %1$s · نیازمند تکمیل: %2$s · ناموفق: %3$s · قبلاً پردازش‌شده: %4$s</string>
+    <string name="sms_dismiss_summary">بستن گزارش</string>
+    <string name="sms_registration_failed">ثبت انجام نشد. دوباره تلاش کنید؛ پیامک حفظ شده است.</string>
+    <string name="sms_missing_category">برای ثبت، دسته‌بندی را انتخاب کنید.</string>
+    <string name="sms_missing_source">برای ثبت، حساب را مشخص کنید.</string>
+    <string name="sms_review_details">مبلغ و نوع تراکنش را در فرم بازبینی کنید.</string>
+    <string name="sms_unavailable">این پیامک قبلاً پردازش شده یا دیگر در دسترس نیست.</string>
+    <string name="sms_complete_details">تکمیل اطلاعات</string>
+    <string name="sms_retry">تلاش دوباره</string>
+    <string name="sms_show_text">نمایش متن پیامک</string>
+    <string name="sms_hide_text">بستن متن پیامک</string>
+    <string name="sms_delete_messages">حذف پیامک‌ها</string>
+    <string name="sms_delete_question">%1$s پیامک شناسایی‌شده حذف شوند؟</string>
+    <string name="sms_delete_note">تراکنش‌های ثبت‌شده پاک نمی‌شوند.</string>
+    <string name="sms_delete_complete">%1$s پیامک حذف شد.</string>
+    <string name="sms_cancel">انصراف</string>
+    <string name="sms_no_pending">پیامک منتظر ثبت وجود ندارد.</string>
+    <string name="sms_delete_failed">حذف انجام نشد. دوباره تلاش کنید.</string>
+    <string name="sms_confidence">%1$s٪</string>
 </resources>

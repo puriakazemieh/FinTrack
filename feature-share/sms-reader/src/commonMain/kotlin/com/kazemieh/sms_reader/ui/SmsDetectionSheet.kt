@@ -1,5 +1,17 @@
 package com.kazemieh.sms_reader.ui
 
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
+import com.kazemieh.designsystem.component.FintrackButton
+import com.kazemieh.designsystem.component.FintrackInlineFeedback
+import com.kazemieh.designsystem.component.localizedInteger
+import com.kazemieh.designsystem.component.model.UiText
+import com.kazemieh.designsystem.component.model.asString
+import com.kazemieh.domain.usecase.SmsBatchProgress
+import fintrack.core.designsystem.generated.resources.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -32,6 +44,7 @@ import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
+import com.kazemieh.designsystem.component.FintrackHeadlineSmallText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.Chip
@@ -75,7 +88,16 @@ fun SmsDetectionSheet(
     onDelete: (SmsDraft) -> Unit,
     onDeleteAll: () -> Unit,
     onUpdateDraft: (SmsDraft) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    readyIds: Set<Long>,
+    isBusy: Boolean,
+    isRegistering: Boolean,
+    progress: SmsBatchProgress?,
+    errors: Map<Long, UiText>,
+    generalError: UiText?,
+    deletedCount: Int?,
+    onRegisterAll: () -> Unit,
+    onDismissSummary: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -83,7 +105,7 @@ fun SmsDetectionSheet(
     var pickingType by remember { mutableStateOf<PickerType?>(null) }
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (!isBusy) onDismiss() },
         sheetState = sheetState,
         dragHandle = null,
         containerColor = MaterialTheme.colorScheme.background
@@ -97,21 +119,30 @@ fun SmsDetectionSheet(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                ScreenHeader(
-                    title = stringResource(Res.string.sms_sheet_title),
-                    sub = stringResource(Res.string.sms_sheet_sub),
-                    onClose = onDismiss
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(onClick = onDeleteAll) {
-                        FintrackLabelMediumText(
-                            text = stringResource(Res.string.action_delete_all),
-                            color = GlassRed
-                        )
+                // Physical right of the title, including in Persian RTL. The close action stays opposite.
+                val direction = LocalLayoutDirection.current
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = onDismiss, enabled = !isBusy) {
+                            Icon(Icons.Default.Close, stringResource(Res.string.sms_cancel))
+                        }
+                        CompositionLocalProvider(LocalLayoutDirection provides direction) {
+                            Column(Modifier.weight(1f).padding(horizontal = 8.dp, vertical = 12.dp),
+                                horizontalAlignment = Alignment.Start) {
+                                FintrackHeadlineSmallText(stringResource(Res.string.sms_sheet_title),
+                                    fontSize = 18.sp, fontWeight = FontWeight.W700,
+                                    color = MaterialTheme.colorScheme.onBackground)
+                                FintrackLabelSmallText(stringResource(Res.string.sms_sheet_sub),
+                                    fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            OutlinedButton(onClick = onDeleteAll, enabled = drafts.isNotEmpty() && !isBusy,
+                                modifier = Modifier.heightIn(min = 48.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
+                                FintrackLabelMediumText(stringResource(Res.string.action_delete_all),
+                                    color = LocalContentColor.current)
+                            }
+                        }
                     }
                 }
 
@@ -120,6 +151,33 @@ fun SmsDetectionSheet(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
                 ) {
+                    item(key = "sms_actions") {
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            FintrackBodyMediumText(stringResource(Res.string.sms_ready_count,
+                                localizedInteger(drafts.size), localizedInteger(readyIds.size)))
+                            FintrackButton(text = stringResource(Res.string.sms_register_all, localizedInteger(readyIds.size)),
+                                enabled = readyIds.isNotEmpty() && !isBusy,
+                                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp), onClick = onRegisterAll)
+                            if (isRegistering) {
+                                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                                progress?.let { FintrackBodyMediumText(stringResource(Res.string.sms_registration_progress,
+                                    localizedInteger(it.processed), localizedInteger(it.total))) }
+                            } else if (progress != null) {
+                                FintrackInlineFeedback(stringResource(Res.string.sms_registration_summary,
+                                    localizedInteger(progress.posted), localizedInteger(progress.incomplete),
+                                    localizedInteger(progress.failed), localizedInteger(progress.unavailable)),
+                                    isError = progress.failed > 0)
+                            }
+                            deletedCount?.let { FintrackInlineFeedback(stringResource(Res.string.sms_delete_complete, localizedInteger(it))) }
+                            generalError?.let { FintrackInlineFeedback(it.asString(), isError = true) }
+                            if (!isBusy && (progress != null || deletedCount != null || generalError != null)) {
+                                TextButton(onClick = onDismissSummary) {
+                                    FintrackLabelMediumText(stringResource(Res.string.sms_dismiss_summary), color = LocalContentColor.current)
+                                }
+                            }
+                            if (drafts.isEmpty()) FintrackBodyMediumText(stringResource(Res.string.sms_no_pending))
+                        }
+                    }
                     items(drafts, key = { it.id }) { draft ->
                         SmsDraftItem(
                             draft = draft,
@@ -128,6 +186,7 @@ fun SmsDetectionSheet(
                             mostUsedCategories = mostUsedCategories,
                             mostUsedSources = mostUsedSources,
                             currency = currency,
+                            isReady = draft.id in readyIds, enabled = !isBusy, error = errors[draft.id],
                             onQuickRegister = { onQuickRegister(draft) },
                             onEdit = { onEdit(draft) },
                             onDelete = { onDelete(draft) },
@@ -189,7 +248,10 @@ fun SmsDraftItem(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onUpdate: (SmsDraft) -> Unit,
-    onPick: (PickerType) -> Unit
+    onPick: (PickerType) -> Unit,
+    isReady: Boolean,
+    enabled: Boolean,
+    error: UiText?
 ) {
     val glassColors = LocalGlassColors.current
 
@@ -199,6 +261,7 @@ fun SmsDraftItem(
     val bank = smsBank(draft.bankName)
     val hideBalance = LocalHideBalance.current
     val amountReview = reviewSmsAmount(draft)
+    var textExpanded by rememberSaveable(draft.id) { mutableStateOf(false) }
 
     GlassCard(
         modifier = Modifier.fillMaxWidth(),
@@ -263,7 +326,7 @@ fun SmsDraftItem(
                         )
 
                         FintrackLabelSmallText(
-                            text = "${draft.confidence}%",
+                            text = stringResource(Res.string.sms_confidence, localizedInteger(draft.confidence)),
                             color = if (draft.confidence >= 90) GlassGreen else glassColors.text3,
                             fontWeight = FontWeight.Bold,
                             fontSize = 10.sp
@@ -271,16 +334,26 @@ fun SmsDraftItem(
                     }
                 }
 
-                IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+                IconButton(onClick = onDelete, enabled = enabled, modifier = Modifier.size(48.dp)) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = null,
+                        contentDescription = stringResource(Res.string.delete),
                         tint = GlassRed.copy(alpha = 0.8f),
                         modifier = Modifier.size(20.dp)
                     )
                 }
             }
 
+            if (!hideBalance) {
+                TextButton(onClick = { textExpanded = !textExpanded }) {
+                    FintrackLabelMediumText(stringResource(if (textExpanded) Res.string.sms_hide_text else Res.string.sms_show_text),
+                        color = LocalContentColor.current)
+                }
+                if (textExpanded) SelectionContainer {
+                    FintrackBodyMediumText(draft.body, modifier = Modifier.fillMaxWidth())
+                }
+            }
+            error?.let { FintrackInlineFeedback(it.asString(), isError = true, announce = false) }
             // Quick Pickers - Matching AddTransaction UI style
             if (amountReview != null) {
                 FintrackLabelSmallText(text = stringResource(Res.string.sms_review_amount), color = GlassRed)
@@ -293,6 +366,7 @@ fun SmsDraftItem(
                     title = selectedCategory?.name ?: stringResource(Res.string.select_category),
                     iconRes = selectedCategory?.let { FinTrackIcons.findIcon(it.iconId).resource },
                     mostUsedItems = mostUsedCategories.filter { it.type == draft.type }.take(4),
+                    enabled = enabled,
                     onPick = { onPick(PickerType.Category) },
                     onItemClick = { item ->
                         val category = item as Category
@@ -307,6 +381,7 @@ fun SmsDraftItem(
                     title = selectedSource?.name ?: stringResource(Res.string.select_source),
                     iconRes = selectedSource?.let { FinTrackIcons.findIcon(it.iconId).resource },
                     mostUsedItems = mostUsedSources.take(4),
+                    enabled = enabled,
                     onPick = { onPick(PickerType.Source) },
                     onItemClick = { item ->
                         val source = item as Source
@@ -319,26 +394,22 @@ fun SmsDraftItem(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Button(
+                FintrackButton(
+                    text = stringResource(when {
+                        isReady && error != null -> Res.string.sms_retry
+                        isReady -> Res.string.notif_action_register
+                        amountReview != null -> Res.string.sms_review_amount
+                        else -> Res.string.sms_complete_details
+                    }),
                     onClick = onQuickRegister,
-                    modifier = Modifier.weight(1.5f).height(44.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = GlassGreen,
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    contentPadding = PaddingValues(0.dp)
-                ) {
-                    FintrackLabelMediumText(
-                        text = stringResource(if (amountReview != null) Res.string.sms_review_amount else Res.string.notif_action_register),
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                    enabled = enabled,
+                    modifier = Modifier.weight(1.5f).heightIn(min = 48.dp)
+                )
 
                 OutlinedButton(
                     onClick = onEdit,
-                    modifier = Modifier.weight(1f).height(44.dp),
+                    enabled = enabled,
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp),
                     border = BorderStroke(1.dp, glassColors.glassEdge.copy(alpha = 0.5f)),
                     shape = RoundedCornerShape(12.dp),
                     contentPadding = PaddingValues(0.dp)
@@ -359,6 +430,7 @@ private fun FieldWithMostUsed(
     title: String,
     iconRes: Any?,
     mostUsedItems: List<Any>,
+    enabled: Boolean,
     onPick: () -> Unit,
     onItemClick: (Any) -> Unit
 ) {
@@ -366,6 +438,7 @@ private fun FieldWithMostUsed(
         Field(
             label = label,
             required = true,
+            enabled = enabled,
             onClick = onPick
         ) {
             Row(
@@ -389,6 +462,7 @@ private fun FieldWithMostUsed(
         if (mostUsedItems.isNotEmpty()) {
             MostUsedRow(
                 items = mostUsedItems,
+                enabled = enabled,
                 onItemClick = onItemClick
             )
         }
@@ -399,6 +473,7 @@ private fun FieldWithMostUsed(
 @Composable
 private fun MostUsedRow(
     items: List<Any>,
+    enabled: Boolean,
     onItemClick: (Any) -> Unit
 ) {
     Row(
@@ -425,6 +500,8 @@ private fun MostUsedRow(
                 
                 Chip(
                     color = GlassGreen,
+                    enabled = enabled,
+                    modifier = Modifier.heightIn(min = 48.dp),
                     onClick = { onItemClick(item) }
                 ) {
                     FintrackLabelSmallText(

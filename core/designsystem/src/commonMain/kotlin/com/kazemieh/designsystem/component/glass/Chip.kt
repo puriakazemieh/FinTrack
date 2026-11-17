@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
@@ -27,6 +28,7 @@ fun Chip(
     dashed: Boolean = false,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
+    enabled: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val backgroundColor = if (active) color.copy(alpha = 0.16f) else Color.Transparent
@@ -34,8 +36,10 @@ fun Chip(
 
     Box(
         modifier = modifier
+            .alpha(if (enabled) 1f else 0.5f)
             .clip(RoundedCornerShape(99.dp))
             .combinedClickable(
+                enabled = enabled,
                 onClick = onClick,
                 onLongClick = onLongClick
             )

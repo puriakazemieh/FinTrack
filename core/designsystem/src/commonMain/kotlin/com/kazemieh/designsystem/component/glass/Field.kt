@@ -7,6 +7,7 @@ import com.kazemieh.designsystem.component.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,12 +28,14 @@ fun Field(
     error: Boolean = false,
     onClick: (() -> Unit)? = null,
     trailingAction: @Composable (() -> Unit)? = null,
+    enabled: Boolean = true,
     children: @Composable () -> Unit
 ) {
     val glassColors = LocalGlassColors.current
     GlassCard(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().alpha(if (enabled) 1f else 0.5f),
         padding = 14.dp,
+        enabled = enabled,
         onClick = onClick
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {

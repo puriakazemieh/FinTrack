@@ -378,7 +378,7 @@ class AddTransactionViewModel(
     private fun submitTransaction() {
         val current = _state.value
         if (current.isLoading) return
-        _state.update { it.copy(isLoading = true) }
+        _state.update { it.copy(isLoading = true, submissionError = null) }
 
         viewModelScope.launch {
             try {
@@ -456,13 +456,13 @@ class AddTransactionViewModel(
                     }
                     _effect.send(AddTransactionEffect.AddedTransaction)
                 } else {
-                    SnackbarController.showMessage(UiText.StringResourceText(Res.string.transaction_failed))
+                    _state.update { it.copy(submissionError = UiText.StringResourceText(Res.string.transaction_failed)) }
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionFailed("transaction_submit", "write_failed"))
-                SnackbarController.showMessage(UiText.StringResourceText(Res.string.transaction_failed))
+                _state.update { it.copy(submissionError = UiText.StringResourceText(Res.string.transaction_failed)) }
             } finally {
                 _state.update { it.copy(isLoading = false) }
             }
@@ -544,6 +544,7 @@ class AddTransactionViewModel(
 }
 
 data class AddTransactionState(
+    val submissionError: UiText? = null,
     val amount: String = "",
     val amountTransfer: String? = null,
     val description: String = "",

@@ -1553,4 +1553,27 @@
     <string name="sms_use_detected_amount">Use SMS amount</string>
     <string name="sms_confirm_entered_amount">Confirm entered amount</string>
     <string name="sms_review_amount">Review amount</string>
+    <string name="number_digits">0123456789</string>
+    <string name="sms_ready_count">Messages: %1$s · Ready: %2$s</string>
+    <string name="sms_register_all">Register all (%1$s ready)</string>
+    <string name="sms_registration_progress">Reviewing %1$s of %2$s</string>
+    <string name="sms_registration_summary">Registered: %1$s · Needs input: %2$s · Failed: %3$s · Already processed: %4$s</string>
+    <string name="sms_dismiss_summary">Dismiss summary</string>
+    <string name="sms_registration_failed">Registration failed. Try again; the message has been kept.</string>
+    <string name="sms_missing_category">Choose a category to register this message.</string>
+    <string name="sms_missing_source">Choose an account to register this message.</string>
+    <string name="sms_review_details">Review the amount and transaction type in the form.</string>
+    <string name="sms_unavailable">This message was already processed or is no longer available.</string>
+    <string name="sms_complete_details">Complete details</string>
+    <string name="sms_retry">Try again</string>
+    <string name="sms_show_text">Show SMS text</string>
+    <string name="sms_hide_text">Hide SMS text</string>
+    <string name="sms_delete_messages">Delete messages</string>
+    <string name="sms_delete_question">Delete selected messages (%1$s)?</string>
+    <string name="sms_delete_note">Registered transactions will be kept.</string>
+    <string name="sms_delete_complete">Deleted messages: %1$s.</string>
+    <string name="sms_cancel">Cancel</string>
+    <string name="sms_no_pending">No messages are waiting to be registered.</string>
+    <string name="sms_delete_failed">Deletion failed. Try again.</string>
+    <string name="sms_confidence">%1$s%</string>
 </resources>

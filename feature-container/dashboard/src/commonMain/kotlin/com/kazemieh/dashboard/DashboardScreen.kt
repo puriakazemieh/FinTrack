@@ -80,6 +80,12 @@ import com.kazemieh.transaction.ui.add.AddTransactionBottomSheet
 import com.kazemieh.transaction.ui.delete.DeleteTransactionBottomSheet
 import com.kazemieh.transaction.ui.main.BalanceHero
 import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.sms_delete_messages
+import fintrack.core.designsystem.generated.resources.sms_delete_question
+import fintrack.core.designsystem.generated.resources.sms_delete_note
+import fintrack.core.designsystem.generated.resources.sms_cancel
+import com.kazemieh.designsystem.component.localizedInteger
+import com.kazemieh.designsystem.component.model.asString
 import fintrack.core.designsystem.generated.resources.action_delete_all
 import fintrack.core.designsystem.generated.resources.dashboard_customize_hint
 import fintrack.core.designsystem.generated.resources.dashboard_customize_title
@@ -300,6 +306,15 @@ fun DashboardScreen(
                     mostUsedCategories = state.mostUsedCategories,
                     mostUsedSources = state.mostUsedSources,
                     currency = state.currency,
+                    readyIds = state.readySmsDraftIds,
+                    isBusy = state.isSmsRegistering || state.isSmsDeleting,
+                    isRegistering = state.isSmsRegistering,
+                    progress = state.smsBatchProgress,
+                    errors = state.smsRegistrationErrors,
+                    generalError = state.smsGeneralError,
+                    deletedCount = state.smsDeletedCount,
+                    onRegisterAll = { viewModel.onIntent(DashboardIntent.RegisterAllSmsDrafts) },
+                    onDismissSummary = { viewModel.onIntent(DashboardIntent.DismissSmsSummary) },
                     onQuickRegister = { draft ->
                         viewModel.onIntent(DashboardIntent.QuickRegisterSms(draft))
                     },
@@ -324,7 +339,12 @@ fun DashboardScreen(
 
             if (state.showDeleteSmsConfirmation && state.smsDraftToDelete != null) {
                 com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet(
-                    itemName = state.smsDraftToDelete!!.bankName,
+                    title = stringResource(Res.string.sms_delete_messages),
+                    message = stringResource(Res.string.sms_delete_question, localizedInteger(1)) + "\n" + stringResource(Res.string.sms_delete_note),
+                    confirmButtonText = stringResource(Res.string.sms_delete_messages),
+                    dismissButtonText = stringResource(Res.string.sms_cancel),
+                    isLoading = state.isSmsDeleting,
+                    errorText = state.smsDeleteError?.asString(),
                     dismissClicked = {
                         viewModel.onIntent(
                             DashboardIntent.ShowDeleteSmsConfirmation(
@@ -340,7 +360,13 @@ fun DashboardScreen(
 
             if (state.showDeleteAllSmsConfirmation) {
                 com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet(
-                    itemName = stringResource(Res.string.action_delete_all),
+                    title = stringResource(Res.string.sms_delete_messages),
+                    message = stringResource(Res.string.sms_delete_question,
+                        localizedInteger(state.smsDrafts.count { it.id in state.smsDeleteIds })) + "\n" + stringResource(Res.string.sms_delete_note),
+                    confirmButtonText = stringResource(Res.string.sms_delete_messages),
+                    dismissButtonText = stringResource(Res.string.sms_cancel),
+                    confirmEnabled = state.smsDrafts.any { it.id in state.smsDeleteIds } && !state.isSmsRegistering,
+                    errorText = state.smsDeleteError?.asString(),
                     dismissClicked = {
                         viewModel.onIntent(
                             DashboardIntent.ShowDeleteAllSmsConfirmation(

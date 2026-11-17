@@ -5,6 +5,9 @@ import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.analytics.AnalyticsService
 import com.kazemieh.common.analytics.NoOpAnalyticsService
 import com.kazemieh.common.analytics.ProductEvent
+import com.kazemieh.common.analytics.CrashReporter
+import com.kazemieh.common.analytics.NoOpCrashReporter
+import kotlinx.coroutines.CancellationException
 import com.kazemieh.domain.notification.NotificationManager
 import com.kazemieh.domain.repository.BudgetRepository
 import com.kazemieh.domain.repository.TransactionRepository
@@ -17,7 +20,8 @@ class AddTransactionUseCase(
     private val updateStreak: UpdateStreakUseCase,
     private val checkAchievements: CheckAchievementsUseCase,
     private val updateXP: UpdateXPUseCase,
-    private val analytics: AnalyticsService = NoOpAnalyticsService()
+    private val analytics: AnalyticsService = NoOpAnalyticsService(),
+    private val crashReporter: CrashReporter = NoOpCrashReporter()
 ) {
     suspend operator fun invoke(
         transaction: Transaction,
@@ -37,21 +41,32 @@ class AddTransactionUseCase(
 
         // This is deliberately checked after the insert and lives in the common creation path,
         // so SMS, asset, cheque and scheduled transaction flows cannot emit it prematurely.
-        if (resultId > 0L && repository.getTransactionCount() == 1L) {
-            analytics.track(ProductEvent.FirstTransactionCompleted)
+        postCommitEffect("transaction_first_event_failed") {
+            if (repository.getTransactionCount() == 1L) analytics.track(ProductEvent.FirstTransactionCompleted)
         }
 
         // Check budget threshold for expenses
         if (transaction.type == TransactionType.EXPENSE) {
-            checkBudgetThreshold(transaction.categoryId)
+            postCommitEffect("transaction_budget_check_failed") { checkBudgetThreshold(transaction.categoryId) }
         }
 
         // Gamification
-        updateStreak()
-        updateXP(10) // Basic XP for adding transaction
-        checkAchievements()
+        postCommitEffect("transaction_streak_failed") { updateStreak() }
+        postCommitEffect("transaction_xp_failed") { updateXP(10) }
+        postCommitEffect("transaction_achievements_failed") { checkAchievements() }
 
         return resultId
+    }
+
+    private suspend fun postCommitEffect(operation: String, action: suspend () -> Unit) {
+        try {
+            action()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            // Reporting must not turn an already committed financial write into a failed write.
+            runCatching { crashReporter.recordException(e, operation) }
+        }
     }
 
     private suspend fun checkBudgetThreshold(categoryId: Long) {

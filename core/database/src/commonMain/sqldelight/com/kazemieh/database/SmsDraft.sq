@@ -37,6 +37,12 @@ DELETE FROM sms_draft WHERE id = ?;
 deleteUnusedSmsDrafts:
 DELETE FROM sms_draft WHERE isUsed = 0;
 
+getUnusedSmsDraftIds:
+SELECT id FROM sms_draft WHERE isUsed = 0 AND id IN ? ORDER BY id;
+
+deleteUnusedSmsDraftsByIds:
+DELETE FROM sms_draft WHERE isUsed = 0 AND id IN ?;
+
 getSmsDraftById:
 SELECT * FROM sms_draft WHERE id = ?;
 

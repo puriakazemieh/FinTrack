@@ -1,5 +1,7 @@
 package com.kazemieh.transaction.ui.add
 
+import com.kazemieh.designsystem.component.model.asString
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -268,7 +270,9 @@ private fun BottomSheetContent(
                 onIntent(AddTransactionIntent.OnDismiss)
             },
             showHero = false,
-            backgroundBrush = backgroundBrush
+            backgroundBrush = backgroundBrush,
+            feedbackText = state.submissionError?.asString(),
+            isLoading = state.isLoading
         ) {
             AddTransactionContent(
                 state = state,

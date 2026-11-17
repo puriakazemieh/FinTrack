@@ -9,6 +9,7 @@ interface SmsDraftLocalDataSource {
     suspend fun markSmsDraftAsUsed(id: Long)
     suspend fun deleteSmsDraft(id: Long)
     suspend fun deleteUnusedSmsDrafts()
+    suspend fun deleteUnusedSmsDrafts(ids: List<Long>): List<Long>
     suspend fun getSmsDraftById(id: Long): SmsDraft?
     suspend fun updateSmsDraft(smsDraft: SmsDraft)
 }

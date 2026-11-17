@@ -2,10 +2,7 @@ package com.kazemieh.dashboard
 
 import androidx.lifecycle.ViewModel
 import com.kazemieh.domain.usecase.resolveSmsSource
-import com.kazemieh.domain.usecase.reviewSmsAmount
-import com.kazemieh.domain.usecase.isSmsSourceCurrencyCompatible
 import androidx.lifecycle.viewModelScope
-import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.common.model.Achievement
 import com.kazemieh.common.model.Category
@@ -18,7 +15,14 @@ import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.domain.repository.GoalRepository
 import com.kazemieh.domain.repository.SmsDraftRepository
 import com.kazemieh.domain.usecase.ObserveAchievementsUseCase
-import com.kazemieh.domain.usecase.ObserveCategoriesUseCase
+import com.kazemieh.domain.usecase.ObserveCategoriesFlatUseCase
+import com.kazemieh.domain.usecase.RegisterSmsDraftsUseCase
+import com.kazemieh.domain.usecase.SmsBatchProgress
+import com.kazemieh.domain.usecase.SmsDraftPreparation
+import com.kazemieh.domain.usecase.SmsPreparationIssue
+import com.kazemieh.domain.usecase.SmsRegistrationResult
+import com.kazemieh.domain.usecase.SmsRegistrationStatus
+import com.kazemieh.domain.usecase.prepareSmsDraftTransaction
 import com.kazemieh.domain.usecase.ObserveSourcesUseCase
 import com.kazemieh.domain.usecase.ObserveStreakUseCase
 import com.kazemieh.domain.usecase.PreferenceUseCases
@@ -26,14 +30,15 @@ import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import com.kazemieh.money.Currency
 import com.kazemieh.preferences.FinTrackPreferences
 import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.transaction_failed
+import fintrack.core.designsystem.generated.resources.*
 import fintrack.core.designsystem.generated.resources.placeholder_user_initial
 import fintrack.core.designsystem.generated.resources.placeholder_user_name
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.launchIn
@@ -48,12 +53,13 @@ class DashboardViewModel(
     private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val preferenceUseCases: PreferenceUseCases,
     private val smsDraftRepository: SmsDraftRepository,
-    private val observeCategories: ObserveCategoriesUseCase,
+    private val observeCategories: ObserveCategoriesFlatUseCase,
     private val observeSources: ObserveSourcesUseCase,
     private val observeAchievements: ObserveAchievementsUseCase,
     private val observeStreak: ObserveStreakUseCase,
     private val transactionUseCaseGroup: TransactionUseCaseGroup,
-    private val goalRepository: GoalRepository
+    private val goalRepository: GoalRepository,
+    private val registerSmsDrafts: RegisterSmsDraftsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DashboardState())
@@ -63,14 +69,11 @@ class DashboardViewModel(
         analytics.track(com.kazemieh.common.analytics.ProductEvent.DashboardViewed)
         observeUserName()
         observeSmsDrafts()
-        loadCategories()
-        loadSources()
         loadAchievements()
         loadStreak()
         observeWidgetLayout()
         observeDisabledTools()
         observeHideBalance()
-        observeCurrency()
         observeMostUsedData()
     }
 
@@ -83,14 +86,6 @@ class DashboardViewModel(
         transactionUseCaseGroup.observeMostUsedSourcesUseCase()
             .onEach { sources ->
                 _state.update { it.copy(mostUsedSources = sources) }
-            }.launchIn(viewModelScope)
-    }
-
-    private fun observeCurrency() {
-        preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_CURRENCY, "")
-            .onEach { currencyJson ->
-                val currency = Currency.valueOf(currencyJson)
-                _state.update { it.copy(currency = currency.code) }
             }.launchIn(viewModelScope)
     }
 
@@ -161,32 +156,84 @@ class DashboardViewModel(
         }
     }
 
-    private fun loadCategories() {
-        viewModelScope.launch {
-            observeCategories().collect { categories ->
-                _state.update { it.copy(categories = categories) }
-            }
-        }
-    }
-
-    private fun loadSources() {
-        viewModelScope.launch {
-            observeSources().collect { sources ->
-                _state.update { it.copy(sources = sources) }
-            }
-        }
-    }
-
     private fun observeSmsDrafts() {
-        combine(smsDraftRepository.observeUnusedSmsDrafts(), flow { emitAll(observeSources()) }) { drafts, sources ->
-            drafts.map { draft ->
-                // Presentation can suggest a unique source; opening the dashboard never rewrites drafts.
+        combine(smsDraftRepository.observeUnusedSmsDrafts(), flow { emitAll(observeSources()) },
+            observeCategories(), preferenceUseCases.getStringFlow(FinTrackPreferences.PREF_CURRENCY, "")) {
+                drafts, sources, categories, preference ->
+            val currency = Currency.valueOf(preference).code
+            val ready = drafts.filter {
+                prepareSmsDraftTransaction(it, categories, sources, currency) is SmsDraftPreparation.Ready
+            }.map { it.id }.toSet()
+            val presented = drafts.map { draft ->
                 if (draft.sourceId == null) draft.copy(sourceId = resolveSmsSource(draft, sources)?.id) else draft
             }
-        }
-            .onEach { drafts ->
-                _state.update { it.copy(smsDrafts = drafts) }
+            SmsSnapshot(presented, categories, sources, currency, ready)
+        }.flowOn(Dispatchers.Default)
+            .onEach { snapshot ->
+                _state.update { it.copy(smsDrafts = snapshot.drafts, categories = snapshot.categories,
+                    sources = snapshot.sources, currency = snapshot.currency, readySmsDraftIds = snapshot.ready) }
             }.launchIn(viewModelScope)
+    }
+
+    private data class SmsSnapshot(val drafts: List<SmsDraft>, val categories: List<Category>,
+        val sources: List<Source>, val currency: String, val ready: Set<Long>)
+
+    private fun smsError(result: SmsRegistrationResult): UiText? {
+        val resource = when (result.status) {
+            SmsRegistrationStatus.POSTED -> return null
+            SmsRegistrationStatus.FAILED -> Res.string.sms_registration_failed
+            SmsRegistrationStatus.UNAVAILABLE -> Res.string.sms_unavailable
+            SmsRegistrationStatus.INCOMPLETE -> when (result.issue) {
+                SmsPreparationIssue.CATEGORY -> Res.string.sms_missing_category
+                SmsPreparationIssue.SOURCE -> Res.string.sms_missing_source
+                SmsPreparationIssue.CURRENCY -> Res.string.sms_source_currency_incompatible
+                SmsPreparationIssue.UNAVAILABLE -> Res.string.sms_unavailable
+                else -> Res.string.sms_review_details
+            }
+        }
+        return UiText.StringResourceText(resource)
+    }
+
+    private fun registerSms(id: Long? = null) {
+        val current = _state.value
+        if (current.isSmsRegistering || current.isSmsDeleting) return
+        val ids = if (id == null) current.smsDrafts.map { it.id } else listOf(id)
+        if (ids.isEmpty() || (id == null && current.readySmsDraftIds.isEmpty())) return
+        _state.update { it.copy(isSmsRegistering = true, smsBatchProgress = null,
+            smsRegistrationErrors = if (id == null) emptyMap() else it.smsRegistrationErrors - id,
+            smsGeneralError = null, smsDeletedCount = null) }
+        viewModelScope.launch {
+            try {
+                if (id == null) {
+                    registerSmsDrafts(ids, current.currency) { progress ->
+                        val errors = progress.results.mapNotNull { result ->
+                            smsError(result)?.let { result.draftId to it }
+                        }.toMap()
+                        _state.update { it.copy(smsBatchProgress = progress, smsRegistrationErrors = errors) }
+                    }
+                } else {
+                    val result = registerSmsDrafts.registerOne(id, current.currency)
+                    val error = smsError(result)
+                    _state.update { it.copy(smsRegistrationErrors = if (error == null)
+                        it.smsRegistrationErrors - id else it.smsRegistrationErrors + (id to error),
+                        smsGeneralError = if (result.status == SmsRegistrationStatus.UNAVAILABLE) error else null) }
+                    if (result.status == SmsRegistrationStatus.POSTED) runCatching {
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsDraftQuickRegistered)
+                    }
+                    if (result.status == SmsRegistrationStatus.INCOMPLETE) {
+                        val draft = smsDraftRepository.getSmsDraftById(id)
+                        if (draft != null && !draft.isUsed) _state.update { it.copy(showAddTransaction = true,
+                            transactionWithRelations = null, initialTransactionType = draft.type, smsDraft = draft) }
+                    }
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _state.update { it.copy(smsGeneralError = UiText.StringResourceText(Res.string.sms_registration_failed)) }
+            } finally {
+                _state.update { it.copy(isSmsRegistering = false) }
+            }
+        }
     }
 
     private fun observeUserName() {
@@ -300,96 +347,68 @@ class DashboardViewModel(
                 }
             }
 
-            is DashboardIntent.IgnoreSmsDraft -> viewModelScope.launch {
-                smsDraftRepository.markSmsDraftAsUsed(intent.draft.id)
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsDraftIgnored)
-                _state.update {
-                    it.copy(
-                        showDeleteSmsConfirmation = false,
-                        smsDraftToDelete = null
-                    )
+            is DashboardIntent.IgnoreSmsDraft -> {
+                if (_state.value.isSmsDeleting || _state.value.isSmsRegistering) return
+                _state.update { it.copy(isSmsDeleting = true, smsDeleteError = null) }
+                viewModelScope.launch {
+                    try {
+                        smsDraftRepository.markSmsDraftAsUsed(intent.draft.id)
+                        _state.update { it.copy(showDeleteSmsConfirmation = false, smsDraftToDelete = null) }
+                        runCatching { analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsDraftIgnored) }
+                    } catch (e: CancellationException) { throw e
+                    } catch (e: Exception) {
+                        _state.update { it.copy(smsDeleteError = UiText.StringResourceText(Res.string.sms_delete_failed)) }
+                    } finally { _state.update { it.copy(isSmsDeleting = false) } }
                 }
             }
 
-            is DashboardIntent.IgnoreAllSmsDrafts -> viewModelScope.launch {
-                _state.update { it.copy(isSmsDeleting = true) }
-                try {
-                    smsDraftRepository.deleteUnusedSmsDrafts()
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsDraftsBulkDeleted)
-                    _state.update {
-                        it.copy(showDeleteAllSmsConfirmation = false, showSmsDetection = false)
-                    }
-                } finally {
-                    _state.update { it.copy(isSmsDeleting = false) }
+            is DashboardIntent.IgnoreAllSmsDrafts -> {
+                if (_state.value.isSmsDeleting || _state.value.isSmsRegistering || !_state.value.showDeleteAllSmsConfirmation) return
+                val ids = _state.value.smsDeleteIds
+                _state.update { it.copy(isSmsDeleting = true, smsDeleteError = null) }
+                viewModelScope.launch {
+                    try {
+                        val deleted = smsDraftRepository.deleteUnusedSmsDrafts(ids)
+                        _state.update { it.copy(showDeleteAllSmsConfirmation = false, smsDeleteIds = emptyList(),
+                            smsDeletedCount = deleted.size, smsBatchProgress = null, smsGeneralError = null,
+                            smsRegistrationErrors = it.smsRegistrationErrors - deleted.toSet()) }
+                        runCatching { analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsDraftsBulkDeleted) }
+                    } catch (e: CancellationException) { throw e
+                    } catch (e: Exception) {
+                        _state.update { it.copy(smsDeleteError = UiText.StringResourceText(Res.string.sms_delete_failed)) }
+                    } finally { _state.update { it.copy(isSmsDeleting = false) } }
                 }
             }
 
             is DashboardIntent.ShowDeleteSmsConfirmation -> _state.update {
-                it.copy(showDeleteSmsConfirmation = intent.show, smsDraftToDelete = intent.draft)
+                if (it.isSmsDeleting || it.isSmsRegistering) it else
+                    it.copy(showDeleteSmsConfirmation = intent.show, smsDraftToDelete = intent.draft, smsDeleteError = null)
             }
 
             is DashboardIntent.ShowDeleteAllSmsConfirmation -> _state.update {
-                it.copy(showDeleteAllSmsConfirmation = intent.show)
+                if (it.isSmsDeleting || it.isSmsRegistering) it else
+                    it.copy(showDeleteAllSmsConfirmation = intent.show,
+                        smsDeleteIds = if (intent.show) it.smsDrafts.map { draft -> draft.id } else emptyList(), smsDeleteError = null)
             }
 
-            is DashboardIntent.UpdateSmsDraft -> viewModelScope.launch {
-                smsDraftRepository.updateSmsDraft(intent.draft)
-            }
-
-            is DashboardIntent.QuickRegisterSms -> viewModelScope.launch {
-                val draft = smsDraftRepository.getSmsDraftById(intent.draft.id) ?: return@launch
-                if (draft.isUsed) return@launch
-                val source = resolveSmsSource(draft, observeSources().first())
-                val currency = Currency.valueOf(preferenceUseCases.getStringPreference(
-                    FinTrackPreferences.PREF_CURRENCY, "")).code
-                if (draft.categoryId == null || source == null || !isSmsSourceCurrencyCompatible(source, currency) || reviewSmsAmount(draft) != null) {
-                    // Fallback to manual registration if data is missing
-                    onIntent(
-                        DashboardIntent.ShowTransactionBottomSheet(
-                            smsDraft = draft,
-                            type = draft.type
-                        )
-                    )
-                    return@launch
-                }
-
-                _state.update { it.copy(isLoading = true) }
-
-                try {
-                    val finalAmount =
-                        if (currency == "IRT") draft.amount / 10 else draft.amount
-
-                    val transaction = com.kazemieh.common.model.Transaction(
-                        id = 0,
-                        currencyCode = currency,
-                        amount = finalAmount,
-                        categoryId = draft.categoryId!!,
-                        sourceId = source.id!!,
-                        description = draft.body,
-                        timeStamp = draft.timeStamp,
-                        type = draft.type,
-                        date = draft.date
-                    )
-                    val id = transactionUseCaseGroup.addTransactionUseCase(
-                        transaction,
-                        emptyList(),
-                        emptyList(),
-                        smsDraftId = draft.id
-                    )
-                    if (id > 0) {
-                        analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsDraftQuickRegistered)
-                    } else {
-                        SnackbarController.showMessage(UiText.StringResourceText(Res.string.transaction_failed))
+            is DashboardIntent.UpdateSmsDraft -> {
+                if (_state.value.isSmsRegistering || _state.value.isSmsDeleting) return
+                viewModelScope.launch {
+                    try {
+                        smsDraftRepository.updateSmsDraft(intent.draft)
+                        _state.update { it.copy(smsRegistrationErrors = it.smsRegistrationErrors - intent.draft.id) }
+                    } catch (e: CancellationException) { throw e
+                    } catch (e: Exception) {
+                        _state.update { it.copy(smsRegistrationErrors = it.smsRegistrationErrors +
+                            (intent.draft.id to UiText.StringResourceText(Res.string.sms_registration_failed))) }
                     }
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionFailed("sms_quick_register", "write_failed"))
-                    SnackbarController.showMessage(UiText.StringResourceText(Res.string.transaction_failed))
-                } finally {
-                    _state.update { it.copy(isLoading = false) }
                 }
             }
+
+            is DashboardIntent.QuickRegisterSms -> registerSms(intent.draft.id)
+            DashboardIntent.RegisterAllSmsDrafts -> registerSms()
+            DashboardIntent.DismissSmsSummary -> _state.update { it.copy(smsBatchProgress = null,
+                smsDeletedCount = null, smsGeneralError = null) }
 
             DashboardIntent.ToggleCustomizeSheet -> _state.update {
                 it.copy(showCustomizeSheet = !it.showCustomizeSheet)
@@ -499,6 +518,14 @@ data class DashboardState(
     val showDeleteSmsConfirmation: Boolean = false,
     val showDeleteAllSmsConfirmation: Boolean = false,
     val isSmsDeleting: Boolean = false,
+    val isSmsRegistering: Boolean = false,
+    val readySmsDraftIds: Set<Long> = emptySet(),
+    val smsBatchProgress: SmsBatchProgress? = null,
+    val smsRegistrationErrors: Map<Long, UiText> = emptyMap(),
+    val smsDeleteIds: List<Long> = emptyList(),
+    val smsDeleteError: UiText? = null,
+    val smsGeneralError: UiText? = null,
+    val smsDeletedCount: Int? = null,
     val smsDraftToDelete: SmsDraft? = null,
     val smsDraft: SmsDraft? = null,
     val currency: String = "IRR",
@@ -551,6 +578,8 @@ sealed interface DashboardIntent {
     data class OpenSmsDraftTransaction(val draftId: Long) : DashboardIntent
     data class IgnoreSmsDraft(val draft: SmsDraft) : DashboardIntent
     data object IgnoreAllSmsDrafts : DashboardIntent
+    data object RegisterAllSmsDrafts : DashboardIntent
+    data object DismissSmsSummary : DashboardIntent
     data class ShowDeleteSmsConfirmation(val show: Boolean, val draft: SmsDraft? = null) :
         DashboardIntent
 

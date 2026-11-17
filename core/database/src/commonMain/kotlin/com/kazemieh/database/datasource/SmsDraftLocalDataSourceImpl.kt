@@ -1,6 +1,7 @@
 package com.kazemieh.database.datasource
 
 import app.cash.sqldelight.async.coroutines.awaitAsOne
+import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
@@ -72,6 +73,15 @@ class SmsDraftLocalDataSourceImpl(
 
     override suspend fun deleteUnusedSmsDrafts(): Unit = withContext(Dispatchers.Default) {
         smsDraftQueries.deleteUnusedSmsDrafts()
+    }
+
+    override suspend fun deleteUnusedSmsDrafts(ids: List<Long>): List<Long> = withContext(Dispatchers.Default) {
+        if (ids.isEmpty()) return@withContext emptyList()
+        db.transactionWithResult {
+            val selected = smsDraftQueries.getUnusedSmsDraftIds(ids.distinct()).awaitAsList()
+            if (selected.isNotEmpty()) smsDraftQueries.deleteUnusedSmsDraftsByIds(selected)
+            selected
+        }
     }
 
     override suspend fun getSmsDraftById(id: Long): SmsDraft? = withContext(Dispatchers.Default) {
