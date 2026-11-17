@@ -1031,6 +1031,7 @@
     <string name="note_locked">Sperren</string>
     <string name="note_unlocked">Es ist offen.</string>
     <string name="note_not_found">Keine Notizen gefunden.</string>
+    <string name="note_load_failed">Die Notiz konnte nicht geöffnet werden. Bitte erneut versuchen.</string>
     <string name="reminder">Erinnerung</string>
     <string name="label_pin">PIN</string>
     <string name="label_pin_active">Angeheftete</string>

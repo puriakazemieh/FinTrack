@@ -1060,6 +1060,7 @@
     <string name="note_locked">قفل شد</string>
     <string name="note_unlocked">باز شد</string>
     <string name="note_not_found">یادداشت یافت نشد</string>
+    <string name="note_load_failed">بازکردن یادداشت انجام نشد. دوباره تلاش کنید.</string>
     <string name="reminder">یادآور</string>
     <string name="label_pin">پین</string>
     <string name="label_pin_active">پین شده</string>

@@ -25,6 +25,13 @@ kotlin {
     jvm()
 
     sourceSets {
+        jvmTest.dependencies {
+            implementation(compose.desktop.currentOs)
+        }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+        }
         commonMain {
             dependencies {
                 implementation(libs.kotlinx.serialization)

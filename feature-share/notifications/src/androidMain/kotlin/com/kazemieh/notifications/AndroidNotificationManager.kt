@@ -258,7 +258,7 @@ class AndroidNotificationManager(
             NotificationManager.CHANNEL_FIXED_EXPENSE -> "fintrack://fixed-expense"
             NotificationManager.CHANNEL_BUDGET -> "fintrack://budget"
             NotificationManager.CHANNEL_SHOPPING -> "fintrack://shopping"
-            NotificationManager.CHANNEL_NOTE -> "fintrack://notes"
+            NotificationManager.CHANNEL_NOTE -> recordId?.let { "fintrack://note?noteId=$it" } ?: "fintrack://notes"
             else -> "fintrack://dashboard"
         }
         val builder = NotificationCompat.Builder(context, postingChannelId(channelId))

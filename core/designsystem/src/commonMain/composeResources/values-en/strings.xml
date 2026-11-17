@@ -1032,6 +1032,7 @@
     <string name="note_locked">Locked</string>
     <string name="note_unlocked">It's open.</string>
     <string name="note_not_found">No notes found.</string>
+    <string name="note_load_failed">Could not open the note. Please try again.</string>
     <string name="reminder">Reminder</string>
     <string name="label_pin">Pin</string>
     <string name="label_pin_active">Pinned</string>

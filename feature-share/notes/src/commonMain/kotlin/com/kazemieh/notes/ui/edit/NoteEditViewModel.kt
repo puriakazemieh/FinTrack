@@ -12,8 +12,10 @@ import com.kazemieh.domain.usecase.ToggleNotePinUseCase
 import com.kazemieh.domain.usecase.ToggleNoteLockUseCase
 import com.kazemieh.domain.notification.NotificationScheduler
 import com.kazemieh.domain.notification.NotificationManager
+import com.kazemieh.designsystem.component.model.UiText
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.note_not_found
+import fintrack.core.designsystem.generated.resources.note_load_failed
 import fintrack.core.designsystem.generated.resources.notes
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,8 +23,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -38,7 +43,9 @@ data class NoteEditState(
     val reminderTime: Long? = null,
     val selectedTags: List<Tag> = emptyList(),
     val allTags: List<Tag> = emptyList(),
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val isUnavailable: Boolean = false,
+    val loadError: UiText? = null
 )
 
 sealed interface NoteEditIntent {
@@ -72,8 +79,12 @@ class NoteEditViewModel(
     private val _state = MutableStateFlow(NoteEditState())
     val state = _state.asStateFlow()
 
-    private val _effect = Channel<NoteEditEffect>()
-    val effect = _effect.receiveAsFlow()
+    private var loadGeneration = 0L
+    private var loadJob: Job? = null
+    private val _effect = Channel<Pair<Long, NoteEditEffect>>(Channel.BUFFERED)
+    val effect = _effect.receiveAsFlow().mapNotNull { (generation, effect) ->
+        effect.takeIf { generation == loadGeneration }
+    }
 
     init {
         viewModelScope.launch {
@@ -84,6 +95,7 @@ class NoteEditViewModel(
     }
 
     fun onIntent(intent: NoteEditIntent) {
+        if (intent !is NoteEditIntent.LoadNote && (_state.value.isLoading || _state.value.isUnavailable)) return
         when (intent) {
             is NoteEditIntent.LoadNote -> loadNote(intent.id)
             is NoteEditIntent.OnTitleChanged -> _state.update { it.copy(title = intent.title) }
@@ -98,27 +110,41 @@ class NoteEditViewModel(
     }
 
     private fun loadNote(id: Long) {
-        if (id == 0L) return
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
-            val note = getNoteById(id)
-            if (note != null) {
-                _state.update {
-                    it.copy(
-                        id = note.id,
-                        title = note.title,
-                        content = note.content,
-                        color = note.color,
-                        isPinned = note.isPinned,
-                        isLocked = note.isLocked,
-                        reminderTime = note.reminderTime,
-                        selectedTags = note.tags,
-                        isLoading = false
-                    )
+        val generation = ++loadGeneration
+        loadJob?.cancel()
+        if (id == 0L) {
+            // A reused dashboard editor must not retain a previous notification's record.
+            if (_state.value.id != 0L) _state.update { NoteEditState(allTags = it.allTags) }
+            return
+        }
+        _state.update { NoteEditState(id = id, allTags = it.allTags, isLoading = true) }
+        loadJob = viewModelScope.launch {
+            try {
+                val note = if (id > 0) getNoteById(id) else null
+                if (generation != loadGeneration) return@launch
+                if (note != null) {
+                    _state.update {
+                        it.copy(
+                            id = note.id,
+                            title = note.title,
+                            content = note.content,
+                            color = note.color,
+                            isPinned = note.isPinned,
+                            isLocked = note.isLocked,
+                            reminderTime = note.reminderTime,
+                            selectedTags = note.tags,
+                            isLoading = false
+                        )
+                    }
+                } else {
+                    _state.update { it.copy(isLoading = false, isUnavailable = true,
+                        loadError = UiText.StringResourceText(Res.string.note_not_found)) }
                 }
-            } else {
-                _effect.send(NoteEditEffect.ShowError(getString(Res.string.note_not_found)))
-                _state.update { it.copy(isLoading = false) }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                if (generation == loadGeneration) _state.update { it.copy(isLoading = false,
+                    isUnavailable = true, loadError = UiText.StringResourceText(Res.string.note_load_failed)) }
             }
         }
     }
@@ -144,8 +170,9 @@ class NoteEditViewModel(
     }
 
     private fun saveNote() {
+        val current = _state.value
+        val generation = loadGeneration
         viewModelScope.launch {
-            val current = _state.value
             val note = Note(
                 id = current.id,
                 title = current.title,
@@ -166,7 +193,7 @@ class NoteEditViewModel(
                 note.id 
             }
             syncReminder(noteId, current.reminderTime, current.title.ifBlank { current.content })
-            _effect.send(NoteEditEffect.SaveSuccess)
+            if (generation == loadGeneration) _effect.send(generation to NoteEditEffect.SaveSuccess)
         }
     }
 
@@ -182,7 +209,8 @@ class NoteEditViewModel(
             message = message,
             scheduledTime = Instant.fromEpochMilliseconds(reminderTime)
                 .toLocalDateTime(TimeZone.currentSystemDefault()),
-            channelId = NotificationManager.CHANNEL_NOTE
+            channelId = NotificationManager.CHANNEL_NOTE,
+            extraId = noteId
         )
     }
 }

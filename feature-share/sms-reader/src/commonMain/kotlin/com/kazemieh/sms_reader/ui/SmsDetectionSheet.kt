@@ -119,15 +119,18 @@ fun SmsDetectionSheet(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Physical right of the title, including in Persian RTL. The close action stays opposite.
+                // Keep delete on the physical left and close on the physical right in either language.
                 val direction = LocalLayoutDirection.current
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp),
                         verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = onDismiss, enabled = !isBusy) {
-                            Icon(Icons.Default.Close, stringResource(Res.string.sms_cancel))
-                        }
                         CompositionLocalProvider(LocalLayoutDirection provides direction) {
+                            OutlinedButton(onClick = onDeleteAll, enabled = drafts.isNotEmpty() && !isBusy,
+                                modifier = Modifier.heightIn(min = 48.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
+                                FintrackLabelMediumText(stringResource(Res.string.action_delete_all),
+                                    color = LocalContentColor.current)
+                            }
                             Column(Modifier.weight(1f).padding(horizontal = 8.dp, vertical = 12.dp),
                                 horizontalAlignment = Alignment.Start) {
                                 FintrackHeadlineSmallText(stringResource(Res.string.sms_sheet_title),
@@ -136,12 +139,9 @@ fun SmsDetectionSheet(
                                 FintrackLabelSmallText(stringResource(Res.string.sms_sheet_sub),
                                     fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
-                            OutlinedButton(onClick = onDeleteAll, enabled = drafts.isNotEmpty() && !isBusy,
-                                modifier = Modifier.heightIn(min = 48.dp),
-                                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
-                                FintrackLabelMediumText(stringResource(Res.string.action_delete_all),
-                                    color = LocalContentColor.current)
-                            }
+                        }
+                        IconButton(onClick = onDismiss, enabled = !isBusy) {
+                            Icon(Icons.Default.Close, stringResource(Res.string.sms_cancel))
                         }
                     }
                 }

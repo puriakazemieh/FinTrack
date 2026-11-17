@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +33,7 @@ import com.kazemieh.designsystem.component.FintrackButton
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
 import com.kazemieh.designsystem.component.FintrackLabelSmallText
 import com.kazemieh.designsystem.component.glass.*
+import com.kazemieh.designsystem.component.model.asString
 import com.kazemieh.designsystem.component.jalali.JalaliDatePickerBottomSheet
 import com.kazemieh.designsystem.component.picker.FintrackTimePickerBottomSheet
 import com.kazemieh.designsystem.picker.FinTrackPickerColors
@@ -81,7 +83,7 @@ fun NoteEditContent(
     onBack: () -> Unit,
     noteId: Long
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     var showTagSheet by remember { mutableStateOf(false) }
     val showDatePicker = remember { mutableStateOf(false) }
     val showTimePicker = remember { mutableStateOf(false) }
@@ -95,12 +97,16 @@ fun NoteEditContent(
     AddFrame(
         title = if (noteId == 0L) stringResource(Res.string.add_note) else stringResource(Res.string.edit_note),
         primaryLabel = stringResource(Res.string.save_),
+        primaryEnabled = !state.isUnavailable && (noteId == 0L || state.id == noteId),
+        isLoading = state.isLoading,
+        feedbackText = state.loadError?.asString(),
         onPrimaryClick = { viewModel.onIntent(NoteEditIntent.OnSave) },
         onClose = onBack,
         showHero = false,
         preventSwipeDismiss = false,
         horizontalPadding = 12.dp
     ) {
+        if (state.isUnavailable) return@AddFrame
         Column(
             modifier = Modifier
                 .fillMaxWidth()

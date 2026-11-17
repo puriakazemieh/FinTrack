@@ -16,7 +16,8 @@ android {
         targetSdk = 36
         versionCode = 15
         versionName = "6.9.0"
-        testInstrumentationRunner = "com.kazemieh.fintrack.NotificationIdentityInstrumentation"
+        testInstrumentationRunner = providers.gradleProperty("fintrackTestRunner")
+            .getOrElse("com.kazemieh.fintrack.NotificationIdentityInstrumentation")
     }
 
     signingConfigs {
@@ -81,6 +82,8 @@ android {
 }
 
 dependencies {
+    androidTestImplementation(libs.kotlinx.datetime)
+    androidTestImplementation(libs.compose.components.resources)
     implementation(project(":composeApp"))
     implementation(project(":core:common"))
     implementation(project(":core:designsystem"))

@@ -409,7 +409,9 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
             )
         }
 
-        composable<Screen.NoteEdit> { backStackEntry ->
+        composable<Screen.NoteEdit>(
+            deepLinks = listOf(navDeepLink { uriPattern = "fintrack://note?noteId={noteId}" })
+        ) { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.NoteEdit>()
             NoteEditScreen(
                 noteId = args.noteId,
