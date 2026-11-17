@@ -74,6 +74,17 @@ class TransactionRepositoryImpl(
         return localDataSource.addTransactionWithBalance(transaction.copy(currencyCode = code), tagIds, personIds, balanceDeltas)
     }
 
+    override suspend fun addSmsTransactionWithBalance(
+        smsDraftId: Long,
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+        balanceDeltas: Map<Long, Long>
+    ): Long {
+        if (transaction.currencyCode != selectedCurrencyCode()) return 0L
+        return localDataSource.addSmsTransactionWithBalance(smsDraftId, transaction, tagIds, personIds, balanceDeltas)
+    }
+
     override suspend fun updateTransactionWithBalance(
         transaction: Transaction,
         tagIds: List<Long>,

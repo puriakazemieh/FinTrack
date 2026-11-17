@@ -23,13 +23,17 @@ class AddTransactionUseCase(
         transaction: Transaction,
         tagIds: List<Long>,
         personIds: List<Long>,
+        smsDraftId: Long? = null,
     ): Long {
         if (transaction.type == TransactionType.TRANSFER && transaction.sourceId == transaction.sourceEndId) {
             throw IllegalArgumentException("Cannot transfer to the same account")
         }
 
         val impact = transaction.balanceImpact()
-        val resultId = repository.addTransactionWithBalance(transaction, tagIds, personIds, impact)
+        val resultId = if (smsDraftId != null) {
+            repository.addSmsTransactionWithBalance(smsDraftId, transaction, tagIds, personIds, impact)
+        } else repository.addTransactionWithBalance(transaction, tagIds, personIds, impact)
+        if (resultId <= 0L) return resultId
 
         // This is deliberately checked after the insert and lives in the common creation path,
         // so SMS, asset, cheque and scheduled transaction flows cannot emit it prematurely.

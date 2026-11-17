@@ -15,6 +15,14 @@ import kotlinx.coroutines.flow.Flow
 
 interface TransactionLocalDataSource {
 
+    suspend fun addSmsTransactionWithBalance(
+        smsDraftId: Long,
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+        balanceDeltas: Map<Long, Long>
+    ): Long
+
     suspend fun addTransactionWithBalance(
         transaction: Transaction,
         tagIds: List<Long>,

@@ -34,6 +34,7 @@ import fintrack.core.designsystem.generated.resources.transaction_failed
 import fintrack.core.designsystem.generated.resources.sms_source_currency_incompatible
 import fintrack.core.designsystem.generated.resources.sms_amount_review_required
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -376,88 +377,94 @@ class AddTransactionViewModel(
 
     private fun submitTransaction() {
         val current = _state.value
+        if (current.isLoading) return
+        _state.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
-
-            val photoPath = current.photoBytes?.let { bytes ->
-                // Simplified: always save if present. 
-                // In a real app, you'd check if it changed.
-                val path = imageStorage.saveImage(bytes)
-                // Delete old photo if it exists and we are saving a new one
-                current.oldTransaction?.photoPath?.let { oldPath ->
-                    imageStorage.deleteImage(oldPath)
+            try {
+                val photoPath = current.photoBytes?.let { bytes ->
+                    // Simplified: always save if present.
+                    // In a real app, you'd check if it changed.
+                    val path = imageStorage.saveImage(bytes)
+                    // Delete old photo if it exists and we are saving a new one
+                    current.oldTransaction?.photoPath?.let { oldPath ->
+                        imageStorage.deleteImage(oldPath)
+                    }
+                    path
+                } ?: run {
+                    // If photoBytes is null, and we had an old photo, it means it was removed
+                    current.oldTransaction?.photoPath?.let { oldPath ->
+                        imageStorage.deleteImage(oldPath)
+                    }
+                    null
                 }
-                path
-            } ?: run {
-                // If photoBytes is null, and we had an old photo, it means it was removed
-                current.oldTransaction?.photoPath?.let { oldPath ->
-                    imageStorage.deleteImage(oldPath)
+
+                val amountValue = current.amount.toLongOrNull() ?: 0L
+                // For a transfer, the destination amount mirrors the source amount unless the
+                // user explicitly entered a different one; otherwise it would stay 0 and the
+                // per-day net / detail math would treat the transfer as having no value.
+                val amountTransferValue = if (current.transactionType == TransactionType.TRANSFER) {
+                    current.amountTransfer?.toLongOrNull()?.takeIf { it > 0L } ?: amountValue
+                } else {
+                    current.amountTransfer?.toLongOrNull() ?: 0L
                 }
-                null
-            }
 
-            val amountValue = current.amount.toLongOrNull() ?: 0L
-            // For a transfer, the destination amount mirrors the source amount unless the
-            // user explicitly entered a different one; otherwise it would stay 0 and the
-            // per-day net / detail math would treat the transfer as having no value.
-            val amountTransferValue = if (current.transactionType == TransactionType.TRANSFER) {
-                current.amountTransfer?.toLongOrNull()?.takeIf { it > 0L } ?: amountValue
-            } else {
-                current.amountTransfer?.toLongOrNull() ?: 0L
-            }
+                val currencyValue = Currency.valueOf(
+                    preferenceUseCases.getStringPreference(
+                        com.kazemieh.preferences.FinTrackPreferences.PREF_CURRENCY,
+                        "IRT"
+                    )
+                ).code
 
-            val currencyValue = Currency.valueOf(
-                preferenceUseCases.getStringPreference(
-                    com.kazemieh.preferences.FinTrackPreferences.PREF_CURRENCY,
-                    "IRT"
+                val transaction = Transaction(
+                    id = current.oldTransaction?.id ?: 0,
+                    currencyCode = current.oldTransaction?.currencyCode ?: currencyValue,
+                    amount = amountValue,
+                    amountTransfer = amountTransferValue,
+                    categoryId = current.category?.id ?: 0,
+                    sourceId = current.source?.id ?: 0,
+                    sourceEndId = current.sourceEnd?.id,
+                    relatedDebtId = current.oldTransaction?.relatedDebtId,
+                    description = current.description,
+                    photoPath = photoPath,
+                    timeStamp = current.timeStamp,
+                    type = current.transactionType,
+                    date = current.date ?: ""
                 )
-            ).code
 
-            val transaction = Transaction(
-                id = current.oldTransaction?.id ?: 0,
-                currencyCode = current.oldTransaction?.currencyCode ?: currencyValue,
-                amount = amountValue,
-                amountTransfer = amountTransferValue,
-                categoryId = current.category?.id ?: 0,
-                sourceId = current.source?.id ?: 0,
-                sourceEndId = current.sourceEnd?.id,
-                relatedDebtId = current.oldTransaction?.relatedDebtId,
-                description = current.description,
-                photoPath = photoPath,
-                timeStamp = current.timeStamp,
-                type = current.transactionType,
-                date = current.date ?: ""
-            )
+                val tagIds = current.tags?.mapNotNull { it.id } ?: emptyList()
+                val personIds = current.persons?.mapNotNull { it.id } ?: emptyList()
 
-            val tagIds = current.tags?.mapNotNull { it.id } ?: emptyList()
-            val personIds = current.persons?.mapNotNull { it.id } ?: emptyList()
-
-            val id = if (current.oldTransaction == null) {
-                val newId = transactionUseCaseGroup.addTransactionUseCase(transaction, tagIds, personIds)
-                if (newId > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionCreated(transaction.type.name))
-                newId
-            } else {
-                val updatedId = transactionUseCaseGroup.updateTransactionUseCase(
-                    current.oldTransaction,
-                    transaction,
-                    tagIds,
-                    personIds
-                )
-                if (updatedId > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionUpdated)
-                updatedId
-            }
-            _state.update { it.copy(isLoading = false) }
-            if (id > 0) {
-                current.smsDraft?.let { draft ->
-                    smsDraftRepository.markSmsDraftAsUsed(draft.id)
+                val id = if (current.oldTransaction == null) {
+                    val newId = transactionUseCaseGroup.addTransactionUseCase(transaction, tagIds, personIds,
+                        smsDraftId = current.smsDraft?.id)
+                    if (newId > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionCreated(transaction.type.name))
+                    newId
+                } else {
+                    val updatedId = transactionUseCaseGroup.updateTransactionUseCase(
+                        current.oldTransaction,
+                        transaction,
+                        tagIds,
+                        personIds
+                    )
+                    if (updatedId > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.TransactionUpdated)
+                    updatedId
                 }
-                if (current.oldTransaction == null && current.transactionType == TransactionType.EXPENSE) {
-                    applyRoundUp(amountValue.toLong())
+                if (id > 0) {
+                    if (current.oldTransaction == null && current.transactionType == TransactionType.EXPENSE) {
+                        applyRoundUp(amountValue.toLong())
+                    }
+                    _effect.send(AddTransactionEffect.AddedTransaction)
+                } else {
+                    SnackbarController.showMessage(UiText.StringResourceText(Res.string.transaction_failed))
                 }
-                _effect.send(AddTransactionEffect.AddedTransaction)
-            } else {
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionFailed("transaction_submit", "write_failed"))
                 SnackbarController.showMessage(UiText.StringResourceText(Res.string.transaction_failed))
+            } finally {
+                _state.update { it.copy(isLoading = false) }
             }
         }
     }

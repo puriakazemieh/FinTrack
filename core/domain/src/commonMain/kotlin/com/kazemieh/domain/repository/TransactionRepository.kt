@@ -15,6 +15,16 @@ import kotlinx.coroutines.flow.Flow
 
 interface TransactionRepository {
 
+    /** Atomically creates the transaction, applies balances and consumes one unused draft.
+     * Returns 0 when the draft or its financial selection is no longer eligible. */
+    suspend fun addSmsTransactionWithBalance(
+        smsDraftId: Long,
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+        balanceDeltas: Map<Long, Long>
+    ): Long
+
     suspend fun addTransactionWithBalance(
         transaction: Transaction,
         tagIds: List<Long>,

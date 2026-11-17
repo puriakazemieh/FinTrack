@@ -678,40 +678,78 @@ class TransactionLocalDataSourceImpl(
         balanceDeltas: Map<Long, Long>
     ): Long = withContext(Dispatchers.Default) {
         db.transactionWithResult {
-            val now = Clock.System.now().toEpochMilliseconds()
-            transactionQueries.insertTransaction(
-                amount = transaction.amount.toLong(),
-                amountTransfer = transaction.amountTransfer.toLong(),
-                categoryId = transaction.categoryId,
-                sourceId = transaction.sourceId,
-                sourceEndId = transaction.sourceEndId,
-                relatedDebtId = transaction.relatedDebtId,
-                description = transaction.description,
-                photoPath = transaction.photoPath,
-                timeStamp = transaction.timeStamp,
-                type = transaction.type.count.toLong(),
-                updatedAt = now,
-                syncStatus = 1,
-                currencyCode = transaction.currencyCode
-            )
-
-            val transactionId = transactionQueries.lastInsertRowId().awaitAsOne()
-
-            tagIds.distinct().forEach { tagId ->
-                transactionTagQueries.insertTransactionTagCrossRefs(transactionId, tagId)
-            }
-
-            personIds.distinct().forEach { personId ->
-                transactionPersonQueries.insertTransactionPersonCrossRefs(transactionId, personId)
-            }
-
-
-            balanceDeltas.forEach { (sourceId, delta) ->
-                sourceQueries.adjustBalance(delta.toLong(), now, 1, sourceId)
-            }
-
-            transactionId
+            insertTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
         }
+    }
+
+    override suspend fun addSmsTransactionWithBalance(
+        smsDraftId: Long,
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+        balanceDeltas: Map<Long, Long>
+    ): Long = withContext(Dispatchers.Default) {
+        db.transactionWithResult {
+            val draft = db.smsDraftQueries.getSmsDraftById(smsDraftId).awaitAsOneOrNull()
+            if (draft == null || draft.isUsed != 0L) return@transactionWithResult 0L
+            if (transaction.amount <= 0L || transaction.currencyCode !in setOf("IRT", "IRR"))
+                return@transactionWithResult 0L
+            val category = categoryQueries.getCategoryById(transaction.categoryId).awaitAsOneOrNull()
+            if (category == null || category.syncStatus == 2L || category.type != transaction.type.count.toLong())
+                return@transactionWithResult 0L
+            for ((sourceId, delta) in balanceDeltas) {
+                val source = sourceQueries.getSourceById(sourceId).awaitAsOneOrNull()
+                if (source == null || source.syncStatus == 2L || source.currencyCode != transaction.currencyCode)
+                    return@transactionWithResult 0L
+                if ((delta > 0 && source.balance > Long.MAX_VALUE - delta) ||
+                    (delta < 0 && source.balance < Long.MIN_VALUE - delta)) return@transactionWithResult 0L
+            }
+            val id = insertTransactionWithBalance(transaction, tagIds, personIds, balanceDeltas)
+            db.smsDraftQueries.markSmsDraftAsUsed(smsDraftId)
+            id
+        }
+    }
+
+    /** Caller owns the database transaction, including the SMS claim when applicable. */
+    private suspend fun insertTransactionWithBalance(
+        transaction: Transaction,
+        tagIds: List<Long>,
+        personIds: List<Long>,
+        balanceDeltas: Map<Long, Long>
+    ): Long {
+        val now = Clock.System.now().toEpochMilliseconds()
+        transactionQueries.insertTransaction(
+            amount = transaction.amount.toLong(),
+            amountTransfer = transaction.amountTransfer.toLong(),
+            categoryId = transaction.categoryId,
+            sourceId = transaction.sourceId,
+            sourceEndId = transaction.sourceEndId,
+            relatedDebtId = transaction.relatedDebtId,
+            description = transaction.description,
+            photoPath = transaction.photoPath,
+            timeStamp = transaction.timeStamp,
+            type = transaction.type.count.toLong(),
+            updatedAt = now,
+            syncStatus = 1,
+            currencyCode = transaction.currencyCode
+        )
+
+        val transactionId = transactionQueries.lastInsertRowId().awaitAsOne()
+
+        tagIds.distinct().forEach { tagId ->
+            transactionTagQueries.insertTransactionTagCrossRefs(transactionId, tagId)
+        }
+
+        personIds.distinct().forEach { personId ->
+            transactionPersonQueries.insertTransactionPersonCrossRefs(transactionId, personId)
+        }
+
+
+        balanceDeltas.forEach { (sourceId, delta) ->
+            sourceQueries.adjustBalance(delta.toLong(), now, 1, sourceId)
+        }
+
+        return transactionId
     }
 
     override suspend fun updateTransactionWithBalance(

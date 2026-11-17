@@ -5,6 +5,8 @@ import com.kazemieh.domain.usecase.resolveSmsSource
 import com.kazemieh.domain.usecase.reviewSmsAmount
 import com.kazemieh.domain.usecase.isSmsSourceCurrencyCompatible
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.designsystem.component.SnackbarController
+import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.common.model.Achievement
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.SmsDraft
@@ -24,6 +26,7 @@ import com.kazemieh.domain.usecase.TransactionUseCaseGroup
 import com.kazemieh.money.Currency
 import com.kazemieh.preferences.FinTrackPreferences
 import fintrack.core.designsystem.generated.resources.Res
+import fintrack.core.designsystem.generated.resources.transaction_failed
 import fintrack.core.designsystem.generated.resources.placeholder_user_initial
 import fintrack.core.designsystem.generated.resources.placeholder_user_name
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +40,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import org.jetbrains.compose.resources.getString
 
 
@@ -351,29 +355,40 @@ class DashboardViewModel(
 
                 _state.update { it.copy(isLoading = true) }
 
-                val finalAmount =
-                    if (currency == "IRT") draft.amount / 10 else draft.amount
+                try {
+                    val finalAmount =
+                        if (currency == "IRT") draft.amount / 10 else draft.amount
 
-                val transaction = com.kazemieh.common.model.Transaction(
-                    id = 0,
-                    amount = finalAmount,
-                    categoryId = draft.categoryId!!,
-                    sourceId = source.id!!,
-                    description = draft.body,
-                    timeStamp = draft.timeStamp,
-                    type = draft.type,
-                    date = draft.date
-                )
-                val id = transactionUseCaseGroup.addTransactionUseCase(
-                    transaction,
-                    emptyList(),
-                    emptyList()
-                )
-                if (id > 0) {
-                    smsDraftRepository.markSmsDraftAsUsed(draft.id)
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsDraftQuickRegistered)
+                    val transaction = com.kazemieh.common.model.Transaction(
+                        id = 0,
+                        currencyCode = currency,
+                        amount = finalAmount,
+                        categoryId = draft.categoryId!!,
+                        sourceId = source.id!!,
+                        description = draft.body,
+                        timeStamp = draft.timeStamp,
+                        type = draft.type,
+                        date = draft.date
+                    )
+                    val id = transactionUseCaseGroup.addTransactionUseCase(
+                        transaction,
+                        emptyList(),
+                        emptyList(),
+                        smsDraftId = draft.id
+                    )
+                    if (id > 0) {
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsDraftQuickRegistered)
+                    } else {
+                        SnackbarController.showMessage(UiText.StringResourceText(Res.string.transaction_failed))
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionFailed("sms_quick_register", "write_failed"))
+                    SnackbarController.showMessage(UiText.StringResourceText(Res.string.transaction_failed))
+                } finally {
+                    _state.update { it.copy(isLoading = false) }
                 }
-                _state.update { it.copy(isLoading = false) }
             }
 
             DashboardIntent.ToggleCustomizeSheet -> _state.update {

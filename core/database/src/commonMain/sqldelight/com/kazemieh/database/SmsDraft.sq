@@ -23,7 +23,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 updateSmsDraft:
 UPDATE sms_draft
 SET sender = ?, body = ?, amount = ?, bankName = ?, type = ?, sourceId = ?, sourceIdentifier = ?, timeStamp = ?, date = ?, categoryId = ?, confidence = ?, isUsed = ?
-WHERE id = ?;
+WHERE id = ? AND isUsed = 0;
 
 observeUnusedSmsDrafts:
 SELECT * FROM sms_draft WHERE isUsed = 0 ORDER BY timeStamp DESC;

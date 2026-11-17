@@ -40,6 +40,10 @@ import kotlinx.coroutines.flow.flowOf
 
 open class FakeTransactionRepository : TransactionRepository {
 
+    override suspend fun addSmsTransactionWithBalance(smsDraftId: Long, transaction: Transaction,
+        tagIds: List<Long>, personIds: List<Long>, balanceDeltas: Map<Long, Long>): Long =
+        error("Atomic SMS posting must be faked explicitly")
+
     val balanceDeltasApplied = mutableMapOf<Long, Long>()
 
 
