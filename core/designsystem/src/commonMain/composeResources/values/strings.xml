@@ -150,9 +150,9 @@
 
     <string name="test_ok">OK</string>
 
-    <string name="percentage_format">%1$s%%</string>
-    <string name="calc_tax">+%1$s%% مالیات</string>
-    <string name="calc_discount">-%1$s%% تخفیف</string>
+    <string name="percentage_format">%1$s٪</string>
+    <string name="calc_tax">+%1$s٪ مالیات</string>
+    <string name="calc_discount">-%1$s٪ تخفیف</string>
     <string name="calc_divide">÷ %1$s</string>
     <string name="calc_multiply">× %1$s</string>
     <string name="optional_wrapper">(%1$s)</string>
@@ -338,7 +338,7 @@
     <string name="label_transaction_net_summary">%1$s %2$s · %3$s</string>
     <string name="label_amount_with_unit">%1$s %2$s</string>
     <string name="label_source_date_summary">%1$s · %2$s</string>
-    <string name="label_percentage_suffix">%1$s %2$s%%</string>
+    <string name="label_percentage_suffix">%1$s %2$s٪</string>
     <string name="label_zero">۰</string>
     <string name="label_char_count_limit">%1$s / %2$s</string>
 
@@ -809,7 +809,7 @@
     <string name="net_debt_balance">تراز نهایی</string>
     <string name="debt_type">نوع مورد</string>
     <string name="ledger_empty">هیچ تراکنش یا بدهی ثبت نشده است</string>
-    <string name="label_percentage_value">%1$s%%</string>
+    <string name="label_percentage_value">%1$s٪</string>
     <string name="label_spent_of_budget">%1$s از %2$s ت</string>
     <string name="msg_asset_added">دارایی با موفقیت اضافه شد</string>
     <string name="msg_asset_deleted">دارایی حذف شد</string>

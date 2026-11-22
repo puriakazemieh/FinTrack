@@ -19,7 +19,7 @@
     <string name="add_transaction">Adding transactions</string>
     <string name="add_source">Adding source</string>
     <string name="label_balance">Inventory</string>
-    <string name="balance">Inventory: %1 s s %1$s</string>
+    <string name="balance">Balance: %1$s</string>
     <string name="navigation_home">Home</string>
     <string name="navigation_report">Transactions</string>
     <string name="navigation_setting">Settings</string>
@@ -49,17 +49,17 @@
     <string name="delete_all_transaction">Deleting all transactions</string>
     <string name="title_delete_category">By removing the classification, all transactions are completely deleted.</string>
     <string name="transaction_delete">Are you sure of deletion?</string>
-    <string name="delete_confirm_question">Are you sure of removing %1 s s %2 s s? %1$s %2$s</string>
+    <string name="delete_confirm_question">Are you sure you want to delete %1$s %2$s?</string>
     <string name="transaction_deleted">Transaction deleted</string>
     <string name="recent_transactions">Recent transactions</string>
     <string name="balance_total">Total inventory:</string>
-    <string name="balance_with_label">Inventory %1 s s : %1$s</string>
+    <string name="balance_with_label">Balance %1$s:</string>
     <string name="payment">Payment</string>
     <string name="income">Received</string>
     <string name="amount_label">%1$s: %2$s %3$s</string>
     <string name="balance_total_label">%1$s Toman</string>
     <string name="tags_label">Labels: %1$s</string>
-    <string name="person_label">Persons: %1 s s %1$s</string>
+    <string name="person_label">People: %1$s</string>
     <string name="delete">Elimination</string>
     <string name="check_name_financial_source">Please enter the name of the source</string>
     <string name="cash_">Cash</string>
@@ -68,8 +68,8 @@
     <string name="custom_range_whit">from %2$ to %1$</string>
     <string name="month_with_year">%1$s %2$d</string>
     <string name="single_day">%1$d %2$s %3$d</string>
-    <string name="range_text_short">%1$s to %2 s s %2$s</string>
-    <string name="range_text">%1$s to %2 s s %2$s</string>
+    <string name="range_text_short">%1$s to %2$s</string>
+    <string name="range_text">%1$s to %2$s</string>
 
     <string name="check_name_person_source">Please enter the person's name</string>
     <string name="add_person">Add Person</string>
@@ -124,8 +124,8 @@
     <string name="save_source">Registered source</string>
     <string name="source_with_value">Source: %1$s</string>
     <string name="description_with_value">Description: %1$s</string>
-    <string name="transfer_from_to_label">From %1 s s to %2 s s %1$s %2$s</string>
-    <string name="amount_transfer_label">Transfer amount: %1 s s %1$s</string>
+    <string name="transfer_from_to_label">From %1$s to %2$s</string>
+    <string name="amount_transfer_label">Transfer amount: %1$s</string>
     <string name="edit">Edit</string>
     <string name="reorder">Displacement</string>
     <string name="label_to">To</string>
@@ -150,9 +150,9 @@
 
     <string name="test_ok">OK</string>
 
-    <string name="percentage_format">%1$s%%</string>
-    <string name="calc_tax">+ %1 s s%% tax %1$s</string>
-    <string name="calc_discount">- %1$s % % discount</string>
+    <string name="percentage_format">%1$s%</string>
+    <string name="calc_tax">+%1$s% tax</string>
+    <string name="calc_discount">-%1$s% discount</string>
     <string name="calc_divide">÷ %1$s</string>
     <string name="calc_multiply">× %1$s</string>
     <string name="optional_wrapper">(%1$s)</string>
@@ -241,7 +241,7 @@
     <string name="hint_optional_note">Optional note...</string>
     <string name="hint_source_name_placeholder">For example the main card or wallet</string>
     <string name="hint_transaction_description">Transaction description...</string>
-    <string name="hint_search_in">Search in 1% s s %1$s</string>
+    <string name="hint_search_in">Search in %1$s</string>
 
     <string name="label_color">Color</string>
     <string name="label_icon">Aiken</string>
@@ -271,7 +271,7 @@
     <string name="label_new_source">New source</string>
     <string name="label_summary_period">Summary of the course</string>
     <string name="label_monthly_trend">Monthly trends</string>
-    <string name="label_cashflow_calendar">Cash flow calendar · %1 s s %1$s</string>
+    <string name="label_cashflow_calendar">Cash flow calendar · %1$s</string>
     <string name="weekday_initials">The one,the one, the one, the one, the one, the one, the one.</string>
 
     <string name="btn_save_category">Save by Category</string>
@@ -303,7 +303,7 @@
     <string name="msg_hello">Hello,</string>
     <string name="msg_no_transaction_found">No transaction found.</string>
     <string name="msg_empty_list">There are no items to display</string>
-    <string name="msg_error_prefix">Error: %1 s s %1$s</string>
+    <string name="msg_error_prefix">Error: %1$s</string>
 
     <string name="unit_transaction">Transaction</string>
     <string name="unit_toman_short">T</string>
@@ -331,14 +331,14 @@
     <string name="label_attachment_fa">Attached photo</string>
 
     <string name="label_retry">Try again.</string>
-    <string name="label_error_with_msg">Error: %1 s s %1$s</string>
+    <string name="label_error_with_msg">Error: %1$s</string>
     <string name="label_required_marker">*</string>
     <string name="label_transfer_arrow">←</string>
     <string name="label_tag_prefix">#%1$s</string>
     <string name="label_transaction_net_summary">%1$s %2$s · %3$s</string>
     <string name="label_amount_with_unit">%1$s %2$s</string>
     <string name="label_source_date_summary">%1$s · %2$s</string>
-    <string name="label_percentage_suffix">%1$s %2$s%%</string>
+    <string name="label_percentage_suffix">%1$s %2$s%</string>
     <string name="label_zero">0</string>
     <string name="label_char_count_limit">%1$s / %2$s</string>
 
@@ -392,7 +392,7 @@
     <string name="label_purchase_price">Purchase price per unit</string>
     <string name="label_asset_profit_loss_short">Profit / loss</string>
     <string name="btn_add_custom_asset">Adding custom assets / other currencies</string>
-    <string name="title_price_history">Price history: %1 s s %1$s</string>
+    <string name="title_price_history">Price history: %1$s</string>
     <string name="title_add_custom_asset">Adding custom assets</string>
     <string name="label_current_unit_value">Current value of each unit (rial)</string>
     <string name="title_stocks_portfolio">Portfolio</string>
@@ -440,14 +440,14 @@
     <string name="label_parent_category">Mother category</string>
 
     <!-- Assets Additional -->
-    <string name="title_price_history_label">Price history: %1 s s %1$s</string>
+    <string name="title_price_history_label">Price history: %1$s</string>
     <string name="label_total_assets">Total value</string>
     <string name="label_shares_suffix">%1$s share</string>
     <string name="title_edit_asset">Asset Editing</string>
     <string name="title_view_history">View history</string>
     <string name="title_delete_asset_action">Asset removal</string>
     <string name="label_add_new_entity">Adding a new one</string>
-    <string name="label_add_specific_new_entity">Added 1%$s new %1$s</string>
+    <string name="label_add_specific_new_entity">Add new %1$s</string>
 
     <!-- Checks Additional -->
     <string name="label_check_status_ongoing">In the stream</string>
@@ -469,7 +469,7 @@
     <string name="label_toman_date_summary">%1$s Toman - Due: %2$s</string>
     <string name="label_toman_recurrence_summary">%1$s Toman - %2$s</string>
     <string name="label_days_count">%1$s days</string>
-    <string name="label_amount_range_summary">%1$s to %2 s s %2$s</string>
+    <string name="label_amount_range_summary">%1$s to %2$s</string>
     <string name="label_units_thousand">Thousand</string>
     <string name="label_units_million">Million</string>
     <string name="label_units_billion">Billion</string>
@@ -508,7 +508,7 @@
     <!-- Profile & Settings -->
     <string name="profile_settings">Profile settings</string>
     <string name="profile_sync_title">Synchronization of data</string>
-    <string name="profile_sync_desc">Last synchronized: %1 s s %1$s</string>
+    <string name="profile_sync_desc">Last sync: %1$s</string>
     <string name="profile_premium_title">Special subscription (premium)</string>
     <string name="profile_premium_desc">Access to all state-of-the-art facilities</string>
     <string name="premium_all_features_free">All facilities are free for you</string>
@@ -749,9 +749,9 @@
     <string name="mark_as_paid">Paid</string>
     <string name="installment_deleted">The installment has been removed.</string>
     <string name="installment_saved">The installment is saved.</string>
-    <string name="remaining_installments">%1 d d remaining installment %1$d</string>
-    <string name="installment_description">Installment %1 d d from %2 d D: %3 s s %1$d %2$d %3$s</string>
-    <string name="installment_reminder_message">The installment payment date is %1%. %1$s</string>
+    <string name="remaining_installments">Remaining installments: %1$d</string>
+    <string name="installment_description">Installment %1$d of %2$d: %3$s</string>
+    <string name="installment_reminder_message">The installment payment is due on %1$s.</string>
     <string name="installment_widget_title">The installments ahead.</string>
     <string name="installment_reminders">Reminder of installments</string>
 
@@ -781,8 +781,8 @@
     <string name="net_debt_balance">Final alignment</string>
     <string name="debt_type">Item type</string>
     <string name="ledger_empty">No transactions or debts were recorded</string>
-    <string name="label_percentage_value">%1$s%%</string>
-    <string name="label_spent_of_budget">1% s from 2% s %1$s %2$s</string>
+    <string name="label_percentage_value">%1$s%</string>
+    <string name="label_spent_of_budget">%1$s of %2$s</string>
     <string name="msg_asset_added">The asset was successfully added</string>
     <string name="msg_asset_deleted">The asset was removed.</string>
     <string name="msg_asset_updated">The asset has been updated.</string>
@@ -790,7 +790,7 @@
     <string name="label_comma">, </string>
     <string name="label_dash">—</string>
     <string name="label_until">Up to</string>
-    <string name="label_until_with_dot">* Up to 1% s s %1$s</string>
+    <string name="label_until_with_dot"> · Until %1$s</string>
     <string name="placeholder_zero">0</string>
     <string name="currency_fiat">Currency units (Fiat)</string>
     <string name="currency_crypto">Cryptocurrencies</string>
@@ -1045,14 +1045,14 @@
     <string name="notes_empty">There is no note.</string>
     <string name="budget_empty">There's no budget yet.</string>
     <string name="fixed_expense_empty">There's no fixed fee yet.</string>
-    <string name="label_next_due">Maturity %1 s s %1$s</string>
-    <string name="label_over_count">1%$d case passed through ceiling %1$d</string>
+    <string name="label_next_due">Due %1$s</string>
+    <string name="label_over_count">Over the limit: %1$d</string>
 
     <!-- Backup & Sync -->
     <string name="backup_restore_title">Backup and recovery</string>
     <string name="backup_restore_subtitle">Protecting your data</string>
     <string name="backup_active_protection">Active protection</string>
-    <string name="backup_last_time">Last Support: %1 s s %1$s</string>
+    <string name="backup_last_time">Last backup: %1$s</string>
     <string name="backup_now">Backup now</string>
     <string name="backup_stats_transactions">Transactions</string>
     <string name="backup_stats_sources">Sources</string>
@@ -1077,7 +1077,7 @@
 
     <!-- Export -->
     <string name="export_title">Getting output</string>
-    <string name="export_subtitle">%1$D transaction · %2$s to %3 s s %3$s</string>
+    <string name="export_subtitle">Transactions: %1$d · %2$s to %3$s</string>
     <string name="export_fintrack_file">Fintrack file</string>
     <string name="export_fintrack_desc">JSON encrypted · for recovery</string>
     <string name="export_excel_title">Excel (.xlsx)</string>
@@ -1091,10 +1091,10 @@
     <!-- SMS Reader -->
     <string name="sms_detection_title">The bank text message has been identified.</string>
     <string name="sms_detection_desc">A transaction related to the bank %1$s was identified.</string>
-    <string name="sms_banner_text">1%$s new bank SMS has been identified. %1$s</string>
+    <string name="sms_banner_text">New bank messages: %1$s</string>
     <string name="sms_sheet_title">Detected text messages</string>
     <string name="sms_sheet_sub">Choosing to register a transaction</string>
-    <string name="sms_ref_label">Draft of the bank SMS * %1 s s %1$s</string>
+    <string name="sms_ref_label">Draft from bank message · %1$s</string>
     <string name="notif_channel_sms">SMS detection</string>
     <string name="notif_channel_shopping">Shopping reminder</string>
     <string name="notif_channel_note">Note reminder</string>
@@ -1112,9 +1112,9 @@
     <string name="notif_action_register">Quick record</string>
     <string name="notif_action_ignore">Ignoring</string>
     <string name="notif_action_manage">Management</string>
-    <string name="bank_label">Bank %1 s s %1$s</string>
+    <string name="bank_label">Bank %1$s</string>
     <string name="amount_rial_label">%1$s Rial</string>
-    <string name="sms_banner_desc">You have 1%$s of unregistered transactions from Bank texts. %1$s</string>
+    <string name="sms_banner_desc">Unregistered transactions from bank messages: %1$s.</string>
     <string name="card_suffix_label">Card: ...%1$s ·</string>
 
     <string name="transaction_detail">Transaction details</string>
@@ -1124,7 +1124,7 @@
     <string name="reorder_list">Displacement</string>
 
     <string name="profile_sync_active">Active cloud synchronization</string>
-    <string name="profile_sync_time">Last synchronized: %1 s s %1$s</string>
+    <string name="profile_sync_time">Last sync: %1$s</string>
     <string name="profile_sync_now">Sink now</string>
     <string name="profile_stats_transactions">Transaction</string>
     <string name="profile_stats_active_days">Active day</string>
@@ -1175,7 +1175,7 @@
     <string name="calculator_add_tax">+9% tax</string>
     <string name="calculator_apply_discount">−10% discount</string>
     <string name="action_refresh">Refresh</string>
-    <string name="label_percentage">%1$s%%</string>
+    <string name="label_percentage">%1$s%</string>
     <string name="pdf_report_title">FinTrack - Transaction Report</string>
     <string name="pdf_transaction_row">%1$s: %2$s - %3$s</string>
     <string name="text_scale_extra_small">XS</string>
@@ -1215,15 +1215,15 @@
     <string name="title_display_currency">Display and currency</string>
     <string name="sub_display_currency">App appearance and common money</string>
     <string name="notif_budget_exceeded_title">Budget warning</string>
-    <string name="notif_budget_exceeded_desc">You have consumed 2% d % of the category budget 1% S. %2$d %1$s</string>
-    <string name="payment_for">Installment payment %1 s s %1$s</string>
+    <string name="notif_budget_exceeded_desc">You have used %2$d% of the budget for %1$s.</string>
+    <string name="payment_for">Installment payment: %1$s</string>
     <string name="notif_installment_title">The installment is due.</string>
-    <string name="notif_installment_desc">It's time to pay the 1%$s installment. %1$s</string>
-    <string name="settle_debt_desc">Debt settlement %1 s s %1$s</string>
+    <string name="notif_installment_desc">Installment %1$s is due.</string>
+    <string name="settle_debt_desc">Settle debt: %1$s</string>
     <string name="label_check_status_title">Check status</string>
-    <string name="msg_notif_check_received">Receive checks from %1 s s %1$s</string>
-    <string name="msg_notif_check_paid">Pay check to %1 s s %1$s</string>
-    <string name="msg_notif_fixed_expense_due">Fixed cost: %1 s s %1$s</string>
+    <string name="msg_notif_check_received">Receive a check from %1$s</string>
+    <string name="msg_notif_check_paid">Pay the check to %1$s</string>
+    <string name="msg_notif_fixed_expense_due">Fixed expense due: %1$s</string>
     <string name="msg_auto_posted_fixed_expense">Automatic registration of fixed fee</string>
     <string name="label_done">All</string>
 
@@ -1231,8 +1231,8 @@
     <string name="ai_advisor_title">Smart consultant</string>
     <string name="ai_advisor_sub">An investment proposal based on your model</string>
     <string name="ai_analysis_title">Monthly analysis</string>
-    <string name="ai_analysis_days">Based on 1%$d of your activity day %1$d</string>
-    <string name="ai_analysis_body">According to the spending and income pattern, about 1% s of monthly income can be saved (approximately 2% s tomans). %1$s %2$s</string>
+    <string name="ai_analysis_days">Days of activity: %1$d</string>
+    <string name="ai_analysis_body">Based on your spending and income, about %1$s of monthly income could be saved (approximately %2$s Toman).</string>
     <string name="ai_month_summary_title">This month's recap.</string>
     <string name="ai_month_top_category">The highest cost in the Category"%1$s"</string>
     <string name="ai_cloud_insight_title">Intelligent Analysis</string>
@@ -1244,9 +1244,9 @@
     <string name="ai_settings_api_key">API key</string>
     <string name="ai_settings_model">Model name</string>
     <string name="action_save">Reserve</string>
-    <string name="ai_suggestions_count">Active offers · %1 d d %1$d</string>
-    <string name="ai_suggestion_risk">Risk: %1 s s %1$s</string>
-    <string name="ai_suggestion_return">Yield: %1 s s %1$s</string>
+    <string name="ai_suggestions_count">Active suggestions · %1$d</string>
+    <string name="ai_suggestion_risk">Risk: %1$s</string>
+    <string name="ai_suggestion_return">Return: %1$s</string>
     <string name="ai_saving_potential_label">Monthly savings potential</string>
 
     <string name="ai_suggestion_gold_title">50% allocation to 18 carat gold</string>
@@ -1276,7 +1276,7 @@
 
     <!-- Subscription detection -->
     <string name="ai_subscriptions_label">Identified subscriptions</string>
-    <string name="ai_subscription_next_payment">Next payment · %1 s s %1$s</string>
+    <string name="ai_subscription_next_payment">Next payment · %1$s</string>
     <string name="ai_subscription_occurrences">%1$d repeated times</string>
 
     <string name="risk_low">Low</string>
@@ -1287,7 +1287,7 @@
     <string name="achievements_title">Achievements</string>
     <string name="streak_days_label">%1$s days</string>
     <string name="streak_desc">Continuous recording of transactions-personal record!</string>
-    <string name="badges_label_summary">Badges * %1$s opened from %2 s s %2$s</string>
+    <string name="badges_label_summary">Badges · %1$s of %2$s unlocked</string>
     <string name="view_all">View all</string>
     <string name="badges_title">Badges</string>
     <string name="achievement_first_transaction">First transaction</string>
@@ -1312,10 +1312,10 @@
     <string name="label_google_drive_backup">Google Drive * daily backup</string>
     <string name="label_backup_size">%1$s MB</string>
     <string name="label_premium_status_summary">Up to %1$s · %2$d months remaining</string>
-    <string name="label_level_n">Level %1 s s %1$s</string>
+    <string name="label_level_n">Level %1$s</string>
     <string name="label_xp_unit">XP</string>
     <string name="label_default">Default</string>
-    <string name="label_minutes_ago">%1 s s minutes ago %1$s</string>
+    <string name="label_minutes_ago">%1$s min ago</string>
 
     <string name="range_this_month">This month</string>
     <string name="range_3_months">3 months</string>
@@ -1325,10 +1325,10 @@
 
     <!-- Goals -->
     <string name="title_savings_goals">Financial targeting</string>
-    <string name="label_active_goals">%1$D active target</string>
+    <string name="label_active_goals">Active goals: %1$d</string>
     <string name="label_total_saved">Total saved</string>
-    <string name="label_goal_summary">Of the total goal %1$s Toman · %2$d%%</string>
-    <string name="label_monthly_target">Monthly %1 s S %1$s</string>
+    <string name="label_goal_summary">Of the total goal %1$s Toman · %2$d%</string>
+    <string name="label_monthly_target">Monthly: %1$s</string>
     <string name="label_new_goal">New goal</string>
     <string name="label_add_to_goal">Adding to this goal</string>
     <string name="label_roundup_title">Automatic rounding</string>
@@ -1345,7 +1345,7 @@
     <string name="label_end_date">End date</string>
     <string name="label_no_end_date">No end date</string>
     <string name="action_clear">Erase</string>
-    <string name="label_date_range_span">%1$s to %2 s s %2$s</string>
+    <string name="label_date_range_span">%1$s to %2$s</string>
     <string name="label_date_range_from">From %1$s</string>
     <string name="btn_save_goal">Target Reserve</string>
     <string name="goal_deleted">The goal was deleted</string>
@@ -1448,16 +1448,16 @@
     <string name="quick_add">Quick addition</string>
     <string name="income_widget">Income</string>
     <string name="expense_widget">Cost</string>
-    <string name="ai_suggestion_budget_title">Creating funds for the Category %1 s s %1$s</string>
-    <string name="ai_suggestion_budget_body">Your expenses in this category have increased by$2%. You can control it by setting a budget. %2$d</string>
+    <string name="ai_suggestion_budget_title">Create a budget for %1$s</string>
+    <string name="ai_suggestion_budget_body">Spending in this category has increased by %2$d%. You can manage it by setting a budget.</string>
 
     <!-- AI advisor · additional rule-based suggestions -->
     <string name="ai_suggestion_overspend_title">The costs are higher than the income.</string>
     <string name="ai_suggestion_overspend_body">You've spent more than your income in the last 30 days. It is better to reduce unnecessary costs.</string>
     <string name="ai_suggestion_overspend_detail">When costs exceed income, savings become negative. Review the largest spending categories and set a budget ceiling for them to balance next month.</string>
 
-    <string name="ai_suggestion_concentration_title">Cost concentration in the Category %1 s s %1$s</string>
-    <string name="ai_suggestion_concentration_body">%%2$d of your total cost is in one category. A more balanced distribution reduces risk.</string>
+    <string name="ai_suggestion_concentration_title">Spending concentration in %1$s</string>
+    <string name="ai_suggestion_concentration_body">%2$d% of your total spending is in one category. A more balanced distribution reduces risk.</string>
     <string name="ai_suggestion_concentration_detail">When a large portion of spending is concentrated in a Category, a small change in that category has a big impact on the entire budget. Set a specific budget for this category and weigh lower-cost alternatives.</string>
 
     <string name="ai_suggestion_emergency_title">Don't build a day fund.</string>
@@ -1466,8 +1466,8 @@
 
     <!-- Goals refinement -->
     <string name="label_add_amount">Add amount</string>
-    <string name="label_goal_eta">Up to 1% s s %1$s</string>
-    <string name="label_monthly_target_with_val">Monthly %1 s S %1$s</string>
+    <string name="label_goal_eta">By %1$s</string>
+    <string name="label_monthly_target_with_val">Monthly: %1$s</string>
 
     <!-- Tools hub grouping -->
     <string name="tools_group_favorites">The most commonly used</string>
@@ -1481,7 +1481,7 @@
 
     <!-- FX rates / converter -->
     <string name="msg_rates_unavailable">Market prices are not available. Check the internet connection and try again.</string>
-    <string name="label_last_update">Last Updated at 1% %1$s</string>
+    <string name="label_last_update">Last updated: %1$s</string>
     <string name="msg_rates_stale">The live price update was unsuccessful; the latest saved prices are displayed.</string>
 
     <!-- Sync / backup messages -->

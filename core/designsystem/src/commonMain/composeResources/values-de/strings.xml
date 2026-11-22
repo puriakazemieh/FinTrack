@@ -19,7 +19,7 @@
     <string name="add_transaction">Transaktionen hinzufügen</string>
     <string name="add_source">Quelle hinzufügen</string>
     <string name="label_balance">Inventar</string>
-    <string name="balance">Inventar: %1 s s %1$s</string>
+    <string name="balance">Kontostand: %1$s</string>
     <string name="navigation_home">Startseite</string>
     <string name="navigation_report">Transaktion</string>
     <string name="navigation_setting">Einstellung</string>
@@ -49,17 +49,17 @@
     <string name="delete_all_transaction">Alle Transaktionen löschen</string>
     <string name="title_delete_category">Durch das Entfernen der Klassifizierung werden alle Transaktionen vollständig gelöscht.</string>
     <string name="transaction_delete">Sind Sie sich der Löschung sicher?</string>
-    <string name="delete_confirm_question">Sind Sie sicher, dass Sie %1 s s %2 s s entfernen werden? %1$s %2$s</string>
+    <string name="delete_confirm_question">Möchten Sie %1$s %2$s wirklich löschen?</string>
     <string name="transaction_deleted">Transaktion gelöscht</string>
     <string name="recent_transactions">Letzte Transaktionen</string>
     <string name="balance_total">Gesamtbestand:</string>
-    <string name="balance_with_label">Inventar %1 s s : %1$s</string>
+    <string name="balance_with_label">Kontostand %1$s:</string>
     <string name="payment">Zahlung</string>
     <string name="income">Empfangen</string>
     <string name="amount_label">%1$s: %2$s %3$s</string>
     <string name="balance_total_label">%1$s Toman</string>
     <string name="tags_label">Etiketten: %1$s</string>
-    <string name="person_label">Personen: %1 s s %1$s</string>
+    <string name="person_label">Personen: %1$s</string>
     <string name="delete">Beseitigung</string>
     <string name="check_name_financial_source">Bitte geben Sie den Namen der Quelle ein</string>
     <string name="cash_">Bargeld</string>
@@ -68,8 +68,8 @@
     <string name="custom_range_whit">von %2$ bis %1$</string>
     <string name="month_with_year">%1$s %2$d</string>
     <string name="single_day">%1$d %2$s %3$d</string>
-    <string name="range_text_short">%1$s bis %2 s s %2$s</string>
-    <string name="range_text">%1$s bis %2 s s %2$s</string>
+    <string name="range_text_short">%1$s bis %2$s</string>
+    <string name="range_text">%1$s bis %2$s</string>
 
     <string name="check_name_person_source">Bitte geben Sie den Namen der Person ein</string>
     <string name="add_person">Person hinzufügen</string>
@@ -124,8 +124,8 @@
     <string name="save_source">Registrierte Quelle</string>
     <string name="source_with_value">Quelle: %1$s</string>
     <string name="description_with_value">Beschreibung: %1$s</string>
-    <string name="transfer_from_to_label">Von %1 s s bis %2 s s %1$s %2$s</string>
-    <string name="amount_transfer_label">Überweisungsbetrag: %1 s s %1$s</string>
+    <string name="transfer_from_to_label">Von %1$s an %2$s</string>
+    <string name="amount_transfer_label">Überweisungsbetrag: %1$s</string>
     <string name="edit">Bearbeiten</string>
     <string name="reorder">Verschiebung</string>
     <string name="label_to">Zu</string>
@@ -150,9 +150,9 @@
 
     <string name="test_ok">Okay</string>
 
-    <string name="percentage_format">%1$s%%</string>
-    <string name="calc_tax">+ %1 s s%% Steuer %1$s</string>
-    <string name="calc_discount">- %1$s % % Rabatt</string>
+    <string name="percentage_format">%1$s%</string>
+    <string name="calc_tax">+%1$s% Steuer</string>
+    <string name="calc_discount">-%1$s% Rabatt</string>
     <string name="calc_divide">÷ %1$s</string>
     <string name="calc_multiply">× %1$s</string>
     <string name="optional_wrapper">(%1$s)</string>
@@ -241,7 +241,7 @@
     <string name="hint_optional_note">Optionale Notiz...</string>
     <string name="hint_source_name_placeholder">Zum Beispiel die Hauptkarte oder Brieftasche</string>
     <string name="hint_transaction_description">Beschreibung der Transaktion...</string>
-    <string name="hint_search_in">Suche in 1% s s %1$s</string>
+    <string name="hint_search_in">In %1$s suchen</string>
 
     <string name="label_color">Farbig</string>
     <string name="label_icon">Aiken</string>
@@ -271,7 +271,7 @@
     <string name="label_new_source">Neue Quelle</string>
     <string name="label_summary_period">Zusammenfassung des Kurses</string>
     <string name="label_monthly_trend">Monatliche Trends</string>
-    <string name="label_cashflow_calendar">Cashflow-Kalender * %1 s s %1$s</string>
+    <string name="label_cashflow_calendar">Cashflow-Kalender · %1$s</string>
     <string name="weekday_initials">Der eine, der eine, der eine, der eine, der eine, der eine, der eine.</string>
 
     <string name="btn_save_category">Nach Kategorie speichern</string>
@@ -303,7 +303,7 @@
     <string name="msg_hello">Hallo,</string>
     <string name="msg_no_transaction_found">Keine Transaktion gefunden.</string>
     <string name="msg_empty_list">Es sind keine Elemente zum Anzeigen vorhanden</string>
-    <string name="msg_error_prefix">Fehler: %1 s s %1$s</string>
+    <string name="msg_error_prefix">Fehler: %1$s</string>
 
     <string name="unit_transaction">Transaktion</string>
     <string name="unit_toman_short">T</string>
@@ -331,14 +331,14 @@
     <string name="label_attachment_fa">Angehängtes Foto</string>
 
     <string name="label_retry">Versuch es noch einmal.</string>
-    <string name="label_error_with_msg">Fehler: %1 s s %1$s</string>
+    <string name="label_error_with_msg">Fehler: %1$s</string>
     <string name="label_required_marker">*</string>
     <string name="label_transfer_arrow">←</string>
     <string name="label_tag_prefix">#%1$s</string>
     <string name="label_transaction_net_summary">%1$s %2$s · %3$s</string>
     <string name="label_amount_with_unit">%1$s %2$s</string>
     <string name="label_source_date_summary">%1$s · %2$s</string>
-    <string name="label_percentage_suffix">%1$s %2$s%%</string>
+    <string name="label_percentage_suffix">%1$s %2$s%</string>
     <string name="label_zero">0</string>
     <string name="label_char_count_limit">%1$s / %2$s</string>
 
@@ -392,7 +392,7 @@
     <string name="label_purchase_price">Kaufpreis pro Stück</string>
     <string name="label_asset_profit_loss_short">Gewinn / Verlust</string>
     <string name="btn_add_custom_asset">Benutzerdefinierte Assets / andere Währungen hinzufügen</string>
-    <string name="title_price_history">Preisentwicklung: %1 s s %1$s</string>
+    <string name="title_price_history">Preisverlauf: %1$s</string>
     <string name="title_add_custom_asset">Benutzerdefinierte Assets hinzufügen</string>
     <string name="label_current_unit_value">Aktueller Wert jeder Einheit (Rial)</string>
     <string name="title_stocks_portfolio">Portfolio</string>
@@ -440,14 +440,14 @@
     <string name="label_parent_category">Kategorie Mutter</string>
 
     <!-- Assets Additional -->
-    <string name="title_price_history_label">Preisentwicklung: %1 s s %1$s</string>
+    <string name="title_price_history_label">Preisverlauf: %1$s</string>
     <string name="label_total_assets">Gesamtwert</string>
     <string name="label_shares_suffix">%1$s Anteil</string>
     <string name="title_edit_asset">Asset-Bearbeitung</string>
     <string name="title_view_history">Verlauf anzeigen</string>
     <string name="title_delete_asset_action">Entfernung von Vermögenswerten</string>
     <string name="label_add_new_entity">Einen neuen hinzufügen</string>
-    <string name="label_add_specific_new_entity">Hinzugefügt 1% $ s neu %1$s</string>
+    <string name="label_add_specific_new_entity">%1$s hinzufügen</string>
 
     <!-- Checks Additional -->
     <string name="label_check_status_ongoing">Im Strom</string>
@@ -469,7 +469,7 @@
     <string name="label_toman_date_summary">%1$s Toman - Fällig: %2$s</string>
     <string name="label_toman_recurrence_summary">%1$s Toman - %2$s</string>
     <string name="label_days_count">%1$s Tage</string>
-    <string name="label_amount_range_summary">%1$s bis %2 s s %2$s</string>
+    <string name="label_amount_range_summary">%1$s bis %2$s</string>
     <string name="label_units_thousand">Tausend</string>
     <string name="label_units_million">Million</string>
     <string name="label_units_billion">Milliarde</string>
@@ -508,7 +508,7 @@
     <!-- Profile & Settings -->
     <string name="profile_settings">Profileinstellungen</string>
     <string name="profile_sync_title">Synchronisation von Daten</string>
-    <string name="profile_sync_desc">Zuletzt synchronisiert: %1 s s %1$s</string>
+    <string name="profile_sync_desc">Zuletzt synchronisiert: %1$s</string>
     <string name="profile_premium_title">Sonderabonnement (Premium)</string>
     <string name="profile_premium_desc">Zugang zu allen hochmodernen Einrichtungen</string>
     <string name="premium_all_features_free">Alle Einrichtungen sind für Sie kostenlos</string>
@@ -748,9 +748,9 @@
     <string name="mark_as_paid">Bezahlen</string>
     <string name="installment_deleted">Die Rate wurde entfernt.</string>
     <string name="installment_saved">Die Rate wird gespeichert.</string>
-    <string name="remaining_installments">%1 d d verbleibende Rate %1$d</string>
-    <string name="installment_description">Rate %1 d d von %2 d D: %3 s s %1$d %2$d %3$s</string>
-    <string name="installment_reminder_message">Das Ratenzahlungsdatum beträgt % 1%. %1$s</string>
+    <string name="remaining_installments">Verbleibende Raten: %1$d</string>
+    <string name="installment_description">Rate %1$d von %2$d: %3$s</string>
+    <string name="installment_reminder_message">Die Rate ist am %1$s fällig.</string>
     <string name="installment_widget_title">Die Raten voraus.</string>
     <string name="installment_reminders">Erinnerung an Raten</string>
 
@@ -780,8 +780,8 @@
     <string name="net_debt_balance">Endgültige Ausrichtung</string>
     <string name="debt_type">Elementtyp</string>
     <string name="ledger_empty">Es wurden keine Transaktionen oder Schulden erfasst</string>
-    <string name="label_percentage_value">%1$s%%</string>
-    <string name="label_spent_of_budget">1% s von 2% s %1$s %2$s</string>
+    <string name="label_percentage_value">%1$s%</string>
+    <string name="label_spent_of_budget">%1$s von %2$s</string>
     <string name="msg_asset_added">Das Asset wurde erfolgreich hinzugefügt</string>
     <string name="msg_asset_deleted">Das Asset wurde entfernt.</string>
     <string name="msg_asset_updated">Das Asset wurde aktualisiert.</string>
@@ -789,7 +789,7 @@
     <string name="label_comma">, </string>
     <string name="label_dash">—</string>
     <string name="label_until">Bis</string>
-    <string name="label_until_with_dot">* Bis zu 1% s s %1$s</string>
+    <string name="label_until_with_dot"> · Bis %1$s</string>
     <string name="placeholder_zero">0</string>
     <string name="currency_fiat">Währungseinheiten (Fiat)</string>
     <string name="currency_crypto">Kryptowährungen</string>
@@ -1044,14 +1044,14 @@
     <string name="notes_empty">Es gibt keine Notiz.</string>
     <string name="budget_empty">Es gibt noch kein Budget.</string>
     <string name="fixed_expense_empty">Es gibt noch keine feste Gebühr.</string>
-    <string name="label_next_due">Fälligkeit %1 s s %1$s</string>
-    <string name="label_over_count">1% $ d-Fall wurde durch die Decke geführt %1$d</string>
+    <string name="label_next_due">Fällig am %1$s</string>
+    <string name="label_over_count">Über dem Limit: %1$d</string>
 
     <!-- Backup & Sync -->
     <string name="backup_restore_title">Sicherung und Wiederherstellung</string>
     <string name="backup_restore_subtitle">Schutz Ihrer Daten</string>
     <string name="backup_active_protection">Aktiver Schutz</string>
-    <string name="backup_last_time">Letzte Unterstützung: %1 s s %1$s</string>
+    <string name="backup_last_time">Letzte Sicherung: %1$s</string>
     <string name="backup_now">Jetzt sichern</string>
     <string name="backup_stats_transactions">Transaktion</string>
     <string name="backup_stats_sources">Hauptquellen</string>
@@ -1076,7 +1076,7 @@
 
     <!-- Export -->
     <string name="export_title">Ausgabe abrufen</string>
-    <string name="export_subtitle">%1$D Transaktion * %2$s bis %3 s s %3$s</string>
+    <string name="export_subtitle">Transaktionen: %1$d · %2$s bis %3$s</string>
     <string name="export_fintrack_file">Fintrack-Datei</string>
     <string name="export_fintrack_desc">JSON verschlüsselt · für die Wiederherstellung</string>
     <string name="export_excel_title">Excel (.xlsx)</string>
@@ -1090,10 +1090,10 @@
     <!-- SMS Reader -->
     <string name="sms_detection_title">Die Banktextnachricht wurde identifiziert.</string>
     <string name="sms_detection_desc">Eine Transaktion von %1$s wurde erkannt.</string>
-    <string name="sms_banner_text">1% $ s neue Bank-SMS wurde identifiziert. %1$s</string>
+    <string name="sms_banner_text">Neue Bank-SMS: %1$s</string>
     <string name="sms_sheet_title">Erkannte Textnachrichten</string>
     <string name="sms_sheet_sub">Auswählen, eine Transaktion zu registrieren</string>
-    <string name="sms_ref_label">Entwurf der Bank-SMS * %1 s s %1$s</string>
+    <string name="sms_ref_label">Entwurf aus Bank-SMS · %1$s</string>
     <string name="notif_channel_sms">SMS-Erkennung</string>
     <string name="notif_channel_shopping">Einkaufserinnerung</string>
     <string name="notif_channel_note">Notiz Erinnerung</string>
@@ -1111,9 +1111,9 @@
     <string name="notif_action_register">Schnelle Aufzeichnung</string>
     <string name="notif_action_ignore">Nichtbeachtung</string>
     <string name="notif_action_manage">Management</string>
-    <string name="bank_label">Bank %1 s s %1$s</string>
+    <string name="bank_label">Bank %1$s</string>
     <string name="amount_rial_label">%1$s Rial</string>
-    <string name="sms_banner_desc">Sie haben 1% $ s an nicht registrierten Transaktionen aus Banktexten. %1$s</string>
+    <string name="sms_banner_desc">Nicht erfasste Transaktionen aus Bank-SMS: %1$s.</string>
     <string name="card_suffix_label">Karte: ...%1$s ·</string>
 
     <string name="transaction_detail">Transaktionsdetails</string>
@@ -1123,7 +1123,7 @@
     <string name="reorder_list">Verschiebung</string>
 
     <string name="profile_sync_active">Aktive Cloud-Synchronisation</string>
-    <string name="profile_sync_time">Zuletzt synchronisiert: %1 s s %1$s</string>
+    <string name="profile_sync_time">Zuletzt synchronisiert: %1$s</string>
     <string name="profile_sync_now">Jetzt sinken</string>
     <string name="profile_stats_transactions">Transaktion</string>
     <string name="profile_stats_active_days">Aktiver Tag</string>
@@ -1174,7 +1174,7 @@
     <string name="calculator_add_tax">+9 % Steuer</string>
     <string name="calculator_apply_discount">−10 % Rabatt</string>
     <string name="action_refresh">Aktualisieren</string>
-    <string name="label_percentage">%1$s %%</string>
+    <string name="label_percentage">%1$s%</string>
     <string name="pdf_report_title">FinTrack - Transaktionsbericht</string>
     <string name="pdf_transaction_row">%1$s: %2$s - %3$s</string>
     <string name="text_scale_extra_small">XS</string>
@@ -1214,15 +1214,15 @@
     <string name="title_display_currency">Anzeige und Währung</string>
     <string name="sub_display_currency">App Aussehen und gemeinsames Geld</string>
     <string name="notif_budget_exceeded_title">Budgetwarnung</string>
-    <string name="notif_budget_exceeded_desc">Sie haben 2% d % des Kategoriebudgets 1% S verbraucht. %2$d %1$s</string>
-    <string name="payment_for">Ratenzahlung %1 s s %1$s</string>
+    <string name="notif_budget_exceeded_desc">Sie haben %2$d% des Budgets für %1$s verbraucht.</string>
+    <string name="payment_for">Ratenzahlung: %1$s</string>
     <string name="notif_installment_title">Die Rate ist fällig.</string>
-    <string name="notif_installment_desc">Es ist Zeit, die 1% $ s Rate zu bezahlen. %1$s</string>
-    <string name="settle_debt_desc">Schuldenregelung %1 s s %1$s</string>
+    <string name="notif_installment_desc">Rate %1$s ist fällig.</string>
+    <string name="settle_debt_desc">Schuld begleichen: %1$s</string>
     <string name="label_check_status_title">Status prüfen</string>
-    <string name="msg_notif_check_received">Empfange Schecks von %1 s s %1$s</string>
-    <string name="msg_notif_check_paid">Scheck an %1 s s bezahlen %1$s</string>
-    <string name="msg_notif_fixed_expense_due">Feste Kosten: %1 s s %1$s</string>
+    <string name="msg_notif_check_received">Scheck von %1$s erhalten</string>
+    <string name="msg_notif_check_paid">Scheck an %1$s bezahlen</string>
+    <string name="msg_notif_fixed_expense_due">Fixkosten fällig: %1$s</string>
     <string name="msg_auto_posted_fixed_expense">Automatische Registrierung der festen Gebühr</string>
     <string name="label_done">Aller</string>
 
@@ -1230,8 +1230,8 @@
     <string name="ai_advisor_title">Kluger Berater</string>
     <string name="ai_advisor_sub">Ein Anlagevorschlag basierend auf Ihrem Modell</string>
     <string name="ai_analysis_title">Monatliche Analyse</string>
-    <string name="ai_analysis_days">Basierend auf 1% $ d Ihres Aktivitätstages %1$d</string>
-    <string name="ai_analysis_body">Je nach Ausgaben- und Einkommensmuster können etwa 1% des monatlichen Einkommens eingespart werden (ungefähr 2%). %1$s %2$s</string>
+    <string name="ai_analysis_days">Aktivitätstage: %1$d</string>
+    <string name="ai_analysis_body">Anhand Ihrer Ausgaben und Einnahmen könnten Sie etwa %1$s Ihres monatlichen Einkommens sparen (ungefähr %2$s Toman).</string>
     <string name="ai_month_summary_title">Zusammenfassung dieses Monats.</string>
     <string name="ai_month_top_category">Die höchsten Kosten in der Kategorie"%1$s"</string>
     <string name="ai_cloud_insight_title">Intelligente Analyse</string>
@@ -1243,9 +1243,9 @@
     <string name="ai_settings_api_key">API-Schlüssel</string>
     <string name="ai_settings_model">Modellnamen</string>
     <string name="action_save">Behalten</string>
-    <string name="ai_suggestions_count">Aktive Angebote * %1 d d %1$d</string>
-    <string name="ai_suggestion_risk">Risiko: %1 s s %1$s</string>
-    <string name="ai_suggestion_return">Ausbeute: %1 s s %1$s</string>
+    <string name="ai_suggestions_count">Aktive Vorschläge · %1$d</string>
+    <string name="ai_suggestion_risk">Risiko: %1$s</string>
+    <string name="ai_suggestion_return">Rendite: %1$s</string>
     <string name="ai_saving_potential_label">Monatliches Einsparpotenzial</string>
 
     <string name="ai_suggestion_gold_title">50% Zuteilung auf 18 Karat Gold</string>
@@ -1275,7 +1275,7 @@
 
     <!-- Subscription detection -->
     <string name="ai_subscriptions_label">Identifizierte Abonnements</string>
-    <string name="ai_subscription_next_payment">Nächste Zahlung * %1 s s %1$s</string>
+    <string name="ai_subscription_next_payment">Nächste Zahlung · %1$s</string>
     <string name="ai_subscription_occurrences">%1$d wiederholte Male</string>
 
     <string name="risk_low">Niedrig</string>
@@ -1286,7 +1286,7 @@
     <string name="achievements_title">Errungenschaften</string>
     <string name="streak_days_label">%1$s Tage</string>
     <string name="streak_desc">Kontinuierliche Aufzeichnung von Transaktionen -persönlicher Rekord!</string>
-    <string name="badges_label_summary">Abzeichen * %1$s geöffnet von %2 s s %2$s</string>
+    <string name="badges_label_summary">Abzeichen · %1$s von %2$s freigeschaltet</string>
     <string name="view_all">Alle anzeigen</string>
     <string name="badges_title">Namensschilder</string>
     <string name="achievement_first_transaction">Erste Transaktion</string>
@@ -1311,10 +1311,10 @@
     <string name="label_google_drive_backup">Google Drive * tägliche Sicherung</string>
     <string name="label_backup_size">%1$s MB</string>
     <string name="label_premium_status_summary">Bis zu %1$s · %2$d Monate verbleibend</string>
-    <string name="label_level_n">Stufe %1 s s %1$s</string>
+    <string name="label_level_n">Stufe %1$s</string>
     <string name="label_xp_unit">XP</string>
     <string name="label_default">Standard</string>
-    <string name="label_minutes_ago">Vor %1 s s Minuten %1$s</string>
+    <string name="label_minutes_ago">Vor %1$s Min.</string>
 
     <string name="range_this_month">Diesen Monat</string>
     <string name="range_3_months">3 monate</string>
@@ -1324,10 +1324,10 @@
 
     <!-- Goals -->
     <string name="title_savings_goals">Finanzielles Targeting</string>
-    <string name="label_active_goals">%1$D aktives Ziel</string>
+    <string name="label_active_goals">Aktive Ziele: %1$d</string>
     <string name="label_total_saved">Insgesamt gespart</string>
-    <string name="label_goal_summary">Vom Gesamtziel %1$s Toman · %2$d%%</string>
-    <string name="label_monthly_target">Monatlich %1 s S %1$s</string>
+    <string name="label_goal_summary">Vom Gesamtziel %1$s Toman · %2$d%</string>
+    <string name="label_monthly_target">Monatlich: %1$s</string>
     <string name="label_new_goal">Neues Ziel</string>
     <string name="label_add_to_goal">Hinzufügen zu diesem Ziel</string>
     <string name="label_roundup_title">Automatische Rundung</string>
@@ -1344,7 +1344,7 @@
     <string name="label_end_date">Enddatum</string>
     <string name="label_no_end_date">Kein Enddatum</string>
     <string name="action_clear">Löschen</string>
-    <string name="label_date_range_span">%1$s bis %2 s s %2$s</string>
+    <string name="label_date_range_span">%1$s bis %2$s</string>
     <string name="label_date_range_from">Von %1$s</string>
     <string name="btn_save_goal">Zielreserve</string>
     <string name="goal_deleted">Das Ziel wurde gelöscht</string>
@@ -1447,16 +1447,16 @@
     <string name="quick_add">Schnelle Ergänzung</string>
     <string name="income_widget">Einkommen</string>
     <string name="expense_widget">Kosten</string>
-    <string name="ai_suggestion_budget_title">Erstellen von Fonds für die Kategorie %1 s s %1$s</string>
-    <string name="ai_suggestion_budget_body">Ihre Ausgaben in dieser Kategorie sind um 2% gestiegen. Sie können es steuern, indem Sie ein Budget festlegen. %2$d</string>
+    <string name="ai_suggestion_budget_title">Budget für %1$s erstellen</string>
+    <string name="ai_suggestion_budget_body">Ihre Ausgaben in dieser Kategorie sind um %2$d% gestiegen. Mit einem Budget können Sie diese Ausgaben steuern.</string>
 
     <!-- AI advisor · additional rule-based suggestions -->
     <string name="ai_suggestion_overspend_title">Die Kosten sind höher als die Einnahmen.</string>
     <string name="ai_suggestion_overspend_body">Sie haben in den letzten 30 Tagen mehr ausgegeben als Ihr Einkommen. Es ist besser, unnötige Kosten zu reduzieren.</string>
     <string name="ai_suggestion_overspend_detail">Wenn die Kosten die Einnahmen übersteigen, werden die Einsparungen negativ. Überprüfen Sie die größten Ausgabenkategorien und legen Sie eine Budgetobergrenze fest, die im nächsten Monat ausgeglichen werden soll.</string>
 
-    <string name="ai_suggestion_concentration_title">Kostenkonzentration in der Kategorie %1 s s %1$s</string>
-    <string name="ai_suggestion_concentration_body">%% 2 $ d Ihrer Gesamtkosten fallen in eine Kategorie. Eine ausgewogenere Verteilung reduziert das Risiko. %2$d</string>
+    <string name="ai_suggestion_concentration_title">Ausgabenkonzentration in %1$s</string>
+    <string name="ai_suggestion_concentration_body">%2$d% Ihrer Gesamtausgaben entfallen auf eine Kategorie. Eine ausgewogenere Verteilung reduziert das Risiko.</string>
     <string name="ai_suggestion_concentration_detail">Wenn ein großer Teil der Ausgaben in einer Kategorie konzentriert ist, hat eine kleine Änderung dort großen Einfluss auf das Gesamtbudget. Legen Sie für diese Kategorie ein Budget fest und prüfen Sie günstigere Alternativen.</string>
 
     <string name="ai_suggestion_emergency_title">Bauen Sie einen Fonds für einen regnerischen Tag auf</string>
@@ -1465,8 +1465,8 @@
 
     <!-- Goals refinement -->
     <string name="label_add_amount">Betrag hinzufügen</string>
-    <string name="label_goal_eta">Bis zu 1% s s %1$s</string>
-    <string name="label_monthly_target_with_val">Monatlich %1 s S %1$s</string>
+    <string name="label_goal_eta">Bis %1$s</string>
+    <string name="label_monthly_target_with_val">Monatlich: %1$s</string>
 
     <!-- Tools hub grouping -->
     <string name="tools_group_favorites">Die am häufigsten verwendeten</string>
@@ -1480,7 +1480,7 @@
 
     <!-- FX rates / converter -->
     <string name="msg_rates_unavailable">Marktpreise sind nicht verfügbar. Überprüfen Sie die Internetverbindung und versuchen Sie es erneut.</string>
-    <string name="label_last_update">Zuletzt aktualisiert am 1% %1$s</string>
+    <string name="label_last_update">Zuletzt aktualisiert: %1$s</string>
     <string name="msg_rates_stale">Die Live-Preisaktualisierung war nicht erfolgreich; die zuletzt gespeicherten Preise werden angezeigt.</string>
 
     <!-- Sync / backup messages -->
