@@ -63,7 +63,8 @@ fun SheetFrame(
                 .let { if (isFullScreen) it.fillMaxSize() else it.wrapContentHeight() }
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            FintrackBackgroundBlobs()
+            // Match the content after measurement instead of expanding compact sheets.
+            Box(Modifier.matchParentSize()) { FintrackBackgroundBlobs() }
             Column(
                 modifier = if (isFullScreen) Modifier.fillMaxSize() else Modifier.fillMaxWidth()
             ) {

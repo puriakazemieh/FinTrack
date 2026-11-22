@@ -1,6 +1,6 @@
 # ادامهٔ BASE-01 در ۲۲ نوامبر
 
-مبنای سورس `82eda75ede2d7fcc84f9b278259d498d2fad7bb1`؛ DirectDebug روی `FinTrack_QA_API31`، API 31، `emulator-5556`، فارسی/RTL، GLASS_DARK، IRT و قلم ۱۰۰٪. `baseline-build.log` ساخت موفق و `baseline-home.png/xml` صفحهٔ خانهٔ قابل تعامل را ثبت می‌کنند. نام فایل‌های مدرک این گزارش زیر `.artifacts/fintrack-2026-11-22/` است.
+مبنای سورس `82eda75ede2d7fcc84f9b278259d498d2fad7bb1`؛ DirectDebug روی `FinTrack_QA_API31`، API 31، `emulator-5556`، فارسی/RTL، GLASS_DARK، IRT و قلم ۱۰۰٪. `baseline-build.log` ساخت موفق و `base-home-after-persons.png/xml` صفحهٔ خانهٔ قابل تعامل را ثبت می‌کنند. نام فایل‌های مدرک این گزارش زیر `.artifacts/fintrack-2026-11-22/` است. فایل `baseline-home` در smoke ساخت بعدی بازنویسی شد و شاهد مبنای این گزارش محسوب نمی‌شود.
 
 ## داده و حفظ اطلاعات
 

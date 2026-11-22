@@ -2,6 +2,8 @@ package com.kazemieh.designsystem.component.bottomsheet
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,7 +64,7 @@ fun DeleteBottomSheet(
     dismissClicked: () -> Unit,
     confirmClicked: () -> Unit,
     // Destructive confirmations are intentionally compact: they should not read like a screen.
-    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
 
     confirmEnabled: Boolean = true,
     dismissEnabled: Boolean = true,
@@ -89,10 +91,12 @@ fun DeleteBottomSheet(
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            FintrackBackgroundBlobs()
+            // Decorative content must not determine the sheet's measured height.
+            Box(Modifier.matchParentSize()) { FintrackBackgroundBlobs() }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
             ) {
                 ScreenHeader(
                     title = finalTitle,
