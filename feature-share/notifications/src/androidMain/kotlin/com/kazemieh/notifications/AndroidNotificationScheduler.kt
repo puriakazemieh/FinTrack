@@ -36,7 +36,8 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
                     message,
                     channelId,
                     id.hashCode(),
-                    extraId
+                    extraId,
+                    target.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
                 )
             )
             .build()

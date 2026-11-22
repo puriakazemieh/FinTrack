@@ -84,6 +84,7 @@ android {
 dependencies {
     androidTestImplementation(libs.kotlinx.datetime)
     androidTestImplementation(libs.compose.components.resources)
+    androidTestImplementation(libs.androidx.work.runtime.ktx)
     implementation(project(":composeApp"))
     implementation(project(":core:common"))
     implementation(project(":core:designsystem"))
