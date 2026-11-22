@@ -24,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,9 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.toPersianDigits
@@ -192,22 +189,20 @@ fun AccentPaletteSection(
     onAccentSelected: (AccentPalette) -> Unit
 ) {
     val space = LocalSpacing.current
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = space.small, vertical = space.small),
-            horizontalArrangement = Arrangement.spacedBy(space.small)
-        ) {
-            AccentPalette.entries.forEach { palette ->
-                AccentSwatch(
-                    modifier = Modifier.weight(1f),
-                    palette = palette,
-                    label = stringResource(accentLabelRes(palette)),
-                    isSelected = palette == selectedAccent,
-                    onClick = { onAccentSelected(palette) }
-                )
-            }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = space.small, vertical = space.small),
+        horizontalArrangement = Arrangement.spacedBy(space.small)
+    ) {
+        AccentPalette.entries.forEach { palette ->
+            AccentSwatch(
+                modifier = Modifier.weight(1f),
+                palette = palette,
+                label = stringResource(accentLabelRes(palette)),
+                isSelected = palette == selectedAccent,
+                onClick = { onAccentSelected(palette) }
+            )
         }
     }
 }
@@ -273,28 +268,26 @@ fun ThemeModeItem(
     onClick: () -> Unit
 ) {
     val space = LocalSpacing.current
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(horizontal = space.medium, vertical = space.small),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            FintrackBodyLargeText(
-                text = label,
-                modifier = Modifier.weight(1f),
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = space.medium, vertical = space.small),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        FintrackBodyLargeText(
+            text = label,
+            modifier = Modifier.weight(1f),
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+        )
+        RadioButton(
+            selected = isSelected,
+            onClick = onClick,
+            colors = RadioButtonDefaults.colors(
+                selectedColor = MaterialTheme.colorScheme.primary
             )
-            RadioButton(
-                selected = isSelected,
-                onClick = onClick,
-                colors = RadioButtonDefaults.colors(
-                    selectedColor = MaterialTheme.colorScheme.primary
-                )
-            )
-        }
+        )
     }
 }
 
@@ -305,24 +298,22 @@ fun TimePickerItem(
     onClick: () -> Unit
 ) {
     val space = LocalSpacing.current
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onClick() }
-                .padding(horizontal = space.medium, vertical = space.medium),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            FintrackBodyLargeText(
-                text = title,
-                modifier = Modifier.weight(1f)
-            )
-            FintrackBodyLargeText(
-                text = time.toPersianDigits(),
-                color = LocalGlassColors.current.text,
-                fontWeight = FontWeight.Bold
-            )
-        }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(horizontal = space.medium, vertical = space.medium),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        FintrackBodyLargeText(
+            text = title,
+            modifier = Modifier.weight(1f)
+        )
+        FintrackBodyLargeText(
+            text = time.toPersianDigits(),
+            color = LocalGlassColors.current.text,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
@@ -340,20 +331,18 @@ fun ThemeGrid(
 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         themes.chunked(2).forEach { rowThemes ->
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    rowThemes.forEach { (theme, labelRes) ->
-                        ThemeItem(
-                            modifier = Modifier.weight(1f),
-                            label = stringResource(labelRes),
-                            isSelected = theme == selectedTheme,
-                            onClick = { onThemeSelected(theme) },
-                            theme = theme
-                        )
-                    }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                rowThemes.forEach { (theme, labelRes) ->
+                    ThemeItem(
+                        modifier = Modifier.weight(1f),
+                        label = stringResource(labelRes),
+                        isSelected = theme == selectedTheme,
+                        onClick = { onThemeSelected(theme) },
+                        theme = theme
+                    )
                 }
             }
         }

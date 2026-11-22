@@ -2,10 +2,7 @@ package com.kazemieh.composeApp.navigation
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,28 +18,26 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
     startDestination: Screen = Screen.BottomBarGraph
 ) {
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        NavHost(
-            navController = navController,
-            startDestination = startDestination,
-            modifier = modifier
-        ) {
-            composable<Screen.Onboarding> {
-                OnboardingScreen(
-                    onFinish = {
-                        navController.navigate(Screen.BottomBarGraph) {
-                            popUpTo(Screen.Onboarding) { inclusive = true }
-                        }
+    NavHost(
+        navController = navController,
+        startDestination = startDestination,
+        modifier = modifier
+    ) {
+        composable<Screen.Onboarding> {
+            OnboardingScreen(
+                onFinish = {
+                    navController.navigate(Screen.BottomBarGraph) {
+                        popUpTo(Screen.Onboarding) { inclusive = true }
                     }
-                )
-            }
-            composable<Screen.BackupRestore> {
-                BackupRestoreScreen(
-                    onBackClick = { navController.popBackStack() },
-                    exportSheet = { onDismiss -> ExportSheet(onClose = onDismiss) }
-                )
-            }
-            bottomBarNavGraph(navController)
+                }
+            )
         }
+        composable<Screen.BackupRestore> {
+            BackupRestoreScreen(
+                onBackClick = { navController.popBackStack() },
+                exportSheet = { onDismiss -> ExportSheet(onClose = onDismiss) }
+            )
+        }
+        bottomBarNavGraph(navController)
     }
 }

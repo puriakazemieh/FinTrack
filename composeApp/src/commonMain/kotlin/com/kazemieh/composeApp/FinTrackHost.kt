@@ -14,7 +14,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,8 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -83,74 +80,72 @@ fun FinTrackHost(
         }
     }
 
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        Scaffold(
-            modifier = Modifier.fillMaxSize()
-        ) { innerPadding ->
-            Box(
-                modifier = Modifier.fillMaxSize().padding(
-                    top = innerPadding.calculateTopPadding(),
-                    bottom = innerPadding.calculateBottomPadding()
-                )
+    Scaffold(
+        modifier = Modifier.fillMaxSize()
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier.fillMaxSize().padding(
+                top = innerPadding.calculateTopPadding(),
+                bottom = innerPadding.calculateBottomPadding()
+            )
+        ) {
+            // Main content fills the whole screen
+            AppNavHost(
+                navController = navController,
+                modifier = Modifier.fillMaxSize(),
+                startDestination = startDestination
+            )
+            BindIncomingDeepLinks(navController)
+
+            AnimatedVisibility(
+                visible = showBottomBar && !showGlobalAddTransaction && !showBottomBarCustomize,
+                enter = fadeIn(animationSpec = tween(400)) +
+                        slideInVertically(
+                            animationSpec = tween(400, easing = FastOutSlowInEasing),
+                            initialOffsetY = { it }
+                        ),
+                exit = fadeOut(animationSpec = tween(400)) +
+                        slideOutVertically(
+                            animationSpec = tween(400, easing = FastOutSlowInEasing),
+                            targetOffsetY = { it }
+                        ),
+                modifier = Modifier.align(Alignment.BottomCenter)
             ) {
-                // Main content fills the whole screen
-                AppNavHost(
+                FintrackNavigationBar(
                     navController = navController,
-                    modifier = Modifier.fillMaxSize(),
-                    startDestination = startDestination
-                )
-                BindIncomingDeepLinks(navController)
-
-                AnimatedVisibility(
-                    visible = showBottomBar && !showGlobalAddTransaction && !showBottomBarCustomize,
-                    enter = fadeIn(animationSpec = tween(400)) +
-                            slideInVertically(
-                                animationSpec = tween(400, easing = FastOutSlowInEasing),
-                                initialOffsetY = { it }
-                            ),
-                    exit = fadeOut(animationSpec = tween(400)) +
-                            slideOutVertically(
-                                animationSpec = tween(400, easing = FastOutSlowInEasing),
-                                targetOffsetY = { it }
-                            ),
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                ) {
-                    FintrackNavigationBar(
-                        navController = navController,
-                        tabs = tabs,
-                        onFabClick = { showGlobalAddTransaction = true },
-                        onCustomize = { showBottomBarCustomize = true }
-                    )
-                }
-
-                if (showBottomBarCustomize) {
-                    BottomBarCustomizeSheet(
-                        selected = tabs,
-                        onApply = { newTabs ->
-                            preferenceUseCases.setStringPreference(
-                                FinTrackPreferences.PREF_BOTTOM_BAR_TABS,
-                                Destinations.serializeTabs(newTabs)
-                            )
-                        },
-                        onDismiss = { showBottomBarCustomize = false }
-                    )
-                }
-
-                if (showGlobalAddTransaction) {
-                    AddTransactionBottomSheet(
-                        onDismiss = { showGlobalAddTransaction = false },
-                        transactionAdded = { showGlobalAddTransaction = false }
-                    )
-                }
-
-                // Snackbar above the navigation bar
-                SnackbarHost(
-                    hostState = snackbarHostState,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 100.dp)
+                    tabs = tabs,
+                    onFabClick = { showGlobalAddTransaction = true },
+                    onCustomize = { showBottomBarCustomize = true }
                 )
             }
+
+            if (showBottomBarCustomize) {
+                BottomBarCustomizeSheet(
+                    selected = tabs,
+                    onApply = { newTabs ->
+                        preferenceUseCases.setStringPreference(
+                            FinTrackPreferences.PREF_BOTTOM_BAR_TABS,
+                            Destinations.serializeTabs(newTabs)
+                        )
+                    },
+                    onDismiss = { showBottomBarCustomize = false }
+                )
+            }
+
+            if (showGlobalAddTransaction) {
+                AddTransactionBottomSheet(
+                    onDismiss = { showGlobalAddTransaction = false },
+                    transactionAdded = { showGlobalAddTransaction = false }
+                )
+            }
+
+            // Snackbar above the navigation bar
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 100.dp)
+            )
         }
     }
 }

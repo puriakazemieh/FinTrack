@@ -12,6 +12,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import com.kazemieh.asset.di.assetModule
 import com.kazemieh.budget.di.budgetModule
 import com.kazemieh.category.di.transactionAddCategoryModule
@@ -246,6 +248,8 @@ fun App() {
         LocalCurrency provides Currency.valueOf(currentCurrency.ifEmpty { "IRT" }),
         LocalHideBalance provides hideBalance.toBoolean(),
         LocalTextFont provides TextFont.fromName(textFontName),
+        LocalLayoutDirection provides if (AppLanguage.fromLanguageTag(languageTag) == AppLanguage.PERSIAN)
+            LayoutDirection.Rtl else LayoutDirection.Ltr,
         LocalCalendarSystem provides CalendarSystem.fromName(calendarSystemName),
         androidx.compose.ui.platform.LocalDensity provides scaledDensity
     ) {
