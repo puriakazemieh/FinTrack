@@ -1,5 +1,13 @@
 package com.kazemieh.financialsource.ui.list
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.unit.dp
+import com.kazemieh.designsystem.component.glass.EntitySummary
+import com.kazemieh.designsystem.component.glass.SummaryHeader
+import com.kazemieh.designsystem.component.model.UiText
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
@@ -9,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Source
 import com.kazemieh.common.toSignedPersianPrice
 import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.LocalHideBalance
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
@@ -45,6 +54,7 @@ fun SourcesScreen(
         }
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
+            SourceBalancesHeader(state.balancesByCurrency)
             EntityList(
                 title = stringResource(Res.string.source),
                 query = state.searchQuery,
@@ -66,7 +76,7 @@ fun SourcesScreen(
                         sub = if (source.type == 1) source.cardNumber else source.description,
                         badge = stringResource(Res.string.label_amount_with_unit,
                             source.balance.toSignedPersianPrice(),
-                            com.kazemieh.money.Currency.valueOf(source.currencyCode).symbol),
+                            sourceCurrency(source.currencyCode).symbol),
                         color = when {
                             source.balance < 0 -> MaterialTheme.colorScheme.error
                             source.balance == 0L -> LocalGlassColors.current.text2
@@ -122,6 +132,31 @@ fun SourcesScreen(
                 onDismiss = { viewModel.onIntent(SourceIntent.ResetFlags) },
                 deleted = { viewModel.onIntent(SourceIntent.ResetFlags) }
             )
+        }
+    }
+}
+
+@Composable
+private fun SourceBalancesHeader(balances: List<SourceCurrencyBalance>) {
+    if (balances.isEmpty()) return
+    val hidden = LocalHideBalance.current
+    LazyRow {
+        items(balances, key = { it.currency.code }) { total ->
+            Box(Modifier.width(260.dp)) {
+                SummaryHeader(listOf(EntitySummary(
+                    label = UiText.StringResourceText(Res.string.source_balance_total_label, listOf(total.currency.code)),
+                    value = total.formattedBalance(hidden)
+                        ?: stringResource(Res.string.source_balance_out_of_range),
+                    unit = total.currency.symbol,
+                    color = when {
+                        hidden -> LocalGlassColors.current.text2
+                        total.balance == null -> MaterialTheme.colorScheme.error
+                        total.balance < 0 -> MaterialTheme.colorScheme.error
+                        total.balance == 0L -> LocalGlassColors.current.text2
+                        else -> GlassGreen
+                    }
+                )))
+            }
         }
     }
 }

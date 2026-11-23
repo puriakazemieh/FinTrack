@@ -1588,4 +1588,6 @@
     <string name="sms_ignored_list">Ignored messages (%1$s)</string>
     <string name="sms_ignored_retention">You can register these messages for 30 days after ignoring them. They are then deleted automatically.</string>
     <string name="sms_no_ignored">No ignored messages.</string>
+    <string name="source_balance_out_of_range">Total exceeds the display limit</string>
+    <string name="source_balance_total_label">Total %1$s</string>
 </resources>

@@ -1576,4 +1576,6 @@
     <string name="sms_ignored_list">Ignorierte Nachrichten (%1$s)</string>
     <string name="sms_ignored_retention">Diese Nachrichten können 30 Tage nach dem Ignorieren gebucht werden. Danach werden sie automatisch gelöscht.</string>
     <string name="sms_no_ignored">Keine ignorierten Nachrichten.</string>
+    <string name="source_balance_out_of_range">Summe außerhalb des Anzeigebereichs</string>
+    <string name="source_balance_total_label">Summe %1$s</string>
 </resources>

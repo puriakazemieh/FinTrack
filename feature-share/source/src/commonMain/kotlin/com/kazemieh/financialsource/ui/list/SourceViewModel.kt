@@ -115,16 +115,16 @@ class SourceViewModel(
                         it.name.contains(query, ignoreCase = true) ||
                                 it.description?.contains(query, ignoreCase = true) == true
                     }
-                    val total = sources.sumOf { it.balance.toLong() }
-                    Triple(sources, filtered, total)
+                    val balances = sourceCurrencyBalances(sources)
+                    Triple(sources, filtered, balances)
                 }
-                .collect { (all, filtered, total) ->
+                .collect { (all, filtered, balances) ->
                     _state.update {
                         it.copy(
                             sources = all,
                             filteredSources = filtered,
                             items = filtered.map { s -> s.toItemUi() }.toSet(),
-                            totalBalance = total,
+                            balancesByCurrency = balances,
                             searchQuery = _searchQuery.value
                         )
                     }
@@ -143,7 +143,7 @@ data class SourceState(
     val isDeleteShow: Boolean = false,
     val isAddShow: Boolean = false,
     val searchQuery: String = "",
-    val totalBalance: Long = 0,
+    val balancesByCurrency: List<SourceCurrencyBalance> = emptyList(),
     val isReorderShow: Boolean = false
 )
 
