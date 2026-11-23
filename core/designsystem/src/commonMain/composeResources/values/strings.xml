@@ -1606,4 +1606,7 @@
     <string name="sms_no_pending">پیامک منتظر ثبت وجود ندارد.</string>
     <string name="sms_delete_failed">حذف انجام نشد. دوباره تلاش کنید.</string>
     <string name="sms_confidence">%1$s٪</string>
+    <string name="entity_actions">عملیات %1$s</string>
+    <string name="entity_set_default">انتخاب به‌عنوان پیش‌فرض</string>
+    <string name="entity_view_transactions">نمایش تراکنش‌ها</string>
 </resources>

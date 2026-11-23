@@ -5,7 +5,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.Source
+import com.kazemieh.common.toSignedPersianPrice
+import com.kazemieh.designsystem.GlassGreen
+import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.glass.EntityItem
 import com.kazemieh.designsystem.component.glass.EntityList
 import com.kazemieh.designsystem.component.glass.ReorderableEntityScaffold
@@ -23,7 +27,7 @@ fun SourcesScreen(
     viewModel: SourceViewModel = koinViewModel()
 ) {
     LaunchedEffect(Unit) { viewModel.onIntent(SourceIntent.LoadAllSource) }
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     var reorderedList by remember(state.sources) { mutableStateOf(state.sources) }
 
     ReorderableEntityScaffold(
@@ -60,8 +64,14 @@ fun SourcesScreen(
                         id = source.id ?: 0L,
                         name = source.name,
                         sub = if (source.type == 1) source.cardNumber else source.description,
-                        badge = source.formattedBalance + " " +
-                            com.kazemieh.money.Currency.valueOf(source.currencyCode).symbol,
+                        badge = stringResource(Res.string.label_amount_with_unit,
+                            source.balance.toSignedPersianPrice(),
+                            com.kazemieh.money.Currency.valueOf(source.currencyCode).symbol),
+                        color = when {
+                            source.balance < 0 -> MaterialTheme.colorScheme.error
+                            source.balance == 0L -> LocalGlassColors.current.text2
+                            else -> GlassGreen
+                        },
                         iconId = source.iconId,
                         colorId = source.colorId,
                         isDefault = source.isDefault

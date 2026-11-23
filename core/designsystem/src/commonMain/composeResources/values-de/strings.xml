@@ -1566,4 +1566,7 @@
     <string name="sms_no_pending">Keine Nachrichten warten auf die Buchung.</string>
     <string name="sms_delete_failed">Löschen fehlgeschlagen. Erneut versuchen.</string>
     <string name="sms_confidence">%1$s%</string>
+    <string name="entity_actions">Aktionen für %1$s</string>
+    <string name="entity_set_default">Als Standard festlegen</string>
+    <string name="entity_view_transactions">Transaktionen anzeigen</string>
 </resources>

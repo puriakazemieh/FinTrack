@@ -1578,4 +1578,7 @@
     <string name="sms_no_pending">No messages are waiting to be registered.</string>
     <string name="sms_delete_failed">Deletion failed. Try again.</string>
     <string name="sms_confidence">%1$s%</string>
+    <string name="entity_actions">Actions for %1$s</string>
+    <string name="entity_set_default">Set as default</string>
+    <string name="entity_view_transactions">View transactions</string>
 </resources>

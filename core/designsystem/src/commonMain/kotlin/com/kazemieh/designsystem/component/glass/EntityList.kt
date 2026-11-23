@@ -30,8 +30,13 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Reorder
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -49,7 +54,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.GlassGreen
-import com.kazemieh.designsystem.GlassRed
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.EmptyList
 import com.kazemieh.designsystem.component.FinTrackLeadingIcon
@@ -65,6 +69,12 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.hint_search_in
 import fintrack.core.designsystem.generated.resources.label_add_specific_new_entity
 import fintrack.core.designsystem.generated.resources.msg_empty_list
+import fintrack.core.designsystem.generated.resources.entity_actions
+import fintrack.core.designsystem.generated.resources.label_default
+import fintrack.core.designsystem.generated.resources.entity_set_default
+import fintrack.core.designsystem.generated.resources.entity_view_transactions
+import fintrack.core.designsystem.generated.resources.edit
+import fintrack.core.designsystem.generated.resources.delete
 import org.jetbrains.compose.resources.stringResource
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -328,6 +338,7 @@ fun EntityRow(
 ) {
     val glassColors = LocalGlassColors.current
     val color = item.color ?: mainColor
+    var actionsExpanded by remember(item.id) { mutableStateOf(false) }
     GlassCard(
         modifier = modifier
             .padding(start = if (isSubCategory) 24.dp else 0.dp)
@@ -375,6 +386,13 @@ fun EntityRow(
                     color = glassColors.text,
                     maxLines = 1
                 )
+                if (item.isDefault) {
+                    FintrackLabelSmallText(
+                        text = stringResource(Res.string.label_default),
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
                 item.badge?.let {
                     Box(
                         modifier = Modifier
@@ -386,7 +404,7 @@ fun EntityRow(
                             )
                             .padding(horizontal = 7.dp, vertical = 2.dp)
                     ) {
-                        FintrackLabelSmallText(
+                        FintrackTitleSmallText(
                             text = it,
                             fontWeight = FontWeight.Bold,
                             color = color
@@ -426,23 +444,41 @@ fun EntityRow(
                     )
                 }
             } else if (showActions) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    onSetDefault?.let {
-                        ActionIcon(
-                            icon = if (item.isDefault) Icons.Default.Star else Icons.Default.StarBorder,
-                            onClick = it,
-                            color = if (item.isDefault) GlassGreen else glassColors.text2
-                        )
+                Box {
+                    IconButton(onClick = { actionsExpanded = true }) {
+                        Icon(Icons.Default.MoreVert,
+                            contentDescription = stringResource(Res.string.entity_actions, item.name),
+                            tint = glassColors.text2)
                     }
-                    onFilter?.let {
-                        ActionIcon(
-                            icon = Icons.Default.FilterList,
-                            onClick = it,
-                            color = GlassGreen
+                    DropdownMenu(expanded = actionsExpanded, onDismissRequest = { actionsExpanded = false }) {
+                        onFilter?.let {
+                            DropdownMenuItem(
+                                text = { FintrackBodyLargeText(stringResource(Res.string.entity_view_transactions)) },
+                                leadingIcon = { Icon(Icons.Default.FilterList, contentDescription = null) },
+                                onClick = { actionsExpanded = false; it() }
+                            )
+                        }
+                        DropdownMenuItem(
+                            text = { FintrackBodyLargeText(stringResource(Res.string.edit)) },
+                            leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) },
+                            onClick = { actionsExpanded = false; onEdit() }
                         )
+                        if (!item.isDefault) {
+                            onSetDefault?.let {
+                                DropdownMenuItem(
+                                    text = { FintrackBodyLargeText(stringResource(Res.string.entity_set_default)) },
+                                    leadingIcon = { Icon(Icons.Default.StarBorder, contentDescription = null) },
+                                    onClick = { actionsExpanded = false; it() }
+                                )
+                            }
+                            DropdownMenuItem(
+                                text = { FintrackBodyLargeText(stringResource(Res.string.delete), color = MaterialTheme.colorScheme.error) },
+                                leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null) },
+                                colors = MenuDefaults.itemColors(leadingIconColor = MaterialTheme.colorScheme.error),
+                                onClick = { actionsExpanded = false; onDelete() }
+                            )
+                        }
                     }
-                    ActionIcon(icon = Icons.Default.Edit, onClick = onEdit, color = glassColors.text2)
-                    if (!item.isDefault) { ActionIcon(icon = Icons.Default.Delete, onClick = onDelete, color = GlassRed) }
                 }
             }
         }
