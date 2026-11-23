@@ -33,7 +33,8 @@ class SmsDraftLocalDataSourceImpl(
             date = smsDraft.date,
             categoryId = smsDraft.categoryId,
             confidence = smsDraft.confidence.toLong(),
-            isUsed = if (smsDraft.isUsed) 1L else 0L
+            isUsed = if (smsDraft.isUsed) 1L else 0L,
+            ignoredAt = smsDraft.ignoredAt
         )
         smsDraftQueries.lastInsertRowId().awaitAsOne()
     }

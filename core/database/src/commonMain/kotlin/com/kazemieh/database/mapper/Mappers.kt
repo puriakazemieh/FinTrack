@@ -909,7 +909,8 @@ fun Sms_draft.toSmsDraft() = SmsDraft(
     date = date,
     categoryId = categoryId,
     confidence = confidence.toInt(),
-    isUsed = isUsed == 1L
+    isUsed = isUsed == 1L,
+    ignoredAt = ignoredAt
 )
 
 fun AchievementDb.toAchievement() = Achievement(
