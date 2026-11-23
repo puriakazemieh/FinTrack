@@ -32,11 +32,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -71,10 +68,6 @@ import fintrack.core.designsystem.generated.resources.label_add_specific_new_ent
 import fintrack.core.designsystem.generated.resources.msg_empty_list
 import fintrack.core.designsystem.generated.resources.entity_actions
 import fintrack.core.designsystem.generated.resources.label_default
-import fintrack.core.designsystem.generated.resources.entity_set_default
-import fintrack.core.designsystem.generated.resources.entity_view_transactions
-import fintrack.core.designsystem.generated.resources.edit
-import fintrack.core.designsystem.generated.resources.delete
 import org.jetbrains.compose.resources.stringResource
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -380,18 +373,19 @@ fun EntityRow(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                FintrackTitleSmallText(
-                    text = item.name,
-                    fontWeight = FontWeight.SemiBold,
-                    color = glassColors.text,
-                    maxLines = 1
-                )
-                if (item.isDefault) {
-                    FintrackLabelSmallText(
-                        text = stringResource(Res.string.label_default),
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.SemiBold
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    FintrackTitleSmallText(
+                        text = item.name,
+                        modifier = Modifier.weight(1f, fill = false),
+                        fontWeight = FontWeight.SemiBold,
+                        color = glassColors.text,
+                        maxLines = 1
                     )
+                    if (item.isDefault) {
+                        Icon(Icons.Default.StarBorder,
+                            contentDescription = stringResource(Res.string.label_default),
+                            tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
+                    }
                 }
                 item.badge?.let {
                     Box(
@@ -450,38 +444,14 @@ fun EntityRow(
                             contentDescription = stringResource(Res.string.entity_actions, item.name),
                             tint = glassColors.text2)
                     }
-                    DropdownMenu(expanded = actionsExpanded, onDismissRequest = { actionsExpanded = false }) {
-                        onFilter?.let {
-                            DropdownMenuItem(
-                                text = { FintrackBodyLargeText(stringResource(Res.string.entity_view_transactions)) },
-                                leadingIcon = { Icon(Icons.Default.FilterList, contentDescription = null) },
-                                onClick = { actionsExpanded = false; it() }
-                            )
-                        }
-                        DropdownMenuItem(
-                            text = { FintrackBodyLargeText(stringResource(Res.string.edit)) },
-                            leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) },
-                            onClick = { actionsExpanded = false; onEdit() }
-                        )
-                        if (!item.isDefault) {
-                            onSetDefault?.let {
-                                DropdownMenuItem(
-                                    text = { FintrackBodyLargeText(stringResource(Res.string.entity_set_default)) },
-                                    leadingIcon = { Icon(Icons.Default.StarBorder, contentDescription = null) },
-                                    onClick = { actionsExpanded = false; it() }
-                                )
-                            }
-                            DropdownMenuItem(
-                                text = { FintrackBodyLargeText(stringResource(Res.string.delete), color = MaterialTheme.colorScheme.error) },
-                                leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null) },
-                                colors = MenuDefaults.itemColors(leadingIconColor = MaterialTheme.colorScheme.error),
-                                onClick = { actionsExpanded = false; onDelete() }
-                            )
-                        }
-                    }
                 }
             }
         }
+    }
+    if (actionsExpanded) {
+        EntityActionsBottomSheet(item.name, item.isDefault,
+            onDismiss = { actionsExpanded = false }, onEdit = onEdit, onDelete = onDelete,
+            onSetDefault = onSetDefault, onFilter = onFilter)
     }
 }
 
