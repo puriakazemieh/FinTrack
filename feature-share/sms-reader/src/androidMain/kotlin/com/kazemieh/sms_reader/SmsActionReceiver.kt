@@ -25,7 +25,7 @@ class SmsActionReceiver : BroadcastReceiver(), KoinComponent {
         val pendingResult = goAsync()
         scope.launch {
             try {
-                smsDraftRepository.markSmsDraftAsUsed(id)
+                smsDraftRepository.ignoreSmsDraft(id)
                 notificationManager.cancelNotification(intent.getIntExtra("notification_id", id.toInt()),
                     NotificationManager.CHANNEL_SMS, id)
                 runCatching { analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationDismissed("ignore")) }

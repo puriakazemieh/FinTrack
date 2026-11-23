@@ -172,7 +172,8 @@ class DashboardViewModel(
             SmsSnapshot(presented, categories, sources, currency, ready)
         }.flowOn(Dispatchers.Default)
             .onEach { snapshot ->
-                _state.update { it.copy(smsDrafts = snapshot.drafts, categories = snapshot.categories,
+                _state.update { it.copy(smsDrafts = snapshot.drafts.filter { draft -> draft.ignoredAt == null },
+                    ignoredSmsDrafts = snapshot.drafts.filter { draft -> draft.ignoredAt != null }.sortedByDescending { draft -> draft.ignoredAt }, categories = snapshot.categories,
                     sources = snapshot.sources, currency = snapshot.currency, readySmsDraftIds = snapshot.ready) }
             }.launchIn(viewModelScope)
     }
@@ -199,8 +200,8 @@ class DashboardViewModel(
     private fun registerSms(id: Long? = null) {
         val current = _state.value
         if (current.isSmsRegistering || current.isSmsDeleting) return
-        val ids = if (id == null) current.smsDrafts.map { it.id } else listOf(id)
-        if (ids.isEmpty() || (id == null && current.readySmsDraftIds.isEmpty())) return
+        val ids = if (id == null) current.currentSmsDrafts.map { it.id } else listOf(id)
+        if (ids.isEmpty() || (id == null && current.currentSmsDrafts.none { it.id in current.readySmsDraftIds })) return
         _state.update { it.copy(isSmsRegistering = true, smsBatchProgress = null,
             smsRegistrationErrors = if (id == null) emptyMap() else it.smsRegistrationErrors - id,
             smsGeneralError = null, smsDeletedCount = null) }
@@ -329,7 +330,15 @@ class DashboardViewModel(
             }
 
             DashboardIntent.ToggleSmsDetectionSheet -> _state.update {
-                it.copy(showSmsDetection = !it.showSmsDetection)
+                it.copy(showSmsDetection = !it.showSmsDetection, showIgnoredSms = false)
+            }
+
+            is DashboardIntent.SelectSmsList -> _state.update {
+                if (it.isSmsRegistering || it.isSmsDeleting) it else it.copy(
+                    showIgnoredSms = intent.ignored, showSmsDetection = intent.open || it.showSmsDetection,
+                    smsBatchProgress = null, smsDeletedCount = null, smsGeneralError = null,
+                    smsRegistrationErrors = emptyMap(), showDeleteAllSmsConfirmation = false,
+                    smsDeleteIds = emptyList(), showDeleteSmsConfirmation = false, smsDraftToDelete = null)
             }
 
             is DashboardIntent.OpenSmsDraftTransaction -> viewModelScope.launch {
@@ -368,7 +377,9 @@ class DashboardViewModel(
 
             is DashboardIntent.IgnoreAllSmsDrafts -> {
                 if (_state.value.isSmsDeleting || _state.value.isSmsRegistering || !_state.value.showDeleteAllSmsConfirmation) return
-                val ids = _state.value.smsDeleteIds
+                val current = _state.value
+                val visibleIds = current.currentSmsDrafts.map { it.id }.toSet()
+                val ids = current.smsDeleteIds.filter { it in visibleIds }
                 _state.update { it.copy(isSmsDeleting = true, smsDeleteError = null) }
                 viewModelScope.launch {
                     try {
@@ -395,7 +406,7 @@ class DashboardViewModel(
             is DashboardIntent.ShowDeleteAllSmsConfirmation -> _state.update {
                 if (it.isSmsDeleting || it.isSmsRegistering) it else
                     it.copy(showDeleteAllSmsConfirmation = intent.show,
-                        smsDeleteIds = if (intent.show) it.smsDrafts.map { draft -> draft.id } else emptyList(), smsDeleteError = null)
+                        smsDeleteIds = if (intent.show) it.currentSmsDrafts.map { draft -> draft.id } else emptyList(), smsDeleteError = null)
             }
 
             is DashboardIntent.UpdateSmsDraft -> {
@@ -517,6 +528,8 @@ data class DashboardState(
     val userName: String = "",
     val userInitial: String = "",
     val smsDrafts: List<SmsDraft> = emptyList(),
+    val ignoredSmsDrafts: List<SmsDraft> = emptyList(),
+    val showIgnoredSms: Boolean = false,
     val categories: List<Category> = emptyList(),
     val sources: List<Source> = emptyList(),
     val achievements: List<Achievement> = emptyList(),
@@ -564,7 +577,9 @@ data class DashboardState(
 
     val showCheckSheet: Boolean = false,
     val selectedCheckId: Long? = null
-)
+) {
+    val currentSmsDrafts: List<SmsDraft> get() = if (showIgnoredSms) ignoredSmsDrafts else smsDrafts
+}
 
 
 sealed interface DashboardIntent {
@@ -582,6 +597,7 @@ sealed interface DashboardIntent {
     data object ToggleBalanceVisibility : DashboardIntent
     data object ResetTemporaryBalanceReveal : DashboardIntent
     data object ToggleSmsDetectionSheet : DashboardIntent
+    data class SelectSmsList(val ignored: Boolean, val open: Boolean = false) : DashboardIntent
     data class OpenSmsDraftTransaction(val draftId: Long) : DashboardIntent
     data class IgnoreSmsDraft(val draft: SmsDraft) : DashboardIntent
     data object IgnoreAllSmsDrafts : DashboardIntent

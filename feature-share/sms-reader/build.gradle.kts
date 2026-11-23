@@ -79,6 +79,7 @@ kotlin {
         androidMain {
             dependencies {
                 implementation(project(":feature-share:notifications"))
+                implementation(libs.androidx.work.runtime.ktx)
             }
         }
     }

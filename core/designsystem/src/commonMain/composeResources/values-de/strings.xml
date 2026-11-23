@@ -1572,4 +1572,8 @@
     <string name="entity_actions">Aktionen für %1$s</string>
     <string name="entity_set_default">Als Standard festlegen</string>
     <string name="entity_view_transactions">Transaktionen anzeigen</string>
+    <string name="sms_pending_list">Neue Nachrichten (%1$s)</string>
+    <string name="sms_ignored_list">Ignorierte Nachrichten (%1$s)</string>
+    <string name="sms_ignored_retention">Diese Nachrichten können 30 Tage nach dem Ignorieren gebucht werden. Danach werden sie automatisch gelöscht.</string>
+    <string name="sms_no_ignored">Keine ignorierten Nachrichten.</string>
 </resources>

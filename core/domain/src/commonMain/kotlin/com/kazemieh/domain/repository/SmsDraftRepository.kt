@@ -6,6 +6,9 @@ import kotlinx.coroutines.flow.Flow
 interface SmsDraftRepository {
     suspend fun addSmsDraft(smsDraft: SmsDraft): Long
     fun observeUnusedSmsDrafts(): Flow<List<SmsDraft>>
+    /** Explicit ignore retains the unused draft for thirty days from the first action. */
+    suspend fun ignoreSmsDraft(id: Long)
+    suspend fun deleteExpiredIgnoredSmsDrafts()
     suspend fun markSmsDraftAsUsed(id: Long)
     suspend fun deleteSmsDraft(id: Long)
     suspend fun deleteUnusedSmsDrafts()

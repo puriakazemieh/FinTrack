@@ -115,6 +115,8 @@ class RegisterSmsDraftsTest {
         val records = linkedMapOf<Long, SmsDraft>()
         override suspend fun addSmsDraft(smsDraft: SmsDraft): Long = error("not used")
         override fun observeUnusedSmsDrafts(): Flow<List<SmsDraft>> = flowOf(records.values.filterNot { it.isUsed })
+        override suspend fun ignoreSmsDraft(id: Long) = error("not used")
+        override suspend fun deleteExpiredIgnoredSmsDrafts() = error("not used")
         override suspend fun markSmsDraftAsUsed(id: Long) { records[id] = records.getValue(id).copy(isUsed = true) }
         override suspend fun deleteSmsDraft(id: Long) { records.remove(id) }
         override suspend fun deleteUnusedSmsDrafts() = error("not used")

@@ -64,6 +64,14 @@ class SmsDraftLocalDataSourceImpl(
             .map { list -> list.map { it.toSmsDraft() } }
     }
 
+    override suspend fun ignoreSmsDraft(id: Long, ignoredAt: Long): Unit = withContext(Dispatchers.Default) {
+        smsDraftQueries.ignoreUnusedSmsDraft(ignoredAt, id)
+    }
+
+    override suspend fun deleteExpiredIgnoredSmsDrafts(cutoff: Long): Unit = withContext(Dispatchers.Default) {
+        smsDraftQueries.deleteExpiredIgnoredSmsDrafts(cutoff)
+    }
+
     override suspend fun markSmsDraftAsUsed(id: Long): Unit = withContext(Dispatchers.Default) {
         smsDraftQueries.markSmsDraftAsUsed(id)
     }

@@ -78,6 +78,10 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun SmsDetectionSheet(
     drafts: List<SmsDraft>,
+    pendingCount: Int,
+    ignoredCount: Int,
+    showingIgnored: Boolean,
+    onSelectList: (Boolean) -> Unit,
     categories: List<Category>,
     sources: List<Source>,
     mostUsedCategories: List<Category>,
@@ -153,6 +157,15 @@ fun SmsDetectionSheet(
                 ) {
                     item(key = "sms_actions") {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                FilterChip(selected = !showingIgnored, onClick = { onSelectList(false) }, enabled = !isBusy,
+                                    modifier = Modifier.heightIn(min = 48.dp),
+                                    label = { FintrackLabelMediumText(stringResource(Res.string.sms_pending_list, localizedInteger(pendingCount))) })
+                                FilterChip(selected = showingIgnored, onClick = { onSelectList(true) }, enabled = !isBusy,
+                                    modifier = Modifier.heightIn(min = 48.dp),
+                                    label = { FintrackLabelMediumText(stringResource(Res.string.sms_ignored_list, localizedInteger(ignoredCount))) })
+                            }
+                            if (showingIgnored) FintrackBodyMediumText(stringResource(Res.string.sms_ignored_retention))
                             FintrackBodyMediumText(stringResource(Res.string.sms_ready_count,
                                 localizedInteger(drafts.size), localizedInteger(readyIds.size)))
                             FintrackButton(text = stringResource(Res.string.sms_register_all, localizedInteger(readyIds.size)),
@@ -175,7 +188,7 @@ fun SmsDetectionSheet(
                                     FintrackLabelMediumText(stringResource(Res.string.sms_dismiss_summary), color = LocalContentColor.current)
                                 }
                             }
-                            if (drafts.isEmpty()) FintrackBodyMediumText(stringResource(Res.string.sms_no_pending))
+                            if (drafts.isEmpty()) FintrackBodyMediumText(stringResource(if (showingIgnored) Res.string.sms_no_ignored else Res.string.sms_no_pending))
                         }
                     }
                     items(drafts, key = { it.id }) { draft ->

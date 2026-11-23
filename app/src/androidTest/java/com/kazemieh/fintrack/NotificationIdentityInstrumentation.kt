@@ -131,7 +131,7 @@ class NotificationIdentityInstrumentation : Instrumentation() {
                     val sms = awaitCard(system, 777003)
                     publisher.showNotification(777003, "QA budget stays", "Synthetic identity probe", NotificationManager.CHANNEL_BUDGET, 1234)
                     sms.notification.actions.last().actionIntent.send()
-                    awaitCondition { runBlocking { drafts.getSmsDraftById(draftId)?.isUsed == true } }
+                    awaitCondition { runBlocking { drafts.getSmsDraftById(draftId)?.let { !it.isUsed && it.ignoredAt != null } == true } }
                     awaitCondition { system.activeNotifications.count { it.id == 777003 } == 1 }
                     check(system.activeNotifications.single { it.id == 777003 }.notification.extras
                         .getCharSequence(android.app.Notification.EXTRA_TITLE).toString() == "QA budget stays")

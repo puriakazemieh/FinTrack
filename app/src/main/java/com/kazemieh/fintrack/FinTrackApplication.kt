@@ -31,5 +31,6 @@ class FinTrackApplication : Application() {
         notificationManager.createChannels()
         SyncWorker.enqueuePeriodicWork(this)
         FixedExpenseWorker.enqueuePeriodicWork(this)
+        com.kazemieh.sms_reader.IgnoredSmsCleanupWorker.enqueuePeriodicWork(this)
     }
 }

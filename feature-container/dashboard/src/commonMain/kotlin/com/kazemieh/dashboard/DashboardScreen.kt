@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -83,6 +84,7 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.sms_delete_messages
 import fintrack.core.designsystem.generated.resources.sms_delete_question
 import fintrack.core.designsystem.generated.resources.sms_delete_note
+import fintrack.core.designsystem.generated.resources.sms_ignored_list
 import fintrack.core.designsystem.generated.resources.sms_cancel
 import com.kazemieh.designsystem.component.localizedInteger
 import com.kazemieh.designsystem.component.model.asString
@@ -208,6 +210,18 @@ fun DashboardScreen(
                     }
                 }
 
+                if (state.ignoredSmsDrafts.isNotEmpty()) {
+                    item {
+                        androidx.compose.material3.OutlinedButton(
+                            onClick = { viewModel.onIntent(DashboardIntent.SelectSmsList(ignored = true, open = true)) },
+                            modifier = Modifier.padding(horizontal = space.large).fillMaxWidth().heightIn(min = 48.dp)
+                        ) {
+                            com.kazemieh.designsystem.component.FintrackLabelMediumText(
+                                stringResource(Res.string.sms_ignored_list, localizedInteger(state.ignoredSmsDrafts.size)))
+                        }
+                    }
+                }
+
 //            item { Spacer(Modifier.height(space.large)) }
 
 //            item {
@@ -300,13 +314,16 @@ fun DashboardScreen(
 
             if (state.showSmsDetection) {
                 SmsDetectionSheet(
-                    drafts = state.smsDrafts,
+                    drafts = state.currentSmsDrafts,
+                    pendingCount = state.smsDrafts.size, ignoredCount = state.ignoredSmsDrafts.size,
+                    showingIgnored = state.showIgnoredSms,
+                    onSelectList = { viewModel.onIntent(DashboardIntent.SelectSmsList(it)) },
                     categories = state.categories,
                     sources = state.sources,
                     mostUsedCategories = state.mostUsedCategories,
                     mostUsedSources = state.mostUsedSources,
                     currency = state.currency,
-                    readyIds = state.readySmsDraftIds,
+                    readyIds = state.readySmsDraftIds.intersect(state.currentSmsDrafts.map { it.id }.toSet()),
                     isBusy = state.isSmsRegistering || state.isSmsDeleting,
                     isRegistering = state.isSmsRegistering,
                     progress = state.smsBatchProgress,
@@ -362,10 +379,10 @@ fun DashboardScreen(
                 com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet(
                     title = stringResource(Res.string.sms_delete_messages),
                     message = stringResource(Res.string.sms_delete_question,
-                        localizedInteger(state.smsDrafts.count { it.id in state.smsDeleteIds })) + "\n" + stringResource(Res.string.sms_delete_note),
+                        localizedInteger(state.currentSmsDrafts.count { it.id in state.smsDeleteIds })) + "\n" + stringResource(Res.string.sms_delete_note),
                     confirmButtonText = stringResource(Res.string.sms_delete_messages),
                     dismissButtonText = stringResource(Res.string.sms_cancel),
-                    confirmEnabled = state.smsDrafts.any { it.id in state.smsDeleteIds } && !state.isSmsRegistering,
+                    confirmEnabled = state.currentSmsDrafts.any { it.id in state.smsDeleteIds } && !state.isSmsRegistering,
                     errorText = state.smsDeleteError?.asString(),
                     dismissClicked = {
                         viewModel.onIntent(

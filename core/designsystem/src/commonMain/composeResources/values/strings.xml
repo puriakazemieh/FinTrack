@@ -1612,4 +1612,8 @@
     <string name="entity_actions">عملیات %1$s</string>
     <string name="entity_set_default">انتخاب به‌عنوان پیش‌فرض</string>
     <string name="entity_view_transactions">نمایش تراکنش‌ها</string>
+    <string name="sms_pending_list">پیامک‌های جدید (%1$s)</string>
+    <string name="sms_ignored_list">نادیده‌گرفته‌شده‌ها (%1$s)</string>
+    <string name="sms_ignored_retention">این پیامک‌ها تا ۳۰ روز پس از نادیده‌گرفتن قابل ثبت‌اند و سپس خودکار پاک می‌شوند.</string>
+    <string name="sms_no_ignored">پیامک نادیده‌گرفته‌شده‌ای وجود ندارد.</string>
 </resources>

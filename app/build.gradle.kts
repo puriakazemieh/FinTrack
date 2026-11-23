@@ -93,6 +93,7 @@ dependencies {
     implementation(project(":feature-share:widget"))
     implementation(project(":feature-share:sync"))
     implementation(project(":feature-share:fixed-expense"))
+    implementation(project(":feature-share:sms-reader"))
 
 
     implementation(libs.androidx.activity.compose)

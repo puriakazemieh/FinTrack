@@ -1584,4 +1584,8 @@
     <string name="entity_actions">Actions for %1$s</string>
     <string name="entity_set_default">Set as default</string>
     <string name="entity_view_transactions">View transactions</string>
+    <string name="sms_pending_list">New messages (%1$s)</string>
+    <string name="sms_ignored_list">Ignored messages (%1$s)</string>
+    <string name="sms_ignored_retention">You can register these messages for 30 days after ignoring them. They are then deleted automatically.</string>
+    <string name="sms_no_ignored">No ignored messages.</string>
 </resources>
