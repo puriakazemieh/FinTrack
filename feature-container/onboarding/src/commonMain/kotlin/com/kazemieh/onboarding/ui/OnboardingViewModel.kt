@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kazemieh.domain.usecase.PreferenceUseCases
 import com.kazemieh.domain.usecase.SeedDataUseCase
 import com.kazemieh.preferences.FinTrackPreferences
+import com.kazemieh.notifications.ui.PermissionSnapshot
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,7 +24,9 @@ class OnboardingViewModel(
     private val preferenceUseCases: PreferenceUseCases
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(OnboardingState())
+    private val _state = MutableStateFlow(OnboardingState(
+        smsReadingEnabled = preferenceUseCases.getBooleanPreference(FinTrackPreferences.PREF_SMS_READING_ENABLED, true)
+    ))
     val state = _state.asStateFlow()
 
     private val _effect = Channel<OnboardingEffect>()
@@ -57,11 +60,22 @@ class OnboardingViewModel(
             OnboardingIntent.Skip -> finishOnboarding(useDefault = true)
             OnboardingIntent.Finish -> finishOnboarding()
             is OnboardingIntent.SetSmsReading -> {
+                _state.update { it.copy(smsReadingEnabled = intent.enabled) }
                 preferenceUseCases.setBooleanPreference(
                     FinTrackPreferences.PREF_SMS_READING_ENABLED,
                     intent.enabled
                 )
-                analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsPermissionResult(intent.enabled))
+            }
+            is OnboardingIntent.SmsPermissionResult -> {
+                _state.update { it.copy(smsPermissionGranted = intent.granted) }
+                onIntent(OnboardingIntent.SetSmsReading(intent.granted))
+                analytics.track(com.kazemieh.common.analytics.ProductEvent.SmsPermissionResult(intent.granted))
+            }
+            is OnboardingIntent.PermissionsObserved -> {
+                _state.update { current -> current.copy(
+                    smsPermissionGranted = intent.snapshot.smsGranted ?: current.smsPermissionGranted,
+                    notificationsGranted = intent.snapshot.notificationsGranted ?: current.notificationsGranted
+                ) }
             }
             is OnboardingIntent.SelectTheme -> {
                 _state.update { it.copy(selectedTheme = intent.theme) }
@@ -72,6 +86,7 @@ class OnboardingViewModel(
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureActionCompleted("onboarding_accent_selected"))
             }
             is OnboardingIntent.NotificationPermissionResult -> {
+                _state.update { it.copy(notificationsGranted = intent.granted) }
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.NotificationPermissionResult(intent.granted))
             }
             OnboardingIntent.NotificationPermissionRequested -> {
@@ -137,7 +152,10 @@ data class OnboardingState(
     val securityQuestion: String = "",
     val securityAnswer: String = "",
     val selectedTheme: String = "GLASS_DARK",
-    val selectedAccent: String = "Default"
+    val selectedAccent: String = "Default",
+    val smsReadingEnabled: Boolean = true,
+    val smsPermissionGranted: Boolean = false,
+    val notificationsGranted: Boolean = false
 )
 
 sealed interface OnboardingIntent {
@@ -148,6 +166,8 @@ sealed interface OnboardingIntent {
     data class UpdateSourceDetails(val name: String, val balance: String) : OnboardingIntent
     data class UpdateSecurityDetails(val question: String, val answer: String) : OnboardingIntent
     data class SetSmsReading(val enabled: Boolean) : OnboardingIntent
+    data class SmsPermissionResult(val granted: Boolean) : OnboardingIntent
+    data class PermissionsObserved(val snapshot: PermissionSnapshot) : OnboardingIntent
     data object NotificationPermissionRequested : OnboardingIntent
     data class NotificationPermissionResult(val granted: Boolean) : OnboardingIntent
     data class SelectTheme(val theme: String) : OnboardingIntent

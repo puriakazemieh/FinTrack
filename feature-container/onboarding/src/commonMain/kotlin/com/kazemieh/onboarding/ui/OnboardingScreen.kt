@@ -21,6 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -35,6 +41,7 @@ import com.kazemieh.designsystem.component.glass.FintrackScreen
 import com.kazemieh.designsystem.component.glass.Switch
 import com.kazemieh.notifications.ui.NotificationPermissionLauncher
 import com.kazemieh.notifications.ui.SmsPermissionLauncher
+import com.kazemieh.notifications.ui.PermissionStatusObserver
 import fintrack.core.designsystem.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -47,6 +54,7 @@ fun OnboardingScreen(
     onFinish: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    PermissionStatusObserver { viewModel.onIntent(OnboardingIntent.PermissionsObserved(it)) }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -106,7 +114,10 @@ fun OnboardingScreen(
                             viewModel.onIntent(OnboardingIntent.UpdateSecurityDetails(question, answer))
                         },
                         onSmsReadingResult = { granted ->
-                            viewModel.onIntent(OnboardingIntent.SetSmsReading(granted))
+                            viewModel.onIntent(OnboardingIntent.SmsPermissionResult(granted))
+                        },
+                        onSmsReadingEnabledChange = { enabled ->
+                            viewModel.onIntent(OnboardingIntent.SetSmsReading(enabled))
                         },
                         onNotificationPermissionResult = { granted ->
                             viewModel.onIntent(OnboardingIntent.NotificationPermissionResult(granted))
@@ -242,7 +253,8 @@ fun StepContent(
     onNotificationPermissionRequest: () -> Unit,
     onSelectTheme: (String) -> Unit,
     onSelectAccent: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSmsReadingEnabledChange: (Boolean) -> Unit = onSmsReadingResult
 ) {
     AnimatedContent(targetState = state.currentStep, modifier = modifier) { currentStep ->
         Column(
@@ -257,7 +269,9 @@ fun StepContent(
                     onSelectTheme = onSelectTheme
                 )
                 3 -> PermissionsStep(
+                    state = state,
                     onSmsReadingResult = onSmsReadingResult,
+                    onSmsReadingEnabledChange = onSmsReadingEnabledChange,
                     onNotificationPermissionResult = onNotificationPermissionResult,
                     onNotificationPermissionRequest = onNotificationPermissionRequest
                 )
@@ -309,7 +323,8 @@ fun WelcomeStep() {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         FeatureItem(stringResource(Res.string.onboarding_feature_sms_title), Icons.Default.Sms)
         FeatureItem(stringResource(Res.string.onboarding_feature_budget_title), Icons.Default.Notifications)
-        FeatureItem(stringResource(Res.string.onboarding_feature_sync_title), Icons.Default.Sync)
+        // Sync is not available in this release.
+        // FeatureItem(stringResource(Res.string.onboarding_feature_sync_title), Icons.Default.Sync)
     }
 }
 
@@ -412,19 +427,18 @@ fun FeatureItem(text: String, icon: ImageVector) {
 fun PermissionsStep(
     onSmsReadingResult: (Boolean) -> Unit = {},
     onNotificationPermissionResult: (Boolean) -> Unit = {},
-    onNotificationPermissionRequest: () -> Unit = {}
+    onNotificationPermissionRequest: () -> Unit = {},
+    state: OnboardingState = OnboardingState(),
+    onSmsReadingEnabledChange: (Boolean) -> Unit = onSmsReadingResult
 ) {
     val glassColors = LocalGlassColors.current
     var triggerPermission by remember { mutableStateOf(false) }
     var triggerSmsPermission by remember { mutableStateOf(false) }
-    var notificationsEnabled by remember { mutableStateOf(false) }
-    var smsReadingEnabled by remember { mutableStateOf(false) }
 
     NotificationPermissionLauncher(
         trigger = triggerPermission,
         onResult = { granted ->
             triggerPermission = false
-            notificationsEnabled = granted
             onNotificationPermissionResult(granted)
         }
     )
@@ -433,7 +447,6 @@ fun PermissionsStep(
         trigger = triggerSmsPermission,
         onResult = { granted ->
             triggerSmsPermission = false
-            smsReadingEnabled = granted
             onSmsReadingResult(granted)
         }
     )
@@ -457,11 +470,10 @@ fun PermissionsStep(
             desc = stringResource(Res.string.onboarding_perm_sms_desc),
             icon = Icons.Default.Sms,
             color = GlassGreen,
-            checked = smsReadingEnabled,
+            checked = state.smsPermissionGranted && state.smsReadingEnabled,
             onToggle = { enabled ->
                 if (enabled) triggerSmsPermission = true else {
-                    smsReadingEnabled = false
-                    onSmsReadingResult(false)
+                    onSmsReadingEnabledChange(false)
                 }
             }
         )
@@ -470,14 +482,12 @@ fun PermissionsStep(
             desc = stringResource(Res.string.onboarding_perm_notif_desc),
             icon = Icons.Default.Notifications,
             color = GlassAmber,
-            checked = notificationsEnabled,
+            checked = state.notificationsGranted,
+            enabled = !state.notificationsGranted,
             onToggle = { enabled ->
                 if (enabled) {
                     onNotificationPermissionRequest()
                     triggerPermission = true
-                } else {
-                    notificationsEnabled = false
-                    onNotificationPermissionResult(false)
                 }
             }
         )
@@ -497,7 +507,8 @@ fun PermissionToggleItem(
     icon: ImageVector,
     color: androidx.compose.ui.graphics.Color,
     checked: Boolean = false,
-    onToggle: (Boolean) -> Unit = {}
+    onToggle: (Boolean) -> Unit = {},
+    enabled: Boolean = true
 ) {
     val glassColors = LocalGlassColors.current
     Row(
@@ -523,7 +534,13 @@ fun PermissionToggleItem(
 
         Switch(
             on = checked,
-            onToggle = onToggle
+            onToggle = onToggle,
+            enabled = enabled,
+            modifier = Modifier.semantics {
+                contentDescription = title
+                role = Role.Switch
+                toggleableState = ToggleableState(checked)
+            }
         )
     }
 }
