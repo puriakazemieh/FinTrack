@@ -41,6 +41,7 @@ fun ScreenHeader(
     onClose: (() -> Unit)? = null,
     actions: List<HeaderAction> = emptyList(),
     center: Boolean = false,
+    titleMaxLines: Int = 1,
     trailingContent: @Composable RowScope.() -> Unit = {}
 ) {
     Row(
@@ -80,7 +81,7 @@ fun ScreenHeader(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.W700,
                 color = MaterialTheme.colorScheme.onBackground,
-                maxLines = 1
+                maxLines = titleMaxLines
             )
             sub?.let {
                 FintrackLabelSmallText(

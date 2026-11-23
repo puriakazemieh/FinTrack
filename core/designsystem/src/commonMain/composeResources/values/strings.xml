@@ -50,6 +50,9 @@
     <string name="title_delete_category" > با حذف دسته‌بندی همه تراکنش‌ها به طور کامل پاک می شود</string>
     <string name="transaction_delete" >آیا از حذف مطمئن هستید؟</string>
     <string name="delete_confirm_question">آیا از حذف %1$s %2$s مطمئن هستید؟</string>
+    <string name="delete_named_item_question">آیا از حذف «%1$s» مطمئن هستید؟</string>
+    <string name="delete_transaction_title">حذف این تراکنش؟</string>
+    <string name="delete_transaction_summary">%1$s · %2$s\nدسته: %3$s\nمنبع: %4$s\nتاریخ: %5$s</string>
     <string name="transaction_deleted">تراکنش حذف شد</string>
     <string name="recent_transactions">تراکنش‌های اخیر</string>
     <string name="balance_total">موجودی کل:</string>

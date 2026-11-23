@@ -131,6 +131,7 @@ import fintrack.core.designsystem.generated.resources.title_person_management
 import fintrack.core.designsystem.generated.resources.title_tag_management
 import fintrack.core.designsystem.generated.resources.title_transaction_management
 import fintrack.core.designsystem.generated.resources.transaction
+import fintrack.core.designsystem.generated.resources.delete_transaction_title
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.decodeToImageBitmap
 import org.jetbrains.compose.resources.painterResource
@@ -376,7 +377,14 @@ private fun BottomSheetContent(
 
         AddTransactionSheet.DeleteConfirmation -> {
             DeleteBottomSheet(
-                itemName = state.description.ifEmpty { state.category?.name },
+                title = stringResource(Res.string.delete_transaction_title),
+                message = state.oldTransaction?.let { saved ->
+                    com.kazemieh.transaction.ui.delete.transactionDeletionMessage(saved,
+                        state.category?.takeIf { it.id == saved.categoryId }?.name,
+                        state.source?.takeIf { it.id == saved.sourceId }?.name,
+                        state.sourceEnd?.takeIf { it.id == saved.sourceEndId }?.name)
+                },
+                confirmEnabled = state.oldTransaction != null,
                 dismissClicked = { onIntent(AddTransactionIntent.PopSheet) },
                 confirmClicked = {
                     onIntent(AddTransactionIntent.Delete)

@@ -9,6 +9,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kazemieh.common.model.TransactionWithRelations
+import fintrack.core.designsystem.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet
 import com.kazemieh.designsystem.component.model.resolveString
 import org.koin.compose.viewmodel.koinViewModel
@@ -22,7 +24,7 @@ fun DeleteTransactionBottomSheet(
     onDismiss: () -> Unit,
     transactionDeleted: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(transactionWithRelations?.transaction?.id) {
         viewModel.onIntent(DeleteTransactionIntent.SetData(transactionWithRelations))
@@ -45,13 +47,17 @@ fun DeleteTransactionBottomSheet(
     }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val details = transactionWithRelations?.let { item ->
+        transactionDeletionMessage(item.transaction, item.category.name, item.source.name, item.sourceEnd?.name)
+    }
 
     DeleteBottomSheet(
+        title = stringResource(Res.string.delete_transaction_title),
+        message = details,
         dismissClicked = { viewModel.onIntent(DeleteTransactionIntent.OnDismiss) },
         confirmClicked = { viewModel.onIntent(DeleteTransactionIntent.Submit) },
         sheetState = sheetState,
-        itemName = transactionWithRelations?.transaction?.description,
-        confirmEnabled = !state.isLoading,
+        confirmEnabled = !state.isLoading && transactionWithRelations != null,
         dismissEnabled = !state.isLoading,
         isLoading = state.isLoading
     )

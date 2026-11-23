@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,6 +47,7 @@ import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.cancell_
 import fintrack.core.designsystem.generated.resources.confirm
 import fintrack.core.designsystem.generated.resources.delete_confirm_question
+import fintrack.core.designsystem.generated.resources.delete_named_item_question
 import fintrack.core.designsystem.generated.resources.transaction_delete
 import org.jetbrains.compose.resources.stringResource
 
@@ -71,13 +73,16 @@ fun DeleteBottomSheet(
     isLoading: Boolean = false,
     message: String? = null,
     errorText: String? = null,
+    content: (@Composable () -> Unit)? = null,
 ) {
     val space = LocalSpacing.current
 
-    val finalTitle = title ?: if (itemName != null) {
-        stringResource(Res.string.delete_confirm_question, itemType ?: "", itemName)
-    } else {
-        stringResource(Res.string.transaction_delete)
+    val name = itemName?.trim()?.takeIf { it.isNotEmpty() }
+    val type = itemType?.trim()?.takeIf { it.isNotEmpty() }
+    val finalTitle = title ?: when {
+        name != null && type != null -> stringResource(Res.string.delete_confirm_question, type, name)
+        name != null -> stringResource(Res.string.delete_named_item_question, name)
+        else -> stringResource(Res.string.transaction_delete)
     }
 
     ModalBottomSheet(
@@ -100,12 +105,16 @@ fun DeleteBottomSheet(
             ) {
                 ScreenHeader(
                     title = finalTitle,
+                    titleMaxLines = Int.MAX_VALUE,
                     onClose = if (dismissEnabled && !isLoading) dismissClicked else null
                 )
 
                 message?.let {
                     FintrackBodyMediumText(text = it, color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp))
+                }
+                content?.let { body ->
+                    Box(Modifier.fillMaxWidth().padding(horizontal = 24.dp)) { body() }
                 }
                 errorText?.let {
                     FintrackInlineFeedback(text = it, isError = true,
@@ -116,7 +125,7 @@ fun DeleteBottomSheet(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp).height(IntrinsicSize.Min),
+                        .padding(horizontal = 24.dp, vertical = 16.dp).height(IntrinsicSize.Min),
                     horizontalArrangement = Arrangement.spacedBy(space.mediumLarge)
                 ) {
 
@@ -124,12 +133,12 @@ fun DeleteBottomSheet(
                         onClick = confirmClicked,
                         enabled = confirmEnabled && !isLoading,
                         colors = confirmButtonColors,
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 48.dp)
                     ) {
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 12.dp),
+                                .fillMaxWidth(),
                             contentAlignment = Alignment.Center,
 
                             ) {
@@ -152,12 +161,12 @@ fun DeleteBottomSheet(
                     OutlinedButton(
                         onClick = { if (dismissEnabled && !isLoading) dismissClicked() },
                         enabled = dismissEnabled && !isLoading,
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 48.dp)
                     ) {
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 12.dp),
+                                .fillMaxWidth(),
                             contentAlignment = Alignment.Center
                         ) {
                             FintrackTitleSmallText(
@@ -169,7 +178,7 @@ fun DeleteBottomSheet(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }

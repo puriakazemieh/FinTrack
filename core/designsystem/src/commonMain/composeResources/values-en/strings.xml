@@ -50,6 +50,9 @@
     <string name="title_delete_category">By removing the classification, all transactions are completely deleted.</string>
     <string name="transaction_delete">Are you sure of deletion?</string>
     <string name="delete_confirm_question">Are you sure you want to delete %1$s %2$s?</string>
+    <string name="delete_named_item_question">Are you sure you want to delete “%1$s”?</string>
+    <string name="delete_transaction_title">Delete this transaction?</string>
+    <string name="delete_transaction_summary">%1$s · %2$s\nCategory: %3$s\nSource: %4$s\nDate: %5$s</string>
     <string name="transaction_deleted">Transaction deleted</string>
     <string name="recent_transactions">Recent transactions</string>
     <string name="balance_total">Total inventory:</string>
