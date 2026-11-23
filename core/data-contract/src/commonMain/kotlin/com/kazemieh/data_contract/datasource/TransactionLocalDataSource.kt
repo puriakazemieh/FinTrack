@@ -51,6 +51,8 @@ interface TransactionLocalDataSource {
 
     suspend fun addCategory(category: Category): Long
     suspend fun updateCategory(category: Category): Int
+    /** Atomically selects an active source by ID without rewriting balances or bank details. */
+    suspend fun setDefaultSource(id: Long): Boolean
     suspend fun updateSource(source: Source): Int
     suspend fun updateTag(tag: Tag): Int
     suspend fun updatePerson(person: Person): Int

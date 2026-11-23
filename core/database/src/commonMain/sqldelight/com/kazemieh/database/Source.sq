@@ -110,3 +110,10 @@ UPDATE source SET syncStatus = 0 WHERE id = ?;
 batchConvertBalances:
 UPDATE source SET balance = CAST(CAST(balance AS REAL) * :rate AS INTEGER), currencyCode = :newCode, updatedAt = :now, syncStatus = 1 WHERE currencyCode = :oldCode AND syncStatus != 2;
 
+
+-- A default-selection command updates flags only; deleted rows remain tombstones.
+setDefaultSourceById:
+UPDATE source
+SET isDefault = CASE WHEN id = :id THEN 1 ELSE 0 END,
+    updatedAt = :updatedAt, syncStatus = 1
+WHERE syncStatus != 2 AND (id = :id OR isDefault = 1);

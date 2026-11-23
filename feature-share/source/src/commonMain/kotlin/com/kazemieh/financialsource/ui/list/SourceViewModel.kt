@@ -19,7 +19,7 @@ class SourceViewModel(
     private val analytics: com.kazemieh.common.analytics.AnalyticsService,
     private val observeSourcesUseCase: ObserveSourcesUseCase,
     private val updateSourcePositionsUseCase: UpdateSourcePositionsUseCase,
-    private val updateSourceUseCase: com.kazemieh.domain.usecase.UpdateSourceUseCase
+    private val setDefaultSourceUseCase: com.kazemieh.domain.usecase.SetDefaultSourceUseCase
 ) : ViewModel() {
 
     init {
@@ -97,13 +97,11 @@ class SourceViewModel(
                 )
             }
             is SourceIntent.SetDefaultSource -> {
+                val id = intent.source.id ?: return
                 viewModelScope.launch {
-                    val previousDefault = _state.value.sources.find { it.isDefault }
-                    if (previousDefault != null && previousDefault.id != intent.source.id) {
-                        updateSourceUseCase(previousDefault.copy(isDefault = false))
+                    if (setDefaultSourceUseCase(id)) {
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.SourceDefaultChanged)
                     }
-                    updateSourceUseCase(intent.source.copy(isDefault = true))
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.SourceDefaultChanged)
                 }
             }
         }

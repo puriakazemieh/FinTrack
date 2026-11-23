@@ -137,6 +137,8 @@ class TransactionRepositoryImpl(
         return localDataSource.updatePerson(person)
     }
 
+    override suspend fun setDefaultSource(id: Long): Boolean = localDataSource.setDefaultSource(id)
+
     override suspend fun updateSource(source: Source): Int {
         return localDataSource.updateSource(source)
     }

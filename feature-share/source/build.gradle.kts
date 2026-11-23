@@ -44,6 +44,9 @@ kotlin {
     jvm()
 
     sourceSets {
+        jvmTest.dependencies {
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+        }
         commonTest.dependencies {
             implementation(kotlin("test"))
         }

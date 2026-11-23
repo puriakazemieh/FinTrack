@@ -159,6 +159,15 @@ class TransactionLocalDataSourceImpl(
             1
         }
 
+    override suspend fun setDefaultSource(id: Long): Boolean = withContext(Dispatchers.Default) {
+        db.transactionWithResult {
+            val source = sourceQueries.getSourceById(id).awaitAsOneOrNull()
+            if (source == null || source.syncStatus == 2L) return@transactionWithResult false
+            sourceQueries.setDefaultSourceById(id = id, updatedAt = Clock.System.now().toEpochMilliseconds())
+            true
+        }
+    }
+
     override suspend fun updateSource(source: Source): Int = withContext(Dispatchers.Default) {
         val id = source.id ?: throw IllegalArgumentException("Source ID cannot be null")
         val now = Clock.System.now().toEpochMilliseconds()

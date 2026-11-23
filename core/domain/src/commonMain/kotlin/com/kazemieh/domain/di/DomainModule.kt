@@ -37,6 +37,7 @@ val domainModule = module {
     factory { ObservePersonsUseCase(get()) }
     factory { DeleteSourceUseCase(get()) }
     factory { UpdateSourceUseCase(get()) }
+    factory { SetDefaultSourceUseCase(get()) }
     factory { ObserveSourceUseCase(get()) }
     factory { UpdatePersonUseCase(get()) }
     factory { ObserveMostUsedCategoriesUseCase(get()) }

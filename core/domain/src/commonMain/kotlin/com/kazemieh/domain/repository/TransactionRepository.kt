@@ -76,6 +76,8 @@ interface TransactionRepository {
 
 
     suspend fun addSource(source: Source): Long
+    /** Atomically selects an active source by ID without rewriting balances or bank details. */
+    suspend fun setDefaultSource(id: Long): Boolean
     suspend fun updateSource(source: Source): Int
     suspend fun deleteSource(from: Source, to: Source?)
     fun observeSources(): Flow<List<Source>>

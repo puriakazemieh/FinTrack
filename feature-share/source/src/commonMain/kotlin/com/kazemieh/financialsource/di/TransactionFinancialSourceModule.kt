@@ -13,7 +13,7 @@ val transactionFinancialSourceModule = module {
             analytics = get(),
             observeSourcesUseCase = get(),
             updateSourcePositionsUseCase = get(),
-            updateSourceUseCase = get()
+            setDefaultSourceUseCase = get()
         )
     }
     viewModel { (sourceId: Long) ->
