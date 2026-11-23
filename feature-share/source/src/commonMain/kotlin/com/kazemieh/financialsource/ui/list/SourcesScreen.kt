@@ -111,7 +111,8 @@ fun SourcesScreen(
                 selectedSource = state.selectedSources,
                 onDismiss = { viewModel.onIntent(SourceIntent.ResetFlags) },
                 onNavigateToTransactions = onNavigateToTransactions,
-                setSource = { viewModel.onIntent(SourceIntent.SelectedSource(it)) }
+                // Management closes the form; only a picker publishes a selected source.
+                setSource = { viewModel.onIntent(SourceIntent.ResetFlags) }
             )
         }
 
