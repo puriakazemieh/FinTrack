@@ -101,6 +101,53 @@ class SmsAtomicPostingTest {
         f.assertState(1, 900, false)
     }
 
+    @Test fun ignoredDraftCanPostOneMillisecondBeforeExpiry() = withDatabase { f ->
+        f.database.smsDraftQueries.ignoreUnusedSmsDraft(f.now - SMS_IGNORED_RETENTION_MILLIS + 1, f.draftId)
+        assertTrue(f.post() > 0)
+        f.database.smsDraftQueries.deleteExpiredIgnoredSmsDrafts(f.now)
+        f.assertState(1, 900, true)
+    }
+
+    @Test fun exactDeadlineRejectsPostEvenBeforeCleanupRuns() = withDatabase { f ->
+        f.database.smsDraftQueries.ignoreUnusedSmsDraft(f.now - SMS_IGNORED_RETENTION_MILLIS, f.draftId)
+        assertEquals(0L, f.post())
+        f.assertState(0, 1000, false)
+        assertEquals(0L, f.post())
+        f.assertState(0, 1000, false)
+    }
+
+    @Test fun expiredIgnoredDraftIsRejectedAfterDeadline() = withDatabase { f ->
+        f.database.smsDraftQueries.ignoreUnusedSmsDraft(f.now - SMS_IGNORED_RETENTION_MILLIS - 1, f.draftId)
+        assertEquals(0L, f.post())
+        f.assertState(0, 1000, false)
+    }
+
+    @Test fun staleCardAtDeadlineCannotWinRaceWithCleanup() = withDatabase { f ->
+        f.database.smsDraftQueries.ignoreUnusedSmsDraft(f.now - SMS_IGNORED_RETENTION_MILLIS, f.draftId)
+        val results = coroutineScope {
+            val posting = async { runCatching { f.post() } }
+            val cleanup = async { f.database.smsDraftQueries.deleteExpiredIgnoredSmsDrafts(f.now - SMS_IGNORED_RETENTION_MILLIS) }
+            cleanup.await()
+            listOf(posting.await())
+        }
+        assertTrue(results.none { (it.getOrNull() ?: 0L) > 0L })
+        assertEquals(0L, f.post())
+        assertEquals(0L, f.transactions.getTransactionCount())
+        assertEquals(1000L, f.transactions.getSourceById(f.sourceId)!!.balance)
+        assertNull(f.sms.getSmsDraftById(f.draftId))
+    }
+
+    @Test fun postingBeforeDeadlineSurvivesCleanupAfterDeadline() = withDatabase { f ->
+        f.database.smsDraftQueries.ignoreUnusedSmsDraft(f.now - SMS_IGNORED_RETENTION_MILLIS + 1, f.draftId)
+        val id = f.post()
+        assertTrue(id > 0L)
+        f.now += 1
+        f.database.smsDraftQueries.deleteExpiredIgnoredSmsDrafts(f.now - SMS_IGNORED_RETENTION_MILLIS)
+        f.assertState(1, 900, true)
+        assertEquals(id, f.database.transactionQueries.getTransactionById(id).awaitAsList().single().id)
+        assertEquals(0L, f.post())
+    }
+
     private fun withDatabase(block: suspend (Fixture) -> Unit) = runBlocking {
         val fixture = Fixture()
         try { fixture.seed(); block(fixture) } finally { fixture.close() }
@@ -116,13 +163,14 @@ class SmsAtomicPostingTest {
         val database: FinTrackDatabase
         val transactions: TransactionLocalDataSourceImpl
         val sms: SmsDraftLocalDataSourceImpl
+        var now = 4_000_000_000L
         var sourceId = 0L
         var draftId = 0L
         lateinit var transaction: Transaction
         init {
             FinTrackDatabase.Schema.synchronous().create(driver)
             database = FinTrackDatabase(driver, Asset.Adapter(EnumColumnAdapter()), Rate_cache.Adapter(EnumColumnAdapter()))
-            transactions = TransactionLocalDataSourceImpl(database)
+            transactions = TransactionLocalDataSourceImpl(database) { now }
             sms = SmsDraftLocalDataSourceImpl(database)
         }
         suspend fun seed() {

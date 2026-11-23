@@ -7,6 +7,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.SMS_IGNORED_RETENTION_MILLIS
 import com.kazemieh.common.model.CategorySum
 import com.kazemieh.common.model.Page
 import com.kazemieh.common.model.PageRequest
@@ -33,7 +34,8 @@ import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 
 class TransactionLocalDataSourceImpl(
-    private val db: FinTrackDatabase
+    private val db: FinTrackDatabase,
+    private val smsNowMillis: () -> Long = { Clock.System.now().toEpochMilliseconds() }
 ) : TransactionLocalDataSource {
 
     private val transactionQueries = db.transactionQueries
@@ -692,6 +694,10 @@ class TransactionLocalDataSourceImpl(
         db.transactionWithResult {
             val draft = db.smsDraftQueries.getSmsDraftById(smsDraftId).awaitAsOneOrNull()
             if (draft == null || draft.isUsed != 0L) return@transactionWithResult 0L
+            // Check under the same transaction as the claim: a stale card cannot
+            // post after retention expires, even if background cleanup is delayed.
+            val cutoff = smsNowMillis().coerceAtLeast(Long.MIN_VALUE + SMS_IGNORED_RETENTION_MILLIS) - SMS_IGNORED_RETENTION_MILLIS
+            if (draft.ignoredAt != null && draft.ignoredAt <= cutoff) return@transactionWithResult 0L
             if (transaction.amount <= 0L || transaction.currencyCode !in setOf("IRT", "IRR"))
                 return@transactionWithResult 0L
             val category = categoryQueries.getCategoryById(transaction.categoryId).awaitAsOneOrNull()
