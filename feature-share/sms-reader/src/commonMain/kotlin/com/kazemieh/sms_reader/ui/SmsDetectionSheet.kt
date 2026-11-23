@@ -3,6 +3,7 @@ package com.kazemieh.sms_reader.ui
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import com.kazemieh.designsystem.component.FintrackButton
@@ -120,41 +121,25 @@ fun SmsDetectionSheet(
                 .background(MaterialTheme.colorScheme.background)
         ) {
             FintrackBackgroundBlobs()
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                // Keep delete on the physical left and close on the physical right in either language.
-                val direction = LocalLayoutDirection.current
-                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                    Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically) {
-                        CompositionLocalProvider(LocalLayoutDirection provides direction) {
-                            OutlinedButton(onClick = onDeleteAll, enabled = drafts.isNotEmpty() && !isBusy,
-                                modifier = Modifier.heightIn(min = 48.dp),
-                                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
-                                FintrackLabelMediumText(stringResource(Res.string.action_delete_all),
-                                    color = LocalContentColor.current)
-                            }
-                            Column(Modifier.weight(1f).padding(horizontal = 8.dp, vertical = 12.dp),
-                                horizontalAlignment = Alignment.Start) {
-                                FintrackHeadlineSmallText(stringResource(Res.string.sms_sheet_title),
-                                    fontSize = 18.sp, fontWeight = FontWeight.W700,
-                                    color = MaterialTheme.colorScheme.onBackground)
-                                FintrackLabelSmallText(stringResource(Res.string.sms_sheet_sub),
-                                    fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                        }
-                        IconButton(onClick = onDismiss, enabled = !isBusy) {
-                            Icon(Icons.Default.Close, stringResource(Res.string.sms_cancel))
-                        }
-                    }
-                }
+            BoxWithConstraints(Modifier.fillMaxSize()) {
+                val scrollHeading = maxWidth / LocalDensity.current.fontScale < 360.dp
+                Column(Modifier.fillMaxSize()) {
+                SmsSheetHeader(
+                    titleInToolbar = !scrollHeading,
+                    canDelete = drafts.isNotEmpty() && !isBusy,
+                    canDismiss = !isBusy,
+                    onDeleteAll = onDeleteAll,
+                    onDismiss = onDismiss
+                )
 
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth().weight(1f),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
                 ) {
+                    if (scrollHeading) item(key = "sms_heading") {
+                        SmsSheetHeading(Modifier.fillMaxWidth())
+                    }
                     item(key = "sms_actions") {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -212,6 +197,7 @@ fun SmsDetectionSheet(
                     }
                     
                     item { Spacer(Modifier.height(32.dp)) }
+                }
                 }
             }
         }
@@ -526,5 +512,46 @@ private fun MostUsedRow(
                 }
             }
         }
+    }
+}
+
+/** Physical action positions are invariant; narrow/large-text headings scroll with the list. */
+@Composable
+private fun SmsSheetHeader(
+    titleInToolbar: Boolean,
+    canDelete: Boolean,
+    canDismiss: Boolean,
+    onDeleteAll: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val direction = LocalLayoutDirection.current
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            CompositionLocalProvider(LocalLayoutDirection provides direction) {
+                OutlinedButton(onClick = onDeleteAll, enabled = canDelete,
+                    modifier = Modifier.heightIn(min = 48.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
+                    FintrackLabelMediumText(stringResource(Res.string.action_delete_all),
+                        color = LocalContentColor.current)
+                }
+                if (titleInToolbar) SmsSheetHeading(Modifier.weight(1f).padding(horizontal = 8.dp))
+                else Spacer(Modifier.weight(1f))
+            }
+            IconButton(onClick = onDismiss, enabled = canDismiss) {
+                Icon(Icons.Default.Close, stringResource(Res.string.sms_cancel))
+            }
+        }
+    }
+}
+
+@Composable
+private fun SmsSheetHeading(modifier: Modifier = Modifier) {
+    Column(modifier, horizontalAlignment = Alignment.Start) {
+        FintrackHeadlineSmallText(stringResource(Res.string.sms_sheet_title),
+            fontSize = 18.sp, fontWeight = FontWeight.W700,
+            color = MaterialTheme.colorScheme.onBackground)
+        FintrackLabelSmallText(stringResource(Res.string.sms_sheet_sub),
+            fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
