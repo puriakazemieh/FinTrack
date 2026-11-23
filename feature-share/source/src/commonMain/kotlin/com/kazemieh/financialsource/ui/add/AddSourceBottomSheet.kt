@@ -36,6 +36,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazemieh.financialsource.ui.list.sourceCurrency
 import com.kazemieh.common.model.Source
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassGreenSoft
@@ -298,7 +299,8 @@ fun AddSourceContent(
                         modifier = Modifier.fillMaxWidth(),
                         suffix = {
                             FintrackLabelSmallText(
-                                text = com.kazemieh.designsystem.LocalCurrency.current.symbol,
+                                text = state.existingSource?.currencyCode?.let(::sourceCurrency)?.symbol
+                                    ?: com.kazemieh.designsystem.LocalCurrency.current.symbol,
                                 color = glassColors.text3
                             )
                         }
