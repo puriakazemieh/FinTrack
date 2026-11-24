@@ -29,8 +29,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -128,6 +131,8 @@ fun AddFixedExpenseBottomSheet(
     viewModel: AddFixedExpenseViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val titleFocusRequester = remember { FocusRequester() }
+    var titleFocusRequested by rememberSaveable(expenseId) { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -179,6 +184,12 @@ fun AddFixedExpenseBottomSheet(
                     contentPadding = PaddingValues(bottom = 100.dp)
                 ) {
                     item(key = "title") {
+                        LaunchedEffect(expenseId) {
+                            if (expenseId == null && !titleFocusRequested) {
+                                titleFocusRequester.requestFocus()
+                                titleFocusRequested = true
+                            }
+                        }
                         Field(
                             label = stringResource(Res.string.label_title),
                             required = true
@@ -197,7 +208,7 @@ fun AddFixedExpenseBottomSheet(
                                     color = LocalGlassColors.current.text,
                                     fontWeight = FontWeight.SemiBold
                                 ),
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth().focusRequester(titleFocusRequester)
                             )
                         }
                     }
@@ -207,7 +218,7 @@ fun AddFixedExpenseBottomSheet(
                             amount = state.amount,
                             onAmountChange = { viewModel.onIntent(AddFixedExpenseIntent.SetAmount(it)) },
                             onCalcClick = { showCalculator = true },
-                            autoFocus = state.expenseId == null
+                            autoFocus = false
                         )
                     }
 
@@ -376,33 +387,34 @@ fun AddFixedExpenseBottomSheet(
                     // Auto post
                     item {
                         GlassCard(padding = 14.dp) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    FintrackBodyMediumText(
-                                        text = stringResource(Res.string.label_auto_post_enabled),
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                    if (state.isAutoPostEnabled && state.category == null) {
-                                        FintrackLabelSmallText(
-                                            text = stringResource(Res.string.error_category_required_for_auto_post),
-                                            color = MaterialTheme.colorScheme.error
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        FintrackBodyMediumText(
+                                            text = stringResource(Res.string.label_auto_post_enabled),
+                                            fontWeight = FontWeight.SemiBold
                                         )
+                                        if (state.isAutoPostEnabled && state.category == null) {
+                                            FintrackLabelSmallText(
+                                                text = stringResource(Res.string.error_category_required_for_auto_post),
+                                                color = MaterialTheme.colorScheme.error
+                                            )
+                                        }
                                     }
+                                    Switch(
+                                        on = state.isAutoPostEnabled,
+                                        onToggle = { viewModel.onIntent(AddFixedExpenseIntent.SetAutoPost(it)) }
+                                    )
                                 }
-                                Switch(
-                                    on = state.isAutoPostEnabled,
-                                    onToggle = { viewModel.onIntent(AddFixedExpenseIntent.SetAutoPost(it)) }
+                                FintrackLabelSmallText(
+                                    text = stringResource(Res.string.guide_fixed_expense_auto_post),
+                                    color = LocalGlassColors.current.text3
                                 )
                             }
-                            FintrackLabelSmallText(
-                                text = stringResource(Res.string.guide_fixed_expense_auto_post),
-                                color = LocalGlassColors.current.text3,
-                                modifier = Modifier.padding(top = 8.dp)
-                            )
                         }
                     }
 
