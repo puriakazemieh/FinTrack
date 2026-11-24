@@ -142,6 +142,7 @@ fun CategoryDb.toCategory() = Category(
     colorId = colorId.toInt(),
     iconId = iconId.toInt(),
     parentId = parentId,
+    position = position.toInt(),
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt()),
     isDefault = isDefault != 0L
