@@ -22,7 +22,7 @@ class FixedExpenseLocalDataSourceImpl(
 
     override suspend fun insertFixedExpense(expense: FixedExpense): Long = withContext(Dispatchers.Default) {
         val now = Clock.System.now().toEpochMilliseconds()
-        database.transaction {
+        database.transactionWithResult {
             queries.insertFixedExpense(
                 title = expense.title,
                 amount = expense.amount,
@@ -46,8 +46,8 @@ class FixedExpenseLocalDataSourceImpl(
             expense.personIds.forEach { personId ->
                 personQueries.insertFixedExpensePerson(id, personId)
             }
+            id
         }
-        queries.lastInsertRowId().executeAsOne()
     }
 
     override suspend fun updateFixedExpense(expense: FixedExpense) {
