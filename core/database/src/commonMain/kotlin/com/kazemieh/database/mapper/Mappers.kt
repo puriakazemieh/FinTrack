@@ -180,7 +180,8 @@ fun SourceDb.toSource() = Source(
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt()),
     isDefault = isDefault != 0L,
-    smsSender = smsSender
+    smsSender = smsSender,
+    position = position.toInt()
 )
 
 // Tag Mappers
@@ -191,7 +192,8 @@ fun TagDb.toTag() = Tag(
     colorId = colorId.toInt(),
     iconId = iconId.toInt(),
     updatedAt = updatedAt,
-    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt()),
+    position = position.toInt()
 )
 
 // Person Mappers
@@ -200,7 +202,8 @@ fun PersonDb.toPerson() = Person(
     name = name,
     description = description,
     updatedAt = updatedAt,
-    syncStatus = SyncStatus.fromInt(syncStatus.toInt())
+    syncStatus = SyncStatus.fromInt(syncStatus.toInt()),
+    position = position.toInt()
 )
 
 // Debt Mappers
