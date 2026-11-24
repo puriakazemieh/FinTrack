@@ -44,6 +44,8 @@ kotlin {
     jvm()
 
     sourceSets {
+        commonTest.dependencies { implementation(kotlin("test")) }
+        jvmTest.dependencies { implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1") }
         commonMain {
             dependencies {
                 implementation(libs.kotlinx.serialization)

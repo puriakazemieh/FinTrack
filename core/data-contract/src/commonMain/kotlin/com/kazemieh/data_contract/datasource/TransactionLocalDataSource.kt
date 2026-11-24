@@ -50,6 +50,8 @@ interface TransactionLocalDataSource {
     fun observeCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>>
 
     suspend fun addCategory(category: Category): Long
+    /** Selects an active category by ID, atomically within its current type and parent. */
+    suspend fun setDefaultCategory(id: Long): Boolean
     suspend fun updateCategory(category: Category): Int
     /** Atomically selects an active source by ID without rewriting balances or bank details. */
     suspend fun setDefaultSource(id: Long): Boolean

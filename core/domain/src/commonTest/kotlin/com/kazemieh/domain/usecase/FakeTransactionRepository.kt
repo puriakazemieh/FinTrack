@@ -97,6 +97,7 @@ open class FakeTransactionRepository : TransactionRepository {
 
     override suspend fun addCategory(category: Category): Long = 1L
 
+    override suspend fun setDefaultCategory(id: Long): Boolean = error("Default category selection must be faked explicitly")
     override suspend fun updateCategory(category: Category): Int = 1
 
     override suspend fun deleteCategory(category: Category, moveCategory: Category?) {}

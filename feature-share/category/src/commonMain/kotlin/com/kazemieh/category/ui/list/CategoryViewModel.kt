@@ -29,7 +29,7 @@ class CategoryViewModel(
     private val observeCategoriesUseCase: ObserveCategoriesUseCase,
     private val observeCategoriesFlatUseCase: ObserveCategoriesFlatUseCase,
     private val updateCategoryPositionsUseCase: UpdateCategoryPositionsUseCase,
-    private val updateCategoryUseCase: com.kazemieh.domain.usecase.UpdateCategoryUseCase
+    private val setDefaultCategoryUseCase: com.kazemieh.domain.usecase.SetDefaultCategoryUseCase
 ) : ViewModel() {
 
     init {
@@ -112,16 +112,14 @@ class CategoryViewModel(
                 )
             }
             is CategoryIntent.SetDefaultCategory -> {
+                val id = intent.category.id ?: return
                 viewModelScope.launch {
-                    val previousDefault = _state.value.categories.find { it.isDefault }
-                    if (previousDefault != null && previousDefault.id != intent.category.id) {
-                        updateCategoryUseCase(previousDefault.copy(isDefault = false))
+                    if (setDefaultCategoryUseCase(id)) {
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.CategoryDefaultChanged)
                     }
-                    updateCategoryUseCase(intent.category.copy(isDefault = true))
-                    analytics.track(com.kazemieh.common.analytics.ProductEvent.CategoryDefaultChanged)
                 }
             }
-            
+
             CategoryIntent.OnDismiss -> {
                 viewModelScope.launch {
                     _effect.send(CategoryEffect.OnDismiss)

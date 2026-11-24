@@ -14,7 +14,7 @@ val transactionCategoryModule = module {
             observeCategoriesUseCase = get(),
             observeCategoriesFlatUseCase = get(),
             updateCategoryPositionsUseCase = get(),
-            updateCategoryUseCase = get()
+            setDefaultCategoryUseCase = get()
         )
     }
     viewModel { (categoryId: Long) ->

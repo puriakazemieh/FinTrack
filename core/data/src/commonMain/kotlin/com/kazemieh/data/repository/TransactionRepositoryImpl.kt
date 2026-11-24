@@ -125,6 +125,8 @@ class TransactionRepositoryImpl(
         return localDataSource.addCategory(category)
     }
 
+    override suspend fun setDefaultCategory(id: Long): Boolean = localDataSource.setDefaultCategory(id)
+
     override suspend fun updateCategory(category: Category): Int {
         return localDataSource.updateCategory(category)
     }

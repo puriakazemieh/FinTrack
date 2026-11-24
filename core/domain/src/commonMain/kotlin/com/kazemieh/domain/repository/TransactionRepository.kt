@@ -51,6 +51,8 @@ interface TransactionRepository {
 
 
     suspend fun addCategory(category: Category): Long
+    /** Selects an active category by ID, atomically within its current type and parent. */
+    suspend fun setDefaultCategory(id: Long): Boolean
     suspend fun updateCategory(category: Category): Int
     suspend fun deleteCategory(category: Category, moveCategory: Category?)
     fun observeCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>>

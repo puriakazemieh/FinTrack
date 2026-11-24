@@ -24,6 +24,7 @@ val domainModule = module {
     factory { GetCategoryUseCase(get()) }
     factory { AddCategoryUseCase(get()) }
     factory { UpdateCategoryUseCase(get()) }
+    factory { SetDefaultCategoryUseCase(get()) }
     factory { UpdateTagUseCase(get()) }
     factory { DeleteCategoryUseCase(get()) }
     factory { DeletePersonUseCase(get()) }

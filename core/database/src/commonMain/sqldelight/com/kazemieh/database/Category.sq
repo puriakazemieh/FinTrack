@@ -128,3 +128,11 @@ SELECT * FROM category WHERE syncStatus = 1;
 
 markCategoryAsSynced:
 UPDATE category SET syncStatus = 0 WHERE id = ?;
+
+-- Flags only: preserve category metadata and defaults in other type/parent scopes.
+setDefaultCategoryById:
+UPDATE category
+SET isDefault = CASE WHEN id = :id THEN 1 ELSE 0 END,
+    updatedAt = :updatedAt, syncStatus = 1
+WHERE syncStatus != 2 AND type = :type AND parentId IS :parentId
+AND (id = :id OR isDefault = 1);

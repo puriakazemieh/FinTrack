@@ -128,6 +128,16 @@ class TransactionLocalDataSourceImpl(
         categoryQueries.lastInsertRowId().awaitAsOne()
     }
 
+    override suspend fun setDefaultCategory(id: Long): Boolean = withContext(Dispatchers.Default) {
+        db.transactionWithResult {
+            val category = categoryQueries.getCategoryById(id).awaitAsOneOrNull()
+            if (category == null || category.syncStatus == 2L) return@transactionWithResult false
+            categoryQueries.setDefaultCategoryById(id = id, type = category.type,
+                parentId = category.parentId, updatedAt = Clock.System.now().toEpochMilliseconds())
+            true
+        }
+    }
+
     override suspend fun updateCategory(category: Category): Int =
         withContext(Dispatchers.Default) {
             val now = Clock.System.now().toEpochMilliseconds()
