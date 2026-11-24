@@ -19,6 +19,7 @@ import com.kazemieh.designsystem.component.FintrackTitleLargeText
 import com.kazemieh.designsystem.component.FintrackTitleMediumText
 import com.kazemieh.designsystem.component.glass.SheetFrame
 import fintrack.core.designsystem.generated.resources.*
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 import com.kazemieh.designsystem.LocalGlassColors
@@ -102,6 +103,7 @@ private fun TimeColumn(
         Spacer(modifier = Modifier.height(8.dp))
         
         val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialValue)
+        val scope = rememberCoroutineScope()
         val flingBehavior = androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior(lazyListState = listState)
         
         // Simple implementation of a "wheel" using LazyColumn
@@ -145,7 +147,10 @@ private fun TimeColumn(
                             .height(50.dp)
                             .fillMaxWidth()
                             .clickable {
-                                // Scroll to this item
+                                scope.launch {
+                                    listState.scrollToItem(index)
+                                    onValueChange(value)
+                                }
                             },
                         contentAlignment = Alignment.Center
                     ) {

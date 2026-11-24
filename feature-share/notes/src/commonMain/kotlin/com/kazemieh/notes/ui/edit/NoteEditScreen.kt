@@ -213,10 +213,8 @@ fun NoteEditContent(
         )
     }
 
-    val openDatePicker = remember { mutableStateOf(false) }
-    LaunchedEffect(showDatePicker.value) { if(showDatePicker.value) openDatePicker.value = true }
     JalaliDatePickerBottomSheet(
-        openSheet = openDatePicker,
+        openSheet = showDatePicker,
         onConfirm = { calendar ->
             pendingReminderDate = calendar.toTimestamp()
             showDatePicker.value = false
@@ -224,14 +222,12 @@ fun NoteEditContent(
         }
     )
 
-    val openTimePicker = remember { mutableStateOf(false) }
-    LaunchedEffect(showTimePicker.value) { if(showTimePicker.value) openTimePicker.value = true }
     val initialTime = state.reminderTime?.let {
         val dt = Instant.fromEpochMilliseconds(it).toLocalDateTime(tz)
         "${dt.hour.toString().padStart(2, '0')}:${dt.minute.toString().padStart(2, '0')}"
     } ?: "09:00"
     FintrackTimePickerBottomSheet(
-        openSheet = openTimePicker,
+        openSheet = showTimePicker,
         initialTime = initialTime,
         onConfirm = { time ->
             val parts = time.split(":")
