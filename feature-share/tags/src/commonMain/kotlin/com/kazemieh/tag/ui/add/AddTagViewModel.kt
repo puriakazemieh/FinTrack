@@ -133,14 +133,16 @@ data class TagDraft(
     val name: String = "",
     val description: String? = null,
     val colorId: Int? = null,
-    val iconId: Int? = null
+    val iconId: Int? = null,
+    val position: Int = 0
 )
 
 private fun Tag.toDraft(): TagDraft = TagDraft(
     name = this.name.orEmpty(),
     description = this.description,
     colorId = this.colorId,
-    iconId = this.iconId
+    iconId = this.iconId,
+    position = position
 )
 
 private fun TagDraft.toTag(id: Long?): Tag = Tag(
@@ -148,7 +150,8 @@ private fun TagDraft.toTag(id: Long?): Tag = Tag(
     name = name,
     description = description,
     colorId = colorId ?: 1,
-    iconId = iconId ?: 1
+    iconId = iconId ?: 1,
+    position = position
 )
 
 /** --- Intent / Effect --- **/

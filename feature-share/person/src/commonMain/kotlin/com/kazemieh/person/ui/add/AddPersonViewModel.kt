@@ -119,18 +119,21 @@ private val AddPersonMode.personIdOrNull: Long?
 
 data class PersonDraft(
     val name: String = "",
-    val description: String? = null
+    val description: String? = null,
+    val position: Int = 0
 )
 
 private fun Person.toDraft(): PersonDraft = PersonDraft(
     name = this.name.orEmpty(),
-    description = this.description
+    description = this.description,
+    position = position
 )
 
 private fun PersonDraft.toPerson(id: Long?): Person = Person(
     id = id,
     name = name,
-    description = description
+    description = description,
+    position = position
 )
 
 /** --- Intent / Effect --- **/
