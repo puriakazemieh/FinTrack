@@ -7,6 +7,7 @@ import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.AddTagUseCase
 import com.kazemieh.domain.usecase.UpdateTagUseCase
+import fintrack.core.designsystem.generated.resources.entity_save_failed
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.check_name_tag_source
 import kotlinx.coroutines.channels.Channel
@@ -98,16 +99,22 @@ class AddTagViewModel(
                     id
                 }
                 is AddTagMode.Edit -> {
-                    val id = updateTagUseCase(tag).toLong()
-                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.TagUpdated)
-                    id
+                    val updatedRows = updateTagUseCase(tag)
+                    if (updatedRows > 0) {
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.TagUpdated)
+                        mode.tagId
+                    } else {
+                        0L
+                    }
                 }
             }
 
-            if (tagId >= 0) {
+            if (tagId > 0) {
                 val saved = tag.copy(id = tagId)
                 _effect.send(AddTagEffect.SavedTag(saved))
                 _state.update { AddTagState() }
+            } else {
+                SnackbarController.showMessage(UiText.StringResourceText(Res.string.entity_save_failed))
             }
         }
     }

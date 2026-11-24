@@ -1618,4 +1618,5 @@
     <string name="sms_no_ignored">پیامک نادیده‌گرفته‌شده‌ای وجود ندارد.</string>
     <string name="source_balance_out_of_range">مجموع خارج از محدودهٔ قابل نمایش</string>
     <string name="source_balance_total_label">مجموع %1$s</string>
+    <string name="entity_save_failed">ذخیره انجام نشد. دوباره تلاش کنید.</string>
 </resources>

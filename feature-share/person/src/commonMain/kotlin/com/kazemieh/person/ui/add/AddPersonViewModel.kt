@@ -7,6 +7,7 @@ import com.kazemieh.designsystem.component.SnackbarController
 import com.kazemieh.designsystem.component.model.UiText
 import com.kazemieh.domain.usecase.AddPersonUseCase
 import com.kazemieh.domain.usecase.UpdatePersonUseCase
+import fintrack.core.designsystem.generated.resources.entity_save_failed
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.check_name_person_source
 import kotlinx.coroutines.channels.Channel
@@ -87,16 +88,22 @@ class AddPersonViewModel(
                     id
                 }
                 is AddPersonMode.Edit -> {
-                    val id = updatePersonUseCase(person).toLong()
-                    if (id > 0) analytics.track(com.kazemieh.common.analytics.ProductEvent.PersonUpdated)
-                    id
+                    val updatedRows = updatePersonUseCase(person)
+                    if (updatedRows > 0) {
+                        analytics.track(com.kazemieh.common.analytics.ProductEvent.PersonUpdated)
+                        mode.personId
+                    } else {
+                        0L
+                    }
                 }
             }
 
-            if (personId >= 0) {
+            if (personId > 0) {
                 val saved = person.copy(id = personId)
                 _effect.send(AddPersonEffect.SavedPerson(saved))
                 _state.update { AddPersonState() }
+            } else {
+                SnackbarController.showMessage(UiText.StringResourceText(Res.string.entity_save_failed))
             }
         }
     }
