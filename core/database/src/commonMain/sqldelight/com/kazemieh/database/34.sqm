@@ -1,0 +1,14 @@
+-- Preserve the same effective default previously returned by position/id ordering.
+-- Do not invent defaults for empty scopes or modify deleted records.
+UPDATE category
+SET isDefault = 0,
+    updatedAt = MAX(updatedAt, CAST(strftime('%s', 'now') AS INTEGER) * 1000),
+    syncStatus = 1
+WHERE syncStatus != 2 AND isDefault = 1
+AND EXISTS (
+    SELECT 1 FROM category AS preferred
+    WHERE preferred.syncStatus != 2 AND preferred.isDefault = 1
+    AND preferred.type = category.type AND preferred.parentId IS category.parentId
+    AND (preferred.position < category.position
+         OR (preferred.position = category.position AND preferred.id < category.id))
+);

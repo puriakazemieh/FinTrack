@@ -57,6 +57,7 @@ class SeedDataUseCase(
             Quintuple(localizedNames["cat_transfer"] ?: "انتقال", TransactionType.TRANSFER, null, 19, 33)
         )
 
+        val seededDefaultTypes = mutableSetOf<TransactionType>()
         defaultCategories.forEach { (name, type, description, iconId, colorId) ->
             transactionRepository.addCategory(
                 Category(
@@ -67,7 +68,7 @@ class SeedDataUseCase(
                     iconId = iconId,
                     position = 0,
                     parentId = null,
-                    isDefault = true
+                    isDefault = seededDefaultTypes.add(type)
                 )
             )
         }
