@@ -121,6 +121,7 @@ class AddDebtViewModel(
                     type = debt.type,
                     date = debt.date,
                     dueDate = debt.dueDate,
+                    reminderEnabled = debt.reminderEnabled,
                     source = withRelations.source,
                     description = debt.description ?: ""
                 )
