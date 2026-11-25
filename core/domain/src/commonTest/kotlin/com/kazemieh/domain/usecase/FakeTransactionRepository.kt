@@ -12,6 +12,7 @@ import com.kazemieh.common.model.CheckStatus
 import com.kazemieh.common.model.Debt
 import com.kazemieh.common.model.DebtWithRelations
 import com.kazemieh.common.model.FixedExpense
+import com.kazemieh.common.model.FixedExpensePostingRequest
 import com.kazemieh.common.model.Installment
 import com.kazemieh.common.model.InstallmentWithRelations
 import com.kazemieh.common.model.Page
@@ -39,6 +40,10 @@ import kotlinx.coroutines.flow.flowOf
 
 
 open class FakeTransactionRepository : TransactionRepository {
+
+    override suspend fun addFixedExpenseTransactionWithBalance(
+        request: FixedExpensePostingRequest, transaction: Transaction
+    ): Long = error("Atomic fixed expense posting must be faked explicitly")
 
     override suspend fun setDefaultSource(id: Long): Boolean = error("Default selection must be faked explicitly")
 

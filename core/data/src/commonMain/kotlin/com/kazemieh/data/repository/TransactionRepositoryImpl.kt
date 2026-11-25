@@ -1,6 +1,7 @@
 package com.kazemieh.data.repository
 
 import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.FixedExpensePostingRequest
 import com.kazemieh.common.model.CategorySum
 import com.kazemieh.common.model.Page
 import com.kazemieh.common.model.PageRequest
@@ -63,6 +64,11 @@ class TransactionRepositoryImpl(
     override fun observeCategorySums(transactionFilterParams: TransactionFilterParams): Flow<List<CategorySum>> {
         return localDataSource.observeCategorySums(transactionFilterParams)
     }
+
+    override suspend fun addFixedExpenseTransactionWithBalance(
+        request: FixedExpensePostingRequest,
+        transaction: Transaction
+    ): Long = localDataSource.addFixedExpenseTransactionWithBalance(request, transaction)
 
     override suspend fun addTransactionWithBalance(
         transaction: Transaction,

@@ -7,6 +7,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.FixedExpensePostingRequest
 import com.kazemieh.common.model.SMS_IGNORED_RETENTION_MILLIS
 import com.kazemieh.common.model.CategorySum
 import com.kazemieh.common.model.Page
@@ -21,6 +22,7 @@ import com.kazemieh.common.model.TransactionWithRelations
 import com.kazemieh.data_contract.datasource.TransactionLocalDataSource
 import com.kazemieh.database.FinTrackDatabase
 import com.kazemieh.database.mapper.toCategory
+import com.kazemieh.database.mapper.toFixedExpense
 import com.kazemieh.database.mapper.toCategorySum
 import com.kazemieh.database.mapper.toPerson
 import com.kazemieh.database.mapper.toSource
@@ -689,6 +691,59 @@ class TransactionLocalDataSourceImpl(
                 updatedAt = person.updatedAt,
                 syncStatus = person.syncStatus.value.toLong()
             )
+        }
+    }
+
+    override suspend fun addFixedExpenseTransactionWithBalance(
+        request: FixedExpensePostingRequest,
+        transaction: Transaction
+    ): Long = withContext(Dispatchers.Default) {
+        db.transactionWithResult {
+            if (request.operationId.isBlank() || request.expense.id <= 0L) return@transactionWithResult 0L
+            val receipts = db.fixedExpensePostingQueries
+            if (receipts.getPostingByOperationId(request.operationId).awaitAsOneOrNull() != null)
+                return@transactionWithResult 0L
+            val current = db.fixedExpenseQueries.getFixedExpenseById(request.expense.id)
+                .awaitAsOneOrNull()?.toFixedExpense() ?: return@transactionWithResult 0L
+            val expected = request.expense.copy(categoryName = null, sourceName = null,
+                tagIds = emptyList(), tagNames = emptyList(), personIds = emptyList(), personNames = emptyList())
+            if (expected != current) return@transactionWithResult 0L
+            val primary = receipts.getPostingsForExpense(current.id).awaitAsList()
+                .any { it.periodDueDate == request.periodDueDate && it.isRepeat == 0L }
+            if (request.isRepeat) {
+                if (!primary) return@transactionWithResult 0L
+            } else {
+                if (primary || !current.isActive || request.periodDueDate != current.nextDueDate)
+                    return@transactionWithResult 0L
+                if (request.nextDueDate < current.nextDueDate ||
+                    (request.nextIsActive && request.nextDueDate <= current.nextDueDate)) return@transactionWithResult 0L
+            }
+            if (transaction.id != 0L || transaction.type != TransactionType.EXPENSE ||
+                transaction.amount <= 0 || transaction.amount != current.amount ||
+                transaction.currencyCode != current.currencyCode || transaction.sourceEndId != null ||
+                transaction.relatedDebtId != null || transaction.amountTransfer != 0L ||
+                transaction.description != (current.description ?: current.title)) return@transactionWithResult 0L
+            val category = categoryQueries.getCategoryById(transaction.categoryId).awaitAsOneOrNull()
+            if (category == null || category.syncStatus == 2L || category.type != TransactionType.EXPENSE.count.toLong() ||
+                (current.categoryId != 0L && category.id != current.categoryId) ||
+                (current.categoryId == 0L && category.isDefault != 1L)) return@transactionWithResult 0L
+            val source = sourceQueries.getSourceById(transaction.sourceId).awaitAsOneOrNull()
+            if (source == null || source.syncStatus == 2L || source.currencyCode != transaction.currencyCode ||
+                (current.sourceId != 0L && source.id != current.sourceId) ||
+                (current.sourceId == 0L && source.isDefault != 1L) ||
+                source.balance < Long.MIN_VALUE + transaction.amount) return@transactionWithResult 0L
+            val tags = db.fixedExpenseTagQueries.getTagsForFixedExpense(current.id).awaitAsList().map { it.id }.toSet()
+            val persons = db.fixedExpensePersonQueries.getPersonsForFixedExpense(current.id).awaitAsList().map { it.id }.toSet()
+            if (tags != request.expense.tagIds.toSet() || persons != request.expense.personIds.toSet())
+                return@transactionWithResult 0L
+            val id = insertTransactionWithBalance(transaction, tags.toList(), persons.toList(),
+                mapOf(transaction.sourceId to -transaction.amount))
+            if (!request.isRepeat) db.fixedExpenseQueries.completePosting(request.nextDueDate,
+                if (request.nextIsActive) 1L else 0L, transaction.timeStamp, current.id)
+            // Last write deliberately owns the uniqueness claim; failure rolls all prior writes back.
+            receipts.insertPosting(request.operationId, current.id, request.periodDueDate, id,
+                transaction.timeStamp, if (request.isRepeat) 1L else 0L)
+            id
         }
     }
 

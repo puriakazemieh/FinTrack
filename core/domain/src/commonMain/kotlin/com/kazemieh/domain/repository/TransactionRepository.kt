@@ -1,6 +1,7 @@
 package com.kazemieh.domain.repository
 
 import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.FixedExpensePostingRequest
 import com.kazemieh.common.model.CategorySum
 import com.kazemieh.common.model.Page
 import com.kazemieh.common.model.PageRequest
@@ -14,6 +15,10 @@ import com.kazemieh.common.model.TransactionWithRelations
 import kotlinx.coroutines.flow.Flow
 
 interface TransactionRepository {
+
+    /** Atomically inserts the financial transaction, receipt and next occurrence.
+     * Returns 0 for an already posted operation/period or a stale/ineligible snapshot. */
+    suspend fun addFixedExpenseTransactionWithBalance(request: FixedExpensePostingRequest, transaction: Transaction): Long
 
     /** Atomically creates the transaction, applies balances and consumes one unused draft.
      * Returns 0 when the draft or its financial selection is no longer eligible. */

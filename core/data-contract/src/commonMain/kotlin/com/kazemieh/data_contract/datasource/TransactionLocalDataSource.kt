@@ -1,6 +1,7 @@
 package com.kazemieh.data_contract.datasource
 
 import com.kazemieh.common.model.Category
+import com.kazemieh.common.model.FixedExpensePostingRequest
 import com.kazemieh.common.model.CategorySum
 import com.kazemieh.common.model.Page
 import com.kazemieh.common.model.PageRequest
@@ -14,6 +15,8 @@ import com.kazemieh.common.model.TransactionWithRelations
 import kotlinx.coroutines.flow.Flow
 
 interface TransactionLocalDataSource {
+
+    suspend fun addFixedExpenseTransactionWithBalance(request: FixedExpensePostingRequest, transaction: Transaction): Long
 
     suspend fun addSmsTransactionWithBalance(
         smsDraftId: Long,

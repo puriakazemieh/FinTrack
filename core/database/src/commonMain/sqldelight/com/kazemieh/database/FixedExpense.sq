@@ -92,6 +92,9 @@ ORDER BY f.nextDueDate ASC;
 updateNextDueDate:
 UPDATE fixed_expense SET nextDueDate = ?, updatedAt = ?, syncStatus = ? WHERE id = ?;
 
+completePosting:
+UPDATE fixed_expense SET nextDueDate = ?, isActive = ?, updatedAt = ?, syncStatus = 1 WHERE id = ?;
+
 lastInsertRowId:
 SELECT last_insert_rowid();
 
