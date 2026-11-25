@@ -4,8 +4,10 @@ import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.kazemieh.common.model.FixedExpense
+import com.kazemieh.common.model.FixedExpensePosting
 import com.kazemieh.data_contract.datasource.FixedExpenseLocalDataSource
 import com.kazemieh.database.FinTrackDatabase
+import com.kazemieh.database.Fixed_expense_posting
 import com.kazemieh.database.mapper.toFixedExpense
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -139,25 +141,72 @@ class FixedExpenseLocalDataSourceImpl(
 
     override suspend fun insertFullFixedExpense(expense: FixedExpense) {
         withContext(Dispatchers.Default) {
-            queries.insertFullFixedExpense(
-                id = expense.id,
-                title = expense.title,
-                amount = expense.amount,
-                categoryId = expense.categoryId,
-                sourceId = expense.sourceId,
-                description = expense.description,
-                recurrence = expense.recurrence.name,
-                startDate = expense.startDate,
-                nextDueDate = expense.nextDueDate,
-                endDate = expense.endDate,
-                isAutoPostEnabled = if (expense.isAutoPostEnabled) 1L else 0L,
-                isActive = if (expense.isActive) 1L else 0L,
-                updatedAt = expense.updatedAt,
-                syncStatus = expense.syncStatus.value.toLong(),
-                currencyCode = expense.currencyCode,
-                reminderEnabled = if (expense.reminderEnabled) 1L else 0L,
-                reminderTime = expense.reminderTime,
-            )
+            database.transaction {
+                // REPLACE deletes the old row and cascades its existing relations.
+                if (queries.fixedExpenseExistsIncludingDeleted(expense.id).executeAsOne() > 0L) {
+                    queries.updateFixedExpense(
+                        id = expense.id, title = expense.title, amount = expense.amount,
+                        categoryId = expense.categoryId, sourceId = expense.sourceId,
+                        description = expense.description, recurrence = expense.recurrence.name,
+                        startDate = expense.startDate, nextDueDate = expense.nextDueDate, endDate = expense.endDate,
+                        isAutoPostEnabled = if (expense.isAutoPostEnabled) 1L else 0L,
+                        isActive = if (expense.isActive) 1L else 0L,
+                        updatedAt = expense.updatedAt, syncStatus = expense.syncStatus.value.toLong(),
+                        currencyCode = expense.currencyCode,
+                        reminderEnabled = if (expense.reminderEnabled) 1L else 0L,
+                        reminderTime = expense.reminderTime
+                    )
+                } else {
+                    queries.insertFullFixedExpense(
+                        id = expense.id,
+                        title = expense.title,
+                        amount = expense.amount,
+                        categoryId = expense.categoryId,
+                        sourceId = expense.sourceId,
+                        description = expense.description,
+                        recurrence = expense.recurrence.name,
+                        startDate = expense.startDate,
+                        nextDueDate = expense.nextDueDate,
+                        endDate = expense.endDate,
+                        isAutoPostEnabled = if (expense.isAutoPostEnabled) 1L else 0L,
+                        isActive = if (expense.isActive) 1L else 0L,
+                        updatedAt = expense.updatedAt,
+                        syncStatus = expense.syncStatus.value.toLong(),
+                        currencyCode = expense.currencyCode,
+                        reminderEnabled = if (expense.reminderEnabled) 1L else 0L,
+                        reminderTime = expense.reminderTime,
+                    )
+                }
+            }
+        }
+    }
+
+    override fun observeFixedExpensePostings(): Flow<List<FixedExpensePosting>> =
+        database.fixedExpensePostingQueries.observeAllPostings().asFlow().mapToList(Dispatchers.Default)
+            .map { rows -> rows.map { it.toPosting() } }
+
+    override suspend fun getFixedExpensePostings(expenseId: Long): List<FixedExpensePosting> =
+        withContext(Dispatchers.Default) {
+            database.fixedExpensePostingQueries.getPostingsForExpense(expenseId).awaitAsList().map { it.toPosting() }
+        }
+
+    override suspend fun getAllFixedExpensePostings(): List<FixedExpensePosting> = withContext(Dispatchers.Default) {
+        database.fixedExpensePostingQueries.observeAllPostings().awaitAsList().map { it.toPosting() }
+    }
+
+    override suspend fun insertFullFixedExpensePosting(posting: FixedExpensePosting) = withContext(Dispatchers.Default) {
+        require(posting.operationId.isNotBlank() && posting.expenseId > 0 && posting.transactionId > 0)
+        database.transaction {
+            val existing = database.fixedExpensePostingQueries.getPostingByOperationId(posting.operationId).executeAsOneOrNull()
+            if (existing != null) {
+                require(existing.toPosting() == posting) { "Conflicting fixed expense posting receipt" }
+            } else {
+                require(queries.fixedExpenseExistsIncludingDeleted(posting.expenseId).executeAsOne() > 0L) {
+                    "Missing fixed expense for posting receipt"
+                }
+                database.fixedExpensePostingQueries.insertPosting(posting.operationId, posting.expenseId,
+                    posting.periodDueDate, posting.transactionId, posting.postedAt, if (posting.isRepeat) 1L else 0L)
+            }
         }
     }
 
@@ -173,3 +222,7 @@ class FixedExpenseLocalDataSourceImpl(
         queries.physicallyDeleteFixedExpense(id)
     }
 }
+
+private fun Fixed_expense_posting.toPosting() = FixedExpensePosting(
+    operationId, expenseId, periodDueDate, transactionId, postedAt, isRepeat != 0L
+)

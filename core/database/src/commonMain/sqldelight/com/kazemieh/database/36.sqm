@@ -1,0 +1,11 @@
+-- No posting history can be inferred safely from old transactions.
+CREATE TABLE fixed_expense_posting (
+    operationId TEXT NOT NULL PRIMARY KEY CHECK (length(trim(operationId)) > 0),
+    expenseId INTEGER NOT NULL CHECK (expenseId > 0),
+    periodDueDate INTEGER NOT NULL,
+    transactionId INTEGER NOT NULL CHECK (transactionId > 0),
+    postedAt INTEGER NOT NULL,
+    isRepeat INTEGER NOT NULL DEFAULT 0 CHECK (isRepeat IN (0, 1))
+);
+CREATE UNIQUE INDEX fixed_expense_posting_primary ON fixed_expense_posting(expenseId, periodDueDate) WHERE isRepeat = 0;
+CREATE INDEX fixed_expense_posting_expense ON fixed_expense_posting(expenseId, periodDueDate);

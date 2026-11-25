@@ -18,7 +18,8 @@ data class BackupData(
     val installments: List<Installment>,
     val notes: List<Note>,
     val shoppingItems: List<ShoppingItem>,
-    val backupTimestamp: Long
+    val backupTimestamp: Long,
+    val fixedExpensePostings: List<FixedExpensePosting> = emptyList()
 )
 
 @Serializable

@@ -1,6 +1,7 @@
 package com.kazemieh.data_contract.datasource
 
 import com.kazemieh.common.model.FixedExpense
+import com.kazemieh.common.model.FixedExpensePosting
 import kotlinx.coroutines.flow.Flow
 
 interface FixedExpenseLocalDataSource {
@@ -24,4 +25,10 @@ interface FixedExpenseLocalDataSource {
     suspend fun getModifiedFixedExpenses(): List<FixedExpense>
     suspend fun markFixedExpenseAsSynced(id: Long)
     suspend fun physicallyDeleteFixedExpense(id: Long)
+
+    fun observeFixedExpensePostings(): Flow<List<FixedExpensePosting>>
+    suspend fun getFixedExpensePostings(expenseId: Long): List<FixedExpensePosting>
+    suspend fun getAllFixedExpensePostings(): List<FixedExpensePosting>
+    /** Replaying an identical receipt is harmless; conflicting content is rejected. */
+    suspend fun insertFullFixedExpensePosting(posting: FixedExpensePosting)
 }

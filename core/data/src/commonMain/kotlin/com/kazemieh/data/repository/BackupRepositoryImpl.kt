@@ -28,6 +28,8 @@ class BackupRepositoryImpl(
         } else {
             allTransactions
         }
+        val fixedExpenses = fixedExpenseLocalDataSource.getAllFixedExpenses()
+        val expenseIds = fixedExpenses.map { it.id }.toSet()
 
         return BackupData(
             transactions = filteredTransactions,
@@ -39,7 +41,8 @@ class BackupRepositoryImpl(
             budgets = budgetLocalDataSource.getAllBudgets(),
             checks = checkLocalDataSource.getAllChecks(),
             debts = debtLocalDataSource.getAllDebts(),
-            fixedExpenses = fixedExpenseLocalDataSource.getAllFixedExpenses(),
+            fixedExpenses = fixedExpenses,
+            fixedExpensePostings = fixedExpenseLocalDataSource.getAllFixedExpensePostings().filter { it.expenseId in expenseIds },
             installments = installmentLocalDataSource.getAllInstallments(),
             notes = noteLocalDataSource.getAllNotes(),
             shoppingItems = shoppingLocalDataSource.getAllShoppingItems(),
@@ -48,6 +51,8 @@ class BackupRepositoryImpl(
     }
 
     override suspend fun getDeltaBackupData(sinceTimestamp: Long): BackupData {
+        val fixedExpenses = fixedExpenseLocalDataSource.getAllFixedExpenses()
+        val expenseIds = fixedExpenses.map { it.id }.toSet()
         return BackupData(
             transactions = transactionLocalDataSource.getAllTransactions().filter { it.updatedAt > sinceTimestamp },
             categories = transactionLocalDataSource.getAllCategories().filter { it.updatedAt > sinceTimestamp },
@@ -58,7 +63,9 @@ class BackupRepositoryImpl(
             budgets = budgetLocalDataSource.getAllBudgets().filter { it.updatedAt > sinceTimestamp },
             checks = checkLocalDataSource.getAllChecks().filter { it.updatedAt > sinceTimestamp },
             debts = debtLocalDataSource.getAllDebts().filter { it.updatedAt > sinceTimestamp },
-            fixedExpenses = fixedExpenseLocalDataSource.getAllFixedExpenses().filter { it.updatedAt > sinceTimestamp },
+            fixedExpenses = fixedExpenses.filter { it.updatedAt > sinceTimestamp },
+            fixedExpensePostings = fixedExpenseLocalDataSource.getAllFixedExpensePostings()
+                .filter { it.postedAt > sinceTimestamp && it.expenseId in expenseIds },
             installments = installmentLocalDataSource.getAllInstallments().filter { it.updatedAt > sinceTimestamp },
             notes = noteLocalDataSource.getAllNotes().filter { it.updatedAt > sinceTimestamp },
             shoppingItems = shoppingLocalDataSource.getAllShoppingItems().filter { it.updatedAt > sinceTimestamp },
@@ -82,6 +89,7 @@ class BackupRepositoryImpl(
         data.checks.filter { it.syncStatus != SyncStatus.DELETED }.forEach { checkLocalDataSource.insertFullCheck(it) }
         data.debts.filter { it.syncStatus != SyncStatus.DELETED }.forEach { debtLocalDataSource.insertFullDebt(it) }
         data.fixedExpenses.filter { it.syncStatus != SyncStatus.DELETED }.forEach { fixedExpenseLocalDataSource.insertFullFixedExpense(it) }
+        data.fixedExpensePostings.forEach { fixedExpenseLocalDataSource.insertFullFixedExpensePosting(it) }
         data.installments.filter { it.syncStatus != SyncStatus.DELETED }.forEach { installmentLocalDataSource.insertFullInstallment(it) }
         data.notes.filter { it.syncStatus != SyncStatus.DELETED }.forEach { noteLocalDataSource.insertFullNote(it) }
         data.shoppingItems.filter { it.syncStatus != SyncStatus.DELETED }.forEach { shoppingLocalDataSource.insertFullShoppingItem(it) }

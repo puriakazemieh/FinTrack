@@ -41,6 +41,9 @@ DELETE FROM fixed_expense WHERE id = ?;
 getFixedExpenseById:
 SELECT * FROM fixed_expense WHERE id = ? AND syncStatus != 2;
 
+fixedExpenseExistsIncludingDeleted:
+SELECT count(*) FROM fixed_expense WHERE id = ?;
+
 observeAllFixedExpenses:
 SELECT
     f.*,
