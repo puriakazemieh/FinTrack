@@ -107,7 +107,7 @@ val domainModule = module {
     factory { ObserveChecksByStatusUseCase(get()) }
 
     factory { AddFixedExpenseUseCase(get(), get()) }
-    factory { UpdateFixedExpenseUseCase(get()) }
+    factory { UpdateFixedExpenseUseCase(get(), get()) }
     factory { DeleteFixedExpenseUseCase(get(), get()) }
     factory { GetFixedExpenseByIdUseCase(get()) }
     factory { GetDebtByIdUseCase(get()) }

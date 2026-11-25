@@ -3,6 +3,7 @@ package com.kazemieh.domain.usecase
 import com.kazemieh.common.model.*
 import com.kazemieh.domain.notification.NotificationManager
 import com.kazemieh.domain.notification.NotificationScheduler
+import com.kazemieh.domain.notification.fixedExpenseReminderTime
 import com.kazemieh.domain.repository.FixedExpenseRepository
 import com.kazemieh.common.persiandatetime.extensions.plus
 import com.kazemieh.common.persiandatetime.extensions.toDateString
@@ -15,30 +16,46 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
+private fun scheduleFixedExpenseReminder(
+    expense: FixedExpense,
+    scheduler: NotificationScheduler,
+    title: String,
+    message: String
+) {
+    val reminderTime = fixedExpenseReminderTime(expense) ?: return
+    scheduler.scheduleReminder(
+        id = "fixed_expense_${expense.id}",
+        title = title.ifBlank { expense.title },
+        message = message.ifBlank { expense.title },
+        scheduledTime = Instant.fromEpochMilliseconds(reminderTime).toLocalDateTime(TimeZone.currentSystemDefault()),
+        channelId = NotificationManager.CHANNEL_FIXED_EXPENSE,
+        extraId = expense.id
+    )
+}
+
 class AddFixedExpenseUseCase(
     private val repository: FixedExpenseRepository,
     private val notificationScheduler: NotificationScheduler
 ) {
     suspend operator fun invoke(expense: FixedExpense, reminderTitle: String, reminderMessage: String) {
         val id = repository.insertFixedExpense(expense)
-        scheduleReminder(expense.copy(id = id), reminderTitle, reminderMessage)
-    }
-
-    private fun scheduleReminder(expense: FixedExpense, title: String, message: String) {
-        val nextDueInstant = Instant.fromEpochMilliseconds(expense.nextDueDate)
-        notificationScheduler.scheduleReminder(
-            id = "fixed_expense_${expense.id}",
-            title = title,
-            message = message,
-            scheduledTime = nextDueInstant.toLocalDateTime(TimeZone.currentSystemDefault()),
-            channelId = NotificationManager.CHANNEL_FIXED_EXPENSE,
-            extraId = expense.id
-        )
+        scheduleFixedExpenseReminder(expense.copy(id = id), notificationScheduler, reminderTitle, reminderMessage)
     }
 }
 
-class UpdateFixedExpenseUseCase(private val repository: FixedExpenseRepository) {
-    suspend operator fun invoke(expense: FixedExpense) = repository.updateFixedExpense(expense)
+class UpdateFixedExpenseUseCase(
+    private val repository: FixedExpenseRepository,
+    private val notificationScheduler: NotificationScheduler
+) {
+    suspend operator fun invoke(
+        expense: FixedExpense,
+        reminderTitle: String = expense.title,
+        reminderMessage: String = expense.title
+    ) {
+        repository.updateFixedExpense(expense)
+        notificationScheduler.cancelReminder("fixed_expense_${expense.id}")
+        scheduleFixedExpenseReminder(expense, notificationScheduler, reminderTitle, reminderMessage)
+    }
 }
 
 class DeleteFixedExpenseUseCase(
