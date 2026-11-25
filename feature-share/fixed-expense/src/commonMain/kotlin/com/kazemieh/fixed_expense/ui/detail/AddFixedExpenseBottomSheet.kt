@@ -68,6 +68,7 @@ import com.kazemieh.common.toPersianDigits
 import com.kazemieh.designsystem.GlassBlue
 import com.kazemieh.designsystem.GlassGreen
 import com.kazemieh.designsystem.GlassGreenDark
+import com.kazemieh.designsystem.component.model.asString
 import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.FintrackBodyMediumText
 import com.kazemieh.designsystem.component.FintrackLabelMediumText
@@ -143,6 +144,7 @@ fun AddFixedExpenseBottomSheet(
     viewModel: AddFixedExpenseViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isTargetReady = state.expenseId == expenseId
     val titleFocusRequester = remember { FocusRequester() }
     var titleFocusRequested by rememberSaveable(expenseId) { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -187,13 +189,17 @@ fun AddFixedExpenseBottomSheet(
     ) {
         Box {
             AddFrame(
-                title = if (state.expenseId == null) stringResource(Res.string.title_add_fixed_expense)
+                title = if (expenseId == null) stringResource(Res.string.title_add_fixed_expense)
                 else stringResource(Res.string.edit),
                 primaryLabel = stringResource(Res.string.save_),
+                primaryEnabled = isTargetReady && !state.isLoading && !state.isUnavailable,
+                isLoading = state.isLoading || !isTargetReady,
+                feedbackText = if (isTargetReady) state.loadError?.asString() else null,
                 onPrimaryClick = { viewModel.onIntent(AddFixedExpenseIntent.Submit) },
                 onClose = onDismiss,
                 showHero = false
             ) {
+                if (!isTargetReady || state.isLoading || state.isUnavailable) return@AddFrame
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(10.dp),

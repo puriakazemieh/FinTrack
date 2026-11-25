@@ -1580,4 +1580,6 @@
     <string name="source_balance_total_label">Summe %1$s</string>
     <string name="entity_save_failed">Speichern fehlgeschlagen. Bitte erneut versuchen.</string>
     <string name="error_reminder_must_be_future">Wähle eine Erinnerungszeit in der Zukunft.</string>
+    <string name="fixed_expense_not_found">Diese feste Ausgabe wurde nicht gefunden oder gelöscht.</string>
+    <string name="fixed_expense_load_failed">Die feste Ausgabe konnte nicht geladen werden. Bitte versuche es erneut.</string>
 </resources>

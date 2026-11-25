@@ -46,8 +46,8 @@ class FixedExpenseFormInstrumentation : Instrumentation() {
             }
             lateinit var vm: AddFixedExpenseViewModel
             runOnMainSync { vm = getKoin().get<AddFixedExpenseViewModel>(); vm.onIntent(AddFixedExpenseIntent.LoadExpense(id!!)) }
-            repeat(100) { if (vm.state.value.expenseId != id) Thread.sleep(100) }
-            check(vm.state.value.expenseId == id) { "Form did not load" }
+            repeat(100) { if (vm.state.value.expenseId != id || vm.state.value.title != original.title) Thread.sleep(100) }
+            check(vm.state.value.expenseId == id && vm.state.value.title == original.title) { "Form did not load" }
             runOnMainSync {
                 vm.onIntent(AddFixedExpenseIntent.SetDescription("QA description-only edit"))
                 vm.onIntent(AddFixedExpenseIntent.Submit)

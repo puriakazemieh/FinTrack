@@ -1620,4 +1620,6 @@
     <string name="source_balance_total_label">مجموع %1$s</string>
     <string name="entity_save_failed">ذخیره انجام نشد. دوباره تلاش کنید.</string>
     <string name="error_reminder_must_be_future">زمان یادآور باید در آینده باشد.</string>
+    <string name="fixed_expense_not_found">هزینهٔ ثابت پیدا نشد یا حذف شده است.</string>
+    <string name="fixed_expense_load_failed">بارگذاری هزینهٔ ثابت انجام نشد. دوباره تلاش کنید.</string>
 </resources>

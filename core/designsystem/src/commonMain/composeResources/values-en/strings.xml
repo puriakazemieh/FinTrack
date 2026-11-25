@@ -1592,4 +1592,6 @@
     <string name="source_balance_total_label">Total %1$s</string>
     <string name="entity_save_failed">Could not save. Please try again.</string>
     <string name="error_reminder_must_be_future">Choose a reminder time in the future.</string>
+    <string name="fixed_expense_not_found">This fixed expense was not found or has been deleted.</string>
+    <string name="fixed_expense_load_failed">The fixed expense could not be loaded. Please try again.</string>
 </resources>

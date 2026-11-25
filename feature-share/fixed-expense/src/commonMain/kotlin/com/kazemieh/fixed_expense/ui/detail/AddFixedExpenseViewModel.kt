@@ -2,6 +2,9 @@ package com.kazemieh.fixed_expense.ui.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kazemieh.designsystem.component.model.UiText
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import com.kazemieh.common.model.Category
 import com.kazemieh.common.model.FixedExpense
 import com.kazemieh.common.model.Person
@@ -45,6 +48,9 @@ class AddFixedExpenseViewModel(
     private val _state = MutableStateFlow(AddFixedExpenseState())
     val state: StateFlow<AddFixedExpenseState> = _state.asStateFlow()
 
+    private var loadGeneration = 0L
+    private var loadJob: Job? = null
+
     private val _effect = Channel<AddFixedExpenseEffect>()
     val effect: Flow<AddFixedExpenseEffect> = _effect.receiveAsFlow()
 
@@ -53,6 +59,8 @@ class AddFixedExpenseViewModel(
     }
 
     fun onIntent(intent: AddFixedExpenseIntent) {
+        if (intent !is AddFixedExpenseIntent.LoadExpense && intent != AddFixedExpenseIntent.Reset &&
+            (_state.value.isLoading || _state.value.isUnavailable)) return
         when (intent) {
             is AddFixedExpenseIntent.SetTitle -> _state.update { it.copy(title = intent.title) }
             is AddFixedExpenseIntent.SetAmount -> _state.update { it.copy(amount = intent.amount) }
@@ -111,6 +119,8 @@ class AddFixedExpenseViewModel(
     }
 
     private fun reset() {
+        ++loadGeneration
+        loadJob?.cancel()
         val now = Clock.System.now().toEpochMilliseconds()
         _state.update {
             AddFixedExpenseState(
@@ -142,34 +152,63 @@ class AddFixedExpenseViewModel(
     }
 
     private fun loadExpense(expenseId: Long) {
-        viewModelScope.launch {
-            val expense = fixedExpenseUseCases.getFixedExpenseByIdUseCase(expenseId) ?: return@launch
-            val category = getCategoryUseCase(expense.categoryId)
-            val source = getSourceByIdUseCase(expense.sourceId)
-            val tags = expense.tagIds.mapNotNull { getTagByIdUseCase(it) }
-            val persons = expense.personIds.mapNotNull { getPersonByIdUseCase(it) }
-            _state.update {
-                it.copy(
-                    expenseId = expense.id,
-                    title = expense.title,
-                    amount = expense.amount.toString(),
-                    category = category,
-                    source = source,
-                    tags = tags.toSet(),
-                    persons = persons.toSet(),
-                    recurrence = expense.recurrence,
-                    startDate = expense.startDate,
-                    baseAt = expense.startDate,
-                    endDate = expense.endDate,
-                    nextDueDate = expense.nextDueDate,
-                    isAutoPostEnabled = expense.isAutoPostEnabled,
-                    isActive = expense.isActive,
-                    currencyCode = expense.currencyCode,
-                    reminderEnabled = expense.reminderEnabled,
-                    reminderTime = expense.reminderTime,
-                    reminderEdited = false,
-                    description = expense.description ?: ""
-                )
+        val generation = ++loadGeneration
+        loadJob?.cancel()
+        _state.update {
+            AddFixedExpenseState(
+                expenseId = expenseId,
+                isLoading = true,
+                mostUsedCategories = it.mostUsedCategories,
+                mostUsedSources = it.mostUsedSources,
+                mostUsedTags = it.mostUsedTags,
+                mostUsedPersons = it.mostUsedPersons
+            )
+        }
+        loadJob = viewModelScope.launch {
+            try {
+                val expense = if (expenseId > 0) fixedExpenseUseCases.getFixedExpenseByIdUseCase(expenseId) else null
+                if (generation != loadGeneration) return@launch
+                if (expense == null) {
+                    _state.update { it.copy(isLoading = false, isUnavailable = true,
+                        loadError = UiText.StringResourceText(Res.string.fixed_expense_not_found)) }
+                    return@launch
+                }
+                val category = getCategoryUseCase(expense.categoryId)
+                val source = getSourceByIdUseCase(expense.sourceId)
+                val tags = expense.tagIds.mapNotNull { getTagByIdUseCase(it) }
+                val persons = expense.personIds.mapNotNull { getPersonByIdUseCase(it) }
+                if (generation != loadGeneration) return@launch
+                _state.update {
+                    it.copy(
+                        expenseId = expense.id,
+                        title = expense.title,
+                        amount = expense.amount.toString(),
+                        category = category,
+                        source = source,
+                        tags = tags.toSet(),
+                        persons = persons.toSet(),
+                        recurrence = expense.recurrence,
+                        startDate = expense.startDate,
+                        baseAt = expense.startDate,
+                        endDate = expense.endDate,
+                        nextDueDate = expense.nextDueDate,
+                        isAutoPostEnabled = expense.isAutoPostEnabled,
+                        isActive = expense.isActive,
+                        currencyCode = expense.currencyCode,
+                        reminderEnabled = expense.reminderEnabled,
+                        reminderTime = expense.reminderTime,
+                        reminderEdited = false,
+                        description = expense.description ?: "",
+                        isLoading = false
+                    )
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                if (generation == loadGeneration) _state.update {
+                    it.copy(isLoading = false, isUnavailable = true,
+                        loadError = UiText.StringResourceText(Res.string.fixed_expense_load_failed))
+                }
             }
         }
     }
@@ -300,7 +339,10 @@ data class AddFixedExpenseState(
     val mostUsedCategories: List<Category> = emptyList(),
     val mostUsedSources: List<Source> = emptyList(),
     val mostUsedTags: List<Tag> = emptyList(),
-    val mostUsedPersons: List<Person> = emptyList()
+    val mostUsedPersons: List<Person> = emptyList(),
+    val isLoading: Boolean = false,
+    val isUnavailable: Boolean = false,
+    val loadError: UiText? = null
 )
 
 sealed interface AddFixedExpenseIntent {
