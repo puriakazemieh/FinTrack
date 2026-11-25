@@ -96,6 +96,9 @@ sealed class Screen {
     data object FixedExpense : Screen()
 
     @Serializable
+    data class FixedExpenseEdit(val expenseId: Long) : Screen()
+
+    @Serializable
     data object Assets : Screen()
 
     @Serializable

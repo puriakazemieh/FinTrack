@@ -255,7 +255,8 @@ class AndroidNotificationManager(
         val tag = notificationTag(channelId, id, recordId)
         val defaultUri = when (channelId) {
             NotificationManager.CHANNEL_INSTALLMENT -> "fintrack://installment"
-            NotificationManager.CHANNEL_FIXED_EXPENSE -> "fintrack://fixed-expense"
+            NotificationManager.CHANNEL_FIXED_EXPENSE -> recordId?.let { "fintrack://fixed-expense/detail?expenseId=$it" }
+                ?: "fintrack://fixed-expense"
             NotificationManager.CHANNEL_BUDGET -> "fintrack://budget"
             NotificationManager.CHANNEL_SHOPPING -> "fintrack://shopping"
             NotificationManager.CHANNEL_NOTE -> recordId?.let { "fintrack://note?noteId=$it" } ?: "fintrack://notes"

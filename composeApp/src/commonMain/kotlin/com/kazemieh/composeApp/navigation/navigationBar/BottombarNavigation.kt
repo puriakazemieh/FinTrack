@@ -360,6 +360,16 @@ fun NavGraphBuilder.bottomBarNavGraph(navController: NavHostController) {
             )
         }
 
+        composable<Screen.FixedExpenseEdit>(
+            deepLinks = listOf(navDeepLink { uriPattern = "fintrack://fixed-expense/detail?expenseId={expenseId}" })
+        ) { backStackEntry ->
+            val args = backStackEntry.toRoute<Screen.FixedExpenseEdit>()
+            FixedExpenseListScreen(
+                onBack = { navController.popBackStack() },
+                initialExpenseId = args.expenseId
+            )
+        }
+
         composable<Screen.Assets> {
             AssetsListScreen(
                 onAddAsset = { id: Long? -> navController.navigate(Screen.AddAsset(id)) },

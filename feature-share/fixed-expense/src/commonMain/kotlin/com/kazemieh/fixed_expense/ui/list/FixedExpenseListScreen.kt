@@ -15,6 +15,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,11 +60,12 @@ private val SECTION_ORDER = listOf(
 @Composable
 fun FixedExpenseListScreen(
     onBack: () -> Unit,
-    viewModel: FixedExpenseListViewModel = koinViewModel()
+    viewModel: FixedExpenseListViewModel = koinViewModel(),
+    initialExpenseId: Long? = null
 ) {
-    val state by viewModel.state.collectAsState()
-    var showAddExpense by remember { mutableStateOf(false) }
-    var selectedExpenseId by remember { mutableStateOf<Long?>(null) }
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    var showAddExpense by rememberSaveable(initialExpenseId) { mutableStateOf(initialExpenseId != null) }
+    var selectedExpenseId by rememberSaveable(initialExpenseId) { mutableStateOf(initialExpenseId) }
     val glassColors = LocalGlassColors.current
     val snackbarHostState = remember { SnackbarHostState() }
 
