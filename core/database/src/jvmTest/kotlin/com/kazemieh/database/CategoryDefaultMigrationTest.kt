@@ -90,7 +90,8 @@ class CategoryDefaultMigrationTest {
             data.addTransactionWithBalance(Transaction(id=0,amount=100,categoryId=4,sourceId=1,
                 currencyCode="IRT",type=TransactionType.EXPENSE),emptyList(),emptyList(),mapOf(1L to -100L))
         }
-        fun migrate() { FinTrackDatabase.Schema.synchronous().migrate(driver,34,FinTrackDatabase.Schema.version) }
+        // This fixture replays category normalization only; later migrations have separate fixtures.
+        fun migrate() { FinTrackDatabase.Schema.synchronous().migrate(driver,34,35) }
         fun activeDefaults(): List<Long> = DriverManager.getConnection(url).use { c ->
             c.createStatement().use { s -> s.executeQuery("SELECT id FROM category WHERE syncStatus!=2 AND isDefault=1 ORDER BY id").use { r ->
                 buildList { while(r.next()) add(r.getLong(1)) }

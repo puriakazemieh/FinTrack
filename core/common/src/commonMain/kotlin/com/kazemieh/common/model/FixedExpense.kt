@@ -25,7 +25,10 @@ data class FixedExpense(
     val personNames: List<String> = emptyList(),
     val currencyCode: String = "IRT",
     override val updatedAt: Long = 0,
-    override val syncStatus: SyncStatus = SyncStatus.SYNCED
+    override val syncStatus: SyncStatus = SyncStatus.SYNCED,
+    // Older records and backups always scheduled reminders. Keep that behavior by default.
+    val reminderEnabled: Boolean = true,
+    val reminderTime: Long? = null
 ) : SyncableEntity
 
 enum class RecurrenceType {

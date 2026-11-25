@@ -1,0 +1,3 @@
+-- Existing expenses had unconditional reminders; preserve them during upgrade.
+ALTER TABLE fixed_expense ADD COLUMN reminderEnabled INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE fixed_expense ADD COLUMN reminderTime INTEGER;
