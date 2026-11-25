@@ -33,3 +33,6 @@ docs/plans/2026-11-17-fintrack-sms-header-addendum.md
 
 
 ادامهٔ ۲۵ نوامبر ۲۰۲۶: FIX-01b3 فرم نیز تکمیل شده است؛ مدرک آن در 2026-11-25-fintrack-fixed-expense-reminder-form-results.md است. fixture4 با عنوان QA Reminder Form،7000IRT، دسته6/منبع3، یادآور خاموش و زمان1795676700000 در امولاتور باقی است و job فعال ندارد. قدم بعد کنترل Worker با رکورد تازه و سپس QA-N9/FIX-02 است؛ نتیجهٔ ENQUEUED را تحویل اعلان حساب نکن.
+
+
+ادامهٔ ۲۵ نوامبر ۲۰۲۶: FIX-01b4 منطق تحویل و زبان شروع سرد با104 تست دامنه و23 سناریوی Android تکمیل شد؛ مدرک در 2026-11-25-fintrack-fixed-expense-delivery-results.md است. اولین ادامهٔ همین بسته FIX-01b5 مقصد همان رکورد است: defaultUri فعلی هزینهٔ ثابت هنوز به فهرست عمومی می‌رود. هیچ fixture تازهٔ b4 نمانده و هزینه4 قبلی همچنان خاموش است. activeNotifications را شاهد بنر/صدا حساب نکن؛ QA-N9 و FIX-02 بازند.

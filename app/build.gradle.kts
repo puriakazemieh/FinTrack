@@ -89,6 +89,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:domain"))
+    implementation(project(":core:preferences"))
     implementation(project(":feature-share:notifications"))
     implementation(project(":feature-share:widget"))
     implementation(project(":feature-share:sync"))
