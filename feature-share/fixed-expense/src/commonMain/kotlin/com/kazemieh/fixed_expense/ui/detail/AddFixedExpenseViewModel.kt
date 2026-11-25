@@ -68,6 +68,14 @@ class AddFixedExpenseViewModel(
                 it.copy(startDate = intent.startDate, baseAt = intent.startDate)
             }
             is AddFixedExpenseIntent.SetEndDate -> _state.update { it.copy(endDate = intent.endDate) }
+            is AddFixedExpenseIntent.SetReminderEnabled -> _state.update {
+                it.copy(reminderEnabled = intent.enabled, reminderEdited = true,
+                    reminderTime = it.reminderTime ?: if (intent.enabled)
+                        (Clock.System.now().toEpochMilliseconds() / 60_000L + 60L) * 60_000L else null)
+            }
+            is AddFixedExpenseIntent.SetReminderTime -> _state.update {
+                it.copy(reminderTime = intent.time, reminderEdited = true)
+            }
             is AddFixedExpenseIntent.SetAutoPost -> _state.update { it.copy(isAutoPostEnabled = intent.enabled) }
             is AddFixedExpenseIntent.SetDescription -> _state.update { it.copy(description = intent.description) }
             is AddFixedExpenseIntent.SetTags -> _state.update { it.copy(tags = intent.tags) }
@@ -156,6 +164,10 @@ class AddFixedExpenseViewModel(
                     nextDueDate = expense.nextDueDate,
                     isAutoPostEnabled = expense.isAutoPostEnabled,
                     isActive = expense.isActive,
+                    currencyCode = expense.currencyCode,
+                    reminderEnabled = expense.reminderEnabled,
+                    reminderTime = expense.reminderTime,
+                    reminderEdited = false,
                     description = expense.description ?: ""
                 )
             }
@@ -180,6 +192,9 @@ class AddFixedExpenseViewModel(
                 nextDueDate = currentState.nextDueDate,
                 isAutoPostEnabled = currentState.isAutoPostEnabled,
                 isActive = currentState.isActive,
+                currencyCode = currentState.currencyCode,
+                reminderEnabled = currentState.reminderEnabled,
+                reminderTime = currentState.reminderTime,
                 description = currentState.description,
                 tagIds = currentState.tags.mapNotNull { it.id },
                 personIds = currentState.persons.mapNotNull { it.id }
@@ -208,6 +223,12 @@ class AddFixedExpenseViewModel(
         
         if (amountValue == null) return
 
+        if (currentState.reminderEnabled && currentState.reminderEdited &&
+            (currentState.reminderTime ?: 0L) <= Clock.System.now().toEpochMilliseconds()) {
+            viewModelScope.launch { _effect.send(AddFixedExpenseEffect.Error(Res.string.error_reminder_must_be_future)) }
+            return
+        }
+
         if (currentState.isAutoPostEnabled && currentState.category == null) {
             viewModelScope.launch { _effect.send(AddFixedExpenseEffect.Error(Res.string.error_category_required_for_auto_post)) }
             return
@@ -229,17 +250,20 @@ class AddFixedExpenseViewModel(
                 nextDueDate = if (currentState.expenseId != null) currentState.nextDueDate else currentState.startDate,
                 isAutoPostEnabled = currentState.isAutoPostEnabled,
                 isActive = currentState.isActive,
+                currencyCode = currentState.currencyCode,
+                reminderEnabled = currentState.reminderEnabled,
+                reminderTime = currentState.reminderTime,
                 description = currentState.description,
                 tagIds = currentState.tags.mapNotNull { it.id },
                 personIds = currentState.persons.mapNotNull { it.id }
             )
-            val reminderTitle = getString(Res.string.notif_installment_label)
+            val reminderTitle = getString(Res.string.notif_fixed_expense_label)
             val reminderMessage = getString(
                 Res.string.msg_notif_fixed_expense_due,
-                currentState.category?.name ?: ""
+                currentState.title
             )
             if (currentState.expenseId != null) {
-                fixedExpenseUseCases.updateFixedExpenseUseCase(expense)
+                fixedExpenseUseCases.updateFixedExpenseUseCase(expense, reminderTitle, reminderMessage)
                 analytics.track(com.kazemieh.common.analytics.ProductEvent.FixedExpenseUpdated)
             } else {
                 fixedExpenseUseCases.addFixedExpenseUseCase(expense, reminderTitle, reminderMessage)
@@ -266,6 +290,10 @@ data class AddFixedExpenseState(
     val nextDueDate: Long = Clock.System.now().toEpochMilliseconds(),
     val isAutoPostEnabled: Boolean = false,
     val isActive: Boolean = true,
+    val currencyCode: String = "IRT",
+    val reminderEnabled: Boolean = false,
+    val reminderTime: Long? = null,
+    val reminderEdited: Boolean = false,
     val description: String = "",
     val tags: Set<Tag> = emptySet(),
     val persons: Set<Person> = emptySet(),
@@ -285,6 +313,8 @@ sealed interface AddFixedExpenseIntent {
     data class SetRecurrence(val recurrence: RecurrenceType) : AddFixedExpenseIntent
     data class SetStartDate(val startDate: Long) : AddFixedExpenseIntent
     data class SetEndDate(val endDate: Long?) : AddFixedExpenseIntent
+    data class SetReminderEnabled(val enabled: Boolean) : AddFixedExpenseIntent
+    data class SetReminderTime(val time: Long) : AddFixedExpenseIntent
     data class SetAutoPost(val enabled: Boolean) : AddFixedExpenseIntent
     data class SetDescription(val description: String) : AddFixedExpenseIntent
     data class LoadExpense(val expenseId: Long) : AddFixedExpenseIntent

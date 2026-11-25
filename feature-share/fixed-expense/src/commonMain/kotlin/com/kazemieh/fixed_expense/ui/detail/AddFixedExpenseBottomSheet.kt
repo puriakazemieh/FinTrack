@@ -1,5 +1,17 @@
 package com.kazemieh.fixed_expense.ui.detail
 
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.semantics.Role
+import com.kazemieh.designsystem.component.picker.FintrackTimePickerBottomSheet
+import com.kazemieh.money.CurrencyProvider
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.toInstant
+import fintrack.core.designsystem.generated.resources.reminder
+import fintrack.core.designsystem.generated.resources.action_select_date
+import fintrack.core.designsystem.generated.resources.label_time
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -157,8 +169,12 @@ fun AddFixedExpenseBottomSheet(
 
     var showCategoryPicker by remember { mutableStateOf(false) }
     var showSourcePicker by remember { mutableStateOf(false) }
-    var showStartDatePicker by remember { mutableStateOf(false) }
-    var showEndDatePicker by remember { mutableStateOf(false) }
+    val showStartDatePicker = remember { mutableStateOf(false) }
+    val showEndDatePicker = remember { mutableStateOf(false) }
+    val showReminderDatePicker = remember { mutableStateOf(false) }
+    val showReminderTimePicker = remember { mutableStateOf(false) }
+    val reminderAt = state.reminderTime ?: state.nextDueDate
+    val reminderDateTime = Instant.fromEpochMilliseconds(reminderAt).toLocalDateTime(TimeZone.currentSystemDefault())
     var showTagPicker by remember { mutableStateOf(false) }
     var showPersonPicker by remember { mutableStateOf(false) }
     var showCalculator by remember { mutableStateOf(false) }
@@ -218,6 +234,7 @@ fun AddFixedExpenseBottomSheet(
                             amount = state.amount,
                             onAmountChange = { viewModel.onIntent(AddFixedExpenseIntent.SetAmount(it)) },
                             onCalcClick = { showCalculator = true },
+                            suffixLabel = if (state.expenseId != null) CurrencyProvider.allCurrencies.firstOrNull { it.code == state.currencyCode }?.symbol ?: state.currencyCode else null,
                             autoFocus = false
                         )
                     }
@@ -347,7 +364,7 @@ fun AddFixedExpenseBottomSheet(
                     item {
                         Field(
                             label = stringResource(Res.string.start),
-                            onClick = { showStartDatePicker = true }
+                            onClick = { showStartDatePicker.value = true }
                         ) {
                             PickerValue(
                                 label = state.startDate.toPersianDate(),
@@ -360,7 +377,7 @@ fun AddFixedExpenseBottomSheet(
                     item {
                         Field(
                             label = stringResource(Res.string.label_end_date),
-                            onClick = { showEndDatePicker = true }
+                            onClick = { showEndDatePicker.value = true }
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -379,6 +396,40 @@ fun AddFixedExpenseBottomSheet(
                                             viewModel.onIntent(AddFixedExpenseIntent.SetEndDate(null))
                                         }
                                     )
+                                }
+                            }
+                        }
+                    }
+
+                    item(key = "reminder") {
+                        GlassCard(padding = 14.dp) {
+                            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).toggleable(
+                                        value = state.reminderEnabled,
+                                        role = Role.Switch,
+                                        onValueChange = { viewModel.onIntent(AddFixedExpenseIntent.SetReminderEnabled(it)) }
+                                    ),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    FintrackBodyMediumText(text = stringResource(Res.string.reminder), fontWeight = FontWeight.SemiBold)
+                                    Switch(on = state.reminderEnabled, onToggle = {
+                                        viewModel.onIntent(AddFixedExpenseIntent.SetReminderEnabled(it))
+                                    })
+                                }
+                                if (state.reminderEnabled) {
+                                    Field(label = stringResource(Res.string.action_select_date),
+                                        onClick = { showReminderDatePicker.value = true }) {
+                                        PickerValue(label = reminderAt.toPersianDate(), icon = Icons.Default.CalendarMonth)
+                                    }
+                                    Field(label = stringResource(Res.string.label_time),
+                                        onClick = { showReminderTimePicker.value = true }) {
+                                        FintrackBodyMediumText(text = (
+                                            reminderDateTime.hour.toString().padStart(2, '0') + ":" +
+                                                reminderDateTime.minute.toString().padStart(2, '0')
+                                            ).toPersianDigits())
+                                    }
                                 }
                             }
                         }
@@ -478,32 +529,38 @@ fun AddFixedExpenseBottomSheet(
         )
     }
 
-    if (showStartDatePicker) {
-        val open = remember { mutableStateOf(true) }
-        LaunchedEffect(open.value) { if (!open.value) showStartDatePicker = false }
-        JalaliDatePickerBottomSheet(
-            openSheet = open,
-            initialDate = JalaliCalendar.fromTimestamp(state.startDate),
-            onConfirm = {
-                viewModel.onIntent(AddFixedExpenseIntent.SetStartDate(it.toTimestamp()))
-                showStartDatePicker = false
-            }
-        )
-    }
-
-    if (showEndDatePicker) {
-        val open = remember { mutableStateOf(true) }
-        LaunchedEffect(open.value) { if (!open.value) showEndDatePicker = false }
-        JalaliDatePickerBottomSheet(
-            openSheet = open,
-            initialDate = JalaliCalendar.fromTimestamp(state.endDate ?: state.startDate),
-            disableBeforeDate = JalaliCalendar.fromTimestamp(state.startDate),
-            onConfirm = {
-                viewModel.onIntent(AddFixedExpenseIntent.SetEndDate(it.toTimestamp()))
-                showEndDatePicker = false
-            }
-        )
-    }
+    JalaliDatePickerBottomSheet(
+        openSheet = showStartDatePicker,
+        initialDate = JalaliCalendar.fromTimestamp(state.startDate),
+        onConfirm = { viewModel.onIntent(AddFixedExpenseIntent.SetStartDate(it.toTimestamp())) }
+    )
+    JalaliDatePickerBottomSheet(
+        openSheet = showEndDatePicker,
+        initialDate = JalaliCalendar.fromTimestamp(state.endDate ?: state.startDate),
+        disableBeforeDate = JalaliCalendar.fromTimestamp(state.startDate),
+        onConfirm = { viewModel.onIntent(AddFixedExpenseIntent.SetEndDate(it.toTimestamp())) }
+    )
+    JalaliDatePickerBottomSheet(
+        openSheet = showReminderDatePicker,
+        initialDate = JalaliCalendar.fromTimestamp(reminderAt),
+        onConfirm = {
+            val tz = TimeZone.currentSystemDefault()
+            val date = Instant.fromEpochMilliseconds(it.toTimestamp()).toLocalDateTime(tz).date
+            viewModel.onIntent(AddFixedExpenseIntent.SetReminderTime(
+                LocalDateTime(date, reminderDateTime.time).toInstant(tz).toEpochMilliseconds()
+            ))
+        }
+    )
+    FintrackTimePickerBottomSheet(
+        openSheet = showReminderTimePicker,
+        initialTime = reminderDateTime.hour.toString().padStart(2, '0') + ":" + reminderDateTime.minute.toString().padStart(2, '0'),
+        onConfirm = { value ->
+            val time = LocalTime.parse(value)
+            viewModel.onIntent(AddFixedExpenseIntent.SetReminderTime(
+                LocalDateTime(reminderDateTime.date, time).toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+            ))
+        }
+    )
 
     if (showCalculator) {
         CalculatorBottomSheet(

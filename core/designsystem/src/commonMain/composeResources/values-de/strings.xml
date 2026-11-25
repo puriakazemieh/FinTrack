@@ -1579,4 +1579,5 @@
     <string name="source_balance_out_of_range">Summe außerhalb des Anzeigebereichs</string>
     <string name="source_balance_total_label">Summe %1$s</string>
     <string name="entity_save_failed">Speichern fehlgeschlagen. Bitte erneut versuchen.</string>
+    <string name="error_reminder_must_be_future">Wähle eine Erinnerungszeit in der Zukunft.</string>
 </resources>
