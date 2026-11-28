@@ -114,6 +114,7 @@ val domainModule = module {
     factory { GetPersonByIdUseCase(get()) }
     factory { GetSourceByIdUseCase(get()) }
     factory { ObserveAllFixedExpensesUseCase(get()) }
+    factory { ObserveFixedExpensePostingStatusUseCase(get()) }
     factory { ObserveFixedExpensesFilteredUseCase(get()) }
     factory { UpdateNextDueDateUseCase(get()) }
     factory { PostFixedExpenseAsTransactionUseCase(get(), get(), get(), get()) }
@@ -215,7 +216,8 @@ val domainModule = module {
             observeAllFixedExpensesUseCase = get(),
             observeFixedExpensesFilteredUseCase = get(),
             updateNextDueDateUseCase = get(),
-            postFixedExpenseAsTransactionUseCase = get()
+            postFixedExpenseAsTransactionUseCase = get(),
+            observeFixedExpensePostingStatusUseCase = get()
         )
     }
     single {

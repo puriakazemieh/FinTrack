@@ -476,6 +476,7 @@ open class FakeInstallmentRepository : InstallmentRepository {
 open class FakeFixedExpenseRepository : FixedExpenseRepository {
 
     val postings = mutableListOf<FixedExpensePosting>()
+    override fun observeFixedExpensePostings(): Flow<List<FixedExpensePosting>> = flowOf(postings.toList())
     override suspend fun getFixedExpensePostings(expenseId: Long): List<FixedExpensePosting> =
         postings.filter { it.expenseId == expenseId }
 

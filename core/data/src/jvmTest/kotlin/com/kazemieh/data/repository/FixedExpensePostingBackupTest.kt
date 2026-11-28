@@ -7,11 +7,18 @@ import com.kazemieh.common.model.*
 import com.kazemieh.database.FinTrackDatabase
 import com.kazemieh.database.datasource.*
 import com.kazemieh.domain.repository.BackupData
+import com.kazemieh.domain.repository.PreferenceRepository
+import com.kazemieh.domain.usecase.FixedExpensePostingStatus
+import com.kazemieh.domain.usecase.ObserveFixedExpensePostingStatusUseCase
+import java.lang.reflect.Proxy
 import java.nio.file.Files
 import java.util.Properties
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
@@ -155,6 +162,34 @@ class FixedExpensePostingBackupTest {
                 f.fixed.insertFullFixedExpensePosting(f.receipt)
                 assertEquals(listOf(f.receipt), withTimeout(5000) { updates.receive() })
             } finally { job.cancel() }
+        }
+    }
+
+    @Test fun repositoryStatusNotifiesTwoSurfacesAfterPrimaryAndRepeatAndRetainsDeletedTransactionClaim() = fixture { f ->
+        val preferences = Proxy.newProxyInstance(PreferenceRepository::class.java.classLoader,
+            arrayOf(PreferenceRepository::class.java)) { _, method, _ -> error("Read-only status accessed preference ${method.name}") }
+            as PreferenceRepository
+        val status = ObserveFixedExpensePostingStatusUseCase(FixedExpenseRepositoryImpl(f.fixed, preferences)) { 150 }
+        coroutineScope {
+            val left = Channel<FixedExpensePostingStatus>(Channel.UNLIMITED)
+            val right = Channel<FixedExpensePostingStatus>(Channel.UNLIMITED)
+            val jobs = listOf(left, right).map { channel ->
+                launch { status().map { it.getValue(1) }.distinctUntilChanged().collect { channel.send(it) } }
+            }
+            suspend fun assertBoth(expected: FixedExpensePostingStatus) {
+                for (channel in listOf(left, right)) assertEquals(expected, withTimeout(5000) { channel.receive() })
+            }
+            try {
+                assertBoth(FixedExpensePostingStatus(100, 0, false, true))
+                f.fixed.insertFullFixedExpensePosting(f.receipt)
+                assertBoth(FixedExpensePostingStatus(100, 1, true, true))
+                f.fixed.insertFullFixedExpensePosting(f.receipt.copy(operationId = "repeat", isRepeat = true))
+                assertBoth(FixedExpensePostingStatus(100, 2, true, true))
+                f.tx.physicallyDeleteTransaction(1)
+                assertEquals(FixedExpensePostingStatus(100, 2, true, true), status().first().getValue(1))
+                assertEquals(f.expense, f.fixed.getFixedExpenseById(1))
+                assertEquals(1000L, f.tx.getSourceById(1)!!.balance)
+            } finally { jobs.forEach { it.cancel() } }
         }
     }
 

@@ -194,5 +194,6 @@ data class FixedExpenseUseCaseGroup(
     val observeAllFixedExpensesUseCase: ObserveAllFixedExpensesUseCase,
     val observeFixedExpensesFilteredUseCase: ObserveFixedExpensesFilteredUseCase,
     val updateNextDueDateUseCase: UpdateNextDueDateUseCase,
-    val postFixedExpenseAsTransactionUseCase: PostFixedExpenseAsTransactionUseCase
+    val postFixedExpenseAsTransactionUseCase: PostFixedExpenseAsTransactionUseCase,
+    val observeFixedExpensePostingStatusUseCase: ObserveFixedExpensePostingStatusUseCase
 )

@@ -5,6 +5,7 @@ import com.kazemieh.common.model.FixedExpensePosting
 import kotlinx.coroutines.flow.Flow
 
 interface FixedExpenseRepository {
+    fun observeFixedExpensePostings(): Flow<List<FixedExpensePosting>>
     suspend fun getFixedExpensePostings(expenseId: Long): List<FixedExpensePosting>
     suspend fun insertFixedExpense(expense: FixedExpense): Long
     suspend fun updateFixedExpense(expense: FixedExpense)

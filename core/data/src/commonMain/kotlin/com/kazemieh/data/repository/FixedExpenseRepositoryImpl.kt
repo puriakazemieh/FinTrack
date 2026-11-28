@@ -12,6 +12,8 @@ class FixedExpenseRepositoryImpl(
     private val localDataSource: FixedExpenseLocalDataSource,
     private val preferenceRepository: PreferenceRepository
 ) : FixedExpenseRepository {
+    override fun observeFixedExpensePostings(): Flow<List<FixedExpensePosting>> =
+        localDataSource.observeFixedExpensePostings()
     override suspend fun getFixedExpensePostings(expenseId: Long): List<FixedExpensePosting> =
         localDataSource.getFixedExpensePostings(expenseId)
     override suspend fun insertFixedExpense(expense: FixedExpense): Long =
