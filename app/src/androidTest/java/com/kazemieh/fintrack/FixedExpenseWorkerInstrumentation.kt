@@ -6,14 +6,17 @@ import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import androidx.work.*
+import androidx.lifecycle.viewModelScope
 import com.kazemieh.common.model.*
 import com.kazemieh.domain.repository.FixedExpenseRepository
 import com.kazemieh.domain.repository.TransactionRepository
 import com.kazemieh.domain.usecase.GetDefaultCategoryUseCase
 import com.kazemieh.fixed_expense.FixedExpenseWorker
+import com.kazemieh.fixed_expense.ui.list.FixedExpenseListViewModel
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.cancel
 import org.json.JSONObject
 import org.koin.java.KoinJavaComponent.getKoin
 
@@ -27,6 +30,7 @@ class FixedExpenseWorkerInstrumentation : Instrumentation() {
         var source = 0L
         val expenses = mutableListOf<Long>()
         val transactions = mutableListOf<Long>()
+        val surfaces = mutableListOf<FixedExpenseListViewModel>()
         var retryAttempt = 0
         val owned = File(targetContext.filesDir, "qa-fixed-worker-owned.json")
         try {
@@ -59,6 +63,15 @@ class FixedExpenseWorkerInstrumentation : Instrumentation() {
                 val once = insert("QA-FIXED-WORKER-$marker-once", RecurrenceType.ONCE, false)
                 owned.writeText(JSONObject().put("marker", marker).put("source", source).put("trigger", trigger)
                     .put("names", org.json.JSONArray(names)).put("expenses", org.json.JSONArray(expenses)).toString())
+                runOnMainSync { repeat(2) { surfaces += getKoin().get<FixedExpenseListViewModel>() } }
+                await("both surfaces initially unposted") {
+                    surfaces.all { vm ->
+                        listOf(daily, once).all { id ->
+                            vm.state.value.expenses.any { it.id == id } &&
+                                vm.state.value.postingStatuses[id]?.let { !it.hasPrimaryPosting && it.postingCount == 0 } == true
+                        }
+                    }
+                }
                 fun current(id: Long) = runBlocking { fixed.getFixedExpenseById(id) }!!
                 fun enqueue(name: String): OneTimeWorkRequest {
                     val request = OneTimeWorkRequestBuilder<FixedExpenseWorker>()
@@ -76,6 +89,12 @@ class FixedExpenseWorkerInstrumentation : Instrumentation() {
                 check(runBlocking { fixed.getFixedExpensePostings(daily) }.map { it.periodDueDate }.toSet() ==
                     setOf(due, due + 86400000L, due + 2 * 86400000L))
                 tests++
+                await("both surfaces observe catch-up's latest period") {
+                    surfaces.all { vm -> vm.state.value.postingStatuses[daily]?.let {
+                        it.hasPrimaryPosting && it.postingCount == 1 && it.periodDueDate == due + 2 * 86400000L
+                    } == true }
+                }
+                tests++
                 val replay = enqueue(names[0])
                 await("worker replay") { info(replay).state == WorkInfo.State.SUCCEEDED }
                 check(runBlocking { tx.getTransactionCount() } == oldIds.size + 3L)
@@ -90,6 +109,9 @@ class FixedExpenseWorkerInstrumentation : Instrumentation() {
                 check(runBlocking { tx.getSourceById(source) }!!.balance == 7000L)
                 check(current(once).isActive && current(once).nextDueDate == due)
                 check(runBlocking { fixed.getFixedExpensePostings(once) }.isEmpty())
+                check(surfaces.all { vm -> vm.state.value.postingStatuses[once]?.let {
+                    !it.hasPrimaryPosting && it.postingCount == 0 && it.canRegister
+                } == true })
                 tests++
                 sql("DROP TRIGGER $trigger")
                 await("retry recovery") { info(retry).state == WorkInfo.State.SUCCEEDED }
@@ -97,19 +119,36 @@ class FixedExpenseWorkerInstrumentation : Instrumentation() {
                 check(!current(once).isActive && runBlocking { fixed.getFixedExpensePostings(once) }.size == 1)
                 check(runBlocking { tx.getSourceById(source) }!!.balance == 6000L)
                 tests++
+                await("both surfaces observe closed one-time after retry") {
+                    surfaces.all { vm ->
+                        vm.state.value.expenses.any { it.id == once && !it.isActive } &&
+                            vm.state.value.postingStatuses[once]?.let {
+                                it.hasPrimaryPosting && it.postingCount == 1 && it.periodDueDate == due && it.canRegister
+                            } == true
+                    }
+                }
+                tests++
                 runBlocking { fixed.updateFixedExpense(current(daily).copy(isAutoPostEnabled = false, nextDueDate = due)) }
                 val disabled = enqueue(names[0])
                 await("disabled automatic posting") { info(disabled).state == WorkInfo.State.SUCCEEDED }
                 check(runBlocking { tx.getTransactionCount() } == oldIds.size + 4L && current(daily).nextDueDate == due)
                 tests++
+                await("both surfaces observe disabled expense without another write") {
+                    surfaces.all { vm -> vm.state.value.expenses.any { it.id == daily && !it.isAutoPostEnabled } &&
+                        vm.state.value.postingStatuses[daily]?.let {
+                            it.hasPrimaryPosting && it.postingCount == 1 && it.periodDueDate == due
+                        } == true }
+                }
+                tests++
                 transactions += runBlocking { tx.getAllTransactions() }.filter { it.id !in oldIds }.map { it.id }
             }
         } catch (error: Throwable) { failures += error.stackTraceToString() }
         finally {
+            runOnMainSync { surfaces.forEach { it.viewModelScope.cancel() } }
             runCatching { cleanup(owned, WorkManager.getInstance(targetContext), getKoin().get()) }
                 .onFailure { failures += "cleanup: ${it.stackTraceToString()}" }
         }
-        finish(if (failures.isEmpty() && (tests == 5 || arguments.getString("mode") == "cleanup")) -1 else 0, Bundle().apply {
+        finish(if (failures.isEmpty() && (tests == 8 || arguments.getString("mode") == "cleanup")) -1 else 0, Bundle().apply {
             putInt("tests", tests); putInt("failures", failures.size); putString("failure_details", failures.joinToString("\n"))
             putLong("source_id", source); putString("expense_ids", expenses.joinToString(","))
             putString("transaction_ids", transactions.joinToString(",")); putInt("retry_attempt", retryAttempt)
