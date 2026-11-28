@@ -397,6 +397,7 @@ fun ObserveInstallments.toInstallment() = Installment(
     isCompleted = isCompleted == 1L,
     reminderEnabled = reminderEnabled == 1L,
     postAsTransaction = postAsTransaction == 1L,
+    currencyCode = currencyCode,
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )
@@ -585,6 +586,7 @@ fun GetInstallmentWithRelationsById.toInstallment() = Installment(
     isCompleted = isCompleted == 1L,
     reminderEnabled = reminderEnabled == 1L,
     postAsTransaction = postAsTransaction == 1L,
+    currencyCode = currencyCode,
     updatedAt = updatedAt,
     syncStatus = SyncStatus.fromInt(syncStatus.toInt())
 )

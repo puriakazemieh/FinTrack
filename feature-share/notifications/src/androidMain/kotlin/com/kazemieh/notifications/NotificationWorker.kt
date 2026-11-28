@@ -9,6 +9,8 @@ import org.koin.core.component.inject
 import com.kazemieh.domain.notification.NotificationManager
 import com.kazemieh.domain.notification.resolveFixedExpenseReminder
 import com.kazemieh.domain.repository.FixedExpenseRepository
+import com.kazemieh.domain.repository.InstallmentRepository
+import com.kazemieh.domain.notification.resolveInstallmentReminder
 import com.kazemieh.money.Currency
 import com.kazemieh.money.CurrencyProvider
 import com.kazemieh.money.MoneyFormatter
@@ -19,6 +21,8 @@ import com.kazemieh.domain.repository.NoteRepository
 import fintrack.core.designsystem.generated.resources.Res
 import fintrack.core.designsystem.generated.resources.notes
 import fintrack.core.designsystem.generated.resources.notif_note_private
+import fintrack.core.designsystem.generated.resources.notif_installment_title
+import fintrack.core.designsystem.generated.resources.notif_installment_desc
 import kotlinx.coroutines.flow.first
 import org.jetbrains.compose.resources.getString
 
@@ -30,6 +34,7 @@ class NotificationWorker(
     private val notificationManager: NotificationManager by inject()
     private val noteRepository: NoteRepository by inject()
     private val fixedExpenseRepository: FixedExpenseRepository by inject()
+    private val installmentRepository: InstallmentRepository by inject()
 
     override suspend fun doWork(): Result {
         var title = inputData.getString(KEY_TITLE) ?: return Result.failure()
@@ -42,6 +47,24 @@ class NotificationWorker(
         }
         val notificationId = inputData.getInt(KEY_NOTIFICATION_ID, 0)
         var extraId = inputData.getLong(KEY_EXTRA_ID, -1L)
+
+        if (channelId == NotificationManager.CHANNEL_INSTALLMENT) {
+            val recordId = extraId.takeIf { inputData.keyValueMap.containsKey(KEY_EXTRA_ID) }
+            val candidates = if (recordId == null) installmentRepository.observeInstallments().first().map { it.installment }
+                else listOfNotNull(installmentRepository.getInstallmentById(recordId))
+            val scheduled = if (inputData.keyValueMap.containsKey(KEY_SCHEDULED_TIME))
+                inputData.getLong(KEY_SCHEDULED_TIME, -1L) else null
+            val installment = resolveInstallmentReminder(candidates, recordId, notificationId, scheduled, System.currentTimeMillis())
+                ?: return Result.success()
+            val currency = CurrencyProvider.allCurrencies.firstOrNull { it.code == installment.currencyCode }
+                ?: Currency(installment.currencyCode, installment.currencyCode, installment.currencyCode)
+            notificationManager.showInstallmentNotification(notificationId,
+                getString(Res.string.notif_installment_title),
+                getString(Res.string.notif_installment_desc,
+                    "${installment.title} · ${MoneyFormatter.format(installment.installmentAmount, currency)}"),
+                installment.id)
+            return Result.success()
+        }
 
         if (channelId == NotificationManager.CHANNEL_NOTE) {
             val recordId = extraId.takeIf { inputData.keyValueMap.containsKey(KEY_EXTRA_ID) }
