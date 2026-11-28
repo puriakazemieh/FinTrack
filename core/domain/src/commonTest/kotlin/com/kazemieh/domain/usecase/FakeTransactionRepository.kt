@@ -13,6 +13,7 @@ import com.kazemieh.common.model.Debt
 import com.kazemieh.common.model.DebtWithRelations
 import com.kazemieh.common.model.FixedExpense
 import com.kazemieh.common.model.FixedExpensePostingRequest
+import com.kazemieh.common.model.FixedExpensePosting
 import com.kazemieh.common.model.Installment
 import com.kazemieh.common.model.InstallmentWithRelations
 import com.kazemieh.common.model.Page
@@ -41,9 +42,11 @@ import kotlinx.coroutines.flow.flowOf
 
 open class FakeTransactionRepository : TransactionRepository {
 
+    var fixedExpensePosting: (suspend (FixedExpensePostingRequest, Transaction) -> Long)? = null
+
     override suspend fun addFixedExpenseTransactionWithBalance(
         request: FixedExpensePostingRequest, transaction: Transaction
-    ): Long = error("Atomic fixed expense posting must be faked explicitly")
+    ): Long = checkNotNull(fixedExpensePosting) { "Atomic fixed expense posting must be faked explicitly" }(request, transaction)
 
     override suspend fun setDefaultSource(id: Long): Boolean = error("Default selection must be faked explicitly")
 
@@ -471,6 +474,10 @@ open class FakeInstallmentRepository : InstallmentRepository {
 
 
 open class FakeFixedExpenseRepository : FixedExpenseRepository {
+
+    val postings = mutableListOf<FixedExpensePosting>()
+    override suspend fun getFixedExpensePostings(expenseId: Long): List<FixedExpensePosting> =
+        postings.filter { it.expenseId == expenseId }
 
     private val fixed = mutableMapOf<Long, FixedExpense>()
 

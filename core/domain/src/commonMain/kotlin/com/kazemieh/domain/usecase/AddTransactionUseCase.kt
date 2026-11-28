@@ -1,6 +1,7 @@
 package com.kazemieh.domain.usecase
 
 import com.kazemieh.common.model.Transaction
+import com.kazemieh.common.model.FixedExpensePostingRequest
 import com.kazemieh.common.model.TransactionType
 import com.kazemieh.common.analytics.AnalyticsService
 import com.kazemieh.common.analytics.NoOpAnalyticsService
@@ -28,13 +29,21 @@ class AddTransactionUseCase(
         tagIds: List<Long>,
         personIds: List<Long>,
         smsDraftId: Long? = null,
+        fixedExpensePosting: FixedExpensePostingRequest? = null,
     ): Long {
+        require(smsDraftId == null || fixedExpensePosting == null) { "A transaction can claim only one event" }
+        if (fixedExpensePosting != null) {
+            require(tagIds.toSet() == fixedExpensePosting.expense.tagIds.toSet() &&
+                personIds.toSet() == fixedExpensePosting.expense.personIds.toSet()) { "Fixed expense relations changed" }
+        }
         if (transaction.type == TransactionType.TRANSFER && transaction.sourceId == transaction.sourceEndId) {
             throw IllegalArgumentException("Cannot transfer to the same account")
         }
 
         val impact = transaction.balanceImpact()
-        val resultId = if (smsDraftId != null) {
+        val resultId = if (fixedExpensePosting != null) {
+            repository.addFixedExpenseTransactionWithBalance(fixedExpensePosting, transaction)
+        } else if (smsDraftId != null) {
             repository.addSmsTransactionWithBalance(smsDraftId, transaction, tagIds, personIds, impact)
         } else repository.addTransactionWithBalance(transaction, tagIds, personIds, impact)
         if (resultId <= 0L) return resultId

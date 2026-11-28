@@ -1,6 +1,7 @@
 package com.kazemieh.data.repository
 
 import com.kazemieh.common.model.FixedExpense
+import com.kazemieh.common.model.FixedExpensePosting
 import com.kazemieh.data_contract.datasource.FixedExpenseLocalDataSource
 import com.kazemieh.domain.repository.FixedExpenseRepository
 import com.kazemieh.domain.repository.PreferenceRepository
@@ -11,6 +12,8 @@ class FixedExpenseRepositoryImpl(
     private val localDataSource: FixedExpenseLocalDataSource,
     private val preferenceRepository: PreferenceRepository
 ) : FixedExpenseRepository {
+    override suspend fun getFixedExpensePostings(expenseId: Long): List<FixedExpensePosting> =
+        localDataSource.getFixedExpensePostings(expenseId)
     override suspend fun insertFixedExpense(expense: FixedExpense): Long =
         localDataSource.insertFixedExpense(expense.copy(currencyCode = selectedCurrencyCode()))
     override suspend fun updateFixedExpense(expense: FixedExpense) = localDataSource.updateFixedExpense(expense)

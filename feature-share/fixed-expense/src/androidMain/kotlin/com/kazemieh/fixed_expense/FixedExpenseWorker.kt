@@ -18,6 +18,7 @@ import com.kazemieh.domain.repository.TransactionRepository
 import com.kazemieh.domain.usecase.FixedExpenseUseCaseGroup
 import fintrack.core.designsystem.generated.resources.*
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.CancellationException
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -34,21 +35,16 @@ class FixedExpenseWorker(
 
     private val fixedExpenseUseCases: FixedExpenseUseCaseGroup by inject()
 
-    override suspend fun doWork(): ListenableWorker.Result {
+    override suspend fun doWork(): ListenableWorker.Result = try {
         val now = Clock.System.now().toEpochMilliseconds()
         val expenses = fixedExpenseUseCases.observeAllFixedExpensesUseCase().first()
 
         expenses.filter { it.isActive && it.isAutoPostEnabled && it.recurrence != RecurrenceType.NONE }.forEach { expense ->
             var currentExpense = expense
             // Catch up all missed periods until nextDueDate is in the future.
-            while (currentExpense.isActive && currentExpense.nextDueDate <= now) {
-                fixedExpenseUseCases.postFixedExpenseAsTransactionUseCase(currentExpense)
-                // Reload or manually advance to continue loop if needed.
-                // Since postFixedExpenseAsTransactionUseCase updates the DB, 
-                // we should either reload from repo or use the advance logic here.
-                
-                // Better approach: use a helper that returns the updated expense.
-                // Or just reload from repository since it's a small list.
+            while (currentExpense.isActive && currentExpense.isAutoPostEnabled && currentExpense.nextDueDate <= now) {
+                fixedExpenseUseCases.postFixedExpenseAsTransactionUseCase(currentExpense,
+                    periodDueDate = currentExpense.nextDueDate, automatic = true)
                 val updated = fixedExpenseUseCases.getFixedExpenseByIdUseCase(currentExpense.id)
                 if (updated == null || !updated.isActive || updated.nextDueDate <= currentExpense.nextDueDate) {
                     break // Prevent infinite loop if something went wrong or it became inactive
@@ -57,7 +53,11 @@ class FixedExpenseWorker(
             }
         }
 
-        return ListenableWorker.Result.success()
+        ListenableWorker.Result.success()
+    } catch (error: CancellationException) {
+        throw error
+    } catch (error: Exception) {
+        ListenableWorker.Result.retry()
     }
 
     companion object {

@@ -10,6 +10,7 @@ import com.kazemieh.common.persiandatetime.extensions.toDateString
 import com.kazemieh.common.persiandatetime.extensions.toEpochMilliseconds
 import com.kazemieh.common.persiandatetime.extensions.toPersianDateTime
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -96,46 +97,68 @@ class PostFixedExpenseAsTransactionUseCase(
     private val fixedExpenseRepository: FixedExpenseRepository,
     private val addTransactionUseCase: AddTransactionUseCase,
     private val getDefaultCategoryUseCase: GetDefaultCategoryUseCase,
-    private val getDefaultFinancialSourceUseCase: GetDefaultFinancialSourceUseCase
+    private val getDefaultFinancialSourceUseCase: GetDefaultFinancialSourceUseCase,
+    private val nowMillis: () -> Long = { Clock.System.now().toEpochMilliseconds() }
 ) {
-    suspend operator fun invoke(expense: FixedExpense) {
-        if (!expense.isActive) return
-
+    suspend operator fun invoke(
+        expense: FixedExpense,
+        periodDueDate: Long? = null,
+        repeatOperationId: String? = null,
+        automatic: Boolean = false
+    ): Long {
+        if (expense.id <= 0L) return 0L
+        // Read the aggregate so persisted tag/person relations participate in the same claim.
+        val current = fixedExpenseRepository.observeAllFixedExpenses().first().find { it.id == expense.id } ?: return 0L
+        if (expense.amount != current.amount || expense.currencyCode != current.currencyCode ||
+            expense.categoryId != current.categoryId || expense.sourceId != current.sourceId) return 0L
+        val nowTs = nowMillis()
+        val postings = fixedExpenseRepository.getFixedExpensePostings(current.id)
+        val period = periodDueDate ?: resolveFixedExpensePostingPeriod(current, postings, nowTs)
+        val alreadyPosted = postings.any { !it.isRepeat && it.periodDueDate == period }
+        val repeat = repeatOperationId != null
+        if (automatic && (!current.isAutoPostEnabled || current.recurrence == RecurrenceType.NONE ||
+                repeat || period > nowTs)) return 0L
+        if (repeat) {
+            if (repeatOperationId.isNullOrBlank() || !alreadyPosted) return 0L
+        } else {
+            if (alreadyPosted || !current.isActive || period != current.nextDueDate ||
+                period < current.startDate || current.endDate?.let { period > it } == true) return 0L
+        }
         val timeZone = TimeZone.currentSystemDefault()
-        val nowTs = Clock.System.now().toEpochMilliseconds()
-
-        val finalCategoryId = if (expense.categoryId == 0L) {
+        val finalCategoryId = if (current.categoryId == 0L) {
             getDefaultCategoryUseCase(TransactionType.EXPENSE).id ?: 0L
-        } else expense.categoryId
-
-        val finalSourceId = if (expense.sourceId == 0L) {
+        } else current.categoryId
+        val finalSourceId = if (current.sourceId == 0L) {
             getDefaultFinancialSourceUseCase()?.id ?: 0L
-        } else expense.sourceId
-
+        } else current.sourceId
+        val (nextDue, nextIsActive) = if (repeat) current.nextDueDate to current.isActive else nextOccurrence(current)
+        val request = FixedExpensePostingRequest(
+            operationId = repeatOperationId ?: "fixed-expense:${current.id}:$period",
+            expense = current, periodDueDate = period, nextDueDate = nextDue,
+            nextIsActive = nextIsActive, isRepeat = repeat
+        )
         val transaction = Transaction(
             id = 0,
-            amount = expense.amount,
+            amount = current.amount,
+            currencyCode = current.currencyCode,
             categoryId = finalCategoryId,
             sourceId = finalSourceId,
-            description = expense.description ?: expense.title,
+            description = current.description ?: current.title,
             timeStamp = nowTs,
             type = TransactionType.EXPENSE,
             date = Instant.fromEpochMilliseconds(nowTs).toPersianDateTime(timeZone).toDateString()
         )
-        addTransactionUseCase(
+        return addTransactionUseCase(
             transaction = transaction,
-            tagIds = expense.tagIds,
-            personIds = expense.personIds
+            tagIds = current.tagIds,
+            personIds = current.personIds,
+            fixedExpensePosting = request
         )
-
-        if (expense.recurrence == RecurrenceType.ONCE) {
-            fixedExpenseRepository.updateFixedExpense(expense.copy(isActive = false))
-        } else {
-            advanceNextDueDate(expense)
-        }
     }
 
-    private suspend fun advanceNextDueDate(expense: FixedExpense) {
+    private fun nextOccurrence(expense: FixedExpense): Pair<Long, Boolean> {
+        if (expense.recurrence == RecurrenceType.ONCE || expense.recurrence == RecurrenceType.NONE)
+            return expense.nextDueDate to false
         val timeZone = TimeZone.currentSystemDefault()
         val currentDueDate = Instant.fromEpochMilliseconds(expense.nextDueDate).toPersianDateTime(timeZone)
 
@@ -148,15 +171,20 @@ class PostFixedExpenseAsTransactionUseCase(
             else -> currentDueDate
         }
 
-        val nextTimestamp = next.toEpochMilliseconds(timeZone)
+        // PersianDateTime retains whole seconds; keep the persisted subsecond precision.
+        val millisecond = ((expense.nextDueDate % 1000L) + 1000L) % 1000L
+        val nextTimestamp = next.toEpochMilliseconds(timeZone) + millisecond
         val endDate = expense.endDate
-        if (endDate != null && nextTimestamp > endDate) {
-            fixedExpenseRepository.updateFixedExpense(expense.copy(isActive = false))
-        } else {
-            fixedExpenseRepository.updateNextDueDate(expense.id, nextTimestamp)
-        }
+        return if (endDate != null && nextTimestamp > endDate) expense.nextDueDate to false else nextTimestamp to true
     }
 }
+
+/** Until the next due date arrives, the last posted occurrence is the UI's current period. */
+fun resolveFixedExpensePostingPeriod(expense: FixedExpense, postings: List<FixedExpensePosting>, now: Long): Long =
+    if (expense.nextDueDate > now) {
+        postings.filter { it.expenseId == expense.id && !it.isRepeat && it.periodDueDate < expense.nextDueDate }
+            .maxOfOrNull { it.periodDueDate } ?: expense.nextDueDate
+    } else expense.nextDueDate
 
 data class FixedExpenseUseCaseGroup(
     val addFixedExpenseUseCase: AddFixedExpenseUseCase,

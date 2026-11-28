@@ -68,6 +68,14 @@ class IdempotencyTest {
     fun `post fixed expense as transaction idempotency`() = runTest {
         val repo = FakeTransactionRepository()
         val fixedRepo = FakeFixedExpenseRepository()
+        repo.fixedExpensePosting = { request, transaction ->
+            val id = repo.addTransactionWithBalance(transaction, request.expense.tagIds, request.expense.personIds,
+                mapOf(transaction.sourceId to -transaction.amount))
+            fixedRepo.postings += FixedExpensePosting(request.operationId, request.expense.id,
+                request.periodDueDate, id, transaction.timeStamp, request.isRepeat)
+            fixedRepo.updateFixedExpense(request.expense.copy(nextDueDate = request.nextDueDate, isActive = request.nextIsActive))
+            id
+        }
         
         val postUseCase = PostFixedExpenseAsTransactionUseCase(
             fixedRepo,

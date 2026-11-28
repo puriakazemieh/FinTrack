@@ -1,9 +1,11 @@
 package com.kazemieh.domain.repository
 
 import com.kazemieh.common.model.FixedExpense
+import com.kazemieh.common.model.FixedExpensePosting
 import kotlinx.coroutines.flow.Flow
 
 interface FixedExpenseRepository {
+    suspend fun getFixedExpensePostings(expenseId: Long): List<FixedExpensePosting>
     suspend fun insertFixedExpense(expense: FixedExpense): Long
     suspend fun updateFixedExpense(expense: FixedExpense)
     suspend fun deleteFixedExpense(id: Long)
