@@ -1622,4 +1622,15 @@
     <string name="error_reminder_must_be_future">زمان یادآور باید در آینده باشد.</string>
     <string name="fixed_expense_not_found">هزینهٔ ثابت پیدا نشد یا حذف شده است.</string>
     <string name="fixed_expense_load_failed">بارگذاری هزینهٔ ثابت انجام نشد. دوباره تلاش کنید.</string>
+    <string name="fixed_expense_repeat_title">ثبت دوبارهٔ هزینه؟</string>
+    <string name="fixed_expense_repeat_message">برای این دوره قبلاً تراکنش ثبت شده است. با تأیید، یک تراکنش دیگر ایجاد می‌شود و سررسید دوباره جلو نمی‌رود.</string>
+    <string name="fixed_expense_repeat_action">ثبت دوباره</string>
+    <string name="fixed_expense_posting_period">دوره: %1$s</string>
+    <string name="fixed_expense_posting_count">%1$s ثبت در این دوره</string>
+    <string name="fixed_expense_not_posted">هنوز ثبت نشده</string>
+    <string name="fixed_expense_posting_busy">در حال ثبت…</string>
+    <string name="fixed_expense_post_not_applied">ثبت جدیدی انجام نشد؛ اطلاعات تغییر کرده یا این دوره قبلاً ثبت شده است.</string>
+    <string name="fixed_expense_post_failed">نتیجهٔ ثبت مشخص نشد. وضعیت را بررسی کنید و در صورت نیاز دوباره تلاش کنید.</string>
+    <string name="fixed_expense_posting_loading">در حال بررسی وضعیت ثبت…</string>
+    <string name="fixed_expense_posting_status_failed">وضعیت ثبت بارگذاری نشد. صفحه را دوباره باز کنید.</string>
 </resources>

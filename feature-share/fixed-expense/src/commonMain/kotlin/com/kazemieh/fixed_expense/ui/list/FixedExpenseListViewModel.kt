@@ -8,11 +8,15 @@ import com.kazemieh.common.DateRange
 import com.kazemieh.common.Direction
 import com.kazemieh.common.model.*
 import com.kazemieh.domain.usecase.FixedExpenseUseCaseGroup
-import fintrack.core.designsystem.generated.resources.Res
-import fintrack.core.designsystem.generated.resources.msg_fixed_expense_added_to_transactions
+import com.kazemieh.domain.usecase.FixedExpensePostingStatus
+import com.kazemieh.designsystem.component.model.UiText
+import fintrack.core.designsystem.generated.resources.*
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class FixedExpenseListViewModel(
     private val analytics: com.kazemieh.common.analytics.AnalyticsService,
@@ -22,7 +26,7 @@ class FixedExpenseListViewModel(
     private val _state = MutableStateFlow(FixedExpenseListState())
     val state: StateFlow<FixedExpenseListState> = _state.asStateFlow()
 
-    private val _effect = Channel<FixedExpenseListEffect>()
+    private val _effect = Channel<FixedExpenseListEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
     private val _searchQuery = MutableStateFlow("")
@@ -36,6 +40,15 @@ class FixedExpenseListViewModel(
         analytics.track(com.kazemieh.common.analytics.ProductEvent.FixedExpenseListViewed)
         analytics.track(com.kazemieh.common.analytics.ProductEvent.FeatureOpened("fixed_expense_list"))
         observeExpenses()
+        viewModelScope.launch {
+            fixedExpenseUseCases.observeFixedExpensePostingStatusUseCase()
+                .catch { error ->
+                    if (error is CancellationException) throw error
+                    _state.update { it.copy(postingStatusFailed = true) }
+                }.collect { statuses ->
+                    _state.update { it.copy(postingStatuses = statuses, postingStatusFailed = false) }
+                }
+        }
     }
 
     fun onIntent(intent: FixedExpenseListIntent) {
@@ -54,6 +67,10 @@ class FixedExpenseListViewModel(
             }
             is FixedExpenseListIntent.ToggleActive -> toggleActive(intent.expenseId)
             is FixedExpenseListIntent.RegisterAsTransaction -> registerAsTransaction(intent.expense)
+            FixedExpenseListIntent.ConfirmRepeat -> _state.value.repeatConfirmation?.let { post(it) }
+            FixedExpenseListIntent.DismissRepeat -> {
+                if (_state.value.postingIds.isEmpty()) _state.update { it.copy(repeatConfirmation = null) }
+            }
             is FixedExpenseListIntent.OnDeleteClick -> _state.update {
                 it.copy(selectedExpense = intent.expense, isDeleteShow = intent.expense != null)
             }
@@ -181,11 +198,50 @@ class FixedExpenseListViewModel(
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     private fun registerAsTransaction(expense: FixedExpense) {
+        val current = _state.value
+        if (current.postingStatusFailed || current.postingIds.isNotEmpty() || current.repeatConfirmation != null) return
+        val status = current.postingStatuses[expense.id] ?: return
+        if (!status.canRegister || current.expenses.none { it.id == expense.id }) return
+        val command = FixedExpensePostingCommand(expense, status.periodDueDate,
+            if (status.hasPrimaryPosting) "fixed-repeat:${Uuid.random()}" else null)
+        if (status.hasPrimaryPosting) _state.update { it.copy(repeatConfirmation = command,
+            postingMessages = it.postingMessages - expense.id, postingFailures = it.postingFailures - expense.id) }
+        else post(command)
+    }
+
+    private fun post(command: FixedExpensePostingCommand) {
+        val id = command.expense.id
+        // Claim on the main-thread intent path, before launching: rapid taps cannot enqueue twice.
+        if (_state.value.postingIds.isNotEmpty()) return
+        _state.update { it.copy(postingIds = setOf(id), postingMessages = it.postingMessages - id,
+            postingFailures = it.postingFailures - id) }
         viewModelScope.launch {
-            fixedExpenseUseCases.postFixedExpenseAsTransactionUseCase(expense)
-            analytics.track(com.kazemieh.common.analytics.ProductEvent.FixedExpenseAutoLogged)
-            _effect.send(FixedExpenseListEffect.ShowMessage(Res.string.msg_fixed_expense_added_to_transactions))
+            try {
+                val result = fixedExpenseUseCases.postFixedExpenseAsTransactionUseCase(
+                    command.expense, command.periodDueDate, command.repeatOperationId)
+                val message = UiText.StringResourceText(if (result > 0L)
+                    Res.string.msg_fixed_expense_added_to_transactions else Res.string.fixed_expense_post_not_applied)
+                _state.update { it.copy(repeatConfirmation = null,
+                    postingMessages = it.postingMessages + (id to message),
+                    postingFailures = if (result > 0L) it.postingFailures - id else it.postingFailures + id) }
+                if (result > 0L) {
+                    runCatching { analytics.track(com.kazemieh.common.analytics.ProductEvent.FixedExpenseAutoLogged) }
+                }
+                _effect.trySend(FixedExpenseListEffect.ShowMessage(message))
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                // Keep the same confirmation nonce for retry after an uncertain response.
+                val message = UiText.StringResourceText(Res.string.fixed_expense_post_failed)
+                _state.update { it.copy(postingMessages = it.postingMessages +
+                    (id to message),
+                    postingFailures = it.postingFailures + id) }
+                _effect.trySend(FixedExpenseListEffect.ShowMessage(message))
+            } finally {
+                _state.update { it.copy(postingIds = it.postingIds - id) }
+            }
         }
     }
 
@@ -200,6 +256,12 @@ class FixedExpenseListViewModel(
 }
 
 data class FixedExpenseListState(
+    val postingStatuses: Map<Long, FixedExpensePostingStatus> = emptyMap(),
+    val postingStatusFailed: Boolean = false,
+    val postingIds: Set<Long> = emptySet(),
+    val postingMessages: Map<Long, UiText> = emptyMap(),
+    val postingFailures: Set<Long> = emptySet(),
+    val repeatConfirmation: FixedExpensePostingCommand? = null,
     // Full, unfiltered list (used by the dashboard widget).
     val expenses: List<FixedExpense> = emptyList(),
     val grouped: Map<RecurrenceType, List<FixedExpense>> = emptyMap(),
@@ -217,6 +279,8 @@ data class FixedExpenseListState(
 )
 
 sealed interface FixedExpenseListIntent {
+    data object ConfirmRepeat : FixedExpenseListIntent
+    data object DismissRepeat : FixedExpenseListIntent
     data class UpdateSearchQuery(val query: String) : FixedExpenseListIntent
     data class ChangeFilterType(val type: DateFilterType) : FixedExpenseListIntent
     data class ShiftRange(val direction: Direction) : FixedExpenseListIntent
@@ -237,5 +301,11 @@ sealed interface FixedExpenseListIntent {
 }
 
 sealed interface FixedExpenseListEffect {
-    data class ShowMessage(val messageRes: org.jetbrains.compose.resources.StringResource) : FixedExpenseListEffect
+    data class ShowMessage(val message: UiText) : FixedExpenseListEffect
 }
+
+data class FixedExpensePostingCommand(
+    val expense: FixedExpense,
+    val periodDueDate: Long,
+    val repeatOperationId: String?
+)

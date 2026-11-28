@@ -38,12 +38,15 @@ import com.kazemieh.designsystem.LocalGlassColors
 import com.kazemieh.designsystem.component.*
 import com.kazemieh.designsystem.component.bottomsheet.DeleteBottomSheet
 import com.kazemieh.designsystem.component.glass.*
+import com.kazemieh.designsystem.component.model.resolveString
+import com.kazemieh.fixed_expense.ui.component.FixedExpensePostingAction
+import com.kazemieh.fixed_expense.ui.component.FixedExpenseRepeatConfirmation
+import com.kazemieh.money.Currency
 import com.kazemieh.financialsource.ui.list.SourceFilterSelectionContent
 import com.kazemieh.fixed_expense.ui.detail.AddFixedExpenseBottomSheet
 import com.kazemieh.person.ui.list.PersonFilterSelectionContent
 import com.kazemieh.tag.ui.list.TagFilterSelectionContent
 import fintrack.core.designsystem.generated.resources.*
-import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -73,7 +76,7 @@ fun FixedExpenseListScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is FixedExpenseListEffect.ShowMessage -> {
-                    snackbarHostState.showSnackbar(getString(effect.messageRes))
+                    snackbarHostState.showSnackbar(effect.message.resolveString())
                 }
             }
         }
@@ -155,6 +158,7 @@ fun FixedExpenseListScreen(
                         items(expenses, key = { it.id }) { expense ->
                             FixedExpenseRow(
                                 expense = expense,
+                                postingState = state,
                                 onEdit = { selectedExpenseId = expense.id; showAddExpense = true },
                                 onDelete = {
                                     viewModel.onIntent(
@@ -196,6 +200,16 @@ fun FixedExpenseListScreen(
                     ?: state.selectedExpense?.description,
                 dismissClicked = { viewModel.onIntent(FixedExpenseListIntent.OnDeleteClick(null)) },
                 confirmClicked = { viewModel.onIntent(FixedExpenseListIntent.ConfirmDelete) }
+            )
+        }
+
+        state.repeatConfirmation?.let { command ->
+            FixedExpenseRepeatConfirmation(
+                command = command,
+                busy = command.expense.id in state.postingIds,
+                error = state.postingMessages[command.expense.id].takeIf { command.expense.id in state.postingFailures },
+                onDismiss = { viewModel.onIntent(FixedExpenseListIntent.DismissRepeat) },
+                onConfirm = { viewModel.onIntent(FixedExpenseListIntent.ConfirmRepeat) }
             )
         }
 
@@ -306,6 +320,7 @@ private fun SectionHeader(
 @Composable
 private fun FixedExpenseRow(
     expense: FixedExpense,
+    postingState: FixedExpenseListState,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onRegister: () -> Unit
@@ -316,118 +331,104 @@ private fun FixedExpenseRow(
         modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp),
         padding = 10.dp
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            FinTrackLeadingIcon(
-                colorId = null,
-                iconId = null,
-                style = LeadingIconStyle.Badge,
-                size = 38.dp,
-                iconSize = 16.dp,
-                corner = 12.dp
-            )
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(3.dp)
+        Column(Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                FintrackTitleSmallText(
-                    text = expense.title.takeIf { it.isNotBlank() }
-                        ?: expense.categoryName
-                        ?: expense.description?.takeIf { it.isNotBlank() }
-                        ?: stringResource(Res.string.label_unknown_person),
-                    fontWeight = FontWeight.SemiBold,
-                    color = glassColors.text,
-                    maxLines = 1
+                FinTrackLeadingIcon(
+                    colorId = null,
+                    iconId = null,
+                    style = LeadingIconStyle.Badge,
+                    size = 38.dp,
+                    iconSize = 16.dp,
+                    corner = 12.dp
                 )
-                FintrackBodySmallText(
-                    text = expense.amount.toPersianPrice() + " " + com.kazemieh.designsystem.LocalCurrency.current.symbol,
-                    color = color,
-                    maxLines = 1
-                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(3.dp)
+                ) {
+                    FintrackTitleSmallText(
+                        text = expense.title.takeIf { it.isNotBlank() }
+                            ?: expense.categoryName
+                            ?: expense.description?.takeIf { it.isNotBlank() }
+                            ?: stringResource(Res.string.label_unknown_person),
+                        fontWeight = FontWeight.SemiBold,
+                        color = glassColors.text,
+                        maxLines = Int.MAX_VALUE
+                    )
+                    MoneyText(amount = expense.amount, currency = Currency.valueOf(expense.currencyCode), color = color)
 
-                if (expense.tagNames.isNotEmpty() || expense.personNames.isNotEmpty()) {
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        expense.tagNames.forEach { name ->
-                            FintrackLabelSmallText(
-                                text = "#$name",
-                                color = GlassGreen,
-                                fontSize = 10.sp
-                            )
-                        }
-                        expense.personNames.forEach { name ->
-                            FintrackLabelSmallText(
-                                text = name,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = 10.sp
-                            )
+                    if (expense.tagNames.isNotEmpty() || expense.personNames.isNotEmpty()) {
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            expense.tagNames.forEach { name ->
+                                FintrackLabelSmallText(
+                                    text = "#$name",
+                                    color = GlassGreen,
+                                    fontSize = 10.sp
+                                )
+                            }
+                            expense.personNames.forEach { name ->
+                                FintrackLabelSmallText(
+                                    text = name,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontSize = 10.sp
+                                )
+                            }
                         }
                     }
-                }
 
-                val rangeText = expense.endDate?.let {
-                    stringResource(
-                        Res.string.label_date_range_span,
-                        DateUtils.formatDate(expense.startDate),
-                        DateUtils.formatDate(it)
+                    val rangeText = expense.endDate?.let {
+                        stringResource(
+                            Res.string.label_date_range_span,
+                            DateUtils.formatDate(expense.startDate),
+                            DateUtils.formatDate(it)
+                        )
+                    } ?: stringResource(
+                        Res.string.label_date_range_from,
+                        DateUtils.formatDate(expense.startDate)
                     )
-                } ?: stringResource(
-                    Res.string.label_date_range_from,
-                    DateUtils.formatDate(expense.startDate)
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarMonth,
+                            contentDescription = null,
+                            tint = glassColors.text3,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        FintrackLabelSmallText(
+                            text = rangeText,
+                            color = glassColors.text3,
+                            maxLines = 1
+                        )
+                    }
+                }
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.CalendarMonth,
-                        contentDescription = null,
-                        tint = glassColors.text3,
-                        modifier = Modifier.size(12.dp)
-                    )
-                    FintrackLabelSmallText(
-                        text = rangeText,
-                        color = glassColors.text3,
-                        maxLines = 1
-                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        RowActionIcon(icon = Icons.Default.Edit, tint = glassColors.text2, onClick = onEdit)
+                        RowActionIcon(icon = Icons.Default.Delete, tint = GlassRed, onClick = onDelete)
+                    }
                 }
             }
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    RowActionIcon(icon = Icons.Default.Edit, tint = glassColors.text2, onClick = onEdit)
-                    RowActionIcon(icon = Icons.Default.Delete, tint = GlassRed, onClick = onDelete)
-                }
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(GlassGreen.copy(alpha = 0.12f))
-                        .clickable(onClick = onRegister)
-                        .padding(horizontal = 8.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AddCircle,
-                        contentDescription = null,
-                        tint = GlassGreen,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    FintrackLabelSmallText(
-                        text = stringResource(Res.string.action_register_transaction),
-                        color = GlassGreen,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 10.sp
-                    )
-                }
-            }
+            FixedExpensePostingAction(
+                status = postingState.postingStatuses[expense.id],
+                busy = expense.id in postingState.postingIds,
+                enabled = postingState.postingIds.isEmpty(),
+                statusFailed = postingState.postingStatusFailed,
+                feedback = postingState.postingMessages[expense.id],
+                failed = expense.id in postingState.postingFailures,
+                onRegister = onRegister,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
     }
 }
